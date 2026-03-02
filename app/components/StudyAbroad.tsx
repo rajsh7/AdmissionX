@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
-import ChapterHeading from "./ChapterHeading";
+import { useRef, useState, useCallback } from "react";
 
 const countries = [
   {
@@ -39,22 +38,42 @@ const countries = [
     href: "/university/nus",
     stats: { acceptance: "12%", students: "42,000+" },
   },
+  {
+    name: "Oxford",
+    fullName: "University of Oxford",
+    rank: "#3 QS Ranking",
+    flag: "🇬🇧",
+    country: "United Kingdom",
+    tags: ["Medicine", "Law", "Philosophy"],
+    image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2670&auto=format&fit=crop",
+    href: "/university/oxford",
+    stats: { acceptance: "17%", students: "26,000+" },
+  },
+  {
+    name: "Stanford",
+    fullName: "Stanford University",
+    rank: "#5 QS Ranking",
+    flag: "🇺🇸",
+    country: "United States",
+    tags: ["AI", "Entrepreneurship", "Engineering"],
+    image: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?q=80&w=2670&auto=format&fit=crop",
+    href: "/university/stanford",
+    stats: { acceptance: "4%", students: "17,000+" },
+  },
+  {
+    name: "ETH Zurich",
+    fullName: "Swiss Federal Institute of Technology",
+    rank: "#7 QS Ranking",
+    flag: "🇨🇭",
+    country: "Switzerland",
+    tags: ["Science", "Engineering", "Architecture"],
+    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2670&auto=format&fit=crop",
+    href: "/university/eth-zurich",
+    stats: { acceptance: "27%", students: "23,000+" },
+  },
 ];
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 60 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.15,
-      duration: 0.8,
-      ease: [0.22, 1, 0.36, 1] as const,
-    },
-  }),
-};
-
-function ParallaxCard({ uni, index }: { uni: typeof countries[0]; index: number }) {
+function ParallaxCard({ uni }: { uni: (typeof countries)[0] }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -63,65 +82,54 @@ function ParallaxCard({ uni, index }: { uni: typeof countries[0]; index: number 
   const imageY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
 
   return (
-    <motion.div
-      ref={ref}
-      custom={index}
-      variants={cardVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
-    >
+    <div ref={ref} className="min-w-[320px] sm:min-w-[380px] lg:min-w-[420px] snap-center flex-shrink-0">
       <Link
         href={uni.href}
-        className="group relative block overflow-hidden rounded-3xl bg-slate-900 min-h-[440px]"
+        className="group relative block overflow-hidden rounded-3xl bg-neutral-900 h-[460px]"
       >
         {/* Parallax Image */}
-        <motion.div
-          className="absolute inset-[-10%] z-0"
-          style={{ y: imageY }}
-        >
-          <div
-            className="h-full w-full bg-cover bg-center group-hover:scale-105 transition-transform duration-1000"
-            style={{ backgroundImage: `url('${uni.image}')` }}
+        <motion.div className="absolute inset-[-10%] z-0" style={{ y: imageY }}>
+          <img
+            src={uni.image}
+            alt={uni.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
           />
         </motion.div>
 
-        {/* Overlay Gradient */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-500" />
+        {/* Overlay */}
+        <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-500" />
 
         {/* Content */}
-        <div className="relative z-20 p-8 h-full flex flex-col justify-between min-h-[440px]">
+        <div className="relative z-10 p-7 lg:p-8 h-full flex flex-col justify-between">
           {/* Top Row */}
           <div className="flex items-start justify-between">
-            <span className="glass px-3 py-1.5 rounded-full text-xs font-bold text-white">
+            <span className="bg-white/15 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full text-xs font-bold text-white">
               {uni.rank}
             </span>
-            <div className="glass rounded-full p-2 h-10 w-10 flex items-center justify-center">
+            <div className="bg-white/15 backdrop-blur-md border border-white/20 rounded-full p-2 h-10 w-10 flex items-center justify-center">
               <span className="text-xl">{uni.flag}</span>
             </div>
           </div>
 
           {/* Bottom Content */}
           <div>
-            <p className="text-sm text-slate-400 font-medium mb-1">{uni.country}</p>
-            <h3 className="text-3xl font-black text-white mb-2 group-hover:text-primary transition-colors">
+            <p className="text-sm text-white/50 font-medium mb-1">{uni.country}</p>
+            <h3 className="text-3xl font-black text-white mb-2 group-hover:text-red-400 transition-colors">
               {uni.name}
             </h3>
-            <p className="text-slate-300 text-sm mb-5">{uni.fullName}</p>
+            <p className="text-white/60 text-sm mb-5">{uni.fullName}</p>
 
-            {/* Stats */}
             <div className="flex gap-6 mb-5">
               <div>
                 <div className="text-lg font-bold text-white">{uni.stats.acceptance}</div>
-                <div className="text-xs text-slate-400">Acceptance</div>
+                <div className="text-xs text-white/40">Acceptance</div>
               </div>
               <div>
                 <div className="text-lg font-bold text-white">{uni.stats.students}</div>
-                <div className="text-xs text-slate-400">Students</div>
+                <div className="text-xs text-white/40">Students</div>
               </div>
             </div>
 
-            {/* Tags */}
             <div className="flex flex-wrap gap-2">
               {uni.tags.map((tag) => (
                 <span
@@ -135,30 +143,121 @@ function ParallaxCard({ uni, index }: { uni: typeof countries[0]; index: number 
           </div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }
 
 export default function StudyAbroad() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 10);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  }, []);
+
+  const scroll = (direction: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.querySelector<HTMLElement>(":scope > div")?.offsetWidth ?? 400;
+    el.scrollBy({
+      left: direction === "left" ? -(cardWidth + 24) : cardWidth + 24,
+      behavior: "smooth",
+    });
+    setTimeout(checkScroll, 400);
+  };
+
   return (
-    <section className="relative w-full py-24 lg:py-32 bg-white dark:bg-background-dark overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+    <section className="relative w-full py-20 lg:py-28 bg-white overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
+      <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-red-500/[0.03] rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="text-center">
-          <ChapterHeading
-            number="03"
-            label="Go Global"
-            title="The World Is Your Classroom"
-            subtitle="Break boundaries. Study at the most prestigious institutions across the globe and build an international career."
-            align="center"
-          />
+        {/* ─── Header Row ─── */}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-14 lg:mb-16">
+          {/* Chapter Heading */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] as const }}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <span className="chapter-number text-xs font-bold tracking-[0.25em] uppercase text-red-500">
+                03
+              </span>
+              <div className="h-px w-8 bg-red-500/30" />
+              <span className="text-xs font-semibold tracking-[0.15em] uppercase text-neutral-400">
+                Go Global
+              </span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-900 leading-[1.1]">
+              The World Is Your Classroom
+            </h2>
+            <p className="mt-4 text-lg text-neutral-500 font-light max-w-xl leading-relaxed">
+              Break boundaries. Study at the most prestigious institutions
+              across the globe and build an international career.
+            </p>
+          </motion.div>
+
+          {/* Arrow Controls */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="flex items-center gap-3 flex-shrink-0"
+          >
+            <button
+              onClick={() => scroll("left")}
+              disabled={!canScrollLeft}
+              className={`flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all duration-300 ${
+                canScrollLeft
+                  ? "border-neutral-300 text-neutral-700 hover:border-red-500 hover:text-red-500 hover:shadow-lg hover:shadow-red-500/10 cursor-pointer"
+                  : "border-neutral-200 text-neutral-300 cursor-not-allowed"
+              }`}
+              aria-label="Scroll left"
+            >
+              <span className="material-symbols-outlined">arrow_back</span>
+            </button>
+            <button
+              onClick={() => scroll("right")}
+              disabled={!canScrollRight}
+              className={`flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all duration-300 ${
+                canScrollRight
+                  ? "border-neutral-300 text-neutral-700 hover:border-red-500 hover:text-red-500 hover:shadow-lg hover:shadow-red-500/10 cursor-pointer"
+                  : "border-neutral-200 text-neutral-300 cursor-not-allowed"
+              }`}
+              aria-label="Scroll right"
+            >
+              <span className="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {countries.map((uni, i) => (
-            <ParallaxCard key={uni.name} uni={uni} index={i} />
-          ))}
+        {/* ─── Horizontal Scroll Cards ─── */}
+        <div className="relative -mx-4 sm:-mx-6 px-4 sm:px-6">
+          <div
+            ref={scrollRef}
+            onScroll={checkScroll}
+            className="flex gap-6 overflow-x-auto hide-scrollbar snap-x pb-4"
+          >
+            {countries.map((uni) => (
+              <ParallaxCard key={uni.name} uni={uni} />
+            ))}
+          </div>
+
+          {/* Left fade edge */}
+          {canScrollLeft && (
+            <div className="absolute left-0 top-0 bottom-4 w-16 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
+          )}
+          {/* Right fade edge */}
+          {canScrollRight && (
+            <div className="absolute right-0 top-0 bottom-4 w-16 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
+          )}
         </div>
       </div>
     </section>

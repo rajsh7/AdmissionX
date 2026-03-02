@@ -2,15 +2,20 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import ChapterHeading from "./ChapterHeading";
 
 interface Exam {
   abbr: string;
   name: string;
   fullName: string;
   date: string;
+  dateLabel: string;
   mode: string;
-  gradient: string;
+  modeIcon: string;
+  level: string;
+  color: string;
+  colorBg: string;
+  colorLight: string;
+  colorBorder: string;
   icon: string;
   href: string;
 }
@@ -20,9 +25,15 @@ const exams: Exam[] = [
     abbr: "SAT",
     name: "SAT 2026",
     fullName: "Scholastic Assessment Test",
-    date: "Oct 07, 2026",
+    date: "Oct 07",
+    dateLabel: "2026",
     mode: "Online / Offline",
-    gradient: "from-indigo-500 to-blue-600",
+    modeIcon: "devices",
+    level: "Undergraduate",
+    color: "text-blue-600",
+    colorBg: "bg-blue-600",
+    colorLight: "bg-blue-50",
+    colorBorder: "border-l-blue-500",
     icon: "edit_note",
     href: "/exams/sat",
   },
@@ -31,8 +42,14 @@ const exams: Exam[] = [
     name: "GRE General",
     fullName: "Graduate Record Examinations",
     date: "Year Round",
+    dateLabel: "Flexible",
     mode: "Computer Based",
-    gradient: "from-rose-500 to-pink-600",
+    modeIcon: "computer",
+    level: "Postgraduate",
+    color: "text-rose-600",
+    colorBg: "bg-rose-600",
+    colorLight: "bg-rose-50",
+    colorBorder: "border-l-rose-500",
     icon: "psychology",
     href: "/exams/gre",
   },
@@ -40,9 +57,15 @@ const exams: Exam[] = [
     abbr: "JEE",
     name: "JEE Main 2026",
     fullName: "Joint Entrance Examination",
-    date: "Jan 24, 2026",
+    date: "Jan 24",
+    dateLabel: "2026",
     mode: "Computer Based",
-    gradient: "from-orange-500 to-amber-600",
+    modeIcon: "computer",
+    level: "Undergraduate",
+    color: "text-orange-600",
+    colorBg: "bg-orange-600",
+    colorLight: "bg-orange-50",
+    colorBorder: "border-l-orange-500",
     icon: "calculate",
     href: "/exams/jee",
   },
@@ -51,8 +74,14 @@ const exams: Exam[] = [
     name: "GMAT Focus",
     fullName: "Graduate Management Admission Test",
     date: "Year Round",
+    dateLabel: "Flexible",
     mode: "Computer Based",
-    gradient: "from-purple-500 to-violet-600",
+    modeIcon: "computer",
+    level: "Postgraduate",
+    color: "text-purple-600",
+    colorBg: "bg-purple-600",
+    colorLight: "bg-purple-50",
+    colorBorder: "border-l-purple-500",
     icon: "analytics",
     href: "/exams/gmat",
   },
@@ -60,121 +89,190 @@ const exams: Exam[] = [
     abbr: "NEET",
     name: "NEET UG 2026",
     fullName: "National Eligibility cum Entrance Test",
-    date: "May 04, 2026",
+    date: "May 04",
+    dateLabel: "2026",
     mode: "Pen & Paper",
-    gradient: "from-teal-500 to-emerald-600",
+    modeIcon: "draw",
+    level: "Undergraduate",
+    color: "text-teal-600",
+    colorBg: "bg-teal-600",
+    colorLight: "bg-teal-50",
+    colorBorder: "border-l-teal-500",
     icon: "biotech",
     href: "/exams/neet",
   },
+  {
+    abbr: "CAT",
+    name: "CAT 2026",
+    fullName: "Common Admission Test",
+    date: "Nov 24",
+    dateLabel: "2026",
+    mode: "Computer Based",
+    modeIcon: "computer",
+    level: "Postgraduate",
+    color: "text-amber-600",
+    colorBg: "bg-amber-600",
+    colorLight: "bg-amber-50",
+    colorBorder: "border-l-amber-500",
+    icon: "trending_up",
+    href: "/exams/cat",
+  },
 ];
 
-const timelineVariants = {
+const containerVariants = {
   hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.12 },
-  },
+  visible: { transition: { staggerChildren: 0.08 } },
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, x: -40 },
+const cardVariants = {
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
-    x: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
+    y: 0,
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
   },
 };
 
 export default function EntranceExams() {
   return (
-    <section className="relative w-full py-24 lg:py-32 bg-white dark:bg-background-dark overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+    <section className="relative w-full py-20 lg:py-28 bg-white overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
+      <div className="absolute -bottom-32 right-0 w-[400px] h-[400px] bg-red-500/[0.03] rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
-        <ChapterHeading
-          number="05"
-          label="Prepare"
-          title="Your Gateway Awaits"
-          subtitle="Every champion prepares. Get ready for the entrance exams that unlock doors to your dream institutions."
-        />
-
-        {/* Timeline Layout */}
+        {/* ─── Chapter Heading ─── */}
         <motion.div
-          variants={timelineVariants}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] as const }}
+          className="mb-14 lg:mb-16"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <span className="chapter-number text-xs font-bold tracking-[0.25em] uppercase text-red-500">
+              05
+            </span>
+            <div className="h-px w-8 bg-red-500/30" />
+            <span className="text-xs font-semibold tracking-[0.15em] uppercase text-neutral-400">
+              Prepare
+            </span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-900 leading-[1.1]">
+            Your Gateway Awaits
+          </h2>
+          <p className="mt-4 text-lg text-neutral-500 font-light max-w-xl leading-relaxed">
+            Every champion prepares. Master the exams that unlock doors to
+            your dream institutions.
+          </p>
+        </motion.div>
+
+        {/* ─── Exam Cards Grid ─── */}
+        <motion.div
+          variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="relative max-w-3xl"
+          viewport={{ once: true, margin: "-80px" }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
         >
-          {/* Timeline Line */}
-          <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary via-accent-violet to-accent-cyan hidden md:block" />
-
-          {exams.map((exam, i) => (
-            <motion.div
-              key={exam.abbr}
-              variants={itemVariants}
-              className="relative mb-6 last:mb-0"
-            >
-              {/* Timeline Dot */}
-              <div className={`absolute left-[14px] top-8 w-[22px] h-[22px] rounded-full bg-gradient-to-br ${exam.gradient} border-[3px] border-white dark:border-background-dark z-10 hidden md:block`} />
-
-              {/* Card */}
+          {exams.map((exam) => (
+            <motion.div key={exam.abbr} variants={cardVariants}>
               <Link
                 href={exam.href}
-                className="group block md:ml-16 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 p-6 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500"
+                className={`group relative flex flex-col bg-white rounded-2xl border border-neutral-100 ${exam.colorBorder} border-l-4 hover:shadow-xl hover:shadow-neutral-900/5 transition-all duration-500 overflow-hidden h-[260px]`}
               >
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  {/* Icon */}
-                  <div className={`h-14 w-14 flex-shrink-0 rounded-2xl bg-gradient-to-br ${exam.gradient} flex items-center justify-center shadow-lg`}>
-                    <span className="material-symbols-outlined text-2xl text-white">
-                      {exam.icon}
+                {/* Watermark Abbreviation */}
+                <span
+                  className="absolute -right-3 -top-2 text-[120px] font-black leading-none text-neutral-900/[0.03] select-none pointer-events-none"
+                  aria-hidden="true"
+                >
+                  {exam.abbr}
+                </span>
+
+                {/* ── Card Content ── */}
+                <div className="relative z-10 flex flex-col h-full p-6">
+                  {/* Row 1: Icon + Level + Mode */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`h-11 w-11 rounded-xl ${exam.colorLight} ${exam.color} flex items-center justify-center flex-shrink-0`}>
+                        <span className="material-symbols-outlined text-xl">
+                          {exam.icon}
+                        </span>
+                      </div>
+                      <div>
+                        <span className={`text-[11px] font-bold uppercase tracking-wider ${exam.color}`}>
+                          {exam.abbr}
+                        </span>
+                        <p className="text-[11px] text-neutral-400 font-medium">
+                          {exam.level}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="flex items-center gap-1 text-[11px] font-medium text-neutral-400 bg-neutral-50 px-2.5 py-1 rounded-full">
+                      <span className="material-symbols-outlined text-[14px]">
+                        {exam.modeIcon}
+                      </span>
+                      {exam.mode}
                     </span>
                   </div>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
-                        {exam.name}
-                      </h3>
-                      <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-primary/10 text-primary">
-                        {exam.abbr}
+                  {/* Row 2: Name + Full Name */}
+                  <h3 className="text-lg font-bold text-neutral-900 leading-snug group-hover:text-red-600 transition-colors">
+                    {exam.name}
+                  </h3>
+                  <p className="text-sm text-neutral-400 mt-0.5">
+                    {exam.fullName}
+                  </p>
+
+                  {/* Spacer */}
+                  <div className="flex-1" />
+
+                  {/* Row 3: Date + Apply CTA */}
+                  <div className="flex items-center justify-between pt-4 border-t border-neutral-100">
+                    <div className="flex items-center gap-2">
+                      <div className={`h-10 w-10 rounded-lg ${exam.colorLight} flex items-center justify-center flex-shrink-0`}>
+                        <span className={`material-symbols-outlined text-lg ${exam.color}`}>
+                          calendar_month
+                        </span>
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-neutral-900">
+                          {exam.date}
+                        </div>
+                        <div className="text-[11px] text-neutral-400">
+                          {exam.dateLabel}
+                        </div>
+                      </div>
+                    </div>
+
+                    <span className={`inline-flex items-center gap-1.5 text-sm font-bold ${exam.color} group-hover:gap-2.5 transition-all`}>
+                      Apply Now
+                      <span className="material-symbols-outlined text-base">
+                        arrow_forward
                       </span>
-                    </div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">{exam.fullName}</p>
+                    </span>
                   </div>
-
-                  {/* Meta */}
-                  <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1 flex-shrink-0">
-                    <div className="flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-300">
-                      <span className="material-symbols-outlined text-base text-primary">calendar_month</span>
-                      <span className="font-semibold">{exam.date}</span>
-                    </div>
-                    <span className="text-xs text-slate-400 font-medium">{exam.mode}</span>
-                  </div>
-
-                  {/* Arrow */}
-                  <span className="hidden sm:flex items-center justify-center h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-primary group-hover:text-white transition-all duration-300 flex-shrink-0">
-                    <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                  </span>
                 </div>
               </Link>
             </motion.div>
           ))}
         </motion.div>
 
+        {/* ─── View All ─── */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
-          className="mt-10 md:ml-16"
+          transition={{ delay: 0.4 }}
+          className="mt-12 text-center"
         >
           <Link
             href="/exams"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-dark transition-colors"
+            className="group inline-flex items-center gap-3 bg-neutral-900 text-white font-bold text-sm px-7 py-4 rounded-2xl hover:bg-red-600 transition-all duration-300 shadow-lg hover:shadow-red-600/25"
           >
             View All Exams
-            <span className="material-symbols-outlined text-base">arrow_forward</span>
+            <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">
+              arrow_forward
+            </span>
           </Link>
         </motion.div>
       </div>

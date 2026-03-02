@@ -129,13 +129,9 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps) {
       />
 
       <motion.header
-        style={{
-          backgroundColor: headerBg,
-          borderBottomColor: headerBorder,
-        }}
-        className="fixed top-0 left-0 right-0 z-50 border-b backdrop-blur-xl transition-colors"
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl bg-neutral-900/80 backdrop-blur-xl border border-white/10 rounded-full shadow-lg shadow-black/20 transition-colors"
       >
-        <div className="mx-auto max-w-7xl flex items-center justify-between px-4 sm:px-6 py-4">
+        <div className="flex items-center justify-between px-5 sm:px-8 py-3">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white overflow-hidden">
@@ -143,7 +139,7 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps) {
               <div className="absolute inset-0 bg-gradient-to-tr from-primary to-accent-violet opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             <span className="text-xl font-bold tracking-tight text-white">
-              Admission<span className="text-primary">x</span>
+              Admission<span className="text-primary">X</span>
             </span>
           </Link>
 
@@ -170,7 +166,7 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps) {
               onMouseEnter={openLogin}
               onMouseLeave={closeLogin}
             >
-              <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-300 hover:text-white transition-colors rounded-lg hover:bg-white/5">
+              <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-300 hover:text-white transition-colors rounded-full hover:bg-white/5">
                 Login
                 <span className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${loginOpen ? "rotate-180" : ""}`}>
                   expand_more
@@ -186,7 +182,7 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps) {
               onMouseEnter={openSignup}
               onMouseLeave={closeSignup}
             >
-              <button className="flex items-center gap-1.5 px-5 py-2.5 text-sm font-bold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all duration-200 hover:shadow-lg hover:shadow-red-600/25">
+              <button className="flex items-center gap-1.5 px-5 py-2.5 text-sm font-bold text-white bg-red-600 rounded-full hover:bg-red-700 transition-all duration-200 hover:shadow-lg hover:shadow-red-600/25">
                 Signup
                 <span className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${signupOpen ? "rotate-180" : ""}`}>
                   expand_more
@@ -199,7 +195,7 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps) {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden h-10 w-10 flex items-center justify-center rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-all"
+            className="lg:hidden h-10 w-10 flex items-center justify-center rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all"
           >
             <span className="material-symbols-outlined">
               {mobileMenuOpen ? "close" : "menu"}
@@ -216,7 +212,7 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-[72px] z-40 glass-dark border-b border-white/5 lg:hidden"
+            className="fixed inset-x-0 top-[80px] z-40 mx-auto w-[95%] max-w-6xl left-1/2 -translate-x-1/2 bg-neutral-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg shadow-black/20 lg:hidden"
           >
             <div className="px-6 py-6 space-y-1">
               {navLinks.map((item, i) => (
