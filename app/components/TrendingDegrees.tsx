@@ -1,142 +1,196 @@
 "use client";
 
 import Link from "next/link";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
+import ChapterHeading from "./ChapterHeading";
+import AnimatedCounter from "./AnimatedCounter";
 
 interface Degree {
   title: string;
   duration: string;
   icon: string;
-  iconBg: string;
-  iconColor: string;
+  gradient: string;
   badge: string;
-  badgeBg: string;
-  salary: string;
-  barWidth: string;
-  barColor: string;
+  salary: number;
+  salaryDisplay: string;
+  placement: number;
+  recruiters: string[];
   href: string;
 }
 
 const degrees: Degree[] = [
   {
     title: "B.Tech Computer Science",
-    duration: "4 Years • Full Time",
+    duration: "4 Years  •  Full Time",
     icon: "code",
-    iconBg: "bg-blue-100 dark:bg-blue-900/40",
-    iconColor: "text-blue-600 dark:text-blue-400",
+    gradient: "from-blue-500 to-indigo-600",
     badge: "High Demand",
-    badgeBg: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-    salary: "$85,000 / yr",
-    barWidth: "85%",
-    barColor: "bg-primary",
+    salary: 85000,
+    salaryDisplay: "$85,000",
+    placement: 85,
+    recruiters: ["Google", "Amazon", "Microsoft", "Meta"],
     href: "/courses/btech-cs",
   },
   {
     title: "MBA Finance",
-    duration: "2 Years • Post Grad",
+    duration: "2 Years  •  Post Grad",
     icon: "bar_chart",
-    iconBg: "bg-orange-100 dark:bg-orange-900/40",
-    iconColor: "text-orange-600 dark:text-orange-400",
+    gradient: "from-orange-500 to-red-600",
     badge: "Popular",
-    badgeBg: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-    salary: "$92,000 / yr",
-    barWidth: "90%",
-    barColor: "bg-orange-500",
+    salary: 92000,
+    salaryDisplay: "$92,000",
+    placement: 90,
+    recruiters: ["Goldman Sachs", "McKinsey", "JP Morgan", "Deloitte"],
     href: "/courses/mba-finance",
   },
   {
     title: "MBBS Medicine",
-    duration: "5.5 Years • Full Time",
+    duration: "5.5 Years  •  Full Time",
     icon: "medical_services",
-    iconBg: "bg-teal-100 dark:bg-teal-900/40",
-    iconColor: "text-teal-600 dark:text-teal-400",
-    badge: "Steady",
-    badgeBg: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-    salary: "$110,000 / yr",
-    barWidth: "95%",
-    barColor: "bg-teal-500",
+    gradient: "from-teal-500 to-emerald-600",
+    badge: "Evergreen",
+    salary: 110000,
+    salaryDisplay: "$110,000",
+    placement: 95,
+    recruiters: ["Apollo", "AIIMS", "Mayo Clinic", "Johns Hopkins"],
     href: "/courses/mbbs",
   },
 ];
 
-const recruiters = [
-  "Google", "Amazon", "Microsoft",
-];
+function ProgressBar({ width, color }: { width: number; color: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+
+  return (
+    <div ref={ref} className="w-full bg-slate-100 dark:bg-slate-700/50 h-2 rounded-full overflow-hidden">
+      <motion.div
+        initial={{ width: 0 }}
+        animate={inView ? { width: `${width}%` } : { width: 0 }}
+        transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] as const, delay: 0.3 }}
+        className={`h-full rounded-full bg-gradient-to-r ${color}`}
+      />
+    </div>
+  );
+}
+
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.15 } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 50, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
 
 export default function TrendingDegrees() {
   return (
-    <section className="bg-slate-50 dark:bg-slate-800/50 py-16">
-      <div className="w-full px-4">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-              Trending Degrees
-            </h2>
-            <p className="mt-2 text-slate-500 dark:text-slate-400">
-              Discover degrees with high placement records.
-            </p>
-          </div>
+    <section className="relative w-full py-24 lg:py-32 bg-background-dark overflow-hidden">
+      {/* Background accents */}
+      <div className="orb orb-violet w-[400px] h-[400px] top-20 -right-40 opacity-30" />
+      <div className="orb orb-cyan w-[300px] h-[300px] -bottom-20 left-0 opacity-20" />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
+        <ChapterHeading
+          number="04"
+          label="Choose Your Path"
+          title="Invest In Your Future"
+          subtitle="Data-driven insights to help you make the most important decision of your career. Explore degrees with stellar placement records."
+          light
+        />
+
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {degrees.map((deg) => (
+            <motion.div key={deg.title} variants={cardVariants}>
+              <Link
+                href={deg.href}
+                className="group block glass rounded-2xl p-6 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500"
+              >
+                {/* Header */}
+                <div className="flex justify-between items-start mb-5">
+                  <div className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${deg.gradient} flex items-center justify-center shadow-lg`}>
+                    <span className="material-symbols-outlined text-2xl text-white">
+                      {deg.icon}
+                    </span>
+                  </div>
+                  <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-white/10 text-white">
+                    {deg.badge}
+                  </span>
+                </div>
+
+                {/* Title */}
+                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-primary transition-colors">
+                  {deg.title}
+                </h3>
+                <p className="text-sm text-slate-400 mb-6">{deg.duration}</p>
+
+                {/* Salary & Placement */}
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-slate-400">Avg. Salary</span>
+                      <span className="font-bold text-white">
+                        <AnimatedCounter target={deg.salary} prefix="$" suffix="/yr" duration={2} className="tabular-nums" />
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-slate-400">Placement Rate</span>
+                      <span className="font-bold text-white">{deg.placement}%</span>
+                    </div>
+                    <ProgressBar width={deg.placement} color={deg.gradient} />
+                  </div>
+                </div>
+
+                {/* Recruiters */}
+                <div className="pt-5 border-t border-white/10">
+                  <p className="text-xs text-slate-500 uppercase font-semibold tracking-wider mb-3">
+                    Top Recruiters
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {deg.recruiters.map((r) => (
+                      <span
+                        key={r}
+                        className="px-3 py-1.5 bg-white/5 rounded-lg text-xs font-medium text-slate-300"
+                      >
+                        {r}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.5 }}
+          className="mt-10 text-center"
+        >
           <Link
             href="/courses"
-            className="text-sm font-semibold text-primary hover:text-primary-dark transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-white transition-colors"
           >
-            View All →
+            View All Degrees
+            <span className="material-symbols-outlined text-base">arrow_forward</span>
           </Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {degrees.map((deg) => (
-            <Link
-              key={deg.title}
-              href={deg.href}
-              className="block bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary/50 transition-colors hover:shadow-md"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div
-                  className={`h-12 w-12 rounded-lg ${deg.iconBg} ${deg.iconColor} flex items-center justify-center`}
-                >
-                  <span className="material-symbols-outlined text-2xl">
-                    {deg.icon}
-                  </span>
-                </div>
-                <span className={`text-xs font-bold px-2 py-1 rounded ${deg.badgeBg}`}>
-                  {deg.badge}
-                </span>
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">
-                {deg.title}
-              </h3>
-              <p className="text-sm text-slate-500 mb-4">{deg.duration}</p>
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">Avg. Salary</span>
-                  <span className="font-bold text-slate-900 dark:text-white">
-                    {deg.salary}
-                  </span>
-                </div>
-                <div className="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                  <div
-                    className={`${deg.barColor} h-full rounded-full transition-all duration-1000`}
-                    style={{ width: deg.barWidth }}
-                  />
-                </div>
-              </div>
-              <div className="pt-4 border-t border-slate-100 dark:border-slate-700">
-                <p className="text-xs text-slate-400 uppercase font-semibold mb-2">
-                  Top Recruiters
-                </p>
-                <div className="flex gap-2">
-                  {recruiters.map((r) => (
-                    <div
-                      key={r}
-                      className="h-6 px-3 flex items-center bg-slate-200 dark:bg-slate-700 rounded text-xs font-medium text-slate-600 dark:text-slate-300"
-                    >
-                      {r}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

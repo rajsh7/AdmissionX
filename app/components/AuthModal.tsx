@@ -32,7 +32,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProp
     >
       <div className="relative w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
         {/* Header */}
-        <div className="bg-primary px-8 pt-8 pb-10 text-white">
+        <div className="bg-red-600 px-8 pt-8 pb-10 text-white">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 h-8 w-8 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"

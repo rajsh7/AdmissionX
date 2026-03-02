@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
+import ChapterHeading from "./ChapterHeading";
 
 interface Article {
   image: string;
   category: string;
-  categoryStyle: string;
+  categoryColor: string;
   time: string;
   title: string;
   excerpt: string;
@@ -14,21 +16,19 @@ interface Article {
 
 const articles: Article[] = [
   {
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCZHsLzuLeArcrDG-GlT6u4Av2kG-MZs4IVdOj7uGbRaX4sXmdRe97xgVriH6QLXTkqYJVEvgRyG26vtJG5fMyHSO25tIBrO6lsJ2y3xtS2BtfrRLMQAn5JSlo3EnADNe6z7e2R2TCpQz5ydakCrilvovFFqneZcnX985Yb7ZN8y_O0ely9mKUMceBJFGJS9N8IWlrvkaLahsKB9eAr1_8vqcQVz35OXA9rYjszVDGBnWqqLD4fhaxRoh2ly4RPAfy1CuXruXz0SaA",
+    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2670&auto=format&fit=crop",
     category: "Admissions",
-    categoryStyle: "text-primary bg-primary/10",
+    categoryColor: "bg-primary/10 text-primary",
     time: "2 hours ago",
-    title: "Fall 2024 Admission Deadlines Announced for Ivy League",
+    title: "Fall 2026 Admission Deadlines Announced for Ivy League",
     excerpt:
       "Most Ivy League universities have released their application deadlines for the upcoming fall semester. Early decision applications are due by November 1st.",
     href: "/news/ivy-league-deadlines",
   },
   {
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCPaz_8mWMCn9KVP3KHlPdsq08U2YWPEKt1oMxiHoz11cAcNozCmOa2S31IIYJ3a-jo2h3HJ6fA0Em6ebmLsoahY5oVzdcH7vGPhjceoKihl-LROcZj4EpSHGmJXnqBQbXHUJGOt5VlqAncLsJZM5wawuWrRh3x8BsO_AT5HrUOuJlo2KpqZO829sp5BZ_PwbfwW00qA2_zjyo96Im1DZdleFF929eQjdbsYSn1SPlRA0bEP90wc0eEVVd5HsZoZx-QyFdmpFf_RJw",
+    image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2670&auto=format&fit=crop",
     category: "Exam Alert",
-    categoryStyle: "text-orange-600 bg-orange-100",
+    categoryColor: "bg-orange-500/10 text-orange-500",
     time: "1 day ago",
     title: "GMAT Focus Edition: Everything You Need to Know",
     excerpt:
@@ -36,70 +36,99 @@ const articles: Article[] = [
     href: "/news/gmat-focus",
   },
   {
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCNs9ccBRMtocrV0p4FzHZ5q34nDRqbQFvO4X4HKcE3IY2_TFLF98w7qLIPxoSFoPTcioM1yVpLQs9ObGkDKain815vPXu_HOAHXDrutmwAoTfylCNqqglTAfZYoL0TsESugmBehvNA35bfPkfBbnBUpRflwwZAA63CGuySAm3Ppi3j4OPjABlI-l7MvFXl4--21KiTZ9dA_NsduwFx7CqlhnjYe4_-cpnJ1USGc6TvQyGxC9icuYXSkAqI5nIp2J93qqcfbncHlcY",
-    category: "Blog",
-    categoryStyle: "text-teal-600 bg-teal-100",
+    image: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=2649&auto=format&fit=crop",
+    category: "Scholarships",
+    categoryColor: "bg-teal-500/10 text-teal-500",
     time: "3 days ago",
-    title: "Top 10 Scholarships for International Students in 2024",
+    title: "Top 10 Scholarships for International Students in 2026",
     excerpt:
       "Funding your education abroad can be challenging. We've compiled a list of the most generous scholarship programs available globally.",
-    href: "/blogs/scholarships-2024",
+    href: "/blogs/scholarships-2026",
   },
 ];
 
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.15 } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
 export default function NewsSection() {
   return (
-    <section className="bg-slate-50 dark:bg-slate-800/50 py-16">
-      <div className="w-full px-4">
-        <div className="mb-10 text-center">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-            Latest Updates &amp; News
-          </h2>
-          <p className="mt-2 text-slate-500 dark:text-slate-400">
-            Stay informed about admission deadlines and education news.
-          </p>
+    <section className="relative w-full py-24 lg:py-32 bg-background-dark overflow-hidden">
+      <div className="orb orb-blue w-[300px] h-[300px] top-10 -right-20 opacity-20" />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="text-center">
+          <ChapterHeading
+            number="06"
+            label="Stay Sharp"
+            title="Knowledge Is Power"
+            subtitle="Stay ahead with the latest admission updates, exam alerts, and education insights that matter."
+            align="center"
+            light
+          />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {articles.map((article) => (
-            <article
+
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8"
+        >
+          {articles.map((article, i) => (
+            <motion.article
               key={article.title}
-              className="flex flex-col bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-shadow"
+              variants={cardVariants}
+              className={i === 0 ? "md:row-span-1" : ""}
             >
-              <div
-                className="h-48 w-full bg-slate-200 bg-cover bg-center"
-                style={{ backgroundImage: `url('${article.image}')` }}
-              />
-              <div className="p-6 flex flex-col flex-1">
-                <div className="flex items-center gap-2 mb-3">
-                  <span
-                    className={`text-xs font-bold px-2 py-0.5 rounded ${article.categoryStyle}`}
-                  >
-                    {article.category}
-                  </span>
-                  <span className="text-xs text-slate-400">
-                    • {article.time}
+              <Link href={article.href} className="group flex flex-col glass rounded-2xl overflow-hidden h-full hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500">
+                {/* Image */}
+                <div className="relative h-52 overflow-hidden">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700"
+                    style={{ backgroundImage: `url('${article.image}')` }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+
+                  {/* Category Badge */}
+                  <div className="absolute top-4 left-4">
+                    <span className={`text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm ${article.categoryColor}`}>
+                      {article.category}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 flex flex-col flex-1">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="material-symbols-outlined text-slate-500 text-[14px]">schedule</span>
+                    <span className="text-xs text-slate-500">{article.time}</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+                    {article.title}
+                  </h3>
+                  <p className="text-sm text-slate-400 mb-5 line-clamp-3 flex-1">
+                    {article.excerpt}
+                  </p>
+                  <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary group-hover:gap-2 transition-all">
+                    Read more
+                    <span className="material-symbols-outlined text-base">arrow_forward</span>
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 line-clamp-2">
-                  {article.title}
-                </h3>
-                <p className="text-sm text-slate-500 mb-4 line-clamp-3 flex-1">
-                  {article.excerpt}
-                </p>
-                <Link
-                  href={article.href}
-                  className="inline-flex items-center text-sm font-semibold text-primary hover:text-primary-dark"
-                >
-                  Read more{" "}
-                  <span className="material-symbols-outlined text-base ml-1">
-                    arrow_forward
-                  </span>
-                </Link>
-              </div>
-            </article>
+              </Link>
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

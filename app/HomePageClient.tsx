@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import TopBar from "./components/TopBar";
 import Header from "./components/Header";
 import HeroSection from "./components/HeroSection";
 import FieldsOfStudy from "./components/FieldsOfStudy";
@@ -10,6 +9,7 @@ import StudyAbroad from "./components/StudyAbroad";
 import TrendingDegrees from "./components/TrendingDegrees";
 import EntranceExams from "./components/EntranceExams";
 import NewsSection from "./components/NewsSection";
+import CallToAction from "./components/CallToAction";
 import Footer from "./components/Footer";
 import AuthModal from "./components/AuthModal";
 
@@ -23,7 +23,6 @@ export default function HomePageClient({ universities }: HomePageClientProps) {
   const [isDark, setIsDark] = useState(false);
   const [authModal, setAuthModal] = useState<"login" | "register" | null>(null);
 
-  // Persist dark mode preference in localStorage
   useEffect(() => {
     const stored = localStorage.getItem("admissionx-dark");
     if (stored === "true") {
@@ -38,11 +37,7 @@ export default function HomePageClient({ universities }: HomePageClientProps) {
   const switchMode = (mode: "login" | "register") => setAuthModal(mode);
 
   return (
-    <div
-      className={`flex min-h-screen flex-col bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 ${
-        isDark ? "dark" : ""
-      }`}
-    >
+    <div className={`min-h-screen bg-background-dark text-white ${isDark ? "dark" : ""}`}>
       {/* Auth Modal */}
       {authModal && (
         <AuthModal
@@ -52,24 +47,34 @@ export default function HomePageClient({ universities }: HomePageClientProps) {
         />
       )}
 
-      {/* Top Navigation Bar */}
-      <TopBar onLoginClick={openLogin} onSignUpClick={openRegister} />
+      {/* Floating Header */}
+      <Header onLoginClick={openLogin} onRegisterClick={openRegister} />
 
-      {/* Sticky Header */}
-      <Header
-        onLoginClick={openLogin}
-        onRegisterClick={openRegister}
-      />
-
-      {/* Page Content */}
-      <main className="flex-1">
+      {/* Story Flow */}
+      <main>
+        {/* Prologue: The Dream */}
         <HeroSection />
+
+        {/* Chapter 1: Explore Your Passion */}
         <FieldsOfStudy />
+
+        {/* Chapter 2: Discover Universities */}
         <TopUniversities universities={universities} />
+
+        {/* Chapter 3: Go Global */}
         <StudyAbroad />
+
+        {/* Chapter 4: Choose Your Path */}
         <TrendingDegrees />
+
+        {/* Chapter 5: Prepare for Exams */}
         <EntranceExams />
+
+        {/* Chapter 6: Stay Informed */}
         <NewsSection />
+
+        {/* Epilogue: Your Story Starts Now */}
+        <CallToAction />
       </main>
 
       {/* Footer */}
