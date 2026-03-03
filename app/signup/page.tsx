@@ -1,3 +1,5 @@
+"use client";
+
 import Header from "../components/Header";
 import { AuthBackgroundSlider } from "../components/AuthBackgroundSlider";
 
