@@ -77,12 +77,11 @@ export default function Footer() {
             {/* Brand */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 mb-12">
               <Link href="/" className="flex items-center gap-3 group">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500 text-white">
-                  <span className="material-symbols-outlined text-xl">school</span>
-                </div>
-                <span className="text-xl font-bold text-white">
-                  Admission<span className="text-red-500">X</span>
-                </span>
+                <img
+                  src="/admissionx-logo.png"
+                  alt="AdmissionX logo"
+                  className="h-8 w-auto object-contain"
+                />
               </Link>
 
               <p className="text-sm text-neutral-400 max-w-md leading-relaxed">

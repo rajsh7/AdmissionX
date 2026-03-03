@@ -10,7 +10,6 @@ import TrendingDegrees from "./components/TrendingDegrees";
 import EntranceExams from "./components/EntranceExams";
 import NewsSection from "./components/NewsSection";
 import CallToAction from "./components/CallToAction";
-import Footer from "./components/Footer";
 import AuthModal from "./components/AuthModal";
 
 import { University } from "./components/TopUniversities";
@@ -77,8 +76,6 @@ export default function HomePageClient({ universities }: HomePageClientProps) {
         <CallToAction />
       </main>
 
-      {/* Footer */}
-      <Footer />
     </div>
   );
 }

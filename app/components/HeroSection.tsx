@@ -15,13 +15,78 @@ const heroImages = [
   "https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?q=80&w=2574&auto=format&fit=crop",
 ];
 
+interface FilterOption {
+  id: number;
+  name: string;
+}
+
+interface FilterData {
+  countries: FilterOption[];
+  states: FilterOption[];
+  cities: FilterOption[];
+  degrees: FilterOption[];
+  courses: FilterOption[];
+}
+
+const FALLBACK_FILTERS: FilterData = {
+  countries: [
+    { id: 1, name: "India" },
+    { id: 2, name: "United States" },
+    { id: 3, name: "United Kingdom" },
+    { id: 4, name: "Canada" },
+    { id: 5, name: "Australia" },
+  ],
+  states: [
+    { id: 1, name: "Maharashtra" },
+    { id: 2, name: "Delhi" },
+    { id: 3, name: "Karnataka" },
+    { id: 4, name: "Tamil Nadu" },
+    { id: 5, name: "Uttar Pradesh" },
+    { id: 6, name: "West Bengal" },
+    { id: 7, name: "Rajasthan" },
+  ],
+  cities: [
+    { id: 1, name: "Mumbai" },
+    { id: 2, name: "Delhi" },
+    { id: 3, name: "Bangalore" },
+    { id: 4, name: "Chennai" },
+    { id: 5, name: "Hyderabad" },
+    { id: 6, name: "Pune" },
+    { id: 7, name: "Kolkata" },
+  ],
+  degrees: [
+    { id: 1, name: "Bachelor" },
+    { id: 2, name: "Master" },
+    { id: 3, name: "PhD" },
+    { id: 4, name: "Diploma" },
+    { id: 5, name: "Certificate" },
+  ],
+  courses: [
+    { id: 1, name: "Computer Science" },
+    { id: 2, name: "Business Administration" },
+    { id: 3, name: "Medicine" },
+    { id: 4, name: "Engineering" },
+    { id: 5, name: "Law" },
+    { id: 6, name: "Arts" },
+    { id: 7, name: "Commerce" },
+  ],
+};
+
 export default function HeroSection() {
   const router = useRouter();
   const [currentWord, setCurrentWord] = useState(0);
   const [currentImage, setCurrentImage] = useState(0);
-  const [location, setLocation] = useState("");
+  const [country, setCountry] = useState("");
+  const [state, setState] = useState("");
+  const [city, setCity] = useState("");
   const [degree, setDegree] = useState("");
   const [course, setCourse] = useState("");
+  const [filters, setFilters] = useState<FilterData>(FALLBACK_FILTERS);
+  const [filtersLoading, setFiltersLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<{ name: string; location: string; slug: string }[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const nextImage = useCallback(() => {
     setCurrentImage((prev) => (prev + 1) % heroImages.length);
@@ -39,9 +104,42 @@ export default function HeroSection() {
     return () => clearInterval(imageInterval);
   }, [nextImage]);
 
+  // Load filter options from DB via API
+  useEffect(() => {
+    fetch("/api/filters")
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.data) setFilters(json.data);
+      })
+      .catch(() => {
+        setFilters(FALLBACK_FILTERS);
+      })
+      .finally(() => setFiltersLoading(false));
+  }, []);
+
+  // Debounced autocomplete fetch
+  useEffect(() => {
+    if (searchQuery.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    setSearchLoading(true);
+    const timer = setTimeout(() => {
+      fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`)
+        .then((r) => r.json())
+        .then((json) => setSuggestions(json.suggestions ?? []))
+        .catch(() => setSuggestions([]))
+        .finally(() => setSearchLoading(false));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (location) params.set("location", location);
+    if (searchQuery) params.set("q", searchQuery);
+    if (country) params.set("country", country);
+    if (state) params.set("state", state);
+    if (city) params.set("city", city);
     if (degree) params.set("degree", degree);
     if (course) params.set("course", course);
     router.push(`/colleges?${params.toString()}`);
@@ -63,6 +161,72 @@ export default function HeroSection() {
     },
   };
 
+  const selectClass =
+    "w-full appearance-none rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-8 text-sm font-medium text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all";
+
+  const filterFields: {
+    key: string;
+    label: string;
+    icon: string;
+    placeholder: string;
+    value: string;
+    onChange: (v: string) => void;
+    options: FilterOption[];
+  }[] = [
+    {
+      key: "country",
+      label: "Countries",
+      icon: "public",
+      placeholder: "Select Country",
+      value: country,
+      onChange: (v) => {
+        setCountry(v);
+        setState("");
+        setCity("");
+      },
+      options: filters.countries,
+    },
+    {
+      key: "state",
+      label: "State",
+      icon: "map",
+      placeholder: "Select State",
+      value: state,
+      onChange: (v) => {
+        setState(v);
+        setCity("");
+      },
+      options: filters.states,
+    },
+    {
+      key: "city",
+      label: "City",
+      icon: "location_city",
+      placeholder: "Select City",
+      value: city,
+      onChange: (v) => setCity(v),
+      options: filters.cities,
+    },
+    {
+      key: "degree",
+      label: "Degree",
+      icon: "school",
+      placeholder: "Select Degree",
+      value: degree,
+      onChange: (v) => setDegree(v),
+      options: filters.degrees,
+    },
+    {
+      key: "course",
+      label: "Courses",
+      icon: "menu_book",
+      placeholder: "All Courses",
+      value: course,
+      onChange: (v) => setCourse(v),
+      options: filters.courses,
+    },
+  ];
+
   return (
     <section className="relative w-full min-h-screen flex flex-col justify-center overflow-hidden">
 
@@ -83,26 +247,31 @@ export default function HeroSection() {
         />
       ))}
 
-      {/* ─── Dark Overlay (makes text readable) ─── */}
+      {/* ─── Dark Overlay ─── */}
       <div
         className="absolute inset-0"
         style={{
           zIndex: 1,
-          background: "linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.40) 40%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.75) 100%)",
+          background:
+            "linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.40) 40%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.75) 100%)",
         }}
       />
 
-      {/* ─── Red accent glow (subtle brand touch) ─── */}
+      {/* ─── Red accent glow ─── */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           zIndex: 2,
-          background: "radial-gradient(ellipse at 20% 80%, rgba(220,38,38,0.12) 0%, transparent 60%)",
+          background:
+            "radial-gradient(ellipse at 20% 80%, rgba(220,38,38,0.12) 0%, transparent 60%)",
         }}
       />
 
       {/* ─── Slide Indicator Dots ─── */}
-      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex items-center gap-2.5" style={{ zIndex: 30 }}>
+      <div
+        className="absolute bottom-24 left-1/2 -translate-x-1/2 flex items-center gap-2.5"
+        style={{ zIndex: 30 }}
+      >
         {heroImages.map((_, idx) => (
           <button
             key={idx}
@@ -122,17 +291,11 @@ export default function HeroSection() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="relative px-4 sm:px-6 pt-32 pb-20 lg:pt-40 lg:pb-28 mx-auto max-w-7xl w-full"
+                className="relative px-4 sm:px-6 pt-28 pb-20 lg:pt-32 lg:pb-28 mx-auto max-w-7xl w-full"
         style={{ zIndex: 10 }}
       >
         <div className="max-w-4xl">
-          {/* Badge */}
-          <motion.div variants={itemVariants} className="mb-8">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md border border-white/15 px-4 py-2 text-xs font-semibold text-white/90 uppercase tracking-widest">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              Trusted by 10,000+ Students
-            </span>
-          </motion.div>
+
 
           {/* Heading */}
           <motion.h1
@@ -177,7 +340,7 @@ export default function HeroSection() {
           {/* CTA Buttons */}
           <motion.div variants={itemVariants} className="mt-10 flex flex-wrap gap-4">
             <button
-              onClick={() => router.push("/register")}
+              onClick={() => router.push("/signup/student")}
               className="group relative h-14 px-8 rounded-2xl bg-red-600 text-white font-bold text-base overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-red-600/40"
             >
               <span className="relative z-10 flex items-center gap-2">
@@ -190,7 +353,9 @@ export default function HeroSection() {
             </button>
             <button
               onClick={() => {
-                document.getElementById("explore")?.scrollIntoView({ behavior: "smooth" });
+                document
+                  .getElementById("explore")
+                  ?.scrollIntoView({ behavior: "smooth" });
               }}
               className="h-14 px-8 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white font-semibold text-base hover:bg-white/20 transition-all duration-300"
             >
@@ -199,95 +364,120 @@ export default function HeroSection() {
           </motion.div>
         </div>
 
-        {/* Search Card */}
+        {/* ─── Search Card with 5 Filters (Countries / State / City / Degree / Courses) ─── */}
         <motion.div variants={itemVariants} className="mt-16 lg:mt-20">
-          <div className="bg-black/30 backdrop-blur-xl border border-white/15 rounded-2xl p-4 sm:p-6 max-w-5xl shadow-2xl">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 items-end">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-white/60">
-                  Location
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 material-symbols-outlined text-[20px]">
-                    location_on
-                  </span>
-                  <select
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-8 text-sm font-medium text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all"
+          <div className="bg-black/30 backdrop-blur-xl border border-white/15 rounded-2xl p-4 sm:p-6 shadow-2xl">
+            {/* ─── Live Search Input ─── */}
+            <div className="relative mb-4">
+              <div className="flex items-center gap-3 rounded-xl border border-white/20 bg-white/8 px-4 py-3 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500 transition-all" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                <span className="material-symbols-outlined text-red-400 text-[22px] shrink-0">
+                  search
+                </span>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => { setSearchQuery(e.target.value); setShowSuggestions(true); }}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { setShowSuggestions(false); handleSearch(); } }}
+                  placeholder="Search college, university or course name..."
+                  className="flex-1 bg-transparent text-white placeholder-white/40 text-sm font-medium outline-none"
+                />
+                {searchLoading && (
+                  <span className="material-symbols-outlined text-white/40 text-[20px] animate-spin shrink-0">progress_activity</span>
+                )}
+                {searchQuery && !searchLoading && (
+                  <button
+                    onClick={() => { setSearchQuery(""); setSuggestions([]); }}
+                    className="text-white/40 hover:text-white/80 transition-colors shrink-0"
                   >
-                    <option value="" className="bg-neutral-900">Select State</option>
-                    <option value="california" className="bg-neutral-900">California</option>
-                    <option value="new-york" className="bg-neutral-900">New York</option>
-                    <option value="texas" className="bg-neutral-900">Texas</option>
-                    <option value="massachusetts" className="bg-neutral-900">Massachusetts</option>
-                    <option value="uk" className="bg-neutral-900">United Kingdom</option>
-                    <option value="singapore" className="bg-neutral-900">Singapore</option>
-                  </select>
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/40 material-symbols-outlined text-[20px]">
-                    expand_more
-                  </span>
-                </div>
+                    <span className="material-symbols-outlined text-[20px]">close</span>
+                  </button>
+                )}
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-white/60">
-                  Degree
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 material-symbols-outlined text-[20px]">
-                    school
-                  </span>
-                  <select
-                    value={degree}
-                    onChange={(e) => setDegree(e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-8 text-sm font-medium text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all"
-                  >
-                    <option value="" className="bg-neutral-900">Select Degree</option>
-                    <option value="bachelors" className="bg-neutral-900">Bachelors</option>
-                    <option value="masters" className="bg-neutral-900">Masters</option>
-                    <option value="phd" className="bg-neutral-900">PhD</option>
-                    <option value="diploma" className="bg-neutral-900">Diploma</option>
-                  </select>
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/40 material-symbols-outlined text-[20px]">
-                    expand_more
-                  </span>
+              {/* Autocomplete Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 rounded-xl border border-white/15 bg-neutral-900/95 backdrop-blur-xl shadow-2xl overflow-hidden" style={{ zIndex: 50 }}>
+                  {suggestions.map((s, i) => (
+                    <button
+                      key={i}
+                      onMouseDown={() => {
+                        setSearchQuery(s.name);
+                        setShowSuggestions(false);
+                        router.push(`/university/${s.slug}`);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors text-left border-b border-white/5 last:border-0"
+                    >
+                      <span className="material-symbols-outlined text-red-400 text-[18px] shrink-0">school</span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">{s.name}</p>
+                        {s.location && <p className="text-xs text-white/40 truncate">{s.location}</p>}
+                      </div>
+                      <span className="material-symbols-outlined text-white/20 text-[16px] ml-auto shrink-0">arrow_forward</span>
+                    </button>
+                  ))}
                 </div>
-              </div>
+              )}
+            </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-white/60">
-                  Course Interest
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 material-symbols-outlined text-[20px]">
-                    menu_book
-                  </span>
-                  <select
-                    value={course}
-                    onChange={(e) => setCourse(e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-8 text-sm font-medium text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all"
-                  >
-                    <option value="" className="bg-neutral-900">All Courses</option>
-                    <option value="cs" className="bg-neutral-900">Computer Science</option>
-                    <option value="business" className="bg-neutral-900">Business Admin</option>
-                    <option value="medicine" className="bg-neutral-900">Medicine</option>
-                    <option value="engineering" className="bg-neutral-900">Engineering</option>
-                    <option value="law" className="bg-neutral-900">Law</option>
-                  </select>
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/40 material-symbols-outlined text-[20px]">
-                    expand_more
-                  </span>
+            {/* Filter grid: 5 dropdowns + search button */}
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 items-end">
+              {filterFields.map((field) => (
+                <div key={field.key} className="space-y-1.5">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-white/60">
+                    {field.label}
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 material-symbols-outlined text-[20px]">
+                      {field.icon}
+                    </span>
+
+                    {filtersLoading ? (
+                      <div className="w-full h-[46px] rounded-xl bg-white/10 animate-pulse" />
+                    ) : (
+                      <select
+                        value={field.value}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        className={selectClass}
+                      >
+                        <option value="" className="bg-neutral-900">
+                          {field.placeholder}
+                        </option>
+                        {field.options.map((opt) => (
+                          <option
+                            key={opt.id}
+                            value={opt.name}
+                            className="bg-neutral-900"
+                          >
+                            {opt.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/40 material-symbols-outlined text-[20px]">
+                      expand_more
+                    </span>
+                  </div>
                 </div>
-              </div>
+              ))}
 
-              <button
-                onClick={handleSearch}
-                className="flex h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-4 text-sm font-bold text-white hover:bg-red-700 transition-all duration-200 hover:shadow-lg hover:shadow-red-600/30"
-              >
-                <span className="material-symbols-outlined text-[18px]">search</span>
-                Search Colleges
-              </button>
+              {/* Search Button */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wider text-transparent select-none">
+                  &nbsp;
+                </label>
+                <button
+                  onClick={handleSearch}
+                  className="flex h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-4 text-sm font-bold text-white hover:bg-red-700 transition-all duration-200 hover:shadow-lg hover:shadow-red-600/30 active:scale-95"
+                >
+                  <span className="material-symbols-outlined text-[18px]">
+                    search
+                  </span>
+                  Search Colleges
+                </button>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -305,9 +495,15 @@ export default function HeroSection() {
           ].map((stat) => (
             <div key={stat.label} className="text-left">
               <div className="text-3xl sm:text-4xl font-black text-white">
-                <AnimatedCounter target={stat.value} suffix={stat.suffix} duration={2.5} />
+                <AnimatedCounter
+                  target={stat.value}
+                  suffix={stat.suffix}
+                  duration={2.5}
+                />
               </div>
-              <div className="mt-1 text-sm text-white/50 font-medium">{stat.label}</div>
+              <div className="mt-1 text-sm text-white/50 font-medium">
+                {stat.label}
+              </div>
             </div>
           ))}
         </motion.div>
@@ -321,12 +517,16 @@ export default function HeroSection() {
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         style={{ zIndex: 20 }}
       >
-        <span className="text-xs font-medium text-white/40 uppercase tracking-widest">Scroll to explore</span>
+        <span className="text-xs font-medium text-white/40 uppercase tracking-widest">
+          Scroll to explore
+        </span>
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
-          <span className="material-symbols-outlined text-white/40 text-2xl">expand_more</span>
+          <span className="material-symbols-outlined text-white/40 text-2xl">
+            expand_more
+          </span>
         </motion.div>
       </motion.div>
     </section>
