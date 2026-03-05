@@ -64,7 +64,7 @@ export default function CallToAction() {
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => router.push("/register")}
+              onClick={() => router.push("/signup/student")}
               className="h-14 px-10 rounded-2xl bg-white text-red-600 font-bold text-base hover:bg-red-50 transition-colors shadow-2xl shadow-black/20"
             >
               Create Free Account
@@ -91,9 +91,15 @@ export default function CallToAction() {
           {stats.map((stat) => (
             <div key={stat.label}>
               <div className="text-3xl sm:text-4xl font-black text-white tabular-nums">
-                <AnimatedCounter target={stat.value} suffix={stat.suffix} duration={2.5} />
+                <AnimatedCounter
+                  target={stat.value}
+                  suffix={stat.suffix}
+                  duration={2.5}
+                />
               </div>
-              <div className="mt-1 text-sm text-white/50 font-medium">{stat.label}</div>
+              <div className="mt-1 text-sm text-white/50 font-medium">
+                {stat.label}
+              </div>
             </div>
           ))}
         </motion.div>

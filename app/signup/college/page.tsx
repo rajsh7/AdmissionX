@@ -1,9 +1,12 @@
- "use client";
+"use client";
 
 import Header from "../../components/Header";
 import { AuthBackgroundSlider } from "../../components/AuthBackgroundSlider";
+import { useRouter } from "next/navigation";
 
 export default function CollegeSignupPage() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen flex flex-col font-display relative">
       <AuthBackgroundSlider />
@@ -52,8 +55,7 @@ export default function CollegeSignupPage() {
                 body: JSON.stringify(body),
               });
               if (res.ok) {
-                alert("College signup saved to database.");
-                form.reset();
+                router.push("/signup/college/success");
               } else {
                 const data = await res.json();
                 alert(data.error || "Signup failed");
@@ -157,8 +159,12 @@ export default function CollegeSignupPage() {
           </form>
 
           <p className="mt-8 text-center text-slate-600 dark:text-slate-400 text-sm">
-            Already onboarded?<br />
-            <a href="/login/college" className="text-primary font-bold hover:underline">
+            Already onboarded?
+            <br />
+            <a
+              href="/login/college"
+              className="text-primary font-bold hover:underline"
+            >
               College Login
             </a>
           </p>
@@ -167,4 +173,3 @@ export default function CollegeSignupPage() {
     </div>
   );
 }
-

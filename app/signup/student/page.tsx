@@ -1,9 +1,12 @@
- "use client";
+"use client";
 
 import Header from "../../components/Header";
 import { AuthBackgroundSlider } from "../../components/AuthBackgroundSlider";
+import { useRouter } from "next/navigation";
 
 export default function StudentSignupPage() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen flex flex-col font-display relative">
       <AuthBackgroundSlider />
@@ -16,7 +19,9 @@ export default function StudentSignupPage() {
           <span className="material-symbols-outlined text-9xl">school</span>
         </div>
         <div className="absolute bottom-10 right-10 opacity-10 pointer-events-none">
-          <span className="material-symbols-outlined text-[12rem]">history_edu</span>
+          <span className="material-symbols-outlined text-[12rem]">
+            history_edu
+          </span>
         </div>
 
         {/* Signup Card */}
@@ -49,8 +54,7 @@ export default function StudentSignupPage() {
                 body: JSON.stringify(body),
               });
               if (res.ok) {
-                alert("Student signup saved to database.");
-                form.reset();
+                router.push("/signup/student/success");
               } else {
                 const data = await res.json();
                 alert(data.error || "Signup failed");
@@ -154,8 +158,12 @@ export default function StudentSignupPage() {
           </form>
 
           <p className="mt-8 text-center text-slate-600 dark:text-slate-400 text-sm">
-            Already registered?<br />
-            <a href="/login/student" className="text-primary font-bold hover:underline">
+            Already registered?
+            <br />
+            <a
+              href="/login/student"
+              className="text-primary font-bold hover:underline"
+            >
               Student Login
             </a>
           </p>
@@ -164,4 +172,3 @@ export default function StudentSignupPage() {
     </div>
   );
 }
-

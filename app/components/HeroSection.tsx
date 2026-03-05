@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimatedCounter from "./AnimatedCounter";
@@ -15,61 +15,493 @@ const heroImages = [
   "https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?q=80&w=2574&auto=format&fit=crop",
 ];
 
+// ── The 8 supported countries (in required display order) ─────────────────
+const COUNTRIES = [
+  "United States",
+  "United Kingdom",
+  "Australia",
+  "Canada",
+  "Philippines",
+  "Japan",
+  "Singapore",
+  "India",
+];
+
+// ── Country → State → Cities cascading data ───────────────────────────────
+const LOCATION_DATA: Record<string, Record<string, string[]>> = {
+  "United States": {
+    California: [
+      "Los Angeles",
+      "San Francisco",
+      "San Diego",
+      "Sacramento",
+      "San Jose",
+      "Fresno",
+      "Oakland",
+      "Long Beach",
+    ],
+    "New York": [
+      "New York City",
+      "Buffalo",
+      "Albany",
+      "Rochester",
+      "Yonkers",
+      "Syracuse",
+      "Ithaca",
+    ],
+    Texas: [
+      "Houston",
+      "Dallas",
+      "Austin",
+      "San Antonio",
+      "Fort Worth",
+      "El Paso",
+      "Plano",
+      "Arlington",
+    ],
+    Florida: [
+      "Miami",
+      "Orlando",
+      "Tampa",
+      "Jacksonville",
+      "Tallahassee",
+      "St. Petersburg",
+      "Gainesville",
+      "Fort Lauderdale",
+    ],
+    Massachusetts: [
+      "Boston",
+      "Worcester",
+      "Springfield",
+      "Cambridge",
+      "Lowell",
+      "Amherst",
+      "Newton",
+    ],
+    Illinois: [
+      "Chicago",
+      "Aurora",
+      "Naperville",
+      "Rockford",
+      "Joliet",
+      "Evanston",
+      "Peoria",
+    ],
+    Pennsylvania: [
+      "Philadelphia",
+      "Pittsburgh",
+      "Allentown",
+      "Erie",
+      "Reading",
+      "Scranton",
+      "State College",
+    ],
+    Washington: [
+      "Seattle",
+      "Spokane",
+      "Tacoma",
+      "Vancouver",
+      "Bellevue",
+      "Redmond",
+      "Olympia",
+    ],
+  },
+
+  "United Kingdom": {
+    England: [
+      "London",
+      "Manchester",
+      "Birmingham",
+      "Liverpool",
+      "Leeds",
+      "Bristol",
+      "Oxford",
+      "Cambridge",
+      "Sheffield",
+      "Nottingham",
+    ],
+    Scotland: [
+      "Edinburgh",
+      "Glasgow",
+      "Aberdeen",
+      "Dundee",
+      "Inverness",
+      "Stirling",
+    ],
+    Wales: ["Cardiff", "Swansea", "Newport", "Wrexham", "Bangor"],
+    "Northern Ireland": ["Belfast", "Derry", "Lisburn", "Armagh", "Newry"],
+  },
+
+  Australia: {
+    "New South Wales": [
+      "Sydney",
+      "Newcastle",
+      "Wollongong",
+      "Albury",
+      "Wagga Wagga",
+      "Maitland",
+      "Coffs Harbour",
+    ],
+    Victoria: [
+      "Melbourne",
+      "Geelong",
+      "Ballarat",
+      "Bendigo",
+      "Shepparton",
+      "Warrnambool",
+      "Wodonga",
+    ],
+    Queensland: [
+      "Brisbane",
+      "Gold Coast",
+      "Townsville",
+      "Cairns",
+      "Toowoomba",
+      "Rockhampton",
+      "Mackay",
+    ],
+    "Western Australia": [
+      "Perth",
+      "Fremantle",
+      "Bunbury",
+      "Geraldton",
+      "Kalgoorlie",
+      "Albany",
+    ],
+    "South Australia": [
+      "Adelaide",
+      "Mount Gambier",
+      "Whyalla",
+      "Mount Barker",
+      "Murray Bridge",
+    ],
+    "Australian Capital Territory": ["Canberra", "Belconnen", "Tuggeranong"],
+    Tasmania: ["Hobart", "Launceston", "Devonport", "Burnie"],
+  },
+
+  Canada: {
+    Ontario: [
+      "Toronto",
+      "Ottawa",
+      "Hamilton",
+      "Mississauga",
+      "London",
+      "Brampton",
+      "Waterloo",
+      "Kingston",
+      "Windsor",
+    ],
+    Quebec: [
+      "Montreal",
+      "Quebec City",
+      "Laval",
+      "Longueuil",
+      "Gatineau",
+      "Sherbrooke",
+      "Trois-Rivières",
+    ],
+    "British Columbia": [
+      "Vancouver",
+      "Victoria",
+      "Kelowna",
+      "Surrey",
+      "Abbotsford",
+      "Burnaby",
+      "Richmond",
+      "Kamloops",
+    ],
+    Alberta: [
+      "Calgary",
+      "Edmonton",
+      "Red Deer",
+      "Lethbridge",
+      "Medicine Hat",
+      "Grande Prairie",
+      "Banff",
+    ],
+    Manitoba: [
+      "Winnipeg",
+      "Brandon",
+      "Steinbach",
+      "Thompson",
+      "Portage la Prairie",
+    ],
+    Saskatchewan: [
+      "Saskatoon",
+      "Regina",
+      "Prince Albert",
+      "Moose Jaw",
+      "Swift Current",
+    ],
+    "Nova Scotia": ["Halifax", "Sydney", "Truro", "New Glasgow"],
+    "New Brunswick": ["Fredericton", "Moncton", "Saint John", "Bathurst"],
+  },
+
+  Philippines: {
+    "Metro Manila": [
+      "Manila",
+      "Quezon City",
+      "Makati",
+      "Pasig",
+      "Taguig",
+      "Mandaluyong",
+      "Marikina",
+      "Caloocan",
+    ],
+    Cebu: ["Cebu City", "Mandaue", "Lapu-Lapu", "Talisay", "Danao", "Toledo"],
+    Davao: ["Davao City", "Tagum", "Digos", "Panabo", "Samal", "Mati"],
+    Laguna: [
+      "Santa Rosa",
+      "Biñan",
+      "San Pablo",
+      "Calamba",
+      "Los Baños",
+      "Sta. Cruz",
+    ],
+    Bulacan: [
+      "Malolos",
+      "Meycauayan",
+      "San Jose del Monte",
+      "Marilao",
+      "Obando",
+    ],
+    Batangas: ["Batangas City", "Lipa", "Tanauan", "Santo Tomas"],
+    Pampanga: ["San Fernando", "Angeles City", "Mabalacat", "Guagua"],
+  },
+
+  Japan: {
+    Tokyo: [
+      "Shinjuku",
+      "Shibuya",
+      "Akihabara",
+      "Harajuku",
+      "Asakusa",
+      "Ginza",
+      "Ikebukuro",
+      "Roppongi",
+    ],
+    Osaka: ["Osaka City", "Kyoto", "Kobe", "Nara", "Sakai", "Higashiosaka"],
+    Aichi: [
+      "Nagoya",
+      "Toyota",
+      "Okazaki",
+      "Ichinomiya",
+      "Toyohashi",
+      "Kasugai",
+    ],
+    Fukuoka: [
+      "Fukuoka City",
+      "Kitakyushu",
+      "Kurume",
+      "Omuta",
+      "Iizuka",
+      "Kasuga",
+    ],
+    Hokkaido: [
+      "Sapporo",
+      "Hakodate",
+      "Asahikawa",
+      "Obihiro",
+      "Kushiro",
+      "Otaru",
+    ],
+    Kanagawa: ["Yokohama", "Kawasaki", "Sagamihara", "Fujisawa", "Yokosuka"],
+    Kyoto: ["Kyoto City", "Uji", "Maizuru", "Fukuchiyama"],
+  },
+
+  Singapore: {
+    "Central Region": [
+      "Marina Bay",
+      "Orchard",
+      "Bugis",
+      "Chinatown",
+      "Little India",
+      "Clarke Quay",
+    ],
+    "East Region": ["Tampines", "Bedok", "Pasir Ris", "Changi", "Simei"],
+    "North Region": ["Woodlands", "Yishun", "Sembawang", "Admiralty"],
+    "North-East Region": [
+      "Sengkang",
+      "Punggol",
+      "Hougang",
+      "Serangoon",
+      "Ang Mo Kio",
+    ],
+    "West Region": [
+      "Jurong East",
+      "Jurong West",
+      "Clementi",
+      "Buona Vista",
+      "Boon Lay",
+    ],
+  },
+
+  India: {
+    Maharashtra: [
+      "Mumbai",
+      "Pune",
+      "Nagpur",
+      "Nashik",
+      "Aurangabad",
+      "Solapur",
+      "Kolhapur",
+      "Thane",
+    ],
+    Delhi: [
+      "New Delhi",
+      "Noida",
+      "Gurgaon",
+      "Faridabad",
+      "Dwarka",
+      "Rohini",
+      "Janakpuri",
+    ],
+    Karnataka: [
+      "Bangalore",
+      "Mysore",
+      "Mangalore",
+      "Hubli",
+      "Belgaum",
+      "Dharwad",
+      "Shimoga",
+    ],
+    "Tamil Nadu": [
+      "Chennai",
+      "Coimbatore",
+      "Madurai",
+      "Trichy",
+      "Salem",
+      "Tirunelveli",
+      "Vellore",
+      "Erode",
+    ],
+    "Uttar Pradesh": [
+      "Lucknow",
+      "Kanpur",
+      "Agra",
+      "Varanasi",
+      "Allahabad",
+      "Meerut",
+      "Ghaziabad",
+      "Noida",
+    ],
+    "West Bengal": [
+      "Kolkata",
+      "Howrah",
+      "Siliguri",
+      "Durgapur",
+      "Asansol",
+      "Bardhaman",
+      "Kharagpur",
+    ],
+    Rajasthan: [
+      "Jaipur",
+      "Jodhpur",
+      "Udaipur",
+      "Kota",
+      "Bikaner",
+      "Ajmer",
+      "Alwar",
+    ],
+    Telangana: [
+      "Hyderabad",
+      "Warangal",
+      "Karimnagar",
+      "Nizamabad",
+      "Khammam",
+      "Nalgonda",
+    ],
+    Gujarat: [
+      "Ahmedabad",
+      "Surat",
+      "Vadodara",
+      "Rajkot",
+      "Gandhinagar",
+      "Bhavnagar",
+      "Junagadh",
+    ],
+    "Madhya Pradesh": [
+      "Bhopal",
+      "Indore",
+      "Jabalpur",
+      "Gwalior",
+      "Ujjain",
+      "Rewa",
+      "Sagar",
+    ],
+    Punjab: [
+      "Chandigarh",
+      "Ludhiana",
+      "Amritsar",
+      "Jalandhar",
+      "Patiala",
+      "Bathinda",
+      "Mohali",
+    ],
+    Bihar: [
+      "Patna",
+      "Gaya",
+      "Muzaffarpur",
+      "Bhagalpur",
+      "Darbhanga",
+      "Begusarai",
+      "Arrah",
+    ],
+    Kerala: [
+      "Thiruvananthapuram",
+      "Kochi",
+      "Kozhikode",
+      "Thrissur",
+      "Kollam",
+      "Kannur",
+      "Palakkad",
+    ],
+    "Andhra Pradesh": [
+      "Visakhapatnam",
+      "Vijayawada",
+      "Guntur",
+      "Nellore",
+      "Kurnool",
+      "Tirupati",
+      "Rajahmundry",
+    ],
+    Odisha: ["Bhubaneswar", "Cuttack", "Rourkela", "Berhampur", "Sambalpur"],
+    Haryana: ["Gurgaon", "Faridabad", "Ambala", "Rohtak", "Hisar", "Panipat"],
+  },
+};
+
+// ── Degree / Course fallbacks ──────────────────────────────────────────────
 interface FilterOption {
   id: number;
   name: string;
 }
 
 interface FilterData {
-  countries: FilterOption[];
-  states: FilterOption[];
-  cities: FilterOption[];
   degrees: FilterOption[];
   courses: FilterOption[];
 }
 
+const FALLBACK_DEGREES: FilterOption[] = [
+  { id: 1, name: "Bachelor" },
+  { id: 2, name: "Master" },
+  { id: 3, name: "PhD" },
+  { id: 4, name: "Diploma" },
+  { id: 5, name: "Certificate" },
+];
+
+const FALLBACK_COURSES: FilterOption[] = [
+  { id: 1, name: "Computer Science" },
+  { id: 2, name: "Business Administration" },
+  { id: 3, name: "Medicine" },
+  { id: 4, name: "Engineering" },
+  { id: 5, name: "Law" },
+  { id: 6, name: "Arts" },
+  { id: 7, name: "Commerce" },
+];
+
 const FALLBACK_FILTERS: FilterData = {
-  countries: [
-    { id: 1, name: "India" },
-    { id: 2, name: "United States" },
-    { id: 3, name: "United Kingdom" },
-    { id: 4, name: "Canada" },
-    { id: 5, name: "Australia" },
-  ],
-  states: [
-    { id: 1, name: "Maharashtra" },
-    { id: 2, name: "Delhi" },
-    { id: 3, name: "Karnataka" },
-    { id: 4, name: "Tamil Nadu" },
-    { id: 5, name: "Uttar Pradesh" },
-    { id: 6, name: "West Bengal" },
-    { id: 7, name: "Rajasthan" },
-  ],
-  cities: [
-    { id: 1, name: "Mumbai" },
-    { id: 2, name: "Delhi" },
-    { id: 3, name: "Bangalore" },
-    { id: 4, name: "Chennai" },
-    { id: 5, name: "Hyderabad" },
-    { id: 6, name: "Pune" },
-    { id: 7, name: "Kolkata" },
-  ],
-  degrees: [
-    { id: 1, name: "Bachelor" },
-    { id: 2, name: "Master" },
-    { id: 3, name: "PhD" },
-    { id: 4, name: "Diploma" },
-    { id: 5, name: "Certificate" },
-  ],
-  courses: [
-    { id: 1, name: "Computer Science" },
-    { id: 2, name: "Business Administration" },
-    { id: 3, name: "Medicine" },
-    { id: 4, name: "Engineering" },
-    { id: 5, name: "Law" },
-    { id: 6, name: "Arts" },
-    { id: 7, name: "Commerce" },
-  ],
+  degrees: FALLBACK_DEGREES,
+  courses: FALLBACK_COURSES,
 };
 
 export default function HeroSection() {
@@ -84,9 +516,22 @@ export default function HeroSection() {
   const [filters, setFilters] = useState<FilterData>(FALLBACK_FILTERS);
   const [filtersLoading, setFiltersLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [suggestions, setSuggestions] = useState<{ name: string; location: string; slug: string }[]>([]);
+  const [suggestions, setSuggestions] = useState<
+    { name: string; location: string; slug: string }[]
+  >([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
+
+  // ── Cascading location options ────────────────────────────────────────────
+  const availableStates = useMemo<string[]>(() => {
+    if (!country) return [];
+    return Object.keys(LOCATION_DATA[country] ?? {}).sort();
+  }, [country]);
+
+  const availableCities = useMemo<string[]>(() => {
+    if (!country || !state) return [];
+    return [...(LOCATION_DATA[country]?.[state] ?? [])].sort();
+  }, [country, state]);
 
   const nextImage = useCallback(() => {
     setCurrentImage((prev) => (prev + 1) % heroImages.length);
@@ -104,20 +549,27 @@ export default function HeroSection() {
     return () => clearInterval(imageInterval);
   }, [nextImage]);
 
-  // Load filter options from DB via API
+  // Load only degrees + courses from API; location data is static
   useEffect(() => {
     fetch("/api/filters")
       .then((r) => r.json())
       .then((json) => {
-        if (json.data) setFilters(json.data);
+        if (json.data) {
+          setFilters({
+            degrees: json.data.degrees?.length
+              ? json.data.degrees
+              : FALLBACK_DEGREES,
+            courses: json.data.courses?.length
+              ? json.data.courses
+              : FALLBACK_COURSES,
+          });
+        }
       })
-      .catch(() => {
-        setFilters(FALLBACK_FILTERS);
-      })
+      .catch(() => setFilters(FALLBACK_FILTERS))
       .finally(() => setFiltersLoading(false));
   }, []);
 
-  // Debounced autocomplete fetch
+  // Debounced autocomplete
   useEffect(() => {
     if (searchQuery.length < 2) {
       setSuggestions([]);
@@ -161,9 +613,13 @@ export default function HeroSection() {
     },
   };
 
-  const selectClass =
+  const baseSelectClass =
     "w-full appearance-none rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-8 text-sm font-medium text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all";
 
+  const disabledSelectClass =
+    "w-full appearance-none rounded-xl border border-white/5 bg-white/[0.03] py-3 pl-10 pr-8 text-sm font-medium text-white/30 cursor-not-allowed transition-all";
+
+  // ── Filter field definitions ───────────────────────────────────────────────
   const filterFields: {
     key: string;
     label: string;
@@ -171,11 +627,12 @@ export default function HeroSection() {
     placeholder: string;
     value: string;
     onChange: (v: string) => void;
-    options: FilterOption[];
+    options: { id: number; name: string }[];
+    disabled: boolean;
   }[] = [
     {
       key: "country",
-      label: "Countries",
+      label: "Country",
       icon: "public",
       placeholder: "Select Country",
       value: country,
@@ -184,28 +641,31 @@ export default function HeroSection() {
         setState("");
         setCity("");
       },
-      options: filters.countries,
+      options: COUNTRIES.map((c, i) => ({ id: i + 1, name: c })),
+      disabled: false,
     },
     {
       key: "state",
-      label: "State",
+      label: "State / Province",
       icon: "map",
-      placeholder: "Select State",
+      placeholder: country ? "Select State" : "Select Country first",
       value: state,
       onChange: (v) => {
         setState(v);
         setCity("");
       },
-      options: filters.states,
+      options: availableStates.map((s, i) => ({ id: i + 1, name: s })),
+      disabled: !country,
     },
     {
       key: "city",
       label: "City",
       icon: "location_city",
-      placeholder: "Select City",
+      placeholder: state ? "Select City" : "Select State first",
       value: city,
       onChange: (v) => setCity(v),
-      options: filters.cities,
+      options: availableCities.map((c, i) => ({ id: i + 1, name: c })),
+      disabled: !state,
     },
     {
       key: "degree",
@@ -215,21 +675,22 @@ export default function HeroSection() {
       value: degree,
       onChange: (v) => setDegree(v),
       options: filters.degrees,
+      disabled: false,
     },
     {
       key: "course",
-      label: "Courses",
+      label: "Course",
       icon: "menu_book",
       placeholder: "All Courses",
       value: course,
       onChange: (v) => setCourse(v),
       options: filters.courses,
+      disabled: false,
     },
   ];
 
   return (
     <section className="relative w-full min-h-screen flex flex-col justify-center overflow-hidden">
-
       {/* ─── Background Image Slides ─── */}
       {heroImages.map((img, idx) => (
         <img
@@ -242,7 +703,8 @@ export default function HeroSection() {
           }`}
           style={{
             zIndex: 0,
-            animation: idx === currentImage ? "heroZoom 6s ease-out forwards" : "none",
+            animation:
+              idx === currentImage ? "heroZoom 6s ease-out forwards" : "none",
           }}
         />
       ))}
@@ -291,12 +753,10 @@ export default function HeroSection() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-                className="relative px-4 sm:px-6 pt-28 pb-20 lg:pt-32 lg:pb-28 mx-auto max-w-7xl w-full"
+        className="relative px-4 sm:px-6 pt-28 pb-20 lg:pt-32 lg:pb-28 mx-auto max-w-7xl w-full"
         style={{ zIndex: 10 }}
       >
         <div className="max-w-4xl">
-
-
           {/* Heading */}
           <motion.h1
             variants={itemVariants}
@@ -338,7 +798,10 @@ export default function HeroSection() {
           </motion.p>
 
           {/* CTA Buttons */}
-          <motion.div variants={itemVariants} className="mt-10 flex flex-wrap gap-4">
+          <motion.div
+            variants={itemVariants}
+            className="mt-10 flex flex-wrap gap-4"
+          >
             <button
               onClick={() => router.push("/signup/student")}
               className="group relative h-14 px-8 rounded-2xl bg-red-600 text-white font-bold text-base overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-red-600/40"
@@ -351,6 +814,7 @@ export default function HeroSection() {
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-red-700 to-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </button>
+
             <button
               onClick={() => {
                 document
@@ -364,41 +828,64 @@ export default function HeroSection() {
           </motion.div>
         </div>
 
-        {/* ─── Search Card with 5 Filters (Countries / State / City / Degree / Courses) ─── */}
+        {/* ─── Search Card ─── */}
         <motion.div variants={itemVariants} className="mt-16 lg:mt-20">
           <div className="bg-black/30 backdrop-blur-xl border border-white/15 rounded-2xl p-4 sm:p-6 shadow-2xl">
             {/* ─── Live Search Input ─── */}
             <div className="relative mb-4">
-              <div className="flex items-center gap-3 rounded-xl border border-white/20 bg-white/8 px-4 py-3 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500 transition-all" style={{ background: 'rgba(255,255,255,0.08)' }}>
+              <div
+                className="flex items-center gap-3 rounded-xl border border-white/20 bg-white/8 px-4 py-3 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500 transition-all"
+                style={{ background: "rgba(255,255,255,0.08)" }}
+              >
                 <span className="material-symbols-outlined text-red-400 text-[22px] shrink-0">
                   search
                 </span>
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => { setSearchQuery(e.target.value); setShowSuggestions(true); }}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowSuggestions(true);
+                  }}
                   onFocus={() => setShowSuggestions(true)}
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') { setShowSuggestions(false); handleSearch(); } }}
+                  onBlur={() =>
+                    setTimeout(() => setShowSuggestions(false), 150)
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      setShowSuggestions(false);
+                      handleSearch();
+                    }
+                  }}
                   placeholder="Search college, university or course name..."
                   className="flex-1 bg-transparent text-white placeholder-white/40 text-sm font-medium outline-none"
                 />
                 {searchLoading && (
-                  <span className="material-symbols-outlined text-white/40 text-[20px] animate-spin shrink-0">progress_activity</span>
+                  <span className="material-symbols-outlined text-white/40 text-[20px] animate-spin shrink-0">
+                    progress_activity
+                  </span>
                 )}
                 {searchQuery && !searchLoading && (
                   <button
-                    onClick={() => { setSearchQuery(""); setSuggestions([]); }}
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSuggestions([]);
+                    }}
                     className="text-white/40 hover:text-white/80 transition-colors shrink-0"
                   >
-                    <span className="material-symbols-outlined text-[20px]">close</span>
+                    <span className="material-symbols-outlined text-[20px]">
+                      close
+                    </span>
                   </button>
                 )}
               </div>
 
               {/* Autocomplete Suggestions Dropdown */}
               {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 rounded-xl border border-white/15 bg-neutral-900/95 backdrop-blur-xl shadow-2xl overflow-hidden" style={{ zIndex: 50 }}>
+                <div
+                  className="absolute top-full left-0 right-0 mt-1 rounded-xl border border-white/15 bg-neutral-900/95 backdrop-blur-xl shadow-2xl overflow-hidden"
+                  style={{ zIndex: 50 }}
+                >
                   {suggestions.map((s, i) => (
                     <button
                       key={i}
@@ -409,12 +896,22 @@ export default function HeroSection() {
                       }}
                       className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors text-left border-b border-white/5 last:border-0"
                     >
-                      <span className="material-symbols-outlined text-red-400 text-[18px] shrink-0">school</span>
+                      <span className="material-symbols-outlined text-red-400 text-[18px] shrink-0">
+                        school
+                      </span>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{s.name}</p>
-                        {s.location && <p className="text-xs text-white/40 truncate">{s.location}</p>}
+                        <p className="text-sm font-semibold text-white truncate">
+                          {s.name}
+                        </p>
+                        {s.location && (
+                          <p className="text-xs text-white/40 truncate">
+                            {s.location}
+                          </p>
+                        )}
                       </div>
-                      <span className="material-symbols-outlined text-white/20 text-[16px] ml-auto shrink-0">arrow_forward</span>
+                      <span className="material-symbols-outlined text-white/20 text-[16px] ml-auto shrink-0">
+                        arrow_forward
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -429,17 +926,25 @@ export default function HeroSection() {
                     {field.label}
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 material-symbols-outlined text-[20px]">
+                    <span
+                      className={`absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[20px] ${
+                        field.disabled ? "text-white/20" : "text-white/40"
+                      }`}
+                    >
                       {field.icon}
                     </span>
 
-                    {filtersLoading ? (
+                    {filtersLoading &&
+                    (field.key === "degree" || field.key === "course") ? (
                       <div className="w-full h-[46px] rounded-xl bg-white/10 animate-pulse" />
                     ) : (
                       <select
                         value={field.value}
                         onChange={(e) => field.onChange(e.target.value)}
-                        className={selectClass}
+                        disabled={field.disabled}
+                        className={
+                          field.disabled ? disabledSelectClass : baseSelectClass
+                        }
                       >
                         <option value="" className="bg-neutral-900">
                           {field.placeholder}
@@ -456,7 +961,11 @@ export default function HeroSection() {
                       </select>
                     )}
 
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/40 material-symbols-outlined text-[20px]">
+                    <span
+                      className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none material-symbols-outlined text-[20px] ${
+                        field.disabled ? "text-white/15" : "text-white/40"
+                      }`}
+                    >
                       expand_more
                     </span>
                   </div>
