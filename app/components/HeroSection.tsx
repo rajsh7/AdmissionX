@@ -571,12 +571,13 @@ export default function HeroSection() {
 
   // Debounced autocomplete
   useEffect(() => {
-    if (searchQuery.length < 2) {
-      setSuggestions([]);
-      return;
-    }
-    setSearchLoading(true);
     const timer = setTimeout(() => {
+      if (searchQuery.length < 2) {
+        setSuggestions([]);
+        setSearchLoading(false);
+        return;
+      }
+      setSearchLoading(true);
       fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`)
         .then((r) => r.json())
         .then((json) => setSuggestions(json.suggestions ?? []))

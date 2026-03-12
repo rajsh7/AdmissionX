@@ -127,9 +127,19 @@ const fields = [
   },
 ];
 
-export default function FieldsOfStudy() {
+interface FieldsOfStudyProps {
+  streamCounts?: Record<string, number>;
+}
+
+export default function FieldsOfStudy({
+  streamCounts = {},
+}: FieldsOfStudyProps) {
   const [active, setActive] = useState(0);
   const current = fields[active];
+
+  // Resolve live college count: DB value takes priority, static fallback otherwise
+  const getCount = (label: string, staticCount: number) =>
+    streamCounts[label.toLowerCase()] ?? staticCount;
 
   return (
     <section
@@ -247,7 +257,7 @@ export default function FieldsOfStudy() {
                   <div className="flex items-center gap-6 mb-8">
                     <div>
                       <div className="text-2xl font-black text-white">
-                        {current.count}+
+                        {getCount(current.label, current.count)}+
                       </div>
                       <div className="text-xs text-white/50 font-medium">
                         Colleges
@@ -341,7 +351,7 @@ export default function FieldsOfStudy() {
                         i === active ? "text-red-500" : "text-neutral-400"
                       }`}
                     >
-                      {field.count}+
+                      {getCount(field.label, field.count)}+
                     </span>
                   </div>
                   <p
@@ -427,7 +437,7 @@ export default function FieldsOfStudy() {
                   <div className="flex items-center gap-5 mb-6">
                     <div>
                       <div className="text-xl font-black text-white">
-                        {current.count}+
+                        {getCount(current.label, current.count)}+
                       </div>
                       <div className="text-[11px] text-white/50">Colleges</div>
                     </div>
@@ -436,7 +446,9 @@ export default function FieldsOfStudy() {
                       <div className="text-xl font-black text-white">
                         {current.avgSalary}
                       </div>
-                      <div className="text-[11px] text-white/50">Avg. Salary</div>
+                      <div className="text-[11px] text-white/50">
+                        Avg. Salary
+                      </div>
                     </div>
                     <div className="w-px h-8 bg-white/15" />
                     <div>

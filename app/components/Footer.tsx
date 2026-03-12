@@ -6,42 +6,42 @@ import { motion } from "framer-motion";
 const footerLinks = {
   "Quick Links": [
     { label: "About Us", href: "/about" },
-    { label: "Careers", href: "/careers" },
-    { label: "Contact Us", href: "/contact" },
-    { label: "Latest Updates", href: "/news" },
-    { label: "Help Center", href: "/help" },
-    { label: "Terms of Service", href: "/terms" },
-    { label: "Cancellation Policy", href: "/cancellation-policy" },
-    { label: "Refunds Policy", href: "/refunds-policy" },
+    { label: "Top Colleges", href: "/top-colleges" },
+    { label: "Top Universities", href: "/top-university" },
+    { label: "Explore Streams", href: "/stream" },
+    { label: "Search Colleges", href: "/search" },
+    { label: "Latest News", href: "/news" },
+    { label: "Education Blogs", href: "/education-blogs" },
+    { label: "Contact Us", href: "/contact-us" },
   ],
-  "Top Courses": [
-    { label: "Engineering", href: "/courses/engineering" },
-    { label: "Commerce", href: "/courses/commerce" },
-    { label: "Management", href: "/courses/management" },
-    { label: "Science", href: "/courses/science" },
-    { label: "Medical", href: "/courses/medical" },
-    { label: "Law", href: "/courses/law" },
-    { label: "Computer Applications", href: "/courses/computer-applications" },
-    { label: "Architecture", href: "/courses/architecture" },
+  "Top Streams": [
+    { label: "Engineering", href: "/search?stream=engineering" },
+    { label: "Management / MBA", href: "/search?stream=management" },
+    { label: "Medical & Pharmacy", href: "/search?stream=medical" },
+    { label: "Science", href: "/search?stream=science" },
+    { label: "Commerce", href: "/search?stream=commerce" },
+    { label: "Law", href: "/search?stream=law" },
+    { label: "Arts & Humanities", href: "/search?stream=arts" },
+    { label: "All Streams", href: "/stream" },
   ],
   "Top Exams": [
-    { label: "Engineering Exam", href: "/exams/engineering" },
-    { label: "Commerce Exam", href: "/exams/commerce" },
-    { label: "Arts Exam", href: "/exams/arts" },
-    { label: "Science Exam", href: "/exams/science" },
-    { label: "Medical Exam", href: "/exams/medical" },
-    { label: "Management Exam", href: "/exams/management" },
-    { label: "Law Exam", href: "/exams/law" },
-    { label: "All Examination", href: "/exams" },
+    { label: "Engineering Exams", href: "/examination/engineering" },
+    { label: "Medical Exams", href: "/examination/medical" },
+    { label: "Management Exams", href: "/examination/management" },
+    { label: "Law Exams", href: "/examination/law" },
+    { label: "Science Exams", href: "/examination/science" },
+    { label: "Commerce Exams", href: "/examination/commerce" },
+    { label: "Arts Exams", href: "/examination/arts" },
+    { label: "All Examinations", href: "/examination" },
   ],
   "Study Abroad": [
-    { label: "United States", href: "/study-abroad/usa" },
-    { label: "United Kingdom", href: "/study-abroad/uk" },
-    { label: "Australia", href: "/study-abroad/australia" },
-    { label: "Canada", href: "/study-abroad/canada" },
-    { label: "Philippines", href: "/study-abroad/philippines" },
-    { label: "Japan", href: "/study-abroad/japan" },
-    { label: "Singapore", href: "/study-abroad/singapore" },
+    { label: "United States", href: "/study-abroad?stream=engineering" },
+    { label: "United Kingdom", href: "/study-abroad?stream=management" },
+    { label: "Australia", href: "/study-abroad?stream=medical" },
+    { label: "Canada", href: "/study-abroad?stream=science" },
+    { label: "Germany", href: "/study-abroad?stream=engineering" },
+    { label: "Singapore", href: "/study-abroad?stream=computer" },
+    { label: "New Zealand", href: "/study-abroad?stream=arts" },
     { label: "Study Abroad Home", href: "/study-abroad" },
   ],
 };
@@ -85,7 +85,7 @@ export default function Footer() {
               </Link>
 
               <p className="text-sm text-neutral-400 max-w-md leading-relaxed">
-                Your one-stop platform for college admissions, entrance exams, 
+                Your one-stop platform for college admissions, entrance exams,
                 scholarships, and study abroad guidance.
               </p>
             </div>
@@ -131,8 +131,16 @@ export default function Footer() {
 
             <div className="flex items-center gap-4">
               {[
-                { icon: "language", href: "https://admissionx.com", label: "Website" },
-                { icon: "mail", href: "mailto:info@admissionx.com", label: "Email" },
+                {
+                  icon: "language",
+                  href: "https://admissionx.com",
+                  label: "Website",
+                },
+                {
+                  icon: "mail",
+                  href: "mailto:info@admissionx.com",
+                  label: "Email",
+                },
               ].map((social) => (
                 <Link
                   key={social.label}

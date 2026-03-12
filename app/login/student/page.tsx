@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { AuthBackgroundSlider } from "../../components/AuthBackgroundSlider";
 import Header from "../../components/Header";
 
@@ -124,12 +125,12 @@ function StudentLoginForm() {
                 <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Password
                 </label>
-                <a
-                  href="#"
+                <Link
+                  href="/forgot-password"
                   className="text-xs font-medium text-primary hover:underline"
                 >
                   Forgot password?
-                </a>
+                </Link>
               </div>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">

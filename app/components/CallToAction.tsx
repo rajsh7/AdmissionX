@@ -3,15 +3,21 @@
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import AnimatedCounter from "./AnimatedCounter";
+import type { HomeStat } from "../api/home/stats/route";
 
-const stats = [
-  { value: 500, suffix: "+", label: "Partner Universities" },
-  { value: 10000, suffix: "+", label: "Students Placed" },
+const STATIC_STATS: HomeStat[] = [
+  { value: 500, suffix: "+", label: "Partner Colleges" },
+  { value: 10000, suffix: "+", label: "Students Registered" },
   { value: 50, suffix: "+", label: "Countries" },
   { value: 200, suffix: "+", label: "Courses Available" },
 ];
 
-export default function CallToAction() {
+interface CallToActionProps {
+  stats?: HomeStat[];
+}
+
+export default function CallToAction({ stats }: CallToActionProps) {
+  const liveStats = stats && stats.length > 0 ? stats : STATIC_STATS;
   const router = useRouter();
 
   return (
@@ -88,7 +94,7 @@ export default function CallToAction() {
           transition={{ delay: 0.3, duration: 0.7 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-12 border-t border-white/10"
         >
-          {stats.map((stat) => (
+          {liveStats.map((stat) => (
             <div key={stat.label}>
               <div className="text-3xl sm:text-4xl font-black text-white tabular-nums">
                 <AnimatedCounter

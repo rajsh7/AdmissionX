@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { motion, useScroll, AnimatePresence } from "framer-motion";
 
 interface HeaderProps {
-  onLoginClick: () => void;
-  onRegisterClick: () => void;
+  onLoginClick?: () => void;
+  onRegisterClick?: () => void;
 }
 
 interface AuthUser {
@@ -18,14 +18,13 @@ interface AuthUser {
 }
 
 const navLinks = [
-  { label: "Colleges", href: "/colleges" },
-  { label: "Universities", href: "/universities" },
-  { label: "Courses", href: "/courses" },
+  { label: "Top Colleges", href: "/top-colleges" },
+  { label: "Universities", href: "/top-university" },
+  { label: "Streams", href: "/stream" },
   { label: "Study Abroad", href: "/study-abroad" },
-  { label: "Exams", href: "/exams" },
-  { label: "Reviews", href: "/reviews" },
+  { label: "Exams", href: "/examination" },
   { label: "Ask", href: "/ask" },
-  { label: "Blogs", href: "/blogs" },
+  { label: "Blogs", href: "/education-blogs" },
   { label: "News", href: "/news" },
 ];
 

@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Windows reserved device name (accidentally created)
+nul
+
+# DB output/debug files
+db-out.txt
+db-output.txt

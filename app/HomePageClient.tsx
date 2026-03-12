@@ -11,24 +11,41 @@ import EntranceExams from "./components/EntranceExams";
 import NewsSection from "./components/NewsSection";
 import CallToAction from "./components/CallToAction";
 import AuthModal from "./components/AuthModal";
+import Footer from "./components/Footer";
 
-import { University } from "./components/TopUniversities";
+import type { University } from "./components/TopUniversities";
+import type { DbBlog } from "./api/home/latest-blogs/route";
+import type { DbExam } from "./api/home/exams/route";
+import type { HomeStat } from "./api/home/stats/route";
 
 interface HomePageClientProps {
   universities: University[];
+  dbBlogs: DbBlog[];
+  dbExams: DbExam[];
+  stats: HomeStat[];
+  streamCounts: Record<string, number>;
 }
 
-export default function HomePageClient({ universities }: HomePageClientProps) {
-  const [isDark, setIsDark] = useState(false);
+export default function HomePageClient({
+  universities,
+  dbBlogs,
+  dbExams,
+  stats,
+  streamCounts,
+}: HomePageClientProps) {
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("admissionx-dark") === "true";
+  });
   const [authModal, setAuthModal] = useState<"login" | "register" | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("admissionx-dark");
-    if (stored === "true") {
-      setIsDark(true);
+    if (isDark) {
       document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
     }
-  }, []);
+  }, [isDark]);
 
   const openLogin = () => setAuthModal("login");
   const openRegister = () => setAuthModal("register");
@@ -36,7 +53,9 @@ export default function HomePageClient({ universities }: HomePageClientProps) {
   const switchMode = (mode: "login" | "register") => setAuthModal(mode);
 
   return (
-    <div className={`min-h-screen bg-background-dark text-white ${isDark ? "dark" : ""}`}>
+    <div
+      className={`min-h-screen bg-background-dark text-white ${isDark ? "dark" : ""}`}
+    >
       {/* Auth Modal */}
       {authModal && (
         <AuthModal
@@ -55,7 +74,7 @@ export default function HomePageClient({ universities }: HomePageClientProps) {
         <HeroSection />
 
         {/* Chapter 1: Explore Your Passion */}
-        <FieldsOfStudy />
+        <FieldsOfStudy streamCounts={streamCounts} />
 
         {/* Chapter 2: Discover Universities */}
         <TopUniversities universities={universities} />
@@ -67,15 +86,17 @@ export default function HomePageClient({ universities }: HomePageClientProps) {
         <TrendingDegrees />
 
         {/* Chapter 5: Prepare for Exams */}
-        <EntranceExams />
+        <EntranceExams dbExams={dbExams} />
 
         {/* Chapter 6: Stay Informed */}
-        <NewsSection />
+        <NewsSection dbBlogs={dbBlogs} />
 
         {/* Epilogue: Your Story Starts Now */}
-        <CallToAction />
+        <CallToAction stats={stats} />
       </main>
 
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

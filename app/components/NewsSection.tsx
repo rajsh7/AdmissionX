@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import type { DbBlog } from "../api/home/latest-blogs/route";
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 interface Article {
   image: string;
@@ -17,67 +20,163 @@ interface Article {
   href: string;
 }
 
-const articles: Article[] = [
+interface NewsSectionProps {
+  dbBlogs?: DbBlog[];
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function timeAgo(dateStr: string): string {
+  try {
+    const now = Date.now();
+    const then = new Date(dateStr).getTime();
+    if (isNaN(then)) return "Recently";
+    const diffMs = now - then;
+    const diffMin = Math.floor(diffMs / 60_000);
+    const diffHr = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHr / 24);
+    const diffWk = Math.floor(diffDay / 7);
+    const diffMo = Math.floor(diffDay / 30);
+
+    if (diffMo >= 1) return `${diffMo} month${diffMo > 1 ? "s" : ""} ago`;
+    if (diffWk >= 1) return `${diffWk} week${diffWk > 1 ? "s" : ""} ago`;
+    if (diffDay >= 1) return `${diffDay} day${diffDay > 1 ? "s" : ""} ago`;
+    if (diffHr >= 1) return `${diffHr} hour${diffHr > 1 ? "s" : ""} ago`;
+    if (diffMin >= 1) return `${diffMin} minute${diffMin > 1 ? "s" : ""} ago`;
+    return "Just now";
+  } catch {
+    return "Recently";
+  }
+}
+
+function htmlToExcerpt(html: string, maxLen = 160): string {
+  const text = html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text.length > maxLen ? text.slice(0, maxLen).trimEnd() + "…" : text;
+}
+
+function estimateReadTime(html: string): string {
+  const words = html
+    .replace(/<[^>]+>/g, " ")
+    .trim()
+    .split(/\s+/).length;
+  const mins = Math.max(1, Math.ceil(words / 200));
+  return `${mins} min read`;
+}
+
+const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2670&auto=format&fit=crop";
+
+// Cycle through a small palette of category styles for visual variety
+const CATEGORY_STYLES = [
   {
-    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2670&auto=format&fit=crop",
+    category: "Admissions",
+    categoryColor: "text-red-600",
+    categoryBg: "bg-red-50",
+  },
+  {
+    category: "Exam Alert",
+    categoryColor: "text-orange-600",
+    categoryBg: "bg-orange-50",
+  },
+  {
+    category: "Scholarships",
+    categoryColor: "text-teal-600",
+    categoryBg: "bg-teal-50",
+  },
+  {
+    category: "Campus Life",
+    categoryColor: "text-violet-600",
+    categoryBg: "bg-violet-50",
+  },
+];
+
+function mapDbBlogToArticle(blog: DbBlog, index: number): Article {
+  const style = CATEGORY_STYLES[index % CATEGORY_STYLES.length];
+  return {
+    image: blog.featimage ? `${IMAGE_BASE}${blog.featimage}` : FALLBACK_IMAGE,
+    category: style.category,
+    categoryColor: style.categoryColor,
+    categoryBg: style.categoryBg,
+    time: timeAgo(blog.created_at),
+    readTime: estimateReadTime(blog.description ?? ""),
+    title: blog.topic ?? "Untitled",
+    excerpt: htmlToExcerpt(blog.description ?? ""),
+    author: "AdmissionX Team",
+    authorRole: "Education Expert",
+    href: `/blogs/${blog.slug ?? ""}`,
+  };
+}
+
+// ── Static fallback articles ──────────────────────────────────────────────────
+
+const STATIC_ARTICLES: Article[] = [
+  {
+    image:
+      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2670&auto=format&fit=crop",
     category: "Admissions",
     categoryColor: "text-red-600",
     categoryBg: "bg-red-50",
     time: "2 hours ago",
     readTime: "5 min read",
-    title: "Fall 2026 Admission Deadlines Announced for Ivy League Universities",
+    title: "Fall 2026 Admission Deadlines Announced for Top Universities",
     excerpt:
-      "Most Ivy League universities have released their application deadlines for the upcoming fall semester. Early decision applications are due by November 1st.",
+      "Most top universities have released their application deadlines for the upcoming fall semester. Early decision applications are due by November 1st.",
     author: "Priya Sharma",
     authorRole: "Admissions Expert",
-    href: "/news/ivy-league-deadlines",
+    href: "/news/admission-deadlines",
   },
   {
-    image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2670&auto=format&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2670&auto=format&fit=crop",
     category: "Exam Alert",
     categoryColor: "text-orange-600",
     categoryBg: "bg-orange-50",
     time: "1 day ago",
     readTime: "4 min read",
-    title: "GMAT Focus Edition: Everything You Need to Know About the New Format",
+    title: "JEE Main 2026: Everything You Need to Know About the New Format",
     excerpt:
-      "The Graduate Management Admission Council has introduced the new GMAT Focus Edition. Learn about the changes in format and scoring.",
+      "The National Testing Agency has introduced changes to the JEE Main 2026 exam. Learn about the revised pattern, scoring, and key dates.",
     author: "Rahul Mehta",
     authorRole: "Test Prep Coach",
-    href: "/news/gmat-focus",
+    href: "/news/jee-main-2026",
   },
   {
-    image: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=2649&auto=format&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=2649&auto=format&fit=crop",
     category: "Scholarships",
     categoryColor: "text-teal-600",
     categoryBg: "bg-teal-50",
     time: "3 days ago",
     readTime: "7 min read",
-    title: "Top 10 Scholarships for International Students in 2026",
+    title: "Top 10 Scholarships for Indian Students in 2026",
     excerpt:
-      "Funding your education abroad can be challenging. We've compiled a list of the most generous scholarship programs available globally.",
+      "Funding your education can be challenging. We've compiled a list of the most generous scholarship programmes available for Indian students.",
     author: "Ananya Gupta",
     authorRole: "Financial Aid Advisor",
     href: "/blogs/scholarships-2026",
   },
   {
-    image: "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=2686&auto=format&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=2686&auto=format&fit=crop",
     category: "Campus Life",
     categoryColor: "text-violet-600",
     categoryBg: "bg-violet-50",
     time: "5 days ago",
     readTime: "6 min read",
-    title: "How to Choose the Right University: A Student's Complete Guide",
+    title: "How to Choose the Right College: A Student's Complete Guide",
     excerpt:
-      "Choosing a university is one of the biggest decisions you'll make. Here's a data-driven framework to help you decide.",
+      "Choosing a college is one of the biggest decisions you'll make. Here's a data-driven framework to help you decide with confidence.",
     author: "Arjun Patel",
     authorRole: "Career Counselor",
-    href: "/blogs/choosing-university",
+    href: "/blogs/choosing-college",
   },
 ];
 
-const featured = articles[0];
-const rest = articles.slice(1);
+// ── Animation variants ────────────────────────────────────────────────────────
 
 const containerVariants = {
   hidden: {},
@@ -93,7 +192,18 @@ const itemVariants = {
   },
 };
 
-export default function NewsSection() {
+// ── Component ─────────────────────────────────────────────────────────────────
+
+export default function NewsSection({ dbBlogs }: NewsSectionProps) {
+  // Map DB blogs to Article shape; if none available, use static fallback
+  const articles: Article[] =
+    dbBlogs && dbBlogs.length > 0
+      ? dbBlogs.map((b, i) => mapDbBlogToArticle(b, i))
+      : STATIC_ARTICLES;
+
+  const featured = articles[0];
+  const rest = articles.slice(1);
+
   return (
     <section className="relative w-full py-20 lg:py-28 bg-neutral-50 overflow-hidden">
       <div className="absolute -top-32 left-0 w-[400px] h-[400px] bg-red-500/[0.03] rounded-full blur-3xl pointer-events-none" />
@@ -127,7 +237,7 @@ export default function NewsSection() {
           </div>
 
           <Link
-            href="/news"
+            href="/education-blogs"
             className="group inline-flex items-center gap-2 text-sm font-semibold text-red-500 hover:text-red-700 transition-colors flex-shrink-0"
           >
             View all articles
@@ -157,22 +267,31 @@ export default function NewsSection() {
                   src={featured.image}
                   alt={featured.title}
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = FALLBACK_IMAGE;
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
 
                 {/* Category + Time overlay */}
                 <div className="absolute top-5 left-5 flex items-center gap-2">
-                  <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${featured.categoryBg} ${featured.categoryColor}`}>
+                  <span
+                    className={`text-xs font-bold px-3 py-1.5 rounded-full ${featured.categoryBg} ${featured.categoryColor}`}
+                  >
                     {featured.category}
                   </span>
                 </div>
                 <div className="absolute bottom-5 left-5 flex items-center gap-3">
                   <span className="flex items-center gap-1 text-xs font-medium text-white/80 bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded-full">
-                    <span className="material-symbols-outlined text-[14px]">schedule</span>
+                    <span className="material-symbols-outlined text-[14px]">
+                      schedule
+                    </span>
                     {featured.time}
                   </span>
                   <span className="flex items-center gap-1 text-xs font-medium text-white/80 bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded-full">
-                    <span className="material-symbols-outlined text-[14px]">menu_book</span>
+                    <span className="material-symbols-outlined text-[14px]">
+                      menu_book
+                    </span>
                     {featured.readTime}
                   </span>
                 </div>
@@ -191,7 +310,9 @@ export default function NewsSection() {
                 <div className="flex items-center justify-between pt-5 border-t border-neutral-100">
                   <div className="flex items-center gap-3">
                     <div className="h-9 w-9 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                      <span className="material-symbols-outlined text-red-500 text-lg">person</span>
+                      <span className="material-symbols-outlined text-red-500 text-lg">
+                        person
+                      </span>
                     </div>
                     <div>
                       <div className="text-sm font-semibold text-neutral-900">
@@ -216,7 +337,11 @@ export default function NewsSection() {
           {/* ── Sidebar Articles (stacked, span 2 cols) ── */}
           <div className="lg:col-span-2 flex flex-col gap-5">
             {rest.map((article) => (
-              <motion.article key={article.title} variants={itemVariants} className="flex-1">
+              <motion.article
+                key={article.href}
+                variants={itemVariants}
+                className="flex-1"
+              >
                 <Link
                   href={article.href}
                   className="group flex gap-4 bg-white rounded-2xl border border-neutral-100 overflow-hidden hover:shadow-lg hover:shadow-neutral-900/5 transition-all duration-500 p-4 h-full"
@@ -227,13 +352,18 @@ export default function NewsSection() {
                       src={article.image}
                       alt={article.title}
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = FALLBACK_IMAGE;
+                      }}
                     />
                   </div>
 
                   {/* Content */}
                   <div className="flex flex-col justify-center flex-1 min-w-0 py-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${article.categoryBg} ${article.categoryColor}`}>
+                      <span
+                        className={`text-[11px] font-bold px-2 py-0.5 rounded ${article.categoryBg} ${article.categoryColor}`}
+                      >
                         {article.category}
                       </span>
                       <span className="text-[11px] text-neutral-400">
@@ -257,7 +387,33 @@ export default function NewsSection() {
                 </Link>
               </motion.article>
             ))}
+
+            {/* Fallback filler if fewer than 3 sidebar articles */}
+            {rest.length === 0 && (
+              <div className="flex-1 flex items-center justify-center rounded-2xl border-2 border-dashed border-neutral-200 p-8 text-neutral-400 text-sm font-medium">
+                More articles coming soon
+              </div>
+            )}
           </div>
+        </motion.div>
+
+        {/* ─── View All CTA ─── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4 }}
+          className="mt-12 text-center"
+        >
+          <Link
+            href="/education-blogs"
+            className="group inline-flex items-center gap-3 bg-neutral-900 text-white font-bold text-sm px-7 py-4 rounded-2xl hover:bg-red-600 transition-all duration-300 shadow-lg hover:shadow-red-600/25"
+          >
+            Explore All Blogs & News
+            <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">
+              arrow_forward
+            </span>
+          </Link>
         </motion.div>
       </div>
     </section>
