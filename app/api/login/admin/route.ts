@@ -12,13 +12,12 @@ export async function POST(req: NextRequest) {
 
     const conn = await pool.getConnection();
     try {
-      // For now reuse next_student_signups as a demo admin store or adapt to real admin table later.
       const [rows] = await conn.query(
-        `SELECT id, password_hash FROM next_student_signups WHERE email = ? LIMIT 1`,
+        `SELECT id, password_hash, role, email FROM admins WHERE email = ? LIMIT 1`,
         [email]
       );
 
-      const list = rows as { id: number; password_hash: string }[];
+      const list = rows as { id: number; password_hash: string; role: string; email: string }[];
       if (!list.length) {
         return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
       }
@@ -28,11 +27,19 @@ export async function POST(req: NextRequest) {
       if (!ok) {
         return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
       }
+
+      // Return the role so the frontend can route accordingly
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role
+        }
+      });
     } finally {
       conn.release();
     }
-
-    return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Admin login error", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
