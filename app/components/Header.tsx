@@ -280,7 +280,7 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps) {
             <img
               src="/admissionx-logo.png"
               alt="AdmissionX logo"
-              className="h-8 w-auto object-contain"
+              className="h-6 sm:h-8 w-auto object-contain"
             />
           </Link>
 
