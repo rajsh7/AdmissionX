@@ -15,8 +15,9 @@ function buildImageUrl(raw: string | null): string {
 }
 
 function stripHtml(html: string | null | undefined): string {
-  if (!html) return "";
-  return html
+  if (html === null || html === undefined || html === "") return "";
+  const str = String(html);
+  return str
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
@@ -443,22 +444,17 @@ export default async function ExamOverviewPage({
                           {row.eventStatus ? (
                             <span
                               className={`inline-flex items-center text-[10px] font-bold px-2.5 py-1 rounded-full ${
-                                row.eventStatus
-                                  .toLowerCase()
-                                  .includes("active") ||
-                                row.eventStatus.toLowerCase().includes("open")
-                                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                  : row.eventStatus
-                                        .toLowerCase()
-                                        .includes("closed") ||
-                                      row.eventStatus
-                                        .toLowerCase()
-                                        .includes("over")
+                                (() => {
+                                  const s = String(row.eventStatus).toLowerCase();
+                                  return s.includes("active") || s.includes("open")
+                                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                    : s.includes("closed") || s.includes("over")
                                     ? "bg-neutral-100 text-neutral-500"
-                                    : "bg-amber-50 text-amber-700 border border-amber-200"
+                                    : "bg-amber-50 text-amber-700 border border-amber-200";
+                                })()
                               }`}
                             >
-                              {row.eventStatus}
+                              {String(row.eventStatus)}
                             </span>
                           ) : upcoming ? (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-50 text-red-600 border border-red-100">

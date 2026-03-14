@@ -27,6 +27,8 @@ interface SearchFiltersProps {
   totalResults?: number;
   /** Called whenever any filter changes — parent can use URL push instead */
   onFilterChange?: (filters: ActiveFilters) => void;
+  entityName?: string;
+  entityNamePlural?: string;
 }
 
 export interface ActiveFilters {
@@ -242,6 +244,8 @@ export default function SearchFilters({
   activeSort = "rating",
   totalResults,
   onFilterChange,
+  entityName = "College",
+  entityNamePlural = "Colleges",
 }: SearchFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -358,10 +362,10 @@ export default function SearchFilters({
       {/* ── Header ── */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="text-base font-black text-neutral-900">Filters</h2>
+          <h2 className="text-base font-black text-neutral-900">Filter {entityNamePlural}</h2>
           {totalResults !== undefined && (
             <p className="text-xs text-neutral-400 mt-0.5">
-              {totalResults.toLocaleString()} colleges found
+              {totalResults.toLocaleString()} {entityNamePlural.toLowerCase()} found
             </p>
           )}
         </div>
@@ -551,8 +555,8 @@ export default function SearchFilters({
   return (
     <>
       {/* ── Desktop sidebar ── */}
-      <aside className="hidden lg:flex flex-col w-64 xl:w-72 flex-shrink-0">
-        <div className="sticky top-24 bg-white rounded-2xl border border-neutral-100 shadow-sm p-5 max-h-[calc(100vh-120px)] overflow-hidden flex flex-col">
+      <aside className="hidden lg:flex flex-col w-72 xl:w-80 flex-shrink-0">
+        <div className="sticky top-24 bg-white/85 backdrop-blur-xl rounded-2xl border border-white/60 shadow-2xl shadow-black/10 p-5 max-h-[calc(100vh-120px)] overflow-hidden flex flex-col">
           {panel}
         </div>
       </aside>
@@ -590,7 +594,7 @@ export default function SearchFilters({
             {/* Drawer header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
               <span className="text-base font-black text-neutral-900">
-                Filter Colleges
+                Filter {entityNamePlural}
               </span>
               <button
                 type="button"
@@ -613,7 +617,7 @@ export default function SearchFilters({
                 onClick={() => setMobileOpen(false)}
                 className="w-full bg-red-600 text-white font-bold py-3.5 rounded-2xl hover:bg-red-700 transition-colors text-sm"
               >
-                Show {totalResults?.toLocaleString() ?? ""} Colleges
+                Show {totalResults?.toLocaleString() ?? ""} {entityNamePlural}
               </button>
             </div>
           </div>

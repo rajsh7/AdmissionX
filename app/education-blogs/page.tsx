@@ -46,10 +46,10 @@ function timeAgo(dateStr: string): string {
   try {
     const diffMs = Date.now() - new Date(dateStr).getTime();
     const diffDay = Math.floor(diffMs / 86_400_000);
-    const diffWk  = Math.floor(diffDay / 7);
-    const diffMo  = Math.floor(diffDay / 30);
-    if (diffMo  >= 1) return `${diffMo}mo ago`;
-    if (diffWk  >= 1) return `${diffWk}w ago`;
+    const diffWk = Math.floor(diffDay / 7);
+    const diffMo = Math.floor(diffDay / 30);
+    if (diffMo >= 1) return `${diffMo}mo ago`;
+    if (diffWk >= 1) return `${diffWk}w ago`;
     if (diffDay >= 1) return `${diffDay}d ago`;
     return "Today";
   } catch { return ""; }
@@ -128,151 +128,163 @@ export default async function EducationBlogsPage({
     ),
   ]);
 
-  const total      = countRows[0]?.total ?? 0;
+  const total = countRows[0]?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   if (currentPage > totalPages && total > 0) notFound();
 
   const featured = blogs[0] ?? null;
-  const rest     = blogs.slice(1);
+  const rest = blogs.slice(1);
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <Header />
-
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <div className="bg-neutral-900 pt-24 pb-14">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
-            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-            <span className="text-neutral-300">Education Blogs</span>
-          </nav>
-
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-            <div className="max-w-2xl">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-                  <span className="material-symbols-outlined text-[13px]">article</span>
-                  Education Blogs
-                </span>
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-3">
-                Insights, Tips &{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-rose-400">
-                  Guides
-                </span>
-              </h1>
-              <p className="text-neutral-400 text-sm leading-relaxed max-w-lg">
-                Expert articles on admissions, entrance exams, career guidance, scholarships, and campus life — everything you need to make the right academic decisions.
-              </p>
-            </div>
-
-            {/* Stats */}
-            <div className="flex gap-4 flex-shrink-0">
-              <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-center min-w-[90px]">
-                <p className="text-2xl font-black text-white">{total}</p>
-                <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wide mt-0.5">Articles</p>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Search bar ── */}
-          <form method="GET" className="mt-8 max-w-xl">
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-[20px] text-neutral-500">
-                search
-              </span>
-              <input
-                type="search"
-                name="q"
-                defaultValue={q}
-                placeholder="Search blogs by topic or keyword…"
-                className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/15 rounded-xl text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-red-400 focus:bg-white/15 transition-all"
-              />
-              {q && (
-                <Link
-                  href="/education-blogs"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors"
-                  aria-label="Clear search"
-                >
-                  <span className="material-symbols-outlined text-[18px]">close</span>
-                </Link>
-              )}
-            </div>
-          </form>
-        </div>
+    <div className="min-h-screen bg-neutral-50 relative">
+      {/* ── Full Page Background ── */}
+      <div className="fixed inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
+          alt="Campus Background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
       </div>
 
-      {/* ── Quick-info strip ── */}
-      <div className="bg-white border-b border-neutral-100">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            {[
-              { icon: "school", label: "Admissions" },
-              { icon: "quiz",   label: "Exam Tips" },
-              { icon: "work",   label: "Career Guidance" },
-              { icon: "payments", label: "Scholarships" },
-              { icon: "apartment", label: "Campus Life" },
-            ].map(({ icon, label }) => (
-              <div key={label} className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600">
-                <span className="material-symbols-outlined text-[15px] text-red-500">{icon}</span>
-                {label}
+      <div className="relative z-10">
+        <Header />
+
+        {/* ── Hero ─────────────────────────────────────────────────────────── */}
+        <div className="pt-24 pb-14">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+              <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+              <span className="text-neutral-300">Education Blogs</span>
+            </nav>
+
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+              <div className="max-w-2xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
+                    <span className="material-symbols-outlined text-[13px]">article</span>
+                    Education Blogs
+                  </span>
+                </div>
+                <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-3">
+                  Insights, Tips &{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-rose-400">
+                    Guides
+                  </span>
+                </h1>
+                <p className="text-neutral-400 text-sm leading-relaxed max-w-lg">
+                  Expert articles on admissions, entrance exams, career guidance, scholarships, and campus life — everything you need to make the right academic decisions.
+                </p>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
 
-      {/* ── Main content ─────────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
-
-        {/* Search context */}
-        {q && (
-          <div className="mb-6 flex items-center gap-3">
-            <p className="text-sm text-neutral-600">
-              Showing <span className="font-black text-neutral-900">{total}</span> result{total !== 1 ? "s" : ""} for{" "}
-              <span className="font-black text-red-600">"{q}"</span>
-            </p>
-            <Link href="/education-blogs" className="text-xs font-bold text-neutral-400 hover:text-red-600 transition-colors">
-              Clear
-            </Link>
-          </div>
-        )}
-
-        {blogs.length === 0 ? (
-          <EmptyState q={q} />
-        ) : (
-          <>
-            {/* Featured post */}
-            {featured && !q && currentPage === 1 && (
-              <FeaturedCard blog={featured} />
-            )}
-
-            {/* Grid */}
-            {rest.length > 0 && (
-              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {(q || currentPage > 1 ? blogs : rest).map((blog) => (
-                  <BlogCard key={blog.id} blog={blog} />
-                ))}
+              {/* Stats */}
+              <div className="flex gap-4 flex-shrink-0">
+                <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-center min-w-[90px]">
+                  <p className="text-2xl font-black text-white">{total}</p>
+                  <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wide mt-0.5">Articles</p>
+                </div>
               </div>
-            )}
+            </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-12 flex items-center justify-center gap-2">
-                <PaginationBar
-                  current={currentPage}
-                  total={totalPages}
-                  q={q}
+            {/* ── Search bar ── */}
+            <form method="GET" className="mt-8 max-w-xl">
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-[20px] text-neutral-500">
+                  search
+                </span>
+                <input
+                  type="search"
+                  name="q"
+                  defaultValue={q}
+                  placeholder="Search blogs by topic or keyword…"
+                  className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/15 rounded-xl text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-red-400 focus:bg-white/15 transition-all"
                 />
+                {q && (
+                  <Link
+                    href="/education-blogs"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">close</span>
+                  </Link>
+                )}
               </div>
-            )}
-          </>
-        )}
-      </div>
+            </form>
+          </div>
+        </div>
 
-      <Footer />
+        {/* ── Quick-info strip ── */}
+        <div className="border-neutral-100">
+          <div className="mx-auto max-w-7xl px-7 sm:px-6 py-3">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+              {[
+                { icon: "school", label: "Admissions" },
+                { icon: "quiz", label: "Exam Tips" },
+                { icon: "work", label: "Career Guidance" },
+                { icon: "payments", label: "Scholarships" },
+                { icon: "apartment", label: "Campus Life" },
+              ].map(({ icon, label }) => (
+                <div key={label} className="flex items-center gap-1.5 text-xs font-bold rounded-full bg-white/10 backdrop-blur-md border border-white/10 px-4 py-2 text-white">
+                  <span className="material-symbols-outlined text-[15px] text-red-400">{icon}</span>
+                  {label}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Main content ─────────────────────────────────────────────────── */}
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
+
+          {/* Search context */}
+          {q && (
+            <div className="mb-6 flex items-center gap-3">
+              <p className="text-sm text-neutral-300">
+                Showing <span className="font-black text-white">{total}</span> result{total !== 1 ? "s" : ""} for{" "}
+                <span className="font-black text-red-400">"{q}"</span>
+              </p>
+              <Link href="/education-blogs" className="text-xs font-bold text-neutral-400 hover:text-red-600 transition-colors">
+                Clear
+              </Link>
+            </div>
+          )}
+
+          {blogs.length === 0 ? (
+            <EmptyState q={q} />
+          ) : (
+            <>
+              {/* Featured post */}
+              {featured && !q && currentPage === 1 && (
+                <FeaturedCard blog={featured} />
+              )}
+
+              {/* Grid */}
+              {rest.length > 0 && (
+                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {(q || currentPage > 1 ? blogs : rest).map((blog) => (
+                    <BlogCard key={blog.id} blog={blog} />
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-12 flex items-center justify-center gap-2">
+                  <PaginationBar
+                    current={currentPage}
+                    total={totalPages}
+                    q={q}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        <Footer />
+      </div>
     </div>
   );
 }
@@ -280,10 +292,10 @@ export default async function EducationBlogsPage({
 // ─── Featured Card ────────────────────────────────────────────────────────────
 
 function FeaturedCard({ blog }: { blog: BlogRow }) {
-  const img   = buildImageUrl(blog.featimage);
-  const desc  = excerpt(blog.description ?? "", 200);
-  const rt    = readTime(blog.description ?? "");
-  const time  = timeAgo(blog.created_at);
+  const img = buildImageUrl(blog.featimage);
+  const desc = excerpt(blog.description ?? "", 200);
+  const rt = readTime(blog.description ?? "");
+  const time = timeAgo(blog.created_at);
 
   return (
     <Link
@@ -333,19 +345,19 @@ function FeaturedCard({ blog }: { blog: BlogRow }) {
 // ─── Blog Card ────────────────────────────────────────────────────────────────
 
 const CARD_ACCENTS = [
-  { dot: "bg-red-500",    badge: "bg-red-50 text-red-700 border-red-100"    },
+  { dot: "bg-red-500", badge: "bg-red-50 text-red-700 border-red-100" },
   { dot: "bg-orange-500", badge: "bg-orange-50 text-orange-700 border-orange-100" },
   { dot: "bg-indigo-500", badge: "bg-indigo-50 text-indigo-700 border-indigo-100" },
-  { dot: "bg-emerald-500",badge: "bg-emerald-50 text-emerald-700 border-emerald-100" },
+  { dot: "bg-emerald-500", badge: "bg-emerald-50 text-emerald-700 border-emerald-100" },
   { dot: "bg-purple-500", badge: "bg-purple-50 text-purple-700 border-purple-100" },
-  { dot: "bg-amber-500",  badge: "bg-amber-50 text-amber-700 border-amber-100"  },
+  { dot: "bg-amber-500", badge: "bg-amber-50 text-amber-700 border-amber-100" },
 ];
 
 function BlogCard({ blog, idx = 0 }: { blog: BlogRow; idx?: number }) {
-  const img    = buildImageUrl(blog.featimage);
-  const desc   = excerpt(blog.description ?? "", 110);
-  const rt     = readTime(blog.description ?? "");
-  const time   = timeAgo(blog.created_at);
+  const img = buildImageUrl(blog.featimage);
+  const desc = excerpt(blog.description ?? "", 110);
+  const rt = readTime(blog.description ?? "");
+  const time = timeAgo(blog.created_at);
   const accent = CARD_ACCENTS[idx % CARD_ACCENTS.length];
 
   return (
@@ -413,7 +425,7 @@ function PaginationBar({
   function href(p: number) {
     const params = new URLSearchParams();
     if (p > 1) params.set("page", String(p));
-    if (q)    params.set("q", q);
+    if (q) params.set("q", q);
     const qs = params.toString();
     return `/education-blogs${qs ? `?${qs}` : ""}`;
   }
@@ -423,7 +435,7 @@ function PaginationBar({
     for (let i = 1; i <= total; i++) pages.push(i);
   } else {
     pages.push(1);
-    if (current > 4)         pages.push("…");
+    if (current > 4) pages.push("…");
     const s = Math.max(2, current - 2);
     const e = Math.min(total - 1, current + 2);
     for (let i = s; i <= e; i++) pages.push(i);
@@ -446,11 +458,10 @@ function PaginationBar({
           <Link
             key={p}
             href={href(p as number)}
-            className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
-              p === current
-                ? "bg-red-600 text-white shadow-md shadow-red-500/25 scale-105"
-                : "bg-white border border-neutral-200 text-neutral-600 hover:border-red-300 hover:text-red-600"
-            }`}
+            className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${p === current
+              ? "bg-red-600 text-white shadow-md shadow-red-500/25 scale-105"
+              : "bg-white border border-neutral-200 text-neutral-600 hover:border-red-300 hover:text-red-600"
+              }`}
           >
             {p}
           </Link>
@@ -476,10 +487,10 @@ function EmptyState({ q }: { q: string }) {
           article
         </span>
       </div>
-      <h3 className="text-lg font-black text-neutral-700 mb-2">
+      <h3 className="text-lg font-black text-white mb-2">
         {q ? `No results for "${q}"` : "No blogs yet"}
       </h3>
-      <p className="text-sm text-neutral-400 max-w-xs leading-relaxed mb-6">
+      <p className="text-sm text-neutral-300 max-w-xs leading-relaxed mb-6">
         {q ? "Try different keywords or browse all articles." : "Check back soon for expert education content."}
       </p>
       {q && (

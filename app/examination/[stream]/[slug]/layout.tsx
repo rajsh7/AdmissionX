@@ -16,9 +16,11 @@ const DEFAULT_BANNER =
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function buildImageUrl(raw: string | null | undefined): string {
-  if (!raw || !raw.trim()) return DEFAULT_BANNER;
-  if (raw.startsWith("http")) return raw;
-  return `${IMAGE_BASE}${raw}`;
+  if (raw === null || raw === undefined || raw === "") return DEFAULT_BANNER;
+  const s = String(raw);
+  if (!s.trim()) return DEFAULT_BANNER;
+  if (s.startsWith("http")) return s;
+  return `${IMAGE_BASE}${s}`;
 }
 
 function formatDate(raw: string | null | undefined): string {
@@ -38,8 +40,9 @@ function isUpcoming(raw: string | null | undefined): boolean {
   return !isNaN(d.getTime()) && d > new Date();
 }
 
-function slugToName(slug: string): string {
-  return slug
+function slugToName(slug: string | null | undefined): string {
+  if (!slug) return "";
+  return String(slug)
     .replace(/-/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
@@ -106,7 +109,7 @@ export async function generateMetadata({
   if (!exam) return { title: "Exam Details | AdmissionX" };
 
   const desc = exam.description
-    ? exam.description
+    ? String(exam.description)
         .replace(/<[^>]+>/g, " ")
         .replace(/\s+/g, " ")
         .trim()

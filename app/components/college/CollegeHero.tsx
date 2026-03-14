@@ -144,11 +144,11 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
               <Link href="/" className="hover:text-white transition-colors">
                 Home
               </Link>
-              <span className="text-neutral-600">›</span>
+              <span className="material-symbols-outlined text-[14px]">chevron_right</span>
               <Link href="/search" className="hover:text-white transition-colors">
                 Colleges
               </Link>
-              <span className="text-neutral-600">›</span>
+              <span className="material-symbols-outlined text-[14px]">chevron_right</span>
               <span className="text-neutral-300 truncate max-w-[240px]">
                 {college_name}
               </span>
@@ -247,14 +247,14 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
 
       {/* ── Quick Stats Bar ── */}
       {quickStats.length > 0 && (
-        <div className="bg-white border-b border-neutral-100 shadow-sm">
+        <div className="bg-white/5 backdrop-blur-md border-b border-white/10 shadow-sm relative z-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="flex items-center gap-0 overflow-x-auto py-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {quickStats.map((stat, i) => (
                 <div
                   key={stat.label}
                   className={`flex items-center gap-2 flex-shrink-0 px-5 py-1 ${
-                    i > 0 ? "border-l border-neutral-100" : ""
+                    i > 0 ? "border-l border-white/10" : ""
                   }`}
                 >
                   <span className="material-symbols-outlined text-[18px] text-red-500 flex-shrink-0">
@@ -264,7 +264,7 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
                     <p className="text-[10px] text-neutral-400 leading-none uppercase tracking-wide font-semibold">
                       {stat.label}
                     </p>
-                    <p className="text-sm font-bold text-neutral-800 leading-snug mt-0.5">
+                    <p className="text-sm font-bold text-white leading-snug mt-0.5">
                       {stat.value}
                     </p>
                   </div>
@@ -272,7 +272,7 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
               ))}
 
               {/* Apply Now CTA on the right */}
-              <div className="ml-auto flex-shrink-0 pl-5 border-l border-neutral-100">
+              <div className="ml-auto flex-shrink-0 pl-5 border-l border-white/10">
                 <a
                   href={`/apply/${slug}`}
                   className="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shadow-sm shadow-red-500/20"

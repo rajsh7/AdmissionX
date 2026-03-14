@@ -33,7 +33,7 @@ interface StatCardProps {
 
 function StatCard({ icon, iconColor, iconBg, label, value, sublabel }: StatCardProps) {
   return (
-    <div className="flex items-start gap-4 bg-white rounded-2xl border border-neutral-100 p-5 shadow-sm">
+    <div className="flex items-start gap-4 bg-white/5 rounded-2xl border border-white/10 p-5">
       <div className={`w-11 h-11 rounded-xl ${iconBg} flex items-center justify-center flex-shrink-0`}>
         <span
           className={`material-symbols-outlined text-[22px] ${iconColor}`}
@@ -46,7 +46,7 @@ function StatCard({ icon, iconColor, iconBg, label, value, sublabel }: StatCardP
         <p className="text-xs text-neutral-400 font-semibold uppercase tracking-wide mb-1">
           {label}
         </p>
-        <p className="text-xl font-black text-neutral-900 leading-none">
+        <p className="text-xl font-black text-white leading-none">
           {value}
         </p>
         {sublabel && (
@@ -86,8 +86,8 @@ export default function PlacementSection({ placement }: PlacementSectionProps) {
     {
       show: !!ctchighest && ctchighest !== "0",
       icon: "trending_up",
-      iconColor: "text-emerald-600",
-      iconBg: "bg-emerald-50",
+      iconColor: "text-emerald-400",
+      iconBg: "bg-emerald-500/10",
       label: "Highest CTC",
       value: formatCTC(ctchighest),
       sublabel: "Per annum",
@@ -95,8 +95,8 @@ export default function PlacementSection({ placement }: PlacementSectionProps) {
     {
       show: !!ctcaverage && ctcaverage !== "0",
       icon: "bar_chart",
-      iconColor: "text-blue-600",
-      iconBg: "bg-blue-50",
+      iconColor: "text-blue-400",
+      iconBg: "bg-blue-500/10",
       label: "Average CTC",
       value: formatCTC(ctcaverage),
       sublabel: "Per annum",
@@ -104,8 +104,8 @@ export default function PlacementSection({ placement }: PlacementSectionProps) {
     {
       show: !!ctclowest && ctclowest !== "0",
       icon: "trending_down",
-      iconColor: "text-amber-600",
-      iconBg: "bg-amber-50",
+      iconColor: "text-amber-400",
+      iconBg: "bg-amber-500/10",
       label: "Lowest CTC",
       value: formatCTC(ctclowest),
       sublabel: "Per annum",
@@ -113,8 +113,8 @@ export default function PlacementSection({ placement }: PlacementSectionProps) {
     {
       show: !!numberofrecruitingcompany && numberofrecruitingcompany !== "0",
       icon: "corporate_fare",
-      iconColor: "text-violet-600",
-      iconBg: "bg-violet-50",
+      iconColor: "text-violet-400",
+      iconBg: "bg-violet-500/10",
       label: "Recruiting Companies",
       value: `${parseInt(String(numberofrecruitingcompany)).toLocaleString("en-IN")}+`,
       sublabel: "Top recruiters",
@@ -123,8 +123,8 @@ export default function PlacementSection({ placement }: PlacementSectionProps) {
       show:
         !!numberofplacementlastyear && numberofplacementlastyear !== "0",
       icon: "how_to_reg",
-      iconColor: "text-red-600",
-      iconBg: "bg-red-50",
+      iconColor: "text-red-400",
+      iconBg: "bg-red-500/10",
       label: "Placed Last Year",
       value: `${parseInt(String(numberofplacementlastyear)).toLocaleString("en-IN")}`,
       sublabel: "Students placed",
@@ -134,12 +134,12 @@ export default function PlacementSection({ placement }: PlacementSectionProps) {
   const visibleStats = stats.filter((s) => s.show);
 
   return (
-    <section className="bg-white rounded-2xl border border-neutral-100 p-6">
+    <section className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6 scroll-mt-24" id="placement">
       {/* Section heading */}
-      <h2 className="text-lg font-black text-neutral-900 mb-6 flex items-center gap-2">
-        <span className="w-1 h-5 bg-red-600 rounded-full block" />
+      <h2 className="text-lg font-black text-white mb-6 flex items-center gap-2">
+        <span className="w-1 h-5 bg-red-500 rounded-full block" />
         Placement Statistics
-        <span className="ml-2 inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">
+        <span className="ml-2 inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">
           <span
             className="material-symbols-outlined text-[12px]"
             style={{ fontVariationSettings: "'FILL' 1" }}
@@ -179,11 +179,11 @@ export default function PlacementSection({ placement }: PlacementSectionProps) {
 
       {/* CTC Range visual bar (when both highest and lowest present) */}
       {ctchighest && ctclowest && ctcaverage && (
-        <div className="bg-gradient-to-r from-neutral-50 to-neutral-100 rounded-xl p-4 mb-6 border border-neutral-100">
-          <p className="text-xs font-bold text-neutral-500 uppercase tracking-wide mb-3">
+        <div className="bg-white/5 rounded-xl p-4 mb-6 border border-white/10">
+          <p className="text-xs font-bold text-neutral-400 uppercase tracking-wide mb-3">
             CTC Range
           </p>
-          <div className="relative h-3 bg-neutral-200 rounded-full overflow-hidden">
+          <div className="relative h-3 bg-white/10 rounded-full overflow-hidden">
             <div
               className="absolute inset-y-0 left-0 bg-gradient-to-r from-amber-400 via-blue-500 to-emerald-500 rounded-full"
               style={{ width: "100%" }}
@@ -205,14 +205,14 @@ export default function PlacementSection({ placement }: PlacementSectionProps) {
 
       {/* Placement info / description */}
       {infoText && (
-        <div className="border-t border-neutral-100 pt-4">
+        <div className="border-t border-white/10 pt-4">
           <p className="text-xs font-bold text-neutral-500 uppercase tracking-wide mb-2 flex items-center gap-1.5">
             <span className="material-symbols-outlined text-[14px] text-red-500">
               info
             </span>
             Placement Overview
           </p>
-          <p className="text-sm text-neutral-600 leading-relaxed line-clamp-6">
+          <p className="text-sm text-neutral-300 leading-relaxed line-clamp-6">
             {infoText}
           </p>
         </div>

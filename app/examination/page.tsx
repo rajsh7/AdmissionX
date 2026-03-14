@@ -173,11 +173,22 @@ export default async function ExaminationHubPage() {
   const totalQuestions = Number(stats.total_questions) || 0;
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <Header />
+    <div className="min-h-screen bg-neutral-50 relative">
+      {/* ── Full Page Background ── */}
+      <div className="fixed inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
+          alt="Campus Background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
+      </div>
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <div className="bg-neutral-900 pt-24 pb-16 relative overflow-hidden">
+      <div className="relative z-10">
+        <Header />
+
+        {/* ── Hero ─────────────────────────────────────────────────────────── */}
+        <div className="pt-24 pb-16 relative overflow-hidden">
         {/* decorative blobs */}
         <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-red-600/10 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 -left-16 w-64 h-64 rounded-full bg-rose-500/10 blur-3xl pointer-events-none" />
@@ -243,8 +254,8 @@ export default async function ExaminationHubPage() {
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-black text-neutral-900">Browse by Stream</h2>
-              <p className="text-sm text-neutral-500 mt-0.5">
+              <h2 className="text-xl font-black text-white">Browse by Stream</h2>
+              <p className="text-sm text-neutral-300 mt-0.5">
                 Select a category to view all exams in that stream
               </p>
             </div>
@@ -291,8 +302,8 @@ export default async function ExaminationHubPage() {
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-black text-neutral-900">Popular Entrance Exams</h2>
-              <p className="text-sm text-neutral-500 mt-0.5">
+              <h2 className="text-xl font-black text-white">Popular Entrance Exams</h2>
+              <p className="text-sm text-neutral-300 mt-0.5">
                 Most-searched exams with key dates and info
               </p>
             </div>
@@ -352,8 +363,8 @@ export default async function ExaminationHubPage() {
         </section>
 
       </div>
-
       <Footer />
+      </div>
     </div>
   );
 }

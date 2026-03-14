@@ -29,13 +29,13 @@ function CutoffRow({
 
   return (
     <tr
-      className={`border-b border-neutral-50 hover:bg-red-50/30 transition-colors ${
-        index % 2 === 0 ? "bg-white" : "bg-neutral-50/40"
+      className={`border-b border-white/5 hover:bg-white/5 transition-colors ${
+        index % 2 === 0 ? "bg-white/5" : "bg-transparent"
       }`}
     >
       {/* # */}
       <td className="px-4 py-3 text-center">
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-neutral-100 text-neutral-500 text-[11px] font-bold">
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/5 text-neutral-400 text-[11px] font-bold">
           {index + 1}
         </span>
       </td>
@@ -43,7 +43,7 @@ function CutoffRow({
       {/* Stream */}
       <td className="px-4 py-3">
         {cutoff.stream_name ? (
-          <span className="inline-flex items-center gap-1 bg-red-50 text-red-700 border border-red-100 text-[11px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide">
+          <span className="inline-flex items-center gap-1 bg-red-500/10 text-red-300 border border-red-500/20 text-[11px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide">
             {cutoff.stream_name}
           </span>
         ) : (
@@ -54,7 +54,7 @@ function CutoffRow({
       {/* Degree */}
       <td className="px-4 py-3">
         {cutoff.degree_name ? (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[11px] font-semibold border border-blue-100">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-300 text-[11px] font-semibold border border-blue-500/20">
             {cutoff.degree_name}
           </span>
         ) : (
@@ -64,7 +64,7 @@ function CutoffRow({
 
       {/* Course */}
       <td className="px-4 py-3">
-        <span className="text-sm font-semibold text-neutral-800">
+        <span className="text-sm font-semibold text-white">
           {cutoff.course_name ?? "—"}
         </span>
       </td>
@@ -72,9 +72,9 @@ function CutoffRow({
       {/* Title / Cut-off value */}
       <td className="px-4 py-3">
         {title ? (
-          <span className="text-sm font-bold text-neutral-900">{title}</span>
+          <span className="text-sm font-bold text-white">{title}</span>
         ) : (
-          <span className="text-neutral-400 text-xs">—</span>
+          <span className="text-neutral-500 text-xs">—</span>
         )}
       </td>
 
@@ -97,15 +97,15 @@ function CutoffRow({
 function EmptyCutoffs() {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="w-16 h-16 rounded-2xl bg-neutral-100 flex items-center justify-center mb-4">
-        <span className="material-symbols-outlined text-[28px] text-neutral-300">
+      <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+        <span className="material-symbols-outlined text-[28px] text-neutral-500">
           bar_chart_4_bars
         </span>
       </div>
-      <p className="text-sm font-semibold text-neutral-500 mb-1">
+      <p className="text-sm font-semibold text-neutral-400 mb-1">
         Cut-off data not available
       </p>
-      <p className="text-xs text-neutral-400 max-w-xs">
+      <p className="text-xs text-neutral-500 max-w-xs">
         Cut-off details will be updated after admission rounds are announced.
       </p>
     </div>
@@ -122,7 +122,7 @@ interface CutOffTableProps {
 export default function CutOffTable({ cutoffs, collegeName }: CutOffTableProps) {
   if (cutoffs.length === 0) {
     return (
-      <section className="bg-white rounded-2xl border border-neutral-100 p-6">
+      <section className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6 scroll-mt-24" id="cutoffs">
         <Header count={0} />
         <EmptyCutoffs />
       </section>
@@ -136,32 +136,32 @@ export default function CutOffTable({ cutoffs, collegeName }: CutOffTableProps) 
 
   const streamColors: Record<string, string> = {};
   const palette = [
-    "bg-red-50 text-red-700 border-red-100",
-    "bg-blue-50 text-blue-700 border-blue-100",
-    "bg-emerald-50 text-emerald-700 border-emerald-100",
-    "bg-amber-50 text-amber-700 border-amber-100",
-    "bg-purple-50 text-purple-700 border-purple-100",
-    "bg-pink-50 text-pink-700 border-pink-100",
+    "bg-red-500/10 text-red-300 border-red-500/20",
+    "bg-blue-500/10 text-blue-300 border-blue-500/20",
+    "bg-emerald-500/10 text-emerald-300 border-emerald-500/20",
+    "bg-amber-500/10 text-amber-300 border-amber-500/20",
+    "bg-purple-500/10 text-purple-300 border-purple-500/20",
+    "bg-pink-500/10 text-pink-300 border-pink-500/20",
   ];
   uniqueStreams.forEach((s, i) => {
     streamColors[s] = palette[i % palette.length];
   });
 
   return (
-    <section className="bg-white rounded-2xl border border-neutral-100 overflow-hidden">
+    <section className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden scroll-mt-24" id="cutoffs">
       {/* ── Section header ── */}
-      <div className="px-6 pt-6 pb-4 border-b border-neutral-100">
+      <div className="px-6 pt-6 pb-4 border-b border-white/10">
         <Header count={cutoffs.length} />
 
         {/* Disclaimer */}
-        <div className="mt-3 flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3">
+        <div className="mt-3 flex items-start gap-2 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3">
           <span
-            className="material-symbols-outlined text-[16px] text-amber-500 flex-shrink-0 mt-0.5"
+            className="material-symbols-outlined text-[16px] text-amber-400 flex-shrink-0 mt-0.5"
             style={{ fontVariationSettings: "'FILL' 1" }}
           >
             warning
           </span>
-          <p className="text-xs text-amber-700 leading-relaxed">
+          <p className="text-xs text-amber-200 leading-relaxed">
             Cut-off data is indicative and may vary by category (General / OBC / SC / ST).
             Always verify with the official college prospectus.
           </p>
@@ -170,7 +170,7 @@ export default function CutOffTable({ cutoffs, collegeName }: CutOffTableProps) 
 
       {/* ── Stream legend ── */}
       {uniqueStreams.length > 0 && (
-        <div className="px-6 py-3 flex flex-wrap gap-2 bg-neutral-50 border-b border-neutral-100">
+        <div className="px-6 py-3 flex flex-wrap gap-2 bg-white/5 border-b border-white/10">
           <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wide self-center mr-1">
             Streams:
           </span>
@@ -190,7 +190,7 @@ export default function CutOffTable({ cutoffs, collegeName }: CutOffTableProps) 
       <div className="overflow-x-auto">
         <table className="w-full text-sm min-w-[720px]">
           <thead>
-            <tr className="bg-neutral-50 border-b border-neutral-100">
+            <tr className="bg-white/5 border-b border-white/10">
               <th className="px-4 py-3 text-center text-[11px] font-bold text-neutral-400 uppercase tracking-wide w-10">
                 #
               </th>
@@ -220,13 +220,13 @@ export default function CutOffTable({ cutoffs, collegeName }: CutOffTableProps) 
       </div>
 
       {/* ── Footer ── */}
-      <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-100 flex items-center justify-between gap-4">
+      <div className="px-6 py-4 bg-white/5 border-t border-white/10 flex items-center justify-between gap-4">
         <p className="text-[11px] text-neutral-400 flex items-center gap-1.5">
           <span className="material-symbols-outlined text-[13px]">info</span>
           Showing {cutoffs.length} cut-off record{cutoffs.length !== 1 ? "s" : ""} for{" "}
-          <span className="font-semibold text-neutral-600">{collegeName}</span>
+          <span className="font-semibold text-neutral-300">{collegeName}</span>
         </p>
-        <span className="text-[10px] text-neutral-300 font-semibold uppercase tracking-wide">
+        <span className="text-[10px] text-neutral-500 font-semibold uppercase tracking-wide">
           Last updated by college
         </span>
       </div>
@@ -239,16 +239,16 @@ export default function CutOffTable({ cutoffs, collegeName }: CutOffTableProps) 
 function Header({ count }: { count: number }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="w-1 h-5 bg-red-600 rounded-full block flex-shrink-0" />
+      <span className="w-1 h-5 bg-red-500 rounded-full block flex-shrink-0" />
       <span
-        className="material-symbols-outlined text-[20px] text-red-500"
+        className="material-symbols-outlined text-[20px] text-red-400"
         style={{ fontVariationSettings: "'FILL' 1" }}
       >
         bar_chart_4_bars
       </span>
-      <h2 className="text-lg font-black text-neutral-900">Cut-off Data</h2>
+      <h2 className="text-lg font-black text-white">Cut-off Data</h2>
       {count > 0 && (
-        <span className="ml-auto text-xs font-semibold text-neutral-400 bg-neutral-100 px-2.5 py-1 rounded-full flex-shrink-0">
+        <span className="ml-auto text-xs font-semibold text-neutral-300 bg-white/5 px-2.5 py-1 rounded-full flex-shrink-0">
           {count} {count === 1 ? "record" : "records"}
         </span>
       )}

@@ -303,8 +303,8 @@ function Sidebar({ college }: { college: CollegeLayoutRow }) {
   return (
     <div className="sticky top-20 space-y-4">
       {/* ── Apply card ── */}
-      <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm p-5">
-        <h3 className="text-sm font-black text-neutral-900 mb-4 flex items-center gap-2">
+      <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-5">
+        <h3 className="text-sm font-black text-white mb-4 flex items-center gap-2">
           <span className="material-symbols-outlined text-[16px] text-red-500">
             edit_document
           </span>
@@ -323,7 +323,7 @@ function Sidebar({ college }: { college: CollegeLayoutRow }) {
           </a>
           <a
             href={`#contact`}
-            className="w-full flex items-center justify-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-sm py-3 rounded-xl transition-colors"
+            className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-bold text-sm py-3 rounded-xl border border-white/10 transition-colors"
           >
             <span className="material-symbols-outlined text-[17px]">call</span>
             Contact College
@@ -332,7 +332,7 @@ function Sidebar({ college }: { college: CollegeLayoutRow }) {
 
         {/* Admission window */}
         {(admissionStart || admissionEnd) && (
-          <div className="border-t border-neutral-100 pt-4 space-y-2">
+          <div className="border-t border-white/10 pt-4 space-y-2">
             <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide flex items-center gap-1">
               <span className="material-symbols-outlined text-[12px]">
                 event
@@ -342,7 +342,7 @@ function Sidebar({ college }: { college: CollegeLayoutRow }) {
             {admissionStart && (
               <div className="flex items-center justify-between text-xs">
                 <span className="text-neutral-400">Opens</span>
-                <span className="font-bold text-neutral-800 bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md">
+                <span className="font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
                   {admissionStart}
                 </span>
               </div>
@@ -350,7 +350,7 @@ function Sidebar({ college }: { college: CollegeLayoutRow }) {
             {admissionEnd && (
               <div className="flex items-center justify-between text-xs">
                 <span className="text-neutral-400">Closes</span>
-                <span className="font-bold text-neutral-800 bg-red-50 text-red-700 px-2 py-0.5 rounded-md">
+                <span className="font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-md">
                   {admissionEnd}
                 </span>
               </div>
@@ -362,10 +362,10 @@ function Sidebar({ college }: { college: CollegeLayoutRow }) {
       {/* ── College details ── */}
       {detailItems.length > 0 && (
         <div
-          className="bg-white rounded-2xl border border-neutral-100 shadow-sm p-5"
+          className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-5"
           id="contact"
         >
-          <h3 className="text-sm font-black text-neutral-900 mb-4 flex items-center gap-2">
+          <h3 className="text-sm font-black text-white mb-4 flex items-center gap-2">
             <span className="material-symbols-outlined text-[16px] text-red-500">
               info
             </span>
@@ -391,7 +391,7 @@ function Sidebar({ college }: { college: CollegeLayoutRow }) {
                       {item.value}
                     </a>
                   ) : (
-                    <span className="font-semibold text-neutral-800 leading-snug">
+                    <span className="font-semibold text-white leading-snug">
                       {item.value}
                     </span>
                   )}
@@ -404,8 +404,8 @@ function Sidebar({ college }: { college: CollegeLayoutRow }) {
 
       {/* ── Social media ── */}
       {(facebookurl || twitterurl) && (
-        <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm p-5">
-          <h3 className="text-sm font-black text-neutral-900 mb-3 flex items-center gap-2">
+        <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-5">
+          <h3 className="text-sm font-black text-white mb-3 flex items-center gap-2">
             <span className="material-symbols-outlined text-[16px] text-red-500">
               share
             </span>
@@ -417,7 +417,7 @@ function Sidebar({ college }: { college: CollegeLayoutRow }) {
                 href={facebookurl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl transition-colors"
+                className="flex items-center gap-2 px-3.5 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold text-xs rounded-xl border border-blue-500/20 transition-colors"
               >
                 <svg
                   className="w-3.5 h-3.5"
@@ -434,7 +434,7 @@ function Sidebar({ college }: { college: CollegeLayoutRow }) {
                 href={twitterurl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-3.5 py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold text-xs rounded-xl transition-colors"
+                className="flex items-center gap-2 px-3.5 py-2 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 font-bold text-xs rounded-xl border border-sky-500/20 transition-colors"
               >
                 <svg
                   className="w-3.5 h-3.5"
@@ -453,7 +453,7 @@ function Sidebar({ college }: { college: CollegeLayoutRow }) {
       {/* ── Back to search ── */}
       <Link
         href="/search"
-        className="flex items-center justify-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-bold text-sm py-3 rounded-2xl transition-colors w-full"
+        className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-neutral-300 font-bold text-sm py-3 rounded-2xl border border-white/10 transition-colors w-full"
       >
         <span className="material-symbols-outlined text-[17px]">
           arrow_back
@@ -530,8 +530,19 @@ export default async function CollegeLayout({
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <Header />
+    <div className="min-h-screen relative">
+      {/* ── Full Page Background ── */}
+      <div className="fixed inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
+          alt="Campus Background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
+      </div>
+
+      <div className="relative z-10">
+        <Header />
 
       {/* ── Hero banner + quick stats ── */}
       <CollegeHero college={heroData} />
@@ -562,6 +573,7 @@ export default async function CollegeLayout({
       </div>
 
       <Footer />
+      </div>
     </div>
   );
 }

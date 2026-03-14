@@ -167,13 +167,13 @@ function GalleryItem({
 
   return (
     <button
-      className="relative overflow-hidden rounded-xl group aspect-square bg-neutral-100 hover:ring-2 hover:ring-red-500 hover:ring-offset-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+      className="relative overflow-hidden rounded-xl group aspect-square bg-white/5 hover:ring-2 hover:ring-red-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500"
       onClick={() => onClick(index)}
       aria-label={image.caption ?? image.name ?? `View image ${index + 1}`}
     >
       {/* Skeleton */}
       {!loaded && (
-        <div className="absolute inset-0 bg-neutral-200 animate-pulse" />
+        <div className="absolute inset-0 bg-white/5 animate-pulse" />
       )}
 
       <img
@@ -234,14 +234,14 @@ export default function GallerySection({
 
   return (
     <>
-      <section className="bg-white rounded-2xl border border-neutral-100 overflow-hidden">
+      <section className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden scroll-mt-24" id="gallery">
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 border-b border-neutral-100 flex items-center justify-between gap-3">
-          <h2 className="text-lg font-black text-neutral-900 flex items-center gap-2">
-            <span className="w-1 h-5 bg-red-600 rounded-full block flex-shrink-0" />
+        <div className="px-6 pt-6 pb-4 border-b border-white/10 flex items-center justify-between gap-3">
+          <h2 className="text-lg font-black text-white flex items-center gap-2">
+            <span className="w-1 h-5 bg-red-500 rounded-full block flex-shrink-0" />
             Photo Gallery
           </h2>
-          <span className="text-xs font-semibold text-neutral-500 bg-neutral-100 px-3 py-1 rounded-full flex-shrink-0">
+          <span className="text-xs font-semibold text-neutral-300 bg-white/5 px-3 py-1 rounded-full flex-shrink-0">
             {validImages.length} photo{validImages.length !== 1 ? "s" : ""}
           </span>
         </div>
@@ -298,13 +298,13 @@ export default function GallerySection({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-neutral-50 border-t border-neutral-100 flex items-center gap-2">
+        <div className="px-6 py-3 bg-white/5 border-t border-white/10 flex items-center gap-2">
           <span className="material-symbols-outlined text-[14px] text-neutral-400">
             photo_camera
           </span>
           <p className="text-[11px] text-neutral-400">
             Campus photos of{" "}
-            <span className="font-semibold text-neutral-500">{collegeName}</span>
+            <span className="font-semibold text-neutral-300">{collegeName}</span>
             {" · "}Click any image to view full screen
           </p>
         </div>

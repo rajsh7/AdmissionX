@@ -232,10 +232,21 @@ export default async function StreamPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      <Header />
+      {/* ── Full Page Background ── */}
+      <div className="fixed inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
+          alt="Campus Background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
+      </div>
 
-      {/* ── Hero ── */}
-      <div className="bg-neutral-900 pt-24 pb-14">
+      <div className="relative z-10">
+        <Header />
+
+        {/* ── Hero ── */}
+        <div className="pt-24 pb-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
@@ -308,10 +319,10 @@ export default async function StreamPage() {
           <section className="mb-14">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xl font-black text-neutral-900">
+                <h2 className="text-xl font-black text-white">
                   Popular Streams
                 </h2>
-                <p className="text-sm text-neutral-400 mt-1">
+                <p className="text-sm text-neutral-300 mt-1">
                   Most-searched fields of study
                 </p>
               </div>
@@ -392,10 +403,10 @@ export default async function StreamPage() {
           <section>
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xl font-black text-neutral-900">
+                <h2 className="text-xl font-black text-white">
                   All Streams
                 </h2>
-                <p className="text-sm text-neutral-400 mt-1">
+                <p className="text-sm text-neutral-300 mt-1">
                   {remaining.length} more streams to explore
                 </p>
               </div>
@@ -445,10 +456,10 @@ export default async function StreamPage() {
                 school
               </span>
             </div>
-            <h3 className="text-lg font-bold text-neutral-800 mb-2">
+            <h3 className="text-lg font-bold text-white mb-2">
               No streams found
             </h3>
-            <p className="text-sm text-neutral-500 max-w-xs">
+            <p className="text-sm text-neutral-300 max-w-xs">
               We couldn&apos;t load the streams right now. Please try again
               shortly.
             </p>
@@ -494,6 +505,7 @@ export default async function StreamPage() {
         )}
       </div>
 
+      </div>
       <Footer />
     </div>
   );

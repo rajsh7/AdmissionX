@@ -7,6 +7,7 @@ import type { CollegeResult } from "@/app/api/search/colleges/route";
 interface CollegeListItemProps {
   college: CollegeResult;
   index?: number;
+  entityName?: string;
 }
 
 function formatFees(fees: number | null): string {
@@ -41,6 +42,7 @@ function StarRating({ rating }: { rating: number }) {
 export default function CollegeListItem({
   college,
   index = 0,
+  entityName = "College",
 }: CollegeListItemProps) {
   const {
     slug,
@@ -118,7 +120,7 @@ export default function CollegeListItem({
 
             {/* Desktop action */}
             <span className="hidden sm:inline-flex items-center gap-1.5 flex-shrink-0 bg-neutral-900 group-hover:bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all duration-300 whitespace-nowrap">
-              View Details
+              View {entityName}
               <span className="material-symbols-outlined text-sm group-hover:translate-x-0.5 transition-transform">
                 arrow_forward
               </span>
@@ -230,7 +232,7 @@ export default function CollegeListItem({
           {/* Mobile CTA */}
           <div className="sm:hidden mt-3">
             <span className="inline-flex items-center gap-1.5 bg-neutral-900 group-hover:bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all duration-300">
-              View Details
+              View {entityName}
               <span className="material-symbols-outlined text-sm">
                 arrow_forward
               </span>

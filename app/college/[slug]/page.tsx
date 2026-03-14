@@ -220,14 +220,14 @@ export default async function CollegeOverviewPage({
         hasCutoffs ||
         hasScholarships ||
         hasGallery) && (
-        <nav className="bg-white rounded-2xl border border-neutral-100 px-5 py-3 flex items-center gap-2 flex-wrap">
+        <nav className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 px-5 py-3 flex items-center gap-2 flex-wrap">
           <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mr-1">
             On this page:
           </span>
           {descriptionText && (
             <a
               href="#about"
-              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-600 hover:text-red-600 transition-colors px-2.5 py-1 rounded-lg hover:bg-red-50"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-300 hover:text-white transition-colors px-2.5 py-1 rounded-lg hover:bg-white/5"
             >
               <span className="material-symbols-outlined text-[13px]">
                 info
@@ -238,7 +238,7 @@ export default async function CollegeOverviewPage({
           {courseCount > 0 && (
             <a
               href="#courses"
-              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-600 hover:text-red-600 transition-colors px-2.5 py-1 rounded-lg hover:bg-red-50"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-300 hover:text-white transition-colors px-2.5 py-1 rounded-lg hover:bg-white/5"
             >
               <span className="material-symbols-outlined text-[13px]">
                 menu_book
@@ -249,7 +249,7 @@ export default async function CollegeOverviewPage({
           {hasPlacement && (
             <a
               href="#placement"
-              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-600 hover:text-red-600 transition-colors px-2.5 py-1 rounded-lg hover:bg-red-50"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-300 hover:text-white transition-colors px-2.5 py-1 rounded-lg hover:bg-white/5"
             >
               <span className="material-symbols-outlined text-[13px]">
                 trending_up
@@ -260,7 +260,7 @@ export default async function CollegeOverviewPage({
           {hasCutoffs && (
             <a
               href="#cutoffs"
-              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-600 hover:text-red-600 transition-colors px-2.5 py-1 rounded-lg hover:bg-red-50"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-300 hover:text-white transition-colors px-2.5 py-1 rounded-lg hover:bg-white/5"
             >
               <span className="material-symbols-outlined text-[13px]">
                 bar_chart_4_bars
@@ -271,7 +271,7 @@ export default async function CollegeOverviewPage({
           {hasScholarships && (
             <a
               href="#scholarships"
-              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-600 hover:text-red-600 transition-colors px-2.5 py-1 rounded-lg hover:bg-red-50"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-300 hover:text-white transition-colors px-2.5 py-1 rounded-lg hover:bg-white/5"
             >
               <span className="material-symbols-outlined text-[13px]">
                 school
@@ -282,7 +282,7 @@ export default async function CollegeOverviewPage({
           {hasGallery && (
             <a
               href="#gallery"
-              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-600 hover:text-red-600 transition-colors px-2.5 py-1 rounded-lg hover:bg-red-50"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-300 hover:text-white transition-colors px-2.5 py-1 rounded-lg hover:bg-white/5"
             >
               <span className="material-symbols-outlined text-[13px]">
                 photo_library
@@ -297,13 +297,13 @@ export default async function CollegeOverviewPage({
       {descriptionText && (
         <section
           id="about"
-          className="bg-white rounded-2xl border border-neutral-100 p-6 scroll-mt-24"
+          className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6 scroll-mt-24"
         >
-          <h2 className="text-lg font-black text-neutral-900 mb-4 flex items-center gap-2">
-            <span className="w-1 h-5 bg-red-600 rounded-full block" />
+          <h2 className="text-lg font-black text-white mb-4 flex items-center gap-2">
+            <span className="w-1 h-5 bg-red-500 rounded-full block" />
             About {collegeName}
           </h2>
-          <p className="text-sm text-neutral-600 leading-relaxed">
+          <p className="text-sm text-neutral-300 leading-relaxed">
             {descriptionText}
           </p>
         </section>
@@ -348,10 +348,10 @@ export default async function CollegeOverviewPage({
       )}
 
       {/* ── Mobile CTA strip (visible only on small screens, sidebar hidden) ── */}
-      <div className="lg:hidden bg-white rounded-2xl border border-neutral-100 p-4 flex gap-3">
+      <div className="lg:hidden bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-4 flex gap-3">
         <a
           href={`/apply/${slug}`}
-          className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold text-sm py-3 rounded-xl transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold text-sm py-3 rounded-xl transition-colors shadow-lg shadow-red-500/20"
         >
           <span className="material-symbols-outlined text-[17px]">
             edit_document
@@ -360,7 +360,7 @@ export default async function CollegeOverviewPage({
         </a>
         <a
           href="#contact"
-          className="flex-1 flex items-center justify-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-sm py-3 rounded-xl transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 text-white font-bold text-sm py-3 rounded-xl border border-white/10 transition-colors"
         >
           <span className="material-symbols-outlined text-[17px]">call</span>
           Contact

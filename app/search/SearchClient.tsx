@@ -45,6 +45,8 @@ interface SearchClientProps {
   initType: string;
   pageTitle: string;
   pageSubtitle: string;
+  entityName?: string;
+  entityNamePlural?: string;
 }
 
 type ViewMode = "grid" | "list";
@@ -238,8 +240,6 @@ function CollegeListSkeleton() {
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
-
 export default function SearchClient({
   initialColleges,
   initialTotal,
@@ -258,6 +258,8 @@ export default function SearchClient({
   initType,
   pageTitle,
   pageSubtitle,
+  entityName = "College",
+  entityNamePlural = "Colleges",
 }: SearchClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -420,234 +422,250 @@ export default function SearchClient({
 
   const showingText = loading
     ? "Loading..."
-    : `Showing ${colleges.length > 0 ? (page - 1) * 12 + 1 : 0}–${Math.min(page * 12, total)} of ${total.toLocaleString()} colleges`;
+    : `Showing ${colleges.length > 0 ? (page - 1) * 12 + 1 : 0}–${Math.min(page * 12, total)} of ${total.toLocaleString()} ${entityNamePlural.toLowerCase()}`;
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <Header />
-
-      {/* ── Hero / Search Banner ── */}
-      <div className="bg-neutral-900 pt-24 pb-10">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-5">
-            <a href="/" className="hover:text-white transition-colors">
-              Home
-            </a>
-            <span className="material-symbols-outlined text-[14px]">
-              chevron_right
-            </span>
-            <span className="text-neutral-300">{pageTitle}</span>
-          </nav>
-
-          {/* Title */}
-          <div className="mb-7">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight mb-2">
-              {pageTitle}
-            </h1>
-            <p className="text-neutral-400 text-sm sm:text-base">
-              {pageSubtitle}
-            </p>
-          </div>
-
-          {/* Search bar */}
-          <div className="max-w-2xl">
-            <SearchBar defaultValue={q} onSearch={handleSearch} />
-          </div>
-
-          {/* Active search indicator */}
-          {q && (
-            <div className="mt-3 flex items-center gap-2 flex-wrap">
-              <span className="text-sm text-neutral-400">Results for:</span>
-              <span className="inline-flex items-center gap-1.5 bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
-                <span className="material-symbols-outlined text-[13px]">
-                  search
-                </span>
-                {q}
-                <button
-                  type="button"
-                  onClick={() => handleSearch("")}
-                  className="ml-0.5 hover:text-red-400 transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[12px]">
-                    close
-                  </span>
-                </button>
-              </span>
-            </div>
-          )}
-        </div>
+    <div className="min-h-screen relative">
+      {/* ── Full Page Background ── */}
+      <div className="fixed inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
+          alt="Campus Background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
       </div>
 
-      {/* ── Main content ── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
-        <div className="flex gap-6">
-          {/* ── Filters sidebar ── */}
-          <SearchFilters
-            streams={streams}
-            degrees={degrees}
-            cities={cities}
-            activeStream={stream}
-            activeDegree={degree}
-            activeCityId={cityId}
-            activeStateId={stateId}
-            activeFeesMax={feesMax}
-            activeSort={sort}
-            totalResults={total}
-          />
+      <div className="relative z-10">
+        <Header />
 
-          {/* ── Results column ── */}
-          <div className="flex-1 min-w-0">
-            {/* ── Toolbar row ── */}
-            <div className="flex items-center justify-between gap-4 mb-5">
-              {/* Count */}
-              <p className="text-sm text-neutral-500 font-medium">
-                {loading ? (
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="w-3 h-3 border-2 border-neutral-300 border-t-red-500 rounded-full animate-spin inline-block" />
-                    Loading colleges...
-                  </span>
-                ) : (
-                  showingText
-                )}
+        {/* ── Hero / Search Banner ── */}
+        <div className="pt-24 pb-10">
+          <div className="mx-auto w-full px-4 lg:px-8 xl:px-12">
+            {/* Breadcrumb */}
+            <nav className="flex items-center justify-center gap-2 text-xs text-neutral-400 mb-5">
+              <a href="/" className="hover:text-white transition-colors">
+                Home
+              </a>
+              <span className="material-symbols-outlined text-[14px]">
+                chevron_right
+              </span>
+              <span className="text-neutral-300">{pageTitle}</span>
+            </nav>
+
+            {/* Title */}
+            <div className="mb-7 text-center">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight mb-2">
+                {pageTitle}
+              </h1>
+              <p className="text-neutral-300 text-sm sm:text-base">
+                {pageSubtitle}
               </p>
-
-              {/* Sort (mobile/tablet) + View toggle */}
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {/* Sort dropdown (desktop inline) */}
-                <div className="hidden sm:flex items-center gap-1 bg-white rounded-xl border border-neutral-200 p-1">
-                  {SORT_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => {
-                        const params = new URLSearchParams(
-                          searchParams.toString(),
-                        );
-                        if (opt.value === "rating") {
-                          params.delete("sort");
-                        } else {
-                          params.set("sort", opt.value);
-                        }
-                        params.delete("page");
-                        router.push(`${pathname}?${params.toString()}`);
-                      }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
-                        (sort || "rating") === opt.value
-                          ? "bg-neutral-900 text-white shadow-sm"
-                          : "text-neutral-500 hover:text-neutral-800"
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-
-                {/* View mode toggle */}
-                <div className="flex items-center bg-white rounded-xl border border-neutral-200 p-1">
-                  <button
-                    type="button"
-                    onClick={() => setViewMode("grid")}
-                    title="Grid view"
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-150 ${
-                      viewMode === "grid"
-                        ? "bg-neutral-900 text-white shadow-sm"
-                        : "text-neutral-400 hover:text-neutral-700"
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-[18px]">
-                      grid_view
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewMode("list")}
-                    title="List view"
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-150 ${
-                      viewMode === "list"
-                        ? "bg-neutral-900 text-white shadow-sm"
-                        : "text-neutral-400 hover:text-neutral-700"
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-[18px]">
-                      view_agenda
-                    </span>
-                  </button>
-                </div>
-              </div>
             </div>
 
-            {/* ── College grid / list ── */}
-            {loading ? (
-              viewMode === "grid" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {Array.from({ length: 9 }).map((_, i) => (
-                    <CollegeCardSkeleton key={i} />
+            {/* Search bar */}
+            <div className="max-w-2xl mx-auto">
+              <SearchBar defaultValue={q} onSearch={handleSearch} />
+            </div>
+
+            {/* Active search indicator */}
+            {q && (
+              <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
+                <span className="text-sm text-neutral-400">Results for:</span>
+                <span className="inline-flex items-center gap-1.5 bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+                  <span className="material-symbols-outlined text-[13px]">
+                    search
+                  </span>
+                  {q}
+                  <button
+                    type="button"
+                    onClick={() => handleSearch("")}
+                    className="ml-0.5 hover:text-red-400 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[12px]">
+                      close
+                    </span>
+                  </button>
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── Main content ── */}
+        <div className="mx-auto w-full px-4 lg:px-8 xl:px-12 py-8">
+          <div className="flex gap-6">
+            {/* ── Filters sidebar ── */}
+              <SearchFilters
+                streams={streams}
+                degrees={degrees}
+                cities={cities}
+                activeStream={stream}
+                activeDegree={degree}
+                activeCityId={cityId}
+                activeStateId={stateId}
+                activeFeesMax={feesMax}
+                activeSort={sort}
+                totalResults={total}
+                entityName={entityName}
+                entityNamePlural={entityNamePlural}
+              />
+
+            {/* ── Results column ── */}
+            <div className="flex-1 min-w-0">
+              {/* ── Toolbar row ── */}
+              <div className="flex items-center justify-between gap-4 mb-5">
+                <p className="text-sm text-neutral-300 font-medium">
+                  {loading ? (
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="w-3 h-3 border-2 border-neutral-300 border-t-red-500 rounded-full animate-spin inline-block" />
+                      Loading {entityNamePlural.toLowerCase()}...
+                    </span>
+                  ) : (
+                    showingText
+                  )}
+                </p>
+
+                {/* Sort (mobile/tablet) + View toggle */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {/* Sort dropdown (desktop inline) */}
+                  <div className="hidden sm:flex items-center gap-1 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-1">
+                    {SORT_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => {
+                          const params = new URLSearchParams(
+                            searchParams.toString(),
+                          );
+                          if (opt.value === "rating") {
+                            params.delete("sort");
+                          } else {
+                            params.set("sort", opt.value);
+                          }
+                          params.delete("page");
+                          router.push(`${pathname}?${params.toString()}`);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${(sort || "rating") === opt.value
+                            ? "bg-white/20 text-white shadow-sm"
+                            : "text-neutral-300 hover:text-white hover:bg-white/5"
+                          }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* View mode toggle */}
+                  <div className="flex items-center bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-1">
+                    <button
+                      type="button"
+                      onClick={() => setViewMode("grid")}
+                      title="Grid view"
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-150 ${viewMode === "grid"
+                          ? "bg-white/20 text-white shadow-sm"
+                          : "text-neutral-300 hover:text-white hover:bg-white/5"
+                        }`}
+                    >
+                      <span className="material-symbols-outlined text-[18px]">
+                        grid_view
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewMode("list")}
+                      title="List view"
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-150 ${viewMode === "list"
+                          ? "bg-white/20 text-white shadow-sm"
+                          : "text-neutral-300 hover:text-white hover:bg-white/5"
+                        }`}
+                    >
+                      <span className="material-symbols-outlined text-[18px]">
+                        view_agenda
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── College grid / list ── */}
+              {loading ? (
+                viewMode === "grid" ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                      <CollegeCardSkeleton key={i} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <CollegeListSkeleton key={i} />
+                    ))}
+                  </div>
+                )
+              ) : colleges.length === 0 ? (
+                /* ── Empty state ── */
+                <div className="flex flex-col items-center justify-center py-24 text-center">
+                  <div className="w-20 h-20 rounded-3xl bg-neutral-100 flex items-center justify-center mb-5">
+                    <span className="material-symbols-outlined text-[40px] text-neutral-300">
+                      search_off
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-bold text-neutral-800 mb-2">
+                    No {entityNamePlural.toLowerCase()} found
+                  </h3>
+                  <p className="text-sm text-neutral-500 max-w-xs mb-6">
+                    {isFiltered
+                      ? "Try removing some filters or searching with different keywords."
+                      : `No ${entityNamePlural.toLowerCase()} match your search. Try different keywords.`}
+                  </p>
+                  {isFiltered && (
+                    <a
+                      href={pathname}
+                      className="inline-flex items-center gap-2 bg-neutral-900 text-white text-sm font-bold px-5 py-3 rounded-xl hover:bg-red-600 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">
+                        filter_list_off
+                      </span>
+                      Clear All Filters
+                    </a>
+                  )}
+                </div>
+              ) : viewMode === "grid" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+                  {colleges.map((college, i) => (
+                    <CollegeCard
+                      key={college.id}
+                      college={college}
+                      index={i}
+                      entityName={entityName}
+                    />
                   ))}
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {Array.from({ length: 8 }).map((_, i) => (
-                    <CollegeListSkeleton key={i} />
+                  {colleges.map((college, i) => (
+                    <CollegeListItem
+                      key={college.id}
+                      college={college}
+                      index={i}
+                      entityName={entityName}
+                    />
                   ))}
                 </div>
-              )
-            ) : colleges.length === 0 ? (
-              /* ── Empty state ── */
-              <div className="flex flex-col items-center justify-center py-24 text-center">
-                <div className="w-20 h-20 rounded-3xl bg-neutral-100 flex items-center justify-center mb-5">
-                  <span className="material-symbols-outlined text-[40px] text-neutral-300">
-                    search_off
-                  </span>
-                </div>
-                <h3 className="text-lg font-bold text-neutral-800 mb-2">
-                  No colleges found
-                </h3>
-                <p className="text-sm text-neutral-500 max-w-xs mb-6">
-                  {isFiltered
-                    ? "Try removing some filters or searching with different keywords."
-                    : "No colleges match your search. Try different keywords."}
-                </p>
-                {isFiltered && (
-                  <a
-                    href={pathname}
-                    className="inline-flex items-center gap-2 bg-neutral-900 text-white text-sm font-bold px-5 py-3 rounded-xl hover:bg-red-600 transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-[16px]">
-                      filter_list_off
-                    </span>
-                    Clear All Filters
-                  </a>
-                )}
-              </div>
-            ) : viewMode === "grid" ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {colleges.map((college, i) => (
-                  <CollegeCard key={college.id} college={college} index={i} />
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {colleges.map((college, i) => (
-                  <CollegeListItem
-                    key={college.id}
-                    college={college}
-                    index={i}
-                  />
-                ))}
-              </div>
-            )}
+              )}
 
-            {/* ── Pagination ── */}
-            {!loading && totalPages > 1 && (
-              <div className="mt-10">
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  useUrl
-                />
-              </div>
-            )}
+              {/* ── Pagination ── */}
+              {!loading && totalPages > 1 && (
+                <div className="mt-10">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    useUrl
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

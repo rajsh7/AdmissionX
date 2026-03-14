@@ -7,6 +7,7 @@ import type { CollegeResult } from "@/app/api/search/colleges/route";
 interface CollegeCardProps {
   college: CollegeResult;
   index?: number;
+  entityName?: string;
 }
 
 function StarRating({ rating, count }: { rating: number; count: number }) {
@@ -63,7 +64,11 @@ function formatFees(fees: number | null): string {
   return `₹${fees}`;
 }
 
-export default function CollegeCard({ college, index = 0 }: CollegeCardProps) {
+export default function CollegeCard({
+  college,
+  index = 0,
+  entityName = "College",
+}: CollegeCardProps) {
   const {
     slug,
     name,
@@ -100,14 +105,14 @@ export default function CollegeCard({ college, index = 0 }: CollegeCardProps) {
     >
       <Link
         href={`/college/${slug}`}
-        className="group flex flex-col bg-white rounded-2xl border border-neutral-100 hover:border-red-200 hover:shadow-xl hover:shadow-red-500/5 transition-all duration-400 overflow-hidden h-full"
+        className="group flex flex-col bg-white/95 backdrop-blur-sm rounded-2xl border border-white/60 shadow-lg shadow-black/5 hover:-translate-y-1 hover:border-red-200 hover:shadow-2xl hover:shadow-red-500/10 transition-all duration-300 overflow-hidden h-full"
       >
         {/* ── Image ── */}
         <div className="relative h-44 overflow-hidden bg-neutral-100 flex-shrink-0">
           <img
             src={image}
             alt={name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
             loading="lazy"
             onError={(e) => {
               (e.target as HTMLImageElement).src =
@@ -212,7 +217,7 @@ export default function CollegeCard({ college, index = 0 }: CollegeCardProps) {
         {/* ── CTA strip ── */}
         <div className="px-4 pb-4">
           <span className="w-full flex items-center justify-center gap-2 bg-neutral-900 group-hover:bg-red-600 text-white text-xs font-bold py-2.5 rounded-xl transition-all duration-300">
-            View College
+            View {entityName}
             <span className="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">
               arrow_forward
             </span>

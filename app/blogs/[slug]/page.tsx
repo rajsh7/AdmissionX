@@ -232,7 +232,7 @@ export default async function BlogDetailPage({
 
               {/* Related Posts */}
               {related.length > 0 && (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="rounded-2xl shadow-sm border border-gray-100 p-6">
                   <h3 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <span className="material-symbols-rounded text-red-600 text-xl" style={icoFill}>article</span>
                     Related Posts
