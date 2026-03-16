@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 
 interface Props {
   user: { id: number; name: string; email: string } | null;
+  initialFilter?: string;
 }
 
 interface Application {
@@ -126,13 +127,13 @@ const TIMELINE_PHASES = [
   { label: "Enrolment",      phase: "Phase 5", icon: "school"       },
 ];
 
-export default function ApplicationsTab({ user }: Props) {
+export default function ApplicationsTab({ user, initialFilter = "all" }: Props) {
   const [applications, setApplications] = useState<Application[]>([]);
   const [stats, setStats]               = useState<AppStats | null>(null);
   const [loading, setLoading]           = useState(true);
   const [error, setError]               = useState<string | null>(null);
 
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [activeFilter, setActiveFilter] = useState(initialFilter);
   const [searchQuery, setSearchQuery]   = useState("");
   const [sortBy, setSortBy]             = useState<"newest" | "status" | "fees">("newest");
 

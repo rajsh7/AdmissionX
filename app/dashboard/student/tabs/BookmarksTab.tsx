@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 
 interface Props {
   user: { id: number; name: string; email: string } | null;
+  initialType?: string;
 }
 
 interface Bookmark {
@@ -63,12 +64,12 @@ function SkeletonCard() {
   );
 }
 
-export default function BookmarksTab({ user }: Props) {
+export default function BookmarksTab({ user, initialType = "all" }: Props) {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [counts, setCounts]       = useState<Counts>({ total: 0, college: 0, course: 0, blog: 0 });
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState<string | null>(null);
-  const [activeType, setActiveType] = useState("all");
+  const [activeType, setActiveType] = useState(initialType);
   const [removing, setRemoving]     = useState<number | null>(null);
   const [searchQ, setSearchQ]       = useState("");
 
