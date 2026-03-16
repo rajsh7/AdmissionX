@@ -5,6 +5,7 @@ import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import Image from "next/image";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -383,11 +384,12 @@ export default async function BoardDetailPage({
       <div className="relative bg-neutral-900 pt-24 pb-12 overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0 z-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={imgUrl}
             alt={displayName}
-            className="w-full h-full object-cover opacity-[0.15]"
+            fill
+            priority
+            className="object-cover opacity-[0.15]"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-neutral-900/60 via-neutral-900/85 to-neutral-900" />
         </div>

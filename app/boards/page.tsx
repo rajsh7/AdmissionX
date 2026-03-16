@@ -4,6 +4,7 @@ import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import Image from "next/image";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -284,12 +285,12 @@ function BoardCard({
     >
       {/* Image */}
       <div className="relative h-44 overflow-hidden bg-neutral-100">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={image}
           alt={displayName}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 400px"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          onError={undefined}
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />

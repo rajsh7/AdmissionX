@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState, useCallback } from "react";
 
@@ -89,10 +90,12 @@ function ParallaxCard({ uni }: { uni: (typeof countries)[0] }) {
       >
         {/* Parallax Image */}
         <motion.div className="absolute inset-[-10%] z-0" style={{ y: imageY }}>
-          <img
+          <Image
             src={uni.image}
             alt={uni.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 450px"
+            className="object-cover group-hover:scale-105 transition-transform duration-1000"
           />
         </motion.div>
 

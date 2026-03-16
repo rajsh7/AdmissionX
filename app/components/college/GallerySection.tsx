@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { GalleryData } from "@/app/api/college/[slug]/route";
+import Image from "next/image";
 
 // ─── Lightbox ─────────────────────────────────────────────────────────────────
 
@@ -99,14 +100,13 @@ function Lightbox({ images, index, onClose }: LightboxProps) {
         className="relative max-w-5xl max-h-[80vh] mx-16 flex flex-col items-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <img
+        <Image
           key={img.id}
           src={img.image}
           alt={img.caption ?? img.name ?? `Gallery image ${current + 1}`}
+          width={1200}
+          height={800}
           className="max-h-[75vh] max-w-full w-auto object-contain rounded-xl shadow-2xl"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).style.display = "none";
-          }}
         />
         {(img.caption || img.name) && (
           <p className="mt-3 text-sm text-white/70 text-center max-w-lg">
@@ -132,13 +132,12 @@ function Lightbox({ images, index, onClose }: LightboxProps) {
                     : "border-transparent opacity-50 hover:opacity-80"
                 }`}
               >
-                <img
+                <Image
                   src={thumb.image}
                   alt={`Thumb ${i + 1}`}
+                  width={48}
+                  height={48}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).parentElement!.style.display = "none";
-                  }}
                 />
               </button>
             ))}
@@ -176,14 +175,15 @@ function GalleryItem({
         <div className="absolute inset-0 bg-white/5 animate-pulse" />
       )}
 
-      <img
+      <Image
         src={image.image}
         alt={image.caption ?? image.name ?? `Gallery ${index + 1}`}
+        fill
+        sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 250px"
         className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ${
           loaded ? "opacity-100" : "opacity-0"
         }`}
         onLoad={() => setLoaded(true)}
-        onError={() => setError(true)}
       />
 
       {/* Hover overlay */}

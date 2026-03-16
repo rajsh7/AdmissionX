@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const IMAGES = [
@@ -30,12 +31,17 @@ export function AuthBackgroundSlider() {
           className={`absolute inset-0 transition-opacity duration-1000 ease-out ${
             i === index ? "opacity-70" : "opacity-0"
           }`}
-          style={{
-            backgroundImage: `url('${src}')`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
+        >
+          <Image
+            src={src}
+            alt=""
+            fill
+            priority={i === 0}
+            sizes="100vw"
+            quality={60}
+            className="object-cover"
+          />
+        </div>
       ))}
       <div className="absolute inset-0 bg-gradient-to-br from-background-light/80 via-background-light/70 to-background-light/80 dark:from-background-dark/85 dark:via-background-dark/85 dark:to-background-dark/90" />
     </div>

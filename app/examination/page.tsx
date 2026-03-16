@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
 import Link from "next/link";
+import Image from "next/image";
 import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
@@ -174,12 +175,15 @@ export default async function ExaminationHubPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 relative">
-      {/* ── Full Page Background ── */}
-      <div className="fixed inset-0 z-0">
-        <img
+      <div className="fixed inset-0 z-0 text-[0px] font-[0] leading-[0]">
+        <Image
           src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
           alt="Campus Background"
-          className="w-full h-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          quality={80}
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
       </div>
@@ -193,16 +197,16 @@ export default async function ExaminationHubPage() {
         <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-red-600/10 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 -left-16 w-64 h-64 rounded-full bg-rose-500/10 blur-3xl pointer-events-none" />
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="relative w-full px-4 lg:px-8 xl:px-12 flex flex-col items-center text-center">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
+          <nav className="flex items-center justify-center gap-2 text-xs text-neutral-500 mb-6 font-medium">
             <Link href="/" className="hover:text-white transition-colors">Home</Link>
             <span className="material-symbols-outlined text-[14px]">chevron_right</span>
             <span className="text-neutral-300">Examinations</span>
           </nav>
 
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="w-full max-w-4xl flex flex-col items-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
               <span className="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
                 <span className="material-symbols-outlined text-[13px]">quiz</span>
                 Entrance Exams
@@ -216,13 +220,13 @@ export default async function ExaminationHubPage() {
               </span>{" "}
               — All in One Place
             </h1>
-            <p className="text-neutral-400 text-base max-w-2xl leading-relaxed mb-8">
+            <p className="text-neutral-400 text-base max-w-2xl leading-relaxed mb-8 text-center">
               Dates, syllabus, eligibility, admit cards, results and preparation tips for every
               major entrance examination across engineering, medical, management, law and more.
             </p>
 
             {/* Quick stats row */}
-            <div className="flex flex-wrap gap-6">
+            <div className="flex flex-wrap items-center justify-center gap-6">
               {[
                 { label: "Exams",     value: totalExams,     icon: "description"    },
                 { label: "Streams",   value: totalStreams,   icon: "category"        },
@@ -248,7 +252,7 @@ export default async function ExaminationHubPage() {
       </div>
 
       {/* ── Main content ──────────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10 space-y-14">
+      <div className="w-full px-4 lg:px-8 xl:px-12 py-10 space-y-14">
 
         {/* ── Exam Streams ─────────────────────────────────────────────── */}
         <section>
@@ -264,7 +268,7 @@ export default async function ExaminationHubPage() {
           {sectionRows.length === 0 ? (
             <EmptySections />
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
               {sectionRows.map((sec) => {
                 const meta = getSectionMeta(sec.name);
                 return (
@@ -312,7 +316,7 @@ export default async function ExaminationHubPage() {
           {examRows.length === 0 ? (
             <EmptyExams />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-5">
               {examRows.map((exam) => {
                 const streamSlug = exam.section_slug ?? exam.stream_slug ?? "general";
                 return (
@@ -387,12 +391,12 @@ function ExamCard({
     >
       {/* Image */}
       <div className="relative h-36 overflow-hidden bg-neutral-100 flex-shrink-0">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={buildImageUrl(exam.image)}
           alt={exam.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          onError={undefined}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         {exam.stream_name && (

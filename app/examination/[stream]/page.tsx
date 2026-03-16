@@ -5,6 +5,7 @@ import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import Image from "next/image";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -178,82 +179,78 @@ export default async function ExaminationStreamPage({
   );
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <>
       <Header />
-
-      {/* ── Hero ── */}
-      <div className="bg-neutral-900 pt-24 pb-14 relative overflow-hidden">
-        <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-red-600/10 blur-3xl pointer-events-none" />
-
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
-            <Link href="/" className="hover:text-white transition-colors">
-              Home
-            </Link>
-            <span className="material-symbols-outlined text-[14px]">
-              chevron_right
-            </span>
-            <Link
-              href="/examination"
-              className="hover:text-white transition-colors"
-            >
-              Examinations
-            </Link>
-            <span className="material-symbols-outlined text-[14px]">
-              chevron_right
-            </span>
-            <span className="text-neutral-300">{streamName}</span>
-          </nav>
-
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
-            <div className="max-w-2xl">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-                  <span className="material-symbols-outlined text-[13px]">
-                    quiz
-                  </span>
-                  {streamName} Exams
-                </span>
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-3">
-                {streamName}{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-rose-500">
-                  Entrance Exams
-                </span>
-              </h1>
-              <p className="text-neutral-400 text-sm leading-relaxed max-w-xl">
-                Complete list of {streamName.toLowerCase()} entrance exams with
-                application dates, eligibility criteria, syllabus, and results.
-              </p>
-            </div>
-
-            {/* Stat badges */}
-            <div className="flex gap-3 flex-shrink-0">
-              <div className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-center">
-                <p className="text-xl font-black text-white">{exams.length}</p>
-                <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wide">
-                  Total
-                </p>
-              </div>
-              {upcomingExams.length > 0 && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-2xl px-4 py-3 text-center">
-                  <p className="text-xl font-black text-red-400">
-                    {upcomingExams.length}
-                  </p>
-                  <p className="text-[10px] font-semibold text-red-500/70 uppercase tracking-wide">
-                    Upcoming
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+      <main className="min-h-screen relative overflow-hidden bg-neutral-900">
+        {/* ── Background Layer ── */}
+        <div className="fixed inset-0 z-0">
+          <Image
+            src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
+            alt="Campus Background"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-black/75 backdrop-blur-[2px]" />
         </div>
-      </div>
 
-      {/* ── Main Content ── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10 space-y-10">
+        {/* ── Content Layer ── */}
+        <div className="relative z-10">
+          {/* Hero Section */}
+          <section className="relative h-[460px] md:h-[540px] flex flex-col items-center justify-center text-center">
+            {/* Localized overlay for text contrast */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 pointer-events-none" />
+
+            {/* Centered Hero Content */}
+            <div className="relative z-20 w-full px-4 lg:px-8 xl:px-12 flex flex-col items-center">
+              {/* Breadcrumbs */}
+              <nav className="flex items-center justify-center flex-wrap gap-1 text-white/70 text-sm mb-6">
+                <Link href="/" className="hover:text-white transition-colors">Home</Link>
+                <span className="material-symbols-rounded text-base" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" }}>chevron_right</span>
+                <Link href="/examination" className="hover:text-white transition-colors">Examinations</Link>
+                <span className="material-symbols-rounded text-base" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" }}>chevron_right</span>
+                <span className="text-white/90 line-clamp-1">{streamName}</span>
+              </nav>
+
+              <div className="flex flex-col items-center max-w-4xl">
+                <div className="flex items-center gap-2 mb-6">
+                  <span className="inline-flex items-center gap-2 bg-red-600/20 backdrop-blur-md border border-red-500/30 text-red-300 text-xs font-black px-5 py-2 rounded-full uppercase tracking-widest shadow-lg">
+                    <span className="material-symbols-rounded text-base" style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" }}>quiz</span>
+                    {streamName} Exams
+                  </span>
+                </div>
+
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6 drop-shadow-2xl">
+                  {streamName}{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-rose-500">
+                    Entrance Exams
+                  </span>
+                </h1>
+                
+                <p className="text-neutral-300 text-lg md:text-xl font-medium leading-relaxed max-w-2xl mb-10 drop-shadow-lg">
+                  Complete list of {streamName.toLowerCase()} entrance exams with
+                  application dates, eligibility criteria, syllabus, and results.
+                </p>
+
+                {/* Stat badges - Glassmorphism */}
+                <div className="flex flex-wrap justify-center gap-4">
+                  <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-6 py-4 text-center min-w-[120px] shadow-2xl">
+                    <p className="text-3xl font-black text-white mb-1">{exams.length}</p>
+                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Total Exams</p>
+                  </div>
+                  {upcomingExams.length > 0 && (
+                    <div className="bg-red-600/20 backdrop-blur-xl border border-red-500/30 rounded-2xl px-6 py-4 text-center min-w-[120px] shadow-2xl">
+                      <p className="text-3xl font-black text-red-400 mb-1">{upcomingExams.length}</p>
+                      <p className="text-[10px] font-black text-red-400/70 uppercase tracking-[0.2em]">Upcoming</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Main Content Area */}
+          <div className="w-full px-4 lg:px-8 xl:px-12 py-10 space-y-12">
 
         {exams.length === 0 ? (
           <EmptyState streamName={streamName} />
@@ -267,7 +264,7 @@ export default async function ExaminationStreamPage({
                   title="Upcoming / Active Exams"
                   badge={{ text: "Live", color: "bg-emerald-500" }}
                 />
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-5">
                   {upcomingExams.map((exam) => (
                     <ExamCard
                       key={exam.id}
@@ -291,7 +288,7 @@ export default async function ExaminationStreamPage({
                       : `All ${streamName} Exams`
                   }
                 />
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-5">
                   {pastExams.map((exam) => (
                     <ExamCard key={exam.id} exam={exam} streamSlug={stream} />
                   ))}
@@ -302,33 +299,35 @@ export default async function ExaminationStreamPage({
         )}
 
         {/* ── Related links strip ── */}
-        <div className="bg-white rounded-2xl border border-neutral-100 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+        <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/10 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
+          <div className="flex items-center gap-4">
             <span
-              className="material-symbols-outlined text-[22px] text-red-500"
-              style={{ fontVariationSettings: "'FILL' 1" }}
+              className="material-symbols-rounded text-3xl text-red-500"
+              style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}
             >
               info
             </span>
-            <p className="text-sm text-neutral-600 font-medium">
+            <p className="text-base text-white/90 font-bold">
               Looking for a different exam stream?
             </p>
           </div>
           <Link
             href="/examination"
-            className="inline-flex items-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-3 bg-white text-neutral-900 hover:bg-red-600 hover:text-white font-black text-sm px-8 py-4 rounded-xl transition-all shadow-xl hover:scale-[1.05] whitespace-nowrap"
           >
-            <span className="material-symbols-outlined text-[16px]">
+            <span className="material-symbols-rounded text-base" style={{ fontVariationSettings: "'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 20" }}>
               apps
             </span>
             All Exam Streams
           </Link>
-        </div>
+        </div> {/* closes Related links strip (302) */}
 
-      </div>
+      </div> {/* closes Main Content Area (253) */}
 
       <Footer />
-    </div>
+      </div> {/* closes Content Layer (198) */}
+      </main>
+    </>
   );
 }
 
@@ -344,18 +343,18 @@ function SectionHeader({
   badge?: { text: string; color: string };
 }) {
   return (
-    <div className="flex items-center gap-3 mb-5">
-      <span className="w-1 h-6 bg-red-600 rounded-full block" />
+    <div className="flex items-center gap-4 mb-8">
+      <div className="w-1.5 h-8 bg-gradient-to-b from-red-600 to-rose-600 rounded-full" />
       <span
-        className="material-symbols-outlined text-[20px] text-red-500"
-        style={{ fontVariationSettings: "'FILL' 1" }}
+        className="material-symbols-rounded text-2xl text-red-500"
+        style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}
       >
         {icon}
       </span>
-      <h2 className="text-lg font-black text-neutral-900">{title}</h2>
+      <h2 className="text-xl md:text-2xl font-black text-white drop-shadow-lg">{title}</h2>
       {badge && (
         <span
-          className={`${badge.color} text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider`}
+          className={`${badge.color} text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg`}
         >
           {badge.text}
         </span>
@@ -383,19 +382,19 @@ function ExamCard({
   return (
     <Link
       href={`/examination/${streamSlug}/${exam.slug}`}
-      className={`group flex flex-col bg-white rounded-2xl border overflow-hidden transition-all duration-300 hover:shadow-lg ${
-        highlighted
+      className={`group flex flex-col bg-white rounded-2xl border overflow-hidden transition-all duration-300 hover:shadow-lg ${highlighted
           ? "border-red-200 shadow-md shadow-red-500/5 hover:border-red-300 hover:shadow-red-500/10"
           : "border-neutral-100 hover:border-neutral-200 hover:shadow-neutral-200/60"
-      }`}
+        }`}
     >
       {/* Image */}
       <div className="relative h-40 overflow-hidden bg-neutral-100 flex-shrink-0">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={buildImageUrl(exam.image)}
           alt={exam.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          fill
+          sizes="(max-width: 640px) 100vw, 350px"
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
 

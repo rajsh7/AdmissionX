@@ -34,7 +34,7 @@ const WHY_ABROAD_ITEMS = [
 export default function WhyStudyAbroad() {
   return (
     <div className="py-14">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="w-full px-4 lg:px-8 xl:px-12">
         <div className="text-center mb-10">
           <h2 className="text-2xl font-black text-white mb-2">
             Why Study Abroad?

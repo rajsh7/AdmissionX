@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimatedCounter from "./AnimatedCounter";
 
@@ -694,12 +695,9 @@ export default function HeroSection() {
     <section className="relative w-full min-h-screen flex flex-col justify-center overflow-hidden">
       {/* ─── Background Image Slides ─── */}
       {heroImages.map((img, idx) => (
-        <img
+        <div
           key={idx}
-          src={img}
-          alt=""
-          draggable={false}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1500ms] ease-in-out select-none ${
+          className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out select-none ${
             idx === currentImage ? "opacity-100" : "opacity-0"
           }`}
           style={{
@@ -707,7 +705,18 @@ export default function HeroSection() {
             animation:
               idx === currentImage ? "heroZoom 6s ease-out forwards" : "none",
           }}
-        />
+        >
+          <Image
+            src={img}
+            alt=""
+            fill
+            priority={idx === 0}
+            sizes="100vw"
+            quality={85}
+            className="object-cover"
+            draggable={false}
+          />
+        </div>
       ))}
 
       {/* ─── Dark Overlay ─── */}

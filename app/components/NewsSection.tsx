@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import type { DbBlog } from "../api/home/latest-blogs/route";
 
@@ -263,13 +264,13 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
             >
               {/* Image */}
               <div className="relative h-64 sm:h-72 lg:h-80 overflow-hidden">
-                <img
+                <Image
                   src={featured.image}
                   alt={featured.title}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = FALLBACK_IMAGE;
-                  }}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 800px"
+                  quality={85}
+                  className="object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
 
@@ -348,13 +349,12 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
                 >
                   {/* Thumbnail */}
                   <div className="relative w-28 sm:w-32 flex-shrink-0 rounded-xl overflow-hidden self-stretch min-h-[100px]">
-                    <img
+                    <Image
                       src={article.image}
                       alt={article.title}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = FALLBACK_IMAGE;
-                      }}
+                      fill
+                      sizes="150px"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                   </div>
 

@@ -5,6 +5,7 @@ import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import Image from "next/image";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -256,12 +257,15 @@ export default async function CareerOpportunitiesByStreamPage({
       <div className="bg-neutral-900 pt-24 pb-14 relative overflow-hidden">
         {/* Subtle tinted background */}
         {streamInfo.bannerimage && (
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-10"
-            style={{
-              backgroundImage: `url(${buildImageUrl(streamInfo.bannerimage)})`,
-            }}
-          />
+          <div className="absolute inset-0 z-0 opacity-10">
+            <Image
+              src={buildImageUrl(streamInfo.bannerimage)}
+              alt=""
+              fill
+              priority
+              className="object-cover"
+            />
+          </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-br from-neutral-900/80 via-neutral-900/95 to-neutral-900" />
 
@@ -495,12 +499,12 @@ function CareerCard({ career }: { career: CareerRelevantRow }) {
     >
       {/* Image */}
       <div className="relative h-40 bg-neutral-100 overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={imgUrl}
           alt={career.title}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 25vw, 300px"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          onError={undefined}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
 

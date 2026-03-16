@@ -39,7 +39,7 @@ export default function StreamList({ streams }: StreamListProps) {
 
   return (
     <div className="py-14">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="w-full px-4 lg:px-8 xl:px-12">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl font-black text-white mb-1">
@@ -60,7 +60,7 @@ export default function StreamList({ streams }: StreamListProps) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-3">
           {streams.slice(0, 12).map((stream, i) => {
             const iconKey = Object.keys(STREAM_ICONS).find((k) =>
               stream.name.toLowerCase().includes(k),

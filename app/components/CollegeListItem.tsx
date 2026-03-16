@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
@@ -92,15 +93,12 @@ export default function CollegeListItem({
       >
         {/* ── Thumbnail ── */}
         <div className="relative w-24 h-20 sm:w-32 sm:h-24 flex-shrink-0 rounded-xl overflow-hidden bg-neutral-100">
-          <img
+          <Image
             src={image}
             alt={name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-            loading="lazy"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=300";
-            }}
+            fill
+            sizes="150px"
+            className="object-cover group-hover:scale-105 transition-transform duration-700"
           />
           {/* Rank overlay */}
           {displayRank ? (

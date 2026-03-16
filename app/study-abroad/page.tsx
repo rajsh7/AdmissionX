@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
+import Image from "next/image";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import SearchClient from "@/app/search/SearchClient";
@@ -448,11 +449,15 @@ export default async function StudyAbroadPage({ searchParams }: PageProps) {
   return (
     <div className="min-h-screen bg-neutral-50 relative">
       {/* ── Full Page Background ── */}
-      <div className="fixed inset-0 z-0">
-        <img
+      <div className="fixed inset-0 z-0 text-[0px] font-[0] leading-[0]">
+        <Image
           src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
           alt="Campus Background"
-          className="w-full h-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          quality={80}
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
       </div>
@@ -467,15 +472,15 @@ export default async function StudyAbroadPage({ searchParams }: PageProps) {
       <WhyStudyAbroad />
 
       {/* Dynamic sections wrapped in Suspense for streaming */}
-      <Suspense fallback={<div className="h-40 animate-pulse bg-neutral-100 mx-auto max-w-7xl rounded-3xl my-8" />}>
+      <Suspense fallback={<div className="h-40 animate-pulse bg-neutral-100 w-full px-4 lg:px-8 xl:px-12 rounded-3xl my-8" />}>
         <DestinationSection />
       </Suspense>
 
-      <Suspense fallback={<div className="h-20 animate-pulse bg-neutral-100 mx-auto max-w-7xl rounded-2xl my-8" />}>
+      <Suspense fallback={<div className="h-20 animate-pulse bg-neutral-100 w-full px-4 lg:px-8 xl:px-12 rounded-2xl my-8" />}>
         <StreamSection />
       </Suspense>
 
-      <Suspense fallback={<div className="py-12 px-4 mx-auto max-w-7xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <Suspense fallback={<div className="py-12 px-4 lg:px-8 xl:px-12 w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
         {[...Array(6)].map((_, i) => (
           <div key={i} className="h-64 animate-pulse bg-neutral-100 rounded-2xl" />
         ))}

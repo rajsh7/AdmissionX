@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { unstable_cache } from "next/cache";
 import { RowDataPacket } from "mysql2";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
@@ -532,11 +533,15 @@ export default async function CollegeLayout({
   return (
     <div className="min-h-screen relative">
       {/* ── Full Page Background ── */}
-      <div className="fixed inset-0 z-0">
-        <img
+      <div className="fixed inset-0 z-0 text-[0px] font-[0] leading-[0]">
+        <Image
           src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
           alt="Campus Background"
-          className="w-full h-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          quality={80}
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
       </div>
@@ -560,7 +565,7 @@ export default async function CollegeLayout({
       />
 
       {/* ── Main body ── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
+      <div className="w-full px-0 py-8">
         <div className="flex gap-6 lg:gap-8 items-start">
           {/* Main column — page content goes here */}
           <main className="flex-1 min-w-0">{children}</main>

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, useScroll, AnimatePresence } from "framer-motion";
 
@@ -276,11 +277,15 @@ export default function Header({ onLoginClick, onRegisterClick }: HeaderProps) {
         <div className="flex items-center justify-between px-5 sm:px-8 py-3 w-full">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group shrink-0">
-            <img
-              src="/admissionx-logo.png"
-              alt="AdmissionX logo"
-              className="h-8 w-auto object-contain"
-            />
+            <Image
+               src="/admissionx-logo.png"
+               alt="AdmissionX logo"
+               width={160}
+               height={32}
+               priority
+              unoptimized
+               className="h-8 w-auto object-contain"
+             />
           </Link>
 
           {/* Desktop Nav */}

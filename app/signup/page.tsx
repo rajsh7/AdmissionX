@@ -1,5 +1,4 @@
-"use client";
-
+import Image from "next/image";
 import Header from "../components/Header";
 import { AuthBackgroundSlider } from "../components/AuthBackgroundSlider";
 
@@ -137,9 +136,11 @@ export default function SignupPage() {
           {/* Social Logins */}
           <div className="grid grid-cols-2 gap-4">
             <button className="flex items-center justify-center gap-2 py-3 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-              <img
+              <Image
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyQiMZtuFFQwIDjUsQfRo4KB5XpFm9G1IKo_Vz6OL6nOUrNlNdPjNbL3iaR6wOroBYMqmtbARjPAg9NsQOm7iR4QPbrTHlsF4ujVKz-oiRnoRjpOgzR5mzcJhz5RGmJxIu0IgQAXb6UwXd5NRCckGhCTi6TS8JrAjuuwAqnNpj984px2UgCxoSwpCjN3fk8E8rosg6vzoq4zoYs3-49MHorEsnlbNL6Bh4OYiG1j5WEifhdvjVTMP59vANCykiSnw-8Lbchd5bXqU"
                 alt="Google Logo"
+                width={20}
+                height={20}
                 className="size-5"
               />
               <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -147,9 +148,11 @@ export default function SignupPage() {
               </span>
             </button>
             <button className="flex items-center justify-center gap-2 py-3 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-              <img
+              <Image
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaVuxU1BhG2vwHEVnoIGKtrUwhU2EdvqI2ZxILM264kVq1sShoIqUiJkcygcMrFIQYZm7EL4iBMCSLNIDZTIoVJRsuQiQflTYBxXkOjS9LdcbhtU7J8ZHn667IQLL--OXbkrX5CHU3Y1SCMDddjAjtdY5ijN1lBmPbTljHpXrjoiGKnts6FzIOcKOs1HWO260qCQ0jODVqmONPogwlY3DcZxfsgXWS4_Qk27J5QsbzvA5-YeB1WnlHlrk42mJLX2U9XOd42XosNl8"
                 alt="LinkedIn Logo"
+                width={20}
+                height={20}
                 className="size-5"
               />
               <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">

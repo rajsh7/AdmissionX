@@ -1,4 +1,4 @@
-import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
@@ -12,7 +12,7 @@ export default function CollegeGrid({ colleges, total }: CollegeGridProps) {
 
   return (
     <div className="py-14">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="w-full px-4 lg:px-8 xl:px-12">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl font-black text-white mb-1">
@@ -33,7 +33,7 @@ export default function CollegeGrid({ colleges, total }: CollegeGridProps) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
           {colleges.slice(0, 8).map((college) => (
             <Link
               key={college.id}
@@ -42,11 +42,12 @@ export default function CollegeGrid({ colleges, total }: CollegeGridProps) {
             >
               {/* Image */}
               <div className="relative h-36 overflow-hidden bg-neutral-100">
-                <img
+                <Image
                   src={college.image}
                   alt={college.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  loading="lazy"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 250px"
+                  className="object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                 <div className="absolute bottom-2 left-3 flex items-center gap-1 text-white text-xs font-medium">

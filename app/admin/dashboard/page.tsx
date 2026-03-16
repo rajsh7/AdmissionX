@@ -28,9 +28,11 @@ async function safeQuery<T extends RowDataPacket>(
 function formatDate(d: string | null | undefined): string {
   if (!d) return "—";
   try {
-    return new Date(d).toLocaleDateString("en-IN", {
-      day: "numeric", month: "short", year: "numeric",
-    });
+    const date = new Date(d);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = date.toLocaleString("en-US", { month: "short" });
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
   } catch { return "—"; }
 }
 
@@ -192,6 +194,7 @@ export default async function AdminDashboardPage() {
   // ── Quick links ────────────────────────────────────────────────────────────
   const QUICK = [
     { href: "/admin/colleges",     icon: "apartment",         label: "Colleges",     color: "text-blue-600",   bg: "bg-blue-50"   },
+    { href: "/admin/colleges/contact", icon: "contact_phone",   label: "Contact Card", color: "text-amber-600",  bg: "bg-amber-50"  },
     { href: "/admin/students",     icon: "school",            label: "Students",     color: "text-emerald-600",bg: "bg-emerald-50"},
     { href: "/admin/applications", icon: "description",       label: "Applications", color: "text-red-600",    bg: "bg-red-50"    },
     { href: "/admin/blogs",        icon: "article",           label: "Blogs",        color: "text-violet-600", bg: "bg-violet-50" },
@@ -216,9 +219,8 @@ export default async function AdminDashboardPage() {
   };
 
   return (
-    <div className="p-6 space-y-8 max-w-[1400px]">
+    <div className="p-6 space-y-8 max-w-[1400px]" suppressHydrationWarning>
 
-      {/* ── Welcome banner ───────────────────────────────────────────────── */}
       <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl p-7 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
         <div>
           <p className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-1 flex items-center gap-1.5">

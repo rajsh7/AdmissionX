@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-interface ExamTabsProps {
+interface ExamTabsUnifiedProps {
   basePath: string;
   faqCount: number;
   questionCount: number;
@@ -17,11 +17,11 @@ interface Tab {
   exact?: boolean;
 }
 
-export default function ExamTabs({
+export default function ExamTabsUnified({
   basePath,
   faqCount,
   questionCount,
-}: ExamTabsProps) {
+}: ExamTabsUnifiedProps) {
   const pathname = usePathname();
 
   const tabs: Tab[] = [
@@ -53,10 +53,13 @@ export default function ExamTabs({
   }
 
   return (
-    <div className="bg-white border-b border-neutral-100 sticky top-0 z-30 shadow-sm">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+    <div 
+      id="exam-tabs-unified-container"
+      className="bg-white border-b border-neutral-100 sticky top-0 z-30 shadow-md"
+    >
+      <div className="w-full px-4 lg:px-8 xl:px-12">
         <nav
-          className="flex items-center gap-1 overflow-x-auto scrollbar-hide"
+          className="flex items-center justify-center gap-1 overflow-x-auto scrollbar-hide"
           aria-label="Exam sections"
         >
           {tabs.map((tab) => {

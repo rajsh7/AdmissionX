@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 
 interface Props {
   user: { id: number; name: string; email: string } | null;
@@ -217,11 +218,12 @@ export default function ProfileTab({ user }: Props) {
               <div className="relative shrink-0">
                 <div className="w-24 h-24 rounded-2xl bg-primary/10 flex items-center justify-center shadow-lg shadow-primary/10 overflow-hidden">
                   {profile?.photo ? (
-                    <img
+                    <Image
                       src={profile.photo}
                       alt={name}
+                      width={96}
+                      height={96}
                       className="w-full h-full object-cover"
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                     />
                   ) : (
                     <span className="text-3xl font-black text-primary">

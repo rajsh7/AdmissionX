@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 
 interface Props {
   user: { id: number; name: string; email: string } | null;
@@ -231,9 +232,12 @@ function UploadModal({
             />
 
             {preview ? (
-              <img
+              <Image
                 src={preview}
                 alt="Preview"
+                width={300}
+                height={128}
+                unoptimized
                 className="max-h-32 mx-auto rounded-xl object-contain mb-3"
               />
             ) : file ? (
@@ -378,13 +382,12 @@ function DocumentCard({
         className={`relative h-28 ${colors.bg} flex items-center justify-center overflow-hidden`}
       >
         {doc.is_image ? (
-          <img
+          <Image
             src={doc.file_path}
             alt={doc.name}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 250px"
             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = "none";
-            }}
           />
         ) : (
           <span

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { CollegeUser } from "../CollegeDashboardClient";
+import Image from "next/image";
 
 interface Props {
   college: CollegeUser;
@@ -142,9 +143,12 @@ function UploadModal({
           >
             {preview ? (
               <div className="relative">
-                <img
+                <Image
                   src={preview}
                   alt="Preview"
+                  width={600}
+                  height={400}
+                  unoptimized
                   className="w-full h-56 object-cover rounded-xl"
                 />
                 <div className="absolute inset-0 bg-black/40 rounded-xl opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -389,16 +393,13 @@ export default function GalleryTab({ college }: Props) {
                   }`}
                 >
                   {/* Image */}
-                  <img
+                  <Image
                     src={img.fullimage}
                     alt={img.name}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, (max-width: 1536px) 20vw, 300px"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
                     onClick={() => setLightbox(img)}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23e2e8f0'/%3E%3C/svg%3E";
-                    }}
                   />
 
                   {/* Overlay on hover */}
@@ -497,9 +498,11 @@ export default function GalleryTab({ college }: Props) {
             </button>
 
             {/* Image */}
-            <img
+            <Image
               src={lightbox.fullimage}
               alt={lightbox.name}
+              width={1200}
+              height={800}
               className="max-w-full max-h-[80vh] mx-auto object-contain rounded-2xl shadow-2xl"
             />
 

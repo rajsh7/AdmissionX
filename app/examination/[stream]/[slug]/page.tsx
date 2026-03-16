@@ -266,15 +266,15 @@ export default async function ExamOverviewPage({
     <div className="space-y-6">
       {/* ── Jump Navigation ───────────────────────────────────────────────── */}
       {jumpItems.length > 1 && (
-        <nav className="bg-white rounded-2xl border border-neutral-100 px-5 py-3 flex items-center gap-1.5 flex-wrap">
-          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mr-2">
+        <nav className="bg-transparent rounded-2xl border border-neutral-200 px-5 py-3 flex items-center gap-1.5 flex-wrap shadow-sm">
+          <span className="text-[10px] font-bold text-black uppercase tracking-widest mr-2">
             On this page:
           </span>
           {jumpItems.map((item) => (
             <a
               key={item.id}
               href={`#${item.id}`}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-600 hover:text-red-600 px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-700 hover:text-red-700 px-2.5 py-1.5 rounded-lg hover:bg-neutral-50 transition-colors"
             >
               <span className="material-symbols-outlined text-[13px]">
                 {item.icon}
@@ -285,107 +285,99 @@ export default async function ExamOverviewPage({
         </nav>
       )}
 
+      {/* ── Key Dates (quick overview row) ────────────────────────────────── */}
+      {(exam.applicationFrom ||
+        exam.applicationTo ||
+        exam.exminationDate ||
+        exam.resultAnnounce) && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              {
+                icon: "edit_document",
+                label: "Application Opens",
+                date: exam.applicationFrom,
+                color: "text-blue-700",
+              },
+              {
+                icon: "calendar_today",
+                label: "Application Closes",
+                date: exam.applicationTo,
+                color: "text-amber-700",
+              },
+              {
+                icon: "event",
+                label: "Exam Date",
+                date: exam.exminationDate,
+                color: "text-red-700",
+              },
+              {
+                icon: "emoji_events",
+                label: "Result Date",
+                date: exam.resultAnnounce,
+                color: "text-emerald-700",
+              },
+            ]
+              .filter((d) => d.date)
+              .map((d) => (
+                <div
+                  key={d.label}
+                  className="bg-white border border-neutral-200 rounded-2xl p-4 flex flex-col gap-2 shadow-md"
+                >
+                  <span
+                    className={`material-symbols-outlined text-[20px] ${d.color}`}
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    {d.icon}
+                  </span>
+                  <div>
+                    <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">
+                      {d.label}
+                    </p>
+                    <p
+                      className="text-sm font-black text-black leading-tight mt-0.5"
+                    >
+                      {formatDate(d.date)}
+                    </p>
+                    {isUpcoming(d.date) && (
+                      <span className="inline-flex items-center gap-0.5 text-[9px] font-black text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5 mt-1">
+                        <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                        Upcoming
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+          </div>
+        )}
+
       {/* ── About ─────────────────────────────────────────────────────────── */}
       {hasAbout && (
         <section
           id="about"
-          className="bg-white rounded-2xl border border-neutral-100 p-6 scroll-mt-24"
+          className="bg-white rounded-2xl border border-neutral-100 p-6 scroll-mt-24 shadow-md"
         >
           <SectionTitle icon="info" title={`About ${exam.title}`} />
           {contentText ? (
-            <div className="text-sm text-neutral-600 leading-relaxed space-y-3">
+            <div className="text-sm text-black leading-relaxed space-y-3 font-medium">
               {contentText.split(/\n{2,}/).map((para, i) => (
                 <p key={i}>{para.trim()}</p>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-neutral-600 leading-relaxed">
+            <p className="text-sm text-black leading-relaxed font-medium">
               {descText}
             </p>
           )}
         </section>
       )}
 
-      {/* ── Key Dates (quick overview row) ────────────────────────────────── */}
-      {(exam.applicationFrom ||
-        exam.applicationTo ||
-        exam.exminationDate ||
-        exam.resultAnnounce) && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[
-            {
-              icon: "edit_document",
-              label: "Application Opens",
-              date: exam.applicationFrom,
-              color: "text-blue-600",
-              bg: "bg-blue-50",
-              border: "border-blue-100",
-            },
-            {
-              icon: "calendar_today",
-              label: "Application Closes",
-              date: exam.applicationTo,
-              color: "text-amber-600",
-              bg: "bg-amber-50",
-              border: "border-amber-100",
-            },
-            {
-              icon: "event",
-              label: "Exam Date",
-              date: exam.exminationDate,
-              color: "text-red-600",
-              bg: "bg-red-50",
-              border: "border-red-100",
-            },
-            {
-              icon: "emoji_events",
-              label: "Result Date",
-              date: exam.resultAnnounce,
-              color: "text-emerald-600",
-              bg: "bg-emerald-50",
-              border: "border-emerald-100",
-            },
-          ]
-            .filter((d) => d.date)
-            .map((d) => (
-              <div
-                key={d.label}
-                className={`${d.bg} border ${d.border} rounded-2xl p-4 flex flex-col gap-2`}
-              >
-                <span
-                  className={`material-symbols-outlined text-[20px] ${d.color}`}
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  {d.icon}
-                </span>
-                <div>
-                  <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">
-                    {d.label}
-                  </p>
-                  <p
-                    className={`text-sm font-black ${d.color} leading-tight mt-0.5`}
-                  >
-                    {formatDate(d.date)}
-                  </p>
-                  {isUpcoming(d.date) && (
-                    <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-emerald-600 bg-white rounded-full px-1.5 py-0.5 mt-1">
-                      <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                      Upcoming
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-        </div>
-      )}
-
       {/* ── Important Dates Table ─────────────────────────────────────────── */}
       {hasDates && (
         <section
           id="dates"
-          className="bg-white rounded-2xl border border-neutral-100 overflow-hidden scroll-mt-24"
+          className="bg-white rounded-2xl border border-neutral-100 overflow-hidden scroll-mt-24 shadow-md"
         >
-          <div className="px-6 py-4 border-b border-neutral-100">
+          <div className="px-6 py-4 border-b border-neutral-100 bg-white">
             <SectionTitle icon="calendar_month" title="Important Dates" />
           </div>
 
@@ -393,76 +385,73 @@ export default async function ExamOverviewPage({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-neutral-50 text-left">
-                    <th className="px-6 py-3 text-[11px] font-bold text-neutral-500 uppercase tracking-wider">
+                  <tr className="bg-white border-b border-neutral-100 text-left">
+                    <th className="px-6 py-3 text-[11px] font-black text-black uppercase tracking-wider">
                       Event
                     </th>
-                    <th className="px-6 py-3 text-[11px] font-bold text-neutral-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-[11px] font-black text-black uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-6 py-3 text-[11px] font-bold text-neutral-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-[11px] font-black text-black uppercase tracking-wider">
                       Degree
                     </th>
-                    <th className="px-6 py-3 text-[11px] font-bold text-neutral-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-[11px] font-black text-black uppercase tracking-wider">
                       Status
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-50">
+                <tbody className="divide-y divide-neutral-100 bg-white">
                   {dateRows.map((row) => {
                     const upcoming = isUpcoming(row.eventDate);
                     return (
                       <tr
                         key={row.id}
-                        className={`transition-colors hover:bg-neutral-50 ${
-                          upcoming ? "bg-red-50/30" : ""
-                        }`}
+                        className={`transition-colors hover:bg-neutral-50 ${upcoming ? "bg-red-50/30" : ""
+                          }`}
                       >
                         <td className="px-6 py-3.5">
                           <div className="flex items-center gap-2">
                             {upcoming && (
-                              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse flex-shrink-0" />
+                              <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse flex-shrink-0" />
                             )}
-                            <span className="font-semibold text-neutral-900 text-xs">
+                            <span className="font-bold text-black text-xs">
                               {row.eventName || "—"}
                             </span>
                           </div>
                         </td>
                         <td className="px-6 py-3.5">
                           <span
-                            className={`text-xs font-black ${
-                              upcoming ? "text-red-600" : "text-neutral-700"
-                            }`}
+                            className={`text-xs font-black ${upcoming ? "text-red-700" : "text-black"
+                              }`}
                           >
                             {formatDate(row.eventDate)}
                           </span>
                         </td>
-                        <td className="px-6 py-3.5 text-xs text-neutral-500">
+                        <td className="px-6 py-3.5 text-xs text-neutral-900 font-medium">
                           {row.degreeName || "—"}
                         </td>
                         <td className="px-6 py-3.5">
                           {row.eventStatus ? (
                             <span
-                              className={`inline-flex items-center text-[10px] font-bold px-2.5 py-1 rounded-full ${
-                                (() => {
-                                  const s = String(row.eventStatus).toLowerCase();
-                                  return s.includes("active") || s.includes("open")
-                                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                              className={`inline-flex items-center text-[10px] font-bold px-2.5 py-1 rounded-full ${(() => {
+                                const s = String(row.eventStatus).toLowerCase();
+                                return s.includes("active") || s.includes("open")
+                                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
                                     : s.includes("closed") || s.includes("over")
-                                    ? "bg-neutral-100 text-neutral-500"
-                                    : "bg-amber-50 text-amber-700 border border-amber-200";
-                                })()
-                              }`}
+                                      ? "bg-neutral-100 text-neutral-600"
+                                      : "bg-amber-50 text-amber-800 border border-amber-200";
+                              })()
+                                }`}
                             >
                               {String(row.eventStatus)}
                             </span>
                           ) : upcoming ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-50 text-red-600 border border-red-100">
-                              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-100">
+                              <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse" />
                               Upcoming
                             </span>
                           ) : (
-                            <span className="text-[10px] text-neutral-400">
+                            <span className="text-[10px] text-neutral-500">
                               —
                             </span>
                           )}
@@ -474,8 +463,8 @@ export default async function ExamOverviewPage({
               </table>
             </div>
           ) : examDatesText ? (
-            <div className="p-6">
-              <p className="text-sm text-neutral-600 leading-relaxed whitespace-pre-line">
+            <div className="p-6 bg-white">
+              <p className="text-sm text-black leading-relaxed whitespace-pre-line font-medium">
                 {examDatesText}
               </p>
             </div>
@@ -487,7 +476,7 @@ export default async function ExamOverviewPage({
       {hasEligibility && (
         <section
           id="eligibility"
-          className="bg-white rounded-2xl border border-neutral-100 p-6 scroll-mt-24"
+          className="bg-white rounded-2xl border border-neutral-100 p-6 scroll-mt-24 shadow-md"
         >
           <SectionTitle icon="verified" title="Eligibility Criteria" />
 
@@ -501,14 +490,14 @@ export default async function ExamOverviewPage({
                         {idx + 1}
                       </span>
                       {row.degreeName && (
-                        <h4 className="text-sm font-black text-neutral-800">
+                        <h4 className="text-sm font-black text-black">
                           {row.degreeName}
                         </h4>
                       )}
                     </div>
                   )}
                   {row.description && (
-                    <div className="ml-7 text-sm text-neutral-600 leading-relaxed">
+                    <div className="ml-7 text-sm text-black font-medium leading-relaxed">
                       {stripHtml(row.description)
                         .split(/\n+/)
                         .filter(Boolean)
@@ -526,9 +515,11 @@ export default async function ExamOverviewPage({
               ))}
             </div>
           ) : eligibilityCriteriaText ? (
-            <p className="text-sm text-neutral-600 leading-relaxed whitespace-pre-line">
-              {eligibilityCriteriaText}
-            </p>
+            <div className="p-6 bg-white">
+              <p className="text-sm text-black font-medium leading-relaxed whitespace-pre-line">
+                {eligibilityCriteriaText}
+              </p>
+            </div>
           ) : null}
         </section>
       )}
@@ -537,18 +528,18 @@ export default async function ExamOverviewPage({
       {hasPattern && (
         <section
           id="pattern"
-          className="bg-white rounded-2xl border border-neutral-100 overflow-hidden scroll-mt-24"
+          className="bg-white rounded-2xl border border-neutral-100 overflow-hidden scroll-mt-24 shadow-md"
         >
-          <div className="px-6 py-4 border-b border-neutral-100">
+          <div className="px-6 py-4 border-b border-neutral-100 bg-white">
             <SectionTitle icon="format_list_bulleted" title="Exam Pattern" />
           </div>
 
-          <div className="divide-y divide-neutral-50">
+          <div className="divide-y divide-neutral-100 bg-white">
             {patternRows.map((row, idx) => (
               <div key={row.id} className="p-6">
                 {row.degreeName && (
-                  <h4 className="text-sm font-black text-neutral-800 mb-4 flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-red-50 text-red-600 text-[11px] font-black flex items-center justify-center">
+                  <h4 className="text-sm font-black text-black mb-4 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-red-50 text-red-700 text-[11px] font-black flex items-center justify-center border border-red-100">
                       {idx + 1}
                     </span>
                     {row.degreeName}
@@ -593,17 +584,17 @@ export default async function ExamOverviewPage({
                     .map((field) => (
                       <div
                         key={field.label}
-                        className="bg-neutral-50 rounded-xl p-3 flex flex-col gap-1.5"
+                        className="bg-white border border-neutral-200 rounded-xl p-3 flex flex-col gap-1.5 shadow-sm"
                       >
                         <div className="flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-[15px] text-red-400">
+                          <span className="material-symbols-outlined text-[15px] text-red-600">
                             {field.icon}
                           </span>
-                          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide">
+                          <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">
                             {field.label}
                           </span>
                         </div>
-                        <p className="text-sm font-black text-neutral-800 leading-snug">
+                        <p className="text-sm font-black text-black leading-snug">
                           {field.value}
                         </p>
                       </div>
@@ -612,18 +603,18 @@ export default async function ExamOverviewPage({
 
                 {/* Marking scheme */}
                 {row.markingSchem && (
-                  <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 flex items-start gap-2 mb-3">
+                  <div className="bg-white border border-red-100 rounded-xl px-4 py-3 flex items-start gap-2 mb-3 shadow-sm">
                     <span
-                      className="material-symbols-outlined text-[18px] text-amber-500 flex-shrink-0 mt-0.5"
+                      className="material-symbols-outlined text-[18px] text-red-600 flex-shrink-0 mt-0.5"
                       style={{ fontVariationSettings: "'FILL' 1" }}
                     >
                       calculate
                     </span>
                     <div>
-                      <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wide mb-0.5">
+                      <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-wide mb-0.5">
                         Marking Scheme
                       </p>
-                      <p className="text-sm text-amber-800 font-semibold">
+                      <p className="text-sm text-black font-black">
                         {row.markingSchem}
                       </p>
                     </div>
@@ -632,7 +623,7 @@ export default async function ExamOverviewPage({
 
                 {/* Pattern description */}
                 {row.patternDesc && (
-                  <div className="mt-2 text-sm text-neutral-600 leading-relaxed">
+                  <div className="mt-2 text-sm text-black font-medium leading-relaxed">
                     {stripHtml(row.patternDesc)
                       .split(/\n+/)
                       .filter(Boolean)
@@ -653,21 +644,21 @@ export default async function ExamOverviewPage({
       {hasFees && (
         <section
           id="fees"
-          className="bg-white rounded-2xl border border-neutral-100 overflow-hidden scroll-mt-24"
+          className="bg-white rounded-2xl border border-neutral-100 overflow-hidden scroll-mt-24 shadow-md"
         >
-          <div className="px-6 py-4 border-b border-neutral-100">
+          <div className="px-6 py-4 border-b border-neutral-100 bg-white">
             <SectionTitle icon="payments" title="Application Fees" />
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-neutral-50 text-left">
+                <tr className="bg-white border-b border-neutral-100 text-left">
                   {["Category", "Quota", "Mode", "Gender", "Amount"].map(
                     (h) => (
                       <th
                         key={h}
-                        className="px-6 py-3 text-[11px] font-bold text-neutral-500 uppercase tracking-wider whitespace-nowrap"
+                        className="px-6 py-3 text-[11px] font-black text-black uppercase tracking-wider whitespace-nowrap"
                       >
                         {h}
                       </th>
@@ -675,36 +666,36 @@ export default async function ExamOverviewPage({
                   )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-50">
+              <tbody className="divide-y divide-neutral-100 bg-white">
                 {feeRows.map((row) => (
                   <tr
                     key={row.id}
                     className="hover:bg-neutral-50 transition-colors"
                   >
                     <td className="px-6 py-3.5">
-                      <span className="text-xs font-bold text-neutral-800">
+                      <span className="text-xs font-black text-black">
                         {row.category || "General"}
                       </span>
                     </td>
-                    <td className="px-6 py-3.5 text-xs text-neutral-600">
+                    <td className="px-6 py-3.5 text-xs text-neutral-800 font-medium">
                       {row.quota || "—"}
                     </td>
-                    <td className="px-6 py-3.5 text-xs text-neutral-600">
+                    <td className="px-6 py-3.5 text-xs text-neutral-800 font-medium">
                       {row.mode || "—"}
                     </td>
-                    <td className="px-6 py-3.5 text-xs text-neutral-600">
+                    <td className="px-6 py-3.5 text-xs text-neutral-800 font-medium">
                       {row.gender || "All"}
                     </td>
                     <td className="px-6 py-3.5">
                       {row.amount ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-xs font-black text-emerald-800 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
                           <span className="material-symbols-outlined text-[12px]">
                             currency_rupee
                           </span>
                           {row.amount}
                         </span>
                       ) : (
-                        <span className="text-xs text-neutral-400">—</span>
+                        <span className="text-xs text-neutral-500">—</span>
                       )}
                     </td>
                   </tr>
@@ -713,8 +704,8 @@ export default async function ExamOverviewPage({
             </table>
           </div>
 
-          <div className="px-6 py-3 bg-neutral-50 border-t border-neutral-100">
-            <p className="text-[11px] text-neutral-400 flex items-center gap-1.5">
+          <div className="px-6 py-3 bg-neutral-100 border-t border-neutral-200">
+            <p className="text-[11px] text-neutral-600 font-bold flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[13px]">
                 info
               </span>
@@ -729,7 +720,7 @@ export default async function ExamOverviewPage({
       {hasProcess && (
         <section
           id="process"
-          className="bg-white rounded-2xl border border-neutral-100 p-6 scroll-mt-24"
+          className="bg-white rounded-2xl border border-neutral-100 p-6 scroll-mt-24 shadow-md"
         >
           <SectionTitle icon="how_to_reg" title="How to Apply" />
 
@@ -743,7 +734,7 @@ export default async function ExamOverviewPage({
 
                 <div className="flex gap-4">
                   {/* Step number */}
-                  <div className="w-8 h-8 rounded-full bg-red-600 text-white text-xs font-black flex items-center justify-center flex-shrink-0 z-10">
+                  <div className="w-8 h-8 rounded-full bg-red-600 text-white text-xs font-black flex items-center justify-center flex-shrink-0 z-10 border-2 border-white shadow-sm">
                     {idx + 1}
                   </div>
 
@@ -751,7 +742,7 @@ export default async function ExamOverviewPage({
                     {/* Mode pills */}
                     <div className="flex flex-wrap gap-2 mb-3">
                       {row.modeofapplication && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-white border border-blue-200 px-2.5 py-1 rounded-full shadow-md">
                           <span className="material-symbols-outlined text-[12px]">
                             app_registration
                           </span>
@@ -759,7 +750,7 @@ export default async function ExamOverviewPage({
                         </span>
                       )}
                       {row.modeofpayment && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-white border border-emerald-200 px-2.5 py-1 rounded-full shadow-md">
                           <span className="material-symbols-outlined text-[12px]">
                             payments
                           </span>
@@ -767,7 +758,7 @@ export default async function ExamOverviewPage({
                         </span>
                       )}
                       {row.examinationmode && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-700 bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-800 bg-white border border-purple-200 px-2.5 py-1 rounded-full shadow-md">
                           <span className="material-symbols-outlined text-[12px]">
                             devices
                           </span>
@@ -778,18 +769,18 @@ export default async function ExamOverviewPage({
 
                     {/* Description */}
                     {row.description && (
-                      <p className="text-sm text-neutral-600 leading-relaxed mb-2">
+                      <p className="text-sm text-black font-medium leading-relaxed mb-2">
                         {stripHtml(row.description)}
                       </p>
                     )}
 
                     {/* Eligibility criteria inline */}
                     {row.eligibilitycriteria && (
-                      <div className="bg-neutral-50 rounded-xl px-4 py-3 mt-2">
+                      <div className="bg-white border border-neutral-200 rounded-xl px-4 py-3 mt-2 shadow-md">
                         <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-wide mb-1">
                           Eligibility
                         </p>
-                        <p className="text-xs text-neutral-600 leading-relaxed">
+                        <p className="text-xs text-black leading-relaxed font-bold">
                           {stripHtml(row.eligibilitycriteria)}
                         </p>
                       </div>
@@ -804,19 +795,24 @@ export default async function ExamOverviewPage({
 
       {/* ── Official link CTA ─────────────────────────────────────────────── */}
       {exam.getMoreInfoLink && (
-        <div className="bg-gradient-to-r from-neutral-900 to-neutral-800 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <span
-              className="material-symbols-outlined text-[22px] text-red-400"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              open_in_new
-            </span>
+        <div className="bg-neutral-900 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl border border-neutral-800 overflow-hidden relative">
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-red-600/10 to-transparent pointer-events-none" />
+          
+          <div className="flex items-start gap-4 relative z-10">
+            <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-red-600/20">
+              <span
+                className="material-symbols-outlined text-[24px] text-white"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                open_in_new
+              </span>
+            </div>
             <div>
-              <p className="text-white font-black text-sm mb-0.5">
+              <p className="text-white font-black text-lg mb-1 leading-tight">
                 Get the latest information
               </p>
-              <p className="text-neutral-400 text-xs leading-relaxed">
+              <p className="text-neutral-400 text-xs leading-relaxed max-w-md">
                 Dates and details may change. Always verify on the official exam
                 website before applying.
               </p>
@@ -826,12 +822,12 @@ export default async function ExamOverviewPage({
             href={exam.getMoreInfoLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors shadow-sm shadow-red-500/20 whitespace-nowrap flex-shrink-0"
+            className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white font-black text-sm px-6 py-3 rounded-xl transition-all shadow-lg shadow-red-600/30 whitespace-nowrap flex-shrink-0 hover:scale-[1.02] active:scale-[0.98] relative z-10"
           >
-            <span className="material-symbols-outlined text-[16px]">
-              open_in_new
-            </span>
             Official Website
+            <span className="material-symbols-outlined text-[18px]">
+              arrow_forward
+            </span>
           </a>
         </div>
       )}
@@ -841,9 +837,17 @@ export default async function ExamOverviewPage({
 
 // ─── Section Title ────────────────────────────────────────────────────────────
 
-function SectionTitle({ icon, title }: { icon: string; title: string }) {
+function SectionTitle({
+  icon,
+  title,
+}: {
+  icon: string;
+  title: string;
+}) {
   return (
-    <h2 className="text-base font-black text-neutral-900 flex items-center gap-2 mb-4">
+    <h2
+      className="bg-white text-base font-black flex items-center gap-2 mb-4 text-black"
+    >
       <span
         className="material-symbols-outlined text-[20px] text-red-500"
         style={{ fontVariationSettings: "'FILL' 1" }}

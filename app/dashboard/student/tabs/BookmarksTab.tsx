@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 
 interface Props {
   user: { id: number; name: string; email: string } | null;
@@ -264,13 +265,12 @@ export default function BookmarksTab({ user }: Props) {
                 {/* Image / placeholder */}
                 <div className="relative h-32 overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-900">
                   {bm.image ? (
-                    <img
+                    <Image
                       src={bm.image}
                       alt={bm.title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 300px"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
