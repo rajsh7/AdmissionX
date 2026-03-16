@@ -44,9 +44,9 @@ export default function CollegeTabs({ slug, counts = {} }: CollegeTabsProps) {
   return (
     <div className="bg-white/5 backdrop-blur-md border-b border-white/10 sticky top-0 z-40 shadow-sm relative overflow-hidden">
       <div className="absolute inset-0 bg-neutral-900/40 -z-10" />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="w-full px-4 lg:px-8 xl:px-12">
         <nav
-          className="flex items-center gap-0 overflow-x-auto scrollbar-none"
+          className="flex items-center justify-center gap-0 overflow-x-auto scrollbar-none"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {TABS.map((tab) => {

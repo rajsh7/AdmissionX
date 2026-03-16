@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
@@ -235,12 +236,15 @@ export default async function NewsPage({
 
   return (
     <div className="min-h-screen bg-neutral-50 relative">
-      {/* ── Full Page Background ── */}
-      <div className="fixed inset-0 z-0">
-        <img
+      <div className="fixed inset-0 z-0 text-[0px] font-[0] leading-[0]">
+        <Image
           src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
           alt="Campus Background"
-          className="w-full h-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          quality={80}
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
       </div>
@@ -250,15 +254,15 @@ export default async function NewsPage({
 
         {/* ── Hero ─────────────────────────────────────────────────────────── */}
         <div className="pt-24 pb-12">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
+          <div className="w-full px-4 lg:px-8 xl:px-12 flex flex-col items-center text-center">
+            <nav className="flex items-center justify-center gap-2 text-xs text-neutral-500 mb-6 font-medium">
               <Link href="/" className="hover:text-white transition-colors">Home</Link>
               <span className="material-symbols-outlined text-[14px]">chevron_right</span>
               <span className="text-neutral-300">News</span>
             </nav>
 
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-              <div className="max-w-2xl">
+            <div className="flex flex-col items-center gap-6">
+              <div className="w-full max-w-2xl flex flex-col items-center">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="inline-flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
                     <span className="material-symbols-outlined text-[13px]">newspaper</span>
@@ -271,14 +275,14 @@ export default async function NewsPage({
                     Education News
                   </span>
                 </h1>
-                <p className="text-neutral-400 text-sm leading-relaxed max-w-lg">
+                <p className="text-neutral-400 text-sm leading-relaxed max-w-lg text-center">
                   Stay informed with the latest admission alerts, exam notifications,
                   scholarship announcements, and campus updates.
                 </p>
               </div>
 
               {/* Stats */}
-              <div className="flex gap-3 flex-shrink-0">
+              <div className="flex justify-center gap-3 flex-shrink-0">
                 <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-center min-w-[80px]">
                   <p className="text-2xl font-black text-white">{total}</p>
                   <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wide mt-0.5">
@@ -298,7 +302,7 @@ export default async function NewsPage({
 
         {/* ── Search bar ───────────────────────────────────────────────────── */}
         <div className="border-neutral-100">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4">
+          <div className="w-full px-4 lg:px-8 xl:px-12 py-4 mx-auto flex justify-center">
             <form method="GET" action="/news" className="flex gap-3 max-w-xl">
               <div className="flex-1 relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-neutral-400">
@@ -327,8 +331,8 @@ export default async function NewsPage({
         {/* ── Type filter chips ─────────────────────────────────────────────── */}
         {allTypes.length > 0 && (
           <div className=" border-neutral-100">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3">
-              <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+            <div className="w-full px-4 lg:px-8 xl:px-12 py-3 mx-auto">
+              <div className="flex items-center justify-center gap-2 overflow-x-auto scrollbar-hide">
                 <Link
                   href={buildUrl({ type: undefined, page: "1" })}
                   className={`inline-flex items-center gap-1.5 px-3  py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition-colors ${!activeType
@@ -358,7 +362,7 @@ export default async function NewsPage({
         )}
 
         {/* ── Main content ──────────────────────────────────────────────────── */}
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
+        <div className="w-full px-4 lg:px-8 xl:px-12 py-10">
           <div className="flex flex-col lg:flex-row gap-8 items-start">
 
             {/* ── NEWS GRID ────────────────────────────────────────────────── */}
@@ -398,7 +402,7 @@ export default async function NewsPage({
                 <EmptyState hasFilters={!!(q || activeType || activeTag)} />
               ) : (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
                     {news.map((item, idx) => (
                       <NewsCard key={item.id} item={item} colorIdx={idx} />
                     ))}
@@ -532,11 +536,12 @@ function NewsCard({ item, colorIdx }: { item: NewsRow; colorIdx: number }) {
     >
       {/* Image */}
       <div className="relative h-44 bg-neutral-100 overflow-hidden flex-shrink-0">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={imgUrl}
           alt={item.topic}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 350px"
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         {ago && (

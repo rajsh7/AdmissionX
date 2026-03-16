@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
 import Link from "next/link";
+import Image from "next/image";
 import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
@@ -548,11 +549,12 @@ function CourseCard({
     <div className="group flex flex-col bg-white rounded-2xl border border-neutral-100 hover:border-purple-200 hover:shadow-lg hover:shadow-purple-500/5 transition-all duration-300 overflow-hidden">
       {/* Image */}
       <div className="relative h-36 overflow-hidden bg-neutral-100">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={imgUrl}
           alt={course.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          fill
+          sizes="(max-width: 640px) 100vw, 350px"
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         {/* Level badge */}

@@ -1,11 +1,12 @@
 import pool from "@/lib/db";
 import { notFound } from "next/navigation";
 import { RowDataPacket } from "mysql2";
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
-import ExamTabs from "./ExamTabs";
+import ExamTabsUnified from "./ExamTabsUnified";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -198,60 +199,68 @@ export default async function ExamLayout({
       label: "Application Open",
       date: formatDate(exam.applicationFrom),
       upcoming: isUpcoming(exam.applicationFrom),
-      color: "text-blue-500",
-      bg: "bg-blue-50",
-    },
-    {
-      icon: "calendar_today",
-      label: "Application Close",
-      date: formatDate(exam.applicationTo),
-      upcoming: isUpcoming(exam.applicationTo),
-      color: "text-amber-500",
-      bg: "bg-amber-50",
+      color: "text-amber-700",
+      bg: "bg-white",
     },
     {
       icon: "event",
       label: "Exam Date",
       date: formatDate(exam.exminationDate),
       upcoming: isUpcoming(exam.exminationDate),
-      color: "text-red-500",
-      bg: "bg-red-50",
+      color: "text-red-700",
+      bg: "bg-white",
     },
     {
       icon: "emoji_events",
       label: "Result Announcement",
       date: formatDate(exam.resultAnnounce),
       upcoming: isUpcoming(exam.resultAnnounce),
-      color: "text-emerald-500",
-      bg: "bg-emerald-50",
+      color: "text-emerald-700",
+      bg: "bg-white",
     },
   ].filter((d) => d.date);
 
   const basePath = `/examination/${sectionSlug}/${slug}`;
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-transparent">
       <Header />
 
-      {/* ── Hero Banner ────────────────────────────────────────────────────── */}
+      {/* ── Fixed Background Image ── */}
+      <div className="fixed inset-0 w-full h-full -z-20 text-[0px] font-[0] leading-[0]">
+        <div className="absolute inset-0 bg-neutral-950/20 backdrop-blur-[2px] z-10" />
+        <Image
+          src={bannerUrl}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          quality={80}
+          className="object-cover"
+        />
+      </div>
+
       <div className="relative pt-16 overflow-hidden">
         {/* Background image layer */}
-        <div className="relative h-56 sm:h-64 md:h-72 overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+        <div className="relative h-64 sm:h-72 md:h-80 overflow-hidden">
+          <Image
             src={bannerUrl}
             alt={examTitle}
-            className="w-full h-full object-cover"
+            fill
+            priority
+            sizes="100vw"
+            quality={90}
+            className="object-cover"
           />
           {/* Dark overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/70 to-neutral-900/30" />
         </div>
 
         {/* Hero content (sits on top of image) */}
-        <div className="absolute inset-0 flex items-end">
-          <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 pb-6">
+        <div className="absolute inset-0 flex items-center justify-center pt-8">
+          <div className="w-full px-4 lg:px-8 xl:px-12 pb-6 flex flex-col items-center text-center">
             {/* Breadcrumb */}
-            <nav className="flex items-center gap-1.5 text-xs text-neutral-400 mb-3 flex-wrap">
+            <nav className="flex items-center justify-center gap-1.5 text-xs text-neutral-400 mb-3 flex-wrap">
               <Link href="/" className="hover:text-white transition-colors">
                 Home
               </Link>
@@ -282,7 +291,7 @@ export default async function ExamLayout({
             </nav>
 
             {/* Title + badges row */}
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+            <div className="flex flex-col items-center gap-3">
               <div className="flex-1 min-w-0">
                 {/* Type badge */}
                 {exam.exam_type_name && (
@@ -299,7 +308,7 @@ export default async function ExamLayout({
                 </h1>
 
                 {/* Quick stats row */}
-                <div className="flex flex-wrap items-center gap-4 mt-2">
+                <div className="flex flex-wrap items-center justify-center gap-4 mt-2">
                   {exam.stream_name && (
                     <span className="flex items-center gap-1 text-xs text-neutral-300 font-medium">
                       <span className="material-symbols-outlined text-[14px] text-red-400">
@@ -347,14 +356,14 @@ export default async function ExamLayout({
       </div>
 
       {/* ── Sticky Tab Navigation ───────────────────────────────────────────── */}
-      <ExamTabs
+      <ExamTabsUnified
         basePath={basePath}
         faqCount={faqCount}
         questionCount={questionCount}
       />
 
       {/* ── Main Content Area ───────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
+      <div className="w-full px-4 lg:px-8 xl:px-12 py-8 relative z-10">
         <div className="flex gap-6 lg:gap-8 items-start">
 
           {/* ── Page content (children) ── */}
@@ -365,23 +374,23 @@ export default async function ExamLayout({
 
             {/* Key Dates card */}
             {keyDates.length > 0 && (
-              <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 border-b border-neutral-100 flex items-center gap-2">
+              <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden z-10">
+                <div className="px-5 py-4 border-b border-neutral-100 flex items-center gap-2 bg-white">
                   <span
                     className="material-symbols-outlined text-[18px] text-red-500"
                     style={{ fontVariationSettings: "'FILL' 1" }}
                   >
                     calendar_month
                   </span>
-                  <h3 className="text-sm font-black text-neutral-900">
+                  <h3 className="text-sm font-black text-black">
                     Key Dates
                   </h3>
                 </div>
-                <div className="divide-y divide-neutral-50">
+                <div className="divide-y divide-neutral-100 bg-white">
                   {keyDates.map((kd) => (
                     <div key={kd.label} className="flex items-start gap-3 px-5 py-3.5">
                       <div
-                        className={`w-8 h-8 rounded-lg ${kd.bg} flex items-center justify-center flex-shrink-0 mt-0.5`}
+                        className="w-8 h-8 rounded-lg bg-white border border-neutral-100 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm"
                       >
                         <span
                           className={`material-symbols-outlined text-[16px] ${kd.color}`}
@@ -391,14 +400,14 @@ export default async function ExamLayout({
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide leading-none mb-1">
+                        <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-wide leading-none mb-1">
                           {kd.label}
                         </p>
-                        <p className="text-sm font-black text-neutral-900">
+                        <p className="text-sm font-black text-black">
                           {kd.date}
                         </p>
                         {kd.upcoming && (
-                          <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full mt-1">
+                          <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-emerald-600 bg-white border border-emerald-100 px-1.5 py-0.5 rounded-full mt-1 shadow-sm">
                             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                             Upcoming
                           </span>
@@ -411,19 +420,19 @@ export default async function ExamLayout({
             )}
 
             {/* Quick Info card */}
-            <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden">
-              <div className="px-5 py-4 border-b border-neutral-100 flex items-center gap-2">
+            <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden z-10">
+              <div className="px-5 py-4 border-b border-neutral-100 flex items-center gap-2 bg-white">
                 <span
                   className="material-symbols-outlined text-[18px] text-blue-500"
                   style={{ fontVariationSettings: "'FILL' 1" }}
                 >
                   info
                 </span>
-                <h3 className="text-sm font-black text-neutral-900">
+                <h3 className="text-sm font-black text-black">
                   Quick Info
                 </h3>
               </div>
-              <div className="p-5 space-y-3">
+              <div className="p-5 space-y-3 bg-white">
                 {[
                   {
                     label: "Stream",
@@ -461,7 +470,7 @@ export default async function ExamLayout({
                         </span>
                         {row.label}
                       </span>
-                      <span className="text-xs font-bold text-neutral-800 text-right">
+                      <span className="text-xs font-bold text-black text-right">
                         {row.value}
                       </span>
                     </div>

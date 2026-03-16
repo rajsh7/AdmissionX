@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
 import Link from "next/link";
+import Image from "next/image";
 import { RowDataPacket } from "mysql2";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
@@ -233,11 +234,15 @@ export default async function StreamPage() {
   return (
     <div className="min-h-screen bg-neutral-50">
       {/* ── Full Page Background ── */}
-      <div className="fixed inset-0 z-0">
-        <img
+      <div className="fixed inset-0 z-0 text-[0px] font-[0] leading-[0]">
+        <Image
           src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
           alt="Campus Background"
-          className="w-full h-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          quality={80}
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
       </div>
@@ -246,10 +251,10 @@ export default async function StreamPage() {
         <Header />
 
         {/* ── Hero ── */}
-        <div className="pt-24 pb-14">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="pt-28 pb-20">
+          <div className="w-full px-4 lg:px-8 xl:px-12 flex flex-col items-center text-center">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
+          <nav className="flex items-center justify-center gap-2 text-xs text-neutral-500 mb-6 font-medium">
             <Link href="/" className="hover:text-white transition-colors">
               Home
             </Link>
@@ -259,9 +264,9 @@ export default async function StreamPage() {
             <span className="text-neutral-300">Streams</span>
           </nav>
 
-          <div className="max-w-3xl">
+          <div className="w-full max-w-4xl flex flex-col items-center">
             {/* Label */}
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center justify-center gap-3 mb-4">
               <span className="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
                 <span className="material-symbols-outlined text-[13px]">
                   school
@@ -282,7 +287,7 @@ export default async function StreamPage() {
             </p>
 
             {/* Stats bar */}
-            <div className="flex flex-wrap items-center gap-6">
+            <div className="flex flex-wrap items-center justify-center gap-6">
               {[
                 { label: "Streams", value: totalStreams, icon: "category" },
                 {
@@ -313,7 +318,7 @@ export default async function StreamPage() {
       </div>
 
       {/* ── Content ── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-12">
+      <div className="w-full px-4 lg:px-8 xl:px-12 py-12">
         {/* ── Featured Streams (large cards) ── */}
         {featured.length > 0 && (
           <section className="mb-14">
@@ -328,7 +333,7 @@ export default async function StreamPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
               {featured.map((stream, i) => (
                 <Link
                   key={stream.id}
@@ -412,7 +417,7 @@ export default async function StreamPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-3">
               {remaining.map((stream, i) => (
                 <Link
                   key={stream.id}

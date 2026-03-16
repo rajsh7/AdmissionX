@@ -35,7 +35,8 @@ async function seed() {
         email         VARCHAR(255)  NOT NULL UNIQUE,
         phone         VARCHAR(32)   NOT NULL,
         password_hash VARCHAR(255)  NOT NULL,
-        created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
     console.log("✔  Table `next_student_signups` ready.");

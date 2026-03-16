@@ -1,4 +1,5 @@
 import type { FacultyData } from "@/app/api/college/[slug]/route";
+import Image from "next/image";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -46,11 +47,12 @@ function FacultyCard({ faculty }: { faculty: FacultyData }) {
       <div className="relative h-40 bg-gradient-to-br from-neutral-100 to-neutral-200 overflow-hidden flex items-center justify-center">
         {image ? (
           <>
-            <img
+            <Image
               src={image}
               alt={displayName}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 250px"
               className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
-              onError={undefined}
             />
             {/* subtle gradient at bottom */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />

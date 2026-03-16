@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   useState,
   useEffect,
@@ -428,10 +429,13 @@ export default function SearchClient({
     <div className="min-h-screen relative">
       {/* ── Full Page Background ── */}
       <div className="fixed inset-0 z-0">
-        <img
+        <Image
           src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
           alt="Campus Background"
-          className="w-full h-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
       </div>
@@ -591,7 +595,7 @@ export default function SearchClient({
               {/* ── College grid / list ── */}
               {loading ? (
                 viewMode === "grid" ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
                     {Array.from({ length: 12 }).map((_, i) => (
                       <CollegeCardSkeleton key={i} />
                     ))}
@@ -632,7 +636,7 @@ export default function SearchClient({
                   )}
                 </div>
               ) : viewMode === "grid" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
                   {colleges.map((college, i) => (
                     <CollegeCard
                       key={college.id}

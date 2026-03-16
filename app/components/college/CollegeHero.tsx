@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -128,19 +129,21 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
       {/* ── Hero Banner ── */}
       <div className="relative h-64 sm:h-80 lg:h-[380px] overflow-hidden bg-neutral-900">
         {/* Background image */}
-        <img
+        <Image
           src={image}
           alt={college_name}
-          className="absolute inset-0 w-full h-full object-cover opacity-50"
-          onError={undefined}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover opacity-50"
         />
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-900/60 to-transparent" />
 
         {/* Breadcrumb */}
         <div className="absolute top-20 left-0 right-0 z-10">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <nav className="flex items-center gap-2 text-xs text-neutral-400" aria-label="Breadcrumb">
+          <div className="w-full px-0">
+            <nav className="flex items-center justify-center gap-2 text-xs text-neutral-400" aria-label="Breadcrumb">
               <Link href="/" className="hover:text-white transition-colors">
                 Home
               </Link>
@@ -158,9 +161,9 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
 
         {/* College identity block (bottom of banner) */}
         <div className="absolute bottom-0 left-0 right-0 z-10">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 pb-5">
+          <div className="w-full px-0 pb-5 flex flex-col items-center text-center">
             {/* Badges row */}
-            <div className="flex flex-wrap items-center gap-2 mb-3">
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
               {verified ? (
                 <span className="inline-flex items-center gap-1 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide">
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -217,7 +220,7 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
             </h1>
 
             {/* Location + Rating row */}
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-4">
               <div className="flex items-center gap-1.5 text-neutral-300 text-sm">
                 <span className="material-symbols-outlined text-[16px] text-red-400">
                   location_on
@@ -248,8 +251,8 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
       {/* ── Quick Stats Bar ── */}
       {quickStats.length > 0 && (
         <div className="bg-white/5 backdrop-blur-md border-b border-white/10 shadow-sm relative z-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <div className="flex items-center gap-0 overflow-x-auto py-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="w-full px-4 lg:px-8 xl:px-12">
+            <div className="flex items-center justify-center gap-0 overflow-x-auto py-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {quickStats.map((stat, i) => (
                 <div
                   key={stat.label}

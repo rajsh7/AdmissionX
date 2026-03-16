@@ -4,12 +4,15 @@ import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import Image from "next/image";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_IMAGE =
   "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=600";
+
+// ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
   title: "Career Opportunities — Explore Career Paths | AdmissionX",
@@ -390,12 +393,12 @@ function CareerCard({ career }: { career: CareerRelevantRow }) {
     >
       {/* Image */}
       <div className="relative h-40 bg-neutral-100 overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={imgUrl}
           alt={career.title}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 25vw, 300px"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          onError={undefined}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
 

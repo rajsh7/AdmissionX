@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 const fields = [
@@ -207,16 +208,22 @@ export default function FieldsOfStudy({
           >
             {/* Background Image */}
             <AnimatePresence mode="wait">
-              <motion.img
+              <motion.div
                 key={current.label}
-                src={current.image}
-                alt={current.label}
+                className="absolute inset-0"
                 initial={{ opacity: 0, scale: 1.1 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.05 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
+              >
+                <Image
+                  src={current.image}
+                  alt={current.label}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  className="object-cover"
+                />
+              </motion.div>
             </AnimatePresence>
 
             {/* Overlay */}
@@ -395,16 +402,22 @@ export default function FieldsOfStudy({
         <div className="lg:hidden">
           <div className="relative rounded-3xl overflow-hidden min-h-[400px]">
             <AnimatePresence mode="wait">
-              <motion.img
+              <motion.div
                 key={`mobile-${current.label}`}
-                src={current.image}
-                alt={current.label}
+                className="absolute inset-0"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4 }}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
+              >
+                <Image
+                  src={current.image}
+                  alt={current.label}
+                  fill
+                  sizes="100vw"
+                  className="object-cover"
+                />
+              </motion.div>
             </AnimatePresence>
 
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10 z-[1]" />

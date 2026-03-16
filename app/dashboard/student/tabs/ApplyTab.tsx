@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 
 interface Props {
   user: { id: number; name: string; email: string } | null;
@@ -387,13 +388,12 @@ function BrowseStep({
                   {/* Banner */}
                   <div className="relative h-36 bg-gradient-to-br from-primary/20 to-slate-300 dark:from-slate-700 dark:to-slate-900 overflow-hidden">
                     {college.image ? (
-                      <img
+                      <Image
                         src={college.image}
                         alt={college.college_name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 400px"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                        }}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
@@ -731,13 +731,12 @@ function ApplicationFormStep({
         {/* College banner */}
         <div className="relative h-32 bg-gradient-to-br from-primary to-blue-700 overflow-hidden">
           {college.image && (
-            <img
+            <Image
               src={college.image}
               alt={college.college_name}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 800px"
               className="w-full h-full object-cover opacity-30"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-              }}
             />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

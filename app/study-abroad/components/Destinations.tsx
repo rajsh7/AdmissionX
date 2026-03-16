@@ -18,7 +18,7 @@ export default function Destinations({ countries, getDestinationMeta }: Destinat
 
   return (
     <div id="destinations" className="py-14">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="w-full px-4 lg:px-8 xl:px-12">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl font-black text-white mb-1">
@@ -30,7 +30,7 @@ export default function Destinations({ countries, getDestinationMeta }: Destinat
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
           {countries.map((country) => {
             const meta = getDestinationMeta(country.name);
             return (

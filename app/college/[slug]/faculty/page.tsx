@@ -1,6 +1,7 @@
 import pool from "@/lib/db";
 import { notFound } from "next/navigation";
 import { RowDataPacket } from "mysql2";
+import Image from "next/image";
 
 // Cache the fully-rendered page for 5 minutes (same TTL as the layout).
 export const revalidate = 300;
@@ -88,11 +89,12 @@ function ManagementCard({ member }: { member: ManagementRow }) {
       {/* Avatar */}
       <div className="flex-shrink-0">
         {imageUrl ? (
-          <img
+          <Image
             src={imageUrl}
             alt={displayName}
+            width={56}
+            height={56}
             className="w-14 h-14 rounded-xl object-cover object-top border border-neutral-100"
-            onError={undefined}
           />
         ) : (
           <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-red-500 to-red-700 text-white flex items-center justify-center text-xl font-black shadow-sm">

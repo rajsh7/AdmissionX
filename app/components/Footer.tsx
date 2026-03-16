@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const footerLinks = {
   "Quick Links": [
@@ -77,11 +78,14 @@ export default function Footer() {
             {/* Brand */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 mb-12">
               <Link href="/" className="flex items-center gap-3 group">
-                <img
-                  src="/admissionx-logo.png"
-                  alt="AdmissionX logo"
-                  className="h-8 w-auto object-contain"
-                />
+                <Image
+                   src="/admissionx-logo.png"
+                   alt="AdmissionX logo"
+                   width={160}
+                   height={32}
+                   unoptimized
+                   className="h-8 w-auto object-contain"
+                 />
               </Link>
 
               <p className="text-sm text-neutral-400 max-w-md leading-relaxed">

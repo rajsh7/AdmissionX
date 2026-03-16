@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 export interface University {
@@ -88,11 +89,15 @@ export default function TopUniversities({ universities }: TopUniversitiesProps) 
               className="group relative block rounded-3xl overflow-hidden bg-neutral-900 h-full min-h-[420px] lg:min-h-[480px]"
             >
               {/* Image */}
-              <img
-                src={featured.image}
-                alt={featured.name}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              />
+              <div className="absolute inset-0 group-hover:scale-105 transition-transform duration-700">
+                <Image
+                  src={featured.image}
+                  alt={featured.name}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-[1]" />
 
               {/* Content */}
@@ -175,11 +180,15 @@ export default function TopUniversities({ universities }: TopUniversitiesProps) 
                 >
                   {/* Image */}
                   <div className="relative w-full sm:w-48 lg:w-56 flex-shrink-0 h-48 sm:h-auto overflow-hidden">
-                    <img
-                      src={uni.image}
-                      alt={uni.name}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
+                    <div className="absolute inset-0 group-hover:scale-105 transition-transform duration-700">
+                      <Image
+                        src={uni.image}
+                        alt={uni.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 200px, 250px"
+                        className="object-cover"
+                      />
+                    </div>
                     <div className="absolute top-3 left-3">
                       <RankBadge rank={i + 2} size="md" />
                     </div>
@@ -258,9 +267,11 @@ export default function TopUniversities({ universities }: TopUniversitiesProps) 
 
                 {/* Thumbnail */}
                 <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
-                  <img
+                  <Image
                     src={uni.image}
                     alt={uni.name}
+                    width={48}
+                    height={48}
                     className="w-full h-full object-cover"
                   />
                 </div>

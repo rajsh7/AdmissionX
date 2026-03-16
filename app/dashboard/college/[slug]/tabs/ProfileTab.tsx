@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { CollegeUser } from "../CollegeDashboardClient";
+import Image from "next/image";
 
 interface Props {
   college: CollegeUser;
@@ -479,13 +480,12 @@ export default function ProfileTab({ college }: Props) {
           >
             {bannerSrc ? (
               <>
-                <img
+                <Image
                   src={bannerSrc}
                   alt="Banner"
+                  fill
+                  unoptimized
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
                 />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <span className="material-symbols-outlined text-white text-3xl">

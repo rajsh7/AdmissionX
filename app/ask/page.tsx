@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
@@ -190,11 +191,15 @@ export default async function AskPage({
   return (
     <div className="min-h-screen relative">
       {/* ── Full Page Background ── */}
-      <div className="fixed inset-0 z-0">
-        <img
+      <div className="fixed inset-0 z-0 text-[0px] font-[0] leading-[0]">
+        <Image
           src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
           alt="Campus Background"
-          className="w-full h-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          quality={80}
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
       </div>
@@ -204,15 +209,15 @@ export default async function AskPage({
 
         {/* ── Hero ─────────────────────────────────────────────────────────── */}
         <div className="pt-24 pb-14">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
+          <div className="w-full px-4 lg:px-8 xl:px-12 flex flex-col items-center text-center">
+            <nav className="flex items-center justify-center gap-2 text-xs text-neutral-500 mb-6 font-medium">
               <Link href="/" className="hover:text-white transition-colors">Home</Link>
               <span className="material-symbols-outlined text-[14px]">chevron_right</span>
               <span className="text-neutral-300">Community Q&amp;A</span>
             </nav>
 
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-              <div className="max-w-2xl">
+            <div className="flex flex-col items-center gap-6">
+              <div className="w-full max-w-2xl flex flex-col items-center">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="inline-flex items-center gap-1.5 bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
                     <span className="material-symbols-outlined text-[13px]">forum</span>
@@ -225,13 +230,13 @@ export default async function AskPage({
                     Anything
                   </span>
                 </h1>
-                <p className="text-neutral-400 text-sm leading-relaxed max-w-lg">
+                <p className="text-neutral-400 text-sm leading-relaxed max-w-lg text-center">
                   Browse questions from students about admissions, exams, scholarships,
                   and campus life — answered by experts and peers.
                 </p>
               </div>
 
-              <div className="flex gap-4 flex-shrink-0">
+              <div className="flex justify-center gap-4 flex-shrink-0">
                 {[
                   { label: "Questions", value: total > 0 ? total.toLocaleString() : "—" },
                   { label: "Topics", value: allTags.length > 0 ? String(allTags.length) : "—" },
@@ -245,7 +250,7 @@ export default async function AskPage({
             </div>
 
             {/* Search bar */}
-            <form method="GET" action="/ask" className="mt-8">
+            <form method="GET" action="/ask" className="mt-8 w-full flex justify-center">
               {tag && <input type="hidden" name="tag" value={tag} />}
               {sort && sort !== "latest" && <input type="hidden" name="sort" value={sort} />}
               <div className="relative max-w-xl">
@@ -264,8 +269,8 @@ export default async function AskPage({
 
         {/* ── Sort tabs ────────────────────────────────────────────────────────── */}
         <div className="border-b border-white/10" style={{ backgroundColor: 'transparent' }}>
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <nav className="flex items-center overflow-x-auto scrollbar-hide">
+          <div className="w-full px-4 lg:px-8 xl:px-12">
+            <nav className="flex items-center justify-center overflow-x-auto scrollbar-hide">
               {sortTabs.map((tab) => {
                 const active = sort === tab.value;
                 return (
@@ -287,7 +292,7 @@ export default async function AskPage({
         </div>
 
         {/* ── Main layout ──────────────────────────────────────────────────────── */}
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
+        <div className="w-full px-4 lg:px-8 xl:px-12 py-10">
           <div className="flex flex-col lg:flex-row gap-8 items-start">
 
             {/* ── Questions list ───────────────────────────────────────────────── */}

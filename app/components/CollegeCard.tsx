@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
@@ -109,15 +110,12 @@ export default function CollegeCard({
       >
         {/* ── Image ── */}
         <div className="relative h-44 overflow-hidden bg-neutral-100 flex-shrink-0">
-          <img
+          <Image
             src={image}
             alt={name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-            loading="lazy"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=600";
-            }}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 350px"
+            className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
           />
           {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
