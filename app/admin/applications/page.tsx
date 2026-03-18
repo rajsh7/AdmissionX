@@ -1,4 +1,5 @@
 import pool from "@/lib/db";
+import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { RowDataPacket } from "mysql2";
@@ -41,18 +42,6 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-function formatDate(d: string | null | undefined): string {
-  if (!d) return "—";
-  try {
-    return new Date(d).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  } catch {
-    return "—";
-  }
-}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -182,7 +171,7 @@ export default async function AdminApplicationsPage({
     safeQuery<CountRow>("SELECT COUNT(*) AS total FROM application"),
   ]);
 
-  const total      = countRows[0]?.total ?? 0;
+  const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const grandTotal = totalAll[0]?.total ?? 0;
 
@@ -359,7 +348,7 @@ export default async function AdminApplicationsPage({
             )}
           </div>
         ) : (
-          <>
+          <div key="results-container">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -542,7 +531,7 @@ export default async function AdminApplicationsPage({
                 </div>
               )}
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

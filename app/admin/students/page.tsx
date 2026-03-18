@@ -145,16 +145,18 @@ export default async function AdminStudentsPage({
     safeQuery<StatsRow>(`
       SELECT
         COUNT(*) AS total,
-        SUM(DATE(created_at) = CURDATE())                         AS today,
+        SUM(created_at >= CURDATE())                              AS today,
         SUM(created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY))        AS this_week,
         SUM(created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY))       AS this_month
       FROM next_student_signups
     `),
   ]);
 
-  const total      = countRows[0]?.total ?? 0;
+  const total      = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const stats      = statsRows[0];
+  const stats      = statsRows[0] 
+    ? Object.fromEntries(Object.entries(statsRows[0]).map(([k, v]) => [k, Number(v ?? 0)])) as unknown as StatsRow
+    : {} as StatsRow;
 
   // ── URL builder ────────────────────────────────────────────────────────────
   function buildUrl(overrides: Record<string, string | number>) {

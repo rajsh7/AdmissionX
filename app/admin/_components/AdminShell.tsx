@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
-import { SidebarSkeleton, NAV_GROUPS, ICO, Admin } from "./Sidebar";
+import { NAV_GROUPS } from "./nav-config";
+import { Admin, SidebarSkeleton, ICO } from "./Sidebar";
 
 // ─── Dynamic components ────────────────────────────────────────────────────────
 
@@ -50,16 +51,35 @@ export default function AdminShell({
 
   // Derive current page label for the topbar breadcrumb
   const currentLabel = (() => {
+    // 1st pass: Search for exact sub-item matches across all groups
     for (const group of NAV_GROUPS) {
       for (const item of group.items) {
-        if (
-          pathname === item.href ||
-          pathname.startsWith(item.href + "/")
-        ) {
+        if (item.subItems) {
+          for (const sub of item.subItems) {
+            if (pathname === sub.href) {
+              return `${item.label} / ${sub.label}`;
+            }
+          }
+        }
+      }
+    }
+
+    // 2nd pass: Search for exact main item matches
+    for (const group of NAV_GROUPS) {
+      for (const item of group.items) {
+        if (pathname === item.href) return item.label;
+      }
+    }
+
+    // 3rd pass: Fallback to startsWith for nested functional pages
+    for (const group of NAV_GROUPS) {
+      for (const item of group.items) {
+        if (pathname.startsWith(item.href + "/")) {
           return item.label;
         }
       }
     }
+    
     return "Admin";
   })();
 
@@ -109,7 +129,7 @@ export default function AdminShell({
               AdmissionX
             </span>
             <span className="text-slate-300 hidden sm:block">/</span>
-            <span className="text-sm font-semibold text-slate-700 truncate">
+            <span className="text-sm font-semibold text-slate-700 truncate" suppressHydrationWarning>
               {currentLabel}
             </span>
           </div>

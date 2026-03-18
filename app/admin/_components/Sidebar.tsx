@@ -11,104 +11,9 @@ export interface Admin {
   email: string;
 }
 
-export interface NavItem {
-  href: string;
-  icon: string;
-  label: string;
-  subItems?: { href: string; label: string }[];
-}
-
-export interface NavGroup {
-  label: string;
-  items: NavItem[];
-}
-
-// ─── Navigation config ────────────────────────────────────────────────────────
-
-export const NAV_GROUPS: NavGroup[] = [
-  {
-    label: "Overview",
-    items: [
-      { href: "/admin/dashboard", icon: "dashboard", label: "Dashboard" },
-    ],
-  },
-  {
-    label: "Management",
-    items: [
-      {
-        href: "/admin/colleges",
-        icon: "apartment",
-        label: "Colleges",
-        subItems: [
-          { href: "/admin/colleges/contact", label: "College Contact Card" },
-          { href: "/admin/colleges/profile", label: "Profile Information" },
-          { href: "/admin/colleges/management", label: "College Management Information" },
-          { href: "/admin/colleges/courses", label: "College Course" },
-          { href: "/admin/colleges/events", label: "College Events" },
-          { href: "/admin/colleges/facilities", label: "College Facilities" },
-          { href: "/admin/colleges/faculty", label: "College Faculty" },
-          { href: "/admin/colleges/placements", label: "College Placement" },
-          { href: "/admin/colleges/scholarships", label: "College Scholarship" },
-          { href: "/admin/colleges/cut-offs", label: "College Cut Offs" },
-          { href: "/admin/colleges/sports", label: "College Sports & Activity" },
-          { href: "/admin/colleges/admission", label: "College Admission Procedure" },
-          { href: "/admin/colleges/reviews", label: "College Reviews" },
-          { href: "/admin/colleges/faqs", label: "College Faqs" },
-        ],
-      },
-      {
-        href: "/admin/students",
-        icon: "school",
-        label: "Students",
-        subItems: [
-          { href: "/admin/students/profile", label: "Profile Information" },
-          { href: "/admin/students/bookmarks", label: "Bookmarks" },
-        ],
-      },
-      {
-        href: "/admin/members",
-        icon: "groups",
-        label: "Members",
-        subItems: [
-          { href: "/admin/members/users", label: "Users" },
-          { href: "/admin/members/roles", label: "User Roles" },
-          { href: "/admin/members/status", label: "User Status" },
-          { href: "/admin/members/privilege", label: "User Privilege" },
-          { href: "/admin/members/groups", label: "User Group" },
-        ],
-      },
-
-      { href: "/admin/applications", icon: "description", label: "Applications" },
-    ],
-  },
-  {
-    label: "Content",
-    items: [
-      { href: "/admin/blogs", icon: "article", label: "Blogs" },
-      { href: "/admin/news", icon: "newspaper", label: "News" },
-    ],
-  },
-  {
-    label: "Academic",
-    items: [
-      { href: "/admin/exams", icon: "quiz", label: "Exams" },
-      { href: "/admin/universities", icon: "account_balance", label: "Universities" },
-      { href: "/admin/degrees", icon: "workspace_premium", label: "Degrees" },
-      { href: "/admin/courses", icon: "menu_book", label: "Courses" },
-      { href: "/admin/streams", icon: "category", label: "Streams" },
-      { href: "/admin/cities", icon: "location_city", label: "Cities" },
-    ],
-  },
-  {
-    label: "Platform",
-    items: [
-      { href: "/admin/seo", icon: "travel_explore", label: "SEO" },
-      { href: "/admin/ads", icon: "campaign", label: "Ads" },
-      { href: "/admin/reports", icon: "bar_chart", label: "Reports" },
-      { href: "/admin/users", icon: "manage_accounts", label: "Admin Users" },
-    ],
-  },
-];
+import { NavItem, NavGroup, NAV_GROUPS } from "./nav-config";
+export type { NavItem, NavGroup };
+export { NAV_GROUPS };
 
 // ─── Icon style helpers ───────────────────────────────────────────────────────
 
@@ -129,12 +34,12 @@ export function SidebarSkeleton() {
 
       {/* Nav groups skeleton */}
       <div className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="space-y-2">
+        {[1, 2].map((g) => (
+          <div key={`skel-group-${g}`} className="space-y-2">
             <div className="h-3 w-16 bg-white/5 rounded ml-3" />
             <div className="space-y-1">
-              {[1, 2, 3].map((j) => (
-                <div key={j} className="h-10 w-full bg-white/5 rounded-xl" />
+              {[1, 2, 3].map((i) => (
+                <div key={`skel-item-${g}-${i}`} className="h-10 w-full bg-white/5 rounded-xl" />
               ))}
             </div>
           </div>
@@ -186,24 +91,24 @@ export function SidebarContent({
         </Link>
       </div>
 
-      {/* Nav groups */}
       <div className="flex-1 overflow-y-auto py-4 px-3 space-y-5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
-        {NAV_GROUPS.map((group) => (
-          <div key={group.label}>
-            <p className="text-[10px] font-bold text-white/35 uppercase tracking-widest px-3 mb-1.5">
-              {group.label}
-            </p>
+        {NAV_GROUPS.map((group, gIdx) => (
+          <div key={`nav-group-${group.label || gIdx}`}>
+            {group.label && (
+              <p className="text-[10px] font-bold text-white/35 uppercase tracking-widest px-3 mb-1.5 mt-1">
+                {group.label}
+              </p>
+            )}
             <ul className="space-y-0.5">
-              {group.items.map((item) => {
+              {group.items.map((item, iIdx) => {
                 const hasSubItems = !!(item.subItems && item.subItems.length > 0);
                 const isSubItemActive = hasSubItems && item.subItems?.some(sub => pathname === sub.href);
                 const isItemActive = pathname === item.href || (item.href !== "/admin/dashboard" && pathname.startsWith(item.href + "/"));
                 const active = isItemActive || isSubItemActive;
-
                 const isExpanded = expandedItems[item.label] || isSubItemActive;
 
                 return (
-                  <li key={item.href}>
+                  <li key={`nav-item-${group.label || gIdx}-${item.label}-${iIdx}`}>
                     {hasSubItems ? (
                       <div>
                         <button
@@ -220,7 +125,16 @@ export function SidebarContent({
                             >
                               {item.icon}
                             </span>
-                            <span className="truncate">{item.label}</span>
+                            <span className="truncate flex-1 text-left">{item.label}</span>
+                            {item.badge && (
+                              <span className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter ${
+                                item.badge.variant === 'new' ? 'bg-red-400 text-white' :
+                                item.badge.variant === 'updated' ? 'bg-emerald-500 text-white' :
+                                'bg-blue-400 text-white'
+                              }`}>
+                                {item.badge.text}
+                              </span>
+                            )}
                           </div>
                           <span
                             className={`material-symbols-rounded text-base transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
@@ -232,10 +146,10 @@ export function SidebarContent({
 
                         {isExpanded && (
                           <ul className="mt-1 ml-4 border-l border-white/10 pl-2 space-y-0.5">
-                            {item.subItems?.map((sub) => {
+                            {item.subItems?.map((sub, sIdx) => {
                               const subActive = pathname === sub.href;
                               return (
-                                <li key={sub.href}>
+                                <li key={`sub-item-${item.label}-${sub.label}-${sIdx}`}>
                                   <Link
                                     href={sub.href}
                                     className={`flex items-center px-3 py-2 rounded-lg text-[13px] font-medium transition-all ${subActive
@@ -265,7 +179,16 @@ export function SidebarContent({
                         >
                           {item.icon}
                         </span>
-                        <span className="truncate">{item.label}</span>
+                        <span className="truncate flex-1">{item.label}</span>
+                        {item.badge && (
+                          <span className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter ${
+                            item.badge.variant === 'new' ? 'bg-red-400 text-white' :
+                            item.badge.variant === 'updated' ? 'bg-emerald-500 text-white' :
+                            'bg-blue-400 text-white'
+                          }`}>
+                            {item.badge.text}
+                          </span>
+                        )}
                       </Link>
                     )}
                   </li>

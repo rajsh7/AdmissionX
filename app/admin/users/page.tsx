@@ -140,7 +140,7 @@ export default async function AdminUsersPage({
     safeQuery<CountRow>("SELECT COUNT(*) AS total FROM next_admin_users WHERE is_active = 0"),
   ]);
 
-  const total      = countRows[0]?.total ?? 0;
+  const total      = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   function buildUrl(overrides: Record<string, string | number>) {
@@ -153,15 +153,15 @@ export default async function AdminUsersPage({
   }
 
   const FILTER_TABS = [
-    { value: "all",      label: "All Admins", count: totalRow[0]?.total   ?? 0 },
-    { value: "active",   label: "Active",     count: activeRow[0]?.total   ?? 0 },
-    { value: "inactive", label: "Inactive",   count: inactiveRow[0]?.total ?? 0 },
+    { value: "all",      label: "All Admins", count: Number(totalRow[0]?.total   ?? 0) },
+    { value: "active",   label: "Active",     count: Number(activeRow[0]?.total   ?? 0) },
+    { value: "inactive", label: "Inactive",   count: Number(inactiveRow[0]?.total ?? 0) },
   ];
 
   const STAT_CARDS = [
-    { label: "Total Admins", count: totalRow[0]?.total   ?? 0, icon: "shield_person" },
-    { label: "Active",       count: activeRow[0]?.total   ?? 0, icon: "check_circle"  },
-    { label: "Inactive",     count: inactiveRow[0]?.total ?? 0, icon: "cancel"        },
+    { label: "Total Admins", count: Number(totalRow[0]?.total   ?? 0), icon: "shield_person" },
+    { label: "Active",       count: Number(activeRow[0]?.total   ?? 0), icon: "check_circle"  },
+    { label: "Inactive",     count: Number(inactiveRow[0]?.total ?? 0), icon: "cancel"        },
   ];
 
   return (

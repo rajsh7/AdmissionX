@@ -695,9 +695,15 @@ export default function HeroSection() {
     <section className="relative w-full min-h-screen flex flex-col justify-center overflow-hidden">
       {/* ─── Background Image Slides ─── */}
       {heroImages.map((img, idx) => (
-        <div
+        <Image
           key={idx}
-          className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out select-none ${
+          src={img}
+          alt=""
+          fill
+          priority={idx === 0}
+          sizes="100vw"
+          quality={85}
+          className={`object-cover transition-opacity duration-[1500ms] ease-in-out select-none ${
             idx === currentImage ? "opacity-100" : "opacity-0"
           }`}
           style={{
@@ -705,18 +711,8 @@ export default function HeroSection() {
             animation:
               idx === currentImage ? "heroZoom 6s ease-out forwards" : "none",
           }}
-        >
-          <Image
-            src={img}
-            alt=""
-            fill
-            priority={idx === 0}
-            sizes="100vw"
-            quality={85}
-            className="object-cover"
-            draggable={false}
-          />
-        </div>
+          draggable={false}
+        />
       ))}
 
       {/* ─── Dark Overlay ─── */}

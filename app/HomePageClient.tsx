@@ -33,11 +33,15 @@ export default function HomePageClient({
   stats,
   streamCounts,
 }: HomePageClientProps) {
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem("admissionx-dark") === "true";
-  });
+  const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState<boolean>(false);
   const [authModal, setAuthModal] = useState<"login" | "register" | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+    const saved = localStorage.getItem("admissionx-dark") === "true";
+    setIsDark(saved);
+  }, []);
 
   useEffect(() => {
     if (isDark) {

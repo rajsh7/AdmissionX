@@ -1,10 +1,25 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { RowDataPacket } from "mysql2";
+import ContactActions from "./ContactActions";
+import DeleteButton from "@/app/admin/_components/DeleteButton";
+import { revalidatePath } from "next/cache";
+
+// ─── Server Actions ───────────────────────────────────────────────────────────
+
+async function deleteContactRow(id: number) {
+  "use server";
+  try {
+    await pool.query("DELETE FROM next_college_signups WHERE id = ?", [id]);
+  } catch (e) {
+    console.error("[admin/colleges/contact deleteAction]", e);
+  }
+  revalidatePath("/admin/colleges/contact");
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 25;
 
 async function safeQuery<T extends RowDataPacket>(
   sql: string,
@@ -17,15 +32,6 @@ async function safeQuery<T extends RowDataPacket>(
     console.error("[admin/colleges/contact safeQuery]", err);
     return [];
   }
-}
-
-function formatPhone(p: string | null): string {
-    if (!p) return "—";
-    const cleaned = p.replace(/\D/g, "");
-    if (cleaned.length === 10) {
-        return `+91 ${cleaned.slice(0, 5)} ${cleaned.slice(5)}`;
-    }
-    return p;
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -86,101 +92,111 @@ export default async function CollegeContactPage({
     ),
   ]);
 
-  const total = countRows[0]?.total ?? 0;
+  const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="p-6 space-y-8 max-w-[1400px]">
+    <div className="p-6 space-y-6 max-w-[1400px]">
       
       {/* ── Header ───────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2.5">
-            <span className="material-symbols-rounded text-amber-500 text-[28px]" style={ICO_FILL}>contact_phone</span>
-            College Contact Cards
+          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>contact_mail</span>
+            College contacts
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Directory of all registered colleges and their primary contact persons.
-          </p>
+          <p className="text-sm text-slate-500 mt-0.5">Manage college inquiries and send welcome communications.</p>
         </div>
-        <form method="GET" action="/admin/colleges/contact" className="w-full sm:w-80">
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
-            <input 
-              type="text" 
-              name="q" 
-              defaultValue={q}
-              placeholder="Search contacts..." 
-              className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-            />
-          </div>
-        </form>
+        <div className="flex items-center gap-3">
+          <form method="GET" action="/admin/colleges/contact" className="w-full sm:w-80">
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
+              <input 
+                type="text" 
+                name="q" 
+                defaultValue={q}
+                placeholder="Search name, email, college..." 
+                className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
+              />
+            </div>
+          </form>
+        </div>
       </div>
 
-      {/* ── Grid ─────────────────────────────────────────────────────────── */}
-      {contacts.length === 0 ? (
-        <div className="bg-white border border-slate-100 rounded-2xl py-20 text-center shadow-sm">
-             <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>contact_phone</span>
-             <p className="text-slate-500 font-medium">No contacts found.</p>
-             {q && (
-                 <Link href="/admin/colleges/contact" className="text-blue-600 text-sm mt-2 hover:underline">Clear search</Link>
-             )}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          {contacts.map((c) => (
-            <div key={c.id} className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col group">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500 group-hover:border-blue-100 transition-colors">
-                  <span className="material-symbols-rounded text-[24px]" style={ICO_FILL}>apartment</span>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-bold text-slate-800 truncate leading-tight group-hover:text-blue-600 transition-colors">{c.college_name}</h3>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1 font-medium">
-                    <span className="material-symbols-rounded text-[14px]" style={ICO_FILL}>person</span>
-                    <span className="truncate">{c.contact_name || "No Contact Person"}</span>
-                  </div>
-                </div>
-              </div>
+      {/* ── Table ─────────────────────────────────────────────────────────── */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        {contacts.length === 0 ? (
+          <div className="py-20 text-center">
+            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>contact_mail</span>
+            <p className="text-slate-500 font-semibold text-sm">No contact records found.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-100 text-left">
+                  <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
+                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College & Contact</th>
+                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Email Address</th>
+                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Phone Number</th>
+                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {contacts.map((c, idx) => (
+                  <tr key={c.id} className="hover:bg-blue-50/20 transition-colors">
+                    <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
+                    <td className="px-4 py-4">
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-slate-800 leading-snug">{c.college_name}</span>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight mt-0.5">{c.contact_name}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <span className="text-slate-600 font-medium">{c.email}</span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <span className="text-xs text-slate-500 font-mono tracking-tight">{c.phone || "Not Available"}</span>
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <div className="flex items-center justify-end gap-3">
+                        <ContactActions 
+                          email={c.email} 
+                          collegeName={c.college_name} 
+                          contactName={c.contact_name} 
+                        />
+                        <div className="h-4 w-px bg-slate-100" />
+                        <DeleteButton action={deleteContactRow.bind(null, c.id)} size="sm" />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-              <div className="space-y-2 mt-auto">
-                <a href={`mailto:${c.email}`} className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors bg-slate-50/50">
-                  <span className="material-symbols-rounded text-slate-400 text-[16px]" style={ICO}>mail</span>
-                  <span className="truncate">{c.email}</span>
-                </a>
-                <a href={`tel:${c.phone}`} className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors bg-slate-50/50">
-                  <span className="material-symbols-rounded text-slate-400 text-[16px]" style={ICO}>call</span>
-                  <span className="truncate font-mono">{formatPhone(c.phone)}</span>
-                </a>
-              </div>
+        {/* ── Pagination ───────────────────────────────────────────────────── */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
+            <p className="text-xs text-slate-500">
+              Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> contacts
+            </p>
+            <div className="flex items-center gap-1">
+              {page > 1 ? (
+                <Link href={`/admin/colleges/contact?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
+              ) : (
+                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
+              )}
+              {page < totalPages ? (
+                <Link href={`/admin/colleges/contact?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
+              ) : (
+                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
+              )}
             </div>
-          ))}
-        </div>
-      )}
-
-      {/* ── Pagination ───────────────────────────────────────────────────── */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center pt-8">
-             <div className="flex items-center gap-2 bg-white border border-slate-100 p-1.5 rounded-2xl shadow-sm">
-                {Array.from({ length: totalPages }).map((_, i) => {
-                    const p = i + 1;
-                    const active = p === page;
-                    return (
-                        <Link 
-                            key={p} 
-                            href={`/admin/colleges/contact?page=${p}${q ? `&q=${q}` : ''}`}
-                            className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
-                                active ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'text-slate-500 hover:bg-slate-50'
-                            }`}
-                        >
-                            {p}
-                        </Link>
-                    )
-                })}
-             </div>
-        </div>
-      )}
-
+          </div>
+        )}
+      </div>
     </div>
   );
 }
