@@ -8,9 +8,9 @@ async function deleteFormEntry(id: number) {
   try {
     await pool.query("DELETE FROM query WHERE id = ?", [id]);
   } catch (e) {
-    console.error("[admin/form deleteAction]", e);
+    console.error("[admin/forms deleteAction]", e);
   }
-  revalidatePath("/admin/form");
+  revalidatePath("/admin/forms");
 }
 
 async function safeQuery<T extends RowDataPacket>(
@@ -21,7 +21,7 @@ async function safeQuery<T extends RowDataPacket>(
     const [rows] = (await pool.query(sql, params)) as [T[], unknown];
     return rows;
   } catch (err) {
-    console.error("[admin/form safeQuery]", err);
+    console.error("[admin/forms safeQuery]", err);
     return [];
   }
 }
@@ -47,7 +47,10 @@ export default async function AdminFormPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE subject LIKE ? OR message LIKE ? OR guestname LIKE ?" : "";
+  // Filter only for guest inquiries if appropriate, or show all general ones
+  const where = q 
+    ? "WHERE (subject LIKE ? OR message LIKE ? OR guestname LIKE ?) AND queryflowtype = 'guest-to-admin'" 
+    : "WHERE queryflowtype = 'guest-to-admin'";
   const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
 
   const data = await safeQuery<FormRow>(
@@ -64,8 +67,8 @@ export default async function AdminFormPage({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-slate-600 text-[22px]" style={ICO_FILL}>dynamic_form</span>
-            Form Queries
+            <span className="material-symbols-rounded text-indigo-600 text-[24px]" style={ICO_FILL}>app_registration</span>
+            General Forms
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">Manage messages and inquiries from general contact forms.</p>
         </div>
@@ -75,7 +78,7 @@ export default async function AdminFormPage({
              name="q" 
              defaultValue={q}
              placeholder="Search forms..." 
-             className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-500/20"
+             className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm"
            />
         </form>
       </div>
@@ -94,30 +97,39 @@ export default async function AdminFormPage({
             <tbody className="divide-y divide-slate-50">
               {data.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-5 py-10 text-center text-slate-400">
-                     No form queries found.
+                  <td colSpan={4} className="px-5 py-20 text-center">
+                     <div className="flex flex-col items-center gap-2 text-slate-400">
+                        <span className="material-symbols-rounded text-[40px]" style={ICO}>inbox</span>
+                        <p className="font-semibold">No form queries found.</p>
+                     </div>
                   </td>
                 </tr>
               ) : (
                 data.map((r) => (
-                  <tr key={r.id} className="hover:bg-slate-50/20 transition-colors group">
-                    <td className="px-5 py-4 min-w-[300px]">
+                  <tr key={r.id} className="hover:bg-indigo-50/20 transition-colors group">
+                    <td className="px-5 py-5 min-w-[300px]">
                       <div className="flex flex-col">
                          <span className="font-bold text-slate-800 line-clamp-1">{r.subject}</span>
-                         <p className="text-[10px] text-slate-400 line-clamp-1 mt-0.5">{r.message}</p>
+                         <p className="text-xs text-slate-500 line-clamp-2 mt-1 leading-relaxed">{r.message}</p>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                         <span className="text-xs font-semibold text-slate-700">{r.guestname || "Anonymous"}</span>
-                         <span className="text-[10px] text-slate-400">{r.guestemail}</span>
-                         <span className="text-[10px] text-slate-400">{r.guestphone}</span>
+                    <td className="px-4 py-5">
+                      <div className="flex flex-col gap-0.5">
+                         <span className="text-xs font-bold text-slate-700">{r.guestname || "Anonymous"}</span>
+                         <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-medium">
+                            <span className="material-symbols-rounded text-[14px]">mail</span>
+                            <span>{r.guestemail || "N/A"}</span>
+                         </div>
+                         <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-medium">
+                            <span className="material-symbols-rounded text-[14px]">call</span>
+                            <span>{r.guestphone || "N/A"}</span>
+                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-xs text-slate-500 font-mono">
-                      {r.created_at ? new Date(r.created_at).toLocaleDateString() : "—"}
+                    <td className="px-4 py-5 text-xs text-slate-500 font-mono">
+                      {r.created_at ? new Date(r.created_at).toLocaleDateString(undefined, { dateStyle: 'medium' }) : "—"}
                     </td>
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-4 py-5 text-right">
                        <DeleteButton action={deleteFormEntry.bind(null, r.id)} size="sm" />
                     </td>
                   </tr>

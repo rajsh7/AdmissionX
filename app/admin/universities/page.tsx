@@ -71,7 +71,7 @@ export default async function AdminUniversitiesPage({
   const params: (string | number)[] = [];
 
   if (q) {
-    conditions.push("(u.college_name LIKE ? OR cp.slug LIKE ? OR cp.universityType LIKE ?)");
+    conditions.push("(ncs.college_name LIKE ? OR cp.slug LIKE ? OR cp.universityType LIKE ?)");
     params.push(`%${q}%`, `%${q}%`, `%${q}%`);
   }
   if (verified === "yes") { conditions.push("cp.verified = 1"); }
@@ -85,7 +85,7 @@ export default async function AdminUniversitiesPage({
       `SELECT
          cp.id,
          cp.slug,
-         u.college_name,
+         ncs.college_name,
          cp.verified,
          cp.isTopUniversity,
          cp.topUniversityRank,
@@ -99,6 +99,7 @@ export default async function AdminUniversitiesPage({
          cp.created_at
        FROM collegeprofile cp
        JOIN users u ON u.id = cp.users_id
+       JOIN next_college_signups ncs ON LOWER(ncs.email) = LOWER(u.email)
        LEFT JOIN city c ON c.id = cp.registeredAddressCityId
        ${where}
        ORDER BY
@@ -111,6 +112,7 @@ export default async function AdminUniversitiesPage({
       `SELECT COUNT(*) AS total
        FROM collegeprofile cp
        JOIN users u ON u.id = cp.users_id
+       JOIN next_college_signups ncs ON LOWER(ncs.email) = LOWER(u.email)
        ${where}`,
       params,
     ),
@@ -121,6 +123,7 @@ export default async function AdminUniversitiesPage({
          SUM(cp.payment_status = 'active' OR cp.payment_status = 'paid') AS paid_count
        FROM collegeprofile cp
        JOIN users u ON u.id = cp.users_id
+       JOIN next_college_signups ncs ON LOWER(ncs.email) = LOWER(u.email)
        WHERE cp.isTopUniversity = 1`,
     ),
   ]);

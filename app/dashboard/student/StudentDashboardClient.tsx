@@ -183,6 +183,7 @@ export default function StudentDashboardClient({ user }: Props) {
     }
   }
 
+<<<<<<< HEAD
   // ── Sidebar inner content ─────────────────────────────────────────────────
   function SidebarContent() {
     return (
@@ -192,6 +193,45 @@ export default function StudentDashboardClient({ user }: Props) {
           <Link href="/" className="flex items-center gap-3 group" onClick={() => setSidebarOpen(false)}>
             <div className="w-9 h-9 bg-gradient-to-br from-green-500 to-green-700 rounded-xl flex items-center justify-center shadow-md shadow-green-200 flex-shrink-0">
               <span className="text-white font-black text-sm tracking-tight">ADX</span>
+=======
+  return (
+    <div className="min-h-screen bg-[#f8f6f6] dark:bg-[#0f1623] font-display">
+      <Header />
+
+      {/* ── Push content below fixed navbar (~88px) ── */}
+      <div className="pt-[112px]">
+        {/* ── Sticky desktop tab bar ── */}
+        <div className="sticky top-[80px] z-40 px-4 sm:px-6 pb-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-100 dark:border-slate-800 px-2 overflow-hidden">
+              <div className="flex items-center overflow-x-auto hide-scrollbar">
+                {TABS.map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-2 px-4 py-3.5 text-sm font-bold whitespace-nowrap border-b-2 transition-all duration-200 ${
+                        isActive
+                          ? "border-primary text-primary"
+                          : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:border-slate-200 dark:hover:border-slate-700"
+                      }`}
+                    >
+                      <span
+                        className="material-symbols-outlined text-[18px]"
+                        style={
+                          isActive ? { fontVariationSettings: "'FILL' 1" } : {}
+                        }
+                      >
+                        {tab.icon}
+                      </span>
+                      <span className="hidden lg:inline">{tab.label}</span>
+                      <span className="lg:hidden">{tab.mobileLabel}</span>
+                    </button>
+                  );
+                })}
+              </div>
+>>>>>>> feature
             </div>
             <div>
               <p className="font-black text-slate-900 text-[15px] tracking-tight leading-tight">AdmissionX</p>

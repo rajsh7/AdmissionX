@@ -7,8 +7,6 @@ import { useRouter } from "next/navigation";
 import { motion, useScroll, AnimatePresence } from "framer-motion";
 
 interface HeaderProps {
-  onLoginClick?: () => void;
-  onRegisterClick?: () => void;
 }
 
 interface AuthUser {
@@ -167,7 +165,7 @@ function UserMenuDropdown({
   );
 }
 
-export default function Header({ onLoginClick, onRegisterClick }: HeaderProps) {
+export default function Header({ }: HeaderProps) {
   const router = useRouter();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

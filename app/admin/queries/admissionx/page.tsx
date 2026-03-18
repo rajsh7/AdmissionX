@@ -60,21 +60,28 @@ export default async function AdmissionXQueryPage({
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // Placeholder data
-  const [queries] = await Promise.all([
-    safeQuery<QueryRow>(
-      `SELECT 
-        1 as id, 
-        'Jane Doe' as name, 
-        'jane@example.com' as email, 
-        '844-000-0000' as phone,
-        'Technical Issue' as subject, 
-        'I cannot login to my account.' as message, 
-        NOW() as created_at
-       LIMIT ? OFFSET ?`,
-      [PAGE_SIZE, offset],
-    ),
-  ]);
+  const where = q 
+    ? "AND (COALESCE(u.firstname, q.guestname) LIKE ? OR COALESCE(u.email, q.guestemail) LIKE ? OR q.subject LIKE ?)" 
+    : "";
+  const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`, PAGE_SIZE, offset] : [PAGE_SIZE, offset];
+
+  const queries = await safeQuery<QueryRow>(
+    `SELECT 
+      q.id, 
+      COALESCE(u.firstname, q.guestname, 'Anonymous') as name, 
+      COALESCE(u.email, q.guestemail) as email, 
+      COALESCE(u.phone, q.guestphone) as phone,
+      q.subject, 
+      q.message, 
+      q.created_at
+     FROM query q
+     LEFT JOIN users u ON q.student_id = u.id
+     WHERE q.queryflowtype = 'student-to-admin'
+     ${where}
+     ORDER BY q.created_at DESC
+     LIMIT ? OFFSET ?`,
+    params,
+  );
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
@@ -116,26 +123,34 @@ export default async function AdmissionXQueryPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {queries.map((r) => (
-                <tr key={r.id} className="hover:bg-blue-50/20 transition-colors group">
-                  <td className="px-5 py-4">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-slate-800">{r.name}</span>
-                      <span className="text-[10px] text-slate-400 font-bold">{r.email}</span>
-                      <span className="text-[10px] text-slate-400 font-mono italic">{r.phone}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <span className="font-semibold text-slate-700">{r.subject}</span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <span className="text-xs text-slate-500 truncate block max-w-[400px]">{r.message}</span>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                     <DeleteButton action={deleteAdmissionXQuery.bind(null, r.id)} size="sm" />
+              {queries.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-5 py-10 text-center text-slate-400">
+                     No queries found.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                queries.map((r) => (
+                  <tr key={r.id} className="hover:bg-blue-50/20 transition-colors group">
+                    <td className="px-5 py-4">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-slate-800">{r.name}</span>
+                        <span className="text-[10px] text-slate-400 font-bold">{r.email}</span>
+                        <span className="text-[10px] text-slate-400 font-mono italic">{r.phone}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <span className="font-semibold text-slate-700">{r.subject}</span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <span className="text-xs text-slate-500 truncate block max-w-[400px]">{r.message}</span>
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                       <DeleteButton action={deleteAdmissionXQuery.bind(null, r.id)} size="sm" />
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

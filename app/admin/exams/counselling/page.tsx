@@ -28,10 +28,10 @@ async function safeQuery<T extends RowDataPacket>(
 
 interface CounsellingRow extends RowDataPacket {
   id: number;
-  name: string;
-  email: string | null;
-  phone: string | null;
-  exam_id: number | null;
+  fullname: string;
+  emailaddress: string | null;
+  mobilenumber: string | null;
+  examination_details_id: number | null;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -45,11 +45,11 @@ export default async function ExamCounsellingPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE name LIKE ? OR email LIKE ? OR phone LIKE ?" : "";
+  const where = q ? "WHERE fullname LIKE ? OR emailaddress LIKE ? OR mobilenumber LIKE ?" : "";
   const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
 
   const data = await safeQuery<CounsellingRow>(
-    `SELECT id, name, email, phone, exam_id
+    `SELECT id, fullname, emailaddress, mobilenumber, examination_details_id
      FROM exam_counselling_forms
      ${where}
      ORDER BY id DESC
@@ -99,16 +99,16 @@ export default async function ExamCounsellingPage({
               ) : (
                 data.map((r) => (
                   <tr key={r.id} className="hover:bg-blue-50/20 transition-colors group">
-                    <td className="px-5 py-4 font-bold text-slate-800">{r.name}</td>
+                    <td className="px-5 py-4 font-bold text-slate-800">{r.fullname}</td>
                     <td className="px-4 py-4">
                       <div className="flex flex-col text-[10px] text-slate-500">
-                         <span>{r.email || "No email"}</span>
-                         <span>{r.phone || "No phone"}</span>
+                         <span>{r.emailaddress || "No email"}</span>
+                         <span>{r.mobilenumber || "No phone"}</span>
                       </div>
                     </td>
                     <td className="px-4 py-4">
                       <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-50 text-slate-500">
-                        {r.exam_id || "—"}
+                        {r.examination_details_id || "—"}
                       </span>
                     </td>
                     <td className="px-4 py-4 text-right">

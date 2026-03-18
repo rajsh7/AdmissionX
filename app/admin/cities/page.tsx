@@ -241,7 +241,7 @@ export default async function AdminCitiesPage({
                 </thead>
                 <tbody className="divide-y divide-slate-50">
                   {cities.map((row, idx) => {
-                    const isActive = row.cityStatus?.toLowerCase() === "active";
+                    const isActive = row.cityStatus?.toString().toLowerCase() === "active";
                     return (
                       <tr key={row.id} className="hover:bg-sky-50/20 transition-colors">
 

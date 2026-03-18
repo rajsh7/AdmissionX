@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen text-slate-900 dark:text-slate-100 font-display relative overflow-hidden">
       <AuthBackgroundSlider />
-      <Header onLoginClick={() => {}} onRegisterClick={() => {}} />
+      <Header />
 
       <main className="relative flex-1 flex flex-col items-center justify-center px-4 pt-40 pb-12 md:pb-20 overflow-hidden">
         {/* Background decorations */}

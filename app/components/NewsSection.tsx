@@ -69,7 +69,7 @@ function estimateReadTime(html: string): string {
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2670&auto=format&fit=crop";
+  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2670&auto=format&fit=crop";
 
 // Cycle through a small palette of category styles for visual variety
 const CATEGORY_STYLES = [
@@ -117,7 +117,7 @@ function mapDbBlogToArticle(blog: DbBlog, index: number): Article {
 const STATIC_ARTICLES: Article[] = [
   {
     image:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2670&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2670&auto=format&fit=crop",
     category: "Admissions",
     categoryColor: "text-red-600",
     categoryBg: "bg-red-50",

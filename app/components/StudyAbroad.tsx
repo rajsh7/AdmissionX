@@ -68,7 +68,7 @@ const countries = [
     flag: "🇨🇭",
     country: "Switzerland",
     tags: ["Science", "Engineering", "Architecture"],
-    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2670&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2670&auto=format&fit=crop",
     href: "/university/eth-zurich",
     stats: { acceptance: "27%", students: "23,000+" },
   },
