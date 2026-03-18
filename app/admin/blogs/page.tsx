@@ -3,6 +3,7 @@ import Link from "next/link";
 import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import DeleteButton from "../_components/DeleteButton";
+import BlogClient from "./BlogClient";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
@@ -28,6 +29,43 @@ async function deleteBlogById(id: number): Promise<void> {
     await pool.query("DELETE FROM blogs WHERE id = ?", [id]);
   } catch (e) {
     console.error("[admin/blogs deleteBlog]", e);
+  }
+  revalidatePath("/admin/blogs");
+}
+
+async function createBlogAction(formData: FormData) {
+  "use server";
+  const topic       = formData.get("topic");
+  const slug        = formData.get("slug");
+  const description = formData.get("description");
+  const isactive    = parseInt(formData.get("isactive") as string, 10);
+
+  try {
+    await pool.query(
+      "INSERT INTO blogs (topic, slug, description, isactive) VALUES (?, ?, ?, ?)",
+      [topic, slug, description, isactive]
+    );
+  } catch (e) {
+    console.error("[admin/blogs createAction]", e);
+  }
+  revalidatePath("/admin/blogs");
+}
+
+async function updateBlogAction(formData: FormData) {
+  "use server";
+  const id          = formData.get("id");
+  const topic       = formData.get("topic");
+  const slug        = formData.get("slug");
+  const description = formData.get("description");
+  const isactive    = parseInt(formData.get("isactive") as string, 10);
+
+  try {
+    await pool.query(
+      "UPDATE blogs SET topic = ?, slug = ?, description = ?, isactive = ? WHERE id = ?",
+      [topic, slug, description, isactive, id]
+    );
+  } catch (e) {
+    console.error("[admin/blogs updateAction]", e);
   }
   revalidatePath("/admin/blogs");
 }
@@ -141,7 +179,7 @@ export default async function AdminBlogsPage({
     ),
   ]);
 
-  const total      = countRows[0]?.total ?? 0;
+  const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const stats      = statsRows[0];
 
@@ -273,211 +311,62 @@ export default async function AdminBlogsPage({
         </div>
       </div>
 
-      {/* ── Table ─────────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {blogs.length === 0 ? (
-          <div className="py-20 text-center">
-            <span
-              className="material-symbols-rounded text-6xl text-slate-200 mb-4 block"
-              style={ICO_FILL}
-            >
-              article
-            </span>
-            <p className="text-slate-500 font-semibold">
-              {q ? `No blogs matching "${q}"` : "No blogs found."}
-            </p>
-            {q && (
+      <BlogClient 
+        blogs={blogs}
+        onAdd={createBlogAction}
+        onEdit={updateBlogAction}
+        onDelete={deleteBlogById}
+        onToggle={toggleBlogAction}
+        offset={offset}
+      />
+
+      {/* ── Pagination ──────────────────────────────────────────────── */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
+          <p className="text-xs text-slate-500">
+            Showing {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of{" "}
+            {total.toLocaleString()} blogs
+          </p>
+          <div className="flex items-center gap-1">
+            {page > 1 && (
               <Link
-                href="/admin/blogs"
-                className="mt-3 inline-block text-sm text-violet-600 hover:underline"
+                href={buildUrl({ page: page - 1 })}
+                className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
               >
-                Clear search
+                ← Prev
+              </Link>
+            )}
+
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const start = Math.max(1, Math.min(page - 2, totalPages - 4));
+              const p = start + i;
+              if (p > totalPages) return null;
+              return (
+                <Link
+                  key={p}
+                  href={buildUrl({ page: p })}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                    p === page
+                      ? "bg-violet-600 text-white"
+                      : "text-slate-600 bg-white border border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  {p}
+                </Link>
+              );
+            })}
+
+            {page < totalPages && (
+              <Link
+                href={buildUrl({ page: page + 1 })}
+                className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Next →
               </Link>
             )}
           </div>
-        ) : (
-          <>
-            {/* Table header */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3 w-8">
-                      #
-                    </th>
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 py-3">
-                      Title
-                    </th>
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 py-3 w-24">
-                      Status
-                    </th>
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 py-3 w-32">
-                      Slug
-                    </th>
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 py-3 w-28">
-                      Date
-                    </th>
-                    <th className="text-right text-[11px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3 w-40">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {blogs.map((blog, idx) => (
-                    <tr
-                      key={blog.id}
-                      className="hover:bg-violet-50/30 transition-colors group"
-                    >
-                      {/* Row number */}
-                      <td className="px-5 py-3.5 text-xs text-slate-400 font-mono">
-                        {offset + idx + 1}
-                      </td>
-
-                      {/* Title + excerpt */}
-                      <td className="px-3 py-3.5 max-w-xs">
-                        <p className="font-semibold text-slate-800 truncate leading-tight">
-                          {blog.topic}
-                        </p>
-                        <p className="text-[11px] text-slate-400 truncate mt-0.5 leading-tight">
-                          {stripHtml(blog.description) || "No description"}
-                        </p>
-                      </td>
-
-                      {/* Status badge */}
-                      <td className="px-3 py-3.5">
-                        <span
-                          className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full ${
-                            blog.isactive
-                              ? "bg-green-100 text-green-700"
-                              : "bg-slate-100 text-slate-500"
-                          }`}
-                        >
-                          <span
-                            className="material-symbols-rounded text-[12px]"
-                            style={ICO_FILL}
-                          >
-                            {blog.isactive ? "check_circle" : "circle"}
-                          </span>
-                          {blog.isactive ? "Live" : "Draft"}
-                        </span>
-                      </td>
-
-                      {/* Slug */}
-                      <td className="px-3 py-3.5">
-                        {blog.slug ? (
-                          <Link
-                            href={`/blogs/${blog.slug}`}
-                            target="_blank"
-                            className="text-[11px] text-violet-600 hover:underline font-mono truncate block max-w-[120px]"
-                          >
-                            {blog.slug}
-                          </Link>
-                        ) : (
-                          <span className="text-[11px] text-slate-400 italic">no slug</span>
-                        )}
-                      </td>
-
-                      {/* Date */}
-                      <td className="px-3 py-3.5 text-[11px] text-slate-500 whitespace-nowrap">
-                        {formatDate(blog.created_at)}
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center justify-end gap-2">
-                          {/* Toggle active */}
-                          <form action={toggleBlogAction}>
-                            <input type="hidden" name="id"      value={blog.id} />
-                            <input type="hidden" name="current" value={blog.isactive} />
-                            <button
-                              type="submit"
-                              className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-colors ${
-                                blog.isactive
-                                  ? "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                                  : "bg-green-100 text-green-700 hover:bg-green-200"
-                              }`}
-                              title={blog.isactive ? "Set to Draft" : "Set to Live"}
-                            >
-                              {blog.isactive ? "Deactivate" : "Activate"}
-                            </button>
-                          </form>
-
-                          {/* View */}
-                          {blog.slug && (
-                            <Link
-                              href={`/blogs/${blog.slug}`}
-                              target="_blank"
-                              className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-violet-50 text-violet-600 hover:bg-violet-100 transition-colors"
-                              title="View on site"
-                            >
-                              View
-                            </Link>
-                          )}
-
-                          {/* Delete */}
-                          <DeleteButton
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            action={(deleteBlogById as any).bind(null, blog.id)}
-                            size="sm"
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* ── Pagination ──────────────────────────────────────────────── */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-                <p className="text-xs text-slate-500">
-                  Showing {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of{" "}
-                  {total.toLocaleString()} blogs
-                </p>
-                <div className="flex items-center gap-1">
-                  {page > 1 && (
-                    <Link
-                      href={buildUrl({ page: page - 1 })}
-                      className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
-                      ← Prev
-                    </Link>
-                  )}
-
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const start = Math.max(1, Math.min(page - 2, totalPages - 4));
-                    const p = start + i;
-                    if (p > totalPages) return null;
-                    return (
-                      <Link
-                        key={p}
-                        href={buildUrl({ page: p })}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                          p === page
-                            ? "bg-violet-600 text-white"
-                            : "text-slate-600 bg-white border border-slate-200 hover:bg-slate-50"
-                        }`}
-                      >
-                        {p}
-                      </Link>
-                    );
-                  })}
-
-                  {page < totalPages && (
-                    <Link
-                      href={buildUrl({ page: page + 1 })}
-                      className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
-                      Next →
-                    </Link>
-                  )}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

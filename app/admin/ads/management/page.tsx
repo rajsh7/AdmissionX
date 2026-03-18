@@ -18,7 +18,7 @@ async function toggleAdAction(formData: FormData) {
   } catch (e) {
     console.error("[admin/ads toggleAd]", e);
   }
-  revalidatePath("/admin/ads");
+  revalidatePath("/admin/ads/management");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -35,7 +35,7 @@ async function safeQuery<T extends RowDataPacket>(
     const [rows] = (await pool.query(sql, params)) as [T[], unknown];
     return rows;
   } catch (err) {
-    console.error("[admin/ads safeQuery]", err);
+    console.error("[admin/ads/management safeQuery]", err);
     return [];
   }
 }
@@ -151,7 +151,7 @@ export default async function AdminAdsPage({
     safeQuery<CountRow>("SELECT COUNT(*) AS total FROM ads_managements WHERE isactive = 0"),
   ]);
 
-  const total      = countRows[0]?.total ?? 0;
+  const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   function buildUrl(overrides: Record<string, string | number>) {
@@ -160,7 +160,7 @@ export default async function AdminAdsPage({
       .filter(([, v]) => v !== "" && v !== "1" && v !== "all")
       .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
       .join("&");
-    return `/admin/ads${qs ? `?${qs}` : ""}`;
+    return `/admin/ads/management${qs ? `?${qs}` : ""}`;
   }
 
   const FILTER_TABS = [
@@ -197,7 +197,7 @@ export default async function AdminAdsPage({
       </div>
 
       {/* ── Stat mini-cards ───────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {STAT_CARDS.map((card, i) => (
           <div
             key={i}
@@ -217,27 +217,27 @@ export default async function AdminAdsPage({
       </div>
 
       {/* ── Filter tabs + Search ──────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
         <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl flex-shrink-0">
           {FILTER_TABS.map((tab) => (
             <Link
               key={tab.value}
               href={buildUrl({ filter: tab.value, page: 1 })}
-              className={`px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
                 filter === tab.value
                   ? "bg-white text-slate-800 shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
               }`}
             >
               {tab.label}
-              <span className="ml-1.5 text-[10px] font-bold opacity-60">
-                ({tab.count})
+              <span className="ml-1.5 text-[10px] font-black opacity-60">
+                {tab.count}
               </span>
             </Link>
           ))}
         </div>
 
-        <form method="GET" action="/admin/ads" className="flex-1 max-w-sm">
+        <form method="GET" action="/admin/ads/management" className="flex-1 max-w-sm ml-auto">
           {filter !== "all" && <input type="hidden" name="filter" value={filter} />}
           <div className="relative">
             <span

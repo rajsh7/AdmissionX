@@ -192,15 +192,16 @@ export default async function AdminCollegesPage({
     ),
   ]);
 
-  const total      = countRows[0]?.total ?? 0;
+  const total      = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   // Build status counts map
   const statusCounts: Record<string, number> = { pending: 0, approved: 0, rejected: 0 };
   let grandTotal = 0;
   for (const row of totals) {
-    const key = (row as unknown as { status: string; total: number }).status;
-    const cnt = (row as unknown as { status: string; total: number }).total;
+    const r = row as any;
+    const key = r.status;
+    const cnt = Number(r.total ?? 0);
     if (key in statusCounts) statusCounts[key] = cnt;
     grandTotal += cnt;
   }
@@ -410,171 +411,97 @@ export default async function AdminCollegesPage({
           </div>
         ) : (
           <>
-            {/* Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3 w-8">
-                      #
-                    </th>
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3">
-                      College
-                    </th>
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3 hidden md:table-cell">
-                      Contact
-                    </th>
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3 hidden sm:table-cell">
-                      Phone
-                    </th>
-                    <th className="text-center text-[11px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3">
-                      Status
-                    </th>
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3 hidden lg:table-cell">
-                      Signed Up
-                    </th>
-                    <th className="text-right text-[11px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 px-1 mb-1">
+          {colleges.map((college, idx) => {
+            const cfg = STATUS_CONFIG[college.status] ?? STATUS_CONFIG.pending;
+            return (
+              <div 
+                key={college.id} 
+                className="group relative bg-white border border-slate-200/60 rounded-[2rem] p-6 shadow-sm hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-200 transition-all duration-500 flex flex-col h-full bg-gradient-to-b from-white to-slate-50/30"
+              >
+                {/* Status Badge + Date */}
+                <div className="flex items-center justify-between mb-6">
+                  <span className={`inline-flex items-center gap-1.5 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter ${cfg.bg} ${cfg.text} ring-1 ring-inset ring-black/5`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot} animate-pulse`} />
+                    {cfg.label}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-lg">
+                    {formatDate(college.created_at)}
+                  </span>
+                </div>
 
-                <tbody className="divide-y divide-slate-50">
-                  {colleges.map((college, idx) => {
-                    const cfg =
-                      STATUS_CONFIG[college.status] ?? STATUS_CONFIG.pending;
+                {/* College Info */}
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="w-16 h-16 rounded-[1.25rem] bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm flex-shrink-0">
+                    <span className="text-2xl font-black">{college.college_name.charAt(0).toUpperCase()}</span>
+                  </div>
+                  <div className="min-w-0 flex-1 pt-1">
+                    <h3 className="font-extrabold text-slate-800 line-clamp-2 leading-[1.2] group-hover:text-indigo-600 transition-colors text-lg">
+                      {college.college_name}
+                    </h3>
+                    <p className="text-xs text-slate-400 truncate mt-1.5 font-bold flex items-center gap-1">
+                      <span className="material-symbols-rounded text-[14px]" style={ICO}>mail</span>
+                      {college.email}
+                    </p>
+                  </div>
+                </div>
 
-                    return (
-                      <tr
-                        key={college.id}
-                        className="hover:bg-blue-50/20 transition-colors group"
-                      >
-                        {/* Row # */}
-                        <td className="px-5 py-4 text-xs text-slate-400 font-mono">
-                          {offset + idx + 1}
-                        </td>
+                {/* Contact Person */}
+                <div className="mb-6 space-y-3">
+                   <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-100/50 border border-slate-200/30 group-hover:bg-white transition-colors">
+                      <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-slate-400 shadow-sm">
+                        <span className="material-symbols-rounded text-[18px]" style={ICO_FILL}>person</span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Contact Person</p>
+                        <p className="text-xs font-bold text-slate-700 truncate">{college.contact_name || "—"}</p>
+                      </div>
+                   </div>
+                   <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-100/50 border border-slate-200/30 group-hover:bg-white transition-colors">
+                      <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-slate-400 shadow-sm">
+                        <span className="material-symbols-rounded text-[18px]" style={ICO_FILL}>call</span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Phone Number</p>
+                        <p className="text-xs font-bold text-slate-700 truncate font-mono">{college.phone || "—"}</p>
+                      </div>
+                   </div>
+                </div>
 
-                        {/* College info */}
-                        <td className="px-4 py-4 max-w-[220px]">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0 text-sm font-bold text-blue-700">
-                              {college.college_name.charAt(0).toUpperCase()}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="font-semibold text-slate-800 truncate leading-tight">
-                                {college.college_name}
-                              </p>
-                              <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                                {college.email}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-
-                        {/* Contact name */}
-                        <td className="px-4 py-4 hidden md:table-cell">
-                          <span className="text-sm text-slate-600">
-                            {college.contact_name || "—"}
-                          </span>
-                        </td>
-
-                        {/* Phone */}
-                        <td className="px-4 py-4 hidden sm:table-cell">
-                          <span className="text-sm text-slate-600 font-mono">
-                            {college.phone || "—"}
-                          </span>
-                        </td>
-
-                        {/* Status badge */}
-                        <td className="px-4 py-4 text-center">
-                          <span
-                            className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full ${cfg.bg} ${cfg.text}`}
-                          >
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full ${cfg.dot} flex-shrink-0`}
-                            />
-                            {cfg.label}
-                          </span>
-                        </td>
-
-                        {/* Date */}
-                        <td className="px-4 py-4 hidden lg:table-cell">
-                          <span className="text-xs text-slate-400 whitespace-nowrap">
-                            {formatDate(college.created_at)}
-                          </span>
-                        </td>
-
-                        {/* Action buttons */}
-                        <td className="px-5 py-4">
-                          <div className="flex items-center justify-end gap-2 flex-wrap">
-
-                            {/* Approve */}
-                            {college.status !== "approved" && (
-                              <form action={approveCollegeAction}>
-                                <input
-                                  type="hidden"
-                                  name="id"
-                                  value={college.id}
-                                />
-                                <button
-                                  type="submit"
-                                  className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors border border-green-200"
-                                  title="Approve this college"
-                                >
-                                  Approve
-                                </button>
-                              </form>
-                            )}
-
-                            {/* Reject */}
-                            {college.status !== "rejected" && (
-                              <form action={rejectCollegeAction}>
-                                <input
-                                  type="hidden"
-                                  name="id"
-                                  value={college.id}
-                                />
-                                <button
-                                  type="submit"
-                                  className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors border border-red-200"
-                                  title="Reject this college"
-                                >
-                                  Reject
-                                </button>
-                              </form>
-                            )}
-
-                            {/* Reset to pending */}
-                            {college.status !== "pending" && (
-                              <form action={pendingCollegeAction}>
-                                <input
-                                  type="hidden"
-                                  name="id"
-                                  value={college.id}
-                                />
-                                <button
-                                  type="submit"
-                                  className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors border border-slate-200"
-                                  title="Reset to pending"
-                                >
-                                  Reset
-                                </button>
-                              </form>
-                            )}
-
-                            {/* Delete */}
-                            <DeleteButton
-                              action={deleteCollegeById.bind(null, college.id)}
-                              size="sm"
-                            />
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                {/* Actions */}
+                <div className="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
+                  <div className="flex items-center gap-2">
+                    {college.status !== "approved" && (
+                      <form action={approveCollegeAction}>
+                        <input type="hidden" name="id" value={college.id} />
+                        <button type="submit" className="text-[10px] font-black px-3 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 hover:shadow-lg hover:shadow-green-500/30 transition-all uppercase tracking-tighter">
+                          Approve
+                        </button>
+                      </form>
+                    )}
+                    {college.status !== "rejected" && (
+                      <form action={rejectCollegeAction}>
+                        <input type="hidden" name="id" value={college.id} />
+                        <button type="submit" className="text-[10px] font-black px-3 py-2 rounded-xl bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all uppercase tracking-tighter">
+                          Reject
+                        </button>
+                      </form>
+                    )}
+                    {college.status !== "pending" && (
+                      <form action={pendingCollegeAction}>
+                        <input type="hidden" name="id" value={college.id} />
+                        <button type="submit" className="text-[10px] font-black px-3 py-2 rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 transition-all uppercase tracking-tighter">
+                          Reset
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                  <DeleteButton action={deleteCollegeById.bind(null, college.id)} size="sm" />
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
             {/* ── Pagination ──────────────────────────────────────────────── */}
             {totalPages > 1 && (

@@ -32,6 +32,19 @@ export async function GET() {
     cities,
     ads,
     adminUsers,
+    // College Subitems
+    subTotalCourses,
+    subTotalFacilities,
+    subTotalFaculty,
+    subTotalPlacements,
+    subTotalAdmissions,
+    subTotalCutOffs,
+    subTotalEvents,
+    subTotalFAQs,
+    subTotalManagement,
+    subTotalReviews,
+    subTotalScholarships,
+    subTotalSports,
   ] = await Promise.all([
     safeCount("SELECT COUNT(*) AS cnt FROM next_college_signups"),
     safeCount("SELECT COUNT(*) AS cnt FROM next_college_signups WHERE status = 'pending'"),
@@ -48,6 +61,19 @@ export async function GET() {
     safeCount("SELECT COUNT(*) AS cnt FROM city"),
     safeCount("SELECT COUNT(*) AS cnt FROM ads_managements"),
     safeCount("SELECT COUNT(*) AS cnt FROM next_admin_users WHERE is_active = 1"),
+    // College Subitems Queries
+    safeCount("SELECT COUNT(*) AS cnt FROM collegemaster"),
+    safeCount("SELECT COUNT(*) AS cnt FROM collegefacilities"),
+    safeCount("SELECT COUNT(*) AS cnt FROM faculty"),
+    safeCount("SELECT COUNT(*) AS cnt FROM placement"),
+    safeCount("SELECT COUNT(*) AS cnt FROM college_admission_procedures"),
+    safeCount("SELECT COUNT(*) AS cnt FROM college_cut_offs"),
+    safeCount("SELECT COUNT(*) AS cnt FROM event"),
+    safeCount("SELECT COUNT(*) AS cnt FROM college_faqs"),
+    safeCount("SELECT COUNT(*) AS cnt FROM college_management_details"),
+    safeCount("SELECT COUNT(*) AS cnt FROM college_reviews"),
+    safeCount("SELECT COUNT(*) AS cnt FROM college_scholarships"),
+    safeCount("SELECT COUNT(*) AS cnt FROM college_sports_activities"),
   ]);
 
   return NextResponse.json({
@@ -68,6 +94,20 @@ export async function GET() {
       cities,
       ads,
       adminUsers,
+      subitems: {
+        courses: subTotalCourses,
+        facilities: subTotalFacilities,
+        faculty: subTotalFaculty,
+        placements: subTotalPlacements,
+        admissions: subTotalAdmissions,
+        cutoffs: subTotalCutOffs,
+        events: subTotalEvents,
+        faqs: subTotalFAQs,
+        management: subTotalManagement,
+        reviews: subTotalReviews,
+        scholarships: subTotalScholarships,
+        sports: subTotalSports,
+      }
     },
   });
 }

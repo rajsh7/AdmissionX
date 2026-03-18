@@ -95,7 +95,7 @@ export default async function AdminCitiesPage({
       ),
     ]);
 
-  const total      = countRows[0]?.total ?? 0;
+  const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   function buildUrl(overrides: Record<string, string | number>) {

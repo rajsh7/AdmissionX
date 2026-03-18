@@ -125,9 +125,14 @@ export default async function AdminUniversitiesPage({
     ),
   ]);
 
-  const total       = countRows[0]?.total ?? 0;
+  const total       = Number(countRows[0]?.total ?? 0);
   const totalPages  = Math.ceil(total / PAGE_SIZE);
-  const statsTotal  = (statsRows[0] as unknown as { total: number; verified_count: number; paid_count: number }) ?? { total: 0, verified_count: 0, paid_count: 0 };
+  const sRaw        = statsRows[0] || { total: 0, verified_count: 0, paid_count: 0 };
+  const statsTotal  = {
+    total: Number(sRaw.total ?? 0),
+    verified_count: Number(sRaw.verified_count ?? 0),
+    paid_count: Number(sRaw.paid_count ?? 0)
+  };
 
   function buildUrl(overrides: Record<string, string | number>) {
     const merged = { q, page: "1", verified, ...overrides };

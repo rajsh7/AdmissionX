@@ -1,4 +1,5 @@
 import pool from "@/lib/db";
+import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import { RowDataPacket } from "mysql2";
 
@@ -25,24 +26,15 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-function formatDate(d: string | null | undefined): string {
-  if (!d) return "—";
-  try {
-    const date = new Date(d);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = date.toLocaleString("en-US", { month: "short" });
-    const year = date.getFullYear();
-    return `${day} ${month} ${year}`;
-  } catch { return "—"; }
-}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface CollegeRow extends RowDataPacket {
+interface CollegeProfileRow extends RowDataPacket {
   id: number;
-  college_name: string;
-  email: string;
-  status: string;
+  name: string;
+  slug: string;
+  image: string | null;
+  verified: number;
   created_at: string;
 }
 
@@ -77,32 +69,57 @@ const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
 export default async function AdminDashboardPage() {
-  // ── Parallel stat counts ───────────────────────────────────────────────────
-  const [
-    collegeCount,
-    pendingColleges,
-    studentCount,
-    applicationCount,
-    activeBlogCount,
-    activeNewsCount,
-    examCount,
-    adCount,
-  ] = await Promise.all([
-    safeCount("SELECT COUNT(*) AS cnt FROM next_college_signups"),
-    safeCount("SELECT COUNT(*) AS cnt FROM next_college_signups WHERE status = 'pending'"),
-    safeCount("SELECT COUNT(*) AS cnt FROM next_student_signups"),
-    safeCount("SELECT COUNT(*) AS cnt FROM application"),
-    safeCount("SELECT COUNT(*) AS cnt FROM blogs WHERE isactive = 1"),
-    safeCount("SELECT COUNT(*) AS cnt FROM news WHERE isactive = 1"),
-    safeCount("SELECT COUNT(*) AS cnt FROM examination_details WHERE status = 1"),
-    safeCount("SELECT COUNT(*) AS cnt FROM ads_managements WHERE isactive = 1"),
-  ]);
+  // ─── Consolidated Stats Query ──────────────────────────────────────────────
+  const [statsRow] = await safeQuery<RowDataPacket>(`
+    SELECT
+      (SELECT COUNT(*) FROM next_college_signups) AS collegeCount,
+      (SELECT COUNT(*) FROM next_college_signups WHERE status = 'pending') AS pendingColleges,
+      (SELECT COUNT(*) FROM next_student_signups) AS studentCount,
+      (SELECT COUNT(*) FROM application) AS applicationCount,
+      (SELECT COUNT(*) FROM blogs WHERE isactive = 1) AS activeBlogCount,
+      (SELECT COUNT(*) FROM news WHERE isactive = 1) AS activeNewsCount,
+      (SELECT COUNT(*) FROM examination_details WHERE status = 1) AS examCount,
+      (SELECT COUNT(*) FROM ads_managements WHERE isactive = 1) AS adCount,
+      
+      (SELECT COUNT(*) FROM collegemaster) AS subCourses,
+      (SELECT COUNT(*) FROM collegefacilities) AS subFacilities,
+      (SELECT COUNT(*) FROM faculty) AS subFaculty,
+      (SELECT COUNT(*) FROM placement) AS subPlacements,
+      (SELECT COUNT(*) FROM college_admission_procedures) AS subAdmissions,
+      (SELECT COUNT(*) FROM college_cut_offs) AS subCutoffs,
+      (SELECT COUNT(*) FROM event) AS subEvents,
+      (SELECT COUNT(*) FROM college_faqs) AS subFAQs,
+      (SELECT COUNT(*) FROM college_management_details) AS subManagement,
+      (SELECT COUNT(*) FROM college_reviews) AS subReviews,
+      (SELECT COUNT(*) FROM college_scholarships) AS subScholarships,
+      (SELECT COUNT(*) FROM college_sports_activities) AS subSports
+  `);
+
+  const {
+    collegeCount, pendingColleges, studentCount, applicationCount,
+    activeBlogCount, activeNewsCount, examCount, adCount,
+    subCourses, subFacilities, subFaculty, subPlacements,
+    subAdmissions, subCutoffs, subEvents, subFAQs,
+    subManagement, subReviews, subScholarships, subSports
+  } = Object.fromEntries(
+    Object.entries(statsRow || {}).map(([k, v]) => [k, Number(v ?? 0)])
+  ) as any;
 
   // ── Recent data ────────────────────────────────────────────────────────────
   const [recentColleges, recentStudents, recentBlogs, recentApps] =
     await Promise.all([
-      safeQuery<CollegeRow>(
-        "SELECT id, college_name, email, status, created_at FROM next_college_signups ORDER BY created_at DESC LIMIT 5",
+      safeQuery<CollegeProfileRow>(
+        `SELECT 
+          cp.id, 
+          cp.slug, 
+          COALESCE(u.firstname, 'Unnamed College') as name,
+          cp.bannerimage as image,
+          cp.verified,
+          cp.created_at 
+        FROM collegeprofile cp
+        LEFT JOIN users u ON cp.users_id = u.id
+        ORDER BY cp.created_at DESC 
+        LIMIT 5`,
       ),
       safeQuery<StudentRow>(
         "SELECT id, name, email, created_at FROM next_student_signups ORDER BY created_at DESC LIMIT 5",
@@ -114,6 +131,21 @@ export default async function AdminDashboardPage() {
         "SELECT id, applicationID, firstname, lastname, email, applicationstatus_id, created_at FROM application ORDER BY created_at DESC LIMIT 5",
       ),
     ]);
+
+  const SUB_STATS = [
+    { label: "Courses",      value: subCourses,      icon: "menu_book",         href: "/admin/colleges/courses",      color: "text-orange-600", bg: "bg-orange-50" },
+    { label: "Facilities",   value: subFacilities,   icon: "category",          href: "/admin/colleges/facilities",   color: "text-blue-600",   bg: "bg-blue-50"   },
+    { label: "Faculty",      value: subFaculty,      icon: "school",            href: "/admin/colleges/faculty",      color: "text-emerald-600",bg: "bg-emerald-50"},
+    { label: "Placements",   value: subPlacements,   icon: "monitoring",        href: "/admin/colleges/placements",   color: "text-indigo-600", bg: "bg-indigo-50" },
+    { label: "Admissions",   value: subAdmissions,   icon: "assignment_ind",    href: "/admin/colleges/admission",    color: "text-rose-600",   bg: "bg-rose-50"   },
+    { label: "Cut-offs",     value: subCutoffs,      icon: "data_exploration",  href: "/admin/colleges/cut-offs",     color: "text-cyan-600",   bg: "bg-cyan-50"   },
+    { label: "Events",       value: subEvents,       icon: "event",             href: "/admin/colleges/events",       color: "text-amber-600",  bg: "bg-amber-50"  },
+    { label: "FAQs",         value: subFAQs,         icon: "quiz",              href: "/admin/colleges/faqs",         color: "text-violet-600", bg: "bg-violet-50" },
+    { label: "Management",   value: subManagement,   icon: "manage_accounts",   href: "/admin/colleges/management",   color: "text-slate-600",  bg: "bg-slate-100" },
+    { label: "Reviews",      value: subReviews,      icon: "forum",             href: "/admin/colleges/reviews",      color: "text-pink-600",   bg: "bg-pink-50"   },
+    { label: "Scholarships", value: subScholarships, icon: "rewarded_ads",      href: "/admin/colleges/scholarships", color: "text-green-600",  bg: "bg-green-50"  },
+    { label: "Sports",       value: subSports,       icon: "sports_basketball", href: "/admin/colleges/sports",       color: "text-teal-600",   bg: "bg-teal-50"   },
+  ];
 
   // ── Stat card config ───────────────────────────────────────────────────────
   const STATS = [
@@ -222,7 +254,7 @@ export default async function AdminDashboardPage() {
     <div className="p-6 space-y-8 max-w-[1400px]" suppressHydrationWarning>
 
       <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl p-7 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
-        <div>
+        <div >
           <p className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-1 flex items-center gap-1.5">
             <span className="material-symbols-rounded text-[14px]" style={ICO_FILL}>admin_panel_settings</span>
             Admin Dashboard
@@ -277,7 +309,7 @@ export default async function AdminDashboardPage() {
               )}
             </div>
             <p className="text-2xl font-bold text-slate-800 group-hover:text-slate-900">
-              {s.value.toLocaleString()}
+              {s.value}
             </p>
             <p className="text-xs font-semibold text-slate-600 mt-0.5">{s.label}</p>
             <p className="text-[11px] text-slate-400 mt-0.5 truncate">{s.sub}</p>
@@ -293,10 +325,10 @@ export default async function AdminDashboardPage() {
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
             <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2">
               <span className="material-symbols-rounded text-blue-600 text-[18px]" style={ICO_FILL}>apartment</span>
-              Recent College Signups
+              Recent College Profiles
             </h2>
-            <Link href="/admin/colleges" className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-              View all →
+            <Link href="/admin/colleges/profile" className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+              Manage Profiles →
             </Link>
           </div>
           {recentColleges.length === 0 ? (
@@ -305,23 +337,26 @@ export default async function AdminDashboardPage() {
             <ul className="divide-y divide-slate-50">
               {recentColleges.map((c) => (
                 <li key={c.id} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors">
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <span className="material-symbols-rounded text-blue-600 text-[16px]" style={ICO_FILL}>apartment</span>
+                  <div className="w-10 h-8 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200">
+                    {c.image ? (
+                      <img src={`https://admissionx.info/public/storage/${c.image}`} alt={c.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-blue-50 text-blue-600">
+                        <span className="material-symbols-rounded text-[16px]" style={ICO_FILL}>apartment</span>
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-slate-800 truncate">{c.college_name}</p>
-                    <p className="text-xs text-slate-400 truncate">{c.email}</p>
+                    <p className="text-sm font-semibold text-slate-800 truncate">{c.name}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider truncate">{c.slug}</p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${
-                      c.status === "approved"
-                        ? "bg-green-100 text-green-700"
-                        : c.status === "rejected"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-amber-100 text-amber-700"
-                    }`}>
-                      {c.status}
-                    </span>
+                    {c.verified === 1 && (
+                      <span className="text-[9px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                        <span className="material-symbols-rounded text-[10px]" style={ICO_FILL}>verified</span>
+                        VERIFIED
+                      </span>
+                    )}
                     <span className="text-[10px] text-slate-400 whitespace-nowrap">{formatDate(c.created_at)}</span>
                   </div>
                 </li>
@@ -443,6 +478,38 @@ export default async function AdminDashboardPage() {
               })}
             </ul>
           )}
+        </div>
+      </div>
+
+      {/* ── College Content Breakdown ─────────────────────────────────────── */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+            <span className="material-symbols-rounded text-indigo-600 text-[20px]" style={ICO_FILL}>inventory_2</span>
+            College Content Breakdown
+          </h2>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Aggregate Records</p>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {SUB_STATS.map((s) => (
+            <Link
+              key={s.label}
+              href={s.href}
+              className="group relative flex flex-col p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300"
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className={`${s.bg} ${s.color} p-2 rounded-xl group-hover:scale-110 transition-transform duration-300`}>
+                  <span className="material-symbols-rounded text-[18px]" style={ICO_FILL}>{s.icon}</span>
+                </div>
+                <span className="text-xs font-black text-slate-800 bg-white px-2 py-0.5 rounded-lg shadow-sm border border-slate-100">
+                  {s.value}
+                </span>
+              </div>
+              <p className="text-[11px] font-bold text-slate-500 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">
+                {s.label}
+              </p>
+            </Link>
+          ))}
         </div>
       </div>
 

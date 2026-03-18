@@ -3,6 +3,7 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { RowDataPacket } from "mysql2";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
+import { formatDate } from "@/lib/utils";
 
 // ─── Server Actions ────────────────────────────────────────────────────────────
 
@@ -43,19 +44,6 @@ async function safeQuery<T extends RowDataPacket>(
   } catch (err) {
     console.error("[admin/news safeQuery]", err);
     return [];
-  }
-}
-
-function formatDate(d: string | null | undefined): string {
-  if (!d) return "—";
-  try {
-    return new Date(d).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  } catch {
-    return "—";
   }
 }
 
@@ -142,7 +130,7 @@ export default async function AdminNewsPage({
       safeQuery<CountRow>("SELECT COUNT(*) AS total FROM news WHERE isactive = 0"),
     ]);
 
-  const total      = countRows[0]?.total ?? 0;
+  const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   const typeMap = new Map<number, string>(allTypes.map((t) => [t.id, t.name]));

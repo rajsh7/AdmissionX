@@ -127,7 +127,7 @@ export default async function AdminDegreesPage({
     safeQuery<CountRow>("SELECT COUNT(*) AS total FROM degree WHERE isShowOnHome = 1"),
   ]);
 
-  const total      = countRows[0]?.total ?? 0;
+  const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   function buildUrl(overrides: Record<string, string | number>) {

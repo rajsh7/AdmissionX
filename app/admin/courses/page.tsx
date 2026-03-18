@@ -118,7 +118,7 @@ export default async function AdminCoursesPage({
     ),
   ]);
 
-  const total      = countRows[0]?.total ?? 0;
+  const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const stats      = statsRows[0];
 
