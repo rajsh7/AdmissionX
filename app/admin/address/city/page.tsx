@@ -99,10 +99,10 @@ export default async function CityPage({
   // ── Query data ─────────────────────────────────────────────────────────────
   const [data, countRows, countries, states] = await Promise.all([
     safeQuery<CityRow>(
-      `SELECT ci.id, ci.name, s.name as stateName, c.name as countryName, ci.state_id, ci.country_id
+      `SELECT ci.id, ci.name, s.name as stateName, c.name as countryName, ci.state_id, s.country_id
        FROM city ci
        LEFT JOIN state s ON s.id = ci.state_id
-       LEFT JOIN country c ON c.id = ci.country_id
+       LEFT JOIN country c ON c.id = s.country_id
        ${where}
        ORDER BY ci.name ASC
        LIMIT ? OFFSET ?`,
@@ -111,7 +111,7 @@ export default async function CityPage({
     safeQuery<{ total: number } & RowDataPacket>(
       `SELECT COUNT(*) as total FROM city ci 
        LEFT JOIN state s ON s.id = ci.state_id
-       LEFT JOIN country c ON c.id = ci.country_id 
+       LEFT JOIN country c ON c.id = s.country_id 
        ${where}`,
       queryParams
     ),
@@ -125,14 +125,6 @@ export default async function CityPage({
 
   const total = Number(countRows[0]?.total || 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
-
-  function buildUrl(p: number) {
-    const params = new URLSearchParams();
-    if (q) params.set("q", q);
-    if (p > 1) params.set("page", String(p));
-    const qs = params.toString();
-    return `/admin/address/city${qs ? `?${qs}` : ""}`;
-  }
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
@@ -168,7 +160,7 @@ export default async function CityPage({
           total,
           offset,
           pageSize: PAGE_SIZE,
-          buildUrl
+          q
         }}
       />
     </div>

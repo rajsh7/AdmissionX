@@ -42,7 +42,7 @@ interface QueryRow extends RowDataPacket {
   college_name: string;
   subject: string;
   message: string;
-  status: string;
+  status: string | null;
   created_at: Date;
 }
 
@@ -66,34 +66,38 @@ export default async function CollegeStudentQueryPage({
   const offset = (page - 1) * PAGE_SIZE;
 
   // ── Build WHERE clause ─────────────────────────────────────────────────────
-  const conditions: string[] = [];
+  const conditions: string[] = ["q.queryflowtype = 'student-to-college'"];
   const params: (string | number)[] = [];
 
-  // Note: This matches a hypothetical 'college_student_queries' table or similar logic
   if (q) {
-    conditions.push("(student_name LIKE ? OR college_name LIKE ? OR subject LIKE ?)");
+    conditions.push("(u_s.firstname LIKE ? OR u_c.firstname LIKE ? OR q.subject LIKE ?)");
     params.push(`%${q}%`, `%${q}%`, `%${q}%`);
   }
 
-  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const where = "WHERE " + conditions.join(" AND ");
 
   // ── Query records ──────────────────────────────────────────────────────────
-  // Using a placeholder query for now as the exact table name is unknown
   const [queries, countRows] = await Promise.all([
     safeQuery<QueryRow>(
       `SELECT 
-        1 as id, 
-        'John Doe' as student_name, 
-        'MIT' as college_name, 
-        'Admission Doubt' as subject, 
-        'I have a doubt regarding admission.' as message, 
+        q.id, 
+        COALESCE(u_s.firstname, q.guestname, 'Anonymous Student') as student_name, 
+        COALESCE(u_c.firstname, 'General Institution') as college_name, 
+        q.subject, 
+        q.message, 
         'Pending' as status, 
-        NOW() as created_at
+        q.created_at
+       FROM query q
+       LEFT JOIN users u_s ON q.student_id = u_s.id
+       LEFT JOIN collegeprofile cp ON q.college_id = cp.id
+       LEFT JOIN users u_c ON cp.users_id = u_c.id
+       ${where}
+       ORDER BY q.created_at DESC
        LIMIT ? OFFSET ?`,
-      [PAGE_SIZE, offset],
+      [...params, PAGE_SIZE, offset],
     ),
     safeQuery<CountRow>(
-      `SELECT 1 as total`,
+      `SELECT COUNT(*) as total FROM query q ${where}`,
       params,
     ),
   ]);
@@ -163,7 +167,7 @@ export default async function CollegeStudentQueryPage({
                     </td>
                     <td className="px-4 py-4">
                       <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-50 text-amber-600 uppercase">
-                        {r.status}
+                        {r.status || 'Pending'}
                       </span>
                     </td>
                     <td className="px-4 py-4 text-right">

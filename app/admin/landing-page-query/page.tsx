@@ -28,9 +28,9 @@ async function safeQuery<T extends RowDataPacket>(
 
 interface QueryRow extends RowDataPacket {
   id: number;
-  name: string;
-  email: string | null;
-  phone_number: string | null;
+  fullname: string;
+  emailaddress: string | null;
+  mobilenumber: string | null;
   created_at: string;
 }
 
@@ -45,11 +45,11 @@ export default async function LandingPageQueryPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE name LIKE ? OR email LIKE ? OR phone_number LIKE ?" : "";
+  const where = q ? "WHERE fullname LIKE ? OR emailaddress LIKE ? OR mobilenumber LIKE ?" : "";
   const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
 
   const data = await safeQuery<QueryRow>(
-    `SELECT id, name, email, phone_number, created_at
+    `SELECT id, fullname, emailaddress, mobilenumber, created_at
      FROM landing_page_query_forms
      ${where}
      ORDER BY id DESC
@@ -99,11 +99,11 @@ export default async function LandingPageQueryPage({
               ) : (
                 data.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50/20 transition-colors group">
-                    <td className="px-5 py-4 font-bold text-slate-800">{r.name}</td>
+                    <td className="px-5 py-4 font-bold text-slate-800">{r.fullname}</td>
                     <td className="px-4 py-4">
                       <div className="flex flex-col">
-                         <span className="text-xs text-slate-600">{r.email || "No email"}</span>
-                         <span className="text-[10px] text-slate-400">{r.phone_number || "No phone"}</span>
+                         <span className="text-xs text-slate-600">{r.emailaddress || "No email"}</span>
+                         <span className="text-[10px] text-slate-400">{r.mobilenumber || "No phone"}</span>
                       </div>
                     </td>
                     <td className="px-4 py-4 text-xs text-slate-500 font-mono">

@@ -70,7 +70,7 @@ export default function HomePageClient({
       )}
 
       {/* Floating Header */}
-      <Header onLoginClick={openLogin} onRegisterClick={openRegister} />
+      <Header />
 
       {/* Story Flow */}
       <main>

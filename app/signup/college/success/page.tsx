@@ -43,7 +43,7 @@ export default function CollegeSignupSuccessPage() {
   return (
     <div className="min-h-screen flex flex-col font-display relative text-slate-900 dark:text-slate-100 antialiased">
       <AuthBackgroundSlider />
-      <Header onLoginClick={() => {}} onRegisterClick={() => {}} />
+      <Header />
 
       {/* ── Main ─────────────────────────────────────────────────── */}
       <main className="flex-1 flex flex-col items-center py-12 px-6 pt-32">

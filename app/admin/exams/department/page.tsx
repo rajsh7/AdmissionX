@@ -59,7 +59,7 @@ export default async function ExamDeptPage({
      LEFT JOIN collegeprofile cp ON cp.id = fd.collegeprofile_id
      LEFT JOIN functionalarea fa ON fa.id = fd.functionalarea_id
      LEFT JOIN degree d ON d.id = fd.degree_id
-     LEFT JOIN courses c ON c.id = fd.course_id
+     LEFT JOIN course c ON c.id = fd.course_id
      ${where}
      ORDER BY fd.id DESC
      LIMIT 100`,

@@ -19,7 +19,7 @@ interface CityClientProps {
     total: number;
     offset: number;
     pageSize: number;
-    buildUrl: (p: number) => string;
+    q: string;
   };
 }
 
@@ -52,7 +52,15 @@ export default function CityClient({
     setEditingCity(null);
   };
 
-  const { page, totalPages, total, offset, pageSize, buildUrl } = pagination;
+  const { page, totalPages, total, offset, pageSize, q } = pagination;
+
+  const buildUrl = (p: number) => {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (p > 1) params.set("page", String(p));
+    const qs = params.toString();
+    return `/admin/address/city${qs ? `?${qs}` : ""}`;
+  };
 
   return (
     <>

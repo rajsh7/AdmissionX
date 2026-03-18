@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  // Prevent Next.js from picking a parent folder as the workspace root when
+  // multiple lockfiles exist on the machine.
+  outputFileTracingRoot: path.join(__dirname),
+  turbopack: {
+    root: path.join(__dirname),
+  },
+
   // ── Image optimisation ──────────────────────────────────────────────────────
   // Whitelist every external host that supplies images so Next.js can optimise
   // them (resize, convert to WebP/AVIF, add cache headers) via <Image />.

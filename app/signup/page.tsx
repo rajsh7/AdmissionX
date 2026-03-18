@@ -6,7 +6,7 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen flex flex-col font-display relative">
       <AuthBackgroundSlider />
-      <Header onLoginClick={() => {}} onRegisterClick={() => {}} />
+      <Header />
 
       {/* Main Content */}
       <main className="relative flex-1 flex flex-col items-center justify-center px-4 pt-32 pb-12 overflow-hidden">

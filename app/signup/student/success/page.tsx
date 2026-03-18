@@ -20,7 +20,7 @@ export default function StudentSignupSuccessPage() {
   return (
     <div className="min-h-screen flex flex-col font-display relative text-slate-900 dark:text-slate-100">
       <AuthBackgroundSlider />
-      <Header onLoginClick={() => {}} onRegisterClick={() => {}} />
+      <Header />
 
       {/* ── Main ─────────────────────────────────────────────────── */}
       <main className="flex-1 flex items-center justify-center p-6 md:p-12 pt-32">

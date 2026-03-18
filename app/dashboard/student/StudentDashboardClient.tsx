@@ -113,7 +113,7 @@ export default function StudentDashboardClient({ user }: Props) {
 
   return (
     <div className="min-h-screen bg-[#f8f6f6] dark:bg-[#0f1623] font-display">
-      <Header onLoginClick={() => {}} onRegisterClick={() => {}} />
+      <Header />
 
       {/* ── Push content below fixed navbar (~88px) ── */}
       <div className="pt-[112px]">

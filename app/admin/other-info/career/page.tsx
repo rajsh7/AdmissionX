@@ -42,14 +42,14 @@ export default async function CareerPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE name LIKE ?" : "";
+  const where = q ? "WHERE firstname LIKE ?" : "";
   const params = q ? [`%${q}%`] : [];
 
   const data = await safeQuery<CareerRow>(
-    `SELECT id, name
+    `SELECT id, firstname as name
      FROM careers
      ${where}
-     ORDER BY name ASC
+     ORDER BY firstname ASC
      LIMIT 100`,
     params
   );

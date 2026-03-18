@@ -30,7 +30,6 @@ interface NewsTypeRow extends RowDataPacket {
   id: number;
   name: string;
   slug: string | null;
-  status: number;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -48,7 +47,7 @@ export default async function NewsTypePage({
   const params = q ? [`%${q}%`, `%${q}%`] : [];
 
   const data = await safeQuery<NewsTypeRow>(
-    `SELECT id, name, slug, status
+    `SELECT id, name, slug
      FROM news_types
      ${where}
      ORDER BY id DESC
@@ -84,14 +83,13 @@ export default async function NewsTypePage({
               <tr className="bg-slate-50/50 border-b border-slate-100 text-left">
                 <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Type Name</th>
                 <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Slug</th>
-                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Status</th>
                 <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {data.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-5 py-10 text-center text-slate-400">
+                  <td colSpan={3} className="px-5 py-10 text-center text-slate-400">
                      No news types found.
                   </td>
                 </tr>
@@ -103,12 +101,6 @@ export default async function NewsTypePage({
                       <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-50 text-slate-500">
                         {r.slug || "—"}
                       </span>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                       <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded ${r.status ? 'bg-green-50 text-green-600' : 'bg-slate-50 text-slate-400'}`}>
-                          <span className="material-symbols-rounded text-[14px]" style={ICO_FILL}>{r.status ? 'check_circle' : 'motion_photos_off'}</span>
-                          {r.status ? 'Live' : 'Draft'}
-                       </span>
                     </td>
                     <td className="px-4 py-4 text-right">
                        <DeleteButton action={deleteNewsType.bind(null, r.id)} size="sm" />

@@ -10,7 +10,7 @@ const heroWords = ["Dream", "College", "Future", "Career", "Journey"];
 
 const heroImages = [
   "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2670&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2670&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2670&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=2686&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?q=80&w=2670&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?q=80&w=2574&auto=format&fit=crop",
