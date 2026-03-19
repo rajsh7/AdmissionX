@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-> **Current Phase**: 1 (Completed)
+> **Current Phase**: 2 (Completed)
 > **Milestone**: v1.0
 
 ## Must-Haves (from SPEC)
@@ -17,7 +17,7 @@
 **Objective**: Ensure robust implementation of student and college registration, login, and profile data gathering mechanisms.
 
 ### Phase 2: College & Course Browsing
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Guarantee that students can reliably discover colleges and courses based on accurate database data.
 
 ### Phase 3: Application Engine & Documents
