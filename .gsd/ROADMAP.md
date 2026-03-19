@@ -1,14 +1,14 @@
 # ROADMAP.md
 
-> **Current Phase**: 3 (Completed)
+> **Current Phase**: 5 (Completed)
 > **Milestone**: v1.0
 
 ## Must-Haves (from SPEC)
-- [ ] Students can successfully register, login, and apply to colleges
-- [ ] Colleges can view and manage applications
-- [ ] Admin can manage users (students, colleges)
-- [ ] Application submission and status tracking works without errors
-- [ ] Dashboard loads correct data (students, applications, stats)
+- [x] Students can successfully register, login, and apply to colleges
+- [x] Colleges can view and manage applications
+- [x] Admin can manage users (students, colleges)
+- [x] Application submission and status tracking works without errors
+- [x] Dashboard loads correct data (students, applications, stats)
 
 ## Phases
 
@@ -25,9 +25,9 @@
 **Objective**: Implement the application submission flow including the safe upload and retrieval of necessary documents (marksheets, ID proofs).
 
 ### Phase 4: College Review Dashboard
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Implement the college-side view allowing them to see applications, review uploaded documents, and update statuses.
 
 ### Phase 5: Admin Oversight & Polish
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Ensure the administrative tools for overseeing students and colleges are fully functional, and run an end-to-end multi-user integration test.

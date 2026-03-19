@@ -23,6 +23,7 @@ async function run() {
     await conn.query(`
       CREATE TABLE applications (
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        applicationRef VARCHAR(20) NOT NULL UNIQUE,
         studentId INT UNSIGNED NOT NULL,
         collegeId INT UNSIGNED NOT NULL,
         courseId INT UNSIGNED NOT NULL,

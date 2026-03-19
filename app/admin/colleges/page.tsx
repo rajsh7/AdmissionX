@@ -65,6 +65,22 @@ async function deleteCollegeById(id: number): Promise<void> {
   revalidatePath("/", "layout");
 }
 
+async function toggleCollegeLoginAction(formData: FormData): Promise<void> {
+  "use server";
+  const usersId = parseInt(formData.get("users_id") as string, 10);
+  const cur     = parseInt(formData.get("cur")     as string, 10);
+  if (!usersId) return;
+  try {
+    await pool.query(
+      "UPDATE users SET is_active = ? WHERE id = ?",
+      [cur ? 0 : 1, usersId],
+    );
+  } catch (e) {
+    console.error("[admin/colleges toggleLoginAction]", e);
+  }
+  revalidatePath("/admin/colleges");
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 20;
@@ -106,6 +122,8 @@ interface CollegeRow extends RowDataPacket {
   status: string;
   created_at: string;
   updated_at: string;
+  users_id: number | null;
+  user_is_active: number;
 }
 
 interface CountRow extends RowDataPacket {
@@ -176,12 +194,21 @@ export default async function AdminCollegesPage({
   // ── Parallel queries ───────────────────────────────────────────────────────
   const [colleges, countRows, totals] = await Promise.all([
     safeQuery<CollegeRow>(
-      `SELECT id, college_name, email, contact_name, phone, status, created_at, updated_at
-       FROM next_college_signups
+      `SELECT ncs.id, ncs.college_name, ncs.email, ncs.contact_name, ncs.phone,
+              ncs.status, ncs.created_at, ncs.updated_at,
+              cp.users_id,
+              COALESCE(u.is_active, 1) AS user_is_active
+       FROM next_college_signups ncs
+       LEFT JOIN collegeprofile cp ON cp.id = (
+         SELECT id FROM collegeprofile WHERE users_id = (
+           SELECT id FROM users WHERE email = ncs.email LIMIT 1
+         ) LIMIT 1
+       )
+       LEFT JOIN users u ON u.id = cp.users_id
        ${where}
        ORDER BY
-         FIELD(status, 'pending', 'approved', 'rejected'),
-         created_at DESC
+         FIELD(ncs.status, 'pending', 'approved', 'rejected'),
+         ncs.created_at DESC
        LIMIT ? OFFSET ?`,
       [...params, PAGE_SIZE, offset],
     ),
@@ -473,8 +500,35 @@ export default async function AdminCollegesPage({
                 </div>
 
                 {/* Actions */}
-                <div className="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
-                  <div className="flex items-center gap-2">
+                <div className="mt-auto pt-6 border-t border-slate-100 space-y-3">
+                  {/* Login toggle */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Login Access</span>
+                    <form action={toggleCollegeLoginAction} className="inline-block">
+                      <input type="hidden" name="users_id" value={college.users_id ?? ""} />
+                      <input type="hidden" name="cur"      value={college.user_is_active} />
+                      <button
+                        type="submit"
+                        disabled={!college.users_id}
+                        title={college.users_id ? (college.user_is_active ? "Disable login" : "Enable login") : "No linked user account"}
+                        className={`inline-flex items-center gap-1 text-[10px] font-black px-3 py-1.5 rounded-xl transition-all ${
+                          !college.users_id
+                            ? "bg-slate-100 text-slate-300 cursor-not-allowed"
+                            : college.user_is_active
+                            ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                            : "bg-red-100 text-red-600 hover:bg-red-200"
+                        }`}
+                      >
+                        <span className="material-symbols-rounded text-[12px]" style={ICO_FILL}>
+                          {college.user_is_active ? "lock_open" : "lock"}
+                        </span>
+                        {college.user_is_active ? "Enabled" : "Disabled"}
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Approve/Reject/Reset + Delete */}
+                  <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
                     {college.status !== "approved" && (
                       <form action={approveCollegeAction}>
                         <input type="hidden" name="id" value={college.id} />

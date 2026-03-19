@@ -15,29 +15,7 @@ async function checkAuth(req: NextRequest) {
 
 // ── Ensure tables exist ───────────────────────────────────────────────────────
 async function ensureTables(conn: Awaited<ReturnType<typeof pool.getConnection>>) {
-  await conn.query(`
-    CREATE TABLE IF NOT EXISTS next_student_applications (
-      id                INT AUTO_INCREMENT PRIMARY KEY,
-      application_ref   VARCHAR(20)   NOT NULL UNIQUE,
-      student_id        INT           NOT NULL,
-      collegeprofile_id INT           DEFAULT NULL,
-      collegemaster_id  INT           DEFAULT NULL,
-      college_name      VARCHAR(255)  DEFAULT NULL,
-      course_name       VARCHAR(255)  DEFAULT NULL,
-      degree_name       VARCHAR(255)  DEFAULT NULL,
-      stream_name       VARCHAR(255)  DEFAULT NULL,
-      fees              DECIMAL(10,2) DEFAULT 0.00,
-      status            VARCHAR(30)   NOT NULL DEFAULT 'submitted',
-      payment_status    VARCHAR(30)   NOT NULL DEFAULT 'pending',
-      transaction_id    VARCHAR(255)  DEFAULT NULL,
-      amount_paid       DECIMAL(10,2) DEFAULT 0.00,
-      notes             TEXT          DEFAULT NULL,
-      created_at        TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
-      updated_at        TIMESTAMP     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_nsa_student (student_id),
-      INDEX idx_nsa_status  (status)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-  `);
+  // Schema is now managed externally by seed-applications.ts
 }
 
 // ── Generate unique application reference ─────────────────────────────────────
@@ -128,10 +106,10 @@ export async function POST(req: NextRequest) {
 
     // ── Guard: one active application per college per student ─────────────────
     const [existingRows] = await conn.query(
-      `SELECT id, application_ref
-       FROM next_student_applications
-       WHERE student_id = ?
-         AND collegeprofile_id = ?
+      `SELECT id, applicationRef AS application_ref
+       FROM applications
+       WHERE studentId = ?
+         AND collegeId = ?
          AND status NOT IN ('rejected')
        LIMIT 1`,
       [studentId, collegeprofile_id],
@@ -202,7 +180,7 @@ export async function POST(req: NextRequest) {
     let attempts = 0;
     while (attempts < 5) {
       const [check] = await conn.query(
-        `SELECT id FROM next_student_applications WHERE application_ref = ? LIMIT 1`,
+        `SELECT id FROM applications WHERE applicationRef = ? LIMIT 1`,
         [applicationRef],
       );
       if ((check as unknown[]).length === 0) break;
@@ -212,22 +190,14 @@ export async function POST(req: NextRequest) {
 
     // ── Insert application ────────────────────────────────────────────────────
     const [result] = await conn.query(
-      `INSERT INTO next_student_applications
-         (application_ref, student_id, collegeprofile_id, collegemaster_id,
-          college_name, course_name, degree_name, stream_name,
-          fees, status, payment_status, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'submitted', 'pending', ?)`,
+      `INSERT INTO applications
+         (applicationRef, studentId, collegeId, courseId, status)
+       VALUES (?, ?, ?, ?, 'submitted')`,
       [
         applicationRef,
         studentId,
         collegeprofile_id,
-        collegemaster_id ?? null,
-        resolvedCollegeName,
-        resolvedCourseName,
-        resolvedDegreeName,
-        resolvedStreamName,
-        resolvedFees,
-        notes?.trim() || null,
+        collegemaster_id ?? 0,
       ],
     );
 

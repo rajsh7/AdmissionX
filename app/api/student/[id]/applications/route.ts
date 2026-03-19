@@ -17,29 +17,7 @@ async function checkAuth(studentId: string) {
 async function ensureTable(
   conn: Awaited<ReturnType<typeof pool.getConnection>>,
 ) {
-  await conn.query(`
-    CREATE TABLE IF NOT EXISTS next_student_applications (
-      id                INT AUTO_INCREMENT PRIMARY KEY,
-      application_ref   VARCHAR(20)  NOT NULL UNIQUE,
-      student_id        INT          NOT NULL,
-      collegeprofile_id INT          DEFAULT NULL,
-      collegemaster_id  INT          DEFAULT NULL,
-      college_name      VARCHAR(255) DEFAULT NULL,
-      course_name       VARCHAR(255) DEFAULT NULL,
-      degree_name       VARCHAR(255) DEFAULT NULL,
-      stream_name       VARCHAR(255) DEFAULT NULL,
-      fees              DECIMAL(10,2) DEFAULT 0.00,
-      status            VARCHAR(30)  NOT NULL DEFAULT 'submitted',
-      payment_status    VARCHAR(30)  NOT NULL DEFAULT 'pending',
-      transaction_id    VARCHAR(255) DEFAULT NULL,
-      amount_paid       DECIMAL(10,2) DEFAULT 0.00,
-      notes             TEXT         DEFAULT NULL,
-      created_at        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
-      updated_at        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_nsa_student (student_id),
-      INDEX idx_nsa_status  (status)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-  `);
+  // Schema managed externally
 }
 
 // ── GET /api/student/[id]/applications ────────────────────────────────────────
@@ -60,23 +38,29 @@ export async function GET(
 
     const [rows] = await conn.query(
       `SELECT
-         id,
-         application_ref,
-         college_name,
-         course_name,
-         degree_name,
-         stream_name,
-         fees,
-         status,
-         payment_status,
-         transaction_id,
-         amount_paid,
-         notes,
-         created_at,
-         updated_at
-       FROM next_student_applications
-       WHERE student_id = ?
-       ORDER BY created_at DESC`,
+         a.id,
+         a.applicationRef AS application_ref,
+         COALESCE(NULLIF(TRIM(u.firstname), ''), cp.slug) AS college_name,
+         co.name AS course_name,
+         d.name AS degree_name,
+         fa.name AS stream_name,
+         cm.fees,
+         a.status,
+         'pending' AS payment_status,
+         NULL AS transaction_id,
+         0 AS amount_paid,
+         NULL AS notes,
+         a.createdAt AS created_at,
+         a.createdAt AS updated_at
+       FROM applications a
+       LEFT JOIN collegeprofile cp ON cp.id = a.collegeId
+       LEFT JOIN users u ON u.id = cp.users_id
+       LEFT JOIN collegemaster cm ON cm.id = a.courseId
+       LEFT JOIN course co ON co.id = cm.course_id
+       LEFT JOIN degree d ON d.id = cm.degree_id
+       LEFT JOIN functionalarea fa ON fa.id = cm.functionalarea_id
+       WHERE a.studentId = ?
+       ORDER BY a.createdAt DESC`,
       [id],
     );
 
@@ -244,8 +228,8 @@ export async function DELETE(
 
     // Only allow deleting draft applications
     const [result] = await conn.query(
-      `DELETE FROM next_student_applications
-       WHERE id = ? AND student_id = ? AND status = 'draft'`,
+      `DELETE FROM applications
+       WHERE id = ? AND studentId = ? AND status = 'draft'`,
       [appId, id],
     );
 

@@ -1,6 +1,25 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { RowDataPacket } from "mysql2";
+import { revalidatePath } from "next/cache";
+
+// ─── Server Action ────────────────────────────────────────────────────────────
+
+async function toggleStudentAction(formData: FormData): Promise<void> {
+  "use server";
+  const id  = parseInt(formData.get("id")  as string, 10);
+  const cur = parseInt(formData.get("cur") as string, 10);
+  if (!id) return;
+  try {
+    await pool.query(
+      "UPDATE next_student_signups SET is_active = ? WHERE id = ?",
+      [cur ? 0 : 1, id],
+    );
+  } catch (e) {
+    console.error("[admin/students toggleStudent]", e);
+  }
+  revalidatePath("/admin/students");
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -77,8 +96,8 @@ interface StudentRow extends RowDataPacket {
   name: string;
   email: string;
   phone: string | null;
+  is_active: number;
   created_at: string;
-  updated_at: string;
 }
 
 interface CountRow extends RowDataPacket {
@@ -108,6 +127,7 @@ export default async function AdminStudentsPage({
   const q      = (sp.q ?? "").trim();
   const page   = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const sort   = (sp.sort ?? "newest") as "newest" | "oldest" | "name";
+  const filter = sp.filter ?? "all"; // all | active | inactive
   const offset = (page - 1) * PAGE_SIZE;
 
   // ── Build WHERE ────────────────────────────────────────────────────────────
@@ -118,6 +138,8 @@ export default async function AdminStudentsPage({
     conditions.push("(name LIKE ? OR email LIKE ? OR phone LIKE ?)");
     params.push(`%${q}%`, `%${q}%`, `%${q}%`);
   }
+  if (filter === "active")   conditions.push("is_active = 1");
+  if (filter === "inactive") conditions.push("is_active = 0");
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
@@ -129,9 +151,9 @@ export default async function AdminStudentsPage({
   const orderBy = orderMap[sort] ?? "created_at DESC";
 
   // ── Parallel queries ───────────────────────────────────────────────────────
-  const [students, countRows, statsRows] = await Promise.all([
+  const [students, countRows, statsRows, activeRow, inactiveRow] = await Promise.all([
     safeQuery<StudentRow>(
-      `SELECT id, name, email, phone, created_at, updated_at
+      `SELECT id, name, email, phone, is_active, created_at
        FROM next_student_signups
        ${where}
        ORDER BY ${orderBy}
@@ -150,6 +172,8 @@ export default async function AdminStudentsPage({
         SUM(created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY))       AS this_month
       FROM next_student_signups
     `),
+    safeQuery<CountRow>("SELECT COUNT(*) AS total FROM next_student_signups WHERE is_active = 1"),
+    safeQuery<CountRow>("SELECT COUNT(*) AS total FROM next_student_signups WHERE is_active = 0"),
   ]);
 
   const total      = Number(countRows[0]?.total ?? 0);
@@ -160,13 +184,19 @@ export default async function AdminStudentsPage({
 
   // ── URL builder ────────────────────────────────────────────────────────────
   function buildUrl(overrides: Record<string, string | number>) {
-    const merged = { q, page: "1", sort, ...overrides };
+    const merged = { q, page: "1", sort, filter, ...overrides };
     const qs = Object.entries(merged)
-      .filter(([, v]) => String(v) !== "" && String(v) !== "1" && String(v) !== "newest")
+      .filter(([, v]) => String(v) !== "" && String(v) !== "1" && String(v) !== "newest" && String(v) !== "all")
       .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
       .join("&");
     return `/admin/students${qs ? `?${qs}` : ""}`;
   }
+
+  const FILTER_TABS = [
+    { value: "all",      label: "All Students", count: Number(statsRows[0]?.total  ?? 0) },
+    { value: "active",   label: "Active",        count: Number(activeRow[0]?.total   ?? 0) },
+    { value: "inactive", label: "Inactive",      count: Number(inactiveRow[0]?.total ?? 0) },
+  ];
 
   // ── Avatar color based on id ───────────────────────────────────────────────
   const AVATAR_COLORS = [
@@ -271,11 +301,31 @@ export default async function AdminStudentsPage({
         ))}
       </div>
 
-      {/* ── Search + sort bar ─────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+      {/* ── Filter tabs + Search bar ──────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+
+        {/* Status filter tabs */}
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl flex-shrink-0">
+          {FILTER_TABS.map((tab) => (
+            <Link
+              key={tab.value}
+              href={buildUrl({ filter: tab.value, page: 1 })}
+              className={`px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                filter === tab.value
+                  ? "bg-white text-slate-800 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              {tab.label}
+              <span className="ml-1.5 text-[10px] font-bold opacity-60">({tab.count})</span>
+            </Link>
+          ))}
+        </div>
+
         {/* Search form */}
         <form method="GET" action="/admin/students" className="flex-1 flex gap-2">
           {sort !== "newest" && <input type="hidden" name="sort" value={sort} />}
+          {filter !== "all" && <input type="hidden" name="filter" value={filter} />}
           <div className="relative flex-1">
             <span
               className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[18px] pointer-events-none"
@@ -445,14 +495,37 @@ export default async function AdminStudentsPage({
                         </div>
                       </td>
 
-                      {/* ID */}
+                      {/* ID + Active toggle */}
                       <td className="px-4 py-3.5 text-right">
-                        <span
-                          className="text-[10px] font-mono font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-lg"
-                          title={formatDateTime(student.created_at)}
-                        >
-                          #{student.id}
-                        </span>
+                        <div className="flex items-center justify-end gap-2">
+                          <span
+                            className="text-[10px] font-mono font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-lg"
+                            title={formatDateTime(student.created_at)}
+                          >
+                            #{student.id}
+                          </span>
+                          <form action={toggleStudentAction} className="inline-block">
+                            <input type="hidden" name="id"  value={student.id} />
+                            <input type="hidden" name="cur" value={student.is_active} />
+                            <button
+                              type="submit"
+                              title={student.is_active ? "Deactivate student" : "Activate student"}
+                              className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full transition-colors ${
+                                student.is_active
+                                  ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                                  : "bg-slate-100 text-slate-400 hover:bg-slate-200"
+                              }`}
+                            >
+                              <span
+                                className="material-symbols-rounded text-[11px]"
+                                style={ICO_FILL}
+                              >
+                                {student.is_active ? "check_circle" : "cancel"}
+                              </span>
+                              {student.is_active ? "Active" : "Inactive"}
+                            </button>
+                          </form>
+                        </div>
                       </td>
                     </tr>
                   ))}

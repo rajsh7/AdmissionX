@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
           phone         VARCHAR(32)  NOT NULL,
           dob           DATE NOT NULL,
           marks12       DECIMAL(5,2) NOT NULL,
+          is_active     TINYINT(1) DEFAULT 1,
           password_hash VARCHAR(255) NOT NULL,
           created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

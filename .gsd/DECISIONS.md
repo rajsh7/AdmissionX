@@ -60,3 +60,30 @@ Record key architectural choices, deviations from the master plan, and the reaso
   - One application per course per student.
   - All requested documents must be uploaded prior to submission.
 - **Upload Security:** Enforce strict 5MB size limit and PDF/JPG/PNG MIME types on both client and server boundaries to prevent malicious payloads.
+
+## Phase 5 Decisions
+
+**Date:** 2026-03-19
+
+### Scope
+- **Admin Applications Overview:** New read-only "Applications" tab in the admin dashboard showing all applications across all colleges. Supports filtering by status, college, and student. Admin cannot change application status.
+- **Admin User Management:** Fix and optimize the existing `/administrator/users` page. Add separate Students/Colleges tabs with pagination.
+- **End-to-End Integration Test:** Validate the full flow: student applies → college reviews → status updated → student dashboard reflects the update.
+- **Polish:** Fix UI inconsistencies, improve loading states, remove unused routes (`top-colleges`, `top-university`, etc.), clean console errors in touched files, and ensure consistent API error handling.
+
+### Approach
+- **Admin Applications Tab:** New tab reading from the `applications` table (same structure as college dashboard). Read-only — no status editing.
+- **Users Page Fix:** Replace full-table query with paginated `LIMIT/OFFSET` queries. Add DB indexes on `role` and `status` columns. Split into Students/Colleges tabs.
+
+### Performance Fix
+- Mandatory fix for `/administrator/users` timeout bug.
+- Pagination (limit + offset) to prevent full dataset fetches.
+- DB indexes on frequently queried fields (`role`, `status`).
+
+### Phase 5 Done Criteria
+1. Admin can view all applications (read-only, filters working)
+2. Admin can activate/deactivate students and colleges
+3. `/administrator/users` no longer times out
+4. Full end-to-end flow works correctly
+5. No critical bugs or broken flows
+
