@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import pool from "@/lib/db";
 import { sendStudentWelcomeEmail } from "@/lib/email";
+import { signStudentToken, STUDENT_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, phone, password, captchaOk } = body;
+    const { name, email, phone, password, dob, marks12, captchaOk } = body;
 
     // ── Validation ──────────────────────────────────────────────────────────
-    if (!name || !email || !phone || !password) {
+    if (!name || !email || !phone || !password || !dob || !marks12) {
       return NextResponse.json(
         { error: "All fields are required." },
         { status: 400 },
@@ -41,6 +42,8 @@ export async function POST(req: NextRequest) {
           name          VARCHAR(255) NOT NULL,
           email         VARCHAR(255) NOT NULL UNIQUE,
           phone         VARCHAR(32)  NOT NULL,
+          dob           DATE NOT NULL,
+          marks12       DECIMAL(5,2) NOT NULL,
           password_hash VARCHAR(255) NOT NULL,
           created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -67,11 +70,12 @@ export async function POST(req: NextRequest) {
       const hashed = await bcrypt.hash(password, 12);
 
       // ── Insert record ─────────────────────────────────────────────────────
-      await conn.query(
-        `INSERT INTO next_student_signups (name, email, phone, password_hash)
-         VALUES (?, ?, ?, ?)`,
-        [name.trim(), emailLower, phone.trim(), hashed],
+      const [insertResult] = await conn.query(
+        `INSERT INTO next_student_signups (name, email, phone, dob, marks12, password_hash)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [name.trim(), emailLower, phone.trim(), dob, parseFloat(marks12), hashed],
       );
+      var newUserId = (insertResult as any).insertId;
     } finally {
       conn.release();
     }
@@ -80,12 +84,20 @@ export async function POST(req: NextRequest) {
     try {
       await sendStudentWelcomeEmail(emailLower, name.trim());
     } catch (emailErr) {
-      console.error("[student signup] welcome email failed:", emailErr);
+      // ignore email error quietly
     }
 
-    return NextResponse.json({ success: true });
+    const token = await signStudentToken({
+      id: newUserId,
+      name: name.trim(),
+      email: emailLower,
+      role: "student",
+    });
+
+    const response = NextResponse.json({ success: true });
+    response.cookies.set(STUDENT_COOKIE, token, COOKIE_OPTIONS);
+    return response;
   } catch (err) {
-    console.error("[student signup]", err);
     return NextResponse.json(
       { error: "Internal server error. Please try again." },
       { status: 500 },

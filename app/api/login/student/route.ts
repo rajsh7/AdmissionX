@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import pool from "@/lib/db";
-import { signStudentToken, STUDENT_COOKIE } from "@/lib/auth";
+import { signStudentToken, STUDENT_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -70,17 +70,10 @@ export async function POST(req: NextRequest) {
     });
 
     // Set HTTP-only cookie
-    response.cookies.set(STUDENT_COOKIE, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/",
-    });
+    response.cookies.set(STUDENT_COOKIE, token, COOKIE_OPTIONS);
 
     return response;
   } catch (err) {
-    console.error("Student login error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
