@@ -6,9 +6,12 @@
   :root {
     --color-primary: #dc2626;
     --color-primary-dark: #b91c1c;
-    --color-accent-violet: #9f1239;
-    --color-accent-cyan: #fb7185;
-    --color-accent-rose: #e11d48;
+    --color-accent-violet: #8b5cf6;
+    --color-accent-cyan: #06b6d4;
+    --color-accent-teal: #00b5ad;
+    --color-accent-rose: #f43f5e;
+    --color-bg-light: #f8fafc;
+    --color-bg-white: #ffffff;
   }
 }
 
@@ -25,15 +28,12 @@ html {
 }
 
 body {
-    font-family: "Lexend", sans-serif;
-    background-color: #ffffff;
+    font-family: "Outfit", "Inter", "Lexend", sans-serif;
+    background-color: var(--color-bg-white);
     color: #0f172a;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
-    transition:
-        background-color 0.3s ease,
-        color 0.3s ease;
 }
 
 .dark body {
@@ -217,21 +217,18 @@ html.dark {
 }
 
 /* ─── Custom Color Utilities ─────────────────────────────────── */
-.text-primary {
-    color: #dc2626;
-}
-.text-primary-dark {
-    color: #b91c1c;
-}
-.bg-primary {
-    background-color: #dc2626;
-}
-.bg-primary-dark {
-    background-color: #b91c1c;
-}
-.border-primary {
-    border-color: #dc2626;
-}
+.text-primary { color: var(--color-primary); }
+.text-primary-dark { color: var(--color-primary-dark); }
+.bg-primary { background-color: var(--color-primary); }
+.bg-primary-dark { background-color: var(--color-primary-dark); }
+.border-primary { border-color: var(--color-primary); }
+
+/* AdmissionX Teal */
+.text-teal { color: var(--color-accent-teal); }
+.bg-teal { background-color: var(--color-accent-teal); }
+.border-teal { border-color: var(--color-accent-teal); }
+.hover\:bg-teal-dark:hover { background-color: #009b95; }
+.hover\:bg-teal:hover { background-color: var(--color-accent-teal); }
 
 .hover\:text-primary:hover {
     color: #dc2626;

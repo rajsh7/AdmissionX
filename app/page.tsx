@@ -10,7 +10,8 @@ import { RowDataPacket } from "mysql2";
 // ── Route-level cache ─────────────────────────────────────────────────────────
 // Tells Next.js to cache the fully-rendered page for 5 minutes.
 // Works in both development and production, unlike unstable_cache alone.
-export const revalidate = 300;
+// export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

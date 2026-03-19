@@ -15,6 +15,11 @@ const config: Config = {
         "primary-light": "#dcfce7",
         "background-light": "#f0fdf4",
         "background-dark": "#101622",
+        teal: {
+          DEFAULT: "#008080",
+          light: "#e6f2f2",
+          dark: "#006666",
+        },
       },
       fontFamily: {
         display: ["Lexend", "sans-serif"],

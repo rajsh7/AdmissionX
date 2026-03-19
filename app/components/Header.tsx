@@ -62,7 +62,7 @@ function Dropdown({
               key={item.label}
               href={item.href}
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-neutral-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+              className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-[#008080]/5 hover:text-[#008080] transition-colors"
             >
               <span className="material-symbols-outlined text-[20px] text-neutral-400">
                 {item.icon}
@@ -113,9 +113,9 @@ function UserMenuDropdown({
           className="absolute top-full right-0 mt-2 w-60 rounded-xl bg-white shadow-2xl shadow-black/15 border border-neutral-100 overflow-hidden z-50"
         >
           {/* User Info Header */}
-          <div className="px-4 py-3 bg-red-50 border-b border-neutral-100">
+          <div className="px-4 py-3 bg-[#008080]/5 border-b border-neutral-100">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+              <div className="w-9 h-9 rounded-full bg-[#008080] flex items-center justify-center text-white text-sm font-bold shrink-0">
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
@@ -135,7 +135,7 @@ function UserMenuDropdown({
               key={item.label}
               href={item.href}
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-neutral-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+              className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-neutral-700 hover:bg-[#008080]/5 hover:text-[#008080] transition-colors"
             >
               <span className="material-symbols-outlined text-[20px] text-neutral-400">
                 {item.icon}
@@ -151,7 +151,7 @@ function UserMenuDropdown({
                 onLogout();
                 onClose();
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors"
             >
               <span className="material-symbols-outlined text-[20px]">
                 logout
@@ -267,136 +267,78 @@ export default function Header({ }: HeaderProps) {
     <>
       {/* Scroll Progress Bar */}
       <motion.div
-        className="scroll-progress-bar"
-        style={{ scaleX: scrollYProgress }}
+        className="scroll-progress-bar h-1 fixed top-0 left-0 right-0 z-[60] origin-left"
+        style={{ scaleX: scrollYProgress, backgroundColor: '#008080' }}
       />
 
-      <motion.header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl bg-white backdrop-blur-xl border border-neutral-200 rounded-full shadow-lg shadow-black/10 transition-colors">
+      <motion.header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl bg-white/95 backdrop-blur-xl border border-white/20 rounded-full shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-colors">
         <div className="flex items-center justify-between px-5 sm:px-8 py-3 w-full">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group shrink-0">
-            <Image
-               src="/admissionx-logo.png"
-               alt="AdmissionX logo"
-               width={160}
-               height={32}
-               priority
-              unoptimized
-               className="h-8 w-auto object-contain"
-             />
+             <img src="/admissionx-logo.png" alt="AdmissionX logo" className="h-8 w-auto object-contain" />
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center xl:gap-6 lg:gap-4">
+          <nav className="hidden lg:flex items-center xl:gap-8 lg:gap-4">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
-                className="text-sm font-medium text-neutral-700 hover:text-red-600 transition-colors relative group"
+                className="text-[13px] font-black uppercase tracking-widest text-slate-600 hover:text-[#008080] transition-colors relative group"
               >
                 {link.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary rounded-full group-hover:w-full transition-all duration-300" />
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 rounded-full group-hover:w-full transition-all duration-300" style={{ backgroundColor: '#008080' }} />
               </Link>
             ))}
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-4">
             {!authChecked ? (
-              /* Loading skeleton */
-              <div className="h-9 w-32 bg-neutral-100 rounded-full animate-pulse" />
+              <div className="h-9 w-32 bg-slate-100 rounded-full animate-pulse" />
             ) : authUser ? (
-              /* ── Logged-in user menu ── */
               <div ref={userMenuRef} className="relative">
                 <button
                   onClick={() => setUserMenuOpen((o) => !o)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-full hover:bg-neutral-100 transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-full hover:bg-slate-50 transition-colors"
                 >
-                  {/* Avatar */}
-                  <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ backgroundColor: '#008080' }}>
                     {initials}
                   </div>
-                  <span className="text-sm font-semibold text-neutral-700 max-w-[120px] truncate">
+                  <span className="text-sm font-semibold text-slate-700 max-w-[120px] truncate">
                     {firstName}
                   </span>
-                  <span
-                    className={`material-symbols-outlined text-[18px] text-neutral-400 transition-transform duration-200 ${
-                      userMenuOpen ? "rotate-180" : ""
-                    }`}
-                  >
+                  <span className={`material-symbols-outlined text-[18px] text-slate-400 transition-transform duration-200 ${userMenuOpen ? "rotate-180" : ""}`}>
                     expand_more
                   </span>
                 </button>
-
-                <UserMenuDropdown
-                  user={authUser}
-                  isOpen={userMenuOpen}
-                  onClose={() => setUserMenuOpen(false)}
-                  onLogout={handleLogout}
-                />
+                <UserMenuDropdown user={authUser} isOpen={userMenuOpen} onClose={() => setUserMenuOpen(false)} onLogout={handleLogout} />
               </div>
             ) : (
-              /* ── Guest: Login + Signup dropdowns ── */
-              <>
-                {/* Login Dropdown */}
-                <div
-                  ref={loginRef}
-                  className="relative"
-                  onMouseEnter={openLogin}
-                  onMouseLeave={closeLogin}
-                >
-                  <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-neutral-700 hover:text-neutral-900 transition-colors rounded-full hover:bg-neutral-100">
+              <div className="flex items-center gap-3">
+                <div ref={loginRef} className="relative" onMouseEnter={openLogin} onMouseLeave={closeLogin}>
+                  <button className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-black uppercase tracking-widest text-slate-600 hover:text-slate-900 transition-colors rounded-full hover:bg-slate-50">
                     Login
-                    <span
-                      className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${
-                        loginOpen ? "rotate-180" : ""
-                      }`}
-                    >
-                      expand_more
-                    </span>
+                    <span className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${loginOpen ? "rotate-180" : ""}`}>expand_more</span>
                   </button>
-                  <Dropdown
-                    items={loginOptions}
-                    isOpen={loginOpen}
-                    onClose={() => setLoginOpen(false)}
-                  />
+                  <Dropdown items={loginOptions} isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
                 </div>
-
-                {/* Signup Dropdown */}
-                <div
-                  ref={signupRef}
-                  className="relative"
-                  onMouseEnter={openSignup}
-                  onMouseLeave={closeSignup}
-                >
-                  <button className="flex items-center gap-1.5 px-5 py-2.5 text-sm font-bold text-white bg-red-600 rounded-full hover:bg-red-700 transition-all duration-200 hover:shadow-lg hover:shadow-red-600/25">
+                <div ref={signupRef} className="relative" onMouseEnter={openSignup} onMouseLeave={closeSignup}>
+                  <button 
+                    className="flex items-center gap-1.5 px-6 py-2.5 text-[13px] font-black uppercase tracking-widest text-white rounded-full hover:brightness-110 transition-all duration-200 hover:shadow-lg"
+                    style={{ backgroundColor: '#008080' }}
+                  >
                     Signup
-                    <span
-                      className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${
-                        signupOpen ? "rotate-180" : ""
-                      }`}
-                    >
-                      expand_more
-                    </span>
+                    <span className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${signupOpen ? "rotate-180" : ""}`}>expand_more</span>
                   </button>
-                  <Dropdown
-                    items={signupOptions}
-                    isOpen={signupOpen}
-                    onClose={() => setSignupOpen(false)}
-                  />
+                  <Dropdown items={signupOptions} isOpen={signupOpen} onClose={() => setSignupOpen(false)} />
                 </div>
-              </>
+              </div>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden h-10 w-10 flex items-center justify-center rounded-full text-neutral-700 hover:text-red-600 hover:bg-neutral-100 transition-all"
-          >
-            <span className="material-symbols-outlined">
-              {mobileMenuOpen ? "close" : "menu"}
-            </span>
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden h-10 w-10 flex items-center justify-center rounded-full text-slate-700 hover:bg-slate-50 transition-all">
+            <span className="material-symbols-outlined">{mobileMenuOpen ? "close" : "menu"}</span>
           </button>
         </div>
       </motion.header>
@@ -404,162 +346,30 @@ export default function Header({ }: HeaderProps) {
       {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-[80px] z-40 mx-auto w-[95%] max-w-6xl left-1/2 -translate-x-1/2 bg-neutral-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg shadow-black/20 lg:hidden"
-          >
-            <div className="px-6 py-6 space-y-1">
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="fixed inset-x-0 top-[88px] z-40 mx-auto w-[95%] max-w-6xl left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-xl border border-slate-100 rounded-3xl shadow-2xl lg:hidden">
+            <div className="px-6 py-8 space-y-1">
               {navLinks.map((item, i) => (
-                <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
-                  <Link
-                    href={item.href}
-                    className="block py-3 text-sm font-medium text-slate-300 hover:text-white transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
+                <motion.div key={item.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
+                  <Link href={item.href} className="block py-3 text-sm font-black uppercase tracking-tighter text-slate-600 hover:text-[#008080]" onClick={() => setMobileMenuOpen(false)}>
                     {item.label}
                   </Link>
                 </motion.div>
               ))}
-
-              <div className="h-px bg-white/10 my-3" />
-
+              <div className="h-px bg-slate-100 my-4" />
               {authUser ? (
-                /* ── Mobile: logged in ── */
                 <div className="space-y-1">
-                  {/* User info row */}
-                  <div className="flex items-center gap-3 py-3">
-                    <div className="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
-                      {initials}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-white">
-                        {authUser.name}
-                      </p>
-                      <p className="text-xs text-slate-400">{authUser.email}</p>
-                    </div>
-                  </div>
-                  <Link
-                    href={`/dashboard/student/${authUser.id}`}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 py-2.5 text-sm text-slate-400 hover:text-white transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">
-                      dashboard
-                    </span>
-                    My Dashboard
-                  </Link>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="flex items-center gap-3 py-2.5 text-sm text-red-400 hover:text-red-300 transition-colors w-full"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">
-                      logout
-                    </span>
-                    Sign Out
-                  </button>
+                   {/* ... */}
+                   <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="flex items-center gap-3 py-3 px-2 text-sm font-bold text-rose-500 w-full text-left">
+                     Sign Out
+                   </button>
                 </div>
               ) : (
-                /* ── Mobile: guest ── */
-                <>
-                  {/* Mobile Login Accordion */}
-                  <div>
-                    <button
-                      onClick={() => setMobileLoginOpen(!mobileLoginOpen)}
-                      className="flex items-center justify-between w-full py-3 text-sm font-semibold text-slate-300 hover:text-white transition-colors"
-                    >
-                      Login
-                      <span
-                        className={`material-symbols-outlined text-[20px] transition-transform duration-200 ${
-                          mobileLoginOpen ? "rotate-180" : ""
-                        }`}
-                      >
-                        expand_more
-                      </span>
-                    </button>
-                    <AnimatePresence>
-                      {mobileLoginOpen && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="pl-4 pb-2 space-y-1">
-                            {loginOptions.map((opt) => (
-                              <Link
-                                key={opt.label}
-                                href={opt.href}
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="flex items-center gap-3 py-2.5 text-sm text-slate-400 hover:text-white transition-colors"
-                              >
-                                <span className="material-symbols-outlined text-[18px]">
-                                  {opt.icon}
-                                </span>
-                                {opt.label}
-                              </Link>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
-                  {/* Mobile Signup Accordion */}
-                  <div>
-                    <button
-                      onClick={() => setMobileSignupOpen(!mobileSignupOpen)}
-                      className="flex items-center justify-between w-full py-3 text-sm font-semibold text-slate-300 hover:text-white transition-colors"
-                    >
-                      Signup
-                      <span
-                        className={`material-symbols-outlined text-[20px] transition-transform duration-200 ${
-                          mobileSignupOpen ? "rotate-180" : ""
-                        }`}
-                      >
-                        expand_more
-                      </span>
-                    </button>
-                    <AnimatePresence>
-                      {mobileSignupOpen && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="pl-4 pb-2 space-y-1">
-                            {signupOptions.map((opt) => (
-                              <Link
-                                key={opt.label}
-                                href={opt.href}
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="flex items-center gap-3 py-2.5 text-sm text-slate-400 hover:text-white transition-colors"
-                              >
-                                <span className="material-symbols-outlined text-[18px]">
-                                  {opt.icon}
-                                </span>
-                                {opt.label}
-                              </Link>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </>
+                <div className="space-y-4 pt-2">
+                   <div className="grid grid-cols-2 gap-3">
+                      <button onClick={() => setMobileLoginOpen(!mobileLoginOpen)} className="py-3 rounded-2xl bg-slate-50 text-slate-600 text-[13px] font-black uppercase tracking-widest border border-slate-100">Login</button>
+                      <button onClick={() => setMobileSignupOpen(!mobileSignupOpen)} className="py-3 rounded-2xl text-white text-[13px] font-black uppercase tracking-widest" style={{ backgroundColor: '#008080' }}>Signup</button>
+                   </div>
+                </div>
               )}
             </div>
           </motion.div>

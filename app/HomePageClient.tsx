@@ -5,11 +5,10 @@ import Header from "./components/Header";
 import HeroSection from "./components/HeroSection";
 import FieldsOfStudy from "./components/FieldsOfStudy";
 import TopUniversities from "./components/TopUniversities";
-import StudyAbroad from "./components/StudyAbroad";
-import TrendingDegrees from "./components/TrendingDegrees";
+import TopCourse from "./components/TopCourse";
 import EntranceExams from "./components/EntranceExams";
 import NewsSection from "./components/NewsSection";
-import CallToAction from "./components/CallToAction";
+import ContactSection from "./components/ContactSection";
 import AuthModal from "./components/AuthModal";
 import Footer from "./components/Footer";
 
@@ -34,32 +33,19 @@ export default function HomePageClient({
   streamCounts,
 }: HomePageClientProps) {
   const [mounted, setMounted] = useState(false);
-  const [isDark, setIsDark] = useState<boolean>(false);
   const [authModal, setAuthModal] = useState<"login" | "register" | null>(null);
 
   useEffect(() => {
     setMounted(true);
-    const saved = localStorage.getItem("admissionx-dark") === "true";
-    setIsDark(saved);
   }, []);
 
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDark]);
-
-  const openLogin = () => setAuthModal("login");
-  const openRegister = () => setAuthModal("register");
   const closeModal = () => setAuthModal(null);
   const switchMode = (mode: "login" | "register") => setAuthModal(mode);
 
+  if (!mounted) return null;
+
   return (
-    <div
-      className={`min-h-screen bg-background-dark text-white ${isDark ? "dark" : ""}`}
-    >
+    <div className="min-h-screen bg-white text-slate-900 selection:bg-teal selection:text-white">
       {/* Auth Modal */}
       {authModal && (
         <AuthModal
@@ -72,31 +58,27 @@ export default function HomePageClient({
       {/* Floating Header */}
       <Header />
 
-      {/* Story Flow */}
       <main>
-        {/* Prologue: The Dream */}
+        {/* 1. Hero Section */}
         <HeroSection />
 
-        {/* Chapter 1: Explore Your Passion */}
-        <FieldsOfStudy streamCounts={streamCounts} />
+        {/* 2. Top Categories (Fields of Study) */}
+        <FieldsOfStudy />
 
-        {/* Chapter 2: Discover Universities */}
+        {/* 3. Discover the Top Universities */}
         <TopUniversities universities={universities} />
 
-        {/* Chapter 3: Go Global */}
-        <StudyAbroad />
+        {/* 4. Discover the Top Course */}
+        <TopCourse />
 
-        {/* Chapter 4: Choose Your Path */}
-        <TrendingDegrees />
-
-        {/* Chapter 5: Prepare for Exams */}
+        {/* 5. Recent coming exams */}
         <EntranceExams dbExams={dbExams} />
 
-        {/* Chapter 6: Stay Informed */}
+        {/* 6. Student Life & Beyond (News/Blogs) */}
         <NewsSection dbBlogs={dbBlogs} />
 
-        {/* Epilogue: Your Story Starts Now */}
-        <CallToAction stats={stats} />
+        {/* 7. Get in Touch Section */}
+        <ContactSection />
       </main>
 
       {/* Footer */}
