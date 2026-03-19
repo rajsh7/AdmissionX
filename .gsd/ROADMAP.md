@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-> **Current Phase**: 2 (Completed)
+> **Current Phase**: 3 (Completed)
 > **Milestone**: v1.0
 
 ## Must-Haves (from SPEC)
@@ -21,7 +21,7 @@
 **Objective**: Guarantee that students can reliably discover colleges and courses based on accurate database data.
 
 ### Phase 3: Application Engine & Documents
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Implement the application submission flow including the safe upload and retrieval of necessary documents (marksheets, ID proofs).
 
 ### Phase 4: College Review Dashboard

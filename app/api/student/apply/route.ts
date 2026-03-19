@@ -77,6 +77,7 @@ export async function POST(req: NextRequest) {
     stream_name?:       string;
     fees?:              number;
     notes?:             string;
+    documents?: { type: string; url: string }[];
   };
 
   try {
@@ -94,7 +95,25 @@ export async function POST(req: NextRequest) {
     stream_name,
     fees,
     notes,
+    documents,
   } = body;
+
+  // ── Validate required documents ──────────────────────────────────────────────
+  const REQUIRED_DOC_TYPES = ["10th Marksheet", "12th Marksheet", "ID Proof"];
+  if (!documents || !Array.isArray(documents)) {
+    return NextResponse.json(
+      { error: "documents field is required and must be an array." },
+      { status: 400 },
+    );
+  }
+  const providedTypes = documents.map((d) => d.type);
+  const missingDocs = REQUIRED_DOC_TYPES.filter((t) => !providedTypes.includes(t));
+  if (missingDocs.length > 0) {
+    return NextResponse.json(
+      { error: `Missing required documents: ${missingDocs.join(", ")}` },
+      { status: 400 },
+    );
+  }
 
   if (!collegeprofile_id) {
     return NextResponse.json(
@@ -213,6 +232,15 @@ export async function POST(req: NextRequest) {
     );
 
     const insertId = (result as { insertId: number }).insertId;
+
+    // ── Insert documents into 'documents' table ───────────────────────────────
+    if (documents && documents.length > 0) {
+      const docValues = documents.map((d) => [insertId, d.type, d.url]);
+      await conn.query(
+        `INSERT INTO documents (applicationId, type, fileUrl) VALUES ?`,
+        [docValues],
+      );
+    }
 
     return NextResponse.json(
       {
