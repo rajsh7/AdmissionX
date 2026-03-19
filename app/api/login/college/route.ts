@@ -131,7 +131,6 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (err) {
-    console.error("[college login]", err);
     return NextResponse.json(
       { error: "Internal server error. Please try again." },
       { status: 500 },
