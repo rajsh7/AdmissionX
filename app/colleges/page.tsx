@@ -1,6 +1,7 @@
 import pool from "@/lib/db";
 import Header from "../components/Header";
 import CollegeListItem from "../components/CollegeListItem";
+import CollegeSearch from "./CollegeSearch";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
 export const dynamic = "force-dynamic";
@@ -18,8 +19,27 @@ function slugToName(slug: string): string {
   return slug.replace(/-\d+$/, "").split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 }
 
-export default async function CollegesPage() {
+export default async function CollegesPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const conn = await pool.getConnection();
+
+  const qRaw = searchParams?.q;
+  const qStr = Array.isArray(qRaw) ? qRaw[0] : (qRaw || "");
+  const q = qStr.trim();
+  
+  const hasTextSearch = q.length >= 2;
+  const filterParams: string[] = [];
+  let filterWhere = "1=1";
+
+  if (hasTextSearch) {
+    filterWhere = "(u.firstname LIKE ? OR cp.registeredSortAddress LIKE ? OR cp.slug LIKE ?)";
+    const like = `%${q}%`;
+    filterParams.push(like, like, like);
+  }
+
   let colleges: CollegeResult[] = [];
   try {
     const [rows] = await conn.query(`
@@ -48,12 +68,13 @@ export default async function CollegesPage() {
       LEFT JOIN city c ON c.id = cp.registeredAddressCityId
       LEFT JOIN collegemaster cm ON cm.collegeprofile_id = cp.id
       LEFT JOIN functionalarea fa ON fa.id = cm.functionalarea_id
+      WHERE ${filterWhere}
       GROUP BY cp.id, cp.slug, u.firstname, cp.registeredSortAddress, c.name, c.state_id,
                cp.bannerimage, cp.rating, cp.totalRatingUser, cp.ranking, cp.isTopUniversity,
                cp.topUniversityRank, cp.universityType, cp.estyear, cp.verified, cp.totalStudent
       ORDER BY cp.rating DESC, cp.totalRatingUser DESC
       LIMIT 20
-    `);
+    `, filterParams);
 
     const dataRows = rows as any[];
     colleges = dataRows.map((row) => ({
@@ -87,7 +108,11 @@ export default async function CollegesPage() {
     <div className="min-h-screen flex flex-col bg-slate-50 font-display">
       <Header />
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-8 mt-16">
-        <h1 className="text-3xl font-bold text-slate-900 mb-6">Explore Colleges</h1>
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">Explore Colleges</h1>
+        <p className="text-slate-500 mb-6">Find the perfect institution to shape your future.</p>
+        
+        <CollegeSearch />
+
         {colleges.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-slate-100">
             <span className="material-symbols-outlined text-5xl text-slate-300 mb-4">search_off</span>
