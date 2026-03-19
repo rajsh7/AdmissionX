@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-> **Current Phase**: Not started
+> **Current Phase**: 1 (Completed)
 > **Milestone**: v1.0
 
 ## Must-Haves (from SPEC)
@@ -13,7 +13,7 @@
 ## Phases
 
 ### Phase 1: Authentication & Profiles
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Ensure robust implementation of student and college registration, login, and profile data gathering mechanisms.
 
 ### Phase 2: College & Course Browsing
