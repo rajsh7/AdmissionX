@@ -12,6 +12,7 @@ async function deleteState(id: number) {
     console.error("[admin/address/state deleteAction]", e);
   }
   revalidatePath("/admin/address/state");
+  revalidatePath("/", "layout");
 }
 
 async function createState(formData: FormData) {
@@ -24,6 +25,7 @@ async function createState(formData: FormData) {
     console.error("[admin/address/state createAction]", e);
   }
   revalidatePath("/admin/address/state");
+  revalidatePath("/", "layout");
 }
 
 async function updateState(formData: FormData) {
@@ -37,6 +39,7 @@ async function updateState(formData: FormData) {
     console.error("[admin/address/state updateAction]", e);
   }
   revalidatePath("/admin/address/state");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

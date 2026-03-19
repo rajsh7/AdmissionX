@@ -15,6 +15,7 @@ async function deletePaymentRecord(id: number) {
     console.error("[admin/payment deleteAction]", e);
   }
   revalidatePath("/admin/payment");
+  revalidatePath("/", "layout");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

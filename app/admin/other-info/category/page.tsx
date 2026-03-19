@@ -11,6 +11,7 @@ async function deleteCategory(id: number) {
     console.error("[admin/other-info/category deleteAction]", e);
   }
   revalidatePath("/admin/other-info/category");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

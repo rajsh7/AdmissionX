@@ -11,6 +11,7 @@ async function deleteTransaction(id: number) {
     console.error("[admin/payment/transactions deleteAction]", e);
   }
   revalidatePath("/admin/payment/transactions");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

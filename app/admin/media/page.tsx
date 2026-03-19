@@ -16,6 +16,7 @@ async function deleteMediaRecord(id: number) {
     console.error("[admin/media deleteAction]", e);
   }
   revalidatePath("/admin/media");
+  revalidatePath("/", "layout");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

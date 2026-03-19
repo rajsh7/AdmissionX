@@ -1,7 +1,46 @@
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
+import NewsTypeListClient from "./NewsTypeListClient";
+
+// ─── Server Actions ───────────────────────────────────────────────────────────
+
+async function createNewsType(formData: FormData) {
+  "use server";
+  const name = formData.get("name") as string;
+  const slug = formData.get("slug") as string;
+
+  if (!name) return;
+
+  try {
+    await pool.query(
+      "INSERT INTO news_types (name, slug, created_at, updated_at) VALUES (?, ?, NOW(), NOW())",
+      [name, slug || null]
+    );
+  } catch (e) {
+    console.error("[admin/news/type createAction]", e);
+  }
+  revalidatePath("/admin/news/type");
+}
+
+async function updateNewsType(formData: FormData) {
+  "use server";
+  const id = parseInt(formData.get("id") as string, 10);
+  const name = formData.get("name") as string;
+  const slug = formData.get("slug") as string;
+
+  if (!id || !name) return;
+
+  try {
+    await pool.query(
+      "UPDATE news_types SET name = ?, slug = ?, updated_at = NOW() WHERE id = ?",
+      [name, slug || null, id]
+    );
+  } catch (e) {
+    console.error("[admin/news/type updateAction]", e);
+  }
+  revalidatePath("/admin/news/type");
+}
 
 async function deleteNewsType(id: number) {
   "use server";
@@ -11,29 +50,29 @@ async function deleteNewsType(id: number) {
     console.error("[admin/news/type deleteAction]", e);
   }
   revalidatePath("/admin/news/type");
+  revalidatePath("/", "layout");
 }
 
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number | boolean)[] = [],
-): Promise<T[]> {
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+async function getNewsTypes(q?: string) {
   try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/news/type safeQuery]", err);
+    const where = q ? "WHERE name LIKE ? OR slug LIKE ?" : "";
+    const params = q ? [`%${q}%`, `%${q}%`] : [];
+    const [rows] = await pool.query(
+      `SELECT id, name, slug FROM news_types ${where} ORDER BY id DESC`,
+      params
+    );
+    return rows as any[];
+  } catch (e) {
+    console.error("[admin/news/type getNewsTypes]", e);
     return [];
   }
 }
 
-interface NewsTypeRow extends RowDataPacket {
-  id: number;
-  name: string;
-  slug: string | null;
-}
-
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
-const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
+
+// ─── Page Component ──────────────────────────────────────────────────────────
 
 export default async function NewsTypePage({
   searchParams,
@@ -42,18 +81,7 @@ export default async function NewsTypePage({
 }) {
   const sp = await searchParams;
   const q = (sp.q || "").trim();
-
-  const where = q ? "WHERE name LIKE ? OR slug LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`] : [];
-
-  const data = await safeQuery<NewsTypeRow>(
-    `SELECT id, name, slug
-     FROM news_types
-     ${where}
-     ORDER BY id DESC
-     LIMIT 100`,
-    params
-  );
+  const data = await getNewsTypes(q);
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
@@ -66,52 +94,23 @@ export default async function NewsTypePage({
           <p className="text-sm text-slate-500 mt-0.5">Manage categories and tags for news articles.</p>
         </div>
         <form method="GET" className="relative max-w-sm w-full">
-           <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[20px]" style={ICO}>search</span>
+           <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[20px]" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" }}>search</span>
            <input 
              name="q" 
              defaultValue={q}
              placeholder="Search types..." 
-             className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+             className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 shadow-sm"
            />
         </form>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-50/50 border-b border-slate-100 text-left">
-                <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Type Name</th>
-                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Slug</th>
-                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {data.length === 0 ? (
-                <tr>
-                  <td colSpan={3} className="px-5 py-10 text-center text-slate-400">
-                     No news types found.
-                  </td>
-                </tr>
-              ) : (
-                data.map((r) => (
-                  <tr key={r.id} className="hover:bg-amber-50/20 transition-colors group">
-                    <td className="px-5 py-4 font-bold text-slate-800">{r.name}</td>
-                    <td className="px-4 py-4">
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-50 text-slate-500">
-                        {r.slug || "—"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                       <DeleteButton action={deleteNewsType.bind(null, r.id)} size="sm" />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <NewsTypeListClient 
+        data={data}
+        createAction={createNewsType}
+        updateAction={updateNewsType}
+        deleteAction={deleteNewsType}
+      />
     </div>
   );
 }
+

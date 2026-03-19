@@ -11,6 +11,7 @@ async function deleteCourseType(id: number) {
     console.error("[admin/other-info/course-type deleteAction]", e);
   }
   revalidatePath("/admin/other-info/course-type");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

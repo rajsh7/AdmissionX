@@ -11,6 +11,7 @@ async function deleteAddress(id: number) {
     console.error("[admin/address/list deleteAction]", e);
   }
   revalidatePath("/admin/address/list");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(
@@ -30,7 +31,7 @@ interface AddressRow extends RowDataPacket {
   id: number;
   name: string | null;
   address1: string | null;
-  zipcode: string | null;
+  postalcode: string | null;
   cityName: string | null;
   stateName: string | null;
 }
@@ -46,14 +47,14 @@ export default async function AddressListPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE a.name LIKE ? OR a.address1 LIKE ? OR a.zipcode LIKE ?" : "";
+  const where = q ? "WHERE a.name LIKE ? OR a.address1 LIKE ? OR a.postalcode LIKE ?" : "";
   const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
 
   const data = await safeQuery<AddressRow>(
-    `SELECT a.id, a.name, a.address1, a.zipcode, ci.name as cityName, s.name as stateName
+    `SELECT a.id, a.name, a.address1, a.postalcode, ci.name as cityName, s.name as stateName
      FROM address a
      LEFT JOIN city ci ON ci.id = a.city_id
-     LEFT JOIN state s ON s.id = a.state_id
+     LEFT JOIN state s ON s.id = ci.state_id
      ${where}
      ORDER BY a.id DESC
      LIMIT 100`,
@@ -75,7 +76,7 @@ export default async function AddressListPage({
            <input 
              name="q" 
              defaultValue={q}
-             placeholder="Search addresses, names or zipcodes..." 
+             placeholder="Search addresses, names or postal codes..." 
              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20"
            />
         </form>
@@ -104,7 +105,7 @@ export default async function AddressListPage({
                     <td className="px-5 py-4">
                        <p className="font-bold text-slate-800">{r.name || "Unnamed Address"}</p>
                        <p className="text-xs text-slate-500 line-clamp-1">{r.address1 || "—"}</p>
-                       <p className="text-[10px] font-mono text-slate-400 mt-1">Zip: {r.zipcode || "—"}</p>
+                       <p className="text-[10px] font-mono text-slate-400 mt-1">Zip: {r.postalcode || "—"}</p>
                     </td>
                     <td className="px-4 py-4">
                        <p className="text-xs text-slate-700 font-medium">{r.cityName || "Unknown City"}</p>

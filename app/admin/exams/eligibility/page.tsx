@@ -11,6 +11,7 @@ async function deleteCriteria(id: number) {
     console.error("[admin/exams/eligibility deleteAction]", e);
   }
   revalidatePath("/admin/exams/eligibility");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

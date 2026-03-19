@@ -11,6 +11,7 @@ async function deleteCollegeType(id: number) {
     console.error("[admin/other-info/college-type deleteAction]", e);
   }
   revalidatePath("/admin/other-info/college-type");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

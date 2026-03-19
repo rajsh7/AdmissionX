@@ -11,6 +11,7 @@ async function deleteCardType(id: number) {
     console.error("[admin/other-info/card-type deleteAction]", e);
   }
   revalidatePath("/admin/other-info/card-type");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

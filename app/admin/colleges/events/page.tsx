@@ -1,10 +1,56 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { RowDataPacket } from "mysql2";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
+import EventListClient from "./EventListClient";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
+
+async function createEvent(formData: FormData) {
+  "use server";
+  const collegeprofile_id = formData.get("collegeprofile_id");
+  const name              = formData.get("name");
+  const datetime          = formData.get("datetime") || null;
+  const venue             = formData.get("venue")    || null;
+  const description       = formData.get("description") || null;
+  const link              = formData.get("link")    || null;
+
+  try {
+    await pool.query(
+      `INSERT INTO event 
+        (collegeprofile_id, name, datetime, venue, description, link, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      [collegeprofile_id, name, datetime, venue, description, link],
+    );
+  } catch (e) {
+    console.error("[admin/colleges/events createAction]", e);
+  }
+  revalidatePath("/admin/colleges/events");
+}
+
+async function updateEvent(formData: FormData) {
+  "use server";
+  const id                = formData.get("id");
+  const collegeprofile_id = formData.get("collegeprofile_id");
+  const name              = formData.get("name");
+  const datetime          = formData.get("datetime") || null;
+  const venue             = formData.get("venue")    || null;
+  const description       = formData.get("description") || null;
+  const link              = formData.get("link")    || null;
+
+  try {
+    await pool.query(
+      `UPDATE event 
+          SET collegeprofile_id = ?, name = ?, datetime = ?, venue = ?, 
+              description = ?, link = ?, updated_at = NOW()
+        WHERE id = ?`,
+      [collegeprofile_id, name, datetime, venue, description, link, id],
+    );
+  } catch (e) {
+    console.error("[admin/colleges/events updateAction]", e);
+  }
+  revalidatePath("/admin/colleges/events");
+}
 
 async function deleteEventRow(id: number) {
   "use server";
@@ -33,22 +79,11 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-function formatEventDate(d: string | null): string {
-    if (!d) return "TBD";
-    const date = new Date(d);
-    return date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-    });
-}
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface EventRow extends RowDataPacket {
   id: number;
+  collegeprofile_id: number;
   name: string;
   datetime: string;
   venue: string;
@@ -59,6 +94,11 @@ interface EventRow extends RowDataPacket {
 
 interface CountRow extends RowDataPacket {
   total: number;
+}
+
+interface OptionRow extends RowDataPacket {
+  id: number;
+  name: string;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -78,22 +118,23 @@ export default async function CollegeEventsPage({
 
   // ── Build WHERE clause ─────────────────────────────────────────────────────
   const conditions: string[] = [];
-  const params: (string | number)[] = [];
+  const filterParams: (string | number)[] = [];
 
   if (q) {
     conditions.push(
       "(e.name LIKE ? OR e.venue LIKE ? OR u.firstname LIKE ?)",
     );
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`);
+    filterParams.push(`%${q}%`, `%${q}%`, `%${q}%`);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Query events ─────────────────────────────────────────────────────────
-  const [events, countRows] = await Promise.all([
+  // ── Fetch metadata + data ──────────────────────────────────────────────────
+  const [events, countRows, colleges] = await Promise.all([
     safeQuery<EventRow>(
       `SELECT 
         e.id,
+        e.collegeprofile_id,
         e.name,
         e.datetime,
         e.venue,
@@ -106,7 +147,7 @@ export default async function CollegeEventsPage({
        ${where}
        ORDER BY e.datetime DESC
        LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
+      [...filterParams, PAGE_SIZE, offset],
     ),
     safeQuery<CountRow>(
       `SELECT COUNT(*) AS total 
@@ -114,8 +155,11 @@ export default async function CollegeEventsPage({
        JOIN collegeprofile cp ON cp.id = e.collegeprofile_id
        JOIN users u ON u.id = cp.users_id
        ${where}`,
-      params,
+      filterParams,
     ),
+    safeQuery<OptionRow>(
+      "SELECT cp.id, u.firstname AS name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
+    )
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
@@ -149,85 +193,38 @@ export default async function CollegeEventsPage({
         </div>
       </div>
 
-      {/* ── Table ─────────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {events.length === 0 ? (
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>event</span>
-            <p className="text-slate-500 font-semibold text-sm">No events found.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-left">
-                  <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Event Name</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College & Venue</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Date & Time</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {events.map((e, idx) => (
-                  <tr key={e.id} className="hover:bg-blue-50/20 transition-colors">
-                    <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-slate-800 leading-snug">{e.name}</span>
-                        <span className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{e.description || "No description"}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-slate-600 font-medium truncate max-w-[200px] block">{e.college_name}</span>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight truncate max-w-[200px] block">{e.venue}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-xs text-slate-700 font-bold whitespace-nowrap">{formatEventDate(e.datetime)}</span>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {e.link && (
-                          <Link href={e.link} target="_blank" className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="View Link">
-                            <span className="material-symbols-rounded text-[18px]">link</span>
-                          </Link>
-                        )}
-                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Update">
-                           <span className="material-symbols-rounded text-[18px]">edit</span>
-                        </button>
-                        <DeleteButton action={deleteEventRow.bind(null, e.id)} size="sm" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+      <EventListClient
+        events={events}
+        colleges={colleges}
+        offset={offset}
+        onAdd={createEvent}
+        onEdit={updateEvent}
+        onDelete={deleteEventRow}
+      />
 
-        {/* ── Pagination ───────────────────────────────────────────────────── */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-            <p className="text-xs text-slate-500">
-              Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> events
-            </p>
-            <div className="flex items-center gap-1">
-              {page > 1 ? (
-                <Link href={`/admin/colleges/events?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-              )}
-              {page < totalPages ? (
-                <Link href={`/admin/colleges/events?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-              )}
-            </div>
+      {/* ── Pagination ───────────────────────────────────────────────────── */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
+          <p className="text-xs text-slate-500">
+            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> events
+          </p>
+          <div className="flex items-center gap-1">
+            {page > 1 ? (
+              <Link href={`/admin/colleges/events?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
+            )}
+            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">
+              {page} / {totalPages}
+            </span>
+            {page < totalPages ? (
+              <Link href={`/admin/colleges/events?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

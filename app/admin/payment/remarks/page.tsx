@@ -11,6 +11,7 @@ async function deleteRemark(id: number) {
     console.error("[admin/payment/remarks deleteAction]", e);
   }
   revalidatePath("/admin/payment/remarks");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

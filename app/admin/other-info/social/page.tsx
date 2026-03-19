@@ -11,6 +11,7 @@ async function deleteSocial(id: number) {
     console.error("[admin/other-info/social deleteAction]", e);
   }
   revalidatePath("/admin/other-info/social");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

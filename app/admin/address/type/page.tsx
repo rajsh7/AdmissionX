@@ -11,6 +11,7 @@ async function deleteAddressType(id: number) {
     console.error("[admin/address/type deleteAction]", e);
   }
   revalidatePath("/admin/address/type");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

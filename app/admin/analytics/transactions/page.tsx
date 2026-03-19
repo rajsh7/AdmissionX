@@ -86,9 +86,10 @@ export default async function TransactionsAnalyticsPage({
   // ── Queries ────────────────────────────────────────────────────────────────
   const [transactions, countRows, statsRows] = await Promise.all([
     safeQuery<TransactionRow>(
-      `SELECT t.*, ps.name as status_name 
+      `SELECT t.*, ps.name as status_name, CAST(COALESCE(a.byafees, '0') AS DECIMAL(10,2)) as amount
        FROM transaction t
        LEFT JOIN paymentstatus ps ON t.paymentstatus_id = ps.id
+       LEFT JOIN application a ON a.id = t.application_id
        ${where} 
        ORDER BY t.created_at DESC 
        LIMIT ? OFFSET ?`,
@@ -98,16 +99,18 @@ export default async function TransactionsAnalyticsPage({
       `SELECT COUNT(*) AS total 
        FROM transaction t
        LEFT JOIN paymentstatus ps ON t.paymentstatus_id = ps.id
+       LEFT JOIN application a ON a.id = t.application_id
        ${where}`,
       params,
     ),
     safeQuery<RowDataPacket>(`
       SELECT 
         COUNT(*) AS total_count,
-        SUM(amount) AS total_volume,
-        SUM(CASE WHEN ps.name = 'Success' THEN amount ELSE 0 END) AS success_volume
+        SUM(CAST(COALESCE(a.byafees, '0') AS DECIMAL(10,2))) AS total_volume,
+        SUM(CASE WHEN ps.name = 'Success' THEN CAST(COALESCE(a.byafees, '0') AS DECIMAL(10,2)) ELSE 0 END) AS success_volume
       FROM transaction t
       LEFT JOIN paymentstatus ps ON t.paymentstatus_id = ps.id
+      LEFT JOIN application a ON a.id = t.application_id
     `),
   ]);
 

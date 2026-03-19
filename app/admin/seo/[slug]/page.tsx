@@ -11,6 +11,7 @@ async function deleteSeoEntry(id: number, slug: string) {
     console.error(`[admin/seo/${slug} deleteAction]`, e);
   }
   revalidatePath(`/admin/seo/${slug}`);
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

@@ -11,6 +11,7 @@ async function deleteEntranceExam(id: number) {
     console.error("[admin/other-info/entrance-exam deleteAction]", e);
   }
   revalidatePath("/admin/other-info/entrance-exam");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

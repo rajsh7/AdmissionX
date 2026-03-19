@@ -12,6 +12,7 @@ async function deleteInfoRecord(id: number) {
     console.error("[admin/other-info deleteAction]", e);
   }
   revalidatePath("/admin/other-info");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

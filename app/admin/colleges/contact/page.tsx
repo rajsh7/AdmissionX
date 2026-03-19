@@ -15,6 +15,7 @@ async function deleteContactRow(id: number) {
     console.error("[admin/colleges/contact deleteAction]", e);
   }
   revalidatePath("/admin/colleges/contact");
+  revalidatePath("/", "layout");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

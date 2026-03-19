@@ -11,6 +11,7 @@ async function deleteDegree(id: number) {
     console.error("[admin/other-info/degrees deleteAction]", e);
   }
   revalidatePath("/admin/other-info/degrees");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

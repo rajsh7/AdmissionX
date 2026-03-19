@@ -11,6 +11,7 @@ async function deleteAppStatus(id: number) {
     console.error("[admin/other-info/app-status deleteAction]", e);
   }
   revalidatePath("/admin/other-info/app-status");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

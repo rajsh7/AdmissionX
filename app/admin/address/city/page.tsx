@@ -13,22 +13,23 @@ async function deleteCity(id: number) {
     console.error("[admin/address/city deleteAction]", e);
   }
   revalidatePath("/admin/address/city");
+  revalidatePath("/", "layout");
 }
 
 async function createCity(formData: FormData) {
   "use server";
   const name = formData.get("name");
   const state_id = formData.get("state_id");
-  const country_id = formData.get("country_id");
   try {
     await pool.query(
-      "INSERT INTO city (name, state_id, country_id) VALUES (?, ?, ?)",
-      [name, state_id, country_id]
+      "INSERT INTO city (name, state_id, created_at, updated_at) VALUES (?, ?, NOW(), NOW())",
+      [name, state_id]
     );
   } catch (e) {
     console.error("[admin/address/city createAction]", e);
   }
   revalidatePath("/admin/address/city");
+  revalidatePath("/", "layout");
 }
 
 async function updateCity(formData: FormData) {
@@ -36,16 +37,16 @@ async function updateCity(formData: FormData) {
   const id = formData.get("id");
   const name = formData.get("name");
   const state_id = formData.get("state_id");
-  const country_id = formData.get("country_id");
   try {
     await pool.query(
-      "UPDATE city SET name = ?, state_id = ?, country_id = ? WHERE id = ?",
-      [name, state_id, country_id, id]
+      "UPDATE city SET name = ?, state_id = ?, updated_at = NOW() WHERE id = ?",
+      [name, state_id, id]
     );
   } catch (e) {
     console.error("[admin/address/city updateAction]", e);
   }
   revalidatePath("/admin/address/city");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

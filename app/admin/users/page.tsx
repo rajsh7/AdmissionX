@@ -37,6 +37,7 @@ async function toggleUserAction(formData: FormData): Promise<void> {
     console.error("[admin/users toggleUser]", e);
   }
   revalidatePath("/admin/users");
+  revalidatePath("/", "layout");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

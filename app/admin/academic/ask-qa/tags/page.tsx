@@ -11,6 +11,7 @@ async function deleteTag(id: number) {
     console.error("[admin/academic/ask-tags deleteAction]", e);
   }
   revalidatePath("/admin/academic/ask-qa/tags");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

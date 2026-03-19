@@ -1,10 +1,48 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { RowDataPacket } from "mysql2";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
+import AdmissionListClient from "./AdmissionListClient";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
+
+async function createAdmission(formData: FormData) {
+  "use server";
+  const collegeprofile_id = formData.get("collegeprofile_id");
+  const title             = formData.get("title");
+  const description       = formData.get("description") || null;
+
+  try {
+    await pool.query(
+      `INSERT INTO college_admission_procedures (collegeprofile_id, title, description, created_at, updated_at)
+       VALUES (?, ?, ?, NOW(), NOW())`,
+      [collegeprofile_id, title, description],
+    );
+  } catch (e) {
+    console.error("[admin/colleges/admission createAction]", e);
+  }
+  revalidatePath("/admin/colleges/admission");
+}
+
+async function updateAdmission(formData: FormData) {
+  "use server";
+  const id                = formData.get("id");
+  const collegeprofile_id = formData.get("collegeprofile_id");
+  const title             = formData.get("title");
+  const description       = formData.get("description") || null;
+
+  try {
+    await pool.query(
+      `UPDATE college_admission_procedures 
+          SET collegeprofile_id = ?, title = ?, description = ?, updated_at = NOW()
+        WHERE id = ?`,
+      [collegeprofile_id, title, description, id],
+    );
+  } catch (e) {
+    console.error("[admin/colleges/admission updateAction]", e);
+  }
+  revalidatePath("/admin/colleges/admission");
+}
 
 async function deleteAdmissionRow(id: number) {
   "use server";
@@ -37,6 +75,7 @@ async function safeQuery<T extends RowDataPacket>(
 
 interface AdmissionRow extends RowDataPacket {
   id: number;
+  collegeprofile_id: number;
   college_name: string;
   title: string;
   description: string;
@@ -44,6 +83,11 @@ interface AdmissionRow extends RowDataPacket {
 
 interface CountRow extends RowDataPacket {
   total: number;
+}
+
+interface OptionRow extends RowDataPacket {
+  id: number;
+  name: string;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -63,22 +107,23 @@ export default async function CollegeAdmissionPage({
 
   // ── Build WHERE clause ─────────────────────────────────────────────────────
   const conditions: string[] = [];
-  const params: (string | number)[] = [];
+  const filterParams: (string | number)[] = [];
 
   if (q) {
     conditions.push(
       "(u.firstname LIKE ? OR ap.title LIKE ? OR ap.description LIKE ?)",
     );
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`);
+    filterParams.push(`%${q}%`, `%${q}%`, `%${q}%`);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Query admissions ───────────────────────────────────────────────────────
-  const [admissions, countRows] = await Promise.all([
+  // ── Fetch everything in parallel ──────────────────────────────────────────
+  const [admissions, countRows, colleges] = await Promise.all([
     safeQuery<AdmissionRow>(
       `SELECT 
         ap.id,
+        ap.collegeprofile_id,
         COALESCE(u.firstname, 'Unnamed College') as college_name,
         ap.title,
         ap.description
@@ -88,7 +133,7 @@ export default async function CollegeAdmissionPage({
        ${where}
        ORDER BY ap.created_at DESC
        LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
+      [...filterParams, PAGE_SIZE, offset],
     ),
     safeQuery<CountRow>(
       `SELECT COUNT(*) AS total 
@@ -96,8 +141,11 @@ export default async function CollegeAdmissionPage({
        JOIN collegeprofile cp ON cp.id = ap.collegeprofile_id
        JOIN users u ON u.id = cp.users_id
        ${where}`,
-      params,
+      filterParams,
     ),
+    safeQuery<OptionRow>(
+      "SELECT cp.id, u.firstname AS name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
+    )
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
@@ -131,77 +179,38 @@ export default async function CollegeAdmissionPage({
         </div>
       </div>
 
-      {/* ── Table ─────────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {admissions.length === 0 ? (
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>assignment_ind</span>
-            <p className="text-slate-500 font-semibold text-sm">No admission records found.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-left">
-                  <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Procedure Title</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College Name</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Description</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {admissions.map((a, idx) => (
-                  <tr key={a.id} className="hover:bg-blue-50/20 transition-colors">
-                    <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-slate-800 leading-snug">{a.title}</span>
-                        <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider mt-0.5">Enrollment Workflow</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-slate-600 font-medium truncate max-w-[200px] block">{a.college_name}</span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-xs text-slate-500 line-clamp-1 max-w-[350px]">{a.description || "No description provided"}</span>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Update">
-                           <span className="material-symbols-rounded text-[18px]">edit</span>
-                        </button>
-                        <DeleteButton action={deleteAdmissionRow.bind(null, a.id)} size="sm" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+      <AdmissionListClient
+        admissions={admissions}
+        colleges={colleges}
+        offset={offset}
+        onAdd={createAdmission}
+        onEdit={updateAdmission}
+        onDelete={deleteAdmissionRow}
+      />
 
-        {/* ── Pagination ───────────────────────────────────────────────────── */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-            <p className="text-xs text-slate-500">
-              Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> procedures
-            </p>
-            <div className="flex items-center gap-1">
-              {page > 1 ? (
-                <Link href={`/admin/colleges/admission?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-              )}
-              {page < totalPages ? (
-                <Link href={`/admin/colleges/admission?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-              )}
-            </div>
+      {/* ── Pagination ───────────────────────────────────────────────────── */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
+          <p className="text-xs text-slate-500">
+            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> procedures
+          </p>
+          <div className="flex items-center gap-1">
+            {page > 1 ? (
+              <Link href={`/admin/colleges/admission?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
+            )}
+            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">
+              {page} / {totalPages}
+            </span>
+            {page < totalPages ? (
+              <Link href={`/admin/colleges/admission?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

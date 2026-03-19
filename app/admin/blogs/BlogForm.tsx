@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import ImageUpload from "../_components/ImageUpload";
 
 interface BlogFormProps {
   initialData?: any;
@@ -56,6 +57,16 @@ export default function BlogForm({
           className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 font-mono text-slate-600"
         />
       </div>
+
+      {/* Banner Image Upload */}
+      <ImageUpload 
+        name="bannerimage_file" 
+        label="Blog Banner Image" 
+        initialImage={initialData?.bannerimage} 
+      />
+      {initialData?.bannerimage && (
+        <input type="hidden" name="bannerimage_existing" value={initialData.bannerimage} />
+      )}
 
       {/* Description / Content */}
       <div className="space-y-1.5">

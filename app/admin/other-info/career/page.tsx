@@ -11,6 +11,7 @@ async function deleteCareer(id: number) {
     console.error("[admin/other-info/career deleteAction]", e);
   }
   revalidatePath("/admin/other-info/career");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

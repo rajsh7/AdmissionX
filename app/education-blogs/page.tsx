@@ -295,7 +295,7 @@ export default async function EducationBlogsPage({
 // ─── Featured Card ────────────────────────────────────────────────────────────
 
 function FeaturedCard({ blog }: { blog: BlogRow }) {
-  const img = buildImageUrl(blog.featimage);
+  const img = buildImageUrl(blog.bannerimage);
   const desc = excerpt(blog.description ?? "", 200);
   const rt = readTime(blog.description ?? "");
   const time = timeAgo(blog.created_at);
@@ -357,7 +357,7 @@ const CARD_ACCENTS = [
 ];
 
 function BlogCard({ blog, idx = 0 }: { blog: BlogRow; idx?: number }) {
-  const img = buildImageUrl(blog.featimage);
+  const img = buildImageUrl(blog.bannerimage);
   const desc = excerpt(blog.description ?? "", 110);
   const rt = readTime(blog.description ?? "");
   const time = timeAgo(blog.created_at);

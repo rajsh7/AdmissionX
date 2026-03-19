@@ -1,51 +1,113 @@
 import pool from "@/lib/db";
+import { RowDataPacket } from "mysql2";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
-import { RowDataPacket } from "mysql2";
+import DegreeListClient from "./DegreeListClient";
+
+const PAGE_SIZE = 25;
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
-async function toggleShowOnTop(formData: FormData) {
+async function createDegree(formData: FormData) {
   "use server";
-  const id  = parseInt(formData.get("id")  as string, 10);
+  const name = formData.get("name") as string;
+  const functionalarea_id = parseInt(formData.get("functionalarea_id") as string, 10);
+  const pageslug = formData.get("pageslug") as string;
+  const logoimage = formData.get("logoimage") as string;
+  const bannerimage = formData.get("bannerimage") as string;
+  const pagetitle = formData.get("pagetitle") as string;
+  const pagedescription = formData.get("pagedescription") as string;
+  const isShowOnTop = formData.get("isShowOnTop") === "on" ? 1 : 0;
+  const isShowOnHome = formData.get("isShowOnHome") === "on" ? 1 : 0;
+
+  if (!name || isNaN(functionalarea_id)) return;
+
+  try {
+    await pool.query(
+      `INSERT INTO degree (name, functionalarea_id, pageslug, logoimage, bannerimage, pagetitle, pagedescription, isShowOnTop, isShowOnHome, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      [name, functionalarea_id, pageslug, logoimage, bannerimage, pagetitle, pagedescription, isShowOnTop, isShowOnHome]
+    );
+  } catch (e) {
+    console.error("[admin/degrees createAction]", e);
+  }
+  revalidatePath("/admin/degrees");
+  revalidatePath("/", "layout");
+}
+
+async function updateDegree(formData: FormData) {
+  "use server";
+  const id = parseInt(formData.get("id") as string, 10);
+  const name = formData.get("name") as string;
+  const functionalarea_id = parseInt(formData.get("functionalarea_id") as string, 10);
+  const pageslug = formData.get("pageslug") as string;
+  const logoimage = formData.get("logoimage") as string;
+  const bannerimage = formData.get("bannerimage") as string;
+  const pagetitle = formData.get("pagetitle") as string;
+  const pagedescription = formData.get("pagedescription") as string;
+  const isShowOnTop = formData.get("isShowOnTop") === "on" ? 1 : 0;
+  const isShowOnHome = formData.get("isShowOnHome") === "on" ? 1 : 0;
+
+  if (!id || !name || isNaN(functionalarea_id)) return;
+
+  try {
+    await pool.query(
+      `UPDATE degree SET name = ?, functionalarea_id = ?, pageslug = ?, logoimage = ?, bannerimage = ?, pagetitle = ?, pagedescription = ?, isShowOnTop = ?, isShowOnHome = ?, updated_at = NOW() 
+       WHERE id = ?`,
+      [name, functionalarea_id, pageslug, logoimage, bannerimage, pagetitle, pagedescription, isShowOnTop, isShowOnHome, id]
+    );
+  } catch (e) {
+    console.error("[admin/degrees updateAction]", e);
+  }
+  revalidatePath("/admin/degrees");
+  revalidatePath("/", "layout");
+}
+
+async function deleteDegree(id: number) {
+  "use server";
+  if (!id) return;
+  try {
+    await pool.query("DELETE FROM degree WHERE id = ?", [id]);
+  } catch (e) {
+    console.error("[admin/degrees deleteAction]", e);
+  }
+  revalidatePath("/admin/degrees");
+  revalidatePath("/", "layout");
+}
+
+async function toggleDegreeTop(formData: FormData) {
+  "use server";
+  const id = parseInt(formData.get("id") as string, 10);
   const cur = parseInt(formData.get("cur") as string, 10);
   if (!id) return;
   try {
-    await pool.query("UPDATE degree SET isShowOnTop = ? WHERE id = ?", [
-      cur ? 0 : 1,
-      id,
-    ]);
+    await pool.query("UPDATE degree SET isShowOnTop = ? WHERE id = ?", [cur ? 0 : 1, id]);
   } catch (e) {
     console.error("[admin/degrees toggleTop]", e);
   }
   revalidatePath("/admin/degrees");
+  revalidatePath("/", "layout");
 }
 
-async function toggleShowOnHome(formData: FormData) {
+async function toggleDegreeHome(formData: FormData) {
   "use server";
-  const id  = parseInt(formData.get("id")  as string, 10);
+  const id = parseInt(formData.get("id") as string, 10);
   const cur = parseInt(formData.get("cur") as string, 10);
   if (!id) return;
   try {
-    await pool.query("UPDATE degree SET isShowOnHome = ? WHERE id = ?", [
-      cur ? 0 : 1,
-      id,
-    ]);
+    await pool.query("UPDATE degree SET isShowOnHome = ? WHERE id = ?", [cur ? 0 : 1, id]);
   } catch (e) {
     console.error("[admin/degrees toggleHome]", e);
   }
   revalidatePath("/admin/degrees");
+  revalidatePath("/", "layout");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const PAGE_SIZE = 25;
-const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
-const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
-
 async function safeQuery<T extends RowDataPacket>(
   sql: string,
-  params: (string | number)[] = [],
+  params: (string | number)[] = []
 ): Promise<T[]> {
   try {
     const [rows] = (await pool.query(sql, params)) as [T[], unknown];
@@ -56,44 +118,38 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-function formatDate(d: string | null | undefined): string {
-  if (!d) return "—";
-  try {
-    return new Date(d).toLocaleDateString("en-IN", {
-      day: "numeric", month: "short", year: "numeric",
-    });
-  } catch { return "—"; }
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 interface DegreeRow extends RowDataPacket {
   id: number;
   name: string;
   pageslug: string | null;
   isShowOnTop: number;
   isShowOnHome: number;
-  stream_name: string | null;
+  functionalarea_id: number;
+  stream_name: string;
   created_at: string;
   updated_at: string;
 }
 
-interface CountRow extends RowDataPacket { total: number; }
+interface StreamOption extends RowDataPacket {
+  id: number;
+  name: string;
+}
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+interface CountRow extends RowDataPacket {
+  total: number;
+}
 
 export default async function AdminDegreesPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
-  const sp     = await searchParams;
-  const q      = (sp.q ?? "").trim();
-  const page   = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
-  const filter = sp.filter ?? "all"; // all | top | home
+  const sp = await searchParams;
+  const q = (sp.q ?? "").trim();
+  const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
+  const filter = sp.filter ?? "all";
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── WHERE ──────────────────────────────────────────────────────────────────
   const conditions: string[] = [];
   const params: (string | number)[] = [];
 
@@ -101,30 +157,29 @@ export default async function AdminDegreesPage({
     conditions.push("(d.name LIKE ? OR d.pageslug LIKE ?)");
     params.push(`%${q}%`, `%${q}%`);
   }
-  if (filter === "top")  conditions.push("d.isShowOnTop = 1");
+  if (filter === "top") conditions.push("d.isShowOnTop = 1");
   if (filter === "home") conditions.push("d.isShowOnHome = 1");
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Parallel queries ───────────────────────────────────────────────────────
-  const [degrees, countRows, totalRow, topRow, homeRow] = await Promise.all([
+  const [degrees, countRows, totalRow, topRow, homeRow, streams] = await Promise.all([
     safeQuery<DegreeRow>(
-      `SELECT d.id, d.name, d.pageslug, d.isShowOnTop, d.isShowOnHome,
-              f.name AS stream_name, d.created_at, d.updated_at
+      `SELECT d.*, f.name as stream_name 
        FROM degree d
-       LEFT JOIN functionalarea f ON f.id = d.functionalarea_id
-       ${where}
-       ORDER BY d.isShowOnTop DESC, d.name ASC
+       LEFT JOIN functionalarea f ON d.functionalarea_id = f.id
+       ${where} 
+       ORDER BY d.isShowOnTop DESC, d.name ASC 
        LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
+      [...params, PAGE_SIZE, offset]
     ),
     safeQuery<CountRow>(
       `SELECT COUNT(*) AS total FROM degree d ${where}`,
-      params,
+      params
     ),
     safeQuery<CountRow>("SELECT COUNT(*) AS total FROM degree"),
     safeQuery<CountRow>("SELECT COUNT(*) AS total FROM degree WHERE isShowOnTop = 1"),
     safeQuery<CountRow>("SELECT COUNT(*) AS total FROM degree WHERE isShowOnHome = 1"),
+    safeQuery<StreamOption>("SELECT id, name FROM functionalarea ORDER BY name ASC"),
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
@@ -140,68 +195,48 @@ export default async function AdminDegreesPage({
   }
 
   const FILTER_TABS = [
-    { value: "all",  label: "All Degrees", count: totalRow[0]?.total ?? 0  },
-    { value: "top",  label: "Show on Top", count: topRow[0]?.total  ?? 0  },
-    { value: "home", label: "On Homepage", count: homeRow[0]?.total ?? 0  },
+    { value: "all", label: "All Degrees", count: totalRow[0]?.total ?? 0 },
+    { value: "top", label: "Show on Top", count: topRow[0]?.total ?? 0 },
+    { value: "home", label: "On Homepage", count: homeRow[0]?.total ?? 0 },
   ];
+
+  const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
+  const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
-
-      {/* ── Header ───────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-pink-600 text-[22px]" style={ICO_FILL}>
-              workspace_premium
-            </span>
-            Degrees
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Manage academic degree types and their homepage visibility.
-          </p>
+        <div className="grid grid-cols-3 gap-4 flex-1">
+          {FILTER_TABS.map((tab) => (
+            <Link
+              key={tab.value}
+              href={buildUrl({ filter: tab.value, page: 1 })}
+              className={`bg-white rounded-2xl border p-4 flex items-center gap-3 hover:shadow-md transition-all ${
+                filter === tab.value ? "border-teal-200 ring-2 ring-teal-100 shadow-sm" : "border-slate-100 shadow-sm"
+              }`}
+            >
+              <div className="bg-teal-50 text-teal-600 p-2 rounded-xl">
+                <span className="material-symbols-rounded text-[18px]" style={ICO_FILL}>
+                  {tab.value === "top" ? "star" : tab.value === "home" ? "home" : "school"}
+                </span>
+              </div>
+              <div className="min-w-0">
+                <p className="text-xl font-bold text-slate-800 leading-tight">{(tab.count || 0).toLocaleString()}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">{tab.label}</p>
+              </div>
+            </Link>
+          ))}
         </div>
-        <span className="text-sm font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-xl flex-shrink-0">
-          {(totalRow[0]?.total ?? 0).toLocaleString()} total
-        </span>
       </div>
 
-      {/* ── Stat mini-cards ───────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-4">
-        {FILTER_TABS.map((tab) => (
-          <Link
-            key={tab.value}
-            href={buildUrl({ filter: tab.value, page: 1 })}
-            className={`bg-white rounded-2xl border p-5 flex items-center gap-4 hover:shadow-md transition-all ${
-              filter === tab.value
-                ? "border-pink-200 ring-2 ring-pink-100"
-                : "border-slate-100 shadow-sm"
-            }`}
-          >
-            <div className="bg-pink-50 text-pink-600 p-2.5 rounded-xl flex-shrink-0">
-              <span className="material-symbols-rounded text-[20px]" style={ICO_FILL}>
-                workspace_premium
-              </span>
-            </div>
-            <div className="min-w-0">
-              <p className="text-2xl font-bold text-slate-800 leading-tight">{tab.count}</p>
-              <p className="text-xs font-semibold text-slate-500 truncate">{tab.label}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {/* ── Filter tabs + Search ──────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
         <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl flex-shrink-0">
           {FILTER_TABS.map((tab) => (
             <Link
               key={tab.value}
               href={buildUrl({ filter: tab.value, page: 1 })}
-              className={`px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                filter === tab.value
-                  ? "bg-white text-slate-800 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                filter === tab.value ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"
               }`}
             >
               {tab.label}
@@ -209,210 +244,52 @@ export default async function AdminDegreesPage({
           ))}
         </div>
 
-        <form method="GET" action="/admin/degrees" className="flex-1 max-w-sm">
+        <form method="GET" action="/admin/degrees" className="flex-1 max-w-sm ml-auto">
           {filter !== "all" && <input type="hidden" name="filter" value={filter} />}
           <div className="relative">
-            <span
-              className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none"
-              style={ICO}
-            >
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>
               search
             </span>
             <input
               name="q"
               defaultValue={q}
               placeholder="Search degree name or slug…"
-              className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-pink-500/30 focus:border-pink-400 transition"
+              className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition"
             />
           </div>
         </form>
-
-        {q && (
-          <Link
-            href={buildUrl({ q: "", page: 1 })}
-            className="text-xs font-semibold text-slate-500 hover:text-slate-700 flex items-center gap-1"
-          >
-            <span className="material-symbols-rounded text-[15px]" style={ICO}>close</span>
-            Clear
-          </Link>
-        )}
       </div>
 
-      {/* ── Table card ────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {degrees.length === 0 ? (
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>
-              workspace_premium
-            </span>
-            <p className="text-sm font-semibold text-slate-500">
-              {q ? `No degrees matching "${q}"` : "No degrees found."}
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="px-5 py-3 text-left w-10">#</th>
-                    <th className="px-4 py-3 text-left">Degree Name</th>
-                    <th className="px-4 py-3 text-left hidden md:table-cell">Stream</th>
-                    <th className="px-4 py-3 text-left hidden lg:table-cell">Slug</th>
-                    <th className="px-4 py-3 text-center">Show Top</th>
-                    <th className="px-4 py-3 text-center">Show Home</th>
-                    <th className="px-4 py-3 text-left hidden sm:table-cell">Updated</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {degrees.map((deg, idx) => (
-                    <tr key={deg.id} className="hover:bg-pink-50/20 transition-colors group">
+      <DegreeListClient 
+        degrees={JSON.parse(JSON.stringify(degrees))} 
+        streams={JSON.parse(JSON.stringify(streams))}
+        offset={offset}
+        createDegree={createDegree}
+        updateDegree={updateDegree}
+        deleteDegree={deleteDegree}
+        toggleDegreeTop={toggleDegreeTop}
+        toggleDegreeHome={toggleDegreeHome}
+      />
 
-                      {/* # */}
-                      <td className="px-5 py-3.5 text-xs text-slate-400 font-mono">
-                        {offset + idx + 1}
-                      </td>
-
-                      {/* Name */}
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center flex-shrink-0">
-                            <span className="material-symbols-rounded text-pink-600 text-[16px]" style={ICO_FILL}>
-                              workspace_premium
-                            </span>
-                          </div>
-                          <p className="font-semibold text-slate-800 truncate max-w-[200px]">
-                            {deg.name}
-                          </p>
-                        </div>
-                      </td>
-
-                      {/* Stream */}
-                      <td className="px-4 py-3.5 hidden md:table-cell">
-                        {deg.stream_name ? (
-                          <span className="text-xs font-medium bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full">
-                            {deg.stream_name}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-slate-300">—</span>
-                        )}
-                      </td>
-
-                      {/* Slug */}
-                      <td className="px-4 py-3.5 hidden lg:table-cell">
-                        {deg.pageslug ? (
-                          <span className="text-xs font-mono text-slate-500 truncate block max-w-[140px]">
-                            /{deg.pageslug}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-slate-300 italic">no slug</span>
-                        )}
-                      </td>
-
-                      {/* isShowOnTop toggle */}
-                      <td className="px-4 py-3.5 text-center">
-                        <form action={toggleShowOnTop} className="inline-block">
-                          <input type="hidden" name="id"  value={deg.id} />
-                          <input type="hidden" name="cur" value={deg.isShowOnTop} />
-                          <button
-                            type="submit"
-                            title={deg.isShowOnTop ? "Remove from top" : "Add to top"}
-                            className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full transition-colors ${
-                              deg.isShowOnTop
-                                ? "bg-pink-100 text-pink-700 hover:bg-pink-200"
-                                : "bg-slate-100 text-slate-400 hover:bg-slate-200"
-                            }`}
-                          >
-                            <span className="material-symbols-rounded text-[13px]" style={ICO_FILL}>
-                              {deg.isShowOnTop ? "star" : "star_border"}
-                            </span>
-                            {deg.isShowOnTop ? "Yes" : "No"}
-                          </button>
-                        </form>
-                      </td>
-
-                      {/* isShowOnHome toggle */}
-                      <td className="px-4 py-3.5 text-center">
-                        <form action={toggleShowOnHome} className="inline-block">
-                          <input type="hidden" name="id"  value={deg.id} />
-                          <input type="hidden" name="cur" value={deg.isShowOnHome} />
-                          <button
-                            type="submit"
-                            title={deg.isShowOnHome ? "Remove from homepage" : "Add to homepage"}
-                            className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full transition-colors ${
-                              deg.isShowOnHome
-                                ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                                : "bg-slate-100 text-slate-400 hover:bg-slate-200"
-                            }`}
-                          >
-                            <span className="material-symbols-rounded text-[13px]" style={ICO_FILL}>
-                              {deg.isShowOnHome ? "home" : "home"}
-                            </span>
-                            {deg.isShowOnHome ? "Yes" : "No"}
-                          </button>
-                        </form>
-                      </td>
-
-                      {/* Updated */}
-                      <td className="px-4 py-3.5 hidden sm:table-cell">
-                        <span className="text-xs text-slate-400 whitespace-nowrap">
-                          {formatDate(deg.updated_at || deg.created_at)}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-                <p className="text-xs text-slate-500">
-                  Showing <strong className="text-slate-700">{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of{" "}
-                  <strong className="text-slate-700">{total}</strong> degrees
-                </p>
-                <div className="flex items-center gap-1">
-                  {page > 1 && (
-                    <Link
-                      href={buildUrl({ page: page - 1 })}
-                      className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
-                      ← Prev
-                    </Link>
-                  )}
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const start = Math.max(1, Math.min(page - 2, totalPages - 4));
-                    const p = start + i;
-                    if (p > totalPages) return null;
-                    return (
-                      <Link
-                        key={p}
-                        href={buildUrl({ page: p })}
-                        className={`min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition-colors ${
-                          p === page
-                            ? "bg-pink-600 text-white shadow-sm"
-                            : "text-slate-500 bg-white border border-slate-200 hover:bg-slate-50"
-                        }`}
-                      >
-                        {p}
-                      </Link>
-                    );
-                  })}
-                  {page < totalPages && (
-                    <Link
-                      href={buildUrl({ page: page + 1 })}
-                      className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
-                      Next →
-                    </Link>
-                  )}
-                </div>
-              </div>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50 rounded-b-2xl shadow-sm">
+          <p className="text-xs text-slate-500">
+            Showing <strong>{offset + 1}</strong> to <strong>{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total}</strong> degrees
+          </p>
+          <div className="flex items-center gap-1">
+            {page > 1 && (
+              <Link href={buildUrl({ page: page - 1 })} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
+                Prev
+              </Link>
             )}
-          </>
-        )}
-      </div>
+            {page < totalPages && (
+              <Link href={buildUrl({ page: page + 1 })} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
+                Next
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+// Forced HMR trigger for hydration fix
 
 import { useState } from "react";
 import AdminModal from "@/app/admin/_components/AdminModal";
@@ -79,6 +80,7 @@ export default function BlogClient({
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
                 <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3 w-8">#</th>
+                <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 py-3 w-16">Image</th>
                 <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 py-3">Title</th>
                 <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 py-3 w-24">Status</th>
                 <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 py-3 w-32">Slug</th>
@@ -90,6 +92,17 @@ export default function BlogClient({
               {blogs.map((blog, idx) => (
                 <tr key={blog.id} className="hover:bg-violet-50/30 transition-colors group">
                   <td className="px-5 py-3.5 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
+                  <td className="px-3 py-3.5">
+                    <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden border border-slate-200">
+                      {blog.bannerimage ? (
+                        <img src={blog.bannerimage} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-300">
+                          <span className="material-symbols-rounded text-base">image</span>
+                        </div>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-3 py-3.5 max-w-xs">
                     <p className="font-semibold text-slate-800 truncate leading-tight tracking-tight uppercase">{blog.topic}</p>
                     <p className="text-[11px] text-slate-400 truncate mt-1 leading-tight italic">{stripHtml(blog.description) || "No description provided."}</p>

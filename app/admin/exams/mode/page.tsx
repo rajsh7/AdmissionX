@@ -11,6 +11,7 @@ async function deleteMode(id: number) {
     console.error("[admin/exams/mode deleteAction]", e);
   }
   revalidatePath("/admin/exams/mode");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

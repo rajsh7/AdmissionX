@@ -11,6 +11,7 @@ async function deleteDepartment(id: number) {
     console.error("[admin/exams/department deleteAction]", e);
   }
   revalidatePath("/admin/exams/department");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(
@@ -18,6 +19,7 @@ async function safeQuery<T extends RowDataPacket>(
   params: (string | number | boolean)[] = [],
 ): Promise<T[]> {
   try {
+    console.log("[admin/exams/department] Executing SQL:", sql);
     const [rows] = (await pool.query(sql, params)) as [T[], unknown];
     return rows;
   } catch (err) {
@@ -45,18 +47,19 @@ export default async function ExamDeptPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE cp.collegename LIKE ? OR fa.name LIKE ? OR d.name LIKE ?" : "";
+  const where = q ? "WHERE u.firstname LIKE ? OR fa.name LIKE ? OR d.name LIKE ?" : "";
   const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
 
   const data = await safeQuery<DeptRow>(
     `SELECT 
       fd.id, 
-      cp.collegename as collegeName,
+      COALESCE(u.firstname, cp.slug) as collegeName,
       fa.name as functionalArea,
       d.name as degree,
       c.name as course
      FROM faculty_departments fd
      LEFT JOIN collegeprofile cp ON cp.id = fd.collegeprofile_id
+     LEFT JOIN users u ON u.id = cp.users_id
      LEFT JOIN functionalarea fa ON fa.id = fd.functionalarea_id
      LEFT JOIN degree d ON d.id = fd.degree_id
      LEFT JOIN course c ON c.id = fd.course_id

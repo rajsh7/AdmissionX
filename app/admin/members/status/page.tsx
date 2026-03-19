@@ -1,8 +1,59 @@
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 import Link from "next/link";
+import { revalidatePath } from "next/cache";
+import StatusListClient from "./StatusListClient";
 
 const PAGE_SIZE = 25;
+
+// ─── Server Actions ───────────────────────────────────────────────────────────
+
+async function createStatus(formData: FormData) {
+  "use server";
+  const name = formData.get("name") as string;
+  if (!name) return;
+  try {
+    await pool.query(
+      "INSERT INTO userstatus (name, created_at, updated_at) VALUES (?, NOW(), NOW())",
+      [name]
+    );
+  } catch (e) {
+    console.error("[admin/members/status createAction]", e);
+  }
+  revalidatePath("/admin/members/status");
+  revalidatePath("/", "layout");
+}
+
+async function updateStatus(formData: FormData) {
+  "use server";
+  const id = parseInt(formData.get("id") as string, 10);
+  const name = formData.get("name") as string;
+  if (!id || !name) return;
+  try {
+    await pool.query(
+      "UPDATE userstatus SET name = ?, updated_at = NOW() WHERE id = ?",
+      [name, id]
+    );
+  } catch (e) {
+    console.error("[admin/members/status updateAction]", e);
+  }
+  revalidatePath("/admin/members/status");
+  revalidatePath("/", "layout");
+}
+
+async function deleteStatus(id: number) {
+  "use server";
+  if (!id) return;
+  try {
+    await pool.query("DELETE FROM userstatus WHERE id = ?", [id]);
+  } catch (e) {
+    console.error("[admin/members/status deleteAction]", e);
+  }
+  revalidatePath("/admin/members/status");
+  revalidatePath("/", "layout");
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T extends RowDataPacket>(
   sql: string,
@@ -75,29 +126,10 @@ export default async function MembersStatusPage({
     return `/admin/members/status${qs ? `?${qs}` : ""}`;
   }
 
-  const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
   const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
   return (
     <div className="p-6 space-y-6 max-w-[1000px]">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-emerald-600 text-[22px]" style={ICO_FILL}>
-              settings_accessibility
-            </span>
-            User Statuses
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Manage account status levels for platform members.
-          </p>
-        </div>
-        <button className="bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-colors flex items-center gap-2">
-          <span className="material-symbols-rounded text-[18px]">add</span>
-          Add New Status
-        </button>
-      </div>
-
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
         <form method="GET" className="flex-1 flex gap-2">
           {sort !== "newest" && <input type="hidden" name="sort" value={sort} />}
@@ -137,51 +169,33 @@ export default async function MembersStatusPage({
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {statuses.length === 0 ? (
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-100 mb-4 block" style={ICO_FILL}>settings_accessibility</span>
-            <p className="text-slate-500 font-medium">No statuses found.</p>
+      <StatusListClient 
+        statuses={statuses} 
+        offset={offset}
+        createStatus={createStatus}
+        updateStatus={updateStatus}
+        deleteStatus={deleteStatus}
+      />
+
+      {totalPages > 1 && (
+        <div className="px-5 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between rounded-b-2xl shadow-sm">
+          <p className="text-xs text-slate-500">
+            Showing <strong>{offset + 1}</strong> to <strong>{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total}</strong> status records
+          </p>
+          <div className="flex gap-1">
+            {page > 1 && (
+              <Link href={buildUrl({ page: page - 1 })} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
+                Prev
+              </Link>
+            )}
+            {page < totalPages && (
+              <Link href={buildUrl({ page: page + 1 })} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
+                Next
+              </Link>
+            )}
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10 text-center">#</th>
-                  <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status Name</th>
-                  <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Created At</th>
-                  <th className="text-right px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {statuses.map((status, idx) => (
-                  <tr key={status.id} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="px-4 py-3.5 text-center text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
-                    <td className="px-4 py-3.5 flex items-center gap-2">
-                       <span className="text-slate-800 font-semibold">{status.name}</span>
-                       <span className="text-[10px] font-mono font-bold text-slate-400 bg-slate-50 px-1 rounded inline-block">ID: #{status.id}</span>
-                    </td>
-                    <td className="px-4 py-3.5 text-slate-500 text-xs text-nowrap">
-                      {status.created_at ? new Date(status.created_at).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' }) : "—"}
-                    </td>
-                    <td className="px-4 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-2 text-slate-400">
-                         <button className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors hover:text-emerald-600">
-                           <span className="material-symbols-rounded text-[18px]">edit</span>
-                         </button>
-                         <button className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors hover:text-red-600">
-                           <span className="material-symbols-rounded text-[18px]">delete</span>
-                         </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            </div>
-          )}
         </div>
-      </div>
-    );
-  }
+      )}
+    </div>
+  );
+}

@@ -19,6 +19,7 @@ async function approveCollegeAction(formData: FormData) {
     console.error("[admin/colleges approveAction]", e);
   }
   revalidatePath("/admin/colleges");
+  revalidatePath("/", "layout");
 }
 
 async function rejectCollegeAction(formData: FormData) {
@@ -34,6 +35,7 @@ async function rejectCollegeAction(formData: FormData) {
     console.error("[admin/colleges rejectAction]", e);
   }
   revalidatePath("/admin/colleges");
+  revalidatePath("/", "layout");
 }
 
 async function pendingCollegeAction(formData: FormData) {
@@ -49,6 +51,7 @@ async function pendingCollegeAction(formData: FormData) {
     console.error("[admin/colleges pendingAction]", e);
   }
   revalidatePath("/admin/colleges");
+  revalidatePath("/", "layout");
 }
 
 async function deleteCollegeById(id: number): Promise<void> {
@@ -59,6 +62,7 @@ async function deleteCollegeById(id: number): Promise<void> {
     console.error("[admin/colleges deleteAction]", e);
   }
   revalidatePath("/admin/colleges");
+  revalidatePath("/", "layout");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

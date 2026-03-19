@@ -11,6 +11,7 @@ async function deleteAnswer(id: number) {
     console.error("[admin/exams/answers deleteAction]", e);
   }
   revalidatePath("/admin/exams/answers");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

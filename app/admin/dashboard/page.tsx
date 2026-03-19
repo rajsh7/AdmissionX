@@ -339,7 +339,7 @@ export default async function AdminDashboardPage() {
                 <li key={c.id} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors">
                   <div className="w-10 h-8 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200">
                     {c.image ? (
-                      <img src={`https://admissionx.info/public/storage/${c.image}`} alt={c.name} className="w-full h-full object-cover" />
+                      <img src={c.image?.startsWith("http") || c.image?.startsWith("/") ? c.image : `https://admin.admissionx.in/uploads/${c.image}`} alt={c.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-blue-50 text-blue-600">
                         <span className="material-symbols-rounded text-[16px]" style={ICO_FILL}>apartment</span>

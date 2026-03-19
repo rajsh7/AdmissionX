@@ -1,12 +1,50 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { RowDataPacket } from "mysql2";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
+import SportsListClient from "./SportsListClient";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
-async function deleteSportsRow(id: number) {
+async function createActivity(formData: FormData) {
+  "use server";
+  const collegeprofile_id = formData.get("collegeprofile_id");
+  const name              = formData.get("name");
+  const type              = formData.get("typeOfActivity");
+
+  try {
+    await pool.query(
+      `INSERT INTO college_sports_activities (collegeprofile_id, name, typeOfActivity, created_at, updated_at)
+       VALUES (?, ?, ?, NOW(), NOW())`,
+      [collegeprofile_id, name, type],
+    );
+  } catch (e) {
+    console.error("[admin/colleges/sports createAction]", e);
+  }
+  revalidatePath("/admin/colleges/sports");
+}
+
+async function updateActivity(formData: FormData) {
+  "use server";
+  const id                = formData.get("id");
+  const collegeprofile_id = formData.get("collegeprofile_id");
+  const name              = formData.get("name");
+  const type              = formData.get("typeOfActivity");
+
+  try {
+    await pool.query(
+      `UPDATE college_sports_activities 
+          SET collegeprofile_id = ?, name = ?, typeOfActivity = ?, updated_at = NOW()
+        WHERE id = ?`,
+      [collegeprofile_id, name, type, id],
+    );
+  } catch (e) {
+    console.error("[admin/colleges/sports updateAction]", e);
+  }
+  revalidatePath("/admin/colleges/sports");
+}
+
+async function deleteActivityRow(id: number) {
   "use server";
   try {
     await pool.query("DELETE FROM college_sports_activities WHERE id = ?", [id]);
@@ -25,10 +63,12 @@ async function safeQuery<T extends RowDataPacket>(
   params: (string | number)[] = [],
 ): Promise<T[]> {
   try {
+    console.log("[admin/colleges/sports] Executing SQL:", sql);
     const [rows] = (await pool.query(sql, params)) as [T[], unknown];
     return rows;
   } catch (err) {
-    console.error("[admin/colleges/sports safeQuery]", err);
+    console.error("[admin/colleges/sports safeQuery ERROR]", err);
+    console.error("[admin/colleges/sports safeQuery SQL]", sql);
     return [];
   }
 }
@@ -37,13 +77,19 @@ async function safeQuery<T extends RowDataPacket>(
 
 interface SportsRow extends RowDataPacket {
   id: number;
+  collegeprofile_id: number;
   college_name: string;
   name: string;
-  type: number | null;
+  typeOfActivity: number;
 }
 
 interface CountRow extends RowDataPacket {
   total: number;
+}
+
+interface OptionRow extends RowDataPacket {
+  id: number;
+  name: string;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -63,32 +109,33 @@ export default async function CollegeSportsPage({
 
   // ── Build WHERE clause ─────────────────────────────────────────────────────
   const conditions: string[] = [];
-  const params: (string | number)[] = [];
+  const filterParams: (string | number)[] = [];
 
   if (q) {
     conditions.push(
       "(u.firstname LIKE ? OR s.name LIKE ?)",
     );
-    params.push(`%${q}%`, `%${q}%`);
+    filterParams.push(`%${q}%`, `%${q}%`);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Query sports ──────────────────────────────────────────────────────────
-  const [sportsList, countRows] = await Promise.all([
+  // ── Fetch metadata + data ──────────────────────────────────────────────────
+  const [activities, countRows, colleges] = await Promise.all([
     safeQuery<SportsRow>(
       `SELECT 
         s.id,
+        s.collegeprofile_id,
         COALESCE(u.firstname, 'Unnamed College') as college_name,
         s.name,
-        s.typeOfActivity as type
+        s.typeOfActivity
        FROM college_sports_activities s
        JOIN collegeprofile cp ON cp.id = s.collegeprofile_id
        JOIN users u ON u.id = cp.users_id
        ${where}
        ORDER BY s.created_at DESC
        LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
+      [...filterParams, PAGE_SIZE, offset],
     ),
     safeQuery<CountRow>(
       `SELECT COUNT(*) AS total 
@@ -96,8 +143,11 @@ export default async function CollegeSportsPage({
        JOIN collegeprofile cp ON cp.id = s.collegeprofile_id
        JOIN users u ON u.id = cp.users_id
        ${where}`,
-      params,
+      filterParams,
     ),
+    safeQuery<OptionRow>(
+      "SELECT cp.id, u.firstname AS name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
+    )
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
@@ -111,9 +161,9 @@ export default async function CollegeSportsPage({
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>sports_basketball</span>
-            Sports & activities
+            Sports & Cultural
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">Manage sports teams, cultural clubs, and student associations.</p>
+          <p className="text-sm text-slate-500 mt-0.5">Manage extra-curricular activities and campus facilities.</p>
         </div>
         <div className="flex items-center gap-3">
           <form method="GET" action="/admin/colleges/sports" className="w-full sm:w-80">
@@ -131,83 +181,39 @@ export default async function CollegeSportsPage({
         </div>
       </div>
 
-      {/* ── Table ─────────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {sportsList.length === 0 ? (
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>sports_basketball</span>
-            <p className="text-slate-500 font-semibold text-sm">No activity records found.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-left">
-                  <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Activity Name</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College Name</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Category</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {sportsList.map((s, idx) => (
-                  <tr key={s.id} className="hover:bg-blue-50/20 transition-colors">
-                    <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                          <span className="material-symbols-rounded text-blue-600 text-[18px]" style={ICO_FILL}>
-                            {s.type === 1 ? 'sports_soccer' : s.type === 2 ? 'music_note' : 'groups'}
-                          </span>
-                        </div>
-                        <span className="font-semibold text-slate-800 leading-snug">{s.name || "Unnamed Activity"}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-slate-600 font-medium truncate max-w-[200px] block">{s.college_name}</span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider bg-blue-50 px-2 py-0.5 rounded-full inline-block">
-                        {s.type === 1 ? 'Sports Team' : s.type === 2 ? 'Cultural Club' : 'Association'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Update">
-                           <span className="material-symbols-rounded text-[18px]">edit</span>
-                        </button>
-                        <DeleteButton action={deleteSportsRow.bind(null, s.id)} size="sm" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+      <SportsListClient
+        activities={activities}
+        colleges={colleges}
+        offset={offset}
+        onAdd={createActivity}
+        onEdit={updateActivity}
+        onDelete={deleteActivityRow}
+      />
 
-        {/* ── Pagination ───────────────────────────────────────────────────── */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-            <p className="text-xs text-slate-500">
-              Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> activities
-            </p>
-            <div className="flex items-center gap-1">
-              {page > 1 ? (
-                <Link href={`/admin/colleges/sports?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-              )}
-              {page < totalPages ? (
-                <Link href={`/admin/colleges/sports?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-              )}
-            </div>
+      {/* ── Pagination ───────────────────────────────────────────────────── */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
+          <p className="text-xs text-slate-500">
+            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> records
+          </p>
+          <div className="flex items-center gap-1">
+            {page > 1 ? (
+              <Link href={`/admin/colleges/sports?page=${page - 1}` + (q ? `&q=${q}` : '')} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
+            )}
+            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">
+              {page} / {totalPages}
+            </span>
+            {page < totalPages ? (
+              <Link href={`/admin/colleges/sports?page=${page + 1}` + (q ? `&q=${q}` : '')} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
+/* FIXED VERSION 2.0 */

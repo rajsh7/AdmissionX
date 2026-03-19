@@ -15,6 +15,7 @@ async function deleteProfileRow(id: number) {
     console.error("[admin/colleges/profile deleteAction]", e);
   }
   revalidatePath("/admin/colleges/profile");
+  revalidatePath("/", "layout");
 }
 
 async function addProfileRow(formData: FormData) {
@@ -29,6 +30,12 @@ async function addProfileRow(formData: FormData) {
     }
 
     const data = Object.fromEntries(formData.entries());
+    const users_id = data.users_id ? parseInt(data.users_id as string, 10) : null;
+    const rating = data.rating ? parseFloat(data.rating as string) : 0;
+    const ranking = data.ranking ? parseInt(data.ranking as string, 10) : null;
+    const topUniversityRank = data.topUniversityRank ? parseInt(data.topUniversityRank as string, 10) : null;
+    const cityId = data.registeredAddressCityId ? parseInt(data.registeredAddressCityId as string, 10) : null;
+
     const sql = `
       INSERT INTO collegeprofile (
         users_id, slug, bannerimage, rating, ranking, 
@@ -37,17 +44,18 @@ async function addProfileRow(formData: FormData) {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
     `;
     await pool.query(sql, [
-      data.users_id, data.slug, bannerimage, data.rating, data.ranking,
+      users_id, data.slug, bannerimage, rating, ranking,
       data.verified === "on" ? 1 : 0,
       data.isTopUniversity === "on" ? 1 : 0,
-      data.topUniversityRank || null,
+      topUniversityRank,
       data.universityType,
-      data.registeredAddressCityId || null
+      cityId
     ]);
   } catch (e) {
     console.error("[admin/colleges/profile addAction]", e);
   }
   revalidatePath("/admin/colleges/profile");
+  revalidatePath("/", "layout");
 }
 
 async function updateProfileRow(formData: FormData) {
@@ -62,6 +70,13 @@ async function updateProfileRow(formData: FormData) {
     }
 
     const data = Object.fromEntries(formData.entries());
+    const id = data.id ? parseInt(data.id as string, 10) : null;
+    const users_id = data.users_id ? parseInt(data.users_id as string, 10) : null;
+    const rating = data.rating ? parseFloat(data.rating as string) : 0;
+    const ranking = data.ranking ? parseInt(data.ranking as string, 10) : null;
+    const topUniversityRank = data.topUniversityRank ? parseInt(data.topUniversityRank as string, 10) : null;
+    const cityId = data.registeredAddressCityId ? parseInt(data.registeredAddressCityId as string, 10) : null;
+
     const sql = `
       UPDATE collegeprofile SET 
         users_id = ?, slug = ?, bannerimage = ?, rating = ?, ranking = ?, 
@@ -70,18 +85,19 @@ async function updateProfileRow(formData: FormData) {
       WHERE id = ?
     `;
     await pool.query(sql, [
-      data.users_id, data.slug, bannerimage, data.rating, data.ranking,
+      users_id, data.slug, bannerimage, rating, ranking,
       data.verified === "on" ? 1 : 0,
       data.isTopUniversity === "on" ? 1 : 0,
-      data.topUniversityRank || null,
+      topUniversityRank,
       data.universityType,
-      data.registeredAddressCityId || null,
-      data.id
+      cityId,
+      id
     ]);
   } catch (e) {
     console.error("[admin/colleges/profile updateAction]", e);
   }
   revalidatePath("/admin/colleges/profile");
+  revalidatePath("/", "layout");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

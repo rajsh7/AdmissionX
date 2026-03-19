@@ -1,12 +1,107 @@
 import pool from "@/lib/db";
-import Link from "next/link";
+import { revalidatePath } from "next/cache";
 import { RowDataPacket } from "mysql2";
+import ExamListClient from "./ExamListClient";
+
+// ─── Server Actions ────────────────────────────────────────────────────────────
+
+async function createExam(formData: FormData) {
+  "use server";
+  const title = formData.get("title") as string;
+  const slug = formData.get("slug") as string;
+  const status = parseInt(formData.get("status") as string, 10) || 0;
+  const description = formData.get("description") as string;
+  const featimage = formData.get("featimage") as string;
+  const fullimage = formData.get("fullimage") as string;
+  const brochure = formData.get("brochure") as string;
+  const website = formData.get("website") as string;
+  const appFrom = formData.get("applicationFrom") as string;
+  const appTo = formData.get("applicationTo") as string;
+  const appFees = formData.get("applicationFees") as string;
+  const eligibility = formData.get("eligibility") as string;
+  const syllabus = formData.get("syllabus") as string;
+  const pattern = formData.get("pattern") as string;
+  const prepare = formData.get("prepare") as string;
+  const contact = formData.get("contact") as string;
+  const typeId = formData.get("examination_types_id") as string;
+
+  if (!title) return;
+
+  try {
+    await pool.query(
+      `INSERT INTO examination_details 
+       (title, slug, status, description, featimage, fullimage, brochure, website, 
+        applicationFrom, applicationTo, applicationFees, eligibility, syllabus, pattern, 
+        prepare, contact, examination_types_id, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      [title, slug || null, status, description || null, featimage || null, fullimage || null,
+       brochure || null, website || null, appFrom || null, appTo || null, appFees || null,
+       eligibility || null, syllabus || null, pattern || null, prepare || null, contact || null, typeId || null]
+    );
+  } catch (e) {
+    console.error("[admin/exams createAction]", e);
+  }
+  revalidatePath("/admin/exams");
+  revalidatePath("/", "layout");
+}
+
+async function updateExam(formData: FormData) {
+  "use server";
+  const id = parseInt(formData.get("id") as string, 10);
+  const title = formData.get("title") as string;
+  const slug = formData.get("slug") as string;
+  const status = parseInt(formData.get("status") as string, 10) || 0;
+  const description = formData.get("description") as string;
+  const featimage = formData.get("featimage") as string;
+  const fullimage = formData.get("fullimage") as string;
+  const brochure = formData.get("brochure") as string;
+  const website = formData.get("website") as string;
+  const appFrom = formData.get("applicationFrom") as string;
+  const appTo = formData.get("applicationTo") as string;
+  const appFees = formData.get("applicationFees") as string;
+  const eligibility = formData.get("eligibility") as string;
+  const syllabus = formData.get("syllabus") as string;
+  const pattern = formData.get("pattern") as string;
+  const prepare = formData.get("prepare") as string;
+  const contact = formData.get("contact") as string;
+  const typeId = formData.get("examination_types_id") as string;
+
+  if (!id || !title) return;
+
+  try {
+    await pool.query(
+      `UPDATE examination_details 
+       SET title = ?, slug = ?, status = ?, description = ?, featimage = ?, fullimage = ?, 
+           brochure = ?, website = ?, applicationFrom = ?, applicationTo = ?, applicationFees = ?, 
+           eligibility = ?, syllabus = ?, pattern = ?, prepare = ?, contact = ?, 
+           examination_types_id = ?, updated_at = NOW() 
+       WHERE id = ?`,
+      [title, slug || null, status, description || null, featimage || null, fullimage || null,
+       brochure || null, website || null, appFrom || null, appTo || null, appFees || null,
+       eligibility || null, syllabus || null, pattern || null, prepare || null, contact || null, 
+       typeId || null, id]
+    );
+  } catch (e) {
+    console.error("[admin/exams updateAction]", e);
+  }
+  revalidatePath("/admin/exams");
+  revalidatePath("/", "layout");
+}
+
+async function deleteExam(id: number) {
+  "use server";
+  try {
+    await pool.query("DELETE FROM examination_details WHERE id = ?", [id]);
+  } catch (e) {
+    console.error("[admin/exams deleteAction]", e);
+  }
+  revalidatePath("/admin/exams");
+  revalidatePath("/", "layout");
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
-const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
-const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
 async function safeQuery<T extends RowDataPacket>(
   sql: string,
@@ -19,24 +114,6 @@ async function safeQuery<T extends RowDataPacket>(
     console.error("[admin/exams safeQuery]", err);
     return [];
   }
-}
-
-function formatDate(d: string | null | undefined): string {
-  if (!d) return "—";
-  try {
-    return new Date(d).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  } catch {
-    return "—";
-  }
-}
-
-function stripHtml(html: string | null | undefined): string {
-  if (!html) return "";
-  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 120);
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -55,6 +132,11 @@ interface ExamRow extends RowDataPacket {
   created_at: string;
 }
 
+interface ExamTypeRow extends RowDataPacket {
+  id: number;
+  name: string;
+}
+
 interface CountRow extends RowDataPacket {
   total: number;
 }
@@ -67,6 +149,9 @@ interface StatsRow extends RowDataPacket {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
+const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
+
 export default async function AdminExamsPage({
   searchParams,
 }: {
@@ -75,10 +160,9 @@ export default async function AdminExamsPage({
   const sp       = await searchParams;
   const q        = (sp.q ?? "").trim();
   const page     = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
-  const filter   = sp.filter ?? "all"; // all | active | inactive
+  const filter   = sp.filter ?? "all";
   const offset   = (page - 1) * PAGE_SIZE;
 
-  // ── WHERE ─────────────────────────────────────────────────────────────────
   const conditions: string[] = [];
   const params: (string | number)[] = [];
 
@@ -91,12 +175,9 @@ export default async function AdminExamsPage({
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Queries ───────────────────────────────────────────────────────────────
-  const [exams, countRows, statsRows] = await Promise.all([
+  const [exams, countRows, statsRows, allTypes] = await Promise.all([
     safeQuery<ExamRow>(
-      `SELECT id, title, slug, status, totalViews, totalLikes,
-              totalApplicationClick, description, applicationFrom, applicationTo, created_at
-       FROM examination_details
+      `SELECT * FROM examination_details
        ${where}
        ORDER BY created_at DESC
        LIMIT ? OFFSET ?`,
@@ -113,13 +194,13 @@ export default async function AdminExamsPage({
         SUM(status != 1 OR status IS NULL) AS inactive
       FROM examination_details
     `),
+    safeQuery<ExamTypeRow>("SELECT id, name FROM examination_types ORDER BY name ASC"),
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const stats      = statsRows[0];
 
-  // ── URL builder ───────────────────────────────────────────────────────────
   function buildUrl(overrides: Record<string, string | number>) {
     const merged = { q, page: "1", filter, ...overrides };
     const qs = Object.entries(merged)
@@ -132,7 +213,6 @@ export default async function AdminExamsPage({
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
 
-      {/* ── Page header ──────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -142,280 +222,102 @@ export default async function AdminExamsPage({
             Examination Management
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            All entrance exam pages — view counts, application links, and status.
+            Manage entrance exam pages — write, edit, and monitor analytics.
           </p>
         </div>
-        <Link
-          href="/examination"
-          target="_blank"
-          className="flex items-center gap-1.5 text-sm font-semibold text-amber-600 hover:text-amber-700 px-3 py-2 rounded-xl border border-amber-200 hover:bg-amber-50 transition-colors flex-shrink-0"
-        >
-          <span className="material-symbols-rounded text-[16px]" style={ICO}>open_in_new</span>
-          View Public Page
-        </Link>
+        <div className="flex items-center gap-3">
+           <span className="text-sm font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-xl">
+            {(stats?.total ?? 0).toLocaleString()} total
+          </span>
+          <a
+            href="/examination"
+            target="_blank"
+            className="flex items-center gap-1.5 text-sm font-semibold text-amber-600 hover:text-amber-700 px-3 py-1.5 rounded-xl border border-amber-200 hover:bg-amber-50 transition-colors"
+          >
+            <span className="material-symbols-rounded text-[16px]" style={ICO}>open_in_new</span>
+            View Public
+          </a>
+        </div>
       </div>
 
-      {/* ── Stat cards ───────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: "Total Exams",    value: stats?.total ?? 0,    icon: "quiz",           color: "text-amber-600",  bg: "bg-amber-50"  },
           { label: "Active (Live)",  value: stats?.active ?? 0,   icon: "check_circle",   color: "text-green-600",  bg: "bg-green-50"  },
           { label: "Inactive",       value: stats?.inactive ?? 0, icon: "unpublished",    color: "text-slate-500",  bg: "bg-slate-100" },
         ].map((s) => (
-          <div key={s.label} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center gap-4">
-            <div className={`${s.bg} ${s.color} p-2.5 rounded-xl flex-shrink-0`}>
+          <div key={s.label} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center gap-4 group hover:border-amber-200 transition-colors capitalize">
+            <div className={`${s.bg} ${s.color} p-2.5 rounded-xl flex-shrink-0 group-hover:scale-110 transition-transform`}>
               <span className="material-symbols-rounded text-[20px]" style={ICO_FILL}>{s.icon}</span>
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800">{Number(s.value).toLocaleString()}</p>
-              <p className="text-xs font-semibold text-slate-500">{s.label}</p>
+              <p className="text-xl font-black text-slate-800">{Number(s.value).toLocaleString()}</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{s.label}</p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* ── Search + filter ───────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-        <form method="GET" action="/admin/exams" className="flex-1 flex gap-2">
-          {filter !== "all" && <input type="hidden" name="filter" value={filter} />}
-          <div className="relative flex-1">
-            <span
-              className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[18px] pointer-events-none"
-              style={ICO}
-            >
-              search
-            </span>
-            <input
-              name="q"
-              defaultValue={q}
-              placeholder="Search by exam title or slug…"
-              className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-400 transition"
-            />
-          </div>
-          <button
-            type="submit"
-            className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-xl transition-colors flex-shrink-0"
-          >
-            Search
-          </button>
-          {q && (
-            <Link
-              href={buildUrl({ q: "" })}
-              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-semibold rounded-xl transition-colors flex-shrink-0"
-            >
-              Clear
-            </Link>
-          )}
-        </form>
-
-        {/* Status filter */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl flex-shrink-0">
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
           {(["all", "active", "inactive"] as const).map((f) => (
-            <Link
+            <a
               key={f}
               href={buildUrl({ filter: f, page: 1 })}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg capitalize transition-all ${
+              className={`text-xs font-bold px-4 py-1.5 rounded-lg capitalize transition-all ${
                 filter === f
                   ? "bg-white text-slate-800 shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
               }`}
             >
               {f}
-            </Link>
+            </a>
           ))}
         </div>
+
+        <form method="GET" action="/admin/exams" className="flex-1 max-w-sm flex gap-2">
+          {filter !== "all" && <input type="hidden" name="filter" value={filter} />}
+          <div className="relative flex-1">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[18px]" style={ICO}>search</span>
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Search exams..."
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all font-medium"
+            />
+          </div>
+        </form>
       </div>
 
-      {/* ── Table ─────────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {exams.length === 0 ? (
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>
-              quiz
-            </span>
-            <p className="text-sm font-semibold text-slate-500">
-              {q ? `No exams matching "${q}"` : "No examination records found."}
-            </p>
-            {q && (
-              <Link href="/admin/exams" className="mt-3 inline-block text-sm text-amber-600 hover:underline">
-                Clear search
-              </Link>
+      <ExamListClient 
+        data={exams}
+        examTypes={allTypes}
+        createAction={createExam}
+        updateAction={updateExam}
+        deleteAction={deleteExam}
+        offset={offset}
+      />
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-6 py-6 border-t border-slate-100 bg-white rounded-2xl shadow-sm">
+          <p className="text-xs text-slate-500 font-medium">
+            Showing <strong className="text-slate-800">{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong className="text-slate-800">{total.toLocaleString()}</strong> exams
+          </p>
+          <div className="flex items-center gap-2">
+            {page > 1 && (
+              <a href={buildUrl({ page: page - 1 })} className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
+                <span className="material-symbols-rounded text-[18px]" style={ICO}>chevron_left</span>
+              </a>
+            )}
+            {page < totalPages && (
+              <a href={buildUrl({ page: page + 1 })} className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
+                <span className="material-symbols-rounded text-[18px]" style={ICO}>chevron_right</span>
+              </a>
             )}
           </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="px-5 py-3 text-left w-10">#</th>
-                    <th className="px-4 py-3 text-left">Exam Title</th>
-                    <th className="px-4 py-3 text-center">Status</th>
-                    <th className="px-4 py-3 text-right hidden sm:table-cell">Views</th>
-                    <th className="px-4 py-3 text-right hidden md:table-cell">Likes</th>
-                    <th className="px-4 py-3 text-right hidden lg:table-cell">App Clicks</th>
-                    <th className="px-4 py-3 text-left hidden xl:table-cell">Apply Window</th>
-                    <th className="px-4 py-3 text-left hidden sm:table-cell">Created</th>
-                    <th className="px-4 py-3 text-right">Link</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {exams.map((exam, idx) => (
-                    <tr key={exam.id} className="hover:bg-amber-50/20 transition-colors group">
-
-                      {/* Row # */}
-                      <td className="px-5 py-3.5 text-xs text-slate-400 font-mono">
-                        {offset + idx + 1}
-                      </td>
-
-                      {/* Title */}
-                      <td className="px-4 py-3.5 max-w-[260px]">
-                        <p className="font-semibold text-slate-800 truncate leading-snug">
-                          {exam.title}
-                        </p>
-                        <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                          {stripHtml(exam.description) || "No description"}
-                        </p>
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-4 py-3.5 text-center">
-                        <span
-                          className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full ${
-                            exam.status === 1
-                              ? "bg-green-100 text-green-700"
-                              : "bg-slate-100 text-slate-500"
-                          }`}
-                        >
-                          <span
-                            className="material-symbols-rounded text-[12px]"
-                            style={ICO_FILL}
-                          >
-                            {exam.status === 1 ? "check_circle" : "radio_button_unchecked"}
-                          </span>
-                          {exam.status === 1 ? "Live" : "Inactive"}
-                        </span>
-                      </td>
-
-                      {/* Views */}
-                      <td className="px-4 py-3.5 text-right hidden sm:table-cell">
-                        <span className="text-sm font-semibold text-slate-700">
-                          {(exam.totalViews ?? 0).toLocaleString()}
-                        </span>
-                      </td>
-
-                      {/* Likes */}
-                      <td className="px-4 py-3.5 text-right hidden md:table-cell">
-                        <span className="text-sm text-slate-500">
-                          {(exam.totalLikes ?? 0).toLocaleString()}
-                        </span>
-                      </td>
-
-                      {/* App Clicks */}
-                      <td className="px-4 py-3.5 text-right hidden lg:table-cell">
-                        <span className="text-sm text-slate-500">
-                          {(exam.totalApplicationClick ?? 0).toLocaleString()}
-                        </span>
-                      </td>
-
-                      {/* Apply window */}
-                      <td className="px-4 py-3.5 hidden xl:table-cell">
-                        {exam.applicationFrom || exam.applicationTo ? (
-                          <span className="text-xs text-slate-500 whitespace-nowrap">
-                            {formatDate(exam.applicationFrom)} → {formatDate(exam.applicationTo)}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-slate-300">—</span>
-                        )}
-                      </td>
-
-                      {/* Created */}
-                      <td className="px-4 py-3.5 hidden sm:table-cell">
-                        <span className="text-xs text-slate-400 whitespace-nowrap">
-                          {formatDate(exam.created_at)}
-                        </span>
-                      </td>
-
-                      {/* Link */}
-                      <td className="px-4 py-3.5 text-right">
-                        {exam.slug ? (
-                          <Link
-                            href={`/examination/${exam.slug}`}
-                            target="_blank"
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 hover:text-amber-700 hover:bg-amber-50 px-2.5 py-1.5 rounded-lg transition-colors"
-                          >
-                            <span className="material-symbols-rounded text-[14px]" style={ICO}>
-                              open_in_new
-                            </span>
-                            View
-                          </Link>
-                        ) : (
-                          <span className="text-xs text-slate-300">no slug</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* ── Pagination ──────────────────────────────────────────────── */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-                <p className="text-xs text-slate-500">
-                  Showing{" "}
-                  <strong className="text-slate-700">
-                    {offset + 1}–{Math.min(offset + PAGE_SIZE, total)}
-                  </strong>{" "}
-                  of <strong className="text-slate-700">{total.toLocaleString()}</strong> exams
-                </p>
-                <div className="flex items-center gap-1">
-                  {page > 1 && (
-                    <Link
-                      href={buildUrl({ page: page - 1 })}
-                      className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
-                      ← Prev
-                    </Link>
-                  )}
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const start = Math.max(1, Math.min(page - 2, totalPages - 4));
-                    const p = start + i;
-                    if (p > totalPages) return null;
-                    return (
-                      <Link
-                        key={p}
-                        href={buildUrl({ page: p })}
-                        className={`min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition-colors ${
-                          p === page
-                            ? "bg-amber-600 text-white shadow-sm"
-                            : "text-slate-500 bg-white border border-slate-200 hover:bg-slate-50"
-                        }`}
-                      >
-                        {p}
-                      </Link>
-                    );
-                  })}
-                  {page < totalPages && (
-                    <Link
-                      href={buildUrl({ page: page + 1 })}
-                      className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
-                      Next →
-                    </Link>
-                  )}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* ── Footer note ───────────────────────────────────────────────────── */}
-      <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
-        <span className="material-symbols-rounded text-[13px]" style={ICO}>info</span>
-        Exam content is managed via the legacy admin. This panel provides read-only visibility and status overview.
-      </p>
+        </div>
+      )}
     </div>
   );
 }
+

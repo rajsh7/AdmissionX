@@ -90,7 +90,12 @@ export default function ProfileModal({
               <ImageUpload 
                 name="bannerimage_file"
                 label="Banner Image"
-                initialImage={initialData?.bannerimage ? (initialData.bannerimage.startsWith('http') ? initialData.bannerimage : `https://admin.admissionx.in/uploads/${initialData.bannerimage}`) : null}
+                initialImage={
+                  !initialData?.bannerimage ? null :
+                  initialData.bannerimage.startsWith('http') ? initialData.bannerimage :
+                  initialData.bannerimage.startsWith('/') ? initialData.bannerimage :
+                  `https://admin.admissionx.in/uploads/${initialData.bannerimage}`
+                }
               />
               <input type="hidden" name="bannerimage_existing" defaultValue={initialData?.bannerimage} />
             </div>

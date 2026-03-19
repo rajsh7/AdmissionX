@@ -11,6 +11,7 @@ async function deletePage(id: number) {
     console.error("[admin/pages/contents deleteAction]", e);
   }
   revalidatePath("/admin/pages/contents");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

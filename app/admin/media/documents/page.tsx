@@ -11,6 +11,7 @@ async function deleteDocument(id: number) {
     console.error("[admin/media/documents deleteAction]", e);
   }
   revalidatePath("/admin/media/documents");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

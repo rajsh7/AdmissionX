@@ -12,6 +12,7 @@ async function deleteCountry(id: number) {
     console.error("[admin/address/country deleteAction]", e);
   }
   revalidatePath("/admin/address/country");
+  revalidatePath("/", "layout");
 }
 
 async function createCountry(formData: FormData) {
@@ -23,6 +24,7 @@ async function createCountry(formData: FormData) {
     console.error("[admin/address/country createAction]", e);
   }
   revalidatePath("/admin/address/country");
+  revalidatePath("/", "layout");
 }
 
 async function updateCountry(formData: FormData) {
@@ -35,6 +37,7 @@ async function updateCountry(formData: FormData) {
     console.error("[admin/address/country updateAction]", e);
   }
   revalidatePath("/admin/address/country");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

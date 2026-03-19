@@ -16,6 +16,7 @@ async function deleteFacilityRow(id: number) {
     console.error("[admin/colleges/facilities deleteAction]", e);
   }
   revalidatePath("/admin/colleges/facilities");
+  revalidatePath("/", "layout");
 }
 
 async function createFacility(formData: FormData) {
@@ -34,6 +35,7 @@ async function createFacility(formData: FormData) {
     console.error("[admin/colleges/facilities createAction]", e);
   }
   revalidatePath("/admin/colleges/facilities");
+  revalidatePath("/", "layout");
 }
 
 async function updateFacility(formData: FormData) {
@@ -53,6 +55,7 @@ async function updateFacility(formData: FormData) {
     console.error("[admin/colleges/facilities updateAction]", e);
   }
   revalidatePath("/admin/colleges/facilities");
+  revalidatePath("/", "layout");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

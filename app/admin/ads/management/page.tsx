@@ -19,6 +19,7 @@ async function toggleAdAction(formData: FormData) {
     console.error("[admin/ads toggleAd]", e);
   }
   revalidatePath("/admin/ads/management");
+  revalidatePath("/", "layout");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

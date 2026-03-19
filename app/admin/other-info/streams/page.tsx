@@ -11,6 +11,7 @@ async function deleteStream(id: number) {
     console.error("[admin/other-info/streams deleteAction]", e);
   }
   revalidatePath("/admin/other-info/streams");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

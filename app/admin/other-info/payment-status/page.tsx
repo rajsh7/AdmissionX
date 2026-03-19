@@ -11,6 +11,7 @@ async function deletePaymentStatus(id: number) {
     console.error("[admin/other-info/payment-status deleteAction]", e);
   }
   revalidatePath("/admin/other-info/payment-status");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

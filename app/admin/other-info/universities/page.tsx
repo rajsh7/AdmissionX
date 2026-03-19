@@ -11,6 +11,7 @@ async function deleteUniversity(id: number) {
     console.error("[admin/other-info/universities deleteAction]", e);
   }
   revalidatePath("/admin/other-info/universities");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

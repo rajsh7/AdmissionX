@@ -15,6 +15,7 @@ async function deleteQueryRecord(id: number) {
     console.error("[admin/queries/college-student deleteAction]", e);
   }
   revalidatePath("/admin/queries/college-student");
+  revalidatePath("/", "layout");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -11,6 +11,7 @@ async function deleteFacility(id: number) {
     console.error("[admin/other-info/facilities deleteAction]", e);
   }
   revalidatePath("/admin/other-info/facilities");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

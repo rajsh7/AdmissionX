@@ -11,6 +11,7 @@ async function deleteQuery(id: number) {
     console.error("[admin/landing-page-query deleteAction]", e);
   }
   revalidatePath("/admin/landing-page-query");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

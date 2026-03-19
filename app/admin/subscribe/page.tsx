@@ -12,6 +12,7 @@ async function deleteSubscription(id: number) {
     console.error("[admin/subscribe deleteAction]", e);
   }
   revalidatePath("/admin/subscribe");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

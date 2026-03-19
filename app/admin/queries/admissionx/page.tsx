@@ -14,6 +14,7 @@ async function deleteAdmissionXQuery(id: number) {
     console.error("[admin/queries/admissionx deleteAction]", e);
   }
   revalidatePath("/admin/queries/admissionx");
+  revalidatePath("/", "layout");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

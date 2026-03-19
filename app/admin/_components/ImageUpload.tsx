@@ -54,6 +54,7 @@ export default function ImageUpload({
                 src={preview} 
                 alt="Preview" 
                 className="w-full h-full object-contain p-2"
+                onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=600"; }}
               />
               <button
                 type="button"

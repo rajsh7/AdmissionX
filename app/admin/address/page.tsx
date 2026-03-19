@@ -15,6 +15,7 @@ async function deleteAddressRecord(id: number) {
     console.error("[admin/address deleteAction]", e);
   }
   revalidatePath("/admin/address");
+  revalidatePath("/", "layout");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

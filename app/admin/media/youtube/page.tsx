@@ -14,6 +14,7 @@ async function deleteYoutubeLink(id: number) {
     console.error("[admin/media/youtube deleteAction]", e);
   }
   revalidatePath("/admin/media/youtube");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

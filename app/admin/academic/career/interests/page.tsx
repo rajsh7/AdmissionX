@@ -1,21 +1,74 @@
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
+import InterestListClient from "./InterestListClient";
+
+// ─── Server Actions ───────────────────────────────────────────────────────────
+
+async function createInterest(formData: FormData) {
+  "use server";
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const slug = formData.get("slug") as string;
+  const functionalarea_id = parseInt(formData.get("functionalarea_id") as string, 10);
+  const status = formData.get("status") === "on" ? 1 : 0;
+
+  if (!title || isNaN(functionalarea_id)) return;
+
+  try {
+    await pool.query(
+      `INSERT INTO counseling_career_interests (title, description, slug, functionalarea_id, status, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
+      [title, description, slug, functionalarea_id, status]
+    );
+  } catch (e) {
+    console.error("[admin/academic/career/interests createAction]", e);
+  }
+  revalidatePath("/admin/academic/career/interests");
+  revalidatePath("/", "layout");
+}
+
+async function updateInterest(formData: FormData) {
+  "use server";
+  const id = parseInt(formData.get("id") as string, 10);
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const slug = formData.get("slug") as string;
+  const functionalarea_id = parseInt(formData.get("functionalarea_id") as string, 10);
+  const status = formData.get("status") === "on" ? 1 : 0;
+
+  if (!id || !title || isNaN(functionalarea_id)) return;
+
+  try {
+    await pool.query(
+      `UPDATE counseling_career_interests SET title = ?, description = ?, slug = ?, functionalarea_id = ?, status = ?, updated_at = NOW() 
+       WHERE id = ?`,
+      [title, description, slug, functionalarea_id, status, id]
+    );
+  } catch (e) {
+    console.error("[admin/academic/career/interests updateAction]", e);
+  }
+  revalidatePath("/admin/academic/career/interests");
+  revalidatePath("/", "layout");
+}
 
 async function deleteInterest(id: number) {
   "use server";
+  if (!id) return;
   try {
     await pool.query("DELETE FROM counseling_career_interests WHERE id = ?", [id]);
   } catch (e) {
     console.error("[admin/academic/career/interests deleteAction]", e);
   }
   revalidatePath("/admin/academic/career/interests");
+  revalidatePath("/", "layout");
 }
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T extends RowDataPacket>(
   sql: string,
-  params: (string | number | boolean)[] = [],
+  params: (string | number | boolean)[] = []
 ): Promise<T[]> {
   try {
     const [rows] = (await pool.query(sql, params)) as [T[], unknown];
@@ -32,11 +85,14 @@ interface InterestRow extends RowDataPacket {
   description: string | null;
   slug: string | null;
   status: number;
+  functionalarea_id: number;
   functionalArea: string | null;
 }
 
-const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
-const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
+interface StreamOption extends RowDataPacket {
+  id: number;
+  name: string;
+}
 
 export default async function CareerInterestsPage({
   searchParams,
@@ -49,93 +105,44 @@ export default async function CareerInterestsPage({
   const where = q ? "WHERE ci.title LIKE ? OR ci.description LIKE ? OR fa.name LIKE ?" : "";
   const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
 
-  const data = await safeQuery<InterestRow>(
-    `SELECT 
-      ci.id, 
-      ci.title, 
-      ci.description, 
-      ci.slug, 
-      ci.status,
-      fa.name as functionalArea
-     FROM counseling_career_interests ci
-     LEFT JOIN functionalarea fa ON fa.id = ci.functionalarea_id
-     ${where}
-     ORDER BY ci.id DESC
-     LIMIT 100`,
-    params
-  );
+  const [interests, streams] = await Promise.all([
+    safeQuery<InterestRow>(
+      `SELECT 
+        ci.*, 
+        fa.name as functionalArea
+       FROM counseling_career_interests ci
+       LEFT JOIN functionalarea fa ON fa.id = ci.functionalarea_id
+       ${where}
+       ORDER BY ci.id DESC
+       LIMIT 200`,
+      params
+    ),
+    safeQuery<StreamOption>("SELECT id, name FROM functionalarea ORDER BY name ASC"),
+  ]);
+
+  const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-indigo-600 text-[22px]" style={ICO_FILL}>interests</span>
-            Types of Career Interest
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">Manage different categories of career interests and their mapping.</p>
-        </div>
-        <form method="GET" className="relative max-w-sm w-full">
-           <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[20px]" style={ICO}>search</span>
-           <input 
-             name="q" 
-             defaultValue={q}
-             placeholder="Search interests or functional areas..." 
-             className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-           />
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <form method="GET" className="relative max-w-sm w-full font-sans">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[18px]" style={ICO}>search</span>
+            <input 
+              name="q" 
+              defaultValue={q}
+              placeholder="Search interests or streams..." 
+              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition text-slate-800"
+            />
         </form>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-50/50 border-b border-slate-100 text-left">
-                <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Interest Title</th>
-                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Functional Area</th>
-                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Slug</th>
-                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">Status</th>
-                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {data.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-slate-400">
-                     No career interests found.
-                  </td>
-                </tr>
-              ) : (
-                data.map((r) => (
-                  <tr key={r.id} className="hover:bg-indigo-50/20 transition-colors group">
-                    <td className="px-5 py-4">
-                      <p className="font-bold text-slate-800">{r.title}</p>
-                      {r.description && <p className="text-xs text-slate-400 line-clamp-1 mt-0.5" title={r.description}>{r.description}</p>}
-                    </td>
-                    <td className="px-4 py-4 text-slate-600 font-medium">
-                      {r.functionalArea || "—"}
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-50 text-slate-500">
-                        {r.slug || "—"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                       <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded ${r.status ? 'bg-green-50 text-green-600' : 'bg-slate-50 text-slate-400'}`}>
-                          <span className="material-symbols-rounded text-[14px]" style={ICO_FILL}>{r.status ? 'check_circle' : 'pending'}</span>
-                          {r.status ? 'Active' : 'Inactive'}
-                       </span>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                       <DeleteButton action={deleteInterest.bind(null, r.id)} size="sm" />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <InterestListClient 
+        interests={interests}
+        streams={streams}
+        createInterest={createInterest}
+        updateInterest={updateInterest}
+        deleteInterest={deleteInterest}
+      />
     </div>
   );
 }

@@ -12,6 +12,7 @@ async function deleteExamRecord(id: number) {
     console.error("[admin/exams/aiea deleteAction]", e);
   }
   revalidatePath("/admin/exams/aiea");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

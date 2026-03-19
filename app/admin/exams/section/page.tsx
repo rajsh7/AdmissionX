@@ -11,6 +11,7 @@ async function deleteSection(id: number) {
     console.error("[admin/exams/section deleteAction]", e);
   }
   revalidatePath("/admin/exams/section");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

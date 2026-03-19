@@ -11,6 +11,7 @@ async function deleteComment(id: number) {
     console.error("[admin/exams/comments deleteAction]", e);
   }
   revalidatePath("/admin/exams/comments");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

@@ -1,8 +1,79 @@
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 import Link from "next/link";
+import { revalidatePath } from "next/cache";
+import GroupListClient from "./GroupListClient";
 
 const PAGE_SIZE = 25;
+
+// ─── Server Actions ───────────────────────────────────────────────────────────
+
+async function createGroup(formData: FormData) {
+  "use server";
+  const name = formData.get("name") as string;
+  const users_id = parseInt(formData.get("users_id") as string, 10);
+  const table_id = formData.get("alltableinformations_id") as string;
+  const create_action = parseInt(formData.get("create_action") as string, 10);
+  const show_action = parseInt(formData.get("show_action") as string, 10);
+  const edit_action = parseInt(formData.get("edit_action") as string, 10);
+  const update_action = parseInt(formData.get("update_action") as string, 10);
+  const delete_action = parseInt(formData.get("delete_action") as string, 10);
+
+  if (!name || !users_id) return;
+
+  try {
+    await pool.query(
+      `INSERT INTO usergroups (name, users_id, allTableInformation_id, create_action, show_action, edit_action, update_action, delete_action, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      [name, users_id, table_id, create_action, show_action, edit_action, update_action, delete_action]
+    );
+  } catch (e) {
+    console.error("[admin/members/groups createAction]", e);
+  }
+  revalidatePath("/admin/members/groups");
+  revalidatePath("/", "layout");
+}
+
+async function updateGroup(formData: FormData) {
+  "use server";
+  const id = parseInt(formData.get("id") as string, 10);
+  const name = formData.get("name") as string;
+  const users_id = parseInt(formData.get("users_id") as string, 10);
+  const table_id = formData.get("alltableinformations_id") as string;
+  const create_action = parseInt(formData.get("create_action") as string, 10);
+  const show_action = parseInt(formData.get("show_action") as string, 10);
+  const edit_action = parseInt(formData.get("edit_action") as string, 10);
+  const update_action = parseInt(formData.get("update_action") as string, 10);
+  const delete_action = parseInt(formData.get("delete_action") as string, 10);
+
+  if (!id || !name || !users_id) return;
+
+  try {
+    await pool.query(
+      `UPDATE usergroups SET name = ?, users_id = ?, allTableInformation_id = ?, create_action = ?, show_action = ?, edit_action = ?, update_action = ?, delete_action = ?, updated_at = NOW() 
+       WHERE id = ?`,
+      [name, users_id, table_id, create_action, show_action, edit_action, update_action, delete_action, id]
+    );
+  } catch (e) {
+    console.error("[admin/members/groups updateAction]", e);
+  }
+  revalidatePath("/admin/members/groups");
+  revalidatePath("/", "layout");
+}
+
+async function deleteGroup(id: number) {
+  "use server";
+  if (!id) return;
+  try {
+    await pool.query("DELETE FROM usergroups WHERE id = ?", [id]);
+  } catch (e) {
+    console.error("[admin/members/groups deleteAction]", e);
+  }
+  revalidatePath("/admin/members/groups");
+  revalidatePath("/", "layout");
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T extends RowDataPacket>(
   sql: string,
@@ -29,6 +100,20 @@ interface GroupRow extends RowDataPacket {
   update_action: number;
   delete_action: number;
   show_action: number;
+  users_id: number;
+  allTableInformation_id: string;
+}
+
+interface UserRow extends RowDataPacket {
+  id: number;
+  firstname: string;
+  lastname: string;
+  email: string;
+}
+
+interface TableRow extends RowDataPacket {
+  id: number;
+  name: string;
 }
 
 interface StatsRow extends RowDataPacket {
@@ -63,14 +148,16 @@ export default async function MembersGroupsPage({
 
   const sortSql = sort === "oldest" ? "g.id ASC" : 
                 sort === "name"   ? "g.name ASC" : 
-                                  "g.id DESC";
+                                   "g.id DESC";
 
-  const [groups, countRows, statsRows] = await Promise.all([
+  const [groups, countRows, statsRows, users, tables] = await Promise.all([
     safeQuery<GroupRow>(
-      `SELECT g.id, g.name, u.firstname as user_name, u.lastname as user_lastname, u.email as user_email, g.allTableInformation_id as table_name,
+      `SELECT g.id, g.name, u.firstname as user_name, u.lastname as user_lastname, u.email as user_email, g.users_id, 
+              g.allTableInformation_id, ati.name as table_name,
               g.create_action, g.edit_action, g.update_action, g.delete_action, g.show_action
        FROM usergroups g
        LEFT JOIN users u ON g.users_id = u.id
+       LEFT JOIN alltableinformations ati ON g.allTableInformation_id = ati.id
        ${where}
        ORDER BY ${sortSql}
        LIMIT ? OFFSET ?`,
@@ -89,6 +176,8 @@ export default async function MembersGroupsPage({
         COUNT(DISTINCT users_id) AS users_with_groups
       FROM usergroups
     `),
+    safeQuery<UserRow>("SELECT id, firstname, lastname, email FROM users ORDER BY firstname ASC"),
+    safeQuery<TableRow>("SELECT id, name FROM alltableinformations ORDER BY name ASC"),
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
@@ -104,53 +193,12 @@ export default async function MembersGroupsPage({
     return `/admin/members/groups${qs ? `?${qs}` : ""}`;
   }
 
-  const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
   const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
-
-  const RenderFlag = ({ val, label }: { val: number; label: string }) => (
-    <div className={`flex flex-col items-center gap-0.5 p-1 rounded-lg ${val ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-50 text-slate-400 opacity-50'}`}>
-      <span className="material-symbols-rounded text-[16px]">
-        {val ? 'check_circle' : 'cancel'}
-      </span>
-      <span className="text-[10px] font-bold uppercase tracking-tighter">{label}</span>
-    </div>
-  );
+  const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-emerald-600 text-[22px]" style={ICO_FILL}>
-              group_work
-            </span>
-            User Groups & Access
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Define organizational groups and their standard access policies.
-          </p>
-        </div>
-      </div>
-
-      {/* Stats cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: "Total Assignments", value: stats?.total ?? 0, icon: "groups", color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "Active Members", value: stats?.users_with_groups ?? 0, icon: "person_celebrate", color: "text-blue-600", bg: "bg-blue-50" },
-        ].map((s) => (
-          <div key={s.label} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center gap-3">
-            <div className={`${s.bg} ${s.color} p-2 rounded-xl`}>
-              <span className="material-symbols-rounded text-[18px]" style={ICO_FILL}>{s.icon}</span>
-            </div>
-            <div>
-              <p className="text-xl font-bold text-slate-800 leading-tight">{(s.value).toLocaleString()}</p>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{s.label}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+    <div className="p-6 space-y-6 max-w-[1400px] font-sans">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
         <form method="GET" className="flex-1 flex gap-2">
           {sort !== "newest" && <input type="hidden" name="sort" value={sort} />}
           <div className="relative flex-1">
@@ -161,17 +209,9 @@ export default async function MembersGroupsPage({
               name="q"
               defaultValue={q}
               placeholder="Search by group or user..."
-              className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-slate-50"
+              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all text-slate-800"
             />
           </div>
-          <button type="submit" className="px-4 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-colors">
-            Search
-          </button>
-          {q && (
-            <Link href={buildUrl({ q: "" })} className="px-4 py-2.5 bg-slate-100 text-slate-600 text-sm font-semibold rounded-xl hover:bg-slate-200 transition-colors">
-              Clear
-            </Link>
-          )}
         </form>
 
         <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
@@ -189,78 +229,35 @@ export default async function MembersGroupsPage({
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10 text-center">#</th>
-                <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Group / User</th>
-                <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Scope</th>
-                <th className="text-center px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-80">Default Actions</th>
-                <th className="text-right px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {groups.map((g, idx) => (
-                <tr key={g.id} className="hover:bg-slate-50/70 transition-colors">
-                  <td className="px-4 py-3.5 text-center text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
-                  <td className="px-4 py-3.5">
-                    <p className="font-semibold text-slate-800 underline decoration-slate-200 underline-offset-4">{g.name || "Untitled Group"}</p>
-                    <p className="text-xs text-slate-500 mt-1 italic">
-                      User: {g.user_name} {g.user_lastname}
-                    </p>
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <span className="px-2 py-1 rounded bg-blue-50 text-blue-700 font-mono text-xs border border-blue-100">
-                      {g.table_name || "global"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <div className="flex justify-center gap-2">
-                       <RenderFlag val={g.create_action} label="Create" />
-                       <RenderFlag val={g.show_action} label="View" />
-                       <RenderFlag val={g.edit_action} label="Edit" />
-                       <RenderFlag val={g.update_action} label="Update" />
-                       <RenderFlag val={g.delete_action} label="Delete" />
-                    </div>
-                  </td>
-                  <td className="px-4 py-3.5 text-right">
-                    <div className="flex items-center justify-end gap-2 text-slate-400">
-                       <button className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors hover:text-emerald-600">
-                         <span className="material-symbols-rounded text-[18px]">edit</span>
-                       </button>
-                       <button className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors hover:text-red-600">
-                         <span className="material-symbols-rounded text-[18px]">delete</span>
-                       </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <GroupListClient 
+        groups={groups} 
+        users={users}
+        tables={tables}
+        offset={offset}
+        createGroup={createGroup}
+        updateGroup={updateGroup}
+        deleteGroup={deleteGroup}
+      />
 
-        {totalPages > 1 && (
-          <div className="px-5 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-            <p className="text-xs text-slate-500">
-              Showing <strong>{offset + 1}</strong> to <strong>{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total}</strong> groups
-            </p>
-            <div className="flex gap-1">
-              {page > 1 && (
-                <Link href={buildUrl({ page: page - 1 })} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
-                  Prev
-                </Link>
-              )}
-              {page < totalPages && (
-                <Link href={buildUrl({ page: page + 1 })} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
-                  Next
-                </Link>
-              )}
-            </div>
+      {totalPages > 1 && (
+        <div className="px-5 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between rounded-b-2xl shadow-sm">
+          <p className="text-xs text-slate-500">
+            Showing <strong>{offset + 1}</strong> to <strong>{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total}</strong> groups
+          </p>
+          <div className="flex gap-1">
+            {page > 1 && (
+              <Link href={buildUrl({ page: page - 1 })} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
+                Prev
+              </Link>
+            )}
+            {page < totalPages && (
+              <Link href={buildUrl({ page: page + 1 })} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
+                Next
+              </Link>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

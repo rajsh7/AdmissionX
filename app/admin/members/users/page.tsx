@@ -1,8 +1,89 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+import { RowDataPacket, ResultSetHeader } from "mysql2";
 import Link from "next/link";
+import { revalidatePath } from "next/cache";
+import bcrypt from "bcryptjs";
+import UserListClient from "./UserListClient";
 
 const PAGE_SIZE = 25;
+
+// ─── Server Actions ───────────────────────────────────────────────────────────
+
+async function createUser(formData: FormData) {
+  "use server";
+  const firstname = formData.get("firstname") as string;
+  const lastname = formData.get("lastname") as string;
+  const email = (formData.get("email") as string).toLowerCase();
+  const phone = formData.get("phone") as string;
+  const password = formData.get("password") as string;
+  const userrole_id = parseInt(formData.get("userrole_id") as string, 10);
+  const userstatus_id = parseInt(formData.get("userstatus_id") as string, 10);
+  const type_of_user = (formData.get("type_of_user") as string) || "MEMBER";
+
+  if (!email || !password) return;
+
+  try {
+    const hashed = await bcrypt.hash(password, 12);
+    await pool.query(
+      `INSERT INTO users (firstname, lastname, email, phone, password, userrole_id, userstatus_id, type_of_user, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      [firstname, lastname, email, phone, hashed, userrole_id, userstatus_id, type_of_user]
+    );
+  } catch (e) {
+    console.error("[admin/members/users createUser]", e);
+  }
+  revalidatePath("/admin/members/users");
+  revalidatePath("/", "layout");
+}
+
+async function updateUser(formData: FormData) {
+  "use server";
+  const id = parseInt(formData.get("id") as string, 10);
+  const firstname = formData.get("firstname") as string;
+  const lastname = formData.get("lastname") as string;
+  const email = (formData.get("email") as string).toLowerCase();
+  const phone = formData.get("phone") as string;
+  const userrole_id = parseInt(formData.get("userrole_id") as string, 10);
+  const userstatus_id = parseInt(formData.get("userstatus_id") as string, 10);
+  const type_of_user = (formData.get("type_of_user") as string) || "MEMBER";
+  const password = formData.get("password") as string;
+
+  if (!id || !email) return;
+
+  try {
+    let sql = `UPDATE users SET firstname = ?, lastname = ?, email = ?, phone = ?, userrole_id = ?, userstatus_id = ?, type_of_user = ?, updated_at = NOW()`;
+    let params = [firstname, lastname, email, phone, userrole_id, userstatus_id, type_of_user];
+
+    if (password && password.trim().length >= 8) {
+      const hashed = await bcrypt.hash(password, 12);
+      sql = `UPDATE users SET firstname = ?, lastname = ?, email = ?, phone = ?, userrole_id = ?, userstatus_id = ?, type_of_user = ?, password = ?, updated_at = NOW()`;
+      params.push(hashed);
+    }
+
+    sql += ` WHERE id = ?`;
+    params.push(id);
+
+    await pool.query(sql, params);
+  } catch (e) {
+    console.error("[admin/members/users updateUser]", e);
+  }
+  revalidatePath("/admin/members/users");
+  revalidatePath("/", "layout");
+}
+
+async function deleteUser(id: number) {
+  "use server";
+  if (!id) return;
+  try {
+    await pool.query("DELETE FROM users WHERE id = ?", [id]);
+  } catch (e) {
+    console.error("[admin/members/users deleteUser]", e);
+  }
+  revalidatePath("/admin/members/users");
+  revalidatePath("/", "layout");
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T extends RowDataPacket>(
   sql: string,
@@ -23,7 +104,10 @@ interface UserRow extends RowDataPacket {
   lastname: string;
   email: string;
   phone: string;
+  userstatus_id: number;
+  userrole_id: number;
   status_name: string;
+  role_name: string;
   type_of_user: string;
   created_at: string;
 }
@@ -62,13 +146,15 @@ export default async function MembersUsersPage({
 
   const sortSql = sort === "oldest" ? "u.created_at ASC" : 
                 sort === "name"   ? "u.firstname ASC, u.lastname ASC" : 
-                                  "u.created_at DESC";
+                                   "u.created_at DESC";
 
-  const [users, countRows, statsRows] = await Promise.all([
+  const [users, countRows, statsRows, roles, statuses] = await Promise.all([
     safeQuery<UserRow>(
-      `SELECT u.id, u.firstname, u.lastname, u.email, u.phone, u.type_of_user, u.created_at, us.name as status_name
+      `SELECT u.id, u.firstname, u.lastname, u.email, u.phone, u.type_of_user, u.created_at, u.userstatus_id, u.userrole_id, 
+              us.name as status_name, ur.name as role_name
        FROM users u
        LEFT JOIN userstatus us ON u.userstatus_id = us.id
+       LEFT JOIN userrole ur ON u.userrole_id = ur.id
        ${where}
        ORDER BY ${sortSql}
        LIMIT ? OFFSET ?`,
@@ -86,6 +172,8 @@ export default async function MembersUsersPage({
         SUM(created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) AS new_last_7d
       FROM users
     `),
+    safeQuery<RowDataPacket & { id: number; name: string }>("SELECT id, name FROM userrole"),
+    safeQuery<RowDataPacket & { id: number; name: string }>("SELECT id, name FROM userstatus"),
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
@@ -106,20 +194,6 @@ export default async function MembersUsersPage({
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-emerald-600 text-[22px]" style={ICO_FILL}>
-              groups
-            </span>
-            Platform Users
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Manage and search all registered platform user accounts.
-          </p>
-        </div>
-      </div>
-
       {/* Stats cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
@@ -133,7 +207,7 @@ export default async function MembersUsersPage({
               <span className="material-symbols-rounded text-[18px]" style={ICO_FILL}>{s.icon}</span>
             </div>
             <div>
-              <p className="text-xl font-bold text-slate-800 leading-tight">{(s.value).toLocaleString()}</p>
+              <p className="text-xl font-bold text-slate-800 leading-tight">{(s.value || 0).toLocaleString()}</p>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{s.label}</p>
             </div>
           </div>
@@ -179,96 +253,36 @@ export default async function MembersUsersPage({
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {users.length === 0 ? (
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-100 mb-4 block" style={ICO_FILL}>groups</span>
-            <p className="text-slate-500 font-medium">No users found.</p>
+      <UserListClient 
+        users={users} 
+        roles={roles as { id: number; name: string }[]} 
+        statuses={statuses as { id: number; name: string }[]} 
+        offset={offset}
+        createUser={createUser}
+        updateUser={updateUser}
+        deleteUser={deleteUser}
+      />
+
+      {totalPages > 1 && (
+        <div className="px-5 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between rounded-b-2xl shadow-sm">
+          <p className="text-xs text-slate-500">
+            Showing <strong>{offset + 1}</strong> to <strong>{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total}</strong> users
+          </p>
+          <div className="flex gap-1">
+            {page > 1 && (
+              <Link href={buildUrl({ page: page - 1 })} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
+                Prev
+              </Link>
+            )}
+            {page < totalPages && (
+              <Link href={buildUrl({ page: page + 1 })} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
+                Next
+              </Link>
+            )}
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10 text-center">#</th>
-                  <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">User</th>
-                  <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Contact</th>
-                  <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider hidden lg:table-cell">Type</th>
-                  <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                  <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider hidden sm:table-cell">Joined</th>
-                  <th className="text-right px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {users.map((user, idx) => (
-                  <tr key={user.id} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="px-4 py-3.5 text-center text-xs text-slate-400 font-mono">
-                      {offset + idx + 1}
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs uppercase text-center align-middle">
-                          {(user.firstname || "U")[0]}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-slate-800">{user.firstname} {user.lastname}</p>
-                          <p className="text-[10px] font-mono font-bold text-slate-400 bg-slate-50 px-1 rounded inline-block mt-0.5">ID: #{user.id}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3.5 hidden md:table-cell">
-                      <p className="text-slate-700">{user.email}</p>
-                      <p className="text-[11px] text-slate-400">{user.phone || "No phone"}</p>
-                    </td>
-                    <td className="px-4 py-3.5 hidden lg:table-cell">
-                      <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-tighter">
-                        {user.type_of_user || "Member"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <div className="flex items-center gap-1.5">
-                        <div className={`w-1.5 h-1.5 rounded-full ${user.status_name === 'Active' ? 'bg-emerald-500' : 'bg-slate-300'}`}></div>
-                        <span className={`text-xs font-medium ${user.status_name === 'Active' ? 'text-emerald-600' : 'text-slate-500'}`}>
-                          {user.status_name || 'Inactive'}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3.5 text-slate-500 text-xs hidden sm:table-cell">
-                      {user.created_at ? new Date(user.created_at).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' }) : "—"}
-                    </td>
-                    <td className="px-4 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                         <button className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-emerald-600 transition-colors">
-                           <span className="material-symbols-rounded text-[18px]">edit</span>
-                         </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-        {totalPages > 1 && (
-          <div className="px-5 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-            <p className="text-xs text-slate-500">
-              Showing <strong>{offset + 1}</strong> to <strong>{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total}</strong> users
-            </p>
-            <div className="flex gap-1">
-              {page > 1 && (
-                <Link href={buildUrl({ page: page - 1 })} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
-                  Prev
-                </Link>
-              )}
-              {page < totalPages && (
-                <Link href={buildUrl({ page: page + 1 })} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
-                  Next
-                </Link>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
+

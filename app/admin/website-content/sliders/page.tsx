@@ -17,6 +17,7 @@ async function deleteSlider(id: number) {
     console.error("[admin/sliders deleteAction]", e);
   }
   revalidatePath("/admin/website-content/sliders");
+  revalidatePath("/", "layout");
 }
 
 async function createSlider(formData: FormData) {
@@ -45,6 +46,7 @@ async function createSlider(formData: FormData) {
     console.error("[admin/sliders createAction]", e);
   }
   revalidatePath("/admin/website-content/sliders");
+  revalidatePath("/", "layout");
 }
 
 async function updateSlider(formData: FormData) {
@@ -79,6 +81,7 @@ async function updateSlider(formData: FormData) {
     console.error("[admin/sliders updateAction]", e);
   }
   revalidatePath("/admin/website-content/sliders");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

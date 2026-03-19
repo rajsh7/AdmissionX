@@ -11,6 +11,7 @@ async function deleteCounselling(id: number) {
     console.error("[admin/exams/counselling deleteAction]", e);
   }
   revalidatePath("/admin/exams/counselling");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(
@@ -28,10 +29,10 @@ async function safeQuery<T extends RowDataPacket>(
 
 interface CounsellingRow extends RowDataPacket {
   id: number;
-  fullname: string;
-  emailaddress: string | null;
-  mobilenumber: string | null;
-  examination_details_id: number | null;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  exam_id: number | null;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -45,11 +46,11 @@ export default async function ExamCounsellingPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE fullname LIKE ? OR emailaddress LIKE ? OR mobilenumber LIKE ?" : "";
+  const where = q ? "WHERE name LIKE ? OR email LIKE ? OR phone LIKE ?" : "";
   const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
 
   const data = await safeQuery<CounsellingRow>(
-    `SELECT id, fullname, emailaddress, mobilenumber, examination_details_id
+    `SELECT id, name, email, phone, exam_id
      FROM exam_counselling_forms
      ${where}
      ORDER BY id DESC
@@ -72,7 +73,7 @@ export default async function ExamCounsellingPage({
            <input 
              name="q" 
              defaultValue={q}
-             placeholder="Search inquiries..." 
+             placeholder="Search inquiries (name, email, phone)..." 
              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
            />
         </form>
@@ -99,16 +100,16 @@ export default async function ExamCounsellingPage({
               ) : (
                 data.map((r) => (
                   <tr key={r.id} className="hover:bg-blue-50/20 transition-colors group">
-                    <td className="px-5 py-4 font-bold text-slate-800">{r.fullname}</td>
+                    <td className="px-5 py-4 font-bold text-slate-800">{r.name}</td>
                     <td className="px-4 py-4">
                       <div className="flex flex-col text-[10px] text-slate-500">
-                         <span>{r.emailaddress || "No email"}</span>
-                         <span>{r.mobilenumber || "No phone"}</span>
+                         <span>{r.email || "No email"}</span>
+                         <span>{r.phone || "No phone"}</span>
                       </div>
                     </td>
                     <td className="px-4 py-4">
                       <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-50 text-slate-500">
-                        {r.examination_details_id || "—"}
+                        {r.exam_id || "—"}
                       </span>
                     </td>
                     <td className="px-4 py-4 text-right">

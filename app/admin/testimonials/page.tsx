@@ -1,18 +1,70 @@
 import pool from "@/lib/db";
-import Link from "next/link";
-import { RowDataPacket } from "mysql2";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
+import { RowDataPacket } from "mysql2";
+import TestimonialListClient from "./TestimonialListClient";
+
+// ─── Server Actions ────────────────────────────────────────────────────────────
+
+async function createTestimonial(formData: FormData) {
+  "use server";
+  const author   = formData.get("author") as string;
+  const misc     = formData.get("misc") as string;
+  const title    = formData.get("title") as string;
+  const slug     = formData.get("slug") as string;
+  const desc     = formData.get("description") as string;
+  const img      = formData.get("featuredimage") as string;
+
+  if (!author || !desc) return;
+
+  try {
+    await pool.query(
+      `INSERT INTO testimonials 
+       (author, misc, title, slug, description, featuredimage, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      [author, misc || null, title || null, slug || null, desc, img || null]
+    );
+  } catch (e) {
+    console.error("[admin/testimonials createAction]", e);
+  }
+  revalidatePath("/admin/testimonials");
+}
+
+async function updateTestimonial(formData: FormData) {
+  "use server";
+  const id     = parseInt(formData.get("id") as string, 10);
+  const author = formData.get("author") as string;
+  const misc   = formData.get("misc") as string;
+  const title  = formData.get("title") as string;
+  const slug   = formData.get("slug") as string;
+  const desc   = formData.get("description") as string;
+  const img    = formData.get("featuredimage") as string;
+
+  if (!id || !author) return;
+
+  try {
+    await pool.query(
+      `UPDATE testimonials 
+       SET author = ?, misc = ?, title = ?, slug = ?, description = ?, featuredimage = ?, updated_at = NOW() 
+       WHERE id = ?`,
+      [author, misc || null, title || null, slug || null, desc, img || null, id]
+    );
+  } catch (e) {
+    console.error("[admin/testimonials updateAction]", e);
+  }
+  revalidatePath("/admin/testimonials");
+}
 
 async function deleteTestimonial(id: number) {
   "use server";
   try {
-    console.log("Delete testimonial ID:", id);
+    await pool.query("DELETE FROM testimonials WHERE id = ?", [id]);
   } catch (e) {
     console.error("[admin/testimonials deleteAction]", e);
   }
   revalidatePath("/admin/testimonials");
 }
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T extends RowDataPacket>(
   sql: string,
@@ -27,14 +79,24 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 interface TestimonialRow extends RowDataPacket {
   id: number;
-  author_name: string;
-  role: string;
-  content: string;
-  rating: number;
-  created_at: Date;
+  author: string;
+  misc: string;
+  title: string;
+  slug: string;
+  description: string;
+  featuredimage: string;
+  created_at: string;
 }
+
+interface CountRow extends RowDataPacket {
+  total: number;
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
@@ -47,21 +109,32 @@ export default async function TestimonialsPage({
   const sp   = await searchParams;
   const q    = (sp.q ?? "").trim();
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
-  const offset = (page - 1) * 25;
+  const PAGE_SIZE = 25;
+  const offset = (page - 1) * PAGE_SIZE;
 
-  const [testimonials] = await Promise.all([
+  const conditions: string[] = [];
+  const params: (string | number)[] = [];
+
+  if (q) {
+    conditions.push("(author LIKE ? OR title LIKE ? OR description LIKE ?)");
+    params.push(`%${q}%`, `%${q}%`, `%${q}%`);
+  }
+
+  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  const [testimonials, countRows] = await Promise.all([
     safeQuery<TestimonialRow>(
-      `SELECT 
-        1 as id, 
-        'Robert Fox' as author_name, 
-        'Student @ Stanford' as role, 
-        'The admission process was incredibly smooth thanks to AdmissionX.' as content,
-        5 as rating,
-        NOW() as created_at 
-       LIMIT 25 OFFSET ?`,
-      [offset],
+      `SELECT * FROM testimonials ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      [...params, PAGE_SIZE, offset],
+    ),
+    safeQuery<CountRow>(
+      `SELECT COUNT(*) AS total FROM testimonials ${where}`,
+      params,
     ),
   ]);
+
+  const total = countRows[0]?.total ?? 0;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
@@ -87,45 +160,33 @@ export default async function TestimonialsPage({
         </form>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-50/50 border-b border-slate-100 text-left">
-                <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Author</th>
-                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Feedback</th>
-                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Rating</th>
-                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {testimonials.map((r) => (
-                <tr key={r.id} className="hover:bg-blue-50/20 transition-colors group">
-                  <td className="px-5 py-4">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-slate-800">{r.author_name}</span>
-                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{r.role}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <span className="text-xs text-slate-500 line-clamp-2 max-w-[450px] italic">"{r.content}"</span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-0.5 text-amber-400">
-                      {Array.from({ length: r.rating }).map((_, i) => (
-                        <span key={i} className="material-symbols-rounded text-[16px]" style={ICO_FILL}>star</span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                     <DeleteButton action={deleteTestimonial.bind(null, r.id)} size="sm" />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <TestimonialListClient 
+        data={testimonials}
+        createAction={createTestimonial}
+        updateAction={updateTestimonial}
+        deleteAction={deleteTestimonial}
+        offset={offset}
+      />
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-6 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
+           <p className="text-xs text-slate-500 font-medium">
+            Showing <strong className="text-slate-800">{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong className="text-slate-800">{total}</strong> testimonials
+          </p>
+          <div className="flex items-center gap-1">
+            {page > 1 && (
+              <a href={`/admin/testimonials?page=${page - 1}${q ? `&q=${q}` : ""}`} className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50">
+                <span className="material-symbols-rounded text-[18px]" style={ICO}>chevron_left</span>
+              </a>
+            )}
+            {page < totalPages && (
+              <a href={`/admin/testimonials?page=${page + 1}${q ? `&q=${q}` : ""}`} className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50">
+                <span className="material-symbols-rounded text-[18px]" style={ICO}>chevron_right</span>
+              </a>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

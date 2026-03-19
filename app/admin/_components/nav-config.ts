@@ -25,7 +25,7 @@ export const NAV_GROUPS: NavGroup[] = [
         badge: { text: "New", variant: "new" }
       },
       {
-        href: "/admin/colleges/ads-list",
+        href: "/admin/ads/colleges-list",
         icon: "list_alt",
         label: "ADS Colleges List",
         badge: { text: "New", variant: "new" }

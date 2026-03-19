@@ -11,6 +11,7 @@ async function deleteEducationLevel(id: number) {
     console.error("[admin/other-info/education-levels deleteAction]", e);
   }
   revalidatePath("/admin/other-info/education-levels");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

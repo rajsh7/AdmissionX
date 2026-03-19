@@ -160,7 +160,7 @@ export default async function BlogDetailPage({
           <section className="relative h-[460px] md:h-[540px] flex flex-col items-center justify-center text-center">
             {/* Darker localized overlay to ensure text is ALWAYS readable */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 pointer-events-none" />
-            
+
             {/* Centered Hero Content */}
             <div className="relative z-20 w-full px-4 lg:px-8 xl:px-12 flex flex-col items-center">
               {/* Breadcrumbs */}
@@ -247,7 +247,7 @@ export default async function BlogDetailPage({
                           <Link href={`/blogs/${r.slug}`} className="flex gap-4 group">
                             <div className="relative w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-100 shadow-sm">
                               <Image
-                                src={buildImageUrl(r.featimage)}
+                                src={buildImageUrl(r.bannerimage)}
                                 alt={r.topic}
                                 fill
                                 className="object-cover group-hover:scale-110 transition-transform duration-500"
@@ -291,7 +291,7 @@ export default async function BlogDetailPage({
             <div className="absolute inset-0 opacity-10 flex items-center justify-center pointer-events-none select-none">
               <span className="text-[200px] font-black tracking-tighter text-white">ADMISSIONX</span>
             </div>
-            
+
             <div className="max-w-4xl mx-auto text-center flex flex-col items-center relative z-10">
               <div className="w-20 h-20 rounded-2xl bg-red-600/10 border border-red-600/20 flex items-center justify-center mb-8">
                 <span className="material-symbols-rounded text-4xl text-red-500" style={ICO_FILL_STYLE}>newspaper</span>

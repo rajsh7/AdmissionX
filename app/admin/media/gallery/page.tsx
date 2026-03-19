@@ -14,6 +14,7 @@ async function deleteGalleryItem(id: number) {
     console.error("[admin/gallery deleteAction]", e);
   }
   revalidatePath("/admin/media/gallery");
+  revalidatePath("/", "layout");
 }
 
 async function createGalleryItem(formData: FormData) {
@@ -46,6 +47,7 @@ async function createGalleryItem(formData: FormData) {
     console.error("[admin/gallery createAction]", e);
   }
   revalidatePath("/admin/media/gallery");
+  revalidatePath("/", "layout");
 }
 
 async function updateGalleryItem(formData: FormData) {
@@ -78,6 +80,7 @@ async function updateGalleryItem(formData: FormData) {
     console.error("[admin/gallery updateAction]", e);
   }
   revalidatePath("/admin/media/gallery");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

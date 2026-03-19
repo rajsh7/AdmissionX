@@ -11,6 +11,7 @@ async function deleteUpdate(id: number) {
     console.error("[admin/website-content/updates deleteAction]", e);
   }
   revalidatePath("/admin/website-content/updates");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

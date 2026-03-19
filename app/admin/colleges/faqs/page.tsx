@@ -1,10 +1,48 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { RowDataPacket } from "mysql2";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
+import FAQListClient from "./FAQListClient";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
+
+async function createFAQ(formData: FormData) {
+  "use server";
+  const collegeprofile_id = formData.get("collegeprofile_id");
+  const question          = formData.get("question");
+  const answer            = formData.get("answer") || null;
+
+  try {
+    await pool.query(
+      `INSERT INTO college_faqs (collegeprofile_id, question, answer, created_at, updated_at)
+       VALUES (?, ?, ?, NOW(), NOW())`,
+      [collegeprofile_id, question, answer],
+    );
+  } catch (e) {
+    console.error("[admin/colleges/faqs createAction]", e);
+  }
+  revalidatePath("/admin/colleges/faqs");
+}
+
+async function updateFAQ(formData: FormData) {
+  "use server";
+  const id                = formData.get("id");
+  const collegeprofile_id = formData.get("collegeprofile_id");
+  const question          = formData.get("question");
+  const answer            = formData.get("answer") || null;
+
+  try {
+    await pool.query(
+      `UPDATE college_faqs 
+          SET collegeprofile_id = ?, question = ?, answer = ?, updated_at = NOW()
+        WHERE id = ?`,
+      [collegeprofile_id, question, answer, id],
+    );
+  } catch (e) {
+    console.error("[admin/colleges/faqs updateAction]", e);
+  }
+  revalidatePath("/admin/colleges/faqs");
+}
 
 async function deleteFAQRow(id: number) {
   "use server";
@@ -37,6 +75,7 @@ async function safeQuery<T extends RowDataPacket>(
 
 interface FAQRow extends RowDataPacket {
   id: number;
+  collegeprofile_id: number;
   college_name: string;
   question: string;
   answer: string;
@@ -44,6 +83,11 @@ interface FAQRow extends RowDataPacket {
 
 interface CountRow extends RowDataPacket {
   total: number;
+}
+
+interface OptionRow extends RowDataPacket {
+  id: number;
+  name: string;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -63,22 +107,23 @@ export default async function CollegeFAQsPage({
 
   // ── Build WHERE clause ─────────────────────────────────────────────────────
   const conditions: string[] = [];
-  const params: (string | number)[] = [];
+  const filterParams: (string | number)[] = [];
 
   if (q) {
     conditions.push(
       "(u.firstname LIKE ? OR f.question LIKE ? OR f.answer LIKE ?)",
     );
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`);
+    filterParams.push(`%${q}%`, `%${q}%`, `%${q}%`);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Query FAQs ────────────────────────────────────────────────────────────
-  const [faqs, countRows] = await Promise.all([
+  // ── Fetch metadata + data ──────────────────────────────────────────────────
+  const [faqs, countRows, colleges] = await Promise.all([
     safeQuery<FAQRow>(
       `SELECT 
         f.id,
+        f.collegeprofile_id,
         COALESCE(u.firstname, 'Unnamed College') as college_name,
         f.question,
         f.answer
@@ -88,7 +133,7 @@ export default async function CollegeFAQsPage({
        ${where}
        ORDER BY f.created_at DESC
        LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
+      [...filterParams, PAGE_SIZE, offset],
     ),
     safeQuery<CountRow>(
       `SELECT COUNT(*) AS total 
@@ -96,8 +141,11 @@ export default async function CollegeFAQsPage({
        JOIN collegeprofile cp ON cp.id = f.collegeprofile_id
        JOIN users u ON u.id = cp.users_id
        ${where}`,
-      params,
+      filterParams,
     ),
+    safeQuery<OptionRow>(
+      "SELECT cp.id, u.firstname AS name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
+    )
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
@@ -131,73 +179,38 @@ export default async function CollegeFAQsPage({
         </div>
       </div>
 
-      {/* ── Table ─────────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {faqs.length === 0 ? (
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>quiz</span>
-            <p className="text-slate-500 font-semibold text-sm">No FAQ records found.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-left">
-                  <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Question & Answer</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College Name</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {faqs.map((f, idx) => (
-                  <tr key={f.id} className="hover:bg-blue-50/20 transition-colors">
-                    <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-slate-800 leading-snug">{f.question}</span>
-                        <span className="text-xs text-slate-400 line-clamp-1 mt-0.5">{f.answer || "No answer provided"}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-slate-600 font-medium truncate max-w-[200px] block">{f.college_name}</span>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Update">
-                           <span className="material-symbols-rounded text-[18px]">edit</span>
-                        </button>
-                        <DeleteButton action={deleteFAQRow.bind(null, f.id)} size="sm" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+      <FAQListClient
+        faqs={faqs}
+        colleges={colleges}
+        offset={offset}
+        onAdd={createFAQ}
+        onEdit={updateFAQ}
+        onDelete={deleteFAQRow}
+      />
 
-        {/* ── Pagination ───────────────────────────────────────────────────── */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-            <p className="text-xs text-slate-500">
-              Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> FAQs
-            </p>
-            <div className="flex items-center gap-1">
-              {page > 1 ? (
-                <Link href={`/admin/colleges/faqs?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-              )}
-              {page < totalPages ? (
-                <Link href={`/admin/colleges/faqs?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-              )}
-            </div>
+      {/* ── Pagination ───────────────────────────────────────────────────── */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
+          <p className="text-xs text-slate-500">
+            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> FAQs
+          </p>
+          <div className="flex items-center gap-1">
+            {page > 1 ? (
+              <Link href={`/admin/colleges/faqs?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
+            )}
+            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">
+              {page} / {totalPages}
+            </span>
+            {page < totalPages ? (
+              <Link href={`/admin/colleges/faqs?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -47,13 +47,56 @@ interface ProfileClientProps {
   onDelete: (id: number) => Promise<void>;
 }
 
-const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
-const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=600";
+const REMOTE_IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 
 function buildImageUrl(raw: string | null): string {
-    if (!raw) return DEFAULT_IMAGE;
+    if (!raw) return "";
     if (raw.startsWith("http")) return raw;
-    return `${IMAGE_BASE}${raw}`;
+    if (raw.startsWith("/")) return raw;
+    return `${REMOTE_IMAGE_BASE}${raw}`;
+}
+
+// Shows image if it loads, otherwise reveals an initial-letter fallback tile.
+// Stateless: no useState → no hydration mismatch.
+function CollegeAvatar({ name, bannerimage }: { name: string; bannerimage: string | null }) {
+  const url = buildImageUrl(bannerimage);
+  const initial = (name || "C")[0].toUpperCase();
+  const colors = ["#3b82f6","#10b981","#8b5cf6","#f43f5e","#f59e0b","#06b6d4"];
+  const color = colors[initial.charCodeAt(0) % colors.length];
+  const fallbackId = `college-fb-${name.replace(/\s+/g, "-").toLowerCase()}-${(bannerimage || "none").slice(-6)}`;
+
+  if (!url) {
+    return (
+      <div style={{ background: color }} className="w-12 h-10 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+        <span className="text-white font-black text-sm">{initial}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-12 h-10 flex-shrink-0">
+      {/* Fallback tile — always rendered, hidden when image loads */}
+      <div
+        id={fallbackId}
+        style={{ background: color, display: "none" }}
+        className="w-12 h-10 rounded-lg flex items-center justify-center shadow-sm absolute inset-0"
+      >
+        <span className="text-white font-black text-sm">{initial}</span>
+      </div>
+      <div className="w-12 h-10 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 shadow-sm">
+        <img
+          src={url}
+          alt={name}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          onError={(e) => {
+            e.currentTarget.style.display = "none";
+            const fb = document.getElementById(fallbackId);
+            if (fb) fb.style.display = "flex";
+          }}
+        />
+      </div>
+    </div>
+  );
 }
 
 export default function ProfileClient({
@@ -176,13 +219,7 @@ export default function ProfileClient({
                     <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-10 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200 shadow-sm">
-                          <img 
-                            src={buildImageUrl(p.bannerimage)} 
-                            alt={p.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        </div>
+                        <CollegeAvatar name={p.name} bannerimage={p.bannerimage} />
                         <div className="flex flex-col min-w-0">
                           <span className="font-bold text-slate-800 leading-snug truncate max-w-[250px]">{p.name}</span>
                           <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{p.slug}</span>

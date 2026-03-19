@@ -11,6 +11,7 @@ async function deleteInvite(id: number) {
     console.error("[admin/other-info/invite deleteAction]", e);
   }
   revalidatePath("/admin/other-info/invite");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

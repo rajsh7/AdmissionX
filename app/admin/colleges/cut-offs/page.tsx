@@ -1,10 +1,53 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { RowDataPacket } from "mysql2";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
+import CutOffListClient from "./CutOffListClient";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
+
+async function createCutOff(formData: FormData) {
+  "use server";
+  const collegeprofile_id = formData.get("collegeprofile_id");
+  const course_id         = formData.get("course_id") || null;
+  const degree_id         = formData.get("degree_id") || null;
+  const title             = formData.get("title");
+  const description       = formData.get("description") || null;
+
+  try {
+    await pool.query(
+      `INSERT INTO college_cut_offs 
+        (collegeprofile_id, course_id, degree_id, title, description, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
+      [collegeprofile_id, course_id, degree_id, title, description],
+    );
+  } catch (e) {
+    console.error("[admin/colleges/cut-offs createAction]", e);
+  }
+  revalidatePath("/admin/colleges/cut-offs");
+}
+
+async function updateCutOff(formData: FormData) {
+  "use server";
+  const id                = formData.get("id");
+  const collegeprofile_id = formData.get("collegeprofile_id");
+  const course_id         = formData.get("course_id") || null;
+  const degree_id         = formData.get("degree_id") || null;
+  const title             = formData.get("title");
+  const description       = formData.get("description") || null;
+
+  try {
+    await pool.query(
+      `UPDATE college_cut_offs 
+          SET collegeprofile_id = ?, course_id = ?, degree_id = ?, title = ?, description = ?, updated_at = NOW()
+        WHERE id = ?`,
+      [collegeprofile_id, course_id, degree_id, title, description, id],
+    );
+  } catch (e) {
+    console.error("[admin/colleges/cut-offs updateAction]", e);
+  }
+  revalidatePath("/admin/colleges/cut-offs");
+}
 
 async function deleteCutOffRow(id: number) {
   "use server";
@@ -37,6 +80,9 @@ async function safeQuery<T extends RowDataPacket>(
 
 interface CutOffRow extends RowDataPacket {
   id: number;
+  collegeprofile_id: number;
+  course_id: number | null;
+  degree_id: number | null;
   college_name: string;
   course_name: string | null;
   degree_name: string | null;
@@ -46,6 +92,11 @@ interface CutOffRow extends RowDataPacket {
 
 interface CountRow extends RowDataPacket {
   total: number;
+}
+
+interface OptionRow extends RowDataPacket {
+  id: number;
+  name: string;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -65,22 +116,25 @@ export default async function CollegeCutOffsPage({
 
   // ── Build WHERE clause ─────────────────────────────────────────────────────
   const conditions: string[] = [];
-  const params: (string | number)[] = [];
+  const filterParams: (string | number)[] = [];
 
   if (q) {
     conditions.push(
       "(u.firstname LIKE ? OR c.name LIKE ? OR co.title LIKE ?)",
     );
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`);
+    filterParams.push(`%${q}%`, `%${q}%`, `%${q}%`);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Query cut-offs ────────────────────────────────────────────────────────
-  const [cutOffs, countRows] = await Promise.all([
+  // ── Fetch metadata + data ──────────────────────────────────────────────────
+  const [cutOffs, countRows, colleges, courses, degrees] = await Promise.all([
     safeQuery<CutOffRow>(
       `SELECT 
         co.id,
+        co.collegeprofile_id,
+        co.course_id,
+        co.degree_id,
         COALESCE(u.firstname, 'Unnamed College') as college_name,
         c.name as course_name,
         d.name as degree_name,
@@ -94,7 +148,7 @@ export default async function CollegeCutOffsPage({
        ${where}
        ORDER BY co.created_at DESC
        LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
+      [...filterParams, PAGE_SIZE, offset],
     ),
     safeQuery<CountRow>(
       `SELECT COUNT(*) AS total 
@@ -104,8 +158,13 @@ export default async function CollegeCutOffsPage({
        LEFT JOIN course c ON c.id = co.course_id
        LEFT JOIN degree d ON d.id = co.degree_id
        ${where}`,
-      params,
+      filterParams,
     ),
+    safeQuery<OptionRow>(
+      "SELECT cp.id, u.firstname AS name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
+    ),
+    safeQuery<OptionRow>("SELECT id, name FROM course ORDER BY name ASC"),
+    safeQuery<OptionRow>("SELECT id, name FROM degree ORDER BY name ASC"),
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
@@ -139,80 +198,40 @@ export default async function CollegeCutOffsPage({
         </div>
       </div>
 
-      {/* ── Table ─────────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {cutOffs.length === 0 ? (
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>data_exploration</span>
-            <p className="text-slate-500 font-semibold text-sm">No cut-off records found.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-left">
-                  <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Trend Title</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College & Program</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Description</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {cutOffs.map((co, idx) => (
-                  <tr key={co.id} className="hover:bg-blue-50/20 transition-colors">
-                    <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-slate-800 leading-snug">{co.title}</span>
-                        <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider mt-0.5">Admission Trend</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-slate-600 font-medium truncate max-w-[200px] block">{co.college_name}</span>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">{co.course_name || "General"} ({co.degree_name || "Any"})</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-xs text-slate-500 line-clamp-1 max-w-[300px]">{co.description || "No description provided"}</span>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Update">
-                           <span className="material-symbols-rounded text-[18px]">edit</span>
-                        </button>
-                        <DeleteButton action={deleteCutOffRow.bind(null, co.id)} size="sm" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+      <CutOffListClient
+        cutoffs={cutOffs}
+        colleges={colleges}
+        courses={courses}
+        degrees={degrees}
+        offset={offset}
+        onAdd={createCutOff}
+        onEdit={updateCutOff}
+        onDelete={deleteCutOffRow}
+      />
 
-        {/* ── Pagination ───────────────────────────────────────────────────── */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-            <p className="text-xs text-slate-500">
-              Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> records
-            </p>
-            <div className="flex items-center gap-1">
-              {page > 1 ? (
-                <Link href={`/admin/colleges/cut-offs?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-              )}
-              {page < totalPages ? (
-                <Link href={`/admin/colleges/cut-offs?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-              )}
-            </div>
+      {/* ── Pagination ───────────────────────────────────────────────────── */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
+          <p className="text-xs text-slate-500">
+            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> records
+          </p>
+          <div className="flex items-center gap-1">
+            {page > 1 ? (
+              <Link href={`/admin/colleges/cut-offs?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
+            )}
+            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">
+              {page} / {totalPages}
+            </span>
+            {page < totalPages ? (
+              <Link href={`/admin/colleges/cut-offs?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

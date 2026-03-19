@@ -20,6 +20,7 @@ async function updateApplicationStatus(formData: FormData): Promise<void> {
     console.error("[admin/applications updateStatus]", e);
   }
   revalidatePath("/admin/applications");
+  revalidatePath("/", "layout");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

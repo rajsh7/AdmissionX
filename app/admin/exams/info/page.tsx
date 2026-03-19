@@ -12,6 +12,7 @@ async function deleteExamInfo(id: number) {
     console.error("[admin/exams/info deleteAction]", e);
   }
   revalidatePath("/admin/exams/info");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(

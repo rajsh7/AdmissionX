@@ -11,6 +11,7 @@ async function deleteFormEntry(id: number) {
     console.error("[admin/forms deleteAction]", e);
   }
   revalidatePath("/admin/forms");
+  revalidatePath("/", "layout");
 }
 
 async function safeQuery<T extends RowDataPacket>(
