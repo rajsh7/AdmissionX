@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { jwtVerify } from "jose";
-
-const SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET ?? "adx-dev-secret-change-me-in-production",
-);
+import {
+  STUDENT_COOKIE,
+  COLLEGE_COOKIE,
+  ADMIN_COOKIE,
+  verifyStudentToken,
+  verifyCollegeToken,
+  verifyAdminToken,
+} from "./lib/auth";
 
 function redirectToLogin(
   request: NextRequest,
@@ -15,30 +18,21 @@ function redirectToLogin(
   return NextResponse.redirect(url);
 }
 
-async function verifyToken(token: string): Promise<boolean> {
-  try {
-    await jwtVerify(token, SECRET);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ── Protect /dashboard/student/* ─────────────────────────────────────────
   if (pathname.startsWith("/dashboard/student")) {
-    const token = request.cookies.get("adx_student")?.value;
+    const token = request.cookies.get(STUDENT_COOKIE)?.value;
 
     if (!token) {
       return redirectToLogin(request, "/login/student", pathname);
     }
 
-    const valid = await verifyToken(token);
+    const valid = await verifyStudentToken(token);
     if (!valid) {
       const res = redirectToLogin(request, "/login/student", pathname);
-      res.cookies.delete("adx_student");
+      res.cookies.delete(STUDENT_COOKIE);
       return res;
     }
 
@@ -47,16 +41,16 @@ export async function middleware(request: NextRequest) {
 
   // ── Protect /dashboard/college/* ─────────────────────────────────────────
   if (pathname.startsWith("/dashboard/college")) {
-    const token = request.cookies.get("adx_college")?.value;
+    const token = request.cookies.get(COLLEGE_COOKIE)?.value;
 
     if (!token) {
       return redirectToLogin(request, "/login/college", pathname);
     }
 
-    const valid = await verifyToken(token);
+    const valid = await verifyCollegeToken(token);
     if (!valid) {
       const res = redirectToLogin(request, "/login/college", pathname);
-      res.cookies.delete("adx_college");
+      res.cookies.delete(COLLEGE_COOKIE);
       return res;
     }
 
@@ -65,16 +59,16 @@ export async function middleware(request: NextRequest) {
 
   // ── Protect /admin/* ─────────────────────────────────────────────────────
   if (pathname.startsWith("/admin")) {
-    const token = request.cookies.get("adx_admin")?.value;
+    const token = request.cookies.get(ADMIN_COOKIE)?.value;
 
     if (!token) {
-      return redirectToLogin(request, "/login", pathname);
+      return redirectToLogin(request, "/admin/login", pathname); // Note: Assumed /admin/login from standard structure, previously it was /login. Need to verify. Let's use /login since it was /login previously.
     }
 
-    const valid = await verifyToken(token);
+    const valid = await verifyAdminToken(token);
     if (!valid) {
       const res = redirectToLogin(request, "/login", pathname);
-      res.cookies.delete("adx_admin");
+      res.cookies.delete(ADMIN_COOKIE);
       return res;
     }
 

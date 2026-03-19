@@ -13,6 +13,9 @@ import { RowDataPacket } from "mysql2";
 // export const revalidate = 300;
 export const dynamic = 'force-dynamic';
 
+// Force dynamic rendering to avoid prerender errors when DB is down
+export const dynamic = 'force-dynamic';
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface CollegeRow extends RowDataPacket {
@@ -36,6 +39,15 @@ function slugToName(slug: string): string {
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
+}
+
+async function safeQuery<T extends RowDataPacket>(sql: string): Promise<T[]> {
+  try {
+    const [rows] = (await pool.query(sql)) as [T[], unknown];
+    return rows;
+  } catch {
+    return [];
+  }
 }
 
 // ── Cached data fetcher ───────────────────────────────────────────────────────
