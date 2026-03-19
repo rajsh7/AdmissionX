@@ -35,3 +35,28 @@ Record key architectural choices, deviations from the master plan, and the reaso
 
 ### Constraints
 - Assume DB contains partial/inconsistent dummy data. Perform basic validation and minimal seeding to ensure the feature works reliably in dev, but skip full production data population.
+
+## Phase 3 Decisions
+
+**Date:** 2026-03-19
+
+### Scope
+- **Entry Points:** Implement two flows: Primary (via student dashboard `ApplyTab.tsx`) and Secondary ("Apply Now" from public `/college/[slug]` redirecting to dashboard with pre-filled college/course).
+- **Documents:** Standardized global requirements for Phase 3 (10th Marksheet, 12th Marksheet, ID Proof). Dynamic college-specific documents are OOS.
+
+### Approach
+- Chose: **Option B (Cloud Storage - Cloudinary/S3)**.
+- Reason: Scalability, production-readiness, and Vercel serverless compatibility.
+- **Data Flow:** Upload files via Next.js API route, store returned secure URLs securely in the MySQL database.
+
+### Database Design
+- **New Tables:** 
+  1. `applications`: id, studentId, collegeId, courseId, status (pending, approved, rejected), createdAt.
+  2. `documents`: id, applicationId, type, fileUrl, uploadedAt.
+
+### Constraints & Security
+- **Strict Validations:** 
+  - Student profile MUST be 100% complete before applying.
+  - One application per course per student.
+  - All requested documents must be uploaded prior to submission.
+- **Upload Security:** Enforce strict 5MB size limit and PDF/JPG/PNG MIME types on both client and server boundaries to prevent malicious payloads.
