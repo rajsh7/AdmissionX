@@ -18,7 +18,7 @@ function redirectToLogin(
   return NextResponse.redirect(url);
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ── Protect /dashboard/student/* ─────────────────────────────────────────
@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get(ADMIN_COOKIE)?.value;
 
     if (!token) {
-      return redirectToLogin(request, "/admin/login", pathname); // Note: Assumed /admin/login from standard structure, previously it was /login. Need to verify. Let's use /login since it was /login previously.
+      return redirectToLogin(request, "/admin/login", pathname); 
     }
 
     const valid = await verifyAdminToken(token);

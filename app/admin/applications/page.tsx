@@ -1,6 +1,7 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { RowDataPacket } from "mysql2";
+import { revalidatePath } from "next/cache";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
