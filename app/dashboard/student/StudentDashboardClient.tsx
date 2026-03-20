@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -18,7 +18,7 @@ import CounselingTab from "./tabs/CounselingTab";
 import HelpDeskTab from "./tabs/HelpDeskTab";
 import ProfileViewTab from "./tabs/ProfileViewTab";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ Types ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 interface Props {
   user: { id: number; name: string; email: string } | null;
 }
@@ -36,7 +36,7 @@ type TabId =
 interface NavChild { id: TabId; label: string; icon: string }
 interface NavGroup  { id: string; label: string; icon: string; children: NavChild[] }
 
-// ── Navigation definition ─────────────────────────────────────────────────────
+// ΓöÇΓöÇ Navigation definition ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 const NAV_GROUPS: NavGroup[] = [
   {
     id: "student-details",
@@ -102,7 +102,7 @@ const STANDALONE: { id: TabId; label: string; icon: string }[] = [
   { id: "profile-view",      label: "Profile View",      icon: "badge"        },
 ];
 
-// helper – which group does a tab belong to?
+// helper ΓÇô which group does a tab belong to?
 function getGroupId(tab: TabId): string | null {
   for (const g of NAV_GROUPS) {
     if (g.children.some((c) => c.id === tab)) return g.id;
@@ -110,7 +110,7 @@ function getGroupId(tab: TabId): string | null {
   return null;
 }
 
-// helper – human-readable breadcrumb label
+// helper ΓÇô human-readable breadcrumb label
 function getBreadcrumb(tab: TabId): { group: string | null; label: string } {
   for (const g of NAV_GROUPS) {
     const child = g.children.find((c) => c.id === tab);
@@ -121,7 +121,7 @@ function getBreadcrumb(tab: TabId): { group: string | null; label: string } {
   return { group: null, label: "Dashboard" };
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 export default function StudentDashboardClient({ user }: Props) {
   const [activeTab, setActiveTab]     = useState<TabId>("overview");
   const [openGroups, setOpenGroups]   = useState<Set<string>>(new Set(["student-details"]));
@@ -151,7 +151,7 @@ export default function StudentDashboardClient({ user }: Props) {
 
   const bc = getBreadcrumb(activeTab);
 
-  // ── Tab renderer ──────────────────────────────────────────────────────────
+  // ΓöÇΓöÇ Tab renderer ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   function renderTab() {
     switch (activeTab) {
       case "overview":               return <OverviewTab           user={user} />;
@@ -183,8 +183,8 @@ export default function StudentDashboardClient({ user }: Props) {
     }
   }
 
-<<<<<<< HEAD
-  // ── Sidebar inner content ─────────────────────────────────────────────────
+
+  // ΓöÇΓöÇ Sidebar inner content ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   function SidebarContent() {
     return (
       <div className="flex flex-col h-full">
@@ -193,45 +193,7 @@ export default function StudentDashboardClient({ user }: Props) {
           <Link href="/" className="flex items-center gap-3 group" onClick={() => setSidebarOpen(false)}>
             <div className="w-9 h-9 bg-gradient-to-br from-green-500 to-green-700 rounded-xl flex items-center justify-center shadow-md shadow-green-200 flex-shrink-0">
               <span className="text-white font-black text-sm tracking-tight">ADX</span>
-=======
-  return (
-    <div className="min-h-screen bg-[#f8f6f6] dark:bg-[#0f1623] font-display">
-      <Header />
 
-      {/* ── Push content below fixed navbar (~88px) ── */}
-      <div className="pt-[112px]">
-        {/* ── Sticky desktop tab bar ── */}
-        <div className="sticky top-[80px] z-40 px-4 sm:px-6 pb-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-100 dark:border-slate-800 px-2 overflow-hidden">
-              <div className="flex items-center overflow-x-auto hide-scrollbar">
-                {TABS.map((tab) => {
-                  const isActive = activeTab === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-2 px-4 py-3.5 text-sm font-bold whitespace-nowrap border-b-2 transition-all duration-200 ${
-                        isActive
-                          ? "border-primary text-primary"
-                          : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:border-slate-200 dark:hover:border-slate-700"
-                      }`}
-                    >
-                      <span
-                        className="material-symbols-outlined text-[18px]"
-                        style={
-                          isActive ? { fontVariationSettings: "'FILL' 1" } : {}
-                        }
-                      >
-                        {tab.icon}
-                      </span>
-                      <span className="hidden lg:inline">{tab.label}</span>
-                      <span className="lg:hidden">{tab.mobileLabel}</span>
-                    </button>
-                  );
-                })}
-              </div>
->>>>>>> feature
             </div>
             <div>
               <p className="font-black text-slate-900 text-[15px] tracking-tight leading-tight">AdmissionX</p>
@@ -409,7 +371,7 @@ export default function StudentDashboardClient({ user }: Props) {
     );
   }
 
-  // ══════════════════════════════════════════════════════════════════════════
+  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   return (
     <div className="flex h-screen bg-[#f4fdf6] font-display overflow-hidden">
 
@@ -421,7 +383,7 @@ export default function StudentDashboardClient({ user }: Props) {
         />
       )}
 
-      {/* ── SIDEBAR ── */}
+      {/* ΓöÇΓöÇ SIDEBAR ΓöÇΓöÇ */}
       <aside
         className={`
           fixed lg:static inset-y-0 left-0 z-50
@@ -434,7 +396,7 @@ export default function StudentDashboardClient({ user }: Props) {
         <SidebarContent />
       </aside>
 
-      {/* ── MAIN CONTENT ── */}
+      {/* ΓöÇΓöÇ MAIN CONTENT ΓöÇΓöÇ */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {/* Top header */}
@@ -514,7 +476,7 @@ export default function StudentDashboardClient({ user }: Props) {
   );
 }
 
-// ── Mobile Bottom Nav ─────────────────────────────────────────────────────────
+// ΓöÇΓöÇ Mobile Bottom Nav ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function MobileBottomNav({
   activeTab,
   navigate,

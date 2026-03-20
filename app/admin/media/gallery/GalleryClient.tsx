@@ -4,7 +4,7 @@ import { useState } from "react";
 import AdminModal from "@/app/admin/_components/AdminModal";
 import GalleryForm from "./GalleryForm";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
-import AdminImage from "@/app/admin/_components/AdminImage";
+import AdminImg from "@/app/admin/_components/AdminImg";
 
 interface GalleryClientProps {
   items: any[];
@@ -74,10 +74,10 @@ export default function GalleryClient({
                     <td className="px-5 py-4">
                        <div className="w-16 h-12 rounded-lg bg-slate-100 overflow-hidden relative group-hover:shadow-md transition-shadow border border-slate-200/50">
                          {r.fullimage ? (
-                            <AdminImage 
+                            <AdminImg 
                               src={`/uploads/${r.fullimage}`} 
-                              alt={r.name}
-                              className="w-full h-full object-cover"
+                              alt={r.name || "Gallery Item"} 
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
                               fallbackType="div"
                               fallbackValue="No Img"
                             />

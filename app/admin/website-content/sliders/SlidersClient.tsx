@@ -4,7 +4,7 @@ import { useState } from "react";
 import AdminModal from "@/app/admin/_components/AdminModal";
 import SliderForm from "./SliderForm";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
-import AdminImage from "@/app/admin/_components/AdminImage";
+import AdminImg from "@/app/admin/_components/AdminImg";
 
 interface SlidersClientProps {
   sliders: any[];
@@ -75,7 +75,7 @@ export default function SlidersClient({
                     <td className="px-5 py-4">
                       <div className="w-20 h-10 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden relative group-hover:border-amber-200 transition-colors">
                         {r.sliderImage ? (
-                          <AdminImage 
+                          <AdminImg 
                             src={`/uploads/sliders/${r.sliderImage}`} 
                             alt={r.sliderTitle || "Slider"} 
                             className="w-full h-full object-cover"

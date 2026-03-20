@@ -155,7 +155,7 @@ export default function TrendingDegrees() {
     <section className="relative w-full py-20 lg:py-28 bg-neutral-50 overflow-hidden">
       <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-red-500/[0.03] rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="relative z-10 mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
         {/* ─── Chapter Heading ─── */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

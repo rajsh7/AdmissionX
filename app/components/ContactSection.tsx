@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 export default function ContactSection() {
   return (
     <section className="w-full py-16 lg:py-24 bg-[#fdfdfd] overflow-hidden">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           
           {/* ── Left: Contact Info ────────────────────────────────────── */}
@@ -25,7 +25,7 @@ export default function ContactSection() {
                   </div>
                   <div>
                     <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest leading-none">Email Us</h4>
-                    <p className="mt-2 text-slate-500 font-semibold">support@admissionx.in</p>
+                    <a href="mailto:support@admissionx.in" className="mt-2 text-slate-500 font-semibold hover:text-[#008080] transition-colors block">support@admissionx.in</a>
                   </div>
                </div>
 

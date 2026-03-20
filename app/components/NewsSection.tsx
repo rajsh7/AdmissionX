@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import type { DbBlog } from "../api/home/blogs/route";
+import type { DbBlog } from "../api/home/latest-blogs/route";
 
 interface NewsSectionProps {
   dbBlogs?: DbBlog[];
@@ -16,7 +16,7 @@ const STATIC_BLOGS = [
     category: "Admissions",
     date: "March 15, 2024",
     image: "https://images.unsplash.com/photo-1523240715627-5d0b541f8d9c?q=80&w=2670&auto=format&fit=crop",
-    href: "/education-blogs/engineering-admissions-2026",
+    href: "/blogs/engineering-admissions-2026",
   },
   {
     id: 2,
@@ -25,7 +25,7 @@ const STATIC_BLOGS = [
     category: "Career Guidance",
     date: "March 12, 2024",
     image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2670&auto=format&fit=crop",
-    href: "/education-blogs/top-mba-specializations-2026",
+    href: "/blogs/top-mba-specializations-2026",
   },
   {
     id: 3,
@@ -34,7 +34,7 @@ const STATIC_BLOGS = [
     category: "Exam Tips",
     date: "March 10, 2024",
     image: "https://images.unsplash.com/photo-1576091160550-217359f41f48?q=80&w=2670&auto=format&fit=crop",
-    href: "/education-blogs/neet-2026-preparation-tips",
+    href: "/blogs/neet-2026-preparation-tips",
   },
 ];
 
@@ -43,7 +43,7 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
 
   return (
     <section className="w-full py-16 lg:py-24 bg-white">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
            <div>
               <h2 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">Student Life & Beyond</h2>

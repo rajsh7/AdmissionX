@@ -15,8 +15,8 @@ interface NewsRow {
   newstagsids: string | null;
   created_at: string;
   updated_at: string;
-  description?: string;
-  featimage?: string;
+  description: string | null;
+  featimage: string | null;
 }
 
 interface NewsListClientProps {

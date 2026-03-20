@@ -178,7 +178,7 @@ export default function StudyAbroad() {
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
       <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-red-500/[0.03] rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="relative z-10 mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
         {/* ─── Header Row ─── */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-14 lg:mb-16">
           {/* Chapter Heading */}

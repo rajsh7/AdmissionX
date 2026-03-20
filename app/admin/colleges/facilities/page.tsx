@@ -1,10 +1,9 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
-import AdminImage from "@/app/admin/_components/AdminImage";
-import FacilitiesClient from "./FacilitiesClient";
 import { revalidatePath } from "next/cache";
+import { RowDataPacket } from "mysql2";
+import AdminImg from "@/app/admin/_components/AdminImg";
+import FacilitiesClient from "./FacilitiesClient";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 

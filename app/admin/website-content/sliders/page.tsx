@@ -1,7 +1,7 @@
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
-import AdminImage from "@/app/admin/_components/AdminImage";
+import AdminImg from "@/app/admin/_components/AdminImg";
 import SlidersClient from "./SlidersClient";
 import { revalidatePath } from "next/cache";
 import { saveUpload } from "@/lib/upload-utils";

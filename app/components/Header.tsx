@@ -17,14 +17,47 @@ interface AuthUser {
 }
 
 const navLinks = [
-  { label: "Top Colleges", href: "/top-colleges" },
-  { label: "Universities", href: "/top-university" },
-  { label: "Streams", href: "/stream" },
-  { label: "Study Abroad", href: "/study-abroad" },
-  { label: "Exams", href: "/examination" },
-  { label: "Ask", href: "/ask" },
-  { label: "Blogs", href: "/education-blogs" },
-  { label: "News", href: "/news" },
+  { label: "Home", href: "/" },
+  { 
+    label: "Study Abroad", 
+    href: "/study-abroad",
+    subItems: [
+      { label: "UK", href: "/study-abroad/uk", icon: "public" },
+      { label: "USA", href: "/study-abroad/usa", icon: "public" },
+      { label: "Canada", href: "/study-abroad/canada", icon: "public" },
+      { label: "Australia", href: "/study-abroad/australia", icon: "public" },
+    ]
+  },
+  { 
+    label: "Counselling", 
+    href: "/counselling",
+    subItems: [
+      { label: "Career Counselling", href: "/counselling/career", icon: "psychology" },
+      { label: "Admission Support", href: "/counselling/admission", icon: "assignment" },
+      { label: "Mental Health", href: "/counselling/mental-health", icon: "potted_plant" },
+    ]
+  },
+  { 
+    label: "Examination", 
+    href: "/examination",
+    subItems: [
+      { label: "Engineering Exams", href: "/examination/engineering", icon: "engineering" },
+      { label: "Medical Exams", href: "/examination/medical", icon: "medical_services" },
+      { label: "Management Exams", href: "/examination/management", icon: "business_center" },
+    ]
+  },
+  { 
+    label: "More", 
+    href: "#",
+    subItems: [
+      { label: "Top Universities", href: "/top-university", icon: "school" },
+      { label: "Top Colleges", href: "/colleges", icon: "apartment" },
+      { label: "Top Courses", href: "/courses", icon: "book" },
+      { label: "Streams", href: "/stream", icon: "grid_view" },
+      { label: "News & Articles", href: "/news", icon: "newspaper" },
+      { label: "Latest Blogs", href: "/blog", icon: "article" },
+    ]
+  },
 ];
 
 const loginOptions = [
@@ -166,12 +199,14 @@ function UserMenuDropdown({
 }
 
 export default function Header({ }: HeaderProps) {
+  // Triggering HMR
   const router = useRouter();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [expandedMobileItem, setExpandedMobileItem] = useState<string | null>(null);
   const [mobileLoginOpen, setMobileLoginOpen] = useState(false);
   const [mobileSignupOpen, setMobileSignupOpen] = useState(false);
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
@@ -271,70 +306,104 @@ export default function Header({ }: HeaderProps) {
         style={{ scaleX: scrollYProgress, backgroundColor: '#008080' }}
       />
 
-      <motion.header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl bg-white/95 backdrop-blur-xl border border-white/20 rounded-full shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-colors">
-        <div className="flex items-center justify-between px-5 sm:px-8 py-3 w-full">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group shrink-0">
-             <img src="/admissionx-logo.png" alt="AdmissionX logo" className="h-8 w-auto object-contain" />
-          </Link>
+      <motion.header className="fixed top-0 left-0 right-0 z-50 w-full min-h-[80px] flex items-center bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] transition-colors">
+        <div className="flex items-center justify-between px-6 sm:px-12 w-full max-w-[1920px] mx-auto">
+          {/* Logo Area */}
+          <div className="flex-none flex justify-start items-center">
+            <Link href="/" className="flex items-center gap-3 group shrink-0">
+              <img src="/admissionx-v2-logo.png" alt="AdmissionX logo" className="h-8 w-auto object-contain" />
+            </Link>
+          </div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center xl:gap-8 lg:gap-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-[13px] font-black uppercase tracking-widest text-slate-600 hover:text-[#008080] transition-colors relative group"
-              >
-                {link.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 rounded-full group-hover:w-full transition-all duration-300" style={{ backgroundColor: '#008080' }} />
-              </Link>
-            ))}
-          </nav>
-
-          {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center gap-4">
-            {!authChecked ? (
-              <div className="h-9 w-32 bg-slate-100 rounded-full animate-pulse" />
-            ) : authUser ? (
-              <div ref={userMenuRef} className="relative">
-                <button
-                  onClick={() => setUserMenuOpen((o) => !o)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-full hover:bg-slate-50 transition-colors"
-                >
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ backgroundColor: '#008080' }}>
-                    {initials}
-                  </div>
-                  <span className="text-sm font-semibold text-slate-700 max-w-[120px] truncate">
-                    {firstName}
-                  </span>
-                  <span className={`material-symbols-outlined text-[18px] text-slate-400 transition-transform duration-200 ${userMenuOpen ? "rotate-180" : ""}`}>
-                    expand_more
-                  </span>
-                </button>
-                <UserMenuDropdown user={authUser} isOpen={userMenuOpen} onClose={() => setUserMenuOpen(false)} onLogout={handleLogout} />
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <div ref={loginRef} className="relative" onMouseEnter={openLogin} onMouseLeave={closeLogin}>
-                  <button className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-black uppercase tracking-widest text-slate-600 hover:text-slate-900 transition-colors rounded-full hover:bg-slate-50">
-                    Login
-                    <span className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${loginOpen ? "rotate-180" : ""}`}>expand_more</span>
-                  </button>
-                  <Dropdown items={loginOptions} isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
-                </div>
-                <div ref={signupRef} className="relative" onMouseEnter={openSignup} onMouseLeave={closeSignup}>
-                  <button 
-                    className="flex items-center gap-1.5 px-6 py-2.5 text-[13px] font-black uppercase tracking-widest text-white rounded-full hover:brightness-110 transition-all duration-200 hover:shadow-lg"
-                    style={{ backgroundColor: '#008080' }}
+          {/* Right Area (Nav & Actions Combined) */}
+          <div className="hidden lg:flex items-center justify-end flex-1 gap-10">
+            {/* Nav Links Area */}
+            <nav className="flex items-center gap-8">
+              {navLinks.map((link) => (
+                <div key={link.label} className="relative group/nav py-8">
+                  <Link
+                    href={link.href}
+                    className="flex items-center gap-1 text-[15px] font-bold text-slate-800 hover:text-teal-600 transition-colors relative"
                   >
-                    Signup
-                    <span className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${signupOpen ? "rotate-180" : ""}`}>expand_more</span>
-                  </button>
-                  <Dropdown items={signupOptions} isOpen={signupOpen} onClose={() => setSignupOpen(false)} />
+                    {link.label}
+                    {link.subItems && (
+                      <span className="material-symbols-outlined text-[16px] text-slate-400 group-hover/nav:text-teal-600 transition-colors">
+                        expand_more
+                      </span>
+                    )}
+                    <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 rounded-full bg-teal-500 group-hover/nav:w-full group-hover/nav:left-0 transition-all duration-300" />
+                  </Link>
+
+                  {link.subItems && (
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-56 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:pointer-events-auto transition-all duration-200 z-50">
+                      <div className="bg-white rounded-xl shadow-2xl shadow-black/10 border border-slate-100 overflow-hidden py-1">
+                        {link.subItems.map((sub) => (
+                          <Link
+                            key={sub.label}
+                            href={sub.href}
+                            className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-slate-600 hover:bg-teal-50 hover:text-teal-700 transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-[18px] text-slate-400">
+                              {sub.icon}
+                            </span>
+                            {sub.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              ))}
+            </nav>
+
+            {/* Actions Area */}
+            <div className="flex items-center gap-6 border-l border-slate-100 pl-10">
+              <button className="text-slate-500 hover:text-teal-600 transition-colors flex items-center justify-center">
+                <span className="material-symbols-outlined text-[22px]">search</span>
+              </button>
+
+              {!authChecked ? (
+                <div className="h-9 w-24 bg-slate-100 rounded-full animate-pulse" />
+              ) : authUser ? (
+                <div ref={userMenuRef} className="relative">
+                  <button
+                    onClick={() => setUserMenuOpen((o) => !o)}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-900 text-white hover:bg-black transition-all shadow-lg shadow-black/10"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">account_circle</span>
+                    <span className="text-[15px] font-bold">Account</span>
+                    <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${userMenuOpen ? "rotate-180" : ""}`}>
+                      expand_more
+                    </span>
+                  </button>
+                  <UserMenuDropdown user={authUser} isOpen={userMenuOpen} onClose={() => setUserMenuOpen(false)} onLogout={handleLogout} />
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  {/* Login Dropdown */}
+                  <div ref={loginRef} className="relative" onMouseEnter={openLogin} onMouseLeave={closeLogin}>
+                    <button 
+                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-slate-700 hover:bg-slate-50 transition-all font-bold text-[15px]"
+                    >
+                      Login
+                      <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${loginOpen ? "rotate-180" : ""}`}>expand_more</span>
+                    </button>
+                    <Dropdown items={loginOptions} isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
+                  </div>
+
+                  {/* Sign Up Dropdown */}
+                  <div ref={signupRef} className="relative" onMouseEnter={openSignup} onMouseLeave={closeSignup}>
+                    <button 
+                      className="flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-slate-900 text-white hover:bg-black transition-all shadow-lg shadow-black/10 font-bold text-[15px]"
+                    >
+                      Sign Up
+                      <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${signupOpen ? "rotate-180" : ""}`}>expand_more</span>
+                    </button>
+                    <Dropdown items={signupOptions} isOpen={signupOpen} onClose={() => setSignupOpen(false)} />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden h-10 w-10 flex items-center justify-center rounded-full text-slate-700 hover:bg-slate-50 transition-all">
@@ -348,26 +417,102 @@ export default function Header({ }: HeaderProps) {
         {mobileMenuOpen && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="fixed inset-x-0 top-[88px] z-40 mx-auto w-[95%] max-w-6xl left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-xl border border-slate-100 rounded-3xl shadow-2xl lg:hidden">
             <div className="px-6 py-8 space-y-1">
-              {navLinks.map((item, i) => (
-                <motion.div key={item.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
-                  <Link href={item.href} className="block py-3 text-sm font-black uppercase tracking-tighter text-slate-600 hover:text-[#008080]" onClick={() => setMobileMenuOpen(false)}>
-                    {item.label}
-                  </Link>
-                </motion.div>
-              ))}
+              {navLinks.map((item, i) => {
+                const isExpanded = expandedMobileItem === item.label;
+                return (
+                  <motion.div key={item.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
+                    <div className="flex flex-col">
+                      <div className="flex items-center justify-between py-3">
+                        <Link 
+                          href={item.href} 
+                          className="text-sm font-bold text-slate-800 uppercase tracking-tight"
+                          onClick={() => {
+                            if (!item.subItems) setMobileMenuOpen(false);
+                            else setExpandedMobileItem(isExpanded ? null : item.label);
+                          }}
+                        >
+                          {item.label}
+                        </Link>
+                        {item.subItems && (
+                          <button 
+                            onClick={() => setExpandedMobileItem(isExpanded ? null : item.label)}
+                            className="p-1 hover:bg-slate-50 rounded-lg transition-colors"
+                          >
+                            <span className={`material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>
+                              expand_more
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                      
+                      {item.subItems && (
+                        <AnimatePresence>
+                          {isExpanded && (
+                            <motion.div 
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden bg-slate-50/50 rounded-2xl"
+                            >
+                              <div className="py-2 px-3 space-y-1">
+                                {item.subItems.map((sub) => (
+                                  <Link
+                                    key={sub.label}
+                                    href={sub.href}
+                                    className="flex items-center gap-3 px-3 py-3 text-[13px] font-medium text-slate-600 hover:text-teal-600 transition-colors"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                  >
+                                    <span className="material-symbols-outlined text-[18px] text-slate-400">
+                                      {sub.icon}
+                                    </span>
+                                    {sub.label}
+                                  </Link>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+              
               <div className="h-px bg-slate-100 my-4" />
+              
               {authUser ? (
                 <div className="space-y-1">
-                   {/* ... */}
-                   <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="flex items-center gap-3 py-3 px-2 text-sm font-bold text-rose-500 w-full text-left">
+                   <Link 
+                     href={`/dashboard/student/${authUser.id}`}
+                     className="flex items-center gap-3 px-3 py-4 text-sm font-bold text-slate-800"
+                     onClick={() => setMobileMenuOpen(false)}
+                   >
+                     <span className="material-symbols-outlined text-teal-600">dashboard</span>
+                     My Dashboard
+                   </Link>
+                   <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="flex items-center gap-3 py-4 px-3 text-sm font-bold text-rose-500 w-full text-left">
+                     <span className="material-symbols-outlined">logout</span>
                      Sign Out
                    </button>
                 </div>
               ) : (
                 <div className="space-y-4 pt-2">
                    <div className="grid grid-cols-2 gap-3">
-                      <button onClick={() => setMobileLoginOpen(!mobileLoginOpen)} className="py-3 rounded-2xl bg-slate-50 text-slate-600 text-[13px] font-black uppercase tracking-widest border border-slate-100">Login</button>
-                      <button onClick={() => setMobileSignupOpen(!mobileSignupOpen)} className="py-3 rounded-2xl text-white text-[13px] font-black uppercase tracking-widest" style={{ backgroundColor: '#008080' }}>Signup</button>
+                      <Link 
+                        href="/login/student" 
+                        className="flex items-center justify-center py-3.5 rounded-2xl bg-slate-50 text-slate-800 text-[13px] font-bold border border-slate-100 shadow-sm"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Login
+                      </Link>
+                      <Link 
+                        href="/signup/student" 
+                        className="flex items-center justify-center py-3.5 rounded-2xl text-white text-[13px] font-bold shadow-lg shadow-teal-500/20" 
+                        style={{ backgroundColor: '#008080' }}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Sign Up
+                      </Link>
                    </div>
                 </div>
               )}

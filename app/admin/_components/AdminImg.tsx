@@ -12,7 +12,7 @@ interface AdminImageProps {
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
-export default function AdminImage({
+export default function AdminImg({
   src,
   alt = "",
   className = "",
@@ -51,8 +51,10 @@ export default function AdminImage({
     if (source.startsWith("http://") || source.startsWith("https://") || source.startsWith("/")) {
       return source;
     }
-    // Assume it's a relative path in the uploads directory
-    return `/uploads/${source}`;
+    
+    // Use the production base URL if nothing else is configured
+    const baseUrl = process.env.NEXT_PUBLIC_IMAGE_BASE || "https://admin.admissionx.in";
+    return `${baseUrl}/uploads/${source}?v=${Date.now()}`;
   };
 
   return (

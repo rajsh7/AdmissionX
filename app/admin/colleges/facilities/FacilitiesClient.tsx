@@ -4,7 +4,7 @@ import { useState } from "react";
 import AdminModal from "@/app/admin/_components/AdminModal";
 import FacilityForm from "./FacilityForm";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
-import AdminImage from "@/app/admin/_components/AdminImage";
+import AdminImg from "@/app/admin/_components/AdminImg";
 
 interface FacilitiesClientProps {
   facilitiesList: any[];
@@ -83,7 +83,7 @@ export default function FacilitiesClient({
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 border border-blue-100/50 overflow-hidden">
                           {String(f.icon || "").match(/\.(png|jpe?g|svg|webp)$/i) ? (
-                            <AdminImage
+                            <AdminImg
                               src={`https://admin.admissionx.in/uploads/${f.icon}`}
                               alt=""
                               className="w-full h-full object-contain p-1"

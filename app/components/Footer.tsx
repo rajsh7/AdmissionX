@@ -5,57 +5,62 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 
 const footerLinks = {
-  "Quick Links": [
-    { label: "About Us", href: "/about" },
-    { label: "Top Colleges", href: "/top-colleges" },
-    { label: "Top Universities", href: "/top-university" },
-    { label: "Latest News", href: "/news" },
-    { label: "Education Blogs", href: "/education-blogs" },
-    { label: "Contact Us", href: "/contact-us" },
+  "Discover": [
+    { label: "Universities", href: "/search" },
+    { label: "Courses", href: "/search" },
+    { label: "Scholarship", href: "/search" }, // Fallback to search if specific page missing
+    { label: "Study Abroad", href: "/study-abroad" },
   ],
-  "Top Streams": [
-    { label: "Engineering", href: "/search?stream=engineering" },
-    { label: "Management / MBA", href: "/search?stream=management" },
-    { label: "Medical & Pharmacy", href: "/search?stream=medical" },
-    { label: "Science", href: "/search?stream=science" },
-    { label: "Commerce", href: "/search?stream=commerce" },
-    { label: "Arts & Humanities", href: "/search?stream=arts" },
+  "Exams": [
+    { label: "GRE Prep", href: "/examination/study-abroad/gre" },
+    { label: "GMAT Prep", href: "/examination/study-abroad/gmat" },
+    { label: "IELTS/TOEFL", href: "/examination/study-abroad/ielts-toefl" },
+    { label: "Mock Tests", href: "/examination" },
   ],
-  "Top Exams": [
-    { label: "Engineering Exams", href: "/examination/engineering" },
-    { label: "Medical Exams", href: "/examination/medical" },
-    { label: "Management Exams", href: "/examination/management" },
-    { label: "Law Exams", href: "/examination/law" },
-    { label: "Science Exams", href: "/examination/science" },
+  "Resources": [
+    { label: "Blogs", href: "/blogs" },
+    { label: "News", href: "/news" },
+    { label: "Career Guide", href: "/careers" },
+    { label: "Community", href: "/" },
+  ],
+  "Legal": [
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Terms of Use", href: "/terms-and-conditions" },
+    { label: "Cookies Policy", href: "/privacy-policy" },
+    { label: "Support", href: "/contact-us" },
   ],
 };
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-white border-t border-slate-100 pt-16 pb-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-16">
+    <footer className="w-full bg-[#F8F9FA] rounded-t-[40px] pt-20 pb-16">
+      <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 lg:gap-8 overflow-hidden">
           
           {/* Brand Column */}
           <div className="lg:col-span-2">
-            <Link href="/" className="inline-block mb-6">
-               <Image 
-                 src="/admissionx-logo.png"
-                 alt="AdmissionX Logo"
-                 width={180}
-                 height={40}
-                 className="h-10 w-auto object-contain"
-                 unoptimized
-               />
+            <Link href="/" className="inline-block mb-8">
+               <img
+                src="/admissionx-v2-logo.png"
+                className="h-10 w-auto object-contain"
+                alt="AdmissionX Logo"
+              />
             </Link>
-            <p className="text-slate-500 font-medium leading-relaxed max-w-sm mb-8">
-               Empowering students to find their perfect educational path. 
-               The leading platform for global admissions and counseling.
+            <p className="text-slate-600 font-medium leading-relaxed max-w-sm mb-10 text-[15px]">
+               Your one-stop platform for college admissions, entrance exams, scholarships, and study abroad guidance.
             </p>
-            <div className="flex items-center gap-3">
-               {['facebook', 'twitter', 'instagram', 'linkedin', 'youtube'].map(social => (
-                 <button key={social} className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100 transition-all hover:bg-teal hover:text-white hover:border-teal hover:-translate-y-1">
-                    <i className={`fab fa-${social} text-sm`}></i>
+            <div className="flex items-center gap-4">
+               {[
+                 { id: 'google', icon: 'google' },
+                 { id: 'twitter', icon: 'x-twitter' },
+                 { id: 'instagram', icon: 'instagram' },
+                 { id: 'facebook', icon: 'facebook-f' }
+               ].map(social => (
+                 <button 
+                  key={social.id} 
+                  className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 border border-slate-100 transition-all hover:bg-teal-600 hover:text-white hover:border-teal-600 hover:-translate-y-1 shadow-sm"
+                 >
+                    <i className={`fab fa-${social.icon} text-[18px]`}></i>
                  </button>
                ))}
             </div>
@@ -63,14 +68,14 @@ export default function Footer() {
 
           {/* Links Columns */}
           {Object.entries(footerLinks).map(([title, links]) => (
-            <div key={title}>
-              <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">{title}</h4>
+            <div key={title} className="lg:col-span-1">
+              <h4 className="text-[17px] font-black text-slate-900 mb-8">{title}</h4>
               <ul className="space-y-4">
                 {links.map(link => (
                   <li key={link.label}>
                     <Link 
                       href={link.href}
-                      className="text-sm font-bold text-slate-500 hover:text-teal transition-colors"
+                      className="text-[15px] font-semibold text-slate-500 hover:text-teal-600 transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -82,15 +87,11 @@ export default function Footer() {
 
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+        {/* Bottom Bar (Optional based on image, keeping minimal) */}
+        <div className="mt-20 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm font-bold text-slate-400">
             © 2026 AdmissionX. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
-            <Link href="/privacy" className="text-xs font-bold text-slate-400 hover:text-teal uppercase tracking-widest">Privacy Policy</Link>
-            <Link href="/terms" className="text-xs font-bold text-slate-400 hover:text-teal uppercase tracking-widest">Terms of Service</Link>
-          </div>
         </div>
       </div>
     </footer>

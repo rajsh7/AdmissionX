@@ -82,6 +82,20 @@ export async function POST(req: NextRequest) {
           passwordHash,
         ],
       );
+
+      // ── Insert into users ─────────────────────────────────────────────────
+      await conn.query(
+        `INSERT IGNORE INTO users
+           (firstname, lastname, email, phone, password, type_of_user, userstatus_id)
+         VALUES (?, ?, ?, ?, ?, 'COLLEGE', 2)`,
+        [
+          collegeName.trim(),
+          contactName.trim(),
+          emailLower,
+          phone.trim(),
+          passwordHash,
+        ]
+      );
     } finally {
       conn.release();
     }

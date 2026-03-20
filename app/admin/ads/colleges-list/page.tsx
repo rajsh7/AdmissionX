@@ -39,10 +39,10 @@ function formatDate(d: string | null | undefined): string {
 interface CollegeAdSignupRow extends RowDataPacket {
   id: number;
   college_name: string;
-  email: string;
-  contact_name: string;
-  phone: string;
-  status: string;
+  email: string | null;
+  contact_name: string | null;
+  phone: string | null;
+  status: number;
   created_at: string;
 }
 
@@ -66,12 +66,12 @@ export default async function AdsCollegesListPage({
   const params: (string | number)[] = [];
 
   if (q) {
-    conditions.push("(college_name LIKE ? OR email LIKE ? OR contact_name LIKE ?)");
+    conditions.push("(u.firstname LIKE ? OR cp.contactpersonemail LIKE ? OR cp.contactpersonname LIKE ?)");
     params.push(`%${q}%`, `%${q}%`, `%${q}%`);
   }
   if (status !== "all") {
-    conditions.push("status = ?");
-    params.push(status);
+    conditions.push("a.status = ?");
+    params.push(status === "active" ? 1 : 0);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -79,19 +79,35 @@ export default async function AdsCollegesListPage({
   // ── Queries ────────────────────────────────────────────────────────────────
   const [colleges, countRows, statsRows] = await Promise.all([
     safeQuery<CollegeAdSignupRow>(
-      `SELECT * FROM next_college_signups ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      `SELECT 
+         a.id, 
+         a.status, 
+         a.created_at, 
+         COALESCE(u.firstname, 'Unnamed College') AS college_name,
+         cp.contactpersonemail AS email,
+         cp.contactpersonname AS contact_name,
+         cp.contactpersonnumber AS phone
+       FROM ads_top_college_lists a
+       LEFT JOIN collegeprofile cp ON cp.id = a.collegeprofile_id
+       LEFT JOIN users u ON u.id = cp.users_id
+       ${where} 
+       ORDER BY a.created_at DESC LIMIT ? OFFSET ?`,
       [...params, PAGE_SIZE, offset],
     ),
     safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total FROM next_college_signups ${where}`,
+      `SELECT COUNT(*) AS total 
+       FROM ads_top_college_lists a
+       LEFT JOIN collegeprofile cp ON cp.id = a.collegeprofile_id
+       LEFT JOIN users u ON u.id = cp.users_id
+       ${where}`,
       params,
     ),
     safeQuery<RowDataPacket>(`
       SELECT 
         COUNT(*) AS total,
-        SUM(status = 'pending') AS pending,
-        SUM(status = 'active') AS active
-      FROM next_college_signups
+        SUM(status = 0) AS pending,
+        SUM(status = 1) AS active
+      FROM ads_top_college_lists
     `),
   ]);
 
@@ -109,8 +125,8 @@ export default async function AdsCollegesListPage({
   }
 
   const STAT_CARDS = [
-    { label: "Total Signups", value: stats?.total ?? 0, icon: "list_alt", accent: "bg-blue-50 text-blue-600" },
-    { label: "Pending", value: stats?.pending ?? 0, icon: "pending", accent: "bg-amber-50 text-amber-600" },
+    { label: "Total Placements", value: stats?.total ?? 0, icon: "list_alt", accent: "bg-blue-50 text-blue-600" },
+    { label: "Inactive", value: stats?.pending ?? 0, icon: "pending", accent: "bg-amber-50 text-amber-600" },
     { label: "Active", value: stats?.active ?? 0, icon: "check_circle", accent: "bg-emerald-50 text-emerald-600" },
   ];
 
@@ -199,9 +215,9 @@ export default async function AdsCollegesListPage({
                     </td>
                     <td className="px-4 py-4 text-center">
                       <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        col.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                        col.status === 1 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
                       }`}>
-                        {col.status}
+                        {col.status === 1 ? 'active' : 'inactive'}
                       </span>
                     </td>
                     <td className="px-4 py-4 text-xs">{formatDate(col.created_at)}</td>
