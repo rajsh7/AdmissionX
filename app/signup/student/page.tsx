@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Header from "../../components/Header";
 import { AuthBackgroundSlider } from "../../components/AuthBackgroundSlider";
 import { useRouter } from "next/navigation";
 
 export default function StudentSignupPage() {
   const router = useRouter();
+  const [errorMsg, setErrorMsg] = useState("");
 
   return (
     <div className="min-h-screen flex flex-col font-display relative">
@@ -35,10 +37,17 @@ export default function StudentSignupPage() {
             </p>
           </div>
 
+          {errorMsg && (
+            <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg text-sm text-center">
+              {errorMsg}
+            </div>
+          )}
+
           <form
             className="space-y-5"
             onSubmit={async (e) => {
               e.preventDefault();
+              setErrorMsg("");
               const form = e.currentTarget as HTMLFormElement;
               const formData = new FormData(form);
               const body = {
@@ -46,6 +55,8 @@ export default function StudentSignupPage() {
                 email: String(formData.get("email") || ""),
                 phone: String(formData.get("phone") || ""),
                 password: String(formData.get("password") || ""),
+                dob: String(formData.get("dob") || ""),
+                marks12: String(formData.get("marks12") || ""),
                 captchaOk: formData.get("captcha") === "on",
               };
               const res = await fetch("/api/signup/student", {
@@ -57,7 +68,7 @@ export default function StudentSignupPage() {
                 router.push("/signup/student/success");
               } else {
                 const data = await res.json();
-                alert(data.error || "Signup failed");
+                setErrorMsg(data.error || "Signup failed");
               }
             }}
           >
@@ -128,8 +139,50 @@ export default function StudentSignupPage() {
                   name="phone"
                   type="tel"
                   placeholder="Enter Your Phone Number"
+                  required
                   className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-slate-100"
                 />
+              </div>
+            </div>
+
+            {/* Sub-grid for DOB and 12th Marks */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-slate-700 dark:text-slate-300 text-sm font-semibold">
+                  Date of Birth
+                </label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">
+                    calendar_today
+                  </span>
+                  <input
+                    name="dob"
+                    type="date"
+                    required
+                    className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-slate-100"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-slate-700 dark:text-slate-300 text-sm font-semibold">
+                  12th Marks (%)
+                </label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">
+                    percent
+                  </span>
+                  <input
+                    name="marks12"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                    placeholder="e.g. 85.5"
+                    required
+                    className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-slate-100"
+                  />
+                </div>
               </div>
             </div>
 

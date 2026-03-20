@@ -668,6 +668,48 @@ function ApplicationFormStep({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // ── Document upload state ──────────────────────────────────────────────────
+  const REQUIRED_DOCS = [
+    { type: "10th Marksheet", icon: "description" },
+    { type: "12th Marksheet", icon: "description" },
+    { type: "ID Proof", icon: "badge" },
+  ];
+  const [docFiles, setDocFiles] = useState<Record<string, File | null>>({});
+  const [docUrls, setDocUrls] = useState<Record<string, string>>({});
+  const [docErrors, setDocErrors] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState<Record<string, boolean>>({});
+
+  const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/png"];
+  const MAX_BYTES = 5 * 1024 * 1024;
+
+  async function handleFileSelect(type: string, file: File | null) {
+    if (!file) return;
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setDocErrors((prev) => ({ ...prev, [type]: "Only PDF, JPG, PNG allowed." }));
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      setDocErrors((prev) => ({ ...prev, [type]: "File must be under 5MB." }));
+      return;
+    }
+    setDocErrors((prev) => { const n = { ...prev }; delete n[type]; return n; });
+    setDocFiles((prev) => ({ ...prev, [type]: file }));
+    setUploading((prev) => ({ ...prev, [type]: true }));
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/student/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Upload failed");
+      setDocUrls((prev) => ({ ...prev, [type]: data.url }));
+    } catch (e) {
+      setDocErrors((prev) => ({ ...prev, [type]: e instanceof Error ? e.message : "Upload failed." }));
+      setDocFiles((prev) => { const n = { ...prev }; delete n[type]; return n; });
+    } finally {
+      setUploading((prev) => { const n = { ...prev }; delete n[type]; return n; });
+    }
+  }
+
   const fees = course?.fees ?? 0;
   const courseLabel =
     [course?.degree_name, course?.course_name].filter(Boolean).join(" ") ||
@@ -676,6 +718,14 @@ function ApplicationFormStep({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!user?.id) return;
+
+    // Ensure all required docs are uploaded
+    const missing = REQUIRED_DOCS.filter((d) => !docUrls[d.type]);
+    if (missing.length > 0) {
+      setError(`Please upload: ${missing.map((d) => d.type).join(", ")}`);
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
     try {
@@ -691,6 +741,7 @@ function ApplicationFormStep({
           stream_name: course?.stream_name ?? undefined,
           fees,
           notes: notes.trim() || undefined,
+          documents: REQUIRED_DOCS.map((d) => ({ type: d.type, url: docUrls[d.type] })),
         }),
       });
 
@@ -787,6 +838,68 @@ function ApplicationFormStep({
               <span className="font-black text-primary text-base">
                 {formatCurrency(fees)}
               </span>
+            </div>
+          </div>
+
+          {/* Required Documents */}
+          <div className="mb-6">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+              Required Documents
+            </p>
+            <div className="space-y-3">
+              {REQUIRED_DOCS.map((doc) => {
+                const uploaded = !!docUrls[doc.type];
+                const isUploading = !!uploading[doc.type];
+                const fileError = docErrors[doc.type];
+                return (
+                  <label
+                    key={doc.type}
+                    className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      uploaded
+                        ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20"
+                        : fileError
+                        ? "border-red-400 bg-red-50 dark:bg-red-900/20"
+                        : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 hover:border-primary/50"
+                    }`}
+                  >
+                    <span
+                      className={`material-symbols-outlined text-2xl flex-shrink-0 ${
+                        uploaded ? "text-emerald-500" : fileError ? "text-red-500" : "text-slate-400"
+                      }`}
+                      style={{ fontVariationSettings: uploaded ? "'FILL' 1" : "'FILL' 0" }}
+                    >
+                      {uploaded ? "check_circle" : isUploading ? "upload" : doc.icon}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                        {doc.type}
+                      </p>
+                      {uploaded && (
+                        <p className="text-xs text-emerald-600 font-medium mt-0.5">Uploaded ✓</p>
+                      )}
+                      {isUploading && (
+                        <p className="text-xs text-primary font-medium mt-0.5 animate-pulse">Uploading…</p>
+                      )}
+                      {fileError && (
+                        <p className="text-xs text-red-500 font-medium mt-0.5">{fileError}</p>
+                      )}
+                      {!uploaded && !isUploading && !fileError && (
+                        <p className="text-xs text-slate-400 mt-0.5">PDF, JPG, PNG · Max 5MB</p>
+                      )}
+                    </div>
+                    <input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      className="sr-only"
+                      disabled={isUploading || submitting}
+                      onChange={(e) => handleFileSelect(doc.type, e.target.files?.[0] ?? null)}
+                    />
+                    {!uploaded && !isUploading && (
+                      <span className="material-symbols-outlined text-slate-400 flex-shrink-0">attach_file</span>
+                    )}
+                  </label>
+                );
+              })}
             </div>
           </div>
 

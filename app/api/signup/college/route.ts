@@ -6,11 +6,11 @@ import { sendCollegeSignupConfirmationEmail } from "@/lib/email";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { collegeName, email, contactName, phone, password, captchaOk } =
+    const { collegeName, email, contactName, phone, address, courses, password, captchaOk } =
       body;
 
     // ── Validation ────────────────────────────────────────────────────────────
-    if (!collegeName || !email || !contactName || !phone || !password) {
+    if (!collegeName || !email || !contactName || !phone || !address || !courses || !password) {
       return NextResponse.json(
         { error: "All fields are required." },
         { status: 400 },
@@ -43,7 +43,9 @@ export async function POST(req: NextRequest) {
           email         VARCHAR(255) NOT NULL UNIQUE,
           contact_name  VARCHAR(255) NOT NULL,
           phone         VARCHAR(32)  NOT NULL,
-          password_hash VARCHAR(255) DEFAULT NULL,
+          address       TEXT NOT NULL,
+          courses       TEXT NOT NULL,
+           password_hash VARCHAR(255) DEFAULT NULL,
           status        VARCHAR(20)  NOT NULL DEFAULT 'pending',
           created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -72,13 +74,15 @@ export async function POST(req: NextRequest) {
       // ── Insert record ─────────────────────────────────────────────────────
       await conn.query(
         `INSERT INTO next_college_signups
-           (college_name, email, contact_name, phone, password_hash, status)
-         VALUES (?, ?, ?, ?, ?, 'pending')`,
+           (college_name, email, contact_name, phone, address, courses, password_hash, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`,
         [
           collegeName.trim(),
           emailLower,
           contactName.trim(),
           phone.trim(),
+          address.trim(),
+          courses.trim(),
           passwordHash,
         ],
       );
@@ -108,12 +112,11 @@ export async function POST(req: NextRequest) {
         contactName.trim(),
       );
     } catch (emailErr) {
-      console.error("[college signup] confirmation email failed:", emailErr);
+      // ignore silently
     }
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("[college signup]", err);
     return NextResponse.json(
       { error: "Internal server error. Please try again." },
       { status: 500 },

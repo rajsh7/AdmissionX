@@ -68,34 +68,10 @@ export async function GET(
 
   const conn = await pool.getConnection();
   try {
-    // Ensure applications table exists (created by student flow but guard anyway)
-    await conn.query(`
-      CREATE TABLE IF NOT EXISTS next_student_applications (
-        id                INT AUTO_INCREMENT PRIMARY KEY,
-        application_ref   VARCHAR(20)   NOT NULL UNIQUE,
-        student_id        INT           NOT NULL,
-        collegeprofile_id INT           DEFAULT NULL,
-        collegemaster_id  INT           DEFAULT NULL,
-        college_name      VARCHAR(255)  DEFAULT NULL,
-        course_name       VARCHAR(255)  DEFAULT NULL,
-        degree_name       VARCHAR(255)  DEFAULT NULL,
-        stream_name       VARCHAR(255)  DEFAULT NULL,
-        fees              DECIMAL(10,2) DEFAULT 0.00,
-        status            VARCHAR(30)   NOT NULL DEFAULT 'submitted',
-        payment_status    VARCHAR(30)   NOT NULL DEFAULT 'pending',
-        transaction_id    VARCHAR(255)  DEFAULT NULL,
-        amount_paid       DECIMAL(10,2) DEFAULT 0.00,
-        notes             TEXT          DEFAULT NULL,
-        created_at        TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
-        updated_at        TIMESTAMP     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_nsa_student (student_id),
-        INDEX idx_nsa_status  (status),
-        INDEX idx_nsa_college (collegeprofile_id)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    // Table schema is managed externally
 
     // Build WHERE clause
-    const whereParts = ["a.collegeprofile_id = ?"];
+    const whereParts = ["a.collegeId = ?"];
     const whereValues: unknown[] = [auth.collegeprofile_id];
 
     if (status) {
@@ -104,12 +80,12 @@ export async function GET(
     }
     if (search) {
       whereParts.push(
-        `(a.application_ref LIKE ?
-          OR a.course_name   LIKE ?
-          OR a.degree_name   LIKE ?
-          OR a.stream_name   LIKE ?
+        `(a.applicationRef LIKE ?
+          OR co.name         LIKE ?
+          OR d.name          LIKE ?
+          OR fa.name         LIKE ?
           OR s.name          LIKE ?
-          OR s.email         LIKE ?)`,
+          OR s.email         LIKE ?)`
       );
       const like = `%${search}%`;
       whereValues.push(like, like, like, like, like, like);
@@ -120,8 +96,14 @@ export async function GET(
     // Count total
     const [countRows] = await conn.query(
       `SELECT COUNT(*) AS total
-       FROM next_student_applications a
-       LEFT JOIN next_student_signups s ON s.id = a.student_id
+       FROM applications a
+       LEFT JOIN next_student_signups s ON s.id = a.studentId
+       ${search ? `
+       LEFT JOIN collegemaster cm ON cm.id = a.courseId
+       LEFT JOIN course co ON co.id = cm.course_id
+       LEFT JOIN degree d ON d.id = cm.degree_id
+       LEFT JOIN functionalarea fa ON fa.id = cm.functionalarea_id
+       ` : ''}
        ${whereSQL}`,
       whereValues,
     );
@@ -131,31 +113,50 @@ export async function GET(
     const [rows] = await conn.query(
       `SELECT
          a.id,
-         a.application_ref,
-         a.student_id,
-         a.course_name,
-         a.degree_name,
-         a.stream_name,
-         a.fees,
+         a.applicationRef AS application_ref,
+         a.studentId AS student_id,
+         co.name AS course_name,
+         d.name AS degree_name,
+         fa.name AS stream_name,
+         cm.fees,
          a.status,
-         a.payment_status,
-         a.transaction_id,
-         a.amount_paid,
-         a.notes,
-         a.created_at,
-         a.updated_at,
+         'pending' AS payment_status,
+         NULL AS transaction_id,
+         0 AS amount_paid,
+         NULL AS notes,
+         a.createdAt AS created_at,
+         a.createdAt AS updated_at,
          s.name  AS student_name,
          s.email AS student_email,
          s.phone AS student_phone
-       FROM next_student_applications a
-       LEFT JOIN next_student_signups s ON s.id = a.student_id
+       FROM applications a
+       LEFT JOIN next_student_signups s ON s.id = a.studentId
+       LEFT JOIN collegemaster cm ON cm.id = a.courseId
+       LEFT JOIN course co ON co.id = cm.course_id
+       LEFT JOIN degree d ON d.id = cm.degree_id
+       LEFT JOIN functionalarea fa ON fa.id = cm.functionalarea_id
        ${whereSQL}
-       ORDER BY a.created_at DESC
+       ORDER BY a.createdAt DESC
        LIMIT ? OFFSET ?`,
       [...whereValues, limit, offset],
     );
 
-    const applications = (rows as Record<string, unknown>[]).map((row) => {
+    const appList = rows as Record<string, unknown>[];
+    const docsByApp: Record<number, any[]> = {};
+
+    if (appList.length > 0) {
+      const appIds = appList.map((r) => r.id);
+      const [docRows] = await conn.query(
+        `SELECT applicationId, type, fileUrl, uploadedAt FROM documents WHERE applicationId IN (?)`,
+        [appIds]
+      );
+      for (const doc of docRows as any[]) {
+        if (!docsByApp[doc.applicationId]) docsByApp[doc.applicationId] = [];
+        docsByApp[doc.applicationId].push(doc);
+      }
+    }
+
+    const applications = appList.map((row) => {
       const st  = String(row.status         ?? "submitted");
       const pay = String(row.payment_status ?? "pending");
       const sm  = STATUS_META[st]  ?? STATUS_META["submitted"];
@@ -173,6 +174,7 @@ export async function GET(
         paymentIcon:    pm.icon,
         fees:           Number(row.fees       ?? 0),
         amount_paid:    Number(row.amount_paid ?? 0),
+        documents:      docsByApp[row.id as number] || [],
         submittedOn:    row.created_at
           ? new Date(row.created_at as string).toLocaleDateString("en-IN", {
               day: "2-digit", month: "short", year: "numeric",
@@ -243,8 +245,8 @@ export async function PUT(
   try {
     // Verify the application belongs to this college
     const [checkRows] = await conn.query(
-      `SELECT id, status FROM next_student_applications
-       WHERE id = ? AND collegeprofile_id = ?
+      `SELECT id, status FROM applications
+       WHERE id = ? AND collegeId = ?
        LIMIT 1`,
       [application_id, auth.collegeprofile_id],
     );
@@ -256,16 +258,11 @@ export async function PUT(
       );
     }
 
-    const updateParts = ["status = ?", "updated_at = CURRENT_TIMESTAMP"];
+    const updateParts = ["status = ?"];
     const updateValues: unknown[] = [status];
 
-    if (notes !== undefined) {
-      updateParts.push("notes = ?");
-      updateValues.push(notes?.trim() || null);
-    }
-
     await conn.query(
-      `UPDATE next_student_applications
+      `UPDATE applications
        SET ${updateParts.join(", ")}
        WHERE id = ?`,
       [...updateValues, application_id],

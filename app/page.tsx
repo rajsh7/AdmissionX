@@ -11,6 +11,8 @@ import { RowDataPacket } from "mysql2";
 // Tells Next.js to cache the fully-rendered page for 5 minutes.
 // Works in both development and production, unlike unstable_cache alone.
 // export const revalidate = 300;
+
+// Force dynamic rendering to avoid prerender errors when DB is down
 export const dynamic = 'force-dynamic';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -36,6 +38,15 @@ function slugToName(slug: string): string {
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
+}
+
+async function safeQuery<T extends RowDataPacket>(sql: string): Promise<T[]> {
+  try {
+    const [rows] = (await pool.query(sql)) as [T[], unknown];
+    return rows;
+  } catch {
+    return [];
+  }
 }
 
 // ── Cached data fetcher ───────────────────────────────────────────────────────

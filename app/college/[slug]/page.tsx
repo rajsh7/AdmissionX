@@ -2,8 +2,8 @@ import pool from "@/lib/db";
 import { notFound } from "next/navigation";
 import { RowDataPacket } from "mysql2";
 
-// Cache the fully-rendered page for 5 minutes (same TTL as the layout).
-export const revalidate = 300;
+// Enforce strictly dynamic rendering to prevent stale data conflicts
+export const dynamic = "force-dynamic";
 import CourseList from "@/app/components/college/CourseList";
 import PlacementSection from "@/app/components/college/PlacementSection";
 import GallerySection from "@/app/components/college/GallerySection";

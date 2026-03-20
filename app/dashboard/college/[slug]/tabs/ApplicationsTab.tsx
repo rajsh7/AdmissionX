@@ -32,6 +32,7 @@ interface Application {
   paymentClass: string;
   paymentIcon: string;
   submittedOn: string | null;
+  documents?: { type: string; fileUrl: string; uploadedAt: string }[];
 }
 
 interface Stats {
@@ -258,6 +259,8 @@ function AppRow({
   slug: string;
   onStatusUpdated: (id: number, status: string) => void;
 }) {
+  const [expanded, setExpanded] = useState(false);
+
   const initials = (app.student_name ?? "?")
     .split(" ")
     .slice(0, 2)
@@ -268,94 +271,167 @@ function AppRow({
   void payMeta;
 
   return (
-    <tr className="border-b border-slate-100 dark:border-slate-700/60 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors group">
-      {/* Ref + student */}
-      <td className="px-4 py-3.5 min-w-[220px]">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center shrink-0">
-            <span className="text-xs font-black text-primary">{initials}</span>
+    <>
+      <tr className="border-b border-slate-100 dark:border-slate-700/60 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors group">
+        {/* Ref + student */}
+        <td className="px-4 py-3.5 min-w-[220px]">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center shrink-0">
+              <span className="text-xs font-black text-primary">{initials}</span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-slate-800 dark:text-white truncate">
+                {app.student_name ?? "Unknown Student"}
+              </p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 truncate">
+                {app.student_email ?? "—"}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="text-sm font-bold text-slate-800 dark:text-white truncate">
-              {app.student_name ?? "Unknown Student"}
-            </p>
-            <p className="text-xs text-slate-400 dark:text-slate-500 truncate">
-              {app.student_email ?? "—"}
-            </p>
-          </div>
-        </div>
-      </td>
+        </td>
 
-      {/* Ref */}
-      <td className="px-4 py-3.5 hidden sm:table-cell">
-        <span className="inline-block font-mono text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-lg">
-          {app.application_ref}
-        </span>
-      </td>
-
-      {/* Course */}
-      <td className="px-4 py-3.5 hidden md:table-cell">
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 truncate max-w-[180px]">
-            {app.course_name ?? "—"}
-          </p>
-          <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-            {app.degree_name && (
-              <span className="text-[11px] text-slate-400 font-medium">
-                {app.degree_name}
-              </span>
-            )}
-            {app.stream_name && (
-              <span className="text-[11px] text-slate-400">
-                · {app.stream_name}
-              </span>
-            )}
-          </div>
-        </div>
-      </td>
-
-      {/* Fees */}
-      <td className="px-4 py-3.5 hidden lg:table-cell">
-        <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
-          {formatCurrency(app.fees)}
-        </span>
-      </td>
-
-      {/* Payment */}
-      <td className="px-4 py-3.5 hidden lg:table-cell">
-        <span
-          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${app.paymentClass}`}
-        >
-          <span
-            className="material-symbols-rounded text-[13px]"
-            style={{
-              fontVariationSettings:
-                "'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 20",
-            }}
-          >
-            {app.paymentIcon}
+        {/* Ref */}
+        <td className="px-4 py-3.5 hidden sm:table-cell">
+          <span className="inline-block font-mono text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-lg">
+            {app.application_ref}
           </span>
-          {app.paymentLabel}
-        </span>
-      </td>
+        </td>
 
-      {/* Status — with dropdown */}
-      <td className="px-4 py-3.5">
-        <StatusDropdown
-          appId={app.id}
-          current={app.status}
-          slug={slug}
-          onUpdated={onStatusUpdated}
-        />
-      </td>
+        {/* Course */}
+        <td className="px-4 py-3.5 hidden md:table-cell">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 truncate max-w-[180px]">
+              {app.course_name ?? "—"}
+            </p>
+            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+              {app.degree_name && (
+                <span className="text-[11px] text-slate-400 font-medium">
+                  {app.degree_name}
+                </span>
+              )}
+              {app.stream_name && (
+                <span className="text-[11px] text-slate-400">
+                  · {app.stream_name}
+                </span>
+              )}
+            </div>
+          </div>
+        </td>
 
-      {/* Date */}
-      <td className="px-4 py-3.5 hidden xl:table-cell">
-        <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">
-          {app.submittedOn ?? "—"}
-        </span>
-      </td>
-    </tr>
+        {/* Fees */}
+        <td className="px-4 py-3.5 hidden lg:table-cell">
+          <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
+            {formatCurrency(app.fees)}
+          </span>
+        </td>
+
+        {/* Payment */}
+        <td className="px-4 py-3.5 hidden lg:table-cell">
+          <span
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${app.paymentClass}`}
+          >
+            <span
+              className="material-symbols-rounded text-[13px]"
+              style={{
+                fontVariationSettings:
+                  "'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 20",
+              }}
+            >
+              {app.paymentIcon}
+            </span>
+            {app.paymentLabel}
+          </span>
+        </td>
+
+        {/* Status — with dropdown */}
+        <td className="px-4 py-3.5">
+          <StatusDropdown
+            appId={app.id}
+            current={app.status}
+            slug={slug}
+            onUpdated={onStatusUpdated}
+          />
+        </td>
+
+        {/* Date & Expand Button */}
+        <td className="px-4 py-3.5 hidden xl:table-cell">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">
+              {app.submittedOn ?? "—"}
+            </span>
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 transition-colors"
+              title={expanded ? "Hide Details" : "View Details & Documents"}
+            >
+              <span className="material-symbols-rounded text-xl">
+                {expanded ? "expand_less" : "expand_more"}
+              </span>
+            </button>
+          </div>
+        </td>
+      </tr>
+
+      {/* Expanded Details Row */}
+      {expanded && (
+        <tr className="bg-slate-50/50 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-700/60">
+          <td colSpan={7} className="px-6 py-5">
+            <div className="flex flex-col sm:flex-row gap-8 text-sm max-w-4xl mx-auto">
+              {/* Documents Section */}
+              <div className="flex-1">
+                <h4 className="font-bold text-slate-800 dark:text-white mb-3 flex items-center gap-2">
+                  <span className="material-symbols-rounded text-primary text-lg">folder_open</span>
+                  Uploaded Documents
+                </h4>
+                {app.documents && app.documents.length > 0 ? (
+                  <div className="flex gap-3 flex-wrap">
+                    {app.documents.map((doc, i) => (
+                      <a
+                        key={i}
+                        href={doc.fileUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-2.5 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl hover:border-primary hover:shadow-sm transition-all text-slate-700 dark:text-slate-200"
+                        title={`View ${doc.type}`}
+                      >
+                        <span className="material-symbols-rounded text-primary bg-primary/10 p-1.5 rounded-lg text-lg mix-blend-multiply dark:mix-blend-normal">
+                          description
+                        </span>
+                        <div className="flex flex-col">
+                           <span className="font-semibold text-sm">{doc.type}</span>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-slate-500 dark:text-slate-400 italic text-sm">
+                    No documents were uploaded for this application.
+                  </p>
+                )}
+              </div>
+              
+              {/* Contact Section */}
+              <div className="w-full sm:w-64 shrink-0">
+                 <h4 className="font-bold text-slate-800 dark:text-white mb-3 flex items-center gap-2">
+                   <span className="material-symbols-rounded text-primary text-lg">contact_mail</span>
+                   Student Contact
+                 </h4>
+                 <div className="space-y-2.5 text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-600 p-3">
+                    <p className="flex items-center gap-2.5">
+                      <span className="material-symbols-rounded text-base text-slate-400 cursor-default" title="Phone Number">call</span>
+                      <a href={`tel:${app.student_phone}`} className="hover:text-primary transition-colors">{app.student_phone || "—"}</a>
+                    </p>
+                    <p className="flex items-center gap-2.5 truncate">
+                      <span className="material-symbols-rounded text-base text-slate-400 cursor-default" title="Email Address">mail</span>
+                      <a href={`mailto:${app.student_email}`} className="hover:text-primary transition-colors truncate">{app.student_email || "—"}</a>
+                    </p>
+                 </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
   );
 }
 

@@ -1,8 +1,7 @@
 import pool from "@/lib/db";
-import { formatDate } from "@/lib/utils";
 import Link from "next/link";
-import { revalidatePath } from "next/cache";
 import { RowDataPacket } from "mysql2";
+import { revalidatePath } from "next/cache";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
@@ -43,44 +42,52 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
+function formatDate(d: string | null | undefined): string {
+  if (!d) return "—";
+  try {
+    return new Date(d).toLocaleDateString("en-IN", {
+      day: "numeric", month: "short", year: "numeric",
+    });
+  } catch { return "—"; }
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AppRow extends RowDataPacket {
   id: number;
-  applicationID: string | null;
-  firstname: string | null;
-  middlename: string | null;
-  lastname: string | null;
-  email: string | null;
-  phone: string | null;
-  gender: string | null;
-  applicationstatus_id: number | null;
-  status_name: string | null;
+  applicationRef: string | null;
+  student_name: string | null;
+  student_email: string | null;
+  student_phone: string | null;
   college_name: string | null;
   college_slug: string | null;
-  created_at: string;
+  course_name: string | null;
+  degree_name: string | null;
+  status: string;
+  createdAt: string;
 }
 
-interface StatusRow extends RowDataPacket {
-  id: number;
-  name: string;
-}
-
-interface CountRow extends RowDataPacket {
-  total: number;
-  status_id: number | null;
-}
+interface CountRow extends RowDataPacket { total: number; }
+interface CollegeFilterRow extends RowDataPacket { slug: string; college_name: string | null; }
 
 // ─── Status badge config ──────────────────────────────────────────────────────
 
+const STATUS_TABS = [
+  { value: "all",          label: "All"          },
+  { value: "submitted",    label: "Submitted"    },
+  { value: "under_review", label: "Under Review" },
+  { value: "verified",     label: "Verified"     },
+  { value: "rejected",     label: "Rejected"     },
+  { value: "enrolled",     label: "Enrolled"     },
+];
+
 const STATUS_STYLE: Record<string, { cls: string; dot: string }> = {
-  submitted:  { cls: "bg-blue-100 text-blue-700",    dot: "bg-blue-500"    },
-  reviewing:  { cls: "bg-amber-100 text-amber-700",  dot: "bg-amber-500"   },
-  accepted:   { cls: "bg-green-100 text-green-700",  dot: "bg-green-500"   },
-  rejected:   { cls: "bg-red-100 text-red-700",      dot: "bg-red-500"     },
-  waitlisted: { cls: "bg-violet-100 text-violet-700",dot: "bg-violet-500"  },
-  default:    { cls: "bg-slate-100 text-slate-600",  dot: "bg-slate-400"   },
+  submitted:    { cls: "bg-blue-100 text-blue-700",    dot: "bg-blue-500"    },
+  under_review: { cls: "bg-amber-100 text-amber-700",  dot: "bg-amber-500"   },
+  verified:     { cls: "bg-emerald-100 text-emerald-700", dot: "bg-emerald-500" },
+  rejected:     { cls: "bg-red-100 text-red-700",      dot: "bg-red-500"     },
+  enrolled:     { cls: "bg-purple-100 text-purple-700",dot: "bg-purple-500"  },
+  default:      { cls: "bg-slate-100 text-slate-600",  dot: "bg-slate-400"   },
 };
 
 function getStatusStyle(name: string | null) {
@@ -93,18 +100,14 @@ function getStatusStyle(name: string | null) {
 export default async function AdminApplicationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string; status?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; status?: string; college?: string }>;
 }) {
   const sp           = await searchParams;
   const q            = (sp.q ?? "").trim();
   const page         = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const statusFilter = sp.status ?? "all";
+  const collegeFilter = sp.college ?? "";
   const offset       = (page - 1) * PAGE_SIZE;
-
-  // ── Load all statuses for the dropdown & filter tabs ──────────────────────
-  const allStatuses = await safeQuery<StatusRow>(
-    "SELECT id, name FROM applicationstatus ORDER BY id ASC",
-  );
 
   // ── Build WHERE conditions ─────────────────────────────────────────────────
   const conditions: string[] = [];
@@ -112,95 +115,94 @@ export default async function AdminApplicationsPage({
 
   if (q) {
     conditions.push(
-      "(a.applicationID LIKE ? OR a.firstname LIKE ? OR a.lastname LIKE ? OR a.email LIKE ?)",
+      `(a.applicationRef LIKE ?
+        OR s.name         LIKE ?
+        OR s.email        LIKE ?
+        OR co.name        LIKE ?)`,
     );
     params.push(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
   }
 
   if (statusFilter !== "all") {
-    const matchedStatus = allStatuses.find(
-      (s) => s.name.toLowerCase() === statusFilter.toLowerCase() ||
-             String(s.id) === statusFilter,
-    );
-    if (matchedStatus) {
-      conditions.push("a.applicationstatus_id = ?");
-      params.push(matchedStatus.id);
-    }
+    conditions.push("a.status = ?");
+    params.push(statusFilter);
+  }
+
+  if (collegeFilter) {
+    conditions.push("cp.slug = ?");
+    params.push(collegeFilter);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
+  const JOINS = `
+    LEFT JOIN next_student_signups s  ON s.id  = a.studentId
+    LEFT JOIN collegeprofile       cp ON cp.id = a.collegeId
+    LEFT JOIN users                u  ON u.id  = cp.users_id
+    LEFT JOIN collegemaster        cm ON cm.id = a.courseId
+    LEFT JOIN course               co ON co.id = cm.course_id
+    LEFT JOIN degree               d  ON d.id  = cm.degree_id
+  `;
+
   // ── Parallel queries ───────────────────────────────────────────────────────
-  const [appRows, countRows, statusCounts, totalAll] = await Promise.all([
+  const [appRows, countRows, statusCounts, totalAll, colleges] = await Promise.all([
     safeQuery<AppRow>(
       `SELECT
          a.id,
-         a.applicationID,
-         a.firstname,
-         a.middlename,
-         a.lastname,
-         a.email,
-         a.phone,
-         a.gender,
-         a.applicationstatus_id,
-         st.name     AS status_name,
+         a.applicationRef,
+         s.name      AS student_name,
+         s.email     AS student_email,
+         s.phone     AS student_phone,
+         COALESCE(NULLIF(TRIM(u.firstname), ''), cp.slug) AS college_name,
          cp.slug     AS college_slug,
-         ncs.college_name
-       FROM application a
-       LEFT JOIN applicationstatus st ON st.id = a.applicationstatus_id
-       LEFT JOIN collegeprofile    cp ON cp.id = a.collegeprofile_id
-       LEFT JOIN next_college_signups ncs ON ncs.email = (
-         SELECT u.email FROM users u WHERE u.id = cp.users_id LIMIT 1
-       )
+         co.name     AS course_name,
+         d.name      AS degree_name,
+         a.status,
+         a.createdAt
+       FROM applications a
+       ${JOINS}
        ${where}
-       ORDER BY a.created_at DESC
+       ORDER BY a.createdAt DESC
        LIMIT ? OFFSET ?`,
       [...params, PAGE_SIZE, offset],
     ),
     safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total
-       FROM application a
-       LEFT JOIN applicationstatus st ON st.id = a.applicationstatus_id
-       ${where}`,
+      `SELECT COUNT(*) AS total FROM applications a ${JOINS} ${where}`,
       params,
     ),
-    safeQuery<CountRow>(
-      `SELECT applicationstatus_id AS status_id, COUNT(*) AS total
-       FROM application
-       GROUP BY applicationstatus_id`,
+    safeQuery<CountRow & { status: string }>(
+      `SELECT status, COUNT(*) AS total FROM applications GROUP BY status`,
     ),
-    safeQuery<CountRow>("SELECT COUNT(*) AS total FROM application"),
+    safeQuery<CountRow>(`SELECT COUNT(*) AS total FROM applications`),
+    safeQuery<CollegeFilterRow>(
+      `SELECT cp.slug,
+              COALESCE(NULLIF(TRIM(u.firstname), ''), cp.slug) AS college_name
+       FROM collegeprofile cp
+       LEFT JOIN users u ON u.id = cp.users_id
+       ORDER BY college_name ASC`,
+    ),
   ]);
 
-  const total = Number(countRows[0]?.total ?? 0);
+  const total      = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const grandTotal = totalAll[0]?.total ?? 0;
+  const grandTotal = Number(totalAll[0]?.total ?? 0);
 
   // Build status→count map
-  const statusCountMap = new Map<number | null, number>();
+  const statusCountMap: Record<string, number> = {};
   for (const row of statusCounts) {
-    statusCountMap.set(row.status_id, row.total);
+    const r = row as { status: string; total: number };
+    statusCountMap[r.status] = Number(r.total ?? 0);
   }
 
   // ── URL builder ────────────────────────────────────────────────────────────
   function buildUrl(overrides: Record<string, string | number>) {
-    const merged = { q, page: String(page), status: statusFilter, ...overrides };
+    const merged = { q, page: String(page), status: statusFilter, college: collegeFilter, ...overrides };
     const qs = Object.entries(merged)
       .filter(([, v]) => v !== "" && v !== "1" && v !== "all")
       .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
       .join("&");
     return `/admin/applications${qs ? `?${qs}` : ""}`;
   }
-
-  // ── Status tabs ────────────────────────────────────────────────────────────
-  const statusTabs = [
-    { label: "All", value: "all", count: grandTotal },
-    ...allStatuses.map((s) => ({
-      label: s.name,
-      value: s.name.toLowerCase(),
-      count: statusCountMap.get(s.id) ?? 0,
-    })),
-  ];
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
@@ -209,97 +211,88 @@ export default async function AdminApplicationsPage({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span
-              className="material-symbols-rounded text-red-600 text-[22px]"
-              style={ICO_FILL}
-            >
+            <span className="material-symbols-rounded text-red-600 text-[22px]" style={ICO_FILL}>
               description
             </span>
             Applications
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Review and manage all admission applications across colleges.
+            Read-only view of all applications across all colleges.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
-            {grandTotal.toLocaleString()} total
-          </span>
-        </div>
+        <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full flex-shrink-0">
+          {grandTotal.toLocaleString()} total
+        </span>
       </div>
 
       {/* ── Mini stat cards ────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        {statusTabs.slice(0, 5).map((tab) => {
-          const style =
-            tab.value === "all"
-              ? { cls: "bg-slate-100 text-slate-600", dot: "bg-slate-400" }
-              : getStatusStyle(tab.label);
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+        {STATUS_TABS.slice(1).map((tab) => {
+          const cnt = statusCountMap[tab.value] ?? 0;
+          const style = getStatusStyle(tab.value);
           return (
             <Link
               key={tab.value}
               href={buildUrl({ status: tab.value, page: 1 })}
-              className={`bg-white rounded-xl border p-4 flex items-center gap-3 hover:shadow-md transition-all ${
-                statusFilter === tab.value
-                  ? "border-red-200 ring-2 ring-red-100"
-                  : "border-slate-100"
+              className={`bg-white rounded-xl border p-3.5 flex flex-col gap-1 hover:shadow-md transition-all ${
+                statusFilter === tab.value ? "border-red-200 ring-2 ring-red-100" : "border-slate-100"
               }`}
             >
-              <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${style.dot}`} />
-              <div className="min-w-0">
-                <p className="text-xl font-bold text-slate-800 leading-none">
-                  {tab.count.toLocaleString()}
-                </p>
-                <p className="text-[11px] font-semibold text-slate-500 truncate mt-0.5">
-                  {tab.label}
-                </p>
-              </div>
+              <span className={`w-2 h-2 rounded-full ${style.dot}`} />
+              <p className="text-xl font-bold text-slate-800 leading-none">{cnt.toLocaleString()}</p>
+              <p className="text-[10px] font-semibold text-slate-500 truncate">{tab.label}</p>
             </Link>
           );
         })}
       </div>
 
       {/* ── Filter bar ────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 flex-wrap items-start sm:items-center">
 
-        {/* Search */}
-        <form method="GET" action="/admin/applications" className="flex-1 flex gap-2">
-          {statusFilter !== "all" && (
-            <input type="hidden" name="status" value={statusFilter} />
-          )}
-          <div className="relative flex-1">
-            <span
-              className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none"
-              style={ICO}
+        {/* Search & College Filter */}
+        <form method="GET" action="/admin/applications" className="flex-1 flex gap-2 min-w-[200px] items-center">
+          {statusFilter !== "all" && <input type="hidden" name="status" value={statusFilter} />}
+          
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span className="text-xs font-semibold text-slate-400 hidden sm:block">College:</span>
+            <select
+              name="college"
+              defaultValue={collegeFilter}
+              className="text-xs border border-slate-200 rounded-xl px-3 py-2 text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-red-400/30 focus:border-red-400 transition cursor-pointer"
             >
+              <option value="">All Colleges</option>
+              {colleges.map((c) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.college_name ?? c.slug}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="relative flex-1">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>
               search
             </span>
             <input
               name="q"
               defaultValue={q}
-              placeholder="Search by name, email, or App ID…"
+              placeholder="Search by name, email, ref, course…"
               className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-red-400/30 focus:border-red-400 transition"
             />
           </div>
-          <button
-            type="submit"
-            className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition-colors flex-shrink-0"
-          >
+          <button type="submit" className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition-colors flex-shrink-0">
             Search
           </button>
-          {q && (
-            <Link
-              href={buildUrl({ q: "", page: 1 })}
-              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-semibold rounded-xl transition-colors flex-shrink-0"
-            >
+          {(q || collegeFilter) && (
+            <Link href={buildUrl({ q: "", college: "", page: 1 })} className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-semibold rounded-xl transition-colors flex-shrink-0">
               Clear
             </Link>
           )}
         </form>
 
-        {/* Status filter dropdown — all tabs */}
-        <div className="flex items-center gap-1.5 flex-wrap flex-shrink-0">
-          {statusTabs.map((tab) => (
+        {/* Status filter tabs */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {STATUS_TABS.map((tab) => (
             <Link
               key={tab.value}
               href={buildUrl({ status: tab.value, page: 1 })}
@@ -310,12 +303,8 @@ export default async function AdminApplicationsPage({
               }`}
             >
               {tab.label}
-              <span
-                className={`ml-1.5 text-[10px] font-bold inline-block align-middle ${
-                  statusFilter === tab.value ? "text-white/80" : "text-slate-400"
-                }`}
-              >
-                {tab.count}
+              <span className={`ml-1.5 text-[10px] font-bold inline-block align-middle ${statusFilter === tab.value ? "text-white/80" : "text-slate-400"}`}>
+                {tab.value === "all" ? grandTotal : (statusCountMap[tab.value] ?? 0)}
               </span>
             </Link>
           ))}
@@ -326,24 +315,14 @@ export default async function AdminApplicationsPage({
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         {appRows.length === 0 ? (
           <div className="py-24 text-center">
-            <span
-              className="material-symbols-rounded text-6xl text-slate-200 block mb-4"
-              style={ICO_FILL}
-            >
+            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>
               description
             </span>
             <p className="text-slate-500 font-semibold text-sm">
-              {q
-                ? `No applications found for "${q}"`
-                : statusFilter !== "all"
-                ? `No ${statusFilter} applications yet.`
-                : "No applications yet."}
+              {q ? `No applications found for "${q}"` : statusFilter !== "all" ? `No ${statusFilter} applications yet.` : "No applications yet."}
             </p>
-            {(q || statusFilter !== "all") && (
-              <Link
-                href="/admin/applications"
-                className="mt-3 inline-block text-xs text-red-600 hover:underline"
-              >
+            {(q || statusFilter !== "all" || collegeFilter) && (
+              <Link href="/admin/applications" className="mt-3 inline-block text-xs text-red-600 hover:underline">
                 Clear filters
               </Link>
             )}
@@ -355,50 +334,40 @@ export default async function AdminApplicationsPage({
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                     <th className="px-5 py-3 text-left">#</th>
-                    <th className="px-4 py-3 text-left">App ID</th>
+                    <th className="px-4 py-3 text-left">App Ref</th>
                     <th className="px-4 py-3 text-left">Student</th>
                     <th className="px-4 py-3 text-left hidden md:table-cell">College</th>
+                    <th className="px-4 py-3 text-left hidden lg:table-cell">Course</th>
                     <th className="px-4 py-3 text-center">Status</th>
                     <th className="px-4 py-3 text-left hidden sm:table-cell">Date</th>
-                    <th className="px-4 py-3 text-right">Update Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
                   {appRows.map((app, idx) => {
-                    const fullName =
-                      [app.firstname, app.middlename, app.lastname]
-                        .filter(Boolean)
-                        .join(" ") || app.email || "—";
-                    const appIdDisplay = app.applicationID ?? `ADX-${String(app.id).padStart(6, "0")}`;
-                    const statusStyle = getStatusStyle(app.status_name);
-
+                    const statusStyle = getStatusStyle(app.status);
                     return (
-                      <tr
-                        key={app.id}
-                        className="hover:bg-slate-50/60 transition-colors group"
-                      >
-                        {/* Row */}
+                      <tr key={app.id} className="hover:bg-slate-50/60 transition-colors">
                         <td className="px-5 py-4 text-xs text-slate-400 font-mono">
                           {offset + idx + 1}
                         </td>
 
-                        {/* App ID */}
+                        {/* App Ref */}
                         <td className="px-4 py-4">
                           <span className="text-xs font-mono font-semibold text-slate-700 bg-slate-100 px-2 py-1 rounded-lg whitespace-nowrap">
-                            {appIdDisplay}
+                            {app.applicationRef ?? `ADX-${String(app.id).padStart(6, "0")}`}
                           </span>
                         </td>
 
                         {/* Student */}
                         <td className="px-4 py-4">
                           <p className="font-semibold text-slate-800 leading-tight truncate max-w-[180px]">
-                            {fullName}
+                            {app.student_name ?? "—"}
                           </p>
                           <p className="text-[11px] text-slate-400 truncate max-w-[180px] mt-0.5">
-                            {app.email ?? "—"}
+                            {app.student_email ?? "—"}
                           </p>
-                          {app.phone && (
-                            <p className="text-[11px] text-slate-400">{app.phone}</p>
+                          {app.student_phone && (
+                            <p className="text-[11px] text-slate-400">{app.student_phone}</p>
                           )}
                         </td>
 
@@ -424,48 +393,29 @@ export default async function AdminApplicationsPage({
                           )}
                         </td>
 
-                        {/* Status */}
+                        {/* Course */}
+                        <td className="px-4 py-4 hidden lg:table-cell">
+                          <p className="text-xs font-semibold text-slate-700 truncate max-w-[140px]">
+                            {app.course_name ?? "—"}
+                          </p>
+                          {app.degree_name && (
+                            <p className="text-[10px] text-slate-400 mt-0.5">{app.degree_name}</p>
+                          )}
+                        </td>
+
+                        {/* Status (read-only badge) */}
                         <td className="px-4 py-4 text-center">
-                          <span
-                            className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${statusStyle.cls}`}
-                          >
+                          <span className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${statusStyle.cls}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot}`} />
-                            {app.status_name ?? "Unknown"}
+                            {app.status ?? "unknown"}
                           </span>
                         </td>
 
                         {/* Date */}
                         <td className="px-4 py-4 hidden sm:table-cell">
                           <span className="text-xs text-slate-400 whitespace-nowrap">
-                            {formatDate(app.created_at)}
+                            {formatDate(app.createdAt)}
                           </span>
-                        </td>
-
-                        {/* Update status form */}
-                        <td className="px-4 py-4 text-right">
-                          <form action={updateApplicationStatus} className="flex items-center justify-end gap-1.5">
-                            <input type="hidden" name="id" value={app.id} />
-                            <select
-                              name="status"
-                              defaultValue={app.applicationstatus_id ?? ""}
-                              className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-red-400/30 focus:border-red-400 transition cursor-pointer"
-                            >
-                              <option value="" disabled>
-                                — Pick status —
-                              </option>
-                              {allStatuses.map((s) => (
-                                <option key={s.id} value={s.id}>
-                                  {s.name}
-                                </option>
-                              ))}
-                            </select>
-                            <button
-                              type="submit"
-                              className="text-xs font-semibold px-2.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors whitespace-nowrap"
-                            >
-                              Update
-                            </button>
-                          </form>
                         </td>
                       </tr>
                     );
@@ -483,24 +433,16 @@ export default async function AdminApplicationsPage({
                 </strong>{" "}
                 of <strong className="text-slate-700">{total.toLocaleString()}</strong>{" "}
                 application{total !== 1 ? "s" : ""}
-                {statusFilter !== "all" && (
-                  <span className="text-slate-400"> (filtered)</span>
-                )}
+                {statusFilter !== "all" && <span className="text-slate-400"> (filtered)</span>}
               </p>
 
               {totalPages > 1 && (
                 <div className="flex items-center gap-1">
-                  {/* Prev */}
                   {page > 1 && (
-                    <Link
-                      href={buildUrl({ page: page - 1 })}
-                      className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
+                    <Link href={buildUrl({ page: page - 1 })} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
                       ← Prev
                     </Link>
                   )}
-
-                  {/* Page numbers */}
                   {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
                     const start = Math.max(1, Math.min(page - 3, totalPages - 6));
                     const p = start + i;
@@ -510,22 +452,15 @@ export default async function AdminApplicationsPage({
                         key={p}
                         href={buildUrl({ page: p })}
                         className={`min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition-colors ${
-                          p === page
-                            ? "bg-red-600 text-white shadow-sm"
-                            : "text-slate-500 bg-white border border-slate-200 hover:bg-slate-50"
+                          p === page ? "bg-red-600 text-white shadow-sm" : "text-slate-500 bg-white border border-slate-200 hover:bg-slate-50"
                         }`}
                       >
                         {p}
                       </Link>
                     );
                   })}
-
-                  {/* Next */}
                   {page < totalPages && (
-                    <Link
-                      href={buildUrl({ page: page + 1 })}
-                      className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
+                    <Link href={buildUrl({ page: page + 1 })} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
                       Next →
                     </Link>
                   )}
@@ -534,6 +469,17 @@ export default async function AdminApplicationsPage({
             </div>
           </div>
         )}
+      </div>
+
+      {/* ── Read-only notice ────────────────────────────────────────────────── */}
+      <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4 text-sm text-blue-800">
+        <span className="material-symbols-rounded text-[18px] mt-0.5 flex-shrink-0" style={ICO_FILL}>
+          info
+        </span>
+        <p>
+          <strong>Read-only view.</strong> Application statuses are managed by colleges directly.
+          Admin oversight only — no status changes from this panel.
+        </p>
       </div>
     </div>
   );

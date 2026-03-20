@@ -1,0 +1,461 @@
+[
+  {
+    "Tables_in_admissionx": "address"
+  },
+  {
+    "Tables_in_admissionx": "addresstype"
+  },
+  {
+    "Tables_in_admissionx": "ads_managements"
+  },
+  {
+    "Tables_in_admissionx": "ads_top_college_lists"
+  },
+  {
+    "Tables_in_admissionx": "alltableinformations"
+  },
+  {
+    "Tables_in_admissionx": "application"
+  },
+  {
+    "Tables_in_admissionx": "application_and_exam_statuses"
+  },
+  {
+    "Tables_in_admissionx": "application_modes"
+  },
+  {
+    "Tables_in_admissionx": "applications"
+  },
+  {
+    "Tables_in_admissionx": "applicationstatus"
+  },
+  {
+    "Tables_in_admissionx": "applicationstatusmessages"
+  },
+  {
+    "Tables_in_admissionx": "ask_question_answer_comments"
+  },
+  {
+    "Tables_in_admissionx": "ask_question_answers"
+  },
+  {
+    "Tables_in_admissionx": "ask_question_tags"
+  },
+  {
+    "Tables_in_admissionx": "ask_questions"
+  },
+  {
+    "Tables_in_admissionx": "assessment_results"
+  },
+  {
+    "Tables_in_admissionx": "blogs"
+  },
+  {
+    "Tables_in_admissionx": "bookmarks"
+  },
+  {
+    "Tables_in_admissionx": "bookmarktypeinfos"
+  },
+  {
+    "Tables_in_admissionx": "cardtype"
+  },
+  {
+    "Tables_in_admissionx": "career_assessment_questions"
+  },
+  {
+    "Tables_in_admissionx": "careers"
+  },
+  {
+    "Tables_in_admissionx": "category"
+  },
+  {
+    "Tables_in_admissionx": "city"
+  },
+  {
+    "Tables_in_admissionx": "college_admission_important_dateds"
+  },
+  {
+    "Tables_in_admissionx": "college_admission_procedures"
+  },
+  {
+    "Tables_in_admissionx": "college_cut_offs"
+  },
+  {
+    "Tables_in_admissionx": "college_faqs"
+  },
+  {
+    "Tables_in_admissionx": "college_management_details"
+  },
+  {
+    "Tables_in_admissionx": "college_master_associate_faculties"
+  },
+  {
+    "Tables_in_admissionx": "college_reviews"
+  },
+  {
+    "Tables_in_admissionx": "college_scholarships"
+  },
+  {
+    "Tables_in_admissionx": "college_social_media_links"
+  },
+  {
+    "Tables_in_admissionx": "college_sports_activities"
+  },
+  {
+    "Tables_in_admissionx": "college_transactions"
+  },
+  {
+    "Tables_in_admissionx": "collegefacilities"
+  },
+  {
+    "Tables_in_admissionx": "collegemaster"
+  },
+  {
+    "Tables_in_admissionx": "collegeprofile"
+  },
+  {
+    "Tables_in_admissionx": "collegetype"
+  },
+  {
+    "Tables_in_admissionx": "comparison_features"
+  },
+  {
+    "Tables_in_admissionx": "contentcategory"
+  },
+  {
+    "Tables_in_admissionx": "contents"
+  },
+  {
+    "Tables_in_admissionx": "counseling_board_admission_dates"
+  },
+  {
+    "Tables_in_admissionx": "counseling_board_details"
+  },
+  {
+    "Tables_in_admissionx": "counseling_board_exam_dates"
+  },
+  {
+    "Tables_in_admissionx": "counseling_board_highlights"
+  },
+  {
+    "Tables_in_admissionx": "counseling_board_imp_dates"
+  },
+  {
+    "Tables_in_admissionx": "counseling_board_latest_updates"
+  },
+  {
+    "Tables_in_admissionx": "counseling_board_sample_papers"
+  },
+  {
+    "Tables_in_admissionx": "counseling_board_syllabus"
+  },
+  {
+    "Tables_in_admissionx": "counseling_boards"
+  },
+  {
+    "Tables_in_admissionx": "counseling_career_details"
+  },
+  {
+    "Tables_in_admissionx": "counseling_career_interests"
+  },
+  {
+    "Tables_in_admissionx": "counseling_career_job_role_saleries"
+  },
+  {
+    "Tables_in_admissionx": "counseling_career_relevants"
+  },
+  {
+    "Tables_in_admissionx": "counseling_career_skill_requirements"
+  },
+  {
+    "Tables_in_admissionx": "counseling_career_where_to_studies"
+  },
+  {
+    "Tables_in_admissionx": "counseling_courses_details"
+  },
+  {
+    "Tables_in_admissionx": "counseling_courses_education_levels"
+  },
+  {
+    "Tables_in_admissionx": "counseling_courses_job_careers"
+  },
+  {
+    "Tables_in_admissionx": "counseling_courses_more_details"
+  },
+  {
+    "Tables_in_admissionx": "counseling_courses_more_titles"
+  },
+  {
+    "Tables_in_admissionx": "country"
+  },
+  {
+    "Tables_in_admissionx": "country-bk"
+  },
+  {
+    "Tables_in_admissionx": "course"
+  },
+  {
+    "Tables_in_admissionx": "course_recommendations"
+  },
+  {
+    "Tables_in_admissionx": "coursetype"
+  },
+  {
+    "Tables_in_admissionx": "degree"
+  },
+  {
+    "Tables_in_admissionx": "documents"
+  },
+  {
+    "Tables_in_admissionx": "educationlevel"
+  },
+  {
+    "Tables_in_admissionx": "eligibility_criterias"
+  },
+  {
+    "Tables_in_admissionx": "engineeringexams"
+  },
+  {
+    "Tables_in_admissionx": "entranceexam"
+  },
+  {
+    "Tables_in_admissionx": "event"
+  },
+  {
+    "Tables_in_admissionx": "exam_admit_cards"
+  },
+  {
+    "Tables_in_admissionx": "exam_analysis_records"
+  },
+  {
+    "Tables_in_admissionx": "exam_answer_key_events"
+  },
+  {
+    "Tables_in_admissionx": "exam_answer_keys"
+  },
+  {
+    "Tables_in_admissionx": "exam_application_fees"
+  },
+  {
+    "Tables_in_admissionx": "exam_application_processes"
+  },
+  {
+    "Tables_in_admissionx": "exam_counselling_contacts"
+  },
+  {
+    "Tables_in_admissionx": "exam_counselling_dates"
+  },
+  {
+    "Tables_in_admissionx": "exam_counselling_forms"
+  },
+  {
+    "Tables_in_admissionx": "exam_counsellings"
+  },
+  {
+    "Tables_in_admissionx": "exam_cut_offs"
+  },
+  {
+    "Tables_in_admissionx": "exam_dates"
+  },
+  {
+    "Tables_in_admissionx": "exam_eligibilities"
+  },
+  {
+    "Tables_in_admissionx": "exam_faqs"
+  },
+  {
+    "Tables_in_admissionx": "exam_list_multiple_degrees"
+  },
+  {
+    "Tables_in_admissionx": "exam_patterns"
+  },
+  {
+    "Tables_in_admissionx": "exam_prepration_tips"
+  },
+  {
+    "Tables_in_admissionx": "exam_question_answer_comments"
+  },
+  {
+    "Tables_in_admissionx": "exam_question_answers"
+  },
+  {
+    "Tables_in_admissionx": "exam_questions"
+  },
+  {
+    "Tables_in_admissionx": "exam_results"
+  },
+  {
+    "Tables_in_admissionx": "exam_sections"
+  },
+  {
+    "Tables_in_admissionx": "exam_syllabus_paper_marks"
+  },
+  {
+    "Tables_in_admissionx": "exam_syllabus_papers"
+  },
+  {
+    "Tables_in_admissionx": "examination_details"
+  },
+  {
+    "Tables_in_admissionx": "examination_important_links"
+  },
+  {
+    "Tables_in_admissionx": "examination_modes"
+  },
+  {
+    "Tables_in_admissionx": "examination_types"
+  },
+  {
+    "Tables_in_admissionx": "examtransaction"
+  },
+  {
+    "Tables_in_admissionx": "facilities"
+  },
+  {
+    "Tables_in_admissionx": "faculty"
+  },
+  {
+    "Tables_in_admissionx": "faculty_departments"
+  },
+  {
+    "Tables_in_admissionx": "faculty_experiences"
+  },
+  {
+    "Tables_in_admissionx": "faculty_qualifications"
+  },
+  {
+    "Tables_in_admissionx": "functionalarea"
+  },
+  {
+    "Tables_in_admissionx": "gallery"
+  },
+  {
+    "Tables_in_admissionx": "homepage_stats"
+  },
+  {
+    "Tables_in_admissionx": "invite"
+  },
+  {
+    "Tables_in_admissionx": "landing_page_query_forms"
+  },
+  {
+    "Tables_in_admissionx": "latest_updates"
+  },
+  {
+    "Tables_in_admissionx": "migrations"
+  },
+  {
+    "Tables_in_admissionx": "news"
+  },
+  {
+    "Tables_in_admissionx": "news_tags"
+  },
+  {
+    "Tables_in_admissionx": "news_types"
+  },
+  {
+    "Tables_in_admissionx": "next_admin_users"
+  },
+  {
+    "Tables_in_admissionx": "next_student_applications"
+  },
+  {
+    "Tables_in_admissionx": "next_student_bookmarks"
+  },
+  {
+    "Tables_in_admissionx": "next_student_documents"
+  },
+  {
+    "Tables_in_admissionx": "next_student_marks"
+  },
+  {
+    "Tables_in_admissionx": "next_student_profiles"
+  },
+  {
+    "Tables_in_admissionx": "next_student_signups"
+  },
+  {
+    "Tables_in_admissionx": "pages"
+  },
+  {
+    "Tables_in_admissionx": "password_reset_tokens"
+  },
+  {
+    "Tables_in_admissionx": "paymentstatus"
+  },
+  {
+    "Tables_in_admissionx": "placement"
+  },
+  {
+    "Tables_in_admissionx": "query"
+  },
+  {
+    "Tables_in_admissionx": "request_for_create_college_accounts"
+  },
+  {
+    "Tables_in_admissionx": "scholarships"
+  },
+  {
+    "Tables_in_admissionx": "seo_contents"
+  },
+  {
+    "Tables_in_admissionx": "slider_managers"
+  },
+  {
+    "Tables_in_admissionx": "socialmanagements"
+  },
+  {
+    "Tables_in_admissionx": "state"
+  },
+  {
+    "Tables_in_admissionx": "student_reviews"
+  },
+  {
+    "Tables_in_admissionx": "studentmarks"
+  },
+  {
+    "Tables_in_admissionx": "studentprofile"
+  },
+  {
+    "Tables_in_admissionx": "subscribe"
+  },
+  {
+    "Tables_in_admissionx": "success_stories"
+  },
+  {
+    "Tables_in_admissionx": "templates"
+  },
+  {
+    "Tables_in_admissionx": "testimonials"
+  },
+  {
+    "Tables_in_admissionx": "transaction"
+  },
+  {
+    "Tables_in_admissionx": "type_of_examinations"
+  },
+  {
+    "Tables_in_admissionx": "university"
+  },
+  {
+    "Tables_in_admissionx": "university_logos"
+  },
+  {
+    "Tables_in_admissionx": "usergroups"
+  },
+  {
+    "Tables_in_admissionx": "userprivileges"
+  },
+  {
+    "Tables_in_admissionx": "userrole"
+  },
+  {
+    "Tables_in_admissionx": "users"
+  },
+  {
+    "Tables_in_admissionx": "userstatus"
+  },
+  {
+    "Tables_in_admissionx": "what_we_offers"
+  }
+]

@@ -103,18 +103,9 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface NewsRow extends RowDataPacket {
-  id: number;
-  topic: string;
-  slug: string | null;
-  isactive: number;
-  newstypeids: string | null;
-  newstagsids: string | null;
-  created_at: string;
-  updated_at: string;
-  description: string | null;
-  featimage: string | null;
-}
+import { NewsRow } from "./NewsListClient";
+
+interface NewsRowDb extends NewsRow, RowDataPacket {}
 
 interface NewsTypeRow extends RowDataPacket {
   id: number;
@@ -165,7 +156,7 @@ export default async function AdminNewsPage({
 
   const [newsRows, countRows, allTypes, allTags, totalAll, totalActive, totalInactive] =
     await Promise.all([
-      safeQuery<NewsRow>(
+      safeQuery<NewsRowDb>(
         `SELECT id, topic, slug, isactive, description, featimage, newstypeids, newstagsids, created_at, updated_at
          FROM news ${where}
          ORDER BY created_at DESC

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -184,7 +184,7 @@ export default function StudentDashboardClient({ user }: Props) {
   }
 
 
-  // ΓöÇΓöÇ Sidebar inner content ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  // ── Sidebar inner content ─────────────────────────────────────────────────
   function SidebarContent() {
     return (
       <div className="flex flex-col h-full">
@@ -195,183 +195,344 @@ export default function StudentDashboardClient({ user }: Props) {
               <span className="text-white font-black text-sm tracking-tight">ADX</span>
 
             </div>
+
             <div>
+
               <p className="font-black text-slate-900 text-[15px] tracking-tight leading-tight">AdmissionX</p>
+
               <p className="text-[9px] text-green-500 font-bold uppercase tracking-widest">Student Portal</p>
+
             </div>
+
           </Link>
+
         </div>
 
         {/* Scrollable nav */}
+
         <nav className="flex-1 overflow-y-auto px-2.5 py-3 space-y-0.5">
 
           {/* Dashboard home */}
+
           <button
+
             onClick={() => navigate("overview")}
+
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 relative group ${
+
               activeTab === "overview"
+
                 ? "bg-green-50 text-green-700"
+
                 : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+
             }`}
+
           >
+
             {activeTab === "overview" && (
+
               <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-green-500 rounded-r-full" />
+
             )}
+
             <span
+
               className={`material-symbols-outlined text-[20px] flex-shrink-0 ${
+
                 activeTab === "overview" ? "text-green-600" : "text-slate-400 group-hover:text-slate-600"
+
               }`}
+
               style={activeTab === "overview" ? { fontVariationSettings: "'FILL' 1" } : {}}
+
             >
+
               dashboard
+
             </span>
+
             <span className="truncate">Dashboard</span>
+
             {activeTab === "overview" && (
+
               <span className="ml-auto w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+
             )}
+
           </button>
 
           {/* Accordion groups */}
+
           {NAV_GROUPS.map((group) => {
+
             const isOpen       = openGroups.has(group.id);
+
             const hasActive    = group.children.some((c) => c.id === activeTab);
+
             return (
+
               <div key={group.id}>
+
                 {/* Group header */}
+
                 <button
+
                   onClick={() => toggleGroup(group.id)}
+
                   className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-150 ${
+
                     hasActive
+
                       ? "text-green-700 bg-green-50/60"
+
                       : "text-slate-600 hover:bg-slate-50 hover:text-slate-800"
+
                   }`}
+
                 >
+
                   <span
+
                     className={`material-symbols-outlined text-[19px] flex-shrink-0 ${
+
                       hasActive ? "text-green-600" : "text-slate-400"
+
                     }`}
+
                     style={hasActive ? { fontVariationSettings: "'FILL' 1" } : {}}
+
                   >
+
                     {group.icon}
+
                   </span>
+
                   <span className="flex-1 text-left truncate text-[13px]">{group.label}</span>
+
                   <span
+
                     className={`material-symbols-outlined text-[16px] flex-shrink-0 transition-transform duration-200 ${
+
                       isOpen ? "rotate-180" : ""
+
                     } ${hasActive ? "text-green-500" : "text-slate-300"}`}
+
                   >
+
                     expand_more
+
                   </span>
+
                 </button>
 
                 {/* Children */}
+
                 {isOpen && (
+
                   <div className="ml-4 pl-3 border-l-2 border-green-100 mt-0.5 mb-1 space-y-0.5">
+
                     {group.children.map((child) => {
+
                       const isActive = activeTab === child.id;
+
                       return (
+
                         <button
+
                           key={child.id}
+
                           onClick={() => navigate(child.id)}
+
                           className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[12.5px] font-semibold transition-all duration-150 relative group ${
+
                             isActive
+
                               ? "bg-green-50 text-green-700"
+
                               : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+
                           }`}
+
                         >
+
                           {isActive && (
+
                             <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-green-500 rounded-r-full" />
+
                           )}
+
                           <span
+
                             className={`material-symbols-outlined text-[16px] flex-shrink-0 ${
+
                               isActive ? "text-green-600" : "text-slate-350 group-hover:text-slate-500"
+
                             }`}
+
                             style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
+
                           >
+
                             {child.icon}
+
                           </span>
+
                           <span className="truncate">{child.label}</span>
+
                           {isActive && (
+
                             <span className="ml-auto w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+
                           )}
+
                         </button>
+
                       );
+
                     })}
+
                   </div>
+
                 )}
+
               </div>
+
             );
+
           })}
 
           {/* Divider */}
+
           <div className="mx-3 my-2 border-t border-dashed border-slate-200" />
 
           {/* Standalone items */}
+
           {STANDALONE.map((item) => {
+
             const isActive = activeTab === item.id;
+
             return (
+
               <button
+
                 key={item.id}
+
                 onClick={() => navigate(item.id)}
+
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 relative group ${
+
                   isActive
+
                     ? "bg-green-50 text-green-700"
+
                     : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+
                 }`}
+
               >
+
                 {isActive && (
+
                   <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-green-500 rounded-r-full" />
+
                 )}
+
                 <span
+
                   className={`material-symbols-outlined text-[20px] flex-shrink-0 ${
+
                     isActive ? "text-green-600" : "text-slate-400 group-hover:text-slate-600"
+
                   }`}
+
                   style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
+
                 >
+
                   {item.icon}
+
                 </span>
+
                 <span className="truncate">{item.label}</span>
+
                 {isActive && (
+
                   <span className="ml-auto w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+
                 )}
+
               </button>
+
             );
+
           })}
 
           {/* Back to site */}
+
           <div className="pt-2">
+
             <Link
+
               href="/"
+
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all duration-150 group"
+
             >
+
               <span className="material-symbols-outlined text-[20px] flex-shrink-0 text-slate-300 group-hover:text-red-400 transition-colors">
+
                 logout
+
               </span>
+
               <span>Back to Site</span>
+
             </Link>
+
           </div>
+
         </nav>
 
         {/* User info */}
+
         <div className="p-3 border-t border-green-50 flex-shrink-0">
+
           <div className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-green-50 cursor-pointer transition-colors group">
+
             <div className="w-9 h-9 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center shadow-sm flex-shrink-0">
+
               <span className="text-white font-black text-sm">{initials}</span>
+
             </div>
+
             <div className="min-w-0 flex-1">
+
               <p className="text-sm font-bold text-slate-800 truncate leading-tight">{user?.name ?? "Student"}</p>
+
               <p className="text-[10px] text-slate-400 truncate">{user?.email ?? ""}</p>
+
             </div>
+
             <span className="material-symbols-outlined text-[16px] text-slate-300 group-hover:text-green-500 transition-colors flex-shrink-0">
+
               more_vert
+
             </span>
+
           </div>
+
         </div>
+
       </div>
+
     );
+
   }
 
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// ══════════════════════════════════════════════════════════════════════════
+
+
   return (
     <div className="flex h-screen bg-[#f4fdf6] font-display overflow-hidden">
 

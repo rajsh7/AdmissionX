@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { verifyAdminToken } from "@/lib/auth";
 import AdminShell from "./_components/AdminShell";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Admin Panel | AdmissionX",
   description: "AdmissionX administration panel",

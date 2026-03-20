@@ -6,7 +6,7 @@ import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { formatDate } from "@/lib/utils";
 import NewsFormModal from "./NewsFormModal";
 
-interface NewsRow {
+export interface NewsRow {
   id: number;
   topic: string;
   slug: string | null;

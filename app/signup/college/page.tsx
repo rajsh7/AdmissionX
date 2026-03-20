@@ -25,12 +25,14 @@ export default function CollegeSignupPage() {
     const email = String(formData.get("email") || "").trim();
     const contactName = String(formData.get("contactName") || "").trim();
     const phone = String(formData.get("phone") || "").trim();
+    const address = String(formData.get("address") || "").trim();
+    const courses = String(formData.get("courses") || "").trim();
     const password = String(formData.get("password") || "");
     const confirmPassword = String(formData.get("confirmPassword") || "");
     const captchaOk = formData.get("captcha") === "on";
 
     // Client-side validation
-    if (!collegeName || !email || !contactName || !phone || !password) {
+    if (!collegeName || !email || !contactName || !phone || !address || !courses || !password) {
       setError("Please fill in all required fields.");
       return;
     }
@@ -57,6 +59,8 @@ export default function CollegeSignupPage() {
           email,
           contactName,
           phone,
+          address,
+          courses,
           password,
           captchaOk,
         }),
@@ -202,6 +206,44 @@ export default function CollegeSignupPage() {
                   placeholder="+91 98765 43210"
                   required
                   autoComplete="tel"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+                />
+              </div>
+            </div>
+
+            {/* Address */}
+            <div className="flex flex-col gap-2">
+              <label className="text-slate-700 dark:text-slate-300 text-sm font-semibold">
+                Complete Address <span className="text-primary">*</span>
+              </label>
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3 top-4 text-slate-400 text-[20px]">
+                  location_on
+                </span>
+                <textarea
+                  name="address"
+                  placeholder="Street, City, State, ZIP"
+                  required
+                  rows={2}
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400 resize-none"
+                />
+              </div>
+            </div>
+
+            {/* Courses Offered */}
+            <div className="flex flex-col gap-2">
+              <label className="text-slate-700 dark:text-slate-300 text-sm font-semibold">
+                Courses Offered (Basic Info) <span className="text-primary">*</span>
+              </label>
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
+                  school
+                </span>
+                <input
+                  name="courses"
+                  type="text"
+                  placeholder="e.g. B.Tech, MBA, Ph.D"
+                  required
                   className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
                 />
               </div>
