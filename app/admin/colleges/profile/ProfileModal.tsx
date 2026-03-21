@@ -96,8 +96,8 @@ export default function ProfileModal({
                   initialData.bannerimage.startsWith('/') ? initialData.bannerimage :
                   `https://admin.admissionx.in/uploads/${initialData.bannerimage}`
                 }
+                existingName="bannerimage_existing"
               />
-              <input type="hidden" name="bannerimage_existing" defaultValue={initialData?.bannerimage} />
             </div>
 
             {/* Rating & Ranking */}

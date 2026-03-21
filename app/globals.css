@@ -74,9 +74,12 @@ html.dark {
     overflow: hidden;
 }
 
-/* ─── Material Symbols fix ──────────────────────────────────── */
-.material-symbols-outlined {
-    font-family: "Material Symbols Outlined";
+/* ─── Material Symbols fix ──────────────────────────────────────── */
+/* FOUT (Flash of Unstyled Text) prevention:
+   Icons are invisible until the font is loaded. Once loaded, `fonts-loaded`
+   class is added to <html> by a script in layout.tsx, revealing the icons. */
+.material-symbols-outlined,
+.material-symbols-rounded {
     font-weight: normal;
     font-style: normal;
     font-size: 24px;
@@ -89,6 +92,19 @@ html.dark {
     direction: ltr;
     vertical-align: middle;
     user-select: none;
+    /* Hide icon text until font is ready */
+    visibility: hidden;
+    transition: visibility 0s;
+}
+
+/* Font-loaded state — set by inline script in layout.tsx */
+.fonts-loaded .material-symbols-outlined,
+.fonts-loaded .material-symbols-rounded {
+    visibility: visible;
+}
+
+.material-symbols-outlined {
+    font-family: "Material Symbols Outlined";
     font-variation-settings:
         "FILL" 0,
         "wght" 400,
@@ -98,18 +114,6 @@ html.dark {
 
 .material-symbols-rounded {
     font-family: "Material Symbols Rounded";
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;
-    display: inline-block;
-    line-height: 1;
-    text-transform: none;
-    letter-spacing: normal;
-    word-wrap: normal;
-    white-space: nowrap;
-    direction: ltr;
-    vertical-align: middle;
-    user-select: none;
     font-variation-settings:
         "FILL" 0,
         "wght" 400,

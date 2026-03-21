@@ -1,4 +1,6 @@
 import nodemailer from "nodemailer";
+import fs from "fs";
+import path from "path";
 
 // ── Transporter ───────────────────────────────────────────────────────────────
 // Reads from environment variables. In development, if no SMTP is configured
@@ -8,15 +10,22 @@ let transporter: nodemailer.Transporter | null = null;
 async function getTransporter(): Promise<nodemailer.Transporter> {
   if (transporter) return transporter;
 
-  if (process.env.SMTP_HOST) {
+  // Support both SMTP_* (Next.js style) and MAIL_* (Laravel style) env vars
+  const smtpHost = process.env.SMTP_HOST ?? process.env.MAIL_HOST;
+  const smtpPort = Number(process.env.SMTP_PORT ?? process.env.MAIL_PORT ?? 587);
+  const smtpUser = process.env.SMTP_USER ?? process.env.MAIL_USERNAME;
+  const smtpPass = process.env.SMTP_PASS ?? process.env.MAIL_PASSWORD;
+  const smtpSecure = process.env.SMTP_SECURE === "true" || smtpPort === 465;
+
+  if (smtpHost) {
     // Production / real SMTP (e.g. Gmail, SendGrid, Mailgun, etc.)
     transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT ?? 587),
-      secure: process.env.SMTP_SECURE === "true", // true for port 465
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: smtpUser,
+        pass: smtpPass,
       },
     });
   } else {
@@ -52,9 +61,12 @@ interface SendMailOptions {
 export async function sendMail(opts: SendMailOptions): Promise<void> {
   const t = await getTransporter();
 
+  const from =
+    process.env.SMTP_FROM ??
+    (process.env.MAIL_USERNAME ? `"AdmissionX" <${process.env.MAIL_USERNAME}>` : '"AdmissionX" <no-reply@admissionx.com>');
+
   const info = await t.sendMail({
-    from:
-      process.env.SMTP_FROM ?? '"AdmissionX" <no-reply@admissionx.com>',
+    from,
     to: opts.to,
     subject: opts.subject,
     html: opts.html,
@@ -62,7 +74,8 @@ export async function sendMail(opts: SendMailOptions): Promise<void> {
   });
 
   // In dev, log the Ethereal preview URL so you can see the email in a browser
-  if (!process.env.SMTP_HOST) {
+  const smtpConfigured = !!(process.env.SMTP_HOST ?? process.env.MAIL_HOST);
+  if (!smtpConfigured) {
     console.log(
       "[email] Preview URL:",
       nodemailer.getTestMessageUrl(info),
@@ -183,6 +196,28 @@ export async function sendStudentWelcomeEmail(
     to,
     subject: "Welcome to AdmissionX — Your account is ready",
     html: wrapInTemplate("Welcome to AdmissionX", body),
+  });
+}
+
+/**
+ * Sends the branded activation email to a newly registered student.
+ * Uses the HTML template at lib/emails/student-activation.html.
+ */
+export async function sendStudentActivationEmail(
+  to: string,
+  name: string,
+  activationLink: string,
+): Promise<void> {
+  const templatePath = path.join(process.cwd(), "lib", "emails", "student-activation.html");
+  let html = fs.readFileSync(templatePath, "utf-8");
+  html = html
+    .replace(/{{STUDENT_NAME}}/g, name)
+    .replace(/{{ACTIVATION_LINK}}/g, activationLink);
+
+  await sendMail({
+    to,
+    subject: "Activate your AdmissionX account",
+    html,
   });
 }
 

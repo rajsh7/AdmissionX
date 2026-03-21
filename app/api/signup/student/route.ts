@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import pool from "@/lib/db";
-import { sendStudentWelcomeEmail } from "@/lib/email";
+import { sendStudentActivationEmail } from "@/lib/email";
 import { signStudentToken, STUDENT_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
@@ -38,18 +39,27 @@ export async function POST(req: NextRequest) {
       // ── Ensure table exists ───────────────────────────────────────────────
       await conn.query(`
         CREATE TABLE IF NOT EXISTS next_student_signups (
-          id            INT AUTO_INCREMENT PRIMARY KEY,
-          name          VARCHAR(255) NOT NULL,
-          email         VARCHAR(255) NOT NULL UNIQUE,
-          phone         VARCHAR(32)  NOT NULL,
-          dob           DATE NOT NULL,
-          marks12       DECIMAL(5,2) NOT NULL,
-          is_active     TINYINT(1) DEFAULT 1,
-          password_hash VARCHAR(255) NOT NULL,
-          created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+          id                   INT AUTO_INCREMENT PRIMARY KEY,
+          name                 VARCHAR(255) NOT NULL,
+          email                VARCHAR(255) NOT NULL UNIQUE,
+          phone                VARCHAR(32)  NOT NULL,
+          dob                  DATE NOT NULL,
+          marks12              DECIMAL(5,2) NOT NULL,
+          is_active            TINYINT(1) DEFAULT 0,
+          password_hash        VARCHAR(255) NOT NULL,
+          activation_token     VARCHAR(64)  DEFAULT NULL,
+          activation_token_exp DATETIME    DEFAULT NULL,
+          created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
       `);
+
+      // ── Add activation columns if table already exists without them ───────
+      await conn.query(`
+        ALTER TABLE next_student_signups
+          ADD COLUMN IF NOT EXISTS activation_token     VARCHAR(64)  DEFAULT NULL,
+          ADD COLUMN IF NOT EXISTS activation_token_exp DATETIME    DEFAULT NULL
+      `).catch(() => {/* ignore if columns already exist */});
 
       // ── Check for duplicate email ─────────────────────────────────────────
       const [existing] = await conn.query(
@@ -70,22 +80,29 @@ export async function POST(req: NextRequest) {
       // ── Hash password ─────────────────────────────────────────────────────
       const hashed = await bcrypt.hash(password, 12);
 
+      // ── Generate activation token ─────────────────────────────────────────
+      const activationToken = crypto.randomBytes(32).toString("hex");
+      const tokenExp = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 h
+
       // ── Insert record ─────────────────────────────────────────────────────
       const [insertResult] = await conn.query(
-        `INSERT INTO next_student_signups (name, email, phone, dob, marks12, password_hash)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [name.trim(), emailLower, phone.trim(), dob, parseFloat(marks12), hashed],
+        `INSERT INTO next_student_signups (name, email, phone, dob, marks12, password_hash, is_active, activation_token, activation_token_exp)
+         VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)`,
+        [name.trim(), emailLower, phone.trim(), dob, parseFloat(marks12), hashed, activationToken, tokenExp],
       );
       var newUserId = (insertResult as any).insertId;
+      var activationTokenForEmail = activationToken;
     } finally {
       conn.release();
     }
 
-    // ── Send welcome email (non-blocking) ────────────────────────────────────
+    // ── Send activation email (non-blocking) ─────────────────────────────────
     try {
-      await sendStudentWelcomeEmail(emailLower, name.trim());
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://admissionx.com";
+      const activationLink = `${baseUrl}/api/auth/activate?token=${activationTokenForEmail}`;
+      await sendStudentActivationEmail(emailLower, name.trim(), activationLink);
     } catch (emailErr) {
-      // ignore email error quietly
+      // ignore email error — account still created
     }
 
     const token = await signStudentToken({

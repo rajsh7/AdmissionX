@@ -33,43 +33,6 @@ async function deleteBlogById(id: number): Promise<void> {
   revalidatePath("/admin/blogs");
 }
 
-async function createBlogAction(formData: FormData) {
-  "use server";
-  const topic       = formData.get("topic");
-  const slug        = formData.get("slug");
-  const description = formData.get("description");
-  const isactive    = parseInt(formData.get("isactive") as string, 10);
-
-  try {
-    await pool.query(
-      "INSERT INTO blogs (topic, slug, description, isactive) VALUES (?, ?, ?, ?)",
-      [topic, slug, description, isactive]
-    );
-  } catch (e) {
-    console.error("[admin/blogs createAction]", e);
-  }
-  revalidatePath("/admin/blogs");
-}
-
-async function updateBlogAction(formData: FormData) {
-  "use server";
-  const id          = formData.get("id");
-  const topic       = formData.get("topic");
-  const slug        = formData.get("slug");
-  const description = formData.get("description");
-  const isactive    = parseInt(formData.get("isactive") as string, 10);
-
-  try {
-    await pool.query(
-      "UPDATE blogs SET topic = ?, slug = ?, description = ?, isactive = ? WHERE id = ?",
-      [topic, slug, description, isactive, id]
-    );
-  } catch (e) {
-    console.error("[admin/blogs updateAction]", e);
-  }
-  revalidatePath("/admin/blogs");
-}
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T extends RowDataPacket>(
@@ -111,6 +74,7 @@ interface BlogRow extends RowDataPacket {
   slug: string | null;
   isactive: number;
   description: string | null;
+  featimage: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -160,7 +124,7 @@ export default async function AdminBlogsPage({
   // ── Fetch data + stats in parallel ────────────────────────────────────────
   const [blogs, countRows, statsRows] = await Promise.all([
     safeQuery<BlogRow>(
-      `SELECT id, topic, slug, isactive, description, created_at, updated_at
+      `SELECT id, topic, slug, isactive, description, featimage, created_at, updated_at
        FROM blogs ${where}
        ORDER BY created_at DESC
        LIMIT ? OFFSET ?`,
@@ -313,8 +277,6 @@ export default async function AdminBlogsPage({
 
       <BlogClient 
         blogs={blogs}
-        onAdd={createBlogAction}
-        onEdit={updateBlogAction}
         onDelete={deleteBlogById}
         onToggle={toggleBlogAction}
         offset={offset}

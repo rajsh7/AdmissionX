@@ -62,8 +62,8 @@ export default function SliderForm({
           name="sliderImage_file"
           label="Slider Image"
           initialImage={initialData?.sliderImage ? `https://admin.admissionx.in/uploads/sliders/${initialData.sliderImage}` : null}
+          existingName="sliderImage_existing"
         />
-        <input type="hidden" name="sliderImage_existing" defaultValue={initialData?.sliderImage} />
         <p className="text-[10px] text-slate-400 ml-1 italic">Note: Uploaded images will be saved to /uploads/sliders/</p>
       </div>
 

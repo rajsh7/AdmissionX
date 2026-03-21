@@ -105,20 +105,28 @@ function UserMenuDropdown({
   onClose: () => void;
   onLogout: () => void;
 }) {
-  const dashboardBase = `/dashboard/student/${user.id}`;
-  const userMenuItems = [
-    { label: "My Dashboard", href: dashboardBase, icon: "dashboard" },
-    {
-      label: "My Profile",
-      href: `${dashboardBase}?tab=profile`,
-      icon: "person",
-    },
-    {
-      label: "My Applications",
-      href: `${dashboardBase}?tab=applications`,
-      icon: "description",
-    },
-  ];
+  const role = user.role?.toLowerCase() || "student";
+  let dashboardBase = `/dashboard/student/${user.id}`;
+  let userMenuItems = [];
+
+  if (role === "admin") {
+    dashboardBase = `/admin`;
+    userMenuItems = [
+      { label: "Admin Dashboard", href: dashboardBase, icon: "admin_panel_settings" },
+    ];
+  } else if (role === "college") {
+    dashboardBase = `/dashboard/college/${user.id}`;
+    userMenuItems = [
+      { label: "College Dashboard", href: dashboardBase, icon: "dashboard" },
+      { label: "College Profile", href: `${dashboardBase}?tab=profile`, icon: "domain" },
+    ];
+  } else {
+    userMenuItems = [
+      { label: "My Dashboard", href: dashboardBase, icon: "dashboard" },
+      { label: "My Profile", href: `${dashboardBase}?tab=profile`, icon: "person" },
+      { label: "My Applications", href: `${dashboardBase}?tab=applications`, icon: "description" },
+    ];
+  }
 
   return (
     <AnimatePresence>
@@ -466,6 +474,7 @@ export default function Header({ }: HeaderProps) {
 
               {authUser ? (
                 <div className="space-y-1">
+<<<<<<< HEAD
                   <Link
                     href={`/dashboard/student/${authUser?.id}`}
                     className="flex items-center gap-3 px-3 py-4 text-sm font-bold text-slate-800"
@@ -478,6 +487,28 @@ export default function Header({ }: HeaderProps) {
                     <span className="material-symbols-outlined">logout</span>
                     Sign Out
                   </button>
+=======
+                   <Link 
+                     href={
+                       authUser.role?.toLowerCase() === "admin" 
+                         ? "/admin" 
+                         : authUser.role?.toLowerCase() === "college" 
+                           ? `/dashboard/college/${authUser.id}` 
+                           : `/dashboard/student/${authUser.id}`
+                     }
+                     className="flex items-center gap-3 px-3 py-4 text-sm font-bold text-slate-800"
+                     onClick={() => setMobileMenuOpen(false)}
+                   >
+                     <span className="material-symbols-outlined text-teal-600">
+                       {authUser.role?.toLowerCase() === "admin" ? "admin_panel_settings" : "dashboard"}
+                     </span>
+                     {authUser.role?.toLowerCase() === "admin" ? "Admin Dashboard" : authUser.role?.toLowerCase() === "college" ? "College Dashboard" : "My Dashboard"}
+                   </Link>
+                   <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="flex items-center gap-3 py-4 px-3 text-sm font-bold text-rose-500 w-full text-left">
+                     <span className="material-symbols-outlined">logout</span>
+                     Sign Out
+                   </button>
+>>>>>>> bbebef06cf6a0b699f51eed9c84a8156e9056444
                 </div>
               ) : (
                 <div className="space-y-4 pt-2">

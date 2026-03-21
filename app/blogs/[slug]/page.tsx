@@ -1,6 +1,7 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import Image from "next/image";
+import BlogImage from "@/app/components/BlogImage";
 import { notFound } from "next/navigation";
 import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
@@ -10,15 +11,18 @@ import Footer from "@/app/components/Footer";
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
-const DEFAULT_IMAGE =
-  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1200";
+const DEFAULT_IMAGE = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || !raw.trim()) return DEFAULT_IMAGE;
-  if (raw.startsWith("http")) return raw;
-  return `${IMAGE_BASE}${raw}`;
+  if (raw.startsWith("/")) return `/api/image-proxy?url=${encodeURIComponent(raw)}`;
+  if (raw.startsWith("http")) {
+    return `/api/image-proxy?url=${encodeURIComponent(raw)}`;
+  }
+  const remoteUrl = `${IMAGE_BASE}${raw}`;
+  return `/api/image-proxy?url=${encodeURIComponent(remoteUrl)}`;
 }
 
 function stripHtml(html: string | null | undefined): string {
@@ -143,13 +147,10 @@ export default async function BlogDetailPage({
       <main className="min-h-screen relative overflow-hidden bg-neutral-900">
         {/* ── Background Layer ── */}
         <div className="fixed inset-0 z-0">
-          <Image
+          <BlogImage
             src={heroImg}
             alt={blog.topic}
-            fill
-            className="object-cover"
-            priority
-            quality={80}
+            className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/75 backdrop-blur-[2px]" />
         </div>
@@ -246,12 +247,10 @@ export default async function BlogDetailPage({
                         <li key={r.id}>
                           <Link href={`/blogs/${r.slug}`} className="flex gap-4 group">
                             <div className="relative w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-100 shadow-sm">
-                              <Image
-                                src={buildImageUrl(r.bannerimage)}
+                              <BlogImage
+                                src={buildImageUrl(r.featimage)}
                                 alt={r.topic}
-                                fill
-                                className="object-cover group-hover:scale-110 transition-transform duration-500"
-                                sizes="80px"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                               />
                             </div>
                             <div className="flex-1 min-w-0 pt-0.5">

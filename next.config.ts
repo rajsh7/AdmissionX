@@ -4,6 +4,7 @@ import path from "path";
 if (process.env.NODE_ENV !== "production") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
+// Force dev server restart to register new API routes
 
 const nextConfig: NextConfig = {
   // Prevent Next.js from picking a parent folder as the workspace root when
@@ -16,6 +17,9 @@ const nextConfig: NextConfig = {
   // Reduces JS bundle size by tree-shaking large packages to only import what's used.
   // framer-motion alone can save hundreds of kB if not addressed.
   experimental: {
+    serverActions: {
+      bodySizeLimit: "5mb",
+    },
     staleTimes: {
       dynamic: 0,  // dynamic routes: no extra client-side staleness
       static: 300, // statically cached routes: serve from cache for 5 min
