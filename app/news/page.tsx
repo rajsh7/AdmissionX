@@ -29,6 +29,7 @@ export const metadata: Metadata = {
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || !raw.trim()) return DEFAULT_NEWS_IMAGE;
   if (raw.startsWith("http")) return raw;
+  if (raw.startsWith("/")) return raw;
   return `${IMAGE_BASE}${raw}`;
 }
 

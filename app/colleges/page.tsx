@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import CollegeListItem from "../components/CollegeListItem";
 import CollegeSearch from "./CollegeSearch";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
@@ -12,6 +13,7 @@ const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1562774053-701939374585
 function buildImageUrl(raw: string | null): string {
   if (!raw) return DEFAULT_IMAGE;
   if (raw.startsWith("http")) return raw;
+  if (raw.startsWith("/")) return raw;
   return `${IMAGE_BASE}${raw}`;
 }
 
@@ -22,11 +24,12 @@ function slugToName(slug: string): string {
 export default async function CollegesPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const params = await searchParams;
   const conn = await pool.getConnection();
 
-  const qRaw = searchParams?.q;
+  const qRaw = params?.q;
   const qStr = Array.isArray(qRaw) ? qRaw[0] : (qRaw || "");
   const q = qStr.trim();
   
@@ -127,6 +130,7 @@ export default async function CollegesPage({
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

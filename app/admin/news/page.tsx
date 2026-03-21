@@ -2,7 +2,10 @@ import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { RowDataPacket } from "mysql2";
 import { formatDate } from "@/lib/utils";
-import NewsListClient from "./NewsListClient";
+import { saveUpload } from "@/lib/upload-utils";
+import NewsListClientV2 from "./NewsListClient";
+// Force re-render after UI update
+
 
 // ─── Server Actions ────────────────────────────────────────────────────────────
 
@@ -11,10 +14,15 @@ async function createNews(formData: FormData) {
   const topic       = formData.get("topic") as string;
   const slug        = formData.get("slug") as string;
   const description = formData.get("description") as string;
-  const featimage   = formData.get("featimage") as string;
   const isactive    = parseInt(formData.get("isactive") as string, 10) || 0;
   const typeids     = formData.get("newstypeids") as string; 
   const tagids      = formData.get("newstagsids") as string; 
+  const featimageFile = formData.get("featimage_file") as File;
+
+  let featimage = null;
+  if (featimageFile && featimageFile.size > 0) {
+    featimage = await saveUpload(featimageFile, "news", "news");
+  } 
 
   if (!topic) return;
 
@@ -38,10 +46,15 @@ async function updateNews(formData: FormData) {
   const topic       = formData.get("topic") as string;
   const slug        = formData.get("slug") as string;
   const description = formData.get("description") as string;
-  const featimage   = formData.get("featimage") as string;
   const isactive    = parseInt(formData.get("isactive") as string, 10) || 0;
   const typeids     = formData.get("newstypeids") as string;
   const tagids      = formData.get("newstagsids") as string;
+  const featimageFile = formData.get("featimage_file") as File;
+  let featimage = formData.get("featimage_existing") as string;
+
+  if (featimageFile && featimageFile.size > 0) {
+    featimage = await saveUpload(featimageFile, "news", "news");
+  }
 
   if (!id || !topic) return;
 
@@ -270,7 +283,7 @@ export default async function AdminNewsPage({
         </form>
       </div>
 
-      <NewsListClient 
+      <NewsListClientV2 
         data={newsRows}
         types={allTypes}
         tags={allTags}

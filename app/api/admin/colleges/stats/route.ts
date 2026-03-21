@@ -3,11 +3,10 @@ import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
-const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=600";
-
-function buildImageUrl(raw: string | null): string {
-    if (!raw) return DEFAULT_IMAGE;
+function buildImageUrl(raw: string | null): string | null {
+    if (!raw) return null;
     if (raw.startsWith("http")) return raw;
+    if (raw.startsWith("/")) return `https://admin.admissionx.in${raw}`;
     return `${IMAGE_BASE}${raw}`;
 }
 

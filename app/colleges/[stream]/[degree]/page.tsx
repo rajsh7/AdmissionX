@@ -72,6 +72,7 @@ const DEFAULT_IMAGE =
 function buildImageUrl(raw: string | null): string {
   if (!raw) return DEFAULT_IMAGE;
   if (raw.startsWith("http")) return raw;
+  if (raw.startsWith("/")) return raw;
   return `${IMAGE_BASE}${raw}`;
 }
 

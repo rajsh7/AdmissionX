@@ -1,16 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import dynamic from "next/dynamic";
 import Header from "./components/Header";
 import HeroSection from "./components/HeroSection";
 import FieldsOfStudy from "./components/FieldsOfStudy";
 import TopUniversities from "./components/TopUniversities";
 import TopCourse from "./components/TopCourse";
-import EntranceExams from "./components/EntranceExams";
-import NewsSection from "./components/NewsSection";
+
+// Below-the-fold components loaded lazily – they won't block the first paint
+const EntranceExams = dynamic(() => import("./components/EntranceExams"), {
+  ssr: true,
+});
+const NewsSection = dynamic(() => import("./components/NewsSection"), {
+  ssr: true,
+});
 import ContactSection from "./components/ContactSection";
-import AuthModal from "./components/AuthModal";
-import Footer from "./components/Footer";
+
+const Footer = dynamic(() => import("./components/Footer"), { ssr: true });
+
+// AuthModal is rarely shown – load it only when needed
+const AuthModal = dynamic(() => import("./components/AuthModal"), {
+  ssr: false,
+});
 
 import type { University } from "./components/TopUniversities";
 import type { DbBlog } from "./api/home/latest-blogs/route";
@@ -32,21 +44,14 @@ export default function HomePageClient({
   stats,
   streamCounts,
 }: HomePageClientProps) {
-  const [mounted, setMounted] = useState(false);
   const [authModal, setAuthModal] = useState<"login" | "register" | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const closeModal = () => setAuthModal(null);
   const switchMode = (mode: "login" | "register") => setAuthModal(mode);
 
-  if (!mounted) return null;
-
   return (
     <div className="min-h-screen bg-white text-slate-900 selection:bg-teal selection:text-white">
-      {/* Auth Modal */}
+      {/* Auth Modal – only rendered when user clicks login */}
       {authModal && (
         <AuthModal
           mode={authModal}
@@ -86,3 +91,4 @@ export default function HomePageClient({
     </div>
   );
 }
+

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { formatDate } from "@/lib/utils";
@@ -30,7 +30,7 @@ interface NewsListClientProps {
   offset: number;
 }
 
-export default function NewsListClient({
+export default function NewsListClientV2({
   data,
   types,
   tags,
@@ -40,8 +40,16 @@ export default function NewsListClient({
   toggleAction,
   offset,
 }: NewsListClientProps) {
+  const [mounted, setMounted] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<NewsRow | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return <div className="min-h-[400px] bg-white rounded-2xl border border-slate-100 animate-pulse" />;
+
 
   const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
   const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
@@ -76,6 +84,7 @@ export default function NewsListClient({
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                 <th className="px-6 py-4 text-left w-12">#</th>
+                <th className="px-6 py-4 text-left w-20">Image</th>
                 <th className="px-6 py-4 text-left">Article Details</th>
                 <th className="px-6 py-4 text-left hidden md:table-cell">Categories</th>
                 <th className="px-6 py-4 text-center">Visibility</th>
@@ -92,6 +101,24 @@ export default function NewsListClient({
                   <tr key={item.id} className="hover:bg-slate-50/70 transition-colors group">
                     <td className="px-6 py-5 text-xs text-slate-400 font-mono italic">
                       {String(rowNum).padStart(2, '0')}
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="w-14 h-10 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 shadow-sm flex-shrink-0">
+                        {item.featimage ? (
+                          <img 
+                            src={item.featimage.startsWith('http') || item.featimage.startsWith('/') ? item.featimage : `https://admin.admissionx.in/uploads/${item.featimage}`} 
+                            alt="" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=100";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-cyan-50 flex items-center justify-center">
+                            <span className="material-symbols-rounded text-cyan-200 text-xl" style={ICO}>image</span>
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-5">
                       <div className="max-w-[400px]">

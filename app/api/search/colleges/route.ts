@@ -11,7 +11,7 @@ export interface CollegeResult {
   location: string;
   city_name: string | null;
   state_id: number | null;
-  image: string;
+  image: string | null;
   rating: number;
   totalRatingUser: number;
   ranking: number | null;
@@ -58,14 +58,13 @@ interface CountRow extends RowDataPacket {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
-const DEFAULT_IMAGE =
-  "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=600";
+const IMAGE_BASE = "https://admin.admissionx.in"; 
 
-function buildImageUrl(raw: string | null): string {
-  if (!raw) return DEFAULT_IMAGE;
+function buildImageUrl(raw: string | null): string | null {
+  if (!raw) return null;
   if (raw.startsWith("http")) return raw;
-  return `${IMAGE_BASE}${raw}`;
+  if (raw.startsWith("/")) return raw; // <--- The crucial fix. Images are in the public/ folder!
+  return `/uploads/${raw}`;
 }
 
 function slugToName(slug: string): string {

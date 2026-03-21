@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 import path from "path";
 
+if (process.env.NODE_ENV !== "production") {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
+
 const nextConfig: NextConfig = {
   // Prevent Next.js from picking a parent folder as the workspace root when
   // multiple lockfiles exist on the machine.
@@ -9,13 +13,21 @@ const nextConfig: NextConfig = {
     root: path.join(__dirname),
   },
 
+  // Reduces JS bundle size by tree-shaking large packages to only import what's used.
+  // framer-motion alone can save hundreds of kB if not addressed.
+  experimental: {
+    staleTimes: {
+      dynamic: 0,  // dynamic routes: no extra client-side staleness
+      static: 300, // statically cached routes: serve from cache for 5 min
+    },
+    optimizePackageImports: ["framer-motion"],
+  },
+
   // ── Image optimisation ──────────────────────────────────────────────────────
-  // Whitelist every external host that supplies images so Next.js can optimise
-  // them (resize, convert to WebP/AVIF, add cache headers) via <Image />.
   images: {
     remotePatterns: [
       {
-        protocol: "https",
+        protocol: "http",
         hostname: "admin.admissionx.in",
         pathname: "/uploads/**",
       },
@@ -39,15 +51,7 @@ const nextConfig: NextConfig = {
 
   // ── HTTP fetch cache (Next.js data cache) ───────────────────────────────────
   // Sets the default TTL for fetch() calls that do NOT specify their own
-  // { next: { revalidate } } option.  Pages that explicitly export
-  // `export const revalidate = N` override this per-route.
-  // 300 s = 5 minutes — matches the unstable_cache TTLs used across the app.
-  experimental: {
-    staleTimes: {
-      dynamic: 0, // dynamic routes: no extra client-side staleness
-      static: 300, // statically cached routes: serve from cache for 5 min
-    },
-  },
+  // { next: { revalidate } } option.
 
   // ── Compiler options ────────────────────────────────────────────────────────
   // Remove console.log in production builds (keep warn/error for debugging).

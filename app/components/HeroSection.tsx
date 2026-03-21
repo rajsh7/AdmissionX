@@ -1,12 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function HeroSection() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchQuery.trim().length >= 2) {
+        setIsLoading(true);
+        fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`)
+          .then((res) => res.json())
+          .then((data) => {
+            setSuggestions(data.suggestions || []);
+            setShowDropdown(true);
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            console.error(err);
+            setIsLoading(false);
+          });
+      } else {
+        setSuggestions([]);
+        setShowDropdown(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,17 +109,71 @@ export default function HeroSection() {
 
             <div className="mt-10 max-w-3xl">
                <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center gap-4">
-                  <div className="relative flex-1 w-full group overflow-hidden bg-white rounded-full border-[1.5px] border-black shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)]">
+                  <div ref={dropdownRef} className="relative flex-1 w-full group bg-white rounded-full border-[1.5px] border-black shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)]">
                     <span className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500">
                       <span className="material-symbols-outlined text-[24px]">location_on</span>
                     </span>
                     <input 
                       type="text"
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setShowDropdown(true);
+                      }}
+                      onFocus={() => {
+                        if (suggestions.length > 0) setShowDropdown(true);
+                      }}
                       placeholder="Location, universities, courses..."
                       className="w-full h-16 pl-14 pr-6 bg-transparent text-slate-800 placeholder:text-slate-400 focus:outline-none text-[16px] font-bold"
                     />
+
+                    {/* Autocomplete Dropdown */}
+                    <AnimatePresence>
+                      {showDropdown && (searchQuery.trim().length >= 2) && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-slate-100 shadow-2xl overflow-hidden z-50 max-h-[300px] overflow-y-auto"
+                        >
+                          {isLoading ? (
+                            <div className="p-4 text-center text-slate-500 text-sm font-medium">Searching...</div>
+                          ) : suggestions.length > 0 ? (
+                            <div className="py-2">
+                              {suggestions.map((item, idx) => (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  onClick={() => {
+                                    setSearchQuery(item.name);
+                                    setShowDropdown(false);
+                                    if (item.slug) {
+                                       router.push(`/college/${item.slug}`);
+                                    } else {
+                                       router.push(`/search?q=${encodeURIComponent(item.name)}`);
+                                    }
+                                  }}
+                                  className="w-full text-left px-4 py-3 hover:bg-teal-50 flex items-center gap-3 transition-colors border-b border-slate-50 last:border-0"
+                                >
+                                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                                    <span className="material-symbols-outlined text-slate-400 text-[20px]">
+                                      {item.slug ? "school" : "search"}
+                                    </span>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="text-[15px] font-bold text-slate-800 truncate">{item.name}</div>
+                                    <div className="text-[12px] font-medium text-slate-500 truncate">{item.location}</div>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="p-4 text-center text-slate-500 text-sm font-medium">No results found for "{searchQuery}"</div>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
                   </div>
                   <button 
                     type="submit"

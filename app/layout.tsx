@@ -6,6 +6,8 @@ const lexend = Lexend({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "900"],
   variable: "--font-lexend",
+  display: "swap", // avoid invisible text during font load
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -24,13 +26,17 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* DNS prefetch + preconnect for critical third-party origins */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
-        {/* Load both Outlined (used in public pages) and Rounded (used in admin) */}
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://admin.admissionx.in" />
+
+        {/* Material Symbols icons – preconnect hints above minimize load delay */}
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
@@ -44,3 +50,4 @@ export default function RootLayout({
     </html>
   );
 }
+

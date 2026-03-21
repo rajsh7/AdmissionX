@@ -1,4 +1,5 @@
 "use client";
+// v2 - redesign cache bust
 
 import Image from "next/image";
 import {
@@ -121,10 +122,10 @@ function SearchBar({
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative w-full"
+      className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full"
       autoComplete="off"
     >
-      <div className="flex items-center gap-2 bg-white rounded-2xl border border-neutral-200 shadow-sm focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-400/10 transition-all duration-200 px-4">
+      <div className="flex-1 flex items-center gap-3 bg-white rounded-2xl border border-neutral-200 shadow-xl focus-within:border-[#008080] focus-within:ring-4 focus-within:ring-[#008080]/5 transition-all duration-300 px-6 py-1">
         <span className="material-symbols-outlined text-[20px] text-neutral-400 flex-shrink-0">
           search
         </span>
@@ -135,8 +136,8 @@ function SearchBar({
           onChange={handleChange}
           onFocus={() => value.length >= 2 && setShowSuggestions(true)}
           onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-          placeholder="Search colleges, universities..."
-          className="flex-1 py-3.5 text-sm text-neutral-800 placeholder:text-neutral-400 bg-transparent outline-none min-w-0"
+          placeholder="Location, universities, courses..."
+          className="flex-1 py-4 text-sm sm:text-base text-neutral-800 placeholder:text-neutral-400 bg-transparent outline-none min-w-0"
         />
         {value && (
           <button
@@ -147,25 +148,26 @@ function SearchBar({
               onSearch("");
               inputRef.current?.focus();
             }}
-            className="flex-shrink-0 text-neutral-400 hover:text-neutral-700 transition-colors"
+            className="flex-shrink-0 text-neutral-400 hover:text-neutral-700 transition-colors pt-1"
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
         )}
-        <button
-          type="submit"
-          className="flex-shrink-0 bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-5 py-2 rounded-xl transition-colors ml-1"
-        >
-          Search
-        </button>
       </div>
+
+      <button
+        type="submit"
+        className="flex-shrink-0 bg-[#008080] hover:bg-[#006666] text-white text-sm font-black px-12 py-5 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-[#008080]/20 min-w-max"
+      >
+        Search Now
+      </button>
 
       {/* Suggestions dropdown */}
       {showSuggestions && value.length >= 2 && (
         <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl border border-neutral-100 shadow-xl overflow-hidden z-40">
           {loadingSuggestions ? (
             <div className="flex items-center gap-2 px-4 py-3 text-sm text-neutral-400">
-              <div className="w-4 h-4 border-2 border-neutral-300 border-t-red-500 rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-neutral-300 border-t-[#008080] rounded-full animate-spin" />
               Searching...
             </div>
           ) : suggestions.length > 0 ? (
@@ -175,20 +177,20 @@ function SearchBar({
                   <button
                     type="button"
                     onMouseDown={() => handleSuggestionClick(s)}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors text-left group"
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#008080]/5 transition-colors text-left group"
                   >
-                    <span className="material-symbols-outlined text-[18px] text-neutral-300 group-hover:text-red-400 transition-colors flex-shrink-0">
+                    <span className="material-symbols-outlined text-[18px] text-neutral-300 group-hover:text-[#008080] transition-colors flex-shrink-0">
                       account_balance
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-neutral-800 group-hover:text-red-700 truncate">
+                      <p className="text-sm font-semibold text-neutral-800 group-hover:text-[#008080] truncate">
                         {s.name}
                       </p>
                       <p className="text-xs text-neutral-400 truncate">
                         {s.location}
                       </p>
                     </div>
-                    <span className="material-symbols-outlined text-[16px] text-neutral-300 group-hover:text-red-400 flex-shrink-0 transition-colors">
+                    <span className="material-symbols-outlined text-[16px] text-neutral-300 group-hover:text-[#008080] flex-shrink-0 transition-colors">
                       north_west
                     </span>
                   </button>
@@ -273,6 +275,11 @@ export default function SearchClient({
   const [currentPage, setCurrentPage] = useState(initPage);
   const [loading, setLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   // Current filter values (derived from URL)
   const q = searchParams.get("q") ?? initQ;
@@ -300,107 +307,12 @@ export default function SearchClient({
     setCurrentPage(initPage);
   }, [initialColleges, initialTotal, initialTotalPages, initPage]);
 
-  // ── Snapshot of the init params the server rendered with ──────────────────
-  // Used to detect whether the current URL already matches what SSR gave us,
-  // so we never fire a redundant fetch for data we already have.
-  const initParamsKey = useMemo(
-    () =>
-      [
-        initQ,
-        initStream,
-        initDegree,
-        initCityId,
-        initStateId,
-        initFeesMax,
-        initSort,
-        String(initPage),
-        initType,
-      ].join("|"),
-    [
-      initQ,
-      initStream,
-      initDegree,
-      initCityId,
-      initStateId,
-      initFeesMax,
-      initSort,
-      initPage,
-      initType,
-    ],
-  );
-
-  // ── Fetch colleges only when URL params change AFTER the initial mount ─────
+  // Loading state cleanly aligns with Next.js router transitions
   useEffect(() => {
-    // Skip the very first effect run — SSR already provided the correct data.
-    if (!isMountedRef.current) {
-      isMountedRef.current = true;
-      return;
+    if (!isPending) {
+      setLoading(false);
     }
-
-    // Also skip if the current URL params exactly match what the server
-    // rendered (e.g. after a router.push() that triggered a new SSR pass —
-    // the initialColleges sync effect above already updated the state).
-    const currentKey = [
-      q,
-      stream,
-      degree,
-      cityId,
-      stateId,
-      feesMax,
-      sort,
-      String(page),
-      type,
-    ].join("|");
-    if (currentKey === initParamsKey) return;
-
-    let cancelled = false;
-
-    async function fetchColleges() {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams();
-        if (q) params.set("q", q);
-        if (stream) params.set("stream", stream);
-        if (degree) params.set("degree", degree);
-        if (cityId) params.set("city_id", cityId);
-        if (stateId) params.set("state_id", stateId);
-        if (feesMax) params.set("fees_max", feesMax);
-        if (sort) params.set("sort", sort);
-        if (type) params.set("type", type);
-        if (page > 1) params.set("page", String(page));
-
-        const res = await fetch(`/api/search/colleges?${params.toString()}`);
-        const data = await res.json();
-
-        if (!cancelled && data.success) {
-          setColleges(data.colleges);
-          setTotal(data.total);
-          setTotalPages(data.totalPages);
-          setCurrentPage(data.page);
-        }
-      } catch (err) {
-        console.error("[SearchClient] fetch error", err);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    fetchColleges();
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    q,
-    stream,
-    degree,
-    cityId,
-    stateId,
-    feesMax,
-    sort,
-    type,
-    page,
-    initParamsKey,
-  ]);
+  }, [isPending]);
 
   // ── Handle search bar submit ───────────────────────────────────────────────
   const handleSearch = useCallback(
@@ -412,6 +324,7 @@ export default function SearchClient({
         params.delete("q");
       }
       params.delete("page");
+      setLoading(true);
       startTransition(() => {
         router.push(`${pathname}?${params.toString()}`);
       });
@@ -426,71 +339,48 @@ export default function SearchClient({
     : `Showing ${colleges.length > 0 ? (page - 1) * 12 + 1 : 0}–${Math.min(page * 12, total)} of ${total.toLocaleString()} ${entityNamePlural.toLowerCase()}`;
 
   return (
-    <div className="min-h-screen relative">
-      {/* ── Full Page Background ── */}
-      <div className="fixed inset-0 z-0">
+    <div className="min-h-screen bg-neutral-50 flex flex-col relative">
+      {/* ── Hero Background ── */}
+      <div className="absolute top-0 left-0 w-full h-[580px] z-0 overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
+          src="https://images.unsplash.com/photo-1541339907198-e087593c02ca?auto=format&fit=crop&q=80&w=2000"
           alt="Campus Background"
           fill
           priority
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-neutral-900/60" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
       </div>
-
-      <div className="relative z-10">
+      <div className="relative z-10 flex-1 flex flex-col">
         <Header />
 
         {/* ── Hero / Search Banner ── */}
-        <div className="pt-24 pb-10">
-          <div className="mx-auto w-full px-4 lg:px-8 xl:px-12">
-            {/* Breadcrumb */}
-            <nav className="flex items-center justify-center gap-2 text-xs text-neutral-400 mb-5">
-              <a href="/" className="hover:text-white transition-colors">
-                Home
-              </a>
-              <span className="material-symbols-outlined text-[14px]">
-                chevron_right
-              </span>
-              <span className="text-neutral-300">{pageTitle}</span>
-            </nav>
+        <div className="pt-28 pb-20 relative">
+          <div className="mx-auto w-full px-4 lg:px-12 xl:px-20">
+            {hasMounted && (
+              <div className="max-w-4xl pt-10">
+                <h1 className="text-6xl sm:text-7xl lg:text-[100px] font-black text-white leading-[1.1] mb-6 drop-shadow-xl">
+                  Finds your <br />
+                  <span className="text-[#008080]">Dream college</span>
+                </h1>
+                <p className="text-white text-lg sm:text-2xl font-bold mb-10 max-w-2xl leading-relaxed">
+                  Search thousands of courses and universities worldwide
+                </p>
 
-            {/* Title */}
-            <div className="mb-7 text-center">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight mb-2">
-                {pageTitle}
-              </h1>
-              <p className="text-neutral-300 text-sm sm:text-base">
-                {pageSubtitle}
-              </p>
-            </div>
-
-            {/* Search bar */}
-            <div className="max-w-2xl mx-auto">
-              <SearchBar defaultValue={q} onSearch={handleSearch} />
-            </div>
+                {/* Search bar */}
+                <div className="max-w-2xl">
+                  <SearchBar defaultValue={q} onSearch={handleSearch} />
+                </div>
+              </div>
+            )}
 
             {/* Active search indicator */}
             {q && (
               <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
-                <span className="text-sm text-neutral-400">Results for:</span>
-                <span className="inline-flex items-center gap-1.5 bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
-                  <span className="material-symbols-outlined text-[13px]">
-                    search
-                  </span>
-                  {q}
-                  <button
-                    type="button"
-                    onClick={() => handleSearch("")}
-                    className="ml-0.5 hover:text-red-400 transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-[12px]">
-                      close
-                    </span>
-                  </button>
-                </span>
+
+
               </div>
             )}
           </div>
@@ -500,6 +390,7 @@ export default function SearchClient({
         <div className="mx-auto w-full px-4 lg:px-8 xl:px-12 py-8">
           <div className="flex gap-6">
             {/* ── Filters sidebar ── */}
+            <div className="flex flex-col gap-6">
               <SearchFilters
                 streams={streams}
                 degrees={degrees}
@@ -513,89 +404,125 @@ export default function SearchClient({
                 totalResults={total}
                 entityName={entityName}
                 entityNamePlural={entityNamePlural}
+                onFilterChange={() => setLoading(true)}
               />
+
+              {/* Ad Placeholder below sidebar */}
+              <div className="hidden lg:block w-72 xl:w-80 h-96 bg-neutral-200/50 rounded-2xl border-2 border-dashed border-neutral-300 flex items-center justify-center text-neutral-400 font-bold text-sm">
+                AD_SPACE
+              </div>
+            </div>
 
             {/* ── Results column ── */}
             <div className="flex-1 min-w-0">
-              {/* ── Toolbar row ── */}
-              <div className="flex items-center justify-between gap-4 mb-5">
-                <p className="text-sm text-neutral-300 font-medium">
-                  {loading ? (
-                    <span className="inline-flex items-center gap-1.5">
-                      <span className="w-3 h-3 border-2 border-neutral-300 border-t-red-500 rounded-full animate-spin inline-block" />
-                      Loading {entityNamePlural.toLowerCase()}...
+              {/* ── Results Toolbar (Figma Redesign) ── */}
+              {/* ── Results Toolbar (Figma Redesign) ── */}
+              <div className="flex flex-col gap-5 mb-8">
+                <div className="flex flex-wrap items-center justify-between gap-4 pt-1 pb-4 border-b border-neutral-100">
+                  {/* Active Filters Row */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="text-sm font-black text-neutral-400 whitespace-nowrap uppercase tracking-wider">
+                      Active Filters:
                     </span>
-                  ) : (
-                    showingText
-                  )}
-                </p>
+                    <div className="flex flex-wrap gap-2">
+                      {stream && (
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-xl text-xs font-bold text-neutral-600 shadow-sm transition-all hover:border-[#008080]">
+                          {streams.find(s => String(s.slug || s.id) === stream)?.name || stream}
+                          <button onClick={() => {
+                            const p = new URLSearchParams(searchParams.toString());
+                            p.delete("stream"); p.delete("page");
+                            router.push(`${pathname}?${p.toString()}`);
+                          }} className="hover:text-red-500 transition-colors">
+                            <span className="material-symbols-outlined text-[16px]">close</span>
+                          </button>
+                        </div>
+                      )}
+                      {degree && (
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-xl text-xs font-bold text-neutral-600 shadow-sm transition-all hover:border-[#008080]">
+                          {degrees.find(d => String(d.slug || d.id) === degree)?.name || degree}
+                          <button onClick={() => {
+                            const p = new URLSearchParams(searchParams.toString());
+                            p.delete("degree"); p.delete("page");
+                            router.push(`${pathname}?${p.toString()}`);
+                          }} className="hover:text-red-500 transition-colors">
+                            <span className="material-symbols-outlined text-[16px]">close</span>
+                          </button>
+                        </div>
+                      )}
+                      {!stream && !degree && !cityId && !stateId && (
+                        <span className="text-xs text-neutral-400 bg-neutral-50 px-3 py-1.5 rounded-lg border border-neutral-100 border-dashed">No filters applied</span>
+                      )}
+                    </div>
+                  </div>
 
-                {/* Sort (mobile/tablet) + View toggle */}
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {/* Sort dropdown (desktop inline) */}
-                  <div className="hidden sm:flex items-center gap-1 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-1">
-                    {SORT_OPTIONS.map((opt) => (
+                  {/* Sort Row */}
+                  <div className="flex items-center gap-4 ml-auto">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-black text-neutral-400 whitespace-nowrap uppercase tracking-wider">
+                        Short by:
+                      </span>
+                      <div className="relative">
+                        <select
+                          value={sort || "rating"}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const p = new URLSearchParams(searchParams.toString());
+                            if (val === "rating") p.delete("sort");
+                            else p.set("sort", val);
+                            p.delete("page");
+                            router.push(`${pathname}?${p.toString()}`);
+                          }}
+                          className="appearance-none bg-white border border-neutral-200 rounded-xl px-4 pr-10 py-2.5 text-xs font-black text-neutral-700 shadow-sm focus:outline-none focus:border-[#008080] transition-all cursor-pointer min-w-[180px]"
+                        >
+                          {SORT_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                        <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-neutral-400 pointer-events-none">
+                          expand_more
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* View Toggle */}
+                    <div className="flex items-center bg-white border border-neutral-200 rounded-xl p-1 shadow-sm">
                       <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => {
-                          const params = new URLSearchParams(
-                            searchParams.toString(),
-                          );
-                          if (opt.value === "rating") {
-                            params.delete("sort");
-                          } else {
-                            params.set("sort", opt.value);
-                          }
-                          params.delete("page");
-                          router.push(`${pathname}?${params.toString()}`);
-                        }}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${(sort || "rating") === opt.value
-                            ? "bg-white/20 text-white shadow-sm"
-                            : "text-neutral-300 hover:text-white hover:bg-white/5"
-                          }`}
+                        onClick={() => setViewMode("grid")}
+                        className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-[#008080] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
                       >
-                        {opt.label}
+                        <span className="material-symbols-outlined text-[20px]">grid_view</span>
                       </button>
-                    ))}
+                      <button
+                        onClick={() => setViewMode("list")}
+                        className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-[#008080] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
+                      >
+                        <span className="material-symbols-outlined text-[20px]">view_headline</span>
+                      </button>
+                    </div>
                   </div>
+                </div>
 
-                  {/* View mode toggle */}
-                  <div className="flex items-center bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-1">
-                    <button
-                      type="button"
-                      onClick={() => setViewMode("grid")}
-                      title="Grid view"
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-150 ${viewMode === "grid"
-                          ? "bg-white/20 text-white shadow-sm"
-                          : "text-neutral-300 hover:text-white hover:bg-white/5"
-                        }`}
-                    >
-                      <span className="material-symbols-outlined text-[18px]">
-                        grid_view
+                {/* Results Count Summary */}
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-slate-500 font-bold">
+                    {loading ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span className="w-3.5 h-3.5 border-2 border-[#008080]/30 border-t-[#008080] rounded-full animate-spin" />
+                        Refreshing {entityNamePlural.toLowerCase()}...
                       </span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setViewMode("list")}
-                      title="List view"
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-150 ${viewMode === "list"
-                          ? "bg-white/20 text-white shadow-sm"
-                          : "text-neutral-300 hover:text-white hover:bg-white/5"
-                        }`}
-                    >
-                      <span className="material-symbols-outlined text-[18px]">
-                        view_agenda
-                      </span>
-                    </button>
-                  </div>
+                    ) : (
+                      showingText
+                    )}
+                  </p>
                 </div>
               </div>
 
               {/* ── College grid / list ── */}
               {loading ? (
                 viewMode === "grid" ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {Array.from({ length: 12 }).map((_, i) => (
                       <CollegeCardSkeleton key={i} />
                     ))}
@@ -626,7 +553,7 @@ export default function SearchClient({
                   {isFiltered && (
                     <a
                       href={pathname}
-                      className="inline-flex items-center gap-2 bg-neutral-900 text-white text-sm font-bold px-5 py-3 rounded-xl hover:bg-red-600 transition-colors"
+                      className="inline-flex items-center gap-2 bg-[#008080] text-white text-sm font-bold px-5 py-3 rounded-xl hover:bg-[#006666] transition-colors"
                     >
                       <span className="material-symbols-outlined text-[16px]">
                         filter_list_off
@@ -636,7 +563,7 @@ export default function SearchClient({
                   )}
                 </div>
               ) : viewMode === "grid" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {colleges.map((college, i) => (
                     <CollegeCard
                       key={college.id}
@@ -659,6 +586,11 @@ export default function SearchClient({
                 </div>
               )}
 
+              {/* Bottom Ad Placeholder */}
+              <div className="mt-12 w-full h-32 bg-neutral-200/50 rounded-2xl border-2 border-dashed border-neutral-300 flex items-center justify-center text-neutral-400 font-bold text-sm">
+                BANNERAD_SPACE
+              </div>
+
               {/* ── Pagination ── */}
               {!loading && totalPages > 1 && (
                 <div className="mt-10">
@@ -678,3 +610,4 @@ export default function SearchClient({
     </div>
   );
 }
+// Force cache invalidation 4

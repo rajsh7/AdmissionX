@@ -232,9 +232,9 @@ export default async function StreamPage() {
   const remaining = streams.slice(6);
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      {/* ── Full Page Background ── */}
-      <div className="fixed inset-0 z-0 text-[0px] font-[0] leading-[0]">
+    <div className="min-h-screen bg-neutral-50 flex flex-col relative">
+      {/* ── Hero Background ── */}
+      <div className="absolute top-0 left-0 w-full h-[380px] z-0 overflow-hidden text-[0px] font-[0] leading-[0]">
         <Image
           src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
           alt="Campus Background"
@@ -509,9 +509,9 @@ export default async function StreamPage() {
           </div>
         )}
       </div>
-
       </div>
       <Footer />
     </div>
   );
 }
+// Force cache invalidation 3

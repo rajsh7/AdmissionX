@@ -67,14 +67,13 @@ interface CountRow extends RowDataPacket {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
-const DEFAULT_IMAGE =
-  "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600";
+const IMAGE_BASE = "https://admin.admissionx.in"; 
 
-function buildImageUrl(raw: string | null): string {
-  if (!raw) return DEFAULT_IMAGE;
+function buildImageUrl(raw: string | null): string | null {
+  if (!raw) return null;
   if (raw.startsWith("http")) return raw;
-  return `${IMAGE_BASE}${raw}`;
+  if (raw.startsWith("/")) return raw;
+  return `/uploads/${raw}`;
 }
 
 function slugToName(slug: string): string {
@@ -235,6 +234,7 @@ const getFilterData = unstable_cache(
 
 // ─── Core fetch ─────────────────────────────────────────────────────────────
 async function fetchTopUniversities(opts: {
+  q: string;
   stream: string;
   degree: string;
   cityId: string;
@@ -244,11 +244,20 @@ async function fetchTopUniversities(opts: {
   page: number;
   limit: number;
 }) {
-  const { stream, degree, cityId, stateId, feesMax, sort, page, limit } = opts;
+  const { q, stream, degree, cityId, stateId, feesMax, sort, page, limit } = opts;
   const offset = (page - 1) * limit;
 
   const filterConditions: string[] = ["cp.isTopUniversity = 1"];
   const filterParams: (string | number)[] = [];
+
+  const hasTextSearch = q.length >= 2;
+  if (hasTextSearch) {
+    filterConditions.push(
+      "(u.firstname LIKE ? OR cp.registeredSortAddress LIKE ? OR cp.slug LIKE ?)"
+    );
+    const like = `%${q}%`;
+    filterParams.push(like, like, like);
+  }
 
   if (stream) {
     filterConditions.push(`EXISTS (
@@ -304,6 +313,7 @@ async function fetchTopUniversities(opts: {
   let idSql = `
     SELECT cp.id
     FROM collegeprofile cp
+    ${hasTextSearch ? "LEFT JOIN users u ON u.id = cp.users_id" : ""}
     WHERE ${filterWhere}
     ORDER BY ${orderBy}
     LIMIT ${limit} OFFSET ${offset}
@@ -313,6 +323,7 @@ async function fetchTopUniversities(opts: {
       idSql = `
         SELECT cp.id
         FROM collegeprofile cp
+        ${hasTextSearch ? "LEFT JOIN users u ON u.id = cp.users_id" : ""}
         LEFT JOIN collegemaster cm_s ON cm_s.collegeprofile_id = cp.id AND cm_s.fees > 0
         WHERE ${filterWhere}
         GROUP BY cp.id
@@ -324,6 +335,7 @@ async function fetchTopUniversities(opts: {
   const countSql = `
     SELECT COUNT(*) AS total
     FROM collegeprofile cp
+    ${hasTextSearch ? "LEFT JOIN users u ON u.id = cp.users_id" : ""}
     WHERE ${filterWhere}
   `;
 
@@ -392,7 +404,7 @@ async function fetchTopUniversities(opts: {
 
 const getCachedTopUniversities = unstable_cache(
   fetchTopUniversities,
-  ["top-university-data"],
+  ["top-university-data-v2"],
   { revalidate: 300 },
 );
 
@@ -413,6 +425,7 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
   const getString = (key: string, fallback = "") =>
     typeof sp[key] === "string" ? (sp[key] as string) : fallback;
 
+  const q = getString("q");
   const stream = getString("stream");
   const degree = getString("degree");
   const cityId = getString("city_id");
@@ -427,6 +440,7 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
     { streamRows, degreeRows, cityRows },
   ] = await Promise.all([
     getCachedTopUniversities({
+      q,
       stream,
       degree,
       cityId,

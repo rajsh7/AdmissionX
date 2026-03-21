@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import AdminModal from "@/app/admin/_components/AdminModal";
+import ImageUpload from "@/app/admin/_components/ImageUpload";
 
 interface NewsFormModalProps {
   isOpen: boolean;
@@ -102,16 +103,15 @@ export default function NewsFormModal({
               className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all font-mono"
             />
           </div>
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">
-              Featured Image URL
-            </label>
-            <input
-              name="featimage"
-              defaultValue={initialData?.featimage || ""}
-              placeholder="https://..."
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all"
+          <div className="md:col-span-2 space-y-1.5">
+            <ImageUpload 
+              name="featimage_file"
+              label="Featured Image"
+              initialImage={initialData?.featimage}
             />
+            {initialData?.featimage && (
+              <input type="hidden" name="featimage_existing" value={initialData.featimage} />
+            )}
           </div>
         </div>
 

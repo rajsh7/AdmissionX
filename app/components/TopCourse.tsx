@@ -117,7 +117,6 @@ export default function TopCourse() {
                     alt={current.name}
                     fill
                     className="object-cover"
-                    unoptimized
                   />
                 </motion.div>
               </AnimatePresence>

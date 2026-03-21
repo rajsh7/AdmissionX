@@ -150,7 +150,7 @@ const getHomePageData = unstable_cache(
 
     return { collegeRows, blogRows, examRows, statRows };
   },
-  ["homepage-data"],
+  ["homepage-data-v3"],
   { revalidate: 300 }, // 5-minute data-cache TTL (belt-and-suspenders with route revalidate)
 );
 
@@ -174,7 +174,9 @@ export default async function Page() {
       name,
       location: row.location || "India",
       image: row.image
-        ? `https://admin.admissionx.in/uploads/${row.image}`
+        ? row.image.startsWith("/") 
+          ? row.image
+          : `/uploads/${row.image}`
         : "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600",
       rating: Number(row.rating) || 4.5,
       abbr: abbreviation,

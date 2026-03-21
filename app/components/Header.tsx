@@ -1,4 +1,5 @@
 "use client";
+// v2 - redesign cache bust
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
@@ -18,8 +19,10 @@ interface AuthUser {
 
 const navLinks = [
   { label: "Home", href: "/" },
-  { 
-    label: "Study Abroad", 
+  { label: "Top colleges", href: "/top-colleges" },
+  { label: "Top Courses", href: "/courses" },
+  {
+    label: "Study Abroad",
     href: "/study-abroad",
     subItems: [
       { label: "UK", href: "/study-abroad/uk", icon: "public" },
@@ -28,31 +31,13 @@ const navLinks = [
       { label: "Australia", href: "/study-abroad/australia", icon: "public" },
     ]
   },
-  { 
-    label: "Counselling", 
-    href: "/counselling",
-    subItems: [
-      { label: "Career Counselling", href: "/counselling/career", icon: "psychology" },
-      { label: "Admission Support", href: "/counselling/admission", icon: "assignment" },
-      { label: "Mental Health", href: "/counselling/mental-health", icon: "potted_plant" },
-    ]
-  },
-  { 
-    label: "Examination", 
-    href: "/examination",
-    subItems: [
-      { label: "Engineering Exams", href: "/examination/engineering", icon: "engineering" },
-      { label: "Medical Exams", href: "/examination/medical", icon: "medical_services" },
-      { label: "Management Exams", href: "/examination/management", icon: "business_center" },
-    ]
-  },
-  { 
-    label: "More", 
+  {
+    label: "More",
     href: "#",
     subItems: [
+      { label: "Counselling", href: "/counselling", icon: "support_agent" },
+      { label: "Examination", href: "/examination", icon: "engineering" },
       { label: "Top Universities", href: "/top-university", icon: "school" },
-      { label: "Top Colleges", href: "/colleges", icon: "apartment" },
-      { label: "Top Courses", href: "/courses", icon: "book" },
       { label: "Streams", href: "/stream", icon: "grid_view" },
       { label: "News & Articles", href: "/news", icon: "newspaper" },
       { label: "Latest Blogs", href: "/blog", icon: "article" },
@@ -199,7 +184,7 @@ function UserMenuDropdown({
 }
 
 export default function Header({ }: HeaderProps) {
-  // Triggering HMR
+  // Trigger cache invalidation for hydration mismatch
   const router = useRouter();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -289,11 +274,11 @@ export default function Header({ }: HeaderProps) {
   // ── User initials avatar ──────────────────────────────────────────────────
   const initials = authUser
     ? authUser.name
-        .split(" ")
-        .slice(0, 2)
-        .map((w) => w[0])
-        .join("")
-        .toUpperCase()
+      .split(" ")
+      .slice(0, 2)
+      .map((w) => w[0])
+      .join("")
+      .toUpperCase()
     : "";
 
   const firstName = authUser?.name?.split(" ")[0] ?? "";
@@ -309,39 +294,38 @@ export default function Header({ }: HeaderProps) {
       <motion.header className="fixed top-0 left-0 right-0 z-50 w-full min-h-[80px] flex items-center bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] transition-colors">
         <div className="flex items-center justify-between px-6 sm:px-12 w-full max-w-[1920px] mx-auto">
           {/* Logo Area */}
-          <div className="flex-none flex justify-start items-center">
-            <Link href="/" className="flex items-center gap-3 group shrink-0">
-              <img src="/admissionx-v2-logo.png" alt="AdmissionX logo" className="h-8 w-auto object-contain" />
+          <div className="shrink-0">
+            <Link href="/" className="flex items-center gap-3 group">
+              <img src="/admissionx-v2-logo.png" alt="AdmissionX logo" className="h-9 w-auto object-contain" />
             </Link>
           </div>
 
-          {/* Right Area (Nav & Actions Combined) */}
-          <div className="hidden lg:flex items-center justify-end flex-1 gap-10">
+          {/* Right Side: Nav + Actions */}
+          <div className="hidden lg:flex items-center gap-10">
             {/* Nav Links Area */}
-            <nav className="flex items-center gap-8">
+            <nav className="flex items-center gap-1">
               {navLinks.map((link) => (
-                <div key={link.label} className="relative group/nav py-8">
+                <div key={link.label} className="relative group/nav">
                   <Link
                     href={link.href}
-                    className="flex items-center gap-1 text-[15px] font-bold text-slate-800 hover:text-teal-600 transition-colors relative"
+                    className="flex items-center gap-1.5 px-4 py-2 text-[14px] font-bold text-slate-700 hover:text-[#008080] transition-colors relative"
                   >
                     {link.label}
                     {link.subItems && (
-                      <span className="material-symbols-outlined text-[16px] text-slate-400 group-hover/nav:text-teal-600 transition-colors">
+                      <span className="material-symbols-outlined text-[16px] text-slate-300 group-hover/nav:text-[#008080] transition-colors">
                         expand_more
                       </span>
                     )}
-                    <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 rounded-full bg-teal-500 group-hover/nav:w-full group-hover/nav:left-0 transition-all duration-300" />
                   </Link>
 
                   {link.subItems && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-56 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:pointer-events-auto transition-all duration-200 z-50">
-                      <div className="bg-white rounded-xl shadow-2xl shadow-black/10 border border-slate-100 overflow-hidden py-1">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-56 pt-3 opacity-0 translate-y-2 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:pointer-events-auto transition-all duration-200 z-50">
+                      <div className="bg-white rounded-2xl shadow-2xl shadow-black/10 border border-slate-50 overflow-hidden py-1.5">
                         {link.subItems.map((sub) => (
                           <Link
                             key={sub.label}
                             href={sub.href}
-                            className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-slate-600 hover:bg-teal-50 hover:text-teal-700 transition-colors"
+                            className="flex items-center gap-3 px-4 py-2.5 text-[14px] font-medium text-slate-600 hover:bg-[#008080]/5 hover:text-[#008080] transition-colors"
                           >
                             <span className="material-symbols-outlined text-[18px] text-slate-400">
                               {sub.icon}
@@ -356,9 +340,9 @@ export default function Header({ }: HeaderProps) {
               ))}
             </nav>
 
-            {/* Actions Area */}
-            <div className="flex items-center gap-6 border-l border-slate-100 pl-10">
-              <button className="text-slate-500 hover:text-teal-600 transition-colors flex items-center justify-center">
+            {/* Right Area (Actions) */}
+            <div className="flex items-center gap-3">
+              <button className="text-slate-500 hover:text-[#008080] transition-colors flex items-center justify-center p-2 rounded-full hover:bg-slate-50">
                 <span className="material-symbols-outlined text-[22px]">search</span>
               </button>
 
@@ -368,10 +352,10 @@ export default function Header({ }: HeaderProps) {
                 <div ref={userMenuRef} className="relative">
                   <button
                     onClick={() => setUserMenuOpen((o) => !o)}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-900 text-white hover:bg-black transition-all shadow-lg shadow-black/10"
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#008080] text-white hover:bg-[#006666] transition-all shadow-lg shadow-[#008080]/10"
                   >
                     <span className="material-symbols-outlined text-[18px]">account_circle</span>
-                    <span className="text-[15px] font-bold">Account</span>
+                    <span className="text-[14px] font-bold">Account</span>
                     <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${userMenuOpen ? "rotate-180" : ""}`}>
                       expand_more
                     </span>
@@ -382,7 +366,7 @@ export default function Header({ }: HeaderProps) {
                 <div className="flex items-center gap-3">
                   {/* Login Dropdown */}
                   <div ref={loginRef} className="relative" onMouseEnter={openLogin} onMouseLeave={closeLogin}>
-                    <button 
+                    <button
                       className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-slate-700 hover:bg-slate-50 transition-all font-bold text-[15px]"
                     >
                       Login
@@ -393,8 +377,8 @@ export default function Header({ }: HeaderProps) {
 
                   {/* Sign Up Dropdown */}
                   <div ref={signupRef} className="relative" onMouseEnter={openSignup} onMouseLeave={closeSignup}>
-                    <button 
-                      className="flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-slate-900 text-white hover:bg-black transition-all shadow-lg shadow-black/10 font-bold text-[15px]"
+                    <button
+                      className="flex items-center gap-1.5 px-6 py-2.5 rounded-full bg-[#008080] text-white hover:bg-[#006666] transition-all shadow-lg shadow-[#008080]/10 font-bold text-[14px]"
                     >
                       Sign Up
                       <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${signupOpen ? "rotate-180" : ""}`}>expand_more</span>
@@ -423,8 +407,8 @@ export default function Header({ }: HeaderProps) {
                   <motion.div key={item.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
                     <div className="flex flex-col">
                       <div className="flex items-center justify-between py-3">
-                        <Link 
-                          href={item.href} 
+                        <Link
+                          href={item.href}
                           className="text-sm font-bold text-slate-800 uppercase tracking-tight"
                           onClick={() => {
                             if (!item.subItems) setMobileMenuOpen(false);
@@ -434,7 +418,7 @@ export default function Header({ }: HeaderProps) {
                           {item.label}
                         </Link>
                         {item.subItems && (
-                          <button 
+                          <button
                             onClick={() => setExpandedMobileItem(isExpanded ? null : item.label)}
                             className="p-1 hover:bg-slate-50 rounded-lg transition-colors"
                           >
@@ -444,11 +428,11 @@ export default function Header({ }: HeaderProps) {
                           </button>
                         )}
                       </div>
-                      
+
                       {item.subItems && (
                         <AnimatePresence>
                           {isExpanded && (
-                            <motion.div 
+                            <motion.div
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: "auto", opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
@@ -477,43 +461,43 @@ export default function Header({ }: HeaderProps) {
                   </motion.div>
                 );
               })}
-              
+
               <div className="h-px bg-slate-100 my-4" />
-              
+
               {authUser ? (
                 <div className="space-y-1">
-                   <Link 
-                     href={`/dashboard/student/${authUser.id}`}
-                     className="flex items-center gap-3 px-3 py-4 text-sm font-bold text-slate-800"
-                     onClick={() => setMobileMenuOpen(false)}
-                   >
-                     <span className="material-symbols-outlined text-teal-600">dashboard</span>
-                     My Dashboard
-                   </Link>
-                   <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="flex items-center gap-3 py-4 px-3 text-sm font-bold text-rose-500 w-full text-left">
-                     <span className="material-symbols-outlined">logout</span>
-                     Sign Out
-                   </button>
+                  <Link
+                    href={`/dashboard/student/${authUser?.id}`}
+                    className="flex items-center gap-3 px-3 py-4 text-sm font-bold text-slate-800"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <span className="material-symbols-outlined text-[#008080]">dashboard</span>
+                    My Dashboard
+                  </Link>
+                  <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="flex items-center gap-3 py-4 px-3 text-sm font-bold text-rose-500 w-full text-left">
+                    <span className="material-symbols-outlined">logout</span>
+                    Sign Out
+                  </button>
                 </div>
               ) : (
                 <div className="space-y-4 pt-2">
-                   <div className="grid grid-cols-2 gap-3">
-                      <Link 
-                        href="/login/student" 
-                        className="flex items-center justify-center py-3.5 rounded-2xl bg-slate-50 text-slate-800 text-[13px] font-bold border border-slate-100 shadow-sm"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Login
-                      </Link>
-                      <Link 
-                        href="/signup/student" 
-                        className="flex items-center justify-center py-3.5 rounded-2xl text-white text-[13px] font-bold shadow-lg shadow-teal-500/20" 
-                        style={{ backgroundColor: '#008080' }}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Sign Up
-                      </Link>
-                   </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link
+                      href="/login/student"
+                      className="flex items-center justify-center py-3.5 rounded-2xl bg-slate-50 text-slate-800 text-[13px] font-bold border border-slate-100 shadow-sm"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/signup/student"
+                      className="flex items-center justify-center py-3.5 rounded-2xl text-white text-[13px] font-bold shadow-lg shadow-teal-500/20"
+                      style={{ backgroundColor: '#008080' }}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>

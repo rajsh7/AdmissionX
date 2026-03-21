@@ -89,20 +89,26 @@ export default function CollegeListItem({
     >
       <Link
         href={`/college/${slug}`}
-        className="group flex items-start gap-4 bg-white rounded-2xl border border-neutral-100 hover:border-red-200 hover:shadow-lg hover:shadow-red-500/5 transition-all duration-300 p-4 sm:p-5"
+        className="group flex items-start gap-4 bg-white rounded-2xl border border-neutral-100 hover:border-[#008080]/20 hover:shadow-xl hover:shadow-[#008080]/5 transition-all duration-300 p-4 sm:p-5"
       >
         {/* ── Thumbnail ── */}
-        <div className="relative w-24 h-20 sm:w-32 sm:h-24 flex-shrink-0 rounded-xl overflow-hidden bg-neutral-100">
-          <Image
-            src={image}
-            alt={name}
-            fill
-            sizes="150px"
-            className="object-cover group-hover:scale-105 transition-transform duration-700"
-          />
+        <div className="relative w-24 h-20 sm:w-32 sm:h-24 flex-shrink-0 rounded-xl overflow-hidden bg-neutral-100 flex items-center justify-center">
+          {image ? (
+            <Image
+              src={image}
+              alt={name}
+              fill
+              sizes="150px"
+              className="object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-[#008080]/10 to-[#008080]/5 flex items-center justify-center p-2 text-center">
+               <span className="material-symbols-outlined text-3xl text-[#008080]/30">account_balance</span>
+            </div>
+          )}
           {/* Rank overlay */}
           {displayRank ? (
-            <div className="absolute top-1.5 left-1.5 w-7 h-7 rounded-lg bg-red-600 text-white flex items-center justify-center text-[10px] font-black shadow-md">
+            <div className="absolute top-1.5 left-1.5 w-7 h-7 rounded-lg bg-[#008080] text-white flex items-center justify-center text-[10px] font-black shadow-md">
               #{displayRank}
             </div>
           ) : null}
@@ -112,12 +118,12 @@ export default function CollegeListItem({
         <div className="flex-1 min-w-0">
           {/* Top row: name + badges */}
           <div className="flex items-start justify-between gap-2 mb-1.5">
-            <h3 className="text-sm sm:text-base font-bold text-neutral-900 group-hover:text-red-600 transition-colors leading-snug line-clamp-2">
+            <h3 className="text-sm sm:text-base font-extrabold text-[#333333] group-hover:text-[#008080] transition-colors leading-snug line-clamp-2">
               {name}
             </h3>
 
             {/* Desktop action */}
-            <span className="hidden sm:inline-flex items-center gap-1.5 flex-shrink-0 bg-neutral-900 group-hover:bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all duration-300 whitespace-nowrap">
+            <span className="hidden sm:inline-flex items-center gap-1.5 flex-shrink-0 bg-[#008080] hover:bg-[#006666] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all duration-300 whitespace-nowrap">
               View {entityName}
               <span className="material-symbols-outlined text-sm group-hover:translate-x-0.5 transition-transform">
                 arrow_forward
@@ -190,13 +196,13 @@ export default function CollegeListItem({
                 {streams.slice(0, 4).map((s) => (
                   <span
                     key={s}
-                    className="px-1.5 py-0.5 bg-neutral-100 text-neutral-500 text-[10px] font-semibold rounded uppercase tracking-wide"
+                    className="px-2 py-0.5 bg-neutral-50 text-neutral-600 text-[10px] font-bold rounded-full border border-neutral-100 group-hover:border-[#008080]/20 group-hover:text-[#008080] group-hover:bg-[#008080]/5 transition-all"
                   >
                     {s}
                   </span>
                 ))}
                 {streams.length > 4 && (
-                  <span className="px-1.5 py-0.5 bg-neutral-100 text-neutral-400 text-[10px] font-semibold rounded uppercase">
+                  <span className="px-2 py-0.5 bg-neutral-50 text-neutral-400 text-[10px] font-bold rounded-full border border-neutral-50 italic">
                     +{streams.length - 4}
                   </span>
                 )}
@@ -208,10 +214,10 @@ export default function CollegeListItem({
               <span className="material-symbols-outlined text-[13px] text-neutral-400">
                 currency_rupee
               </span>
-              <span className="text-xs font-semibold text-neutral-700">
+              <span className="text-xs font-black text-[#008080]">
                 {feesLabel}
               </span>
-              <span className="text-[10px] text-neutral-400">/ year</span>
+              <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tight">/ year</span>
             </div>
 
             {/* Est. year */}
@@ -220,7 +226,7 @@ export default function CollegeListItem({
                 <span className="material-symbols-outlined text-[13px] text-neutral-400">
                   calendar_month
                 </span>
-                <span className="text-[10px] text-neutral-400">
+                <span className="text-[10px] text-neutral-400 font-bold">
                   Est. {estyear}
                 </span>
               </div>
@@ -229,7 +235,7 @@ export default function CollegeListItem({
 
           {/* Mobile CTA */}
           <div className="sm:hidden mt-3">
-            <span className="inline-flex items-center gap-1.5 bg-neutral-900 group-hover:bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all duration-300">
+            <span className="inline-flex items-center gap-1.5 bg-[#008080] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all duration-300">
               View {entityName}
               <span className="material-symbols-outlined text-sm">
                 arrow_forward

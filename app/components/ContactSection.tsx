@@ -1,105 +1,95 @@
+// v2 – cache bust
 "use client";
-
-import { motion } from "framer-motion";
 
 export default function ContactSection() {
   return (
     <section className="w-full py-16 lg:py-24 bg-[#fdfdfd] overflow-hidden">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-          
-          {/* ── Left: Contact Info ────────────────────────────────────── */}
-          <div>
-            <h2 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
-              Get in Touch
-            </h2>
-            <p className="mt-4 text-slate-500 font-medium leading-relaxed max-w-md">
-              Have questions about colleges, courses, or admissions? 
-              Our experts are here to help you navigate your academic journey.
-            </p>
+        <div className="bg-white rounded-[32px] p-8 lg:p-12 shadow-[0_4px_40px_-12px_rgba(0,0,0,0.08)] border border-slate-100">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
 
-            <div className="mt-10 space-y-8">
-               <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-[#008080]/10 flex items-center justify-center text-[#008080] shrink-0">
-                    <span className="material-symbols-rounded text-[24px]">mail</span>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest leading-none">Email Us</h4>
-                    <a href="mailto:support@admissionx.in" className="mt-2 text-slate-500 font-semibold hover:text-[#008080] transition-colors block">support@admissionx.in</a>
-                  </div>
-               </div>
-
-               <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-yellow-400/10 flex items-center justify-center text-yellow-600 shrink-0">
-                    <span className="material-symbols-rounded text-[24px]">call</span>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest leading-none">Call Us (Toll Free)</h4>
-                    <p className="mt-2 text-slate-500 font-semibold">1800-XXX-XXXX</p>
-                  </div>
-               </div>
-
-               <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-400/10 flex items-center justify-center text-blue-600 shrink-0">
-                    <span className="material-symbols-rounded text-[24px]">location_on</span>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest leading-none">Visit Us</h4>
-                    <p className="mt-2 text-slate-500 font-semibold">Registered Office, New Delhi, India</p>
-                  </div>
-               </div>
-            </div>
-          </div>
-
-          {/* ── Right: Contact Form ───────────────────────────────────── */}
-          <div className="bg-white p-8 lg:p-10 rounded-[40px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] border border-slate-100">
-             <form className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                   <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-                      <input 
-                        type="text" 
-                        placeholder="John Doe"
-                        className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-semibold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008080]/10 focus:border-[#008080] transition-all"
-                      />
-                   </div>
-                   <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
-                      <input 
-                        type="email" 
-                        placeholder="john@example.com"
-                        className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-semibold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008080]/10 focus:border-[#008080] transition-all"
-                      />
-                   </div>
+            {/* ── Left: Contact Form ─────────────────────────────── */}
+            <div>
+              <h3 className="text-xl font-bold text-slate-800 mb-6">Send a message</h3>
+              <form className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-600 mb-1.5">Email</label>
+                  <input
+                    type="email"
+                    placeholder="your.email@example.com"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008080]/20 focus:border-[#008080] transition-all"
+                  />
                 </div>
 
-                <div className="space-y-2">
-                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
-                   <input 
-                     type="tel" 
-                     placeholder="+91 XXXXX XXXXX"
-                     className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-semibold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008080]/10 focus:border-[#008080] transition-all"
-                   />
+                <div>
+                  <label className="block text-sm font-semibold text-slate-600 mb-1.5">Your Message</label>
+                  <textarea
+                    rows={5}
+                    placeholder="Tell us about your inquiry..."
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008080]/20 focus:border-[#008080] transition-all resize-none"
+                  />
                 </div>
 
-                <div className="space-y-2">
-                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Your Message</label>
-                   <textarea 
-                     rows={4}
-                     placeholder="Tell us about your requirements..."
-                     className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-semibold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008080]/10 focus:border-[#008080] transition-all resize-none"
-                   ></textarea>
-                </div>
-
-                <button 
+                <button
                   type="submit"
-                  className="w-full py-4 rounded-2xl bg-[#008080] text-white font-black text-sm uppercase tracking-widest hover:bg-[#006666] transition-all active:scale-[0.98] shadow-lg shadow-[#008080]/10"
+                  className="w-full py-3.5 rounded-xl bg-[#008080] text-white text-sm font-bold hover:bg-[#006666] transition-colors"
                 >
                   Send Message
                 </button>
-             </form>
-          </div>
+              </form>
+            </div>
 
+            {/* ── Right: Contact Info ────────────────────────────── */}
+            <div className="flex flex-col justify-center">
+              <h2 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight mb-3">
+                Get in Touch
+              </h2>
+              <p className="text-slate-500 font-medium leading-relaxed mb-10 max-w-md">
+                Get the real story about campus life, professors, and placements from people who&apos;ve actually been there.
+              </p>
+
+              <div className="space-y-6">
+                {/* Email */}
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-xl bg-[#008080] flex items-center justify-center shrink-0">
+                    <span className="material-symbols-rounded text-[20px] text-white">mail</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-sm">Email Us</h4>
+                    <a href="mailto:supportseg1@sgin.com" className="text-sm text-slate-500 hover:text-[#008080] transition-colors">
+                      supportseg1@sgin.com
+                    </a>
+                    <p className="text-xs text-slate-400 mt-0.5">General Inquiries &amp; support</p>
+                  </div>
+                </div>
+
+                {/* Call */}
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-xl bg-[#008080] flex items-center justify-center shrink-0">
+                    <span className="material-symbols-rounded text-[20px] text-white">call</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-sm">Call Us</h4>
+                    <p className="text-sm text-slate-500">+91 767-888-9792</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Mon to Fri ( 9:00 am to 5:00 pm  IST )</p>
+                  </div>
+                </div>
+
+                {/* Visit */}
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-xl bg-[#008080] flex items-center justify-center shrink-0">
+                    <span className="material-symbols-rounded text-[20px] text-white">location_on</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-sm">Visit Us</h4>
+                    <p className="text-sm text-slate-500">Lajpat Nagar, Delhi.</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Mon to Fri ( 9:00 am to 5:00 pm  IST )</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
     </section>
