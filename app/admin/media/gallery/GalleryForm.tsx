@@ -63,8 +63,8 @@ export default function GalleryForm({
           name="fullimage_file"
           label="Gallery Image"
           initialImage={initialData?.fullimage ? `https://admin.admissionx.in/uploads/${initialData.fullimage}` : null}
+          existingName="fullimage_existing"
         />
-        <input type="hidden" name="fullimage_existing" defaultValue={initialData?.fullimage} />
         <p className="text-[10px] text-slate-400 ml-1 italic">Note: Uploaded images will be saved to /uploads/gallery/</p>
       </div>
 

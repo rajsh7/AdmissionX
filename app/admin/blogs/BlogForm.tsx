@@ -1,31 +1,38 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import ImageUpload from "../_components/ImageUpload";
 
 interface BlogFormProps {
   initialData?: any;
-  onSubmitAction: (formData: FormData) => Promise<void>;
   onSuccess: () => void;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
-export default function BlogForm({ 
-  initialData, 
-  onSubmitAction,
-  onSuccess 
-}: BlogFormProps) {
-  const [isPending, startTransition] = useTransition();
+export default function BlogForm({ initialData, onSuccess }: BlogFormProps) {
+  const [isPending, setIsPending] = useState(false);
+  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setIsPending(true);
     const formData = new FormData(e.currentTarget);
-    
-    startTransition(async () => {
-      await onSubmitAction(formData);
+    const isEdit = !!initialData?.id;
+    try {
+      const res = await fetch("/api/admin/blogs", {
+        method: isEdit ? "PUT" : "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Failed");
+      router.refresh();
       onSuccess();
-    });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsPending(false);
+    }
   }
 
   return (
@@ -62,11 +69,9 @@ export default function BlogForm({
       <ImageUpload 
         name="bannerimage_file" 
         label="Blog Banner Image" 
-        initialImage={initialData?.bannerimage} 
+        initialImage={initialData?.featimage} 
+        existingName="bannerimage_existing"
       />
-      {initialData?.bannerimage && (
-        <input type="hidden" name="bannerimage_existing" value={initialData.bannerimage} />
-      )}
 
       {/* Description / Content */}
       <div className="space-y-1.5">

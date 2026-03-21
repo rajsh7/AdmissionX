@@ -10,8 +10,6 @@ import Link from "next/link";
 interface BlogClientProps {
   blogs: any[];
   onDelete: (id: number) => Promise<void>;
-  onAdd: (formData: FormData) => Promise<void>;
-  onEdit: (formData: FormData) => Promise<void>;
   onToggle: (formData: FormData) => Promise<void>;
   offset: number;
 }
@@ -21,8 +19,6 @@ const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz
 export default function BlogClient({
   blogs,
   onDelete,
-  onAdd,
-  onEdit,
   onToggle,
   offset
 }: BlogClientProps) {
@@ -94,8 +90,8 @@ export default function BlogClient({
                   <td className="px-5 py-3.5 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
                   <td className="px-3 py-3.5">
                     <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden border border-slate-200">
-                      {blog.bannerimage ? (
-                        <img src={blog.bannerimage} alt="" className="w-full h-full object-cover" />
+                      {blog.featimage ? (
+                        <img src={blog.featimage} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-slate-300">
                           <span className="material-symbols-rounded text-base">image</span>
@@ -147,7 +143,7 @@ export default function BlogClient({
 
       {/* CRUD Modal */}
       <AdminModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingBlog ? "Update Blog Post" : "Create New Post"}>
-        <BlogForm initialData={editingBlog} onSubmitAction={editingBlog ? onEdit : onAdd} onSuccess={handleFormSuccess} />
+        <BlogForm initialData={editingBlog} onSuccess={handleFormSuccess} />
       </AdminModal>
     </>
   );

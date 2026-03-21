@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import path from "path";
 
+// Force dev server restart to register new API routes
 const nextConfig: NextConfig = {
   // Prevent Next.js from picking a parent folder as the workspace root when
   // multiple lockfiles exist on the machine.

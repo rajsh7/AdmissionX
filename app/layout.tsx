@@ -33,7 +33,25 @@ export default function RootLayout({
         {/* Load both Outlined (used in public pages) and Rounded (used in admin) */}
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
+        />
+        {/* Detect when icon fonts are ready and reveal icons — prevents FOUT */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                function markLoaded() {
+                  document.documentElement.classList.add('fonts-loaded');
+                }
+                if (document.fonts && document.fonts.ready) {
+                  document.fonts.ready.then(markLoaded);
+                } else {
+                  // Fallback for older browsers — reveal after 500ms max
+                  setTimeout(markLoaded, 500);
+                }
+              })();
+            `,
+          }}
         />
       </head>
       <body

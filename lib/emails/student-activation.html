@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Welcome to AdmissionX</title>
+<style>
+  body { margin: 0; padding: 0; background-color: #f9f9fe; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1c1f; }
+  .wrapper { max-width: 600px; margin: 32px auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid rgba(195,198,209,0.2); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .header { background: #eeedf2; padding: 24px 32px; text-align: center; }
+  .header h1 { margin: 0; font-size: 22px; font-weight: 900; color: #001e40; letter-spacing: -0.5px; }
+  .main { padding: 40px 40px 32px; }
+  .hero-title { font-size: 28px; font-weight: 800; color: #001e40; text-align: center; line-height: 1.25; margin: 0 0 12px; }
+  .hero-sub { font-size: 16px; color: #43474f; text-align: center; margin: 0 0 28px; }
+  .hero-img { width: 100%; border-radius: 10px; display: block; }
+  .btn-wrap { text-align: center; margin: 28px 0; }
+  .btn { display: inline-block; padding: 14px 36px; background: linear-gradient(to right, #001e40, #003366); color: #ffffff !important; font-size: 16px; font-weight: 600; border-radius: 10px; text-decoration: none; }
+  .features { background: #f4f3f8; border-radius: 10px; padding: 24px; margin: 0 0 28px; }
+  .features h3 { font-size: 17px; font-weight: 700; color: #001e40; margin: 0 0 16px; }
+  .feature-item { display: flex; align-items: flex-start; gap: 12px; background: #ffffff; border-radius: 8px; padding: 14px; margin-bottom: 10px; }
+  .feature-item:last-child { margin-bottom: 0; }
+  .feature-icon { font-size: 20px; line-height: 1; flex-shrink: 0; }
+  .feature-title { font-size: 14px; font-weight: 600; color: #1a1c1f; margin: 0 0 2px; }
+  .feature-desc { font-size: 13px; color: #43474f; margin: 0; }
+  .quote { text-align: center; font-style: italic; font-size: 15px; color: #1a1c1f; margin: 0 0 8px; }
+  .team { text-align: center; font-size: 12px; font-weight: 700; color: #735c00; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
+  .footer { background: #f4f3f8; padding: 28px 32px; text-align: center; border-radius: 0 0 12px 12px; }
+  .footer-brand { font-size: 15px; font-weight: 700; color: #001e40; margin: 0 0 8px; }
+  .footer-desc { font-size: 13px; color: #43474f; margin: 0 0 16px; line-height: 1.6; }
+  .footer-links { margin: 0 0 16px; }
+  .footer-links a { font-size: 13px; color: #43474f; text-decoration: none; margin: 0 10px; }
+  .footer-copy { font-size: 12px; color: #43474f; margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <h1>AdmissionX</h1>
+  </div>
+  <div class="main">
+    <h2 class="hero-title">Welcome to AdmissionX, {{STUDENT_NAME}}!</h2>
+    <p class="hero-sub">You're one step closer to finding your dream college and courses.</p>
+
+    <img
+      class="hero-img"
+      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCJM3ivsJmriZD45fkHzsgVzaVBsbYz0HBxCO41-Xc8rxhwlD0TKg_px9cnadgueI-jGwQ58mqUX2pjcs1vZ71jX-JJmhOk7bLqSG8Sa-ILCSDIX_88sLZbGWJNT80qtj0vuKugArAdhMwwOFm5FMzv18VfqH6NvjpPW1TMKPik_QzEBMeo0wGdOqsWA9s0_lZjX8GA_s_VtC_MwB83g61g1eCdEYWcnwr8BWgmSlx6VZjtvTOBbk-6v-jwJ5HmHpYcI1kEkgybLc"
+      alt="Modern university library"
+    />
+
+    <div class="btn-wrap">
+      <a class="btn" href="{{ACTIVATION_LINK}}">Activate My Account</a>
+    </div>
+
+    <div class="features">
+      <h3>Your Journey Starts Here</h3>
+      <div class="feature-item">
+        <span class="feature-icon">🎓</span>
+        <div>
+          <p class="feature-title">Discover top colleges</p>
+          <p class="feature-desc">Browse elite institutions worldwide.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">📖</span>
+        <div>
+          <p class="feature-title">Explore diverse courses</p>
+          <p class="feature-desc">Find the curriculum that fits your passion.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">⭐</span>
+        <div>
+          <p class="feature-title">Get personalized recommendations</p>
+          <p class="feature-desc">AI-powered matches based on your profile.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="quote">"We're excited to help you achieve your educational goals."</p>
+    <p class="team">— Team AdmissionX —</p>
+  </div>
+
+  <div class="footer">
+    <p class="footer-brand">AdmissionX Support</p>
+    <p class="footer-desc">
+      Questions? Our advisory team is here to help. Reach out at
+      <a href="mailto:support@admissionx.com">support@admissionx.com</a>
+      or visit our Help Center.
+    </p>
+    <div class="footer-links">
+      <a href="https://admissionx.com/help-center">Support</a>
+      <a href="https://admissionx.com/privacy-policy">Privacy Policy</a>
+      <a href="https://admissionx.com/terms-and-conditions">Terms of Service</a>
+    </div>
+    <p class="footer-copy">© 2024 AdmissionX. All rights reserved.</p>
+  </div>
+</div>
+</body>
+</html>

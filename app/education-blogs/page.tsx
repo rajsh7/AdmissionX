@@ -2,6 +2,7 @@ import pool from "@/lib/db";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import BlogImage from "@/app/components/BlogImage";
 import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
@@ -10,16 +11,21 @@ import Footer from "@/app/components/Footer";
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
-const DEFAULT_IMAGE =
-  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800";
+const DEFAULT_IMAGE = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
 const PAGE_SIZE = 12;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || !raw.trim()) return DEFAULT_IMAGE;
-  if (raw.startsWith("http")) return raw;
-  return `${IMAGE_BASE}${raw}`;
+  if (raw.startsWith("/")) return `/api/image-proxy?url=${encodeURIComponent(raw)}`;
+  if (raw.startsWith("http")) {
+    // Route through proxy to avoid SSL SNI issue with admin.admissionx.in
+    return `/api/image-proxy?url=${encodeURIComponent(raw)}`;
+  }
+  // Bare filename — was stored by old system
+  const remoteUrl = `${IMAGE_BASE}${raw}`;
+  return `/api/image-proxy?url=${encodeURIComponent(remoteUrl)}`;
 }
 
 function stripHtml(html: string | null | undefined): string {
@@ -295,7 +301,7 @@ export default async function EducationBlogsPage({
 // ─── Featured Card ────────────────────────────────────────────────────────────
 
 function FeaturedCard({ blog }: { blog: BlogRow }) {
-  const img = buildImageUrl(blog.bannerimage);
+  const img = buildImageUrl(blog.featimage);
   const desc = excerpt(blog.description ?? "", 200);
   const rt = readTime(blog.description ?? "");
   const time = timeAgo(blog.created_at);
@@ -307,13 +313,10 @@ function FeaturedCard({ blog }: { blog: BlogRow }) {
     >
       <div className="flex flex-col lg:flex-row">
         <div className="relative lg:w-1/2 h-64 lg:h-auto bg-neutral-100 overflow-hidden flex-shrink-0">
-          <Image
+          <BlogImage
             src={img}
             alt={blog.topic}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            unoptimized={img.startsWith("http") && !img.includes("unsplash")}
-            priority
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/20" />
           <div className="absolute top-4 left-4">
@@ -357,7 +360,7 @@ const CARD_ACCENTS = [
 ];
 
 function BlogCard({ blog, idx = 0 }: { blog: BlogRow; idx?: number }) {
-  const img = buildImageUrl(blog.bannerimage);
+  const img = buildImageUrl(blog.featimage);
   const desc = excerpt(blog.description ?? "", 110);
   const rt = readTime(blog.description ?? "");
   const time = timeAgo(blog.created_at);
@@ -369,13 +372,10 @@ function BlogCard({ blog, idx = 0 }: { blog: BlogRow; idx?: number }) {
       className="group flex flex-col bg-white rounded-2xl border border-neutral-100 overflow-hidden hover:shadow-lg hover:shadow-neutral-200/60 hover:border-red-100 transition-all duration-300"
     >
       <div className="relative h-44 bg-neutral-100 overflow-hidden flex-shrink-0">
-        <Image
+        <BlogImage
           src={img}
           alt={blog.topic}
-          fill
-          sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
-          unoptimized={img.startsWith("http") && !img.includes("unsplash")}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">

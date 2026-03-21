@@ -7,6 +7,7 @@ interface ImageUploadProps {
   label?: string;
   initialImage?: string | null;
   required?: boolean;
+  existingName?: string;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -15,7 +16,8 @@ export default function ImageUpload({
   name, 
   label = "Select Image", 
   initialImage,
-  required = false 
+  required = false,
+  existingName
 }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(initialImage || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -85,6 +87,11 @@ export default function ImageUpload({
           onChange={handleFileChange}
           required={required && !preview}
         />
+        
+        {/* Only submit the existing image if no new file is chosen AND it wasn't cleared */}
+        {existingName && initialImage && preview === initialImage && (
+          <input type="hidden" name={existingName} value={initialImage} />
+        )}
         
         {preview && (
           <button
