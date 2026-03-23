@@ -474,41 +474,26 @@ export default function Header({ }: HeaderProps) {
 
               {authUser ? (
                 <div className="space-y-1">
-<<<<<<< HEAD
                   <Link
-                    href={`/dashboard/student/${authUser?.id}`}
+                    href={
+                      authUser.role?.toLowerCase() === "admin"
+                        ? "/admin"
+                        : authUser.role?.toLowerCase() === "college"
+                          ? `/dashboard/college/${authUser.id}`
+                          : `/dashboard/student/${authUser.id}`
+                    }
                     className="flex items-center gap-3 px-3 py-4 text-sm font-bold text-slate-800"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <span className="material-symbols-outlined text-[#008080]">dashboard</span>
-                    My Dashboard
+                    <span className="material-symbols-outlined text-[#008080]">
+                      {authUser.role?.toLowerCase() === "admin" ? "admin_panel_settings" : "dashboard"}
+                    </span>
+                    {authUser.role?.toLowerCase() === "admin" ? "Admin Dashboard" : authUser.role?.toLowerCase() === "college" ? "College Dashboard" : "My Dashboard"}
                   </Link>
                   <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="flex items-center gap-3 py-4 px-3 text-sm font-bold text-rose-500 w-full text-left">
                     <span className="material-symbols-outlined">logout</span>
                     Sign Out
                   </button>
-=======
-                   <Link 
-                     href={
-                       authUser.role?.toLowerCase() === "admin" 
-                         ? "/admin" 
-                         : authUser.role?.toLowerCase() === "college" 
-                           ? `/dashboard/college/${authUser.id}` 
-                           : `/dashboard/student/${authUser.id}`
-                     }
-                     className="flex items-center gap-3 px-3 py-4 text-sm font-bold text-slate-800"
-                     onClick={() => setMobileMenuOpen(false)}
-                   >
-                     <span className="material-symbols-outlined text-teal-600">
-                       {authUser.role?.toLowerCase() === "admin" ? "admin_panel_settings" : "dashboard"}
-                     </span>
-                     {authUser.role?.toLowerCase() === "admin" ? "Admin Dashboard" : authUser.role?.toLowerCase() === "college" ? "College Dashboard" : "My Dashboard"}
-                   </Link>
-                   <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="flex items-center gap-3 py-4 px-3 text-sm font-bold text-rose-500 w-full text-left">
-                     <span className="material-symbols-outlined">logout</span>
-                     Sign Out
-                   </button>
->>>>>>> bbebef06cf6a0b699f51eed9c84a8156e9056444
                 </div>
               ) : (
                 <div className="space-y-4 pt-2">
