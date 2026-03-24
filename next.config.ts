@@ -29,6 +29,8 @@ const nextConfig: NextConfig = {
 
   // ── Image optimisation ──────────────────────────────────────────────────────
   images: {
+    loader: "custom",
+    loaderFile: "./lib/image-loader.ts",
     remotePatterns: [
       {
         protocol: "http",

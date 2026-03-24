@@ -1,7 +1,13 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import { RowDataPacket } from "mysql2";
 import AdsCollegesListClient from "./AdsCollegesListClient";
+
+interface OptionRow extends RowDataPacket {
+  id: number;
+  name: string;
+}
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 

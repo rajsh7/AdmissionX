@@ -343,7 +343,7 @@ export default function SearchClient({
       {/* ── Hero Background ── */}
       <div className="absolute top-0 left-0 w-full h-[580px] z-0 overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1541339907198-e087593c02ca?auto=format&fit=crop&q=80&w=2000"
+          src="https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=2000&auto=format&fit=crop"
           alt="Campus Background"
           fill
           priority

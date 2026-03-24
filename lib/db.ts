@@ -17,20 +17,23 @@ declare global {
 
 function createPool(): mysql.Pool {
   return mysql.createPool({
-    host: process.env.DB_HOST || "127.0.0.1",
+    host: process.env.DB_HOST || "::1",
     port: Number(process.env.DB_PORT) || 3306,
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "",
     database: process.env.DB_NAME || "admissionx",
 
     // ── Connection pool tuning ──────────────────────────────────────────────
+    // Keep the pool small so we never exhaust MySQL's max_connections.
+    // Previous value of 20 × multiple dev-server restarts = 100+ stuck
+    // connections that prevented any new connection from being accepted.
     waitForConnections: true, // queue requests instead of throwing immediately
-    connectionLimit: 20, // raised from 10 — pages run 4-6 parallel queries
-    queueLimit: 0, // unlimited queue (bounded by waitForConnections)
-    idleTimeout: 60000, // release idle connections after 60 s
+    connectionLimit: 5, // conservative — pages need at most 3 parallel queries
+    queueLimit: 20, // fail fast if more than 20 requests are waiting
+    idleTimeout: 30000, // release idle connections after 30 s
     enableKeepAlive: true, // prevent stale connections being dropped by MySQL
     keepAliveInitialDelay: 0,
-    connectTimeout: 60000 // 60 seconds timeout for initial connection
+    connectTimeout: 8000, // fail in 8 s instead of 60 s — surfaces DB issues fast
   });
 }
 

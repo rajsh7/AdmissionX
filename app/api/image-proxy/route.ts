@@ -12,6 +12,9 @@ export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
   const url = req.nextUrl.searchParams.get("url");
+  const width = req.nextUrl.searchParams.get("w");
+  const quality = req.nextUrl.searchParams.get("q");
+
   if (!url) return new NextResponse("Missing url", { status: 400 });
 
   // Handle local dynamic uploads bypassing Dev Server Cache
@@ -35,7 +38,8 @@ export async function GET(req: NextRequest) {
           "Cache-Control": "public, max-age=86400",
         },
       });
-    } catch {
+    } catch (error) {
+      console.error("Error reading local file:", error);
       return new NextResponse("Server Error", { status: 500 });
     }
   }
@@ -48,7 +52,12 @@ export async function GET(req: NextRequest) {
   try {
     const buffer = await new Promise<Buffer>((resolve, reject) => {
       const chunks: Buffer[] = [];
-      https.get(url, { rejectUnauthorized: false }, (res) => {
+      const agent = new https.Agent({
+        rejectUnauthorized: false, // Bypass SSL certificate validation
+        timeout: 10000, // 10 second timeout
+      });
+
+      https.get(url, { agent }, (res) => {
         if (res.statusCode !== 200) {
           reject(new Error(`Status ${res.statusCode}`));
           res.resume();
@@ -57,7 +66,10 @@ export async function GET(req: NextRequest) {
         res.on("data", (chunk: Buffer) => chunks.push(chunk));
         res.on("end", () => resolve(Buffer.concat(chunks)));
         res.on("error", reject);
-      }).on("error", reject);
+      }).on("error", (error) => {
+        console.error("HTTPS request error:", error);
+        reject(error);
+      });
     });
 
     const ext = url.split(".").pop()?.toLowerCase() ?? "jpg";
@@ -74,7 +86,8 @@ export async function GET(req: NextRequest) {
         "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
       },
     });
-  } catch {
+  } catch (error) {
+    console.error("Image proxy error:", error);
     return new NextResponse("Fetch failed", { status: 502 });
   }
 }

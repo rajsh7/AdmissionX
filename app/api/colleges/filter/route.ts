@@ -1,65 +1,31 @@
 import { NextResponse } from "next/server";
-import pool from "@/lib/db";
+import { getCachedCollegesForSlug, CATEGORY_SLUG } from "@/lib/college-filter";
+
+// ─── GET /api/colleges/filter ─────────────────────────────────────────────────
+//
+//  Query param:
+//    stream – UI category label  e.g. "MBA" | "Engineering" | "MBBS" …
+//             Falls back to the raw value lowercased if not in CATEGORY_SLUG.
+//
+//  All heavy lifting (3-step query + caching) lives in lib/college-filter.ts.
+//
+// ─────────────────────────────────────────────────────────────────────────────
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const stream = searchParams.get("stream") || "Engineering";
+  const rawStream = (searchParams.get("stream") ?? "Engineering").trim();
 
-  // Map UI category names to DB functionalarea names if needed
-  let dbStream = stream;
-  if (stream === "MBA") dbStream = "Management";
-  if (stream === "MBBS") dbStream = "Medical";
-  if (stream === "B.Com") dbStream = "Commerce";
-  if (stream === "Humanities") dbStream = "Arts";
-  if (stream === "Fashion") dbStream = "Design"; // Fallback as investigated
+  // Map UI label → DB pageslug
+  const slug = CATEGORY_SLUG[rawStream] ?? rawStream.toLowerCase();
 
   try {
-    const [rows] = await pool.query(`
-      SELECT 
-        cp.id, 
-        cp.slug, 
-        COALESCE(NULLIF(TRIM(u.firstname), ''), cp.slug) AS name,
-        COALESCE(cp.registeredSortAddress, '')            AS location,
-        cp.bannerimage                                    AS image,
-        cp.rating                                         AS rating
-      FROM collegeprofile cp
-      LEFT JOIN users u ON u.id = cp.users_id
-      JOIN collegemaster cm ON cm.collegeprofile_id = cp.id
-      JOIN functionalarea f ON f.id = cm.functionalarea_id
-      WHERE (f.name LIKE ? OR f.pageslug = ?)
-        AND u.firstname NOT LIKE 'Delete%'
-      GROUP BY cp.id
-      LIMIT 8
-    `, [`%${dbStream}%`, stream.toLowerCase()]);
-
-    const universities = (rows as any[]).map((row) => {
-      const name = row.name || "University";
-      const words = name.split(" ");
-      const abbreviation =
-        words.length > 1
-          ? (words[0][0] + words[1][0]).toUpperCase()
-          : name.substring(0, 2).toUpperCase();
-
-      return {
-        name,
-        location: row.location || "India",
-        image: row.image
-          ? row.image.startsWith("/") 
-            ? row.image
-            : `/uploads/${row.image}`
-          : "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600",
-        rating: Number(row.rating) || 4.5,
-        abbr: abbreviation,
-        abbrBg: "bg-primary",
-        tags: ["Featured", "Top Ranked"],
-        tuition: "View Fees",
-        href: `/university/${row.slug || ""}`,
-      };
-    });
-
-    return NextResponse.json({ success: true, data: universities });
+    const data = await getCachedCollegesForSlug(slug);
+    return NextResponse.json({ success: true, data });
   } catch (error) {
-    console.error("Filter API Error:", error);
-    return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
+    console.error("[/api/colleges/filter]", error);
+    return NextResponse.json(
+      { success: false, error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

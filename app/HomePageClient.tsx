@@ -7,6 +7,7 @@ import HeroSection from "./components/HeroSection";
 import FieldsOfStudy from "./components/FieldsOfStudy";
 import TopUniversities from "./components/TopUniversities";
 import TopCourse from "./components/TopCourse";
+import type { FilterCollegeResult } from "@/lib/college-filter";
 
 // Below-the-fold components loaded lazily – they won't block the first paint
 const EntranceExams = dynamic(() => import("./components/EntranceExams"), {
@@ -35,6 +36,7 @@ interface HomePageClientProps {
   dbExams: DbExam[];
   stats: HomeStat[];
   streamCounts: Record<string, number>;
+  initialStreamColleges: FilterCollegeResult[];
 }
 
 export default function HomePageClient({
@@ -43,6 +45,7 @@ export default function HomePageClient({
   dbExams,
   stats,
   streamCounts,
+  initialStreamColleges,
 }: HomePageClientProps) {
   const [authModal, setAuthModal] = useState<"login" | "register" | null>(null);
 
@@ -71,7 +74,10 @@ export default function HomePageClient({
         <FieldsOfStudy />
 
         {/* 3. Discover the Top Universities */}
-        <TopUniversities universities={universities} />
+        <TopUniversities
+          universities={universities}
+          initialStreamColleges={initialStreamColleges}
+        />
 
         {/* 4. Discover the Top Course */}
         <TopCourse />
@@ -91,4 +97,3 @@ export default function HomePageClient({
     </div>
   );
 }
-

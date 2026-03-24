@@ -6,12 +6,17 @@ import { DbBlog } from "./api/home/latest-blogs/route";
 import { DbExam } from "./api/home/exams/route";
 import { HomeStat } from "./api/home/stats/route";
 import { RowDataPacket } from "mysql2";
+import {
+  getCachedCollegesForSlug,
+  CATEGORY_SLUG,
+  FilterCollegeResult,
+} from "@/lib/college-filter";
 
 // ── Route-level cache ─────────────────────────────────────────────────────────
 // Tells Next.js to cache the fully-rendered page for 5 minutes.
 // Works in both development and production, unlike unstable_cache alone.
 // export const revalidate = 300;
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -172,7 +177,7 @@ export default async function Page() {
       name,
       location: row.location || "India",
       image: row.image
-        ? row.image.startsWith("/") 
+        ? row.image.startsWith("/")
           ? row.image
           : `/uploads/${row.image}`
         : "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600",
@@ -239,6 +244,21 @@ export default async function Page() {
   //
   const streamCounts: Record<string, number> = {};
 
+  // ── Pre-warm the default "Engineering" tab cache ──────────────────────────
+  // The TopUniversities component mounts with "Engineering" as the active tab.
+  // By fetching it here (server-side, cached), the first tab click is instant
+  // and the API route serves from the warm cache rather than hitting the DB.
+  // If this fetch fails (e.g. DB still slow), we fall back to the featured
+  // universities already loaded above so the page never breaks.
+  let initialStreamColleges: FilterCollegeResult[] = [];
+  try {
+    initialStreamColleges = await getCachedCollegesForSlug(
+      CATEGORY_SLUG["Engineering"],
+    );
+  } catch {
+    // Non-fatal — component will fetch on first tab click instead
+  }
+
   return (
     <HomePageClient
       universities={universities}
@@ -246,6 +266,7 @@ export default async function Page() {
       dbExams={examRows}
       stats={stats}
       streamCounts={streamCounts}
+      initialStreamColleges={initialStreamColleges}
     />
   );
 }

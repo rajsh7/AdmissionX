@@ -531,25 +531,10 @@ export default async function CollegeLayout({
   };
 
   return (
-    <div className="min-h-screen relative">
-      {/* ── Full Page Background ── */}
-      <div className="fixed inset-0 z-0 text-[0px] font-[0] leading-[0]">
-        <Image
-          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
-          alt="Campus Background"
-          fill
-          priority
-          sizes="100vw"
-          quality={80}
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
-      </div>
+    <div className="min-h-screen bg-white">
+      <Header />
 
-      <div className="relative z-10">
-        <Header />
-
-      {/* ── Hero banner + quick stats ── */}
+      {/* ── Hero banner ── */}
       <CollegeHero college={heroData} />
 
       {/* ── Sticky tab navigation ── */}
@@ -564,21 +549,12 @@ export default async function CollegeLayout({
         }}
       />
 
-      {/* ── Main body ── */}
-      <div className="w-full px-0 py-8">
-        <div className="flex gap-6 lg:gap-8 items-start">
-          {/* Main column — page content goes here */}
-          <main className="flex-1 min-w-0">{children}</main>
-
-          {/* Sidebar — shown on large screens only */}
-          <aside className="hidden lg:block w-72 xl:w-80 flex-shrink-0">
-            <Sidebar college={raw} />
-          </aside>
-        </div>
+      {/* ── Page content ── */}
+      <div className="bg-white">
+        <main className="w-full">{children}</main>
       </div>
 
       <Footer />
-      </div>
     </div>
   );
 }
