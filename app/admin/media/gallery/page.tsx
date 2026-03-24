@@ -25,11 +25,6 @@ async function createGalleryItem(formData: FormData) {
 
     if (bannerFile && bannerFile.size > 0) {
       const publicUrl = await saveUpload(bannerFile, "gallery", "photo");
-      // Remove leading '/uploads/' to match existing paths if needed, 
-      // but saveUpload returns '/uploads/gallery/photo_...jpg'
-      // We'll store the part after '/uploads/' if the DB expect it that way.
-      // Looking at GalleryForm: `initialImage={initialData?.fullimage ? \`https://admin.admissionx.in/uploads/\${initialData.fullimage}\` : null}`
-      // So it expects the path relative to /uploads/.
       fullimage = publicUrl.replace("/uploads/", "");
     }
 
@@ -101,6 +96,7 @@ interface GalleryRow extends RowDataPacket {
   name: string;
   fullimage: string | null;
   caption: string | null;
+  users_id: number | null;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -118,7 +114,7 @@ export default async function GalleryPage({
   const params = q ? [`%${q}%`, `%${q}%`] : [];
 
   const data = await safeQuery<GalleryRow>(
-    `SELECT id, name, fullimage, caption
+    `SELECT id, name, fullimage, caption, users_id
      FROM gallery
      ${where}
      ORDER BY id DESC

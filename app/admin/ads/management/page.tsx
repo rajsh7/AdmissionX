@@ -3,6 +3,7 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { RowDataPacket } from "mysql2";
 import AdsManagementDashboardClient from "./AdsManagementDashboardClient";
+import { saveUpload } from "@/lib/upload-utils";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
@@ -25,18 +26,25 @@ async function toggleAdAction(formData: FormData) {
 
 async function createAdManagement(formData: FormData) {
   "use server";
-  const title = formData.get("title") as string;
-  const slug = formData.get("slug") as string;
-  const description = formData.get("description") as string;
-  const img = formData.get("img") as string;
-  const redirectto = formData.get("redirectto") as string;
-  const start = formData.get("start") as string;
-  const end = formData.get("end") as string;
-  const ads_position = formData.get("ads_position") as string;
-  const users_id = parseInt(formData.get("users_id") as string, 10);
-  const isactive = formData.get("isactive") ? 1 : 0;
-
   try {
+    const title = formData.get("title") as string;
+    const slug = formData.get("slug") as string;
+    const description = formData.get("description") as string;
+    const redirectto = formData.get("redirectto") as string;
+    const start = formData.get("start") as string;
+    const end = formData.get("end") as string;
+    const ads_position = formData.get("ads_position") as string;
+    const users_id = parseInt(formData.get("users_id") as string, 10);
+    const isactive = formData.get("isactive") ? 1 : 0;
+
+    const imgFile = formData.get("img_file") as File;
+    let img = "";
+
+    if (imgFile && imgFile.size > 0) {
+      const publicUrl = await saveUpload(imgFile, "ads", "banner");
+      img = publicUrl.replace("/uploads/", "");
+    }
+
     await pool.query(
       `INSERT INTO ads_managements (title, slug, description, img, redirectto, start, end, ads_position, users_id, isactive, created_at, updated_at) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
@@ -51,20 +59,28 @@ async function createAdManagement(formData: FormData) {
 
 async function updateAdManagement(formData: FormData) {
   "use server";
-  const id = parseInt(formData.get("id") as string, 10);
-  if (!id) return;
-  const title = formData.get("title") as string;
-  const slug = formData.get("slug") as string;
-  const description = formData.get("description") as string;
-  const img = formData.get("img") as string;
-  const redirectto = formData.get("redirectto") as string;
-  const start = formData.get("start") as string;
-  const end = formData.get("end") as string;
-  const ads_position = formData.get("ads_position") as string;
-  const users_id = parseInt(formData.get("users_id") as string, 10);
-  const isactive = formData.get("isactive") ? 1 : 0;
-
   try {
+    const id = parseInt(formData.get("id") as string, 10);
+    if (!id) return;
+    
+    const title = formData.get("title") as string;
+    const slug = formData.get("slug") as string;
+    const description = formData.get("description") as string;
+    const redirectto = formData.get("redirectto") as string;
+    const start = formData.get("start") as string;
+    const end = formData.get("end") as string;
+    const ads_position = formData.get("ads_position") as string;
+    const users_id = parseInt(formData.get("users_id") as string, 10);
+    const isactive = formData.get("isactive") ? 1 : 0;
+
+    const imgFile = formData.get("img_file") as File;
+    let img = formData.get("img_existing") as string;
+
+    if (imgFile && imgFile.size > 0) {
+      const publicUrl = await saveUpload(imgFile, "ads", "banner");
+      img = publicUrl.replace("/uploads/", "");
+    }
+
     await pool.query(
       `UPDATE ads_managements SET title=?, slug=?, description=?, img=?, redirectto=?, start=?, end=?, ads_position=?, users_id=?, isactive=?, updated_at=NOW() WHERE id=?`,
       [title, slug, description, img, redirectto, start || null, end || null, ads_position, isNaN(users_id) ? null : users_id, isactive, id]
@@ -121,6 +137,7 @@ interface AdRow extends RowDataPacket {
   end: string | null;
   ads_position: string | null;
   users_id: number | null;
+  college_banner: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -156,16 +173,16 @@ export default async function AdminAdsPage({
   // ── Parallel queries ───────────────────────────────────────────────────────
   const [ads, countRows, totalRow, activeRow, inactiveRow] = await Promise.all([
     safeQuery<AdRow>(
-      `SELECT id, title, img, description, isactive, slug, redirectto,
-              start, end, ads_position, users_id, created_at, updated_at
-       FROM ads_managements
-       ${where}
-       ORDER BY isactive DESC, created_at DESC
+      `SELECT a.*, cp.bannerimage AS college_banner
+       FROM ads_managements a
+       LEFT JOIN collegeprofile cp ON a.users_id = cp.users_id
+       ${where ? where.replace(/title|ads_position|redirectto/g, (m) => "a." + m) : ""}
+       ORDER BY a.isactive DESC, a.created_at DESC
        LIMIT ? OFFSET ?`,
       [...params, PAGE_SIZE, offset],
     ),
     safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total FROM ads_managements ${where}`,
+      `SELECT COUNT(*) AS total FROM ads_managements a ${where ? where.replace(/title|ads_position|redirectto/g, (m) => "a." + m) : ""}`,
       params,
     ),
     safeQuery<CountRow>("SELECT COUNT(*) AS total FROM ads_managements"),

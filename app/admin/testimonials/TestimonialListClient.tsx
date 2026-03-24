@@ -36,6 +36,14 @@ export default function TestimonialListClient({
   const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
   const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
+  const getImgUrl = (src: string | null) => {
+    if (!src) return null;
+    if (src.startsWith("/") || src.startsWith("http")) return src;
+    // Legacy support for images stored in admin.admissionx.in/uploads/testimonials/
+    // or if they are local but missing prefix
+    return `https://admin.admissionx.in/uploads/testimonials/${src}`;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
@@ -68,7 +76,15 @@ export default function TestimonialListClient({
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-3">
                       {item.featuredimage ? (
-                        <img src={item.featuredimage} alt={item.author} className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100" />
+                        <img 
+                          src={getImgUrl(item.featuredimage) || ""} 
+                          alt={item.author} 
+                          className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100" 
+                          onError={(e) => {
+                            // Fallback if the admin.admissionx.in URL fails
+                            e.currentTarget.src = "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=100";
+                          }}
+                        />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
                           <span className="material-symbols-rounded text-[20px]" style={ICO}>person</span>

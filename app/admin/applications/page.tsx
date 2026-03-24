@@ -2,6 +2,7 @@ import pool from "@/lib/db";
 import Link from "next/link";
 import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
+import ApplicationsListClient from "./ApplicationsListClient";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
@@ -42,15 +43,6 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-function formatDate(d: string | null | undefined): string {
-  if (!d) return "—";
-  try {
-    return new Date(d).toLocaleDateString("en-IN", {
-      day: "numeric", month: "short", year: "numeric",
-    });
-  } catch { return "—"; }
-}
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AppRow extends RowDataPacket {
@@ -82,12 +74,12 @@ const STATUS_TABS = [
 ];
 
 const STATUS_STYLE: Record<string, { cls: string; dot: string }> = {
-  submitted:    { cls: "bg-blue-100 text-blue-700",    dot: "bg-blue-500"    },
-  under_review: { cls: "bg-amber-100 text-amber-700",  dot: "bg-amber-500"   },
-  verified:     { cls: "bg-emerald-100 text-emerald-700", dot: "bg-emerald-500" },
-  rejected:     { cls: "bg-red-100 text-red-700",      dot: "bg-red-500"     },
-  enrolled:     { cls: "bg-purple-100 text-purple-700",dot: "bg-purple-500"  },
-  default:      { cls: "bg-slate-100 text-slate-600",  dot: "bg-slate-400"   },
+  approved:     { cls: "bg-emerald-50 text-emerald-700 border-emerald-100", dot: "bg-emerald-500" },
+  pending:      { cls: "bg-amber-50 text-amber-700 border-amber-100",  dot: "bg-amber-500"   },
+  submitted:    { cls: "bg-blue-50 text-blue-700 border-blue-100",    dot: "bg-blue-500"    },
+  rejected:     { cls: "bg-red-50 text-red-700 border-red-100",      dot: "bg-red-500"     },
+  cancelled:    { cls: "bg-slate-50 text-slate-600 border-slate-100",  dot: "bg-slate-400"   },
+  default:      { cls: "bg-slate-50 text-slate-600 border-slate-100",  dot: "bg-slate-400"   },
 };
 
 function getStatusStyle(name: string | null) {
@@ -115,17 +107,23 @@ export default async function AdminApplicationsPage({
 
   if (q) {
     conditions.push(
-      `(a.applicationRef LIKE ?
-        OR s.name         LIKE ?
-        OR s.email        LIKE ?
+      `(a.applicationID LIKE ?
+        OR a.firstname    LIKE ?
+        OR a.lastname     LIKE ?
+        OR a.email        LIKE ?
         OR co.name        LIKE ?)`,
     );
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
+    params.push(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
   }
 
-  if (statusFilter !== "all") {
-    conditions.push("a.status = ?");
-    params.push(statusFilter);
+  if (statusFilter !== "all" && statusFilter !== "submitted") {
+    const statusMap: Record<string, number> = { verified: 1, under_review: 2, rejected: 3 };
+    if (statusMap[statusFilter]) {
+      conditions.push("a.applicationstatus_id = ?");
+      params.push(statusMap[statusFilter]);
+    }
+  } else if (statusFilter === "submitted") {
+     conditions.push("(a.applicationstatus_id = 2 OR a.applicationstatus_id IS NULL)");
   }
 
   if (collegeFilter) {
@@ -136,12 +134,12 @@ export default async function AdminApplicationsPage({
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
   const JOINS = `
-    LEFT JOIN next_student_signups s  ON s.id  = a.studentId
-    LEFT JOIN collegeprofile       cp ON cp.id = a.collegeId
-    LEFT JOIN users                u  ON u.id  = cp.users_id
-    LEFT JOIN collegemaster        cm ON cm.id = a.courseId
-    LEFT JOIN course               co ON co.id = cm.course_id
-    LEFT JOIN degree               d  ON d.id  = cm.degree_id
+    LEFT JOIN collegeprofile cp ON cp.id = a.collegeprofile_id
+    LEFT JOIN users          u  ON u.id  = cp.users_id
+    LEFT JOIN collegemaster  cm ON cm.id = a.collegemaster_id
+    LEFT JOIN course         co ON co.id = cm.course_id
+    LEFT JOIN degree         d  ON d.id  = cm.degree_id
+    LEFT JOIN applicationstatus ast ON ast.id = a.applicationstatus_id
   `;
 
   // ── Parallel queries ───────────────────────────────────────────────────────
@@ -149,31 +147,34 @@ export default async function AdminApplicationsPage({
     safeQuery<AppRow>(
       `SELECT
          a.id,
-         a.applicationRef,
-         s.name      AS student_name,
-         s.email     AS student_email,
-         s.phone     AS student_phone,
+         a.applicationID AS applicationRef,
+         CONCAT(COALESCE(a.firstname, ''), ' ', COALESCE(a.lastname, '')) AS student_name,
+         a.email         AS student_email,
+         a.phone         AS student_phone,
          COALESCE(NULLIF(TRIM(u.firstname), ''), cp.slug) AS college_name,
-         cp.slug     AS college_slug,
-         co.name     AS course_name,
-         d.name      AS degree_name,
-         a.status,
-         a.createdAt
-       FROM applications a
+         cp.slug         AS college_slug,
+         co.name         AS course_name,
+         d.name          AS degree_name,
+         COALESCE(ast.name, 'Submitted') AS status,
+         a.created_at    AS createdAt
+       FROM application a
        ${JOINS}
        ${where}
-       ORDER BY a.createdAt DESC
+       ORDER BY a.created_at DESC
        LIMIT ? OFFSET ?`,
       [...params, PAGE_SIZE, offset],
     ),
     safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total FROM applications a ${JOINS} ${where}`,
+      `SELECT COUNT(*) AS total FROM application a ${JOINS} ${where}`,
       params,
     ),
     safeQuery<CountRow & { status: string }>(
-      `SELECT status, COUNT(*) AS total FROM applications GROUP BY status`,
+      `SELECT COALESCE(ast.name, 'Submitted') as status, COUNT(*) AS total 
+       FROM application a
+       LEFT JOIN applicationstatus ast ON ast.id = a.applicationstatus_id
+       GROUP BY a.applicationstatus_id`,
     ),
-    safeQuery<CountRow>(`SELECT COUNT(*) AS total FROM applications`),
+    safeQuery<CountRow>(`SELECT COUNT(*) AS total FROM application`),
     safeQuery<CollegeFilterRow>(
       `SELECT cp.slug,
               COALESCE(NULLIF(TRIM(u.firstname), ''), cp.slug) AS college_name
@@ -187,11 +188,11 @@ export default async function AdminApplicationsPage({
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const grandTotal = Number(totalAll[0]?.total ?? 0);
 
-  // Build status→count map
   const statusCountMap: Record<string, number> = {};
   for (const row of statusCounts) {
     const r = row as { status: string; total: number };
-    statusCountMap[r.status] = Number(r.total ?? 0);
+    const s = r.status.toLowerCase().replace(" ", "_");
+    statusCountMap[s] = Number(r.total ?? 0);
   }
 
   // ── URL builder ────────────────────────────────────────────────────────────
@@ -206,280 +207,208 @@ export default async function AdminApplicationsPage({
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
-
-      {/* ── Page header ───────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      
+      {/* ── Page Header ───────────────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-red-600 text-[22px]" style={ICO_FILL}>
+            <span className="material-symbols-rounded text-teal-600 text-[22px]" style={ICO_FILL}>
               description
             </span>
-            Applications
+            Applications Management
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Read-only view of all applications across all colleges.
+            Managing {grandTotal.toLocaleString()} total entries across all institutions.
           </p>
         </div>
-        <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full flex-shrink-0">
-          {grandTotal.toLocaleString()} total
-        </span>
       </div>
 
-      {/* ── Mini stat cards ────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-        {STATUS_TABS.slice(1).map((tab) => {
-          const cnt = statusCountMap[tab.value] ?? 0;
-          const style = getStatusStyle(tab.value);
+      {/* ── Stat cards ─────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
+        {STATUS_TABS.map((tab) => {
+          const val = tab.value === "all" ? grandTotal : (statusCountMap[tab.value] ?? 0);
+          const isActive = statusFilter === tab.value;
+
           return (
             <Link
               key={tab.value}
               href={buildUrl({ status: tab.value, page: 1 })}
-              className={`bg-white rounded-xl border p-3.5 flex flex-col gap-1 hover:shadow-md transition-all ${
-                statusFilter === tab.value ? "border-red-200 ring-2 ring-red-100" : "border-slate-100"
+              className={`bg-white rounded-2xl border p-5 flex flex-col gap-3 transition-all hover:shadow-md group ${
+                isActive ? "border-teal-500 ring-2 ring-teal-50" : "border-slate-100 shadow-sm"
               }`}
             >
-              <span className={`w-2 h-2 rounded-full ${style.dot}`} />
-              <p className="text-xl font-bold text-slate-800 leading-none">{cnt.toLocaleString()}</p>
-              <p className="text-[10px] font-semibold text-slate-500 truncate">{tab.label}</p>
+              <div className={`p-2.5 rounded-xl w-fit ${isActive ? "bg-teal-50 text-teal-600" : "bg-slate-50 text-slate-400 group-hover:text-slate-600"} transition-colors`}>
+                <span className="material-symbols-rounded text-[20px]" style={ICO_FILL}>
+                  {tab.value === "all" ? "dashboard_customize" : tab.value === "rejected" ? "block" : tab.value === "verified" ? "verified" : "pending_actions"}
+                </span>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-800 leading-tight">
+                  {val.toLocaleString()}
+                </p>
+                <p className="text-xs font-semibold text-slate-500 truncate">{tab.label}</p>
+              </div>
             </Link>
           );
         })}
       </div>
 
-      {/* ── Filter bar ────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 flex-wrap items-start sm:items-center">
+      {/* ── Filter & Search Bar ────────────────────────────────────────────── */}
+      <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center">
+        
+        {/* Status tabs */}
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl flex-shrink-0 overflow-x-auto no-scrollbar">
+          {STATUS_TABS.map((tab) => (
+            <Link
+              key={tab.value}
+              href={buildUrl({ status: tab.value, page: 1 })}
+              className={`px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${
+                statusFilter === tab.value
+                  ? "bg-white text-slate-800 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              {tab.label}
+              <span className="ml-1.5 text-[10px] font-bold opacity-60">
+                ({tab.value === "all" ? grandTotal : (statusCountMap[tab.value] ?? 0)})
+              </span>
+            </Link>
+          ))}
+        </div>
 
-        {/* Search & College Filter */}
-        <form method="GET" action="/admin/applications" className="flex-1 flex gap-2 min-w-[200px] items-center">
+        {/* Search & Institution form */}
+        <form method="GET" action="/admin/applications" className="flex-1 flex flex-wrap sm:flex-nowrap gap-2 w-full">
           {statusFilter !== "all" && <input type="hidden" name="status" value={statusFilter} />}
           
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <span className="text-xs font-semibold text-slate-400 hidden sm:block">College:</span>
+          <div className="relative w-full sm:w-60">
             <select
               name="college"
               defaultValue={collegeFilter}
-              className="text-xs border border-slate-200 rounded-xl px-3 py-2 text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-red-400/30 focus:border-red-400 transition cursor-pointer"
+              className="w-full appearance-none pl-4 pr-10 py-2.5 text-sm font-semibold bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 transition-all cursor-pointer"
             >
-              <option value="">All Colleges</option>
+              <option value="">All Institutions</option>
               {colleges.map((c) => (
                 <option key={c.slug} value={c.slug}>
                   {c.college_name ?? c.slug}
                 </option>
               ))}
             </select>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>
+              expand_more
+            </span>
           </div>
 
-          <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>
+          <div className="relative flex-1 min-w-[200px]">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400" style={ICO}>
               search
             </span>
             <input
               name="q"
               defaultValue={q}
-              placeholder="Search by name, email, ref, course…"
-              className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-red-400/30 focus:border-red-400 transition"
+              placeholder="Search by student, ID or course..."
+              className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 transition-all bg-slate-50"
             />
           </div>
-          <button type="submit" className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition-colors flex-shrink-0">
+
+          <button type="submit" className="px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-semibold rounded-xl transition-all shadow-sm active:scale-95">
             Search
           </button>
+          
           {(q || collegeFilter) && (
-            <Link href={buildUrl({ q: "", college: "", page: 1 })} className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-semibold rounded-xl transition-colors flex-shrink-0">
+            <Link href={buildUrl({ q: "", college: "", page: 1 })} className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-semibold rounded-xl transition-all text-center">
               Clear
             </Link>
           )}
         </form>
-
-        {/* Status filter tabs */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {STATUS_TABS.map((tab) => (
-            <Link
-              key={tab.value}
-              href={buildUrl({ status: tab.value, page: 1 })}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-xl transition-colors whitespace-nowrap ${
-                statusFilter === tab.value
-                  ? "bg-red-600 text-white shadow-sm"
-                  : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-              }`}
-            >
-              {tab.label}
-              <span className={`ml-1.5 text-[10px] font-bold inline-block align-middle ${statusFilter === tab.value ? "text-white/80" : "text-slate-400"}`}>
-                {tab.value === "all" ? grandTotal : (statusCountMap[tab.value] ?? 0)}
-              </span>
-            </Link>
-          ))}
-        </div>
       </div>
 
-      {/* ── Applications table ─────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      {/* ── Applications Table ─────────────────────────────────────────────── */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
         {appRows.length === 0 ? (
           <div className="py-24 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>
-              description
-            </span>
-            <p className="text-slate-500 font-semibold text-sm">
-              {q ? `No applications found for "${q}"` : statusFilter !== "all" ? `No ${statusFilter} applications yet.` : "No applications yet."}
+            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
+              <span className="material-symbols-rounded text-3xl text-slate-300" style={ICO_FILL}>
+                folder_open
+              </span>
+            </div>
+            <h3 className="text-slate-800 font-bold text-lg">
+              No matching applications
+            </h3>
+            <p className="text-slate-400 text-sm mt-1 max-w-[280px] mx-auto font-medium">
+              We couldn't find any records matching your current filter criteria.
             </p>
             {(q || statusFilter !== "all" || collegeFilter) && (
-              <Link href="/admin/applications" className="mt-3 inline-block text-xs text-red-600 hover:underline">
-                Clear filters
+              <Link href="/admin/applications" className="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-teal-50 text-teal-700 text-xs font-bold rounded-xl hover:bg-teal-100 transition-all active:scale-95">
+                Reset Filters
               </Link>
             )}
           </div>
         ) : (
-          <div key="results-container">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="px-5 py-3 text-left">#</th>
-                    <th className="px-4 py-3 text-left">App Ref</th>
-                    <th className="px-4 py-3 text-left">Student</th>
-                    <th className="px-4 py-3 text-left hidden md:table-cell">College</th>
-                    <th className="px-4 py-3 text-left hidden lg:table-cell">Course</th>
-                    <th className="px-4 py-3 text-center">Status</th>
-                    <th className="px-4 py-3 text-left hidden sm:table-cell">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {appRows.map((app, idx) => {
-                    const statusStyle = getStatusStyle(app.status);
-                    return (
-                      <tr key={app.id} className="hover:bg-slate-50/60 transition-colors">
-                        <td className="px-5 py-4 text-xs text-slate-400 font-mono">
-                          {offset + idx + 1}
-                        </td>
-
-                        {/* App Ref */}
-                        <td className="px-4 py-4">
-                          <span className="text-xs font-mono font-semibold text-slate-700 bg-slate-100 px-2 py-1 rounded-lg whitespace-nowrap">
-                            {app.applicationRef ?? `ADX-${String(app.id).padStart(6, "0")}`}
-                          </span>
-                        </td>
-
-                        {/* Student */}
-                        <td className="px-4 py-4">
-                          <p className="font-semibold text-slate-800 leading-tight truncate max-w-[180px]">
-                            {app.student_name ?? "—"}
-                          </p>
-                          <p className="text-[11px] text-slate-400 truncate max-w-[180px] mt-0.5">
-                            {app.student_email ?? "—"}
-                          </p>
-                          {app.student_phone && (
-                            <p className="text-[11px] text-slate-400">{app.student_phone}</p>
-                          )}
-                        </td>
-
-                        {/* College */}
-                        <td className="px-4 py-4 hidden md:table-cell">
-                          {app.college_name ? (
-                            <div>
-                              <p className="text-xs font-semibold text-slate-700 truncate max-w-[160px]">
-                                {app.college_name}
-                              </p>
-                              {app.college_slug && (
-                                <Link
-                                  href={`/college/${app.college_slug}`}
-                                  target="_blank"
-                                  className="text-[10px] text-blue-500 hover:underline font-mono"
-                                >
-                                  view profile →
-                                </Link>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-xs text-slate-300 italic">Unknown</span>
-                          )}
-                        </td>
-
-                        {/* Course */}
-                        <td className="px-4 py-4 hidden lg:table-cell">
-                          <p className="text-xs font-semibold text-slate-700 truncate max-w-[140px]">
-                            {app.course_name ?? "—"}
-                          </p>
-                          {app.degree_name && (
-                            <p className="text-[10px] text-slate-400 mt-0.5">{app.degree_name}</p>
-                          )}
-                        </td>
-
-                        {/* Status (read-only badge) */}
-                        <td className="px-4 py-4 text-center">
-                          <span className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${statusStyle.cls}`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot}`} />
-                            {app.status ?? "unknown"}
-                          </span>
-                        </td>
-
-                        {/* Date */}
-                        <td className="px-4 py-4 hidden sm:table-cell">
-                          <span className="text-xs text-slate-400 whitespace-nowrap">
-                            {formatDate(app.createdAt)}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
+          <>
+            <ApplicationsListClient initialRows={appRows} offset={offset} />
+            
             {/* ── Pagination ─────────────────────────────────────────────── */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-              <p className="text-xs text-slate-500">
-                Showing{" "}
-                <strong className="text-slate-700">
-                  {offset + 1}–{Math.min(offset + PAGE_SIZE, total)}
-                </strong>{" "}
-                of <strong className="text-slate-700">{total.toLocaleString()}</strong>{" "}
-                application{total !== 1 ? "s" : ""}
-                {statusFilter !== "all" && <span className="text-slate-400"> (filtered)</span>}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-5 border-t border-slate-50 bg-slate-50/50">
+              <p className="text-xs text-slate-500 font-semibold">
+                Showing <span className="text-slate-900">{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</span> of <span className="text-slate-900">{total.toLocaleString()}</span> entries
               </p>
 
               {totalPages > 1 && (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   {page > 1 && (
-                    <Link href={buildUrl({ page: page - 1 })} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-                      ← Prev
+                    <Link href={buildUrl({ page: page - 1 })} className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all text-slate-600 shadow-sm">
+                      <span className="material-symbols-rounded text-[18px]" style={ICO}>chevron_left</span>
                     </Link>
                   )}
-                  {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
-                    const start = Math.max(1, Math.min(page - 3, totalPages - 6));
-                    const p = start + i;
-                    if (p > totalPages) return null;
-                    return (
-                      <Link
-                        key={p}
-                        href={buildUrl({ page: p })}
-                        className={`min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition-colors ${
-                          p === page ? "bg-red-600 text-white shadow-sm" : "text-slate-500 bg-white border border-slate-200 hover:bg-slate-50"
-                        }`}
-                      >
-                        {p}
-                      </Link>
-                    );
-                  })}
+                  
+                  <div className="flex items-center gap-1 px-1 py-1 bg-white border border-slate-200 rounded-xl shadow-sm">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let p = 1;
+                      if (totalPages <= 5) p = i + 1;
+                      else if (page <= 3) p = i + 1;
+                      else if (page >= totalPages - 2) p = totalPages - 4 + i;
+                      else p = page - 2 + i;
+
+                      return (
+                        <Link
+                          key={p}
+                          href={buildUrl({ page: p })}
+                          className={`w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold transition-all ${
+                            p === page 
+                              ? "bg-teal-600 text-white shadow-sm" 
+                              : "text-slate-500 hover:bg-slate-50 hover:text-teal-600"
+                          }`}
+                        >
+                          {p}
+                        </Link>
+                      );
+                    })}
+                  </div>
+
                   {page < totalPages && (
-                    <Link href={buildUrl({ page: page + 1 })} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-                      Next →
+                    <Link href={buildUrl({ page: page + 1 })} className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all text-slate-600 shadow-sm">
+                      <span className="material-symbols-rounded text-[18px]" style={ICO}>chevron_right</span>
                     </Link>
                   )}
                 </div>
               )}
             </div>
-          </div>
+          </>
         )}
       </div>
 
-      {/* ── Read-only notice ────────────────────────────────────────────────── */}
-      <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4 text-sm text-blue-800">
-        <span className="material-symbols-rounded text-[18px] mt-0.5 flex-shrink-0" style={ICO_FILL}>
+      {/* ── Footer Notice ────────────────────────────────────────────────── */}
+      <div className="flex items-start gap-3 bg-slate-100/50 border border-slate-200/50 rounded-2xl px-6 py-5 text-xs text-slate-500">
+        <span className="material-symbols-rounded text-slate-400 text-[20px]" style={ICO_FILL}>
           info
         </span>
-        <p>
-          <strong>Read-only view.</strong> Application statuses are managed by colleges directly.
-          Admin oversight only — no status changes from this panel.
-        </p>
+        <div className="space-y-1">
+          <p className="font-bold text-slate-700">System Information</p>
+          <p className="leading-relaxed font-semibold">
+            Application statuses are managed directly by individual institutions. 
+            Administrators can monitor progress and view details, but cannot modify application states from this dashboard.
+          </p>
+        </div>
       </div>
     </div>
   );

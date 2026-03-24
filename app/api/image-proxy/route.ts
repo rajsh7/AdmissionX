@@ -40,8 +40,8 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // Handle old proxy for admin.admissionx.in
-  if (!url.startsWith("https://admin.admissionx.in/")) {
+  // Handle old proxy for legacy domains with SSL SNI issues
+  if (!url.startsWith("https://admin.admissionx.in/") && !url.startsWith("https://admissionx.info/")) {
     return new NextResponse("Forbidden", { status: 403 });
   }
 

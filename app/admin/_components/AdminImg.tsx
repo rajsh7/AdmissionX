@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface AdminImageProps {
   src: string;
@@ -20,6 +20,11 @@ export default function AdminImg({
   fallbackValue = "No Image"
 }: AdminImageProps) {
   const [error, setError] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // If there's an error or no src, show the fallback
   if (error || !src) {
@@ -54,7 +59,19 @@ export default function AdminImg({
     
     // Use the production base URL if nothing else is configured
     const baseUrl = process.env.NEXT_PUBLIC_IMAGE_BASE || "https://admin.admissionx.in";
-    return `${baseUrl}/uploads/${source}?v=${Date.now()}`;
+    let url = `${baseUrl}/uploads/${source}`;
+    
+    // If it's a legacy production URL, use our proxy to bypass SSL SNI issues
+    if (url.startsWith("https://admin.admissionx.in/") || url.startsWith("https://admissionx.info/")) {
+      url = `/api/image-proxy?url=${encodeURIComponent(url)}`;
+    }
+
+    // Only add a cache buster if we are already mounted on the client
+    // to avoid hydration mismatches.
+    if (mounted) {
+      return `${url}${url.includes("?") ? "&" : "?" }v=${Date.now()}`;
+    }
+    return url;
   };
 
   return (

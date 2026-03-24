@@ -1,6 +1,111 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
+import { revalidatePath } from "next/cache";
+import AdsCollegesListClient from "./AdsCollegesListClient";
+
+// ─── Server Actions ───────────────────────────────────────────────────────────
+
+async function toggleAdRowStatus(formData: FormData) {
+  "use server";
+  const id = parseInt(formData.get("id") as string, 10);
+  const currentStatus = parseInt(formData.get("status") as string, 10);
+  if (!id) return;
+  try {
+    await pool.query("UPDATE ads_top_college_lists SET status = ? WHERE id = ?", [
+      currentStatus ? 0 : 1,
+      id,
+    ]);
+  } catch (e) {
+    console.error("[admin/ads/colleges-list toggleStatus]", e);
+  }
+  revalidatePath("/admin/ads/colleges-list");
+  revalidatePath("/", "layout");
+}
+
+async function deleteAdRow(id: number) {
+  "use server";
+  if (!id) return;
+  try {
+    await pool.query("DELETE FROM ads_top_college_lists WHERE id = ?", [id]);
+  } catch (e) {
+    console.error("[admin/ads/colleges-list deleteRow]", e);
+  }
+  revalidatePath("/admin/ads/colleges-list");
+  revalidatePath("/", "layout");
+}
+
+async function createAdRow(formData: FormData) {
+  "use server";
+  try {
+    const status = formData.get("status") ? 1 : 0;
+    const method_type = formData.get("method_type") as string;
+    
+    const getIntOrNull = (name: string) => {
+       const val = parseInt(formData.get(name) as string, 10);
+       return isNaN(val) ? null : val;
+    };
+
+    const collegeprofile_id = getIntOrNull("collegeprofile_id");
+    const functionalarea_id = getIntOrNull("functionalarea_id");
+    const degree_id = getIntOrNull("degree_id");
+    const course_id = getIntOrNull("course_id");
+    const educationlevel_id = getIntOrNull("educationlevel_id");
+    const city_id = getIntOrNull("city_id");
+    const state_id = getIntOrNull("state_id");
+    const country_id = getIntOrNull("country_id");
+    const university_id = getIntOrNull("university_id");
+    const employee_id = getIntOrNull("employee_id");
+
+    await pool.query(
+      `INSERT INTO ads_top_college_lists 
+       (method_type, status, collegeprofile_id, functionalarea_id, degree_id, course_id, educationlevel_id, city_id, state_id, country_id, university_id, employee_id, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      [method_type || null, status, collegeprofile_id, functionalarea_id, degree_id, course_id, educationlevel_id, city_id, state_id, country_id, university_id, employee_id]
+    );
+  } catch (e) {
+    console.error("[admin/ads/colleges-list createRow]", e);
+  }
+  revalidatePath("/admin/ads/colleges-list");
+  revalidatePath("/", "layout");
+}
+
+async function updateAdRow(formData: FormData) {
+  "use server";
+  const id = parseInt(formData.get("id") as string, 10);
+  if (!id) return;
+
+  try {
+    const status = formData.get("status") ? 1 : 0;
+    const method_type = formData.get("method_type") as string;
+    
+    const getIntOrNull = (name: string) => {
+       const val = parseInt(formData.get(name) as string, 10);
+       return isNaN(val) ? null : val;
+    };
+
+    const collegeprofile_id = getIntOrNull("collegeprofile_id");
+    const functionalarea_id = getIntOrNull("functionalarea_id");
+    const degree_id = getIntOrNull("degree_id");
+    const course_id = getIntOrNull("course_id");
+    const educationlevel_id = getIntOrNull("educationlevel_id");
+    const city_id = getIntOrNull("city_id");
+    const state_id = getIntOrNull("state_id");
+    const country_id = getIntOrNull("country_id");
+    const university_id = getIntOrNull("university_id");
+    const employee_id = getIntOrNull("employee_id");
+
+    await pool.query(
+      `UPDATE ads_top_college_lists SET 
+       method_type = ?, status = ?, collegeprofile_id = ?, functionalarea_id = ?, degree_id = ?, course_id = ?, educationlevel_id = ?, city_id = ?, state_id = ?, country_id = ?, university_id = ?, employee_id = ?, updated_at = NOW() 
+       WHERE id = ?`,
+      [method_type || null, status, collegeprofile_id, functionalarea_id, degree_id, course_id, educationlevel_id, city_id, state_id, country_id, university_id, employee_id, id]
+    );
+  } catch (e) {
+    console.error("[admin/ads/colleges-list updateRow]", e);
+  }
+  revalidatePath("/admin/ads/colleges-list");
+  revalidatePath("/", "layout");
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -16,7 +121,7 @@ async function safeQuery<T extends RowDataPacket>(
     const [rows] = (await pool.query(sql, params)) as [T[], unknown];
     return rows;
   } catch (err) {
-    console.error("[admin/colleges/ads-list safeQuery]", err);
+    console.error("[admin/ads/colleges-list safeQuery]", err);
     return [];
   }
 }
@@ -38,12 +143,25 @@ function formatDate(d: string | null | undefined): string {
 
 interface CollegeAdSignupRow extends RowDataPacket {
   id: number;
+  method_type: string | null;
+  status: number;
+  created_at: string;
+  updated_at: string;
   college_name: string;
   email: string | null;
   contact_name: string | null;
   phone: string | null;
-  status: number;
-  created_at: string;
+  
+  collegeprofile_id: number | null;
+  functionalarea_id: number | null;
+  degree_id: number | null;
+  course_id: number | null;
+  educationlevel_id: number | null;
+  city_id: number | null;
+  state_id: number | null;
+  country_id: number | null;
+  university_id: number | null;
+  employee_id: number | null;
 }
 
 interface CountRow extends RowDataPacket { total: number; }
@@ -76,13 +194,11 @@ export default async function AdsCollegesListPage({
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Queries ────────────────────────────────────────────────────────────────
-  const [colleges, countRows, statsRows] = await Promise.all([
+  // ── Fetch metadata + data ──────────────────────────────────────────────────
+  const [collegesRows, countRows, statsRows, collegeOps, degreeOps, courseOps, cityOps, stateOps] = await Promise.all([
     safeQuery<CollegeAdSignupRow>(
       `SELECT 
-         a.id, 
-         a.status, 
-         a.created_at, 
+         a.*, 
          COALESCE(u.firstname, 'Unnamed College') AS college_name,
          cp.contactpersonemail AS email,
          cp.contactpersonname AS contact_name,
@@ -109,10 +225,14 @@ export default async function AdsCollegesListPage({
         SUM(status = 1) AS active
       FROM ads_top_college_lists
     `),
+    safeQuery<OptionRow>("SELECT cp.id, u.firstname AS name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"),
+    safeQuery<OptionRow>("SELECT id, name FROM degree ORDER BY name ASC"),
+    safeQuery<OptionRow>("SELECT id, name FROM course ORDER BY name ASC"),
+    safeQuery<OptionRow>("SELECT id, name FROM city ORDER BY name ASC"),
+    safeQuery<OptionRow>("SELECT id, name FROM state ORDER BY name ASC"),
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
-  const totalPages = Math.ceil(total / PAGE_SIZE);
   const stats      = statsRows[0];
 
   function buildUrl(overrides: Record<string, string | number>) {
@@ -172,7 +292,7 @@ export default async function AdsCollegesListPage({
         <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
           {["all", "pending", "active"].map((s) => (
             <Link 
-              key={s} href={buildUrl({ status: s })} 
+              key={s} href={buildUrl({ q, page: 1, status: s })} 
               className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${status === s ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
             >
               {s}
@@ -182,64 +302,24 @@ export default async function AdsCollegesListPage({
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {colleges.length === 0 ? (
-          <div className="py-20 text-center text-slate-400">
-            <span className="material-symbols-rounded text-6xl block mb-4" style={ICO}>list_alt</span>
-            <p className="text-sm font-semibold">No colleges found.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  <th className="px-5 py-3 w-10">#</th>
-                  <th className="px-4 py-3">College</th>
-                  <th className="px-4 py-3">Contact Person</th>
-                  <th className="px-4 py-3 text-center">Status</th>
-                  <th className="px-4 py-3">Signup Date</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50 text-slate-600">
-                {colleges.map((col, idx) => (
-                  <tr key={col.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-5 py-4 text-xs font-mono text-slate-400">{offset + idx + 1}</td>
-                    <td className="px-4 py-4">
-                      <p className="font-semibold text-slate-800">{col.college_name}</p>
-                      <p className="text-xs text-slate-400">{col.email}</p>
-                    </td>
-                    <td className="px-4 py-4">
-                      <p className="font-medium">{col.contact_name}</p>
-                      <p className="text-xs text-slate-400">{col.phone}</p>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        col.status === 1 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                      }`}>
-                        {col.status === 1 ? 'active' : 'inactive'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 text-xs">{formatDate(col.created_at)}</td>
-                    <td className="px-4 py-4 text-right">
-                      <button className="text-blue-600 hover:text-blue-700 font-bold text-xs">Verify</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-        {totalPages > 1 && (
-          <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
-            <p className="text-xs text-slate-500">Showing <strong>{offset + 1}-{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total}</strong></p>
-            <div className="flex gap-1">
-              {page > 1 && <Link href={buildUrl({ page: page - 1 })} className="px-3 py-1.5 text-xs font-bold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Prev</Link>}
-              {page < totalPages && <Link href={buildUrl({ page: page + 1 })} className="px-3 py-1.5 text-xs font-bold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Next</Link>}
-            </div>
-          </div>
-        )}
-      </div>
+      <AdsCollegesListClient 
+        colleges={collegesRows}
+        total={total}
+        offset={offset}
+        pageSize={PAGE_SIZE}
+        q={q}
+        toggleAction={toggleAdRowStatus}
+        deleteAction={deleteAdRow}
+        updateAction={updateAdRow}
+        createAction={createAdRow}
+        options={{
+          colleges: collegeOps,
+          degrees: degreeOps,
+          courses: courseOps,
+          cities: cityOps,
+          states: stateOps,
+        }}
+      />
     </div>
   );
 }

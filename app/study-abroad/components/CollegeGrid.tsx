@@ -43,7 +43,7 @@ export default function CollegeGrid({ colleges, total }: CollegeGridProps) {
               {/* Image */}
               <div className="relative h-36 overflow-hidden bg-neutral-100">
                 <Image
-                  src={college.image}
+                  src={college.image || "https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=800&auto=format&fit=crop"}
                   alt={college.name}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 250px"

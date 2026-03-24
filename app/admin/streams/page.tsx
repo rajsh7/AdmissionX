@@ -2,6 +2,8 @@ import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import { formatDate } from "@/lib/utils";
+import { saveUpload } from "@/lib/upload-utils";
 import StreamListClient from "./StreamListClient";
 
 const PAGE_SIZE = 25;
@@ -12,12 +14,22 @@ async function createStream(formData: FormData) {
   "use server";
   const name = formData.get("name") as string;
   const pageslug = formData.get("pageslug") as string;
-  const logoimage = formData.get("logoimage") as string;
-  const bannerimage = formData.get("bannerimage") as string;
+  const logoimageFile = formData.get("logoimage_file") as File;
+  const bannerimageFile = formData.get("bannerimage_file") as File;
   const pagetitle = formData.get("pagetitle") as string;
   const pagedescription = formData.get("pagedescription") as string;
   const isShowOnTop = formData.get("isShowOnTop") === "on" ? 1 : 0;
   const isShowOnHome = formData.get("isShowOnHome") === "on" ? 1 : 0;
+
+  let logoimage = "";
+  if (logoimageFile && logoimageFile.size > 0) {
+    logoimage = await saveUpload(logoimageFile, "streams", "stream_logo");
+  }
+
+  let bannerimage = "";
+  if (bannerimageFile && bannerimageFile.size > 0) {
+    bannerimage = await saveUpload(bannerimageFile, "streams", "stream_banner");
+  }
 
   if (!name) return;
 
@@ -39,12 +51,22 @@ async function updateStream(formData: FormData) {
   const id = parseInt(formData.get("id") as string, 10);
   const name = formData.get("name") as string;
   const pageslug = formData.get("pageslug") as string;
-  const logoimage = formData.get("logoimage") as string;
-  const bannerimage = formData.get("bannerimage") as string;
+  const logoimageFile = formData.get("logoimage_file") as File;
+  const bannerimageFile = formData.get("bannerimage_file") as File;
+  let logoimage = formData.get("logoimage_existing") as string;
+  let bannerimage = formData.get("bannerimage_existing") as string;
   const pagetitle = formData.get("pagetitle") as string;
   const pagedescription = formData.get("pagedescription") as string;
   const isShowOnTop = formData.get("isShowOnTop") === "on" ? 1 : 0;
   const isShowOnHome = formData.get("isShowOnHome") === "on" ? 1 : 0;
+
+  if (logoimageFile && logoimageFile.size > 0) {
+    logoimage = await saveUpload(logoimageFile, "streams", "stream_logo");
+  }
+
+  if (bannerimageFile && bannerimageFile.size > 0) {
+    bannerimage = await saveUpload(bannerimageFile, "streams", "stream_banner");
+  }
 
   if (!id || !name) return;
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AdminModal from "@/app/admin/_components/AdminModal";
+import ImageUpload from "@/app/admin/_components/ImageUpload";
 
 interface TestimonialFormModalProps {
   isOpen: boolean;
@@ -67,10 +68,12 @@ export default function TestimonialFormModal({
           <input name="slug" defaultValue={initialData?.slug || ""} placeholder="john-doe" className={inputClass} />
         </div>
 
-        <div className="space-y-1.5">
-          <label className={labelClass}>Author Image URL</label>
-          <input name="featuredimage" defaultValue={initialData?.featuredimage || ""} placeholder="https://..." className={inputClass} />
-        </div>
+        <ImageUpload 
+          name="image_file" 
+          existingName="featuredimage" 
+          initialImage={initialData?.featuredimage} 
+          label="Author Image"
+        />
 
         <div className="space-y-1.5">
           <label className={labelClass}>Testimonial Content</label>

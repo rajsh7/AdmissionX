@@ -1,6 +1,7 @@
 import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { RowDataPacket } from "mysql2";
+import { saveUpload } from "@/lib/upload-utils";
 import TestimonialListClient from "./TestimonialListClient";
 
 // ─── Server Actions ────────────────────────────────────────────────────────────
@@ -12,7 +13,12 @@ async function createTestimonial(formData: FormData) {
   const title    = formData.get("title") as string;
   const slug     = formData.get("slug") as string;
   const desc     = formData.get("description") as string;
-  const img      = formData.get("featuredimage") as string;
+  const imgFile  = formData.get("image_file") as File;
+
+  let featuredimage = null;
+  if (imgFile && imgFile.size > 0) {
+    featuredimage = await saveUpload(imgFile, "testimonials", "testimonial");
+  }
 
   if (!author || !desc) return;
 
@@ -21,7 +27,7 @@ async function createTestimonial(formData: FormData) {
       `INSERT INTO testimonials 
        (author, misc, title, slug, description, featuredimage, created_at, updated_at) 
        VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      [author, misc || null, title || null, slug || null, desc, img || null]
+      [author, misc || null, title || null, slug || null, desc, featuredimage || null]
     );
   } catch (e) {
     console.error("[admin/testimonials createAction]", e);
@@ -37,7 +43,12 @@ async function updateTestimonial(formData: FormData) {
   const title  = formData.get("title") as string;
   const slug   = formData.get("slug") as string;
   const desc   = formData.get("description") as string;
-  const img    = formData.get("featuredimage") as string;
+  const imgFile = formData.get("image_file") as File;
+  let featuredimage = formData.get("featuredimage") as string;
+
+  if (imgFile && imgFile.size > 0) {
+    featuredimage = await saveUpload(imgFile, "testimonials", "testimonial");
+  }
 
   if (!id || !author) return;
 
@@ -46,7 +57,7 @@ async function updateTestimonial(formData: FormData) {
       `UPDATE testimonials 
        SET author = ?, misc = ?, title = ?, slug = ?, description = ?, featuredimage = ?, updated_at = NOW() 
        WHERE id = ?`,
-      [author, misc || null, title || null, slug || null, desc, img || null, id]
+      [author, misc || null, title || null, slug || null, desc, featuredimage || null, id]
     );
   } catch (e) {
     console.error("[admin/testimonials updateAction]", e);

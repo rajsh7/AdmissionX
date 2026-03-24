@@ -5,6 +5,7 @@ import Link from "next/link";
 import AdminModal from "@/app/admin/_components/AdminModal";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import AdminImg from "@/app/admin/_components/AdminImg";
+import ImageUpload from "@/app/admin/_components/ImageUpload";
 
 interface AdRow {
   id: number;
@@ -18,6 +19,7 @@ interface AdRow {
   end: string | null;
   ads_position: string | null;
   users_id: number | null;
+  college_banner: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -134,12 +136,12 @@ export default function AdsManagementDashboardClient({
                 <tr key={ad.id} className="hover:bg-rose-50/20 transition-colors">
                   <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
                   
-                  <td className="px-4 py-4">
-                    <div className="w-20 h-12 rounded-lg overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center shadow-sm">
+                   <td className="px-4 py-4">
+                    <div className="w-20 h-12 rounded-lg overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center shadow-sm group">
                       <AdminImg 
-                        src={ad.img || ""} 
+                        src={ad.img || ad.college_banner || ""} 
                         alt={ad.title || "Ad"} 
-                        className="w-full h-full object-cover" 
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" 
                         fallbackType="symbol" 
                         fallbackValue="image" 
                       />
@@ -233,8 +235,16 @@ export default function AdsManagementDashboardClient({
           </div>
 
           <div>
-             <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Image URL</label>
-             <input name="img" defaultValue={editingAd?.img || ""} type="text" placeholder="https:// or /uploads/..." className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-rose-500/30 outline-none" />
+             <ImageUpload 
+               name="img_file" 
+               label="Ad Banner Image" 
+               initialImage={
+                 editingAd?.img 
+                   ? (editingAd.img.startsWith("/") ? editingAd.img : `/uploads/${editingAd.img}`)
+                   : (editingAd?.college_banner || null)
+               }
+               existingName="img_existing"
+             />
           </div>
 
           <div>

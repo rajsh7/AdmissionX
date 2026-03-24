@@ -165,7 +165,7 @@ export default function TopCourse() {
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">Job Growth</span>
                 </div>
                 <Link 
-                  href={`/search?stream=${current.slug}`}
+                  href={`/careers-courses?stream=${current.slug}`}
                   className="group flex items-center gap-3 text-[#008080] font-black text-xl hover:translate-x-1 transition-all"
                 >
                   View more

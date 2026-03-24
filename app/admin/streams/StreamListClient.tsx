@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import StreamFormModal from "./StreamFormModal";
 
@@ -39,6 +39,13 @@ export default function StreamListClient({
 }: StreamListClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStream, setEditingStream] = useState<Stream | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return <div className="min-h-[400px] bg-white rounded-2xl border border-slate-100 animate-pulse mt-6" />;
 
   const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
@@ -55,17 +62,20 @@ export default function StreamListClient({
   function formatDate(d: string | null | undefined): string {
     if (!d) return "—";
     try {
-      return new Date(d).toLocaleDateString("en-IN", {
-        day: "numeric", month: "short", year: "numeric",
-      });
+      const date = new Date(d);
+      const day = date.getUTCDate();
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const month = monthNames[date.getUTCMonth()];
+      const year = date.getUTCFullYear();
+      return `${day} ${month} ${year}`;
     } catch { return "—"; }
   }
 
   return (
-    <>
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-1.5">
             <span className="material-symbols-rounded text-teal-600 text-[22px]" style={ICO_FILL}>
               hub
             </span>
@@ -92,7 +102,7 @@ export default function StreamListClient({
                 <th className="px-5 py-3 text-left w-10">#</th>
                 <th className="px-4 py-3 text-left">Stream Name</th>
                 <th className="px-4 py-3 text-left hidden lg:table-cell">Slug</th>
-                <th className="px-4 py-3 text-center hidden md:table-cell">Assets</th>
+                <th className="px-4 py-3 text-center hidden md:table-cell">Images</th>
                 <th className="px-4 py-3 text-center">Show on Top</th>
                 <th className="px-4 py-3 text-center">Show on Home</th>
                 <th className="px-4 py-3 text-left hidden sm:table-cell">Updated</th>
@@ -131,22 +141,38 @@ export default function StreamListClient({
                       <span className="text-xs text-slate-300 italic">no slug</span>
                     )}
                   </td>
-                  <td className="px-4 py-3.5 hidden md:table-cell text-center">
+                  <td className="px-4 py-3.5 hidden md:table-cell">
                     <div className="flex items-center justify-center gap-2">
-                      <span
-                        title="Logo"
-                        className={`text-[13px] material-symbols-rounded ${row.logoimage ? "text-teal-500" : "text-slate-200"}`}
-                        style={ICO_FILL}
-                      >
-                        image
-                      </span>
-                      <span
-                        title="Banner"
-                        className={`text-[13px] material-symbols-rounded ${row.bannerimage ? "text-teal-500" : "text-slate-200"}`}
-                        style={ICO_FILL}
-                      >
-                        panorama
-                      </span>
+                      {/* Logo Thumbnail */}
+                      <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden flex-shrink-0 shadow-sm group/img relative" title="Logo">
+                        {row.logoimage ? (
+                          <img 
+                            src={row.logoimage} 
+                            alt="" 
+                            className="w-full h-full object-contain p-1"
+                            onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=100"; }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-slate-50">
+                            <span className="material-symbols-rounded text-slate-200 text-lg" style={ICO_FILL}>image</span>
+                          </div>
+                        )}
+                      </div>
+                      {/* Banner Thumbnail */}
+                      <div className="w-16 h-10 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden flex-shrink-0 shadow-sm group/img relative" title="Banner">
+                        {row.bannerimage ? (
+                          <img 
+                            src={row.bannerimage} 
+                            alt="" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=160"; }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-slate-50">
+                            <span className="material-symbols-rounded text-slate-200 text-lg" style={ICO_FILL}>panorama</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </td>
                   <td className="px-4 py-3.5 text-center">
@@ -189,7 +215,7 @@ export default function StreamListClient({
                       </button>
                     </form>
                   </td>
-                  <td className="px-4 py-3.5 hidden sm:table-cell">
+                  <td className="px-4 py-3.5 hidden sm:table-cell" suppressHydrationWarning>
                     <span className="text-xs text-slate-400 whitespace-nowrap">
                       {formatDate(row.updated_at || row.created_at)}
                     </span>
@@ -218,6 +244,6 @@ export default function StreamListClient({
         onSubmit={editingStream ? updateStream : createStream}
         stream={editingStream}
       />
-    </>
+    </div>
   );
 }

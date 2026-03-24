@@ -20,7 +20,7 @@ interface AuthUser {
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "Top colleges", href: "/top-colleges" },
-  { label: "Top Courses", href: "/courses" },
+  { label: "Top Courses", href: "/careers-courses" },
   {
     label: "Study Abroad",
     href: "/study-abroad",
@@ -195,6 +195,7 @@ export default function Header({ }: HeaderProps) {
   // Trigger cache invalidation for hydration mismatch
   const router = useRouter();
 
+  const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
@@ -229,6 +230,7 @@ export default function Header({ }: HeaderProps) {
   }, []);
 
   useEffect(() => {
+    setMounted(true);
     checkAuth();
   }, [checkAuth]);
 
@@ -294,10 +296,12 @@ export default function Header({ }: HeaderProps) {
   return (
     <>
       {/* Scroll Progress Bar */}
-      <motion.div
-        className="scroll-progress-bar h-1 fixed top-0 left-0 right-0 z-[60] origin-left"
-        style={{ scaleX: scrollYProgress, backgroundColor: '#008080' }}
-      />
+      {mounted && (
+        <motion.div
+          className="scroll-progress-bar h-1 fixed top-0 left-0 right-0 z-[60] origin-left"
+          style={{ scaleX: scrollYProgress, backgroundColor: '#008080' }}
+        />
+      )}
 
       <motion.header className="fixed top-0 left-0 right-0 z-50 w-full min-h-[80px] flex items-center bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] transition-colors">
         <div className="flex items-center justify-between px-6 sm:px-12 w-full max-w-[1920px] mx-auto">
@@ -474,41 +478,26 @@ export default function Header({ }: HeaderProps) {
 
               {authUser ? (
                 <div className="space-y-1">
-<<<<<<< HEAD
                   <Link
-                    href={`/dashboard/student/${authUser?.id}`}
+                    href={
+                      authUser.role?.toLowerCase() === "admin"
+                        ? "/admin"
+                        : authUser.role?.toLowerCase() === "college"
+                          ? `/dashboard/college/${authUser.id}`
+                          : `/dashboard/student/${authUser.id}`
+                    }
                     className="flex items-center gap-3 px-3 py-4 text-sm font-bold text-slate-800"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <span className="material-symbols-outlined text-[#008080]">dashboard</span>
-                    My Dashboard
+                    <span className="material-symbols-outlined text-teal-600">
+                      {authUser.role?.toLowerCase() === "admin" ? "admin_panel_settings" : "dashboard"}
+                    </span>
+                    {authUser.role?.toLowerCase() === "admin" ? "Admin Dashboard" : authUser.role?.toLowerCase() === "college" ? "College Dashboard" : "My Dashboard"}
                   </Link>
                   <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="flex items-center gap-3 py-4 px-3 text-sm font-bold text-rose-500 w-full text-left">
                     <span className="material-symbols-outlined">logout</span>
                     Sign Out
                   </button>
-=======
-                   <Link 
-                     href={
-                       authUser.role?.toLowerCase() === "admin" 
-                         ? "/admin" 
-                         : authUser.role?.toLowerCase() === "college" 
-                           ? `/dashboard/college/${authUser.id}` 
-                           : `/dashboard/student/${authUser.id}`
-                     }
-                     className="flex items-center gap-3 px-3 py-4 text-sm font-bold text-slate-800"
-                     onClick={() => setMobileMenuOpen(false)}
-                   >
-                     <span className="material-symbols-outlined text-teal-600">
-                       {authUser.role?.toLowerCase() === "admin" ? "admin_panel_settings" : "dashboard"}
-                     </span>
-                     {authUser.role?.toLowerCase() === "admin" ? "Admin Dashboard" : authUser.role?.toLowerCase() === "college" ? "College Dashboard" : "My Dashboard"}
-                   </Link>
-                   <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="flex items-center gap-3 py-4 px-3 text-sm font-bold text-rose-500 w-full text-left">
-                     <span className="material-symbols-outlined">logout</span>
-                     Sign Out
-                   </button>
->>>>>>> bbebef06cf6a0b699f51eed9c84a8156e9056444
                 </div>
               ) : (
                 <div className="space-y-4 pt-2">

@@ -39,6 +39,36 @@ export default function GalleryClient({
     setEditingItem(null);
   };
 
+  const getGalleryImgSrc = (fullimage: string | null, users_id?: number | null) => {
+    if (!fullimage) return "";
+    
+    // If it's already an absolute URL or starts with /, use as-is
+    if (fullimage.startsWith("http") || fullimage.startsWith("/")) return fullimage;
+    
+    // If it includes a folder (locally uploaded), prepend /uploads/
+    if (fullimage.includes("/")) return `/uploads/${fullimage}`;
+    
+    // Legacy logic: if it's just a filename and we have a users_id
+    if (users_id) {
+      // Determine the folder name: [prefix]-[users_id]
+      // Filename pattern is usually: [prefix]-[users_id]-[timestamp].ext
+      const parts = fullimage.split("-");
+      // Find where the users_id is in the filename to get the prefix
+      const idIdx = parts.findIndex(p => p === String(users_id));
+      if (idIdx !== -1) {
+        const prefix = parts.slice(0, idIdx + 1).join("-");
+        // Use the legacy server's gallery path which has subdirectories
+        return `https://admissionx.info/gallery/${prefix}/${fullimage}`;
+      }
+      
+      // Fallback if ID not found in filename but we have the ID
+      // Some filenames might not match exactly, so we just return it and let AdminImg handle it
+    }
+  
+    // Final fallback: handle via AdminImg's default behavior
+    return fullimage;
+  };
+
   return (
     <>
       <div className="flex justify-end mb-4">
@@ -72,15 +102,22 @@ export default function GalleryClient({
                 items.map((r) => (
                   <tr key={r.id} className="hover:bg-blue-50/20 transition-colors group">
                     <td className="px-5 py-4">
-                       <div className="w-16 h-12 rounded-lg bg-slate-100 overflow-hidden relative group-hover:shadow-md transition-shadow border border-slate-200/50">
+                       <div className="w-16 h-12 rounded-lg bg-slate-100 overflow-hidden relative group-hover:shadow-md transition-shadow border border-slate-200/50 flex items-center justify-center">
                          {r.fullimage ? (
-                            <AdminImg 
-                              src={`/uploads/${r.fullimage}`} 
-                              alt={r.name || "Gallery Item"} 
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
-                              fallbackType="div"
-                              fallbackValue="No Img"
-                            />
+                           r.fullimage.toLowerCase().endsWith(".pdf") ? (
+                             <div className="flex flex-col items-center justify-center text-red-500 gap-0.5">
+                               <span className="material-symbols-rounded text-[24px]">picture_as_pdf</span>
+                               <span className="text-[8px] font-bold uppercase">PDF</span>
+                             </div>
+                           ) : (
+                             <AdminImg 
+                               src={getGalleryImgSrc(r.fullimage, r.users_id)} 
+                               alt={r.name || "Gallery Item"} 
+                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                               fallbackType="div"
+                               fallbackValue="No Img"
+                             />
+                           )
                          ) : (
                            <div className="w-full h-full flex items-center justify-center text-slate-300">
                               <span className="material-symbols-rounded text-[20px]">image</span>

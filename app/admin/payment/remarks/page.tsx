@@ -56,11 +56,11 @@ export default async function ApplicationRemarksPage({
       asm.application_id, 
       asm.message, 
       asm.applicationStatus,
-      sp.name as studentName,
-      c.college_name as collegeName
+      COALESCE(NULLIF(TRIM(sp.firstname), ''), 'Student') as studentName,
+      COALESCE(c.slug, 'College') as collegeName
      FROM applicationstatusmessages asm
-     LEFT JOIN next_student_signups sp ON sp.id = asm.student_id
-     LEFT JOIN next_college_signups c ON c.id = asm.college_id
+     LEFT JOIN users sp ON sp.id = asm.student_id
+     LEFT JOIN collegeprofile c ON c.id = asm.college_id
      ${where}
      ORDER BY asm.id DESC
      LIMIT 100`,

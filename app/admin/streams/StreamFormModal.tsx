@@ -1,6 +1,7 @@
 "use client";
 
 import AdminModal from "@/app/admin/_components/AdminModal";
+import ImageUpload from "@/app/admin/_components/ImageUpload";
 import { useState } from "react";
 
 interface StreamFormModalProps {
@@ -61,24 +62,26 @@ export default function StreamFormModal({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-500 uppercase">Logo URL</label>
-            <input
-              name="logoimage"
-              defaultValue={stream?.logoimage || ""}
-              placeholder="URL to icon/logo"
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            <ImageUpload 
+              name="logoimage_file"
+              label="Logo Image"
+              initialImage={stream?.logoimage}
             />
+            {stream?.logoimage && (
+              <input type="hidden" name="logoimage_existing" value={stream.logoimage} />
+            )}
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-500 uppercase">Banner URL</label>
-            <input
-              name="bannerimage"
-              defaultValue={stream?.bannerimage || ""}
-              placeholder="URL to banner"
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            <ImageUpload 
+              name="bannerimage_file"
+              label="Banner Image"
+              initialImage={stream?.bannerimage}
             />
+            {stream?.bannerimage && (
+              <input type="hidden" name="bannerimage_existing" value={stream.bannerimage} />
+            )}
           </div>
         </div>
 
