@@ -72,8 +72,8 @@ async function toggleCollegeLoginAction(formData: FormData): Promise<void> {
   if (!usersId) return;
   try {
     await pool.query(
-      "UPDATE users SET is_active = ? WHERE id = ?",
-      [cur ? 0 : 1, usersId],
+      "UPDATE users SET userstatus_id = ? WHERE id = ?",
+      [cur === 1 ? 2 : 1, usersId],
     );
   } catch (e) {
     console.error("[admin/colleges toggleLoginAction]", e);
@@ -197,7 +197,7 @@ export default async function AdminCollegesPage({
       `SELECT ncs.id, ncs.college_name, ncs.email, ncs.contact_name, ncs.phone,
               ncs.status, ncs.created_at, ncs.updated_at,
               cp.users_id,
-              COALESCE(u.is_active, 1) AS user_is_active
+              COALESCE(u.userstatus_id, 1) AS user_is_active
        FROM next_college_signups ncs
        LEFT JOIN collegeprofile cp ON cp.id = (
          SELECT id FROM collegeprofile WHERE users_id = (

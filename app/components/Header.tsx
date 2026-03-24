@@ -489,7 +489,11 @@ export default function Header({ }: HeaderProps) {
                     className="flex items-center gap-3 px-3 py-4 text-sm font-bold text-slate-800"
                     onClick={() => setMobileMenuOpen(false)}
                   >
+<<<<<<< HEAD
                     <span className="material-symbols-outlined text-teal-600">
+=======
+                    <span className="material-symbols-outlined text-[#008080]">
+>>>>>>> b53fab0075329efe9629528a612203aedb97b6e0
                       {authUser.role?.toLowerCase() === "admin" ? "admin_panel_settings" : "dashboard"}
                     </span>
                     {authUser.role?.toLowerCase() === "admin" ? "Admin Dashboard" : authUser.role?.toLowerCase() === "college" ? "College Dashboard" : "My Dashboard"}
