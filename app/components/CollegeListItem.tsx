@@ -89,11 +89,11 @@ export default function CollegeListItem({
     >
       <Link
         href={`/college/${slug}`}
-        className="group flex items-start gap-4 bg-white rounded-2xl border border-neutral-100 hover:border-[#008080]/20 hover:shadow-xl hover:shadow-[#008080]/5 transition-all duration-300 p-4 sm:p-5"
+        className="group flex items-start gap-4 bg-white rounded-[10px] border border-neutral-100 hover:border-[#008080]/20 hover:shadow-xl hover:shadow-[#008080]/5 transition-all duration-300 p-4 sm:p-5"
       >
         {/* ── Thumbnail ── */}
-        <div className="relative w-24 h-20 sm:w-32 sm:h-24 flex-shrink-0 rounded-xl overflow-hidden bg-neutral-100 flex items-center justify-center">
-          {image ? (
+        <div className="relative w-24 h-20 sm:w-32 sm:h-24 flex-shrink-0 rounded-[10px] overflow-hidden bg-neutral-100 flex items-center justify-center">
+          {image && image !== "" ? (
             <Image
               src={image}
               alt={name}
@@ -108,7 +108,7 @@ export default function CollegeListItem({
           )}
           {/* Rank overlay */}
           {displayRank ? (
-            <div className="absolute top-1.5 left-1.5 w-7 h-7 rounded-lg bg-[#008080] text-white flex items-center justify-center text-[10px] font-black shadow-md">
+            <div className="absolute top-1.5 left-1.5 w-7 h-7 rounded-[10px] bg-[#008080] text-white flex items-center justify-center text-[10px] font-black shadow-md">
               #{displayRank}
             </div>
           ) : null}
@@ -123,7 +123,7 @@ export default function CollegeListItem({
             </h3>
 
             {/* Desktop action */}
-            <span className="hidden sm:inline-flex items-center gap-1.5 flex-shrink-0 bg-[#008080] hover:bg-[#006666] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all duration-300 whitespace-nowrap">
+            <span className="hidden sm:inline-flex items-center gap-1.5 flex-shrink-0 bg-[#008080] hover:bg-[#006666] text-white text-xs font-bold px-4 py-2 rounded-[10px] transition-all duration-300 whitespace-nowrap">
               View {entityName}
               <span className="material-symbols-outlined text-sm group-hover:translate-x-0.5 transition-transform">
                 arrow_forward
@@ -235,7 +235,7 @@ export default function CollegeListItem({
 
           {/* Mobile CTA */}
           <div className="sm:hidden mt-3">
-            <span className="inline-flex items-center gap-1.5 bg-[#008080] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all duration-300">
+            <span className="inline-flex items-center gap-1.5 bg-[#008080] text-white text-xs font-bold px-4 py-2 rounded-[10px] transition-all duration-300">
               View {entityName}
               <span className="material-symbols-outlined text-sm">
                 arrow_forward

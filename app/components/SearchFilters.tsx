@@ -176,7 +176,7 @@ export default function SearchFilters({
   const panel = (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-[#1A1A1A] -mx-5 -mt-5 mb-8 rounded-t-2xl shadow-lg border-b border-white/5">
+      <div className="flex items-center justify-between p-4 bg-[#1A1A1A] -mx-5 -mt-5 mb-8 rounded-t-[10px] shadow-lg border-b border-white/5">
         <h2 className="text-sm font-black text-white flex items-center gap-2">
           <span className="material-symbols-outlined text-[20px] text-[#008080]">filter_alt</span>
           Filters
@@ -195,7 +195,7 @@ export default function SearchFilters({
             <input
               type="text"
               placeholder="Search your university..."
-              className="w-full pl-4 pr-3 py-3 text-sm border border-neutral-200 rounded-xl focus:outline-none focus:border-[#008080] focus:ring-4 focus:ring-[#008080]/5 bg-white transition-all placeholder:text-neutral-400"
+              className="w-full pl-4 pr-3 py-3 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#008080] focus:ring-4 focus:ring-[#008080]/5 bg-white transition-all placeholder:text-neutral-400"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   applyFilters({ q: (e.target as HTMLInputElement).value });
@@ -221,7 +221,7 @@ export default function SearchFilters({
                   handleState("");
                 }
               }}
-              className="w-full pl-4 pr-10 py-3 text-sm border border-neutral-200 rounded-xl focus:outline-none focus:border-[#008080] bg-white appearance-none cursor-pointer transition-all"
+              className="w-full pl-4 pr-10 py-3 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#008080] bg-white appearance-none cursor-pointer transition-all"
             >
               <option value="">Search with location...</option>
               {INDIAN_STATES.map((s) => (
@@ -242,7 +242,7 @@ export default function SearchFilters({
             <select
               value={degree}
               onChange={(e) => handleDegree(e.target.value)}
-              className="w-full pl-4 pr-10 py-3 text-sm border border-neutral-200 rounded-xl focus:outline-none focus:border-[#008080] bg-white appearance-none cursor-pointer"
+              className="w-full pl-4 pr-10 py-3 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#008080] bg-white appearance-none cursor-pointer"
             >
               <option value="">Search according to the course...</option>
               {degrees.map((d) => (
@@ -260,7 +260,7 @@ export default function SearchFilters({
             <select
               value={stream}
               onChange={(e) => handleStream(e.target.value)}
-              className="w-full pl-4 pr-10 py-3 text-sm border border-neutral-200 rounded-xl focus:outline-none focus:border-[#008080] bg-white appearance-none cursor-pointer"
+              className="w-full pl-4 pr-10 py-3 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#008080] bg-white appearance-none cursor-pointer"
             >
               <option value="">Select Stream...</option>
               {streams.map((s) => (
@@ -278,7 +278,7 @@ export default function SearchFilters({
             <select
               value={feesMax}
               onChange={(e) => handleFees(e.target.value)}
-              className="w-full pl-4 pr-10 py-3 text-sm border border-neutral-200 rounded-xl focus:outline-none focus:border-[#008080] bg-white appearance-none cursor-pointer"
+              className="w-full pl-4 pr-10 py-3 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#008080] bg-white appearance-none cursor-pointer"
             >
               <option value="">Select Fees Range...</option>
               {FEES_OPTIONS.map((opt) => (
@@ -319,18 +319,18 @@ export default function SearchFilters({
         </div>
 
         {/* Sidebar Actions */}
-        <div className="pt-8 flex flex-col gap-3 pb-4">
+        <div className="pt-8 grid grid-cols-2 items-stretch gap-2.5 pb-4">
           <button
             type="button"
             onClick={() => setMobileOpen(false)}
-            className="w-full bg-[#008080] hover:bg-[#006666] text-white text-sm font-black py-3.5 rounded-xl shadow-lg shadow-[#008080]/20 transition-all active:scale-[0.98]"
+            className="w-full whitespace-nowrap bg-[#008080] hover:bg-[#006666] text-white text-sm font-black py-3.5 rounded-[10px] shadow-lg shadow-[#008080]/20 transition-all active:scale-[0.98]"
           >
             Apply filter
           </button>
           <button
             type="button"
             onClick={resetAll}
-            className="w-full bg-white border border-neutral-200 text-neutral-400 hover:text-neutral-600 hover:border-neutral-400 text-sm font-black py-3.5 rounded-xl transition-all"
+            className="w-full whitespace-nowrap bg-white border border-neutral-200 text-neutral-400 hover:text-neutral-600 hover:border-neutral-400 text-sm font-black py-3.5 rounded-[10px] transition-all"
           >
             Reset
           </button>
@@ -341,8 +341,8 @@ export default function SearchFilters({
 
   return (
     <>
-      <aside className="hidden lg:flex flex-col w-72 xl:w-80 flex-shrink-0">
-        <div className="sticky top-28 bg-white rounded-2xl border border-neutral-100 shadow-xl p-5 flex flex-col">
+      <aside className="hidden lg:flex flex-col w-full flex-shrink-0">
+        <div className="sticky top-6 bg-white rounded-[10px] border border-neutral-100 shadow-xl p-5 flex flex-col">
           {panel}
         </div>
       </aside>
@@ -352,7 +352,7 @@ export default function SearchFilters({
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
-          className="flex items-center gap-2 bg-neutral-900 text-white font-bold text-sm px-6 py-3.5 rounded-2xl shadow-2xl shadow-black/20 hover:bg-[#008080] transition-all duration-300"
+          className="flex items-center gap-2 bg-neutral-900 text-white font-bold text-sm px-6 py-3.5 rounded-[10px] shadow-2xl shadow-black/20 hover:bg-[#008080] transition-all duration-300"
         >
           <span className="material-symbols-outlined text-[18px]">filter_list</span>
           Filters
@@ -374,7 +374,7 @@ export default function SearchFilters({
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                className="w-8 h-8 rounded-xl bg-neutral-100 flex items-center justify-center hover:bg-neutral-200 transition-colors"
+                className="w-8 h-8 rounded-[10px] bg-neutral-100 flex items-center justify-center hover:bg-neutral-200 transition-colors"
               >
                 <span className="material-symbols-outlined text-[18px] text-neutral-600">close</span>
               </button>
@@ -384,7 +384,7 @@ export default function SearchFilters({
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                className="w-full bg-[#008080] text-white font-bold py-3.5 rounded-2xl hover:bg-[#006666] transition-colors text-sm"
+                className="w-full bg-[#008080] text-white font-bold py-3.5 rounded-[10px] hover:bg-[#006666] transition-colors text-sm"
               >
                 Show {totalResults?.toLocaleString() ?? ""} {entityNamePlural}
               </button>

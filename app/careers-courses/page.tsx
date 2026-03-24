@@ -1,10 +1,10 @@
 import pool from "@/lib/db";
 import type { Metadata } from "next";
-import { RowDataPacket } from "mysql2";
-import CourseSearchClient from "@/app/components/CourseSearchClient";
+import type { RowDataPacket } from "mysql2";
+import ListingSearchV4NoSSR from "@/app/components/ListingSearchV4NoSSR";
 import type { CourseResult } from "@/app/api/search/courses/route";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 
@@ -150,7 +150,7 @@ export default async function CareerCoursesPage({ searchParams }: PageProps) {
   }));
 
   return (
-    <CourseSearchClient
+    <ListingSearchV4NoSSR
       initialCourses={initialCourses}
       initialTotal={total}
       initialTotalPages={totalPages}

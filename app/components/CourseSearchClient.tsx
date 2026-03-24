@@ -1,5 +1,6 @@
 "use client";
-// v2.1 - force rebuild for hydration
+// v2.3 - force rebuild for hydration stability
+// timestamp: 2026-03-24T12:45:00
 
 import {
   useState,
@@ -11,9 +12,9 @@ import Image from "next/image";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
-import CourseCardV2 from "@/app/components/CourseCardV2";
+import CourseCardV3 from "@/app/components/CourseCardV3";
 import CourseFilters from "@/app/components/CourseFilters";
-import Pagination from "@/app/components/Pagination";
+import PaginationFixed from "@/app/components/PaginationFixed";
 import type { CourseResult } from "@/app/api/search/courses/route";
 
 interface CourseSearchClientProps {
@@ -50,6 +51,7 @@ export default function CourseSearchClient({
   const [isPending, startTransition] = useTransition();
   const [mounted, setMounted] = useState(false);
 
+  // Sync with URL params
   const q = searchParams.get("q") ?? initQ;
   const level = searchParams.get("level") ?? initLevel;
   const stream = searchParams.get("stream") ?? initStream;
@@ -88,160 +90,175 @@ export default function CourseSearchClient({
     : `Showing ${courses.length > 0 ? (page - 1) * 12 + 1 : 0}–${Math.min(page * 12, total)} of ${total.toLocaleString()} courses`;
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col relative">
-      {/* ── Hero section ── */}
-      <div className="relative w-full overflow-hidden">
-        {/* ── Hero Background ── */}
-        <div className="absolute top-0 left-0 w-full h-[580px] z-0 overflow-hidden">
-            {/* Background Image - Full width and height of container */}
-            <Image
-              src="https://images.unsplash.com/photo-1541339907198-e087593c02ca?auto=format&fit=crop&q=80&w=2000"
-              alt="Campus Background"
-              fill
-              priority
-              className="object-cover"
-            />
-            {/* Gradient Overlay for better text readability */}
-            <div className="absolute inset-0 bg-neutral-900/60" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
+    <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
+      {/* â”€â”€ Hero section â”€â”€ */}
+      {/* Using inline style for height to ensure absolute server/client sync */}
+      <div className="relative w-full overflow-hidden" style={{ height: '580px' }}>
+        {/* â”€â”€ Hero Background â”€â”€ */}
+        <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
+          {/* Background Image - Stable Unsplash ID */}
+          <Image
+            src="https://images.unsplash.com/photo-1523050853063-bd758451c6b3?q=80&w=2000&auto=format&fit=crop"
+            alt="Campus Background"
+            fill
+            priority
+            className="object-cover"
+          />
+          {/* Gradient Overlays */}
+          <div className="absolute inset-0 bg-neutral-900/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
         </div>
-        
-        <div className="relative z-10 w-full">
-            <Header />
-            
-            {/* ── Hero / Search Banner ── */}
-            <div className="pt-28 pb-20 relative">
-                <div className="mx-auto w-full px-4 lg:px-12 xl:px-20">
-                    {mounted && (
-                      <div className="max-w-4xl pt-10 text-left">
-                          <h1 className="text-6xl sm:text-7xl lg:text-[100px] font-black text-white leading-[1.1] mb-6 drop-shadow-xl">
-                            Finds your <br />
-                            <span className="text-[#008080]">perfect course!</span>
-                          </h1>
-                          <p className="text-white text-lg sm:text-2xl font-bold mb-10 max-w-2xl leading-relaxed">
-                            Search thousands of courses and universities worldwide
-                          </p>
 
-                          {/* Search bar */}
-                          <div className="max-w-2xl">
-                              <form
-                                onSubmit={(e) => { e.preventDefault(); handleSearch((e.target as any).q.value); }}
-                                className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full"
-                              >
-                                <div className="flex-1 flex items-center gap-3 bg-white rounded-2xl border border-neutral-200 shadow-xl focus-within:border-[#008080] focus-within:ring-4 focus-within:ring-[#008080]/5 transition-all duration-300 px-6 py-1">
-                                  <span className="material-symbols-outlined text-[20px] text-neutral-400 flex-shrink-0">search</span>
-                                  <input
-                                    name="q"
-                                    type="text"
-                                    defaultValue={q}
-                                    placeholder="Location, universities, courses..."
-                                    className="flex-1 py-4 text-sm sm:text-base text-neutral-800 placeholder:text-neutral-400 bg-transparent outline-none min-w-0"
-                                  />
-                                </div>
-                                <button
-                                  type="submit"
-                                  className="flex-shrink-0 bg-[#008080] hover:bg-[#006666] text-white text-sm font-black px-12 py-5 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-[#008080]/20 min-w-max"
-                                >
-                                  Search Now
-                                </button>
-                              </form>
-                          </div>
-                      </div>
-                    )}
+        <div className="relative z-10 w-full h-full flex flex-col">
+          <Header />
+
+          {/* â”€â”€ Hero / Search Banner â”€â”€ */}
+          <div className="flex-1 flex items-center justify-start relative">
+            <div className="mx-auto w-full px-4 lg:px-12 xl:px-20">
+              <div className="max-w-4xl text-left transition-opacity duration-700" style={{ opacity: mounted ? 1 : 0 }}>
+                <h1 className="text-6xl sm:text-7xl lg:text-[100px] font-black text-white leading-[1.1] mb-6 drop-shadow-2xl">
+                  Finds your <br />
+                  <span className="text-[#008080]">perfect course!</span>
+                </h1>
+                <p className="text-white text-lg sm:text-2xl font-bold mb-10 max-w-2xl leading-relaxed opacity-90">
+                  Search thousands of courses and universities worldwide
+                </p>
+
+                {/* Search bar */}
+                <div className="max-w-2xl">
+                  <form
+                    onSubmit={(e) => { e.preventDefault(); handleSearch((e.target as any).q.value); }}
+                    className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full"
+                  >
+                    <div className="flex-1 flex items-center gap-3 bg-white/95 backdrop-blur-sm rounded-2xl border border-white/20 shadow-2xl focus-within:border-[#008080] focus-within:ring-4 focus-within:ring-[#008080]/10 transition-all duration-300 px-6 py-1">
+                      <span className="material-symbols-outlined text-[20px] text-neutral-400 flex-shrink-0">search</span>
+                      <input
+                        name="q"
+                        type="text"
+                        defaultValue={q}
+                        placeholder="Location, universities, courses..."
+                        className="flex-1 py-4 text-sm sm:text-base text-neutral-800 placeholder:text-neutral-400 bg-transparent outline-none min-w-0 font-medium"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="flex-shrink-0 bg-[#008080] hover:bg-[#006666] text-white text-sm font-black px-12 py-5 rounded-2xl transition-all active:scale-[0.98] shadow-xl shadow-[#008080]/30 min-w-max"
+                    >
+                      Search Now
+                    </button>
+                  </form>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
       </div>
 
-      <div className="relative z-10 flex-1 flex flex-col pt-12">
-        {/* ── Main content ── */}
-        <div className="mx-auto w-full px-4 lg:px-8 xl:px-12 py-8">
-          <div className="flex gap-8">
-            {/* ── Filters sidebar ── */}
-            <CourseFilters
-              levels={levels}
-              streams={streams}
-              activeLevel={level}
-              activeStream={stream}
-              totalResults={total}
-              onFilterChange={() => setLoading(true)}
-            />
+      {/* â”€â”€ Main content â”€â”€ */}
+      <div className="relative z-10 flex-1 flex flex-col pt-0">
+        <div className="mx-auto w-full px-4 lg:px-8 xl:px-12 pt-12 pb-16">
+          <div className="flex gap-10">
+            {/* â”€â”€ Filters sidebar â”€â”€ */}
+            <div className="hidden lg:block w-72 flex-shrink-0">
+              <CourseFilters
+                levels={levels}
+                streams={streams}
+                activeLevel={level}
+                activeStream={stream}
+                totalResults={total}
+                onFilterChange={() => setLoading(true)}
+              />
+            </div>
 
-            {/* ── Results column ── */}
+            {/* â”€â”€ Results column â”€â”€ */}
             <div className="flex-1 min-w-0">
-              {/* ── Results Toolbar ── */}
-              <div className="flex flex-col gap-6 mb-8">
-                <div className="flex flex-wrap items-center justify-between gap-4 pt-1 pb-4 border-b border-neutral-100">
-                  {/* Active Filters Row */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-sm font-black text-neutral-400 whitespace-nowrap uppercase tracking-wider">
-                      Active Filters:
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                        {level && (
-                            <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-xl text-xs font-bold text-neutral-600 shadow-sm transition-all hover:border-[#008080]">
-                                {levels.find(l => l.slug === level)?.name || level}
-                                <button onClick={() => handleSearch("")} className="hover:text-red-500 transition-colors">
-                                    <span className="material-symbols-outlined text-[16px]">close</span>
-                                </button>
-                            </div>
-                        )}
-                        {stream && (
-                            <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-xl text-xs font-bold text-neutral-600 shadow-sm transition-all hover:border-[#008080]">
-                                {streams.find(s => s.slug === stream)?.name || stream}
-                                <button onClick={() => handleSearch("")} className="hover:text-red-500 transition-colors">
-                                    <span className="material-symbols-outlined text-[16px]">close</span>
-                                </button>
-                            </div>
-                        )}
-                        {!level && !stream && (
-                             <span className="text-xs text-neutral-400 bg-neutral-50 px-3 py-1.5 rounded-lg border border-neutral-100 border-dashed">No filters applied</span>
-                        )}
-                    </div>
+              {/* â”€â”€ Results Toolbar â”€â”€ */}
+              <div className="flex flex-col gap-6 mb-10">
+                <div className="flex flex-wrap items-center justify-between gap-4 pb-1">
+                  <div className="flex flex-col gap-1">
+                    <h2 className="text-2xl font-black text-neutral-900 tracking-tight">Academic Courses</h2>
+                    <p className="text-sm text-neutral-500 font-bold">
+                      {showingText}
+                    </p>
                   </div>
 
                   {/* Sort placeholder */}
-                  <div className="flex items-center gap-2 ml-auto">
-                    <span className="text-sm font-black text-neutral-400 whitespace-nowrap uppercase tracking-wider">
-                      Short by:
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-black text-neutral-400 whitespace-nowrap uppercase tracking-widest">
+                      Sort By:
                     </span>
-                    <select className="bg-white border border-neutral-200 rounded-xl px-4 py-2.5 text-xs font-black text-neutral-700 shadow-sm focus:outline-none focus:border-[#008080]">
+                    <select className="bg-white border border-neutral-200 rounded-xl px-5 py-3 text-xs font-black text-neutral-700 shadow-sm focus:outline-none focus:border-[#008080] cursor-pointer">
                       <option>Most Popular</option>
-                      <option>Newest</option>
+                      <option>Newest First</option>
+                      <option>Level (A-Z)</option>
                     </select>
                   </div>
                 </div>
 
-                <p className="text-sm text-slate-500 font-bold">
-                  {showingText}
-                </p>
+                {/* Active Filters Row */}
+                {(level || stream) && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {level && (
+                      <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-neutral-600 shadow-sm">
+                        {levels.find(l => l.slug === level)?.name || level}
+                        <button onClick={() => {
+                          const p = new URLSearchParams(searchParams.toString());
+                          p.delete("level"); p.delete("page");
+                          router.push(`${pathname}?${p.toString()}`);
+                        }} className="hover:text-red-500 transition-colors">
+                          <span className="material-symbols-outlined text-[14px]">close</span>
+                        </button>
+                      </div>
+                    )}
+                    {stream && (
+                      <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-neutral-600 shadow-sm">
+                        {streams.find(s => s.slug === stream)?.name || stream}
+                        <button onClick={() => {
+                          const p = new URLSearchParams(searchParams.toString());
+                          p.delete("stream"); p.delete("page");
+                          router.push(`${pathname}?${p.toString()}`);
+                        }} className="hover:text-red-500 transition-colors">
+                          <span className="material-symbols-outlined text-[14px]">close</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
-              {/* ── Course grid ── */}
+              {/* â”€â”€ Course grid â”€â”€ */}
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="bg-white rounded-3xl border border-neutral-100 aspect-[3/4] animate-pulse" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i} className="bg-white rounded-3xl border border-neutral-100 aspect-[4/5] animate-pulse" />
                   ))}
                 </div>
               ) : courses.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <span className="material-symbols-outlined text-6xl text-neutral-200 mb-4">search_off</span>
-                    <h3 className="text-xl font-bold text-neutral-800 mb-2">No courses found</h3>
-                    <p className="text-neutral-400 max-w-md">Try adjusting your filters or search keywords to find what you're looking for.</p>
+                <div className="flex flex-col items-center justify-center py-32 text-center bg-white rounded-[2rem] border border-neutral-100">
+                  <div className="w-20 h-20 bg-neutral-50 rounded-full flex items-center justify-center mb-6">
+                    <span className="material-symbols-outlined text-4xl text-neutral-300">search_off</span>
+                  </div>
+                  <h3 className="text-2xl font-black text-neutral-900 mb-2 tracking-tight">No courses match your search</h3>
+                  <p className="text-neutral-400 max-w-sm mb-8 font-medium">Try adjusting your filters or using different keywords to explore more options.</p>
+                  <button
+                    onClick={() => router.push(pathname)}
+                    className="bg-[#008080] text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-[#006666] transition-all"
+                  >
+                    Clear All Filters
+                  </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {courses.map((course, i) => (
-                    <CourseCardV2 key={course.id} course={course} index={i} />
+                    <CourseCardV3 key={course.id} course={course} index={i} />
                   ))}
                 </div>
               )}
 
-              {/* ── Pagination ── */}
+              {/* â”€â”€ Pagination â”€â”€ */}
               {!loading && totalPages > 1 && (
-                <div className="mt-12">
-                  <Pagination
+                <div className="mt-16 border-t border-neutral-100 pt-10">
+                  <PaginationFixed
                     currentPage={page}
                     totalPages={totalPages}
                     useUrl

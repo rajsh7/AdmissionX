@@ -14,7 +14,7 @@ interface CollegeCardProps {
 function StarRating({ rating, count }: { rating: number; count: number }) {
   if (rating === 0) return null;
   return (
-    <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-xl shadow-lg border border-white/20">
+    <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-[10px] shadow-lg border border-white/20">
       <span className="material-symbols-outlined text-[14px] text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>
         star
       </span>
@@ -93,11 +93,11 @@ export default function CollegeCard({
     >
       <Link
         href={`/college/${slug}`}
-        className="group flex flex-col bg-white rounded-3xl border border-neutral-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden h-full"
+        className="group flex flex-col bg-white rounded-[10px] border border-neutral-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden h-full"
       >
         {/* ── Image ── */}
         <div className="relative h-48 overflow-hidden bg-neutral-50 flex-shrink-0 flex items-center justify-center">
-          {image ? (
+          {image && image !== "" ? (
             <Image
               src={image}
               alt={name}
@@ -114,7 +114,7 @@ export default function CollegeCard({
 
           {/* Top-left: Rank badge */}
           {displayRank ? (
-            <div className="absolute top-3 left-3 flex items-center gap-1 bg-[#008080] text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-lg">
+            <div className="absolute top-3 left-3 flex items-center gap-1 bg-[#008080] text-white text-[10px] font-black px-2.5 py-1 rounded-[10px] shadow-lg">
               #{displayRank}
             </div>
           ) : null}
@@ -126,7 +126,7 @@ export default function CollegeCard({
         {/* ── Body ── */}
         <div className="flex flex-col flex-1 p-5">
           {/* Name */}
-          <h3 className="text-[17px] font-extrabold text-[#333333] mb-1 group-hover:text-[#008080] transition-colors line-clamp-2">
+          <h3 className="text-[17px] font-medium text-[#333333] mb-1 group-hover:text-[#008080] transition-colors line-clamp-2">
             {name}
           </h3>
 

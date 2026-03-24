@@ -16,7 +16,7 @@ import Footer from "@/app/components/Footer";
 import CollegeCard from "@/app/components/CollegeCard";
 import CollegeListItem from "@/app/components/CollegeListItem";
 import SearchFilters from "@/app/components/SearchFilters";
-import Pagination from "@/app/components/Pagination";
+import PaginationFixed from "@/app/components/PaginationFixed";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -125,7 +125,7 @@ function SearchBar({
       className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full"
       autoComplete="off"
     >
-      <div className="flex-1 flex items-center gap-3 bg-white rounded-2xl border border-neutral-200 shadow-xl focus-within:border-[#008080] focus-within:ring-4 focus-within:ring-[#008080]/5 transition-all duration-300 px-6 py-1">
+      <div className="flex-1 flex items-center gap-3 bg-white rounded-[10px] border border-neutral-200 shadow-xl focus-within:border-[#008080] focus-within:ring-4 focus-within:ring-[#008080]/5 transition-all duration-300 px-6 py-1">
         <span className="material-symbols-outlined text-[20px] text-neutral-400 flex-shrink-0">
           search
         </span>
@@ -137,7 +137,7 @@ function SearchBar({
           onFocus={() => value.length >= 2 && setShowSuggestions(true)}
           onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
           placeholder="Location, universities, courses..."
-          className="flex-1 py-4 text-sm sm:text-base text-neutral-800 placeholder:text-neutral-400 bg-transparent outline-none min-w-0"
+          className="flex-1 py-3 text-sm sm:text-base text-neutral-800 placeholder:text-neutral-400 bg-transparent outline-none min-w-0"
         />
         {value && (
           <button
@@ -157,14 +157,14 @@ function SearchBar({
 
       <button
         type="submit"
-        className="flex-shrink-0 bg-[#008080] hover:bg-[#006666] text-white text-sm font-black px-12 py-5 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-[#008080]/20 min-w-max"
+        className="flex-shrink-0 bg-[#008080] hover:bg-[#006666] text-white text-base font-bold px-10 py-3 rounded-[10px] transition-all active:scale-[0.98] shadow-lg shadow-[#008080]/20 min-w-max"
       >
         Search Now
       </button>
 
       {/* Suggestions dropdown */}
       {showSuggestions && value.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl border border-neutral-100 shadow-xl overflow-hidden z-40">
+        <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-[10px] border border-neutral-100 shadow-xl overflow-hidden z-40">
           {loadingSuggestions ? (
             <div className="flex items-center gap-2 px-4 py-3 text-sm text-neutral-400">
               <div className="w-4 h-4 border-2 border-neutral-300 border-t-[#008080] rounded-full animate-spin" />
@@ -212,16 +212,16 @@ function SearchBar({
 
 function CollegeCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl border border-neutral-100 overflow-hidden animate-pulse">
+    <div className="bg-white rounded-[10px] border border-neutral-100 overflow-hidden animate-pulse">
       <div className="h-44 bg-neutral-100" />
       <div className="p-4 space-y-3">
-        <div className="h-4 bg-neutral-100 rounded-lg w-3/4" />
-        <div className="h-3 bg-neutral-100 rounded-lg w-1/2" />
+        <div className="h-4 bg-neutral-100 rounded-[10px] w-3/4" />
+        <div className="h-3 bg-neutral-100 rounded-[10px] w-1/2" />
         <div className="flex gap-2 mt-2">
           <div className="h-5 bg-neutral-100 rounded w-16" />
           <div className="h-5 bg-neutral-100 rounded w-16" />
         </div>
-        <div className="h-8 bg-neutral-100 rounded-xl mt-4" />
+        <div className="h-8 bg-neutral-100 rounded-[10px] mt-4" />
       </div>
     </div>
   );
@@ -229,11 +229,11 @@ function CollegeCardSkeleton() {
 
 function CollegeListSkeleton() {
   return (
-    <div className="bg-white rounded-2xl border border-neutral-100 p-5 flex gap-4 animate-pulse">
-      <div className="w-32 h-24 bg-neutral-100 rounded-xl flex-shrink-0" />
+    <div className="bg-white rounded-[10px] border border-neutral-100 p-5 flex gap-4 animate-pulse">
+      <div className="w-32 h-24 bg-neutral-100 rounded-[10px] flex-shrink-0" />
       <div className="flex-1 space-y-3">
-        <div className="h-4 bg-neutral-100 rounded-lg w-2/3" />
-        <div className="h-3 bg-neutral-100 rounded-lg w-1/3" />
+        <div className="h-4 bg-neutral-100 rounded-[10px] w-2/3" />
+        <div className="h-3 bg-neutral-100 rounded-[10px] w-1/3" />
         <div className="flex gap-2">
           <div className="h-5 bg-neutral-100 rounded w-20" />
           <div className="h-5 bg-neutral-100 rounded w-20" />
@@ -339,58 +339,47 @@ export default function SearchClient({
     : `Showing ${colleges.length > 0 ? (page - 1) * 12 + 1 : 0}–${Math.min(page * 12, total)} of ${total.toLocaleString()} ${entityNamePlural.toLowerCase()}`;
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col relative">
-      {/* ── Hero Background ── */}
-      <div className="absolute top-0 left-0 w-full h-[580px] z-0 overflow-hidden">
-        <Image
-          src="https://images.unsplash.com/photo-1541339907198-e087593c02ca?auto=format&fit=crop&q=80&w=2000"
-          alt="Campus Background"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-neutral-900/60" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
-      </div>
-      <div className="relative z-10 flex-1 flex flex-col">
-        <Header />
-
-        {/* ── Hero / Search Banner ── */}
-        <div className="pt-28 pb-20 relative">
-          <div className="mx-auto w-full px-4 lg:px-12 xl:px-20">
-            {hasMounted && (
-              <div className="max-w-4xl pt-10">
-                <h1 className="text-6xl sm:text-7xl lg:text-[100px] font-black text-white leading-[1.1] mb-6 drop-shadow-xl">
-                  Finds your <br />
-                  <span className="text-[#008080]">Dream college</span>
+    <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
+      <div className="relative w-full overflow-hidden" style={{ height: "560px" }}>
+        <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
+          <Image
+            src="/images/hero-student.png"
+            alt="Campus Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-neutral-900/60" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
+        </div>
+        <div className="relative z-10 w-full h-full flex flex-col">
+          <Header />
+          <div className="flex-1 flex items-center justify-start relative">
+            <div className="mx-auto w-full px-4 lg:px-12 xl:px-16">
+              <div className={`max-w-4xl text-left transition-opacity duration-300 mt-6 ${hasMounted ? "opacity-100" : "opacity-0"}`}>
+                <h1 className="font-poppins text-white leading-[1.05] tracking-[0.02em] mb-4 drop-shadow-2xl">
+                  <span className="text-[36px] sm:text-[48px] lg:text-[64px] font-extrabold block mb-0">Finds your</span>
+                  <span className="text-[40px] sm:text-[54px] lg:text-[72px] font-black text-[#00a4a4]">Dream college</span>
                 </h1>
-                <p className="text-white text-lg sm:text-2xl font-bold mb-10 max-w-2xl leading-relaxed">
+                <p className="text-white text-lg sm:text-2xl font-bold mb-8 max-w-2xl leading-relaxed opacity-90">
                   Search thousands of courses and universities worldwide
                 </p>
-
-                {/* Search bar */}
                 <div className="max-w-2xl">
                   <SearchBar defaultValue={q} onSearch={handleSearch} />
                 </div>
               </div>
-            )}
-
-            {/* Active search indicator */}
-            {q && (
-              <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
-
-
-              </div>
-            )}
+            </div>
           </div>
         </div>
+      </div>
 
+      <div className="relative z-10 flex-1 flex flex-col min-h-screen">
         {/* ── Main content ── */}
-        <div className="mx-auto w-full px-4 lg:px-8 xl:px-12 py-8">
-          <div className="flex gap-6">
+        <div className="mx-auto w-full px-4 lg:px-6 xl:px-8 pt-8 pb-8">
+          <div className="flex gap-5">
             {/* ── Filters sidebar ── */}
-            <div className="flex flex-col gap-6">
+            <div className="hidden lg:flex flex-col gap-6 basis-[300px] min-w-[300px] max-w-[300px] flex-shrink-0">
               <SearchFilters
                 streams={streams}
                 degrees={degrees}
@@ -407,15 +396,10 @@ export default function SearchClient({
                 onFilterChange={() => setLoading(true)}
               />
 
-              {/* Ad Placeholder below sidebar */}
-              <div className="hidden lg:block w-72 xl:w-80 h-96 bg-neutral-200/50 rounded-2xl border-2 border-dashed border-neutral-300 flex items-center justify-center text-neutral-400 font-bold text-sm">
-                AD_SPACE
-              </div>
             </div>
 
             {/* ── Results column ── */}
             <div className="flex-1 min-w-0">
-              {/* ── Results Toolbar (Figma Redesign) ── */}
               {/* ── Results Toolbar (Figma Redesign) ── */}
               <div className="flex flex-col gap-5 mb-8">
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-1 pb-4 border-b border-neutral-100">
@@ -426,7 +410,7 @@ export default function SearchClient({
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {stream && (
-                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-xl text-xs font-bold text-neutral-600 shadow-sm transition-all hover:border-[#008080]">
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm transition-all hover:border-[#008080]">
                           {streams.find(s => String(s.slug || s.id) === stream)?.name || stream}
                           <button onClick={() => {
                             const p = new URLSearchParams(searchParams.toString());
@@ -438,7 +422,7 @@ export default function SearchClient({
                         </div>
                       )}
                       {degree && (
-                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-xl text-xs font-bold text-neutral-600 shadow-sm transition-all hover:border-[#008080]">
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm transition-all hover:border-[#008080]">
                           {degrees.find(d => String(d.slug || d.id) === degree)?.name || degree}
                           <button onClick={() => {
                             const p = new URLSearchParams(searchParams.toString());
@@ -450,7 +434,7 @@ export default function SearchClient({
                         </div>
                       )}
                       {!stream && !degree && !cityId && !stateId && (
-                        <span className="text-xs text-neutral-400 bg-neutral-50 px-3 py-1.5 rounded-lg border border-neutral-100 border-dashed">No filters applied</span>
+                        <span className="text-xs text-neutral-400 bg-neutral-50 px-3 py-1.5 rounded-[10px] border border-neutral-100 border-dashed">No filters applied</span>
                       )}
                     </div>
                   </div>
@@ -472,7 +456,7 @@ export default function SearchClient({
                             p.delete("page");
                             router.push(`${pathname}?${p.toString()}`);
                           }}
-                          className="appearance-none bg-white border border-neutral-200 rounded-xl px-4 pr-10 py-2.5 text-xs font-black text-neutral-700 shadow-sm focus:outline-none focus:border-[#008080] transition-all cursor-pointer min-w-[180px]"
+                          className="appearance-none bg-white border border-neutral-200 rounded-[10px] px-4 pr-10 py-2.5 text-xs font-black text-neutral-700 shadow-sm focus:outline-none focus:border-[#008080] transition-all cursor-pointer min-w-[180px]"
                         >
                           {SORT_OPTIONS.map((opt) => (
                             <option key={opt.value} value={opt.value}>
@@ -487,16 +471,16 @@ export default function SearchClient({
                     </div>
 
                     {/* View Toggle */}
-                    <div className="flex items-center bg-white border border-neutral-200 rounded-xl p-1 shadow-sm">
+                    <div className="flex items-center bg-white border border-neutral-200 rounded-[10px] p-1 shadow-sm">
                       <button
                         onClick={() => setViewMode("grid")}
-                        className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-[#008080] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
+                        className={`p-1.5 rounded-[10px] transition-all ${viewMode === 'grid' ? 'bg-[#008080] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
                       >
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                       </button>
                       <button
                         onClick={() => setViewMode("list")}
-                        className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-[#008080] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
+                        className={`p-1.5 rounded-[10px] transition-all ${viewMode === 'list' ? 'bg-[#008080] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
                       >
                         <span className="material-symbols-outlined text-[20px]">view_headline</span>
                       </button>
@@ -522,7 +506,7 @@ export default function SearchClient({
               {/* ── College grid / list ── */}
               {loading ? (
                 viewMode === "grid" ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-5 gap-x-[10px]">
                     {Array.from({ length: 12 }).map((_, i) => (
                       <CollegeCardSkeleton key={i} />
                     ))}
@@ -537,7 +521,7 @@ export default function SearchClient({
               ) : colleges.length === 0 ? (
                 /* ── Empty state ── */
                 <div className="flex flex-col items-center justify-center py-24 text-center">
-                  <div className="w-20 h-20 rounded-3xl bg-neutral-100 flex items-center justify-center mb-5">
+                  <div className="w-20 h-20 rounded-[10px] bg-neutral-100 flex items-center justify-center mb-5">
                     <span className="material-symbols-outlined text-[40px] text-neutral-300">
                       search_off
                     </span>
@@ -553,7 +537,7 @@ export default function SearchClient({
                   {isFiltered && (
                     <a
                       href={pathname}
-                      className="inline-flex items-center gap-2 bg-[#008080] text-white text-sm font-bold px-5 py-3 rounded-xl hover:bg-[#006666] transition-colors"
+                      className="inline-flex items-center gap-2 bg-[#008080] text-white text-sm font-bold px-5 py-3 rounded-[10px] hover:bg-[#006666] transition-colors"
                     >
                       <span className="material-symbols-outlined text-[16px]">
                         filter_list_off
@@ -563,7 +547,7 @@ export default function SearchClient({
                   )}
                 </div>
               ) : viewMode === "grid" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-5 gap-x-[10px]">
                   {colleges.map((college, i) => (
                     <CollegeCard
                       key={college.id}
@@ -586,15 +570,10 @@ export default function SearchClient({
                 </div>
               )}
 
-              {/* Bottom Ad Placeholder */}
-              <div className="mt-12 w-full h-32 bg-neutral-200/50 rounded-2xl border-2 border-dashed border-neutral-300 flex items-center justify-center text-neutral-400 font-bold text-sm">
-                BANNERAD_SPACE
-              </div>
-
               {/* ── Pagination ── */}
               {!loading && totalPages > 1 && (
                 <div className="mt-10">
-                  <Pagination
+                  <PaginationFixed
                     currentPage={currentPage}
                     totalPages={totalPages}
                     useUrl

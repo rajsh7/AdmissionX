@@ -1,12 +1,20 @@
 import type { Metadata } from "next";
-import { Lexend } from "next/font/google";
+import { Lexend, Poppins } from "next/font/google";
 import "./globals.css";
 
 const lexend = Lexend({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "900"],
   variable: "--font-lexend",
-  display: "swap", // avoid invisible text during font load
+  display: "swap",
+  preload: true,
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins",
+  display: "swap",
   preload: true,
 });
 
@@ -61,7 +69,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${lexend.variable} font-display antialiased overflow-x-hidden`}
+        className={`${lexend.variable} ${poppins.variable} font-display antialiased overflow-x-hidden`}
       >
         {children}
       </body>
