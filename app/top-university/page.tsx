@@ -67,7 +67,7 @@ interface CountRow extends RowDataPacket {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const IMAGE_BASE = "https://admin.admissionx.in"; 
+const IMAGE_BASE = "https://admin.admissionx.in";
 
 function buildImageUrl(raw: string | null): string | null {
   if (!raw) return null;
@@ -127,38 +127,52 @@ function buildUniversities(rows: UniversityRow[]): CollegeResult[] {
 }
 
 // ─── Cached filter data ────────────────────────────────────────────────────────
+//
+// PREVIOUS IMPLEMENTATION caused server-wide connection-pool exhaustion:
+//   Query 1 — GROUP BY functionalarea_id across full collegemaster JOIN
+//             collegeprofile  →  no covering index  →  120 s+ timeout
+//   Query 3 — degree JOIN collegemaster JOIN collegeprofile DISTINCT
+//             →  same problem
+//
+// FIX: replace both slow collegemaster JOINs with direct selects on the
+// tiny lookup tables (functionalarea ≈ 45 rows, degree ≈ small).
+// The filter sidebar renders these in plain <select> dropdowns — counts
+// are never displayed — so removing the GROUP BY is invisible to users.
+//
+// City lookup keeps the two-step approach (collegeprofile → city) which
+// only touches collegeprofile (fast) and the city table (small).
+// ─────────────────────────────────────────────────────────────────────────────
 const getFilterData = unstable_cache(
   async () => {
     try {
-      const [[faCountRows], [rawCityIdRows], [degreeRows]] = await Promise.all([
+      const [[streamRows], [rawCityIdRows], [degreeRows]] = await Promise.all([
+        // Streams: direct select on functionalarea (~45 rows) — always instant.
+        // No GROUP BY, no collegemaster JOIN.
         pool.query(
-          `SELECT functionalarea_id, COUNT(*) AS college_count
-           FROM collegemaster cm
-           INNER JOIN collegeprofile cp ON cp.id = cm.collegeprofile_id
-           WHERE cp.isTopUniversity = 1 AND functionalarea_id IS NOT NULL
-           GROUP BY functionalarea_id
-           ORDER BY college_count DESC
-           LIMIT 25`,
-        ) as Promise<
-          [{ functionalarea_id: number; college_count: number }[], unknown]
-        >,
+          `SELECT id, name, pageslug
+           FROM   functionalarea
+           WHERE  name IS NOT NULL AND name != ''
+           ORDER  BY name
+           LIMIT  30`,
+        ) as Promise<[Pick<StreamRow, "id" | "name" | "pageslug">[], unknown]>,
 
+        // City IDs: only touches collegeprofile — fast.
         pool.query(
           `SELECT registeredAddressCityId
-           FROM collegeprofile
-           WHERE isTopUniversity = 1
-             AND registeredAddressCityId IS NOT NULL
-           LIMIT 2000`,
+           FROM   collegeprofile
+           WHERE  isTopUniversity = 1
+             AND  registeredAddressCityId IS NOT NULL
+           LIMIT  2000`,
         ) as Promise<[{ registeredAddressCityId: number }[], unknown]>,
 
+        // Degrees: direct select on degree table — small table, fast.
+        // No collegemaster JOIN needed.
         pool.query(
-          `SELECT DISTINCT d.id, d.name, d.pageslug
-           FROM degree d
-           INNER JOIN collegemaster cm ON cm.degree_id = d.id
-           INNER JOIN collegeprofile cp ON cp.id = cm.collegeprofile_id
-           WHERE cp.isTopUniversity = 1 AND d.name IS NOT NULL AND d.name != ''
-           ORDER BY d.name
-           LIMIT 50`,
+          `SELECT id, name, pageslug
+           FROM   degree
+           WHERE  name IS NOT NULL AND name != ''
+           ORDER  BY name
+           LIMIT  50`,
         ) as Promise<[DegreeRow[], unknown]>,
       ]);
 
@@ -166,70 +180,38 @@ const getFilterData = unstable_cache(
         ...new Set(rawCityIdRows.map((r) => r.registeredAddressCityId)),
       ];
 
-      if (!faCountRows || faCountRows.length === 0) {
-        return {
-          streamRows: [] as StreamRow[],
-          degreeRows: degreeRows as DegreeRow[],
-          cityRows: [] as CityRow[],
-        };
-      }
-
-      const faIds = faCountRows.map((r) => r.functionalarea_id).join(",");
       const cityIdList = uniqueCityIds.slice(0, 400).join(",");
 
-      const [[faNameRows], [cityRows]] = await Promise.all([
-        pool.query(
-          `SELECT id, name, pageslug
-           FROM functionalarea
-           WHERE id IN (${faIds})
-             AND name IS NOT NULL
-             AND name != ''`,
-        ) as Promise<[Pick<StreamRow, "id" | "name" | "pageslug">[], unknown]>,
-
+      const [cityRows] =
         cityIdList.length > 0
-          ? (pool.query(
+          ? ((await pool.query(
               `SELECT id, name
-               FROM city
-               WHERE id IN (${cityIdList})
-                 AND name IS NOT NULL
-                 AND name != ''
-               ORDER BY name
-               LIMIT 100`,
-            ) as Promise<[CityRow[], unknown]>)
-          : Promise.resolve([[] as CityRow[], undefined] as [
-              CityRow[],
-              unknown,
-            ]),
-      ]);
+             FROM   city
+             WHERE  id IN (${cityIdList})
+               AND  name IS NOT NULL
+               AND  name != ''
+             ORDER  BY name
+             LIMIT  100`,
+            )) as [CityRow[], unknown])
+          : [[] as CityRow[]];
 
-      const countMap = new Map(
-        faCountRows.map((r) => [r.functionalarea_id, r.college_count]),
-      );
-      const streamRows = (
-        faNameRows as Pick<StreamRow, "id" | "name" | "pageslug">[]
-      )
-        .map((f) => ({
-          ...f,
-          college_count: countMap.get(f.id) ?? 0,
-        }))
-        .sort((a, b) => b.college_count - a.college_count) as StreamRow[];
+      // Attach a dummy college_count of 0 — the UI never displays it.
+      const hydratedStreamRows: StreamRow[] = (
+        streamRows as Pick<StreamRow, "id" | "name" | "pageslug">[]
+      ).map((r) => ({ ...r, college_count: 0 })) as StreamRow[];
 
       return {
-        streamRows,
+        streamRows: hydratedStreamRows,
         degreeRows: degreeRows as DegreeRow[],
         cityRows: cityRows as CityRow[],
       };
     } catch (err) {
       console.error("[top-university] getFilterData error:", err);
-      return {
-        streamRows: [] as StreamRow[],
-        degreeRows: [] as DegreeRow[],
-        cityRows: [] as CityRow[],
-      };
+      throw err;
     }
   },
-  ["top-university-filters"],
-  { revalidate: 600 },
+  ["top-university-filters-v3"],
+  { revalidate: 3600 }, // 1 hour — lookup tables change rarely
 );
 
 // ─── Core fetch ─────────────────────────────────────────────────────────────
@@ -244,7 +226,8 @@ async function fetchTopUniversities(opts: {
   page: number;
   limit: number;
 }) {
-  const { q, stream, degree, cityId, stateId, feesMax, sort, page, limit } = opts;
+  const { q, stream, degree, cityId, stateId, feesMax, sort, page, limit } =
+    opts;
   const offset = (page - 1) * limit;
 
   const filterConditions: string[] = ["cp.isTopUniversity = 1"];
@@ -253,28 +236,42 @@ async function fetchTopUniversities(opts: {
   const hasTextSearch = q.length >= 2;
   if (hasTextSearch) {
     filterConditions.push(
-      "(u.firstname LIKE ? OR cp.registeredSortAddress LIKE ? OR cp.slug LIKE ?)"
+      "(u.firstname LIKE ? OR cp.registeredSortAddress LIKE ? OR cp.slug LIKE ?)",
     );
     const like = `%${q}%`;
     filterParams.push(like, like, like);
   }
 
   if (stream) {
-    filterConditions.push(`EXISTS (
-      SELECT 1 FROM collegemaster cm2
-      INNER JOIN functionalarea fa2 ON fa2.id = cm2.functionalarea_id
-      WHERE cm2.collegeprofile_id = cp.id AND fa2.pageslug = ?
-    )`);
-    filterParams.push(stream);
+    // Pre-resolve pageslug → integer id so the EXISTS subquery uses a plain
+    // integer equality on cm2.functionalarea_id instead of a JOIN + string
+    // compare.  functionalarea is ~45 rows — this lookup is always instant.
+    const [faRows] = (await pool.query(
+      "SELECT id FROM functionalarea WHERE pageslug = ? LIMIT 1",
+      [stream],
+    )) as [{ id: number }[], unknown];
+    if (faRows.length > 0) {
+      filterConditions.push(`EXISTS (
+        SELECT 1 FROM collegemaster cm2
+        WHERE cm2.collegeprofile_id = cp.id
+          AND cm2.functionalarea_id = ${faRows[0].id}
+      )`);
+    }
   }
 
   if (degree) {
-    filterConditions.push(`EXISTS (
-      SELECT 1 FROM collegemaster cm3
-      INNER JOIN degree d2 ON d2.id = cm3.degree_id
-      WHERE cm3.collegeprofile_id = cp.id AND d2.pageslug = ?
-    )`);
-    filterParams.push(degree);
+    // Same pattern: pre-resolve degree pageslug → integer id.
+    const [degRows] = (await pool.query(
+      "SELECT id FROM degree WHERE pageslug = ? LIMIT 1",
+      [degree],
+    )) as [{ id: number }[], unknown];
+    if (degRows.length > 0) {
+      filterConditions.push(`EXISTS (
+        SELECT 1 FROM collegemaster cm3
+        WHERE cm3.collegeprofile_id = cp.id
+          AND cm3.degree_id = ${degRows[0].id}
+      )`);
+    }
   }
 
   if (feesMax && !isNaN(parseInt(feesMax))) {
@@ -307,7 +304,7 @@ async function fetchTopUniversities(opts: {
   } else if (sort === "ranking") {
     orderBy = "cp.topUniversityRank ASC, cp.ranking ASC";
   } else if (sort === "fees") {
-      // Logic for fees sort needs a join in the id query if we want to sort by MIN(fees)
+    // Logic for fees sort needs a join in the id query if we want to sort by MIN(fees)
   }
 
   let idSql = `
@@ -320,7 +317,7 @@ async function fetchTopUniversities(opts: {
   `;
 
   if (sort === "fees") {
-      idSql = `
+    idSql = `
         SELECT cp.id
         FROM collegeprofile cp
         ${hasTextSearch ? "LEFT JOIN users u ON u.id = cp.users_id" : ""}
@@ -389,7 +386,10 @@ async function fetchTopUniversities(opts: {
       ORDER BY FIELD(cp.id, ${idList})
     `;
 
-    const [dataRows] = (await pool.query(enrichSql)) as [UniversityRow[], unknown];
+    const [dataRows] = (await pool.query(enrichSql)) as [
+      UniversityRow[],
+      unknown,
+    ];
 
     return {
       universities: buildUniversities(dataRows),
@@ -398,13 +398,13 @@ async function fetchTopUniversities(opts: {
     };
   } catch (err) {
     console.error("[top-university] fetch error:", err);
-    return { universities: [], total: 0, totalPages: 0 };
+    throw err;
   }
 }
 
 const getCachedTopUniversities = unstable_cache(
   fetchTopUniversities,
-  ["top-university-data-v2"],
+  ["top-university-data-v4"],
   { revalidate: 300 },
 );
 
@@ -416,7 +416,8 @@ interface PageProps {
 
 export const metadata: Metadata = {
   title: "Top Universities in India 2024 | AdmissionX",
-  description: "Explore India's top universities ranked by academic excellence, placements, and infrastructure. Filter by stream, degree, city, and fees.",
+  description:
+    "Explore India's top universities ranked by academic excellence, placements, and infrastructure. Filter by stream, degree, city, and fees.",
 };
 
 export default async function TopUniversityPage({ searchParams }: PageProps) {
@@ -473,7 +474,8 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
 
   let pageSubtitle = `${total.toLocaleString()} top-ranked universities across India`;
   if (stream) {
-    const streamName = streamOptions.find((s) => s.slug === stream)?.name ?? stream;
+    const streamName =
+      streamOptions.find((s) => s.slug === stream)?.name ?? stream;
     pageSubtitle = `${total.toLocaleString()} top ${streamName} universities`;
   }
 

@@ -40,8 +40,9 @@ export default function TestimonialListClient({
     if (!src) return null;
     if (src.startsWith("/") || src.startsWith("http")) return src;
     // Legacy support for images stored in admin.admissionx.in/uploads/testimonials/
-    // or if they are local but missing prefix
-    return `https://admin.admissionx.in/uploads/testimonials/${src}`;
+    // Use image proxy to handle SSL issues
+    const url = `https://admin.admissionx.in/uploads/testimonials/${src}`;
+    return `/api/image-proxy?url=${encodeURIComponent(url)}`;
   };
 
   return (

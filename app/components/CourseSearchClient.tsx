@@ -91,14 +91,12 @@ export default function CourseSearchClient({
 
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
-      {/* â”€â”€ Hero section â”€â”€ */}
-      {/* Using inline style for height to ensure absolute server/client sync */}
-      <div className="relative w-full overflow-hidden" style={{ height: '580px' }}>
-        {/* â”€â”€ Hero Background â”€â”€ */}
+      {/* ── Hero section ── */}
+      <div className="relative w-full overflow-hidden" style={{ height: '560px' }}>
+        {/* ── Hero Background ── */}
         <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
-          {/* Background Image - Stable Unsplash ID */}
           <Image
-            src="https://images.unsplash.com/photo-1523050853063-bd758451c6b3?q=80&w=2000&auto=format&fit=crop"
+            src="/images/hero-student.png"
             alt="Campus Background"
             fill
             priority
@@ -112,13 +110,13 @@ export default function CourseSearchClient({
         <div className="relative z-10 w-full h-full flex flex-col">
           <Header />
 
-          {/* â”€â”€ Hero / Search Banner â”€â”€ */}
+          {/* ── Hero / Search Banner ── */}
           <div className="flex-1 flex items-center justify-start relative">
             <div className="mx-auto w-full px-4 lg:px-12 xl:px-20">
               <div className="max-w-4xl text-left transition-opacity duration-700" style={{ opacity: mounted ? 1 : 0 }}>
-                <h1 className="text-6xl sm:text-7xl lg:text-[100px] font-black text-white leading-[1.1] mb-6 drop-shadow-2xl">
-                  Finds your <br />
-                  <span className="text-[#008080]">perfect course!</span>
+                <h1 className="font-poppins text-white leading-[1.05] tracking-[0.02em] mb-4 drop-shadow-2xl">
+                  <span className="text-[36px] sm:text-[48px] lg:text-[64px] font-extrabold block mb-0">Finds your</span>
+                  <span className="text-[40px] sm:text-[54px] lg:text-[72px] font-black text-[#008080]">perfect course!</span>
                 </h1>
                 <p className="text-white text-lg sm:text-2xl font-bold mb-10 max-w-2xl leading-relaxed opacity-90">
                   Search thousands of courses and universities worldwide

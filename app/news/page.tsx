@@ -239,7 +239,7 @@ export default async function NewsPage({
     <div className="min-h-screen bg-neutral-50 relative">
       <div className="fixed inset-0 z-0 text-[0px] font-[0] leading-[0]">
         <Image
-          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
+          src="https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=2000&auto=format&fit=crop"
           alt="Campus Background"
           fill
           priority
