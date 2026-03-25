@@ -63,7 +63,7 @@ async function updateReview(formData: FormData) {
 
 async function deleteReview(id: number) {
   "use server";
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("DELETE FROM college_reviews WHERE id = ?", [id]);
   } catch (e) {

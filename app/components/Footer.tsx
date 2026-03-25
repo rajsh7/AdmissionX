@@ -59,7 +59,7 @@ const footerLinks = {
     { label: "Mock Tests", href: "/examination" },
   ],
   "Resources": [
-    { label: "Blogs", href: "/blogs" },
+    { label: "Blogs", href: "/education-blogs" },
     { label: "News", href: "/news" },
     { label: "Career Guide", href: "/careers" },
     { label: "Community", href: "/" },

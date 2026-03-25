@@ -85,7 +85,7 @@ export default async function AdminUniversitiesPage({
       `SELECT
          cp.id,
          cp.slug,
-         ncs.college_name,
+         COALESCE(ncs.college_name, cp.slug) AS college_name,
          cp.verified,
          cp.isTopUniversity,
          cp.topUniversityRank,
@@ -98,8 +98,8 @@ export default async function AdminUniversitiesPage({
          c.name AS city_name,
          cp.created_at
        FROM collegeprofile cp
-       JOIN users u ON u.id = cp.users_id
-       JOIN next_college_signups ncs ON LOWER(ncs.email) = LOWER(u.email)
+       LEFT JOIN users u ON u.id = cp.users_id
+       LEFT JOIN next_college_signups ncs ON LOWER(ncs.email) = LOWER(u.email)
        LEFT JOIN city c ON c.id = cp.registeredAddressCityId
        ${where}
        ORDER BY
@@ -111,8 +111,8 @@ export default async function AdminUniversitiesPage({
     safeQuery<CountRow>(
       `SELECT COUNT(*) AS total
        FROM collegeprofile cp
-       JOIN users u ON u.id = cp.users_id
-       JOIN next_college_signups ncs ON LOWER(ncs.email) = LOWER(u.email)
+       LEFT JOIN users u ON u.id = cp.users_id
+       LEFT JOIN next_college_signups ncs ON LOWER(ncs.email) = LOWER(u.email)
        ${where}`,
       params,
     ),
@@ -122,8 +122,6 @@ export default async function AdminUniversitiesPage({
          SUM(cp.verified = 1) AS verified_count,
          SUM(cp.payment_status = 'active' OR cp.payment_status = 'paid') AS paid_count
        FROM collegeprofile cp
-       JOIN users u ON u.id = cp.users_id
-       JOIN next_college_signups ncs ON LOWER(ncs.email) = LOWER(u.email)
        WHERE cp.isTopUniversity = 1`,
     ),
   ]);

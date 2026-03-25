@@ -11,7 +11,7 @@ async function toggleBlogAction(formData: FormData) {
   "use server";
   const id      = parseInt(formData.get("id")      as string, 10);
   const current = parseInt(formData.get("current") as string, 10);
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("UPDATE blogs SET isactive = ? WHERE id = ?", [
       current ? 0 : 1,

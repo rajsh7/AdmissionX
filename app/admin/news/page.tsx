@@ -56,7 +56,7 @@ async function updateNews(formData: FormData) {
     featimage = await saveUpload(featimageFile, "news", "news");
   }
 
-  if (!id || !topic) return;
+  if (isNaN(id) || !topic) return;
 
   try {
     await pool.query(
@@ -76,7 +76,7 @@ async function toggleNewsAction(formData: FormData) {
   "use server";
   const id = parseInt(formData.get("id") as string, 10);
   const cur = parseInt(formData.get("current") as string, 10);
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("UPDATE news SET isactive = ? WHERE id = ?", [cur ? 0 : 1, id]);
   } catch (e) {

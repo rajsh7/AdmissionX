@@ -9,7 +9,7 @@ async function toggleStudentAction(formData: FormData): Promise<void> {
   "use server";
   const id  = parseInt(formData.get("id")  as string, 10);
   const cur = parseInt(formData.get("cur") as string, 10);
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query(
       "UPDATE next_student_signups SET is_active = ? WHERE id = ?",

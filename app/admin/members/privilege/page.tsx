@@ -44,7 +44,7 @@ async function updatePrivilege(formData: FormData) {
   const update = parseInt(formData.get("update") as string, 10);
   const del = parseInt(formData.get("delete") as string, 10);
 
-  if (!id || !users_id || !table_id) return;
+  if (isNaN(id) || !users_id || !table_id) return;
 
   try {
     await pool.query(
@@ -61,7 +61,7 @@ async function updatePrivilege(formData: FormData) {
 
 async function deletePrivilege(id: number) {
   "use server";
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("DELETE FROM userprivileges WHERE id = ?", [id]);
   } catch (e) {

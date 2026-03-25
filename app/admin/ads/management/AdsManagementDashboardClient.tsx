@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import AdminModal from "@/app/admin/_components/AdminModal";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
 import AdminImg from "@/app/admin/_components/AdminImg";
 import ImageUpload from "@/app/admin/_components/ImageUpload";
+import {
+  toggleAdAction,
+  createAdManagement,
+  updateAdManagement,
+} from "./actions";
 
 interface AdRow {
   id: number;
@@ -30,10 +34,6 @@ interface PageProps {
   offset: number;
   pageSize: number;
   q: string;
-  createAction: (data: FormData) => Promise<void>;
-  updateAction: (data: FormData) => Promise<void>;
-  deleteAction: (id: number) => Promise<void>;
-  toggleAction: (data: FormData) => Promise<void>;
 }
 
 export default function AdsManagementDashboardClient({
@@ -42,14 +42,11 @@ export default function AdsManagementDashboardClient({
   offset,
   pageSize,
   q,
-  createAction,
-  updateAction,
-  deleteAction,
-  toggleAction,
 }: PageProps) {
   const [mounted, setMounted] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
   const [editingAd, setEditingAd] = useState<AdRow | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setMounted(true);
@@ -57,6 +54,18 @@ export default function AdsManagementDashboardClient({
 
   const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
   const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
+
+  function handleDelete(id: number) {
+    if (!confirm("Delete this ad?")) return;
+    startTransition(async () => {
+      await fetch("/api/admin/ads", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      window.location.reload();
+    });
+  }
 
   function handleAdd() {
     setEditingAd(null);
@@ -171,7 +180,7 @@ export default function AdsManagementDashboardClient({
                   </td>
 
                   <td className="px-4 py-4 text-center">
-                     <form action={toggleAction} className="inline-block">
+                     <form action={toggleAdAction} className="inline-block">
                         <input type="hidden" name="id" value={ad.id} />
                         <input type="hidden" name="cur" value={ad.isactive} />
                         <button type="submit" className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase transition-colors ${
@@ -200,7 +209,13 @@ export default function AdsManagementDashboardClient({
                        <button onClick={() => handleEdit(ad)} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-rose-600 transition-colors">
                          <span className="material-symbols-rounded text-[18px]">edit</span>
                        </button>
-                       <DeleteButton action={deleteAction.bind(null, ad.id)} size="sm" />
+                       <button
+                         onClick={() => handleDelete(ad.id)}
+                         disabled={isPending}
+                         className="text-xs font-semibold px-2 py-1 rounded text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors disabled:opacity-40"
+                       >
+                         Delete
+                       </button>
                     </div>
                   </td>
                 </tr>
@@ -215,7 +230,7 @@ export default function AdsManagementDashboardClient({
         onClose={closeModal}
         title={modalMode === "add" ? "Create New Ad" : "Edit Ad"}
       >
-        <form action={modalMode === "add" ? createAction : updateAction} className="space-y-4" onSubmit={() => setTimeout(closeModal, 100)}>
+        <form action={modalMode === "add" ? createAdManagement : updateAdManagement} className="space-y-4" onSubmit={() => setTimeout(closeModal, 100)}>
           {editingAd && <input type="hidden" name="id" value={editingAd.id} />}
           
           <div className="grid grid-cols-2 gap-4">
@@ -268,6 +283,7 @@ export default function AdsManagementDashboardClient({
               <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Position</label>
               <select name="ads_position" defaultValue={editingAd?.ads_position || "default"} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-rose-500/30 outline-none">
                 <option value="default">Default</option>
+                <option value="home">Home Page</option>
                 <option value="top">Top</option>
                 <option value="sidebar">Sidebar</option>
                 <option value="banner">Banner</option>

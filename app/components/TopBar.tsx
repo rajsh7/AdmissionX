@@ -15,7 +15,7 @@ const navLinks = [
   { label: "Exams", href: "/exams" },
   { label: "Reviews", href: "/reviews" },
   { label: "News", href: "/news" },
-  { label: "Blogs", href: "/blogs" },
+  { label: "Blogs", href: "/education-blogs" },
   { label: "Career Assessment", href: "/career" },
   { label: "Ask", href: "/ask" },
 ];

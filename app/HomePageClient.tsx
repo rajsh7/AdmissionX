@@ -17,6 +17,8 @@ const NewsSection = dynamic(() => import("./components/NewsSection"), {
   ssr: true,
 });
 import ContactSection from "./components/ContactSection";
+import AdsSection from "./components/AdsSection";
+import type { AdItem } from "./components/AdsSection";
 
 const Footer = dynamic(() => import("./components/Footer"), { ssr: true });
 
@@ -37,6 +39,7 @@ interface HomePageClientProps {
   stats: HomeStat[];
   streamCounts: Record<string, number>;
   initialStreamColleges: FilterCollegeResult[];
+  ads: AdItem[];
 }
 
 export default function HomePageClient({
@@ -46,6 +49,7 @@ export default function HomePageClient({
   stats,
   streamCounts,
   initialStreamColleges,
+  ads,
 }: HomePageClientProps) {
   const [authModal, setAuthModal] = useState<"login" | "register" | null>(null);
 
@@ -73,22 +77,25 @@ export default function HomePageClient({
         {/* 2. Top Categories (Fields of Study) */}
         <FieldsOfStudy />
 
-        {/* 3. Discover the Top Universities */}
+        {/* 3. Ads Section */}
+        <AdsSection ads={ads} />
+
+        {/* 4. Discover the Top Universities */}
         <TopUniversities
           universities={universities}
           initialStreamColleges={initialStreamColleges}
         />
 
-        {/* 4. Discover the Top Course */}
+        {/* 5. Discover the Top Course */}
         <TopCourse />
 
-        {/* 5. Recent coming exams */}
+        {/* 6. Recent coming exams */}
         <EntranceExams dbExams={dbExams} />
 
-        {/* 6. Student Life & Beyond (News/Blogs) */}
+        {/* 7. Student Life & Beyond (News/Blogs) */}
         <NewsSection dbBlogs={dbBlogs} />
 
-        {/* 7. Get in Touch Section */}
+        {/* 8. Get in Touch Section */}
         <ContactSection />
       </main>
 

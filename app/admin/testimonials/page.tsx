@@ -50,7 +50,7 @@ async function updateTestimonial(formData: FormData) {
     featuredimage = await saveUpload(imgFile, "testimonials", "testimonial");
   }
 
-  if (!id || !author) return;
+  if (isNaN(id) || !author) return;
 
   try {
     await pool.query(

@@ -10,8 +10,7 @@ async function toggleAdRowStatus(formData: FormData) {
   "use server";
   const id = parseInt(formData.get("id") as string, 10);
   const currentStatus = parseInt(formData.get("status") as string, 10);
-  if (!id) return;
-  
+  if (isNaN(id)) return;
   try {
     await pool.query("UPDATE ads_top_college_lists SET status = ? WHERE id = ?", [
       currentStatus ? 0 : 1,
@@ -26,7 +25,7 @@ async function toggleAdRowStatus(formData: FormData) {
 
 async function deleteAdRow(id: number) {
   "use server";
-  if (!id) return;
+  if (isNaN(id)) return;
   
   try {
     await pool.query("DELETE FROM ads_top_college_lists WHERE id = ?", [id]);
@@ -75,7 +74,7 @@ async function createAdRow(formData: FormData) {
 async function updateAdRow(formData: FormData) {
   "use server";
   const id = parseInt(formData.get("id") as string, 10);
-  if (!id) return;
+  if (isNaN(id)) return;
 
   try {
     const method_type = formData.get("method_type") as string;

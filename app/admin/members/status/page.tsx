@@ -28,7 +28,7 @@ async function updateStatus(formData: FormData) {
   "use server";
   const id = parseInt(formData.get("id") as string, 10);
   const name = formData.get("name") as string;
-  if (!id || !name) return;
+  if (isNaN(id) || !name) return;
   try {
     await pool.query(
       "UPDATE userstatus SET name = ?, updated_at = NOW() WHERE id = ?",
@@ -43,7 +43,7 @@ async function updateStatus(formData: FormData) {
 
 async function deleteStatus(id: number) {
   "use server";
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("DELETE FROM userstatus WHERE id = ?", [id]);
   } catch (e) {

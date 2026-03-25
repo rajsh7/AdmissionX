@@ -48,7 +48,7 @@ async function updateDegree(formData: FormData) {
   const isShowOnTop = formData.get("isShowOnTop") === "on" ? 1 : 0;
   const isShowOnHome = formData.get("isShowOnHome") === "on" ? 1 : 0;
 
-  if (!id || !name || isNaN(functionalarea_id)) return;
+  if (isNaN(id) || !name || isNaN(functionalarea_id)) return;
 
   try {
     await pool.query(
@@ -65,7 +65,7 @@ async function updateDegree(formData: FormData) {
 
 async function deleteDegree(id: number) {
   "use server";
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("DELETE FROM degree WHERE id = ?", [id]);
   } catch (e) {
@@ -79,7 +79,7 @@ async function toggleDegreeTop(formData: FormData) {
   "use server";
   const id = parseInt(formData.get("id") as string, 10);
   const cur = parseInt(formData.get("cur") as string, 10);
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("UPDATE degree SET isShowOnTop = ? WHERE id = ?", [cur ? 0 : 1, id]);
   } catch (e) {
@@ -93,7 +93,7 @@ async function toggleDegreeHome(formData: FormData) {
   "use server";
   const id = parseInt(formData.get("id") as string, 10);
   const cur = parseInt(formData.get("cur") as string, 10);
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("UPDATE degree SET isShowOnHome = ? WHERE id = ?", [cur ? 0 : 1, id]);
   } catch (e) {

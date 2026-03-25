@@ -11,6 +11,7 @@ import {
   CATEGORY_SLUG,
   FilterCollegeResult,
 } from "@/lib/college-filter";
+import type { AdItem } from "./components/AdsSection";
 
 // ── Route-level cache ─────────────────────────────────────────────────────────
 // Tells Next.js to cache the fully-rendered page for 5 minutes.
@@ -85,7 +86,7 @@ async function safeQuery<T extends RowDataPacket>(sql: string): Promise<T[]> {
 
 const getHomePageData = unstable_cache(
   async () => {
-    const [collegeRows, blogRows, examRows, statRows] = await Promise.all([
+    const [collegeRows, blogRows, examRows, adRows, statRows] = await Promise.all([
       // 1. Featured colleges — LEFT JOIN users for real name
       pool
         .query(
@@ -131,7 +132,20 @@ const getHomePageData = unstable_cache(
         )
         .then(([rows]) => rows as DbExam[]),
 
-      // 4. Approximate site stats via information_schema — near-instant.
+      // 4. Active home-page ads
+      pool
+        .query(
+          `SELECT id, title, description, img, redirectto
+           FROM ads_managements
+           WHERE isactive = 1 AND ads_position = 'home'
+             AND (start IS NULL OR start <= NOW())
+             AND (end IS NULL OR end >= NOW())
+           ORDER BY created_at DESC
+           LIMIT 6`,
+        )
+        .then(([rows]) => rows as AdItem[]),
+
+      // 5. Approximate site stats via information_schema — near-instant.
       //    InnoDB keeps estimated row counts in the data dictionary; this
       //    query never scans any actual table rows.
       pool
@@ -151,16 +165,16 @@ const getHomePageData = unstable_cache(
         .then(([rows]) => rows as InfoSchemaRow[]),
     ]);
 
-    return { collegeRows, blogRows, examRows, statRows };
+    return { collegeRows, blogRows, examRows, adRows, statRows };
   },
-  ["homepage-data-v3"],
+  ["homepage-data-v4"],
   { revalidate: 300 }, // 5-minute data-cache TTL (belt-and-suspenders with route revalidate)
 );
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function Page() {
-  const { collegeRows, blogRows, examRows, statRows } = await getHomePageData();
+  const { collegeRows, blogRows, examRows, adRows, statRows } = await getHomePageData();
 
   // ── Transform colleges ──────────────────────────────────────────────────
   const universities: University[] = collegeRows.map((row) => {
@@ -267,6 +281,7 @@ export default async function Page() {
       stats={stats}
       streamCounts={streamCounts}
       initialStreamColleges={initialStreamColleges}
+      ads={adRows}
     />
   );
 }

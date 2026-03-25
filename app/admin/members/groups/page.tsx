@@ -46,7 +46,7 @@ async function updateGroup(formData: FormData) {
   const update_action = parseInt(formData.get("update_action") as string, 10);
   const delete_action = parseInt(formData.get("delete_action") as string, 10);
 
-  if (!id || !name || !users_id) return;
+  if (isNaN(id) || !name || !users_id) return;
 
   try {
     await pool.query(
@@ -63,7 +63,7 @@ async function updateGroup(formData: FormData) {
 
 async function deleteGroup(id: number) {
   "use server";
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("DELETE FROM usergroups WHERE id = ?", [id]);
   } catch (e) {

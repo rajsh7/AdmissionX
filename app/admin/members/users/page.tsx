@@ -48,7 +48,7 @@ async function updateUser(formData: FormData) {
   const type_of_user = (formData.get("type_of_user") as string) || "MEMBER";
   const password = formData.get("password") as string;
 
-  if (!id || !email) return;
+  if (isNaN(id) || !email) return;
 
   try {
     let sql = `UPDATE users SET firstname = ?, lastname = ?, email = ?, phone = ?, userrole_id = ?, userstatus_id = ?, type_of_user = ?, updated_at = NOW()`;
@@ -73,7 +73,7 @@ async function updateUser(formData: FormData) {
 
 async function deleteUser(id: number) {
   "use server";
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("DELETE FROM users WHERE id = ?", [id]);
   } catch (e) {

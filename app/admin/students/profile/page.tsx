@@ -79,7 +79,7 @@ async function updateProfile(formData: FormData) {
 
 async function deleteProfile(id: number) {
   "use server";
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("DELETE FROM studentprofile WHERE id = ?", [id]);
   } catch (e) {

@@ -68,12 +68,10 @@ async function updateStream(formData: FormData) {
     bannerimage = await saveUpload(bannerimageFile, "streams", "stream_banner");
   }
 
-  if (!id || !name) return;
-
+  if (isNaN(id) || !name) return;
   try {
     await pool.query(
-      `UPDATE functionalarea SET name = ?, pageslug = ?, logoimage = ?, bannerimage = ?, pagetitle = ?, pagedescription = ?, isShowOnTop = ?, isShowOnHome = ?, updated_at = NOW() 
-       WHERE id = ?`,
+      `UPDATE functionalarea SET name = ?, pageslug = ?, logoimage = ?, bannerimage = ?, pagetitle = ?, pagedescription = ?, isShowOnTop = ?, isShowOnHome = ?, updated_at = NOW() WHERE id = ?`,
       [name, pageslug, logoimage, bannerimage, pagetitle, pagedescription, isShowOnTop, isShowOnHome, id]
     );
   } catch (e) {
@@ -85,7 +83,7 @@ async function updateStream(formData: FormData) {
 
 async function deleteStream(id: number) {
   "use server";
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("DELETE FROM functionalarea WHERE id = ?", [id]);
   } catch (e) {
@@ -99,7 +97,7 @@ async function toggleStreamTop(formData: FormData) {
   "use server";
   const id = parseInt(formData.get("id") as string, 10);
   const cur = parseInt(formData.get("cur") as string, 10);
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("UPDATE functionalarea SET isShowOnTop = ? WHERE id = ?", [cur ? 0 : 1, id]);
   } catch (e) {
@@ -113,7 +111,7 @@ async function toggleStreamHome(formData: FormData) {
   "use server";
   const id = parseInt(formData.get("id") as string, 10);
   const cur = parseInt(formData.get("cur") as string, 10);
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("UPDATE functionalarea SET isShowOnHome = ? WHERE id = ?", [cur ? 0 : 1, id]);
   } catch (e) {

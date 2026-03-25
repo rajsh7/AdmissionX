@@ -75,7 +75,7 @@ async function updateBookmark(formData: FormData) {
 
 async function deleteBookmark(id: number) {
   "use server";
-  if (!id) return;
+  if (isNaN(id)) return;
   try {
     await pool.query("DELETE FROM bookmarks WHERE id = ?", [id]);
   } catch (e) {
