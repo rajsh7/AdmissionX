@@ -13,7 +13,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import CourseCardV3 from "@/app/components/CourseCardV3";
-import CourseFilters from "@/app/components/CourseFilters";
+import CourseFiltersV2 from "@/app/components/CourseFiltersV2";
 import PaginationFixed from "@/app/components/PaginationFixed";
 import type { CourseResult } from "@/app/api/search/courses/route";
 
@@ -158,7 +158,7 @@ export default function CourseSearchClient({
           <div className="flex gap-10">
             {/* â”€â”€ Filters sidebar â”€â”€ */}
             <div className="hidden lg:block w-72 flex-shrink-0">
-              <CourseFilters
+              <CourseFiltersV2
                 levels={levels}
                 streams={streams}
                 activeLevel={level}

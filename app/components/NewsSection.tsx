@@ -8,38 +8,30 @@ interface NewsSectionProps {
   dbBlogs?: DbBlog[];
 }
 
-const STATIC_BLOGS = [
-  {
-    id: 1,
-    title: "Guide to Engineering Admissions 2026: Everything You Need to Know",
-    excerpt: "Discover the step-by-step process for securing your seat in top engineering colleges this year.",
-    category: "Admissions",
-    date: "March 15, 2024",
-    image: "https://images.unsplash.com/photo-1523240715627-5d0b541f8d9c?q=80&w=2670&auto=format&fit=crop",
-    href: "/blogs/engineering-admissions-2026",
-  },
-  {
-    id: 2,
-    title: "Top 10 MBA Specializations for a High-Growth Career in 2026",
-    excerpt: "From AI Management to Sustainable Business, explore the specializations that are in high demand.",
-    category: "Career Guidance",
-    date: "March 12, 2024",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2670&auto=format&fit=crop",
-    href: "/blogs/top-mba-specializations-2026",
-  },
-  {
-    id: 3,
-    title: "How to Prepare for NEET 2026: Tips from Top Rankers",
-    excerpt: "Effective study plans and strategies shared by successful medical aspirants.",
-    category: "Exam Tips",
-    date: "March 10, 2024",
-    image: "https://images.unsplash.com/photo-1576091160550-217359f41f48?q=80&w=2670&auto=format&fit=crop",
-    href: "/blogs/neet-2026-preparation-tips",
-  },
-];
+const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
+
+function buildImageUrl(raw: string | null | undefined): string {
+  if (!raw || !raw.trim()) return "https://images.unsplash.com/photo-1523240715627-5d0b541f8d9c?q=80&w=800&auto=format&fit=crop";
+  if (raw.startsWith("http")) return `/api/image-proxy?url=${encodeURIComponent(raw)}`;
+  if (raw.startsWith("/")) return `/api/image-proxy?url=${encodeURIComponent(raw)}`;
+  return `/api/image-proxy?url=${encodeURIComponent(IMAGE_BASE + raw)}`;
+}
+
+function formatDate(dateStr: string): string {
+  try {
+    return new Date(dateStr).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+  } catch {
+    return "";
+  }
+}
+
+function stripHtml(html: string | null | undefined): string {
+  if (!html) return "";
+  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
 
 export default function NewsSection({ dbBlogs }: NewsSectionProps) {
-  const blogs = STATIC_BLOGS;
+  const blogs = dbBlogs && dbBlogs.length > 0 ? dbBlogs.slice(0, 3) : [];
 
   return (
     <section className="w-full py-16 lg:py-24 bg-white">
@@ -56,54 +48,55 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
            </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-           {blogs.map((blog, i) => (
-             <motion.div
-               key={blog.id}
-               initial={{ opacity: 0, y: 20 }}
-               whileInView={{ opacity: 1, y: 0 }}
-               viewport={{ once: true }}
-               transition={{ duration: 0.5, delay: i * 0.1 }}
-             >
-                <Link 
-                  href={blog.href}
-                  className="group block"
-                >
-                   <div className="relative aspect-[16/10] rounded-[32px] overflow-hidden mb-6 shadow-lg shadow-black/5">
-                      <img 
-                        src={blog.image} 
-                        alt={blog.title} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                      <div className="absolute top-4 left-4">
-                         <span className="px-3 py-1.5 rounded-xl bg-white/90 backdrop-blur-md text-[10px] font-black uppercase tracking-widest text-[#008080]">
-                            {blog.category}
-                         </span>
-                      </div>
-                   </div>
-                   
-                   <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                         <span>{blog.date}</span>
-                         <span className="w-1 h-1 rounded-full bg-slate-300" />
-                         <span>5 min read</span>
-                      </div>
-                      <h3 className="text-xl font-black text-slate-900 leading-tight group-hover:text-[#008080] transition-colors line-clamp-2">
-                        {blog.title}
-                      </h3>
-                      <p className="text-sm text-slate-500 font-medium line-clamp-2 leading-relaxed">
-                        {blog.excerpt}
-                      </p>
-                      
-                      <div className="pt-2 flex items-center gap-2 text-[#008080] font-black text-xs uppercase tracking-widest">
-                         <span>Read Article</span>
-                         <span className="material-symbols-rounded text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                      </div>
-                   </div>
+        {blogs.length === 0 ? (
+          <p className="text-slate-400 text-sm font-medium">No articles available yet.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {blogs.map((blog, i) => (
+              <motion.div
+                key={blog.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+              >
+                <Link href={`/blogs/${blog.slug}`} className="group block">
+                  <div className="relative aspect-[16/10] rounded-[32px] overflow-hidden mb-6 shadow-lg shadow-black/5">
+                    <img
+                      src={buildImageUrl(blog.featimage)}
+                      alt={blog.topic}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute top-4 left-4">
+                      <span className="px-3 py-1.5 rounded-xl bg-white/90 backdrop-blur-md text-[10px] font-black uppercase tracking-widest text-[#008080]">
+                        Education
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                      <span>{formatDate(blog.created_at)}</span>
+                      <span className="w-1 h-1 rounded-full bg-slate-300" />
+                      <span>5 min read</span>
+                    </div>
+                    <h3 className="text-xl font-black text-slate-900 leading-tight group-hover:text-[#008080] transition-colors line-clamp-2">
+                      {blog.topic}
+                    </h3>
+                    <p className="text-sm text-slate-500 font-medium line-clamp-2 leading-relaxed">
+                      {stripHtml(blog.description)}
+                    </p>
+
+                    <div className="pt-2 flex items-center gap-2 text-[#008080] font-black text-xs uppercase tracking-widest">
+                      <span>Read Article</span>
+                      <span className="material-symbols-rounded text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </div>
+                  </div>
                 </Link>
-             </motion.div>
-           ))}
-        </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
