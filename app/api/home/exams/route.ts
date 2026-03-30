@@ -1,37 +1,30 @@
 import { NextResponse } from "next/server";
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 
 export interface DbExam {
-  id: number;
+  id: string | number;
   title: string;
   slug: string;
   exminationDate: string | null;
   image: string | null;
-  functionalarea_id: number | null;
-  courses_id: number | null;
+  functionalarea_id: string | number | null;
+  courses_id: string | number | null;
   totalViews: number;
 }
 
 export async function GET() {
   try {
-    const conn = await pool.getConnection();
+    const db = await getDb();
 
-    const [rows] = (await conn.query(`
-      SELECT
-        id,
-        title,
-        slug,
-        exminationDate,
-        image,
-        functionalarea_id,
-        courses_id,
-        totalViews
-      FROM examination_details
-      ORDER BY totalViews DESC, created_at DESC
-      LIMIT 6
-    `)) as [DbExam[], unknown];
-
-    conn.release();
+    const rows = await db.collection("examination_details")
+      .find({})
+      .sort({ totalViews: -1, created_at: -1 })
+      .limit(6)
+      .project({
+        _id: 1, title: 1, slug: 1, exminationDate: 1,
+        image: 1, functionalarea_id: 1, courses_id: 1, totalViews: 1,
+      })
+      .toArray();
 
     return NextResponse.json({ success: true, data: rows });
   } catch (err) {

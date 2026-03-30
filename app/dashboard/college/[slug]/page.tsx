@@ -1,11 +1,19 @@
 import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import CollegeDashboardClient from "./CollegeDashboardClient";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+interface CollegeUser {
+  id: string;
+  name: string;
+  email: string;
+  slug: string;
+  collegeprofile_id: unknown | null;
 }
 
 export default async function CollegeDashboardPage({ params }: PageProps) {
@@ -13,59 +21,42 @@ export default async function CollegeDashboardPage({ params }: PageProps) {
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_college")?.value;
 
-  if (!token) {
-    redirect(`/login/college?redirect=/dashboard/college/${slug}`);
-  }
+  if (!token) redirect(`/login/college?redirect=/dashboard/college/${slug}`);
 
   const payload = await verifyCollegeToken(token);
-  if (!payload) {
-    redirect(`/login/college?redirect=/dashboard/college/${slug}`);
-  }
+  if (!payload) redirect(`/login/college?redirect=/dashboard/college/${slug}`);
 
-  // Look up the collegeprofile matching this slug + the logged-in college's email
-  const conn = await pool.getConnection();
-  let collegeprofile_id: number | null = null;
+  const db = await getDb();
+  let collegeprofile_id: unknown = null;
   let collegeName = payload.name;
   let collegeSlug = slug;
 
-  try {
-    const [rows] = await conn.query(
-      `SELECT cp.id, cp.slug, COALESCE(NULLIF(TRIM(u.firstname), ''), cp.slug) AS college_name
-       FROM collegeprofile cp
-       JOIN users u ON u.id = cp.users_id
-       WHERE cp.slug = ? AND TRIM(LOWER(u.email)) = LOWER(?)
-       LIMIT 1`,
-      [slug, payload.email],
-    );
-    const list = rows as { id: number; slug: string; college_name: string }[];
+  const cpRows = await db.collection("collegeprofile").aggregate([
+    { $match: { slug } },
+    { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
+    { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
+    { $match: { "u.email": { $regex: `^${payload.email}$`, $options: "i" } } },
+    { $project: { _id: 1, id: 1, slug: 1, college_name: { $ifNull: [{ $trim: { input: "$u.firstname" } }, "$slug"] } } },
+    { $limit: 1 },
+  ]).toArray();
 
-    if (list.length) {
-      collegeprofile_id = list[0].id;
-      collegeName = list[0].college_name || payload.name;
-      collegeSlug = list[0].slug;
-    } else {
-      // Email didn't match — this college doesn't own this slug.
-      // Try to find their actual slug by email and redirect.
-      const [own] = await conn.query(
-        `SELECT cp.slug
-         FROM collegeprofile cp
-         JOIN users u ON u.id = cp.users_id
-         WHERE TRIM(LOWER(u.email)) = LOWER(?)
-         LIMIT 1`,
-        [payload.email],
-      );
-      const ownList = own as { slug: string }[];
-      if (ownList.length) {
-        redirect(`/dashboard/college/${ownList[0].slug}`);
-      }
-      // No profile found — they're a pending new signup.
-      // Fall through with collegeprofile_id = null so the UI shows the pending state.
-    }
-  } finally {
-    conn.release();
+  if (cpRows.length) {
+    collegeprofile_id = cpRows[0]._id;
+    collegeName = cpRows[0].college_name || payload.name;
+    collegeSlug = cpRows[0].slug;
+  } else {
+    // Try to find their actual slug by email
+    const ownRows = await db.collection("collegeprofile").aggregate([
+      { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
+      { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
+      { $match: { "u.email": { $regex: `^${payload.email}$`, $options: "i" } } },
+      { $project: { slug: 1 } },
+      { $limit: 1 },
+    ]).toArray();
+    if (ownRows.length) redirect(`/dashboard/college/${ownRows[0].slug}`);
   }
 
-  const college = {
+  const college: CollegeUser = {
     id: payload.id,
     name: collegeName,
     email: payload.email,

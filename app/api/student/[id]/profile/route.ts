@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyStudentToken } from "@/lib/auth";
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
+import { Filter, Document } from "mongodb";
 
-// ── Auth helper ───────────────────────────────────────────────────────────────
 async function checkAuth(studentId: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_student")?.value;
@@ -13,143 +13,59 @@ async function checkAuth(studentId: string) {
   return payload;
 }
 
-// ── Ensure tables exist ───────────────────────────────────────────────────────
-async function ensureTables(conn: Awaited<ReturnType<typeof pool.getConnection>>) {
-  await conn.query(`
-    CREATE TABLE IF NOT EXISTS next_student_profiles (
-      id           INT AUTO_INCREMENT PRIMARY KEY,
-      student_id   INT NOT NULL UNIQUE,
-      dob          DATE,
-      gender       VARCHAR(20),
-      city         VARCHAR(100),
-      state        VARCHAR(100),
-      country      VARCHAR(100) DEFAULT 'India',
-      photo        VARCHAR(500),
-      hobbies      TEXT,
-      interest     TEXT,
-      about        TEXT,
-      created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-  `);
-}
-
-// ── GET /api/student/[id]/profile ─────────────────────────────────────────────
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
   const payload = await checkAuth(id);
-  if (!payload) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const conn = await pool.getConnection();
-  try {
-    await ensureTables(conn);
+  const db = await getDb();
 
-    const [baseRows] = await conn.query(
-      `SELECT id, name, email, phone, created_at
-       FROM next_student_signups
-       WHERE id = ?
-       LIMIT 1`,
-      [id],
-    );
-    const baseList = baseRows as {
-      id: number;
-      name: string;
-      email: string;
-      phone: string | null;
-      created_at: string;
-    }[];
-    if (!baseList.length) {
-      return NextResponse.json({ error: "Student not found" }, { status: 404 });
-    }
-    const base = baseList[0];
+  const base = await db.collection("next_student_signups").findOne(
+    { email: payload.email } as Filter<Document>,
+    { projection: { _id: 1, name: 1, email: 1, phone: 1, created_at: 1 } }
+  );
+  if (!base) return NextResponse.json({ error: "Student not found" }, { status: 404 });
 
-    const [profRows] = await conn.query(
-      `SELECT dob, gender, city, state, country, photo, hobbies, interest, about
-       FROM next_student_profiles
-       WHERE student_id = ?
-       LIMIT 1`,
-      [id],
-    );
-    const profList = profRows as {
-      dob: string | null;
-      gender: string | null;
-      city: string | null;
-      state: string | null;
-      country: string | null;
-      photo: string | null;
-      hobbies: string | null;
-      interest: string | null;
-      about: string | null;
-    }[];
-    const prof = profList[0] ?? {};
+  const prof = await db.collection("next_student_profiles").findOne(
+    { student_id: id } as Filter<Document>,
+    { projection: { dob: 1, gender: 1, city: 1, state: 1, country: 1, photo: 1, hobbies: 1, interest: 1, about: 1 } }
+  ) ?? {};
 
-    // Profile completeness score
-    const fields = [
-      base.name,
-      base.email,
-      base.phone,
-      prof.dob,
-      prof.gender,
-      prof.city,
-      prof.state,
-      prof.photo,
-      prof.hobbies,
-      prof.interest,
-      prof.about,
-    ];
-    const filled = fields.filter(Boolean).length;
-    const profileComplete = Math.round((filled / fields.length) * 100);
+  const p = prof as Record<string, unknown>;
+  const fields = [base.name, base.email, base.phone, p.dob, p.gender, p.city, p.state, p.photo, p.hobbies, p.interest, p.about];
+  const profileComplete = Math.round((fields.filter(Boolean).length / fields.length) * 100);
 
-    return NextResponse.json({
-      id: base.id,
-      name: base.name,
-      email: base.email,
-      phone: base.phone ?? "",
-      dob: prof.dob ?? "",
-      gender: prof.gender ?? "",
-      city: prof.city ?? "",
-      state: prof.state ?? "",
-      country: prof.country ?? "India",
-      photo: prof.photo ?? "",
-      hobbies: prof.hobbies ?? "",
-      interest: prof.interest ?? "",
-      about: prof.about ?? "",
-      member_since: base.created_at,
-      profile_complete: profileComplete,
-    });
-  } finally {
-    conn.release();
-  }
+  return NextResponse.json({
+    id: base._id,
+    name: base.name,
+    email: base.email,
+    phone: base.phone ?? "",
+    dob: p.dob ?? "",
+    gender: p.gender ?? "",
+    city: p.city ?? "",
+    state: p.state ?? "",
+    country: p.country ?? "India",
+    photo: p.photo ?? "",
+    hobbies: p.hobbies ?? "",
+    interest: p.interest ?? "",
+    about: p.about ?? "",
+    member_since: base.created_at,
+    profile_complete: profileComplete,
+  });
 }
 
-// ── PUT /api/student/[id]/profile ─────────────────────────────────────────────
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
   const payload = await checkAuth(id);
-  if (!payload) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  let body: {
-    name?: string;
-    phone?: string;
-    dob?: string;
-    gender?: string;
-    city?: string;
-    state?: string;
-    country?: string;
-    hobbies?: string;
-    interest?: string;
-    about?: string;
-  };
+  let body: Record<string, string | undefined>;
   try {
     body = await req.json();
   } catch {
@@ -157,54 +73,36 @@ export async function PUT(
   }
 
   const { name, phone, dob, gender, city, state, country, hobbies, interest, about } = body;
+  const db = await getDb();
 
-  const conn = await pool.getConnection();
-  try {
-    await ensureTables(conn);
+  const baseUpdate: Record<string, unknown> = { updated_at: new Date() };
+  if (name?.trim()) baseUpdate.name = name.trim();
+  if (phone !== undefined) baseUpdate.phone = phone.trim() || "";
 
-    // Update base info
-    if (name?.trim()) {
-      await conn.query(
-        `UPDATE next_student_signups SET name = ? WHERE id = ?`,
-        [name.trim(), id],
-      );
-    }
-    if (phone !== undefined) {
-      await conn.query(
-        `UPDATE next_student_signups SET phone = ? WHERE id = ?`,
-        [phone.trim() || null, id],
-      );
-    }
+  await db.collection("next_student_signups").updateOne(
+    { email: payload.email } as Filter<Document>,
+    { $set: baseUpdate }
+  );
 
-    // Upsert extended profile
-    await conn.query(
-      `INSERT INTO next_student_profiles
-         (student_id, dob, gender, city, state, country, hobbies, interest, about)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE
-         dob      = VALUES(dob),
-         gender   = VALUES(gender),
-         city     = VALUES(city),
-         state    = VALUES(state),
-         country  = VALUES(country),
-         hobbies  = VALUES(hobbies),
-         interest = VALUES(interest),
-         about    = VALUES(about)`,
-      [
-        id,
-        dob || null,
-        gender || null,
-        city || null,
-        state || null,
-        country || "India",
-        hobbies || null,
-        interest || null,
-        about || null,
-      ],
-    );
+  await db.collection("next_student_profiles").updateOne(
+    { student_id: id } as Filter<Document>,
+    {
+      $set: {
+        student_id: id,
+        dob: dob || null,
+        gender: gender || null,
+        city: city || null,
+        state: state || null,
+        country: country || "India",
+        hobbies: hobbies || null,
+        interest: interest || null,
+        about: about || null,
+        updated_at: new Date(),
+      },
+      $setOnInsert: { created_at: new Date() },
+    },
+    { upsert: true }
+  );
 
-    return NextResponse.json({ success: true, message: "Profile updated successfully" });
-  } finally {
-    conn.release();
-  }
+  return NextResponse.json({ success: true, message: "Profile updated successfully" });
 }

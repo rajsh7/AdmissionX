@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface Admin {
-  id: number;
+  id: string;
   name: string;
   email: string;
 }

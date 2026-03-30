@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 
 interface Props {
-  user: { id: number; name: string; email: string } | null;
+  user: { id: string | number; name: string; email: string } | null;
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────

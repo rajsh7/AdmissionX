@@ -1,11 +1,10 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { unstable_cache } from "next/cache";
 import HomePageClient from "./HomePageClient";
 import { University } from "./components/TopUniversities";
 import { DbBlog } from "./api/home/latest-blogs/route";
 import { DbExam } from "./api/home/exams/route";
 import { HomeStat } from "./api/home/stats/route";
-import { RowDataPacket } from "mysql2";
 import {
   getCachedCollegesForSlug,
   CATEGORY_SLUG,
@@ -21,17 +20,12 @@ export const dynamic = "force-dynamic";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-interface CollegeRow extends RowDataPacket {
+interface CollegeRow {
   slug: string;
   name: string | null;
   location: string | null;
   image: string | null;
   rating: string | null;
-}
-
-interface InfoSchemaRow extends RowDataPacket {
-  table_name: string;
-  table_rows: number;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -44,10 +38,10 @@ function slugToName(slug: string): string {
     .join(" ");
 }
 
-async function safeQuery<T extends RowDataPacket>(sql: string): Promise<T[]> {
+async function safeQuery<T>(collection: string): Promise<T[]> {
   try {
-    const [rows] = (await pool.query(sql)) as [T[], unknown];
-    return rows;
+    const db = await getDb();
+    return await db.collection(collection).find({}).toArray() as T[];
   } catch {
     return [];
   }
@@ -86,95 +80,81 @@ async function safeQuery<T extends RowDataPacket>(sql: string): Promise<T[]> {
 
 const getHomePageData = unstable_cache(
   async () => {
-    const [collegeRows, blogRows, examRows, adRows, statRows] = await Promise.all([
-      // 1. Featured colleges — LEFT JOIN users for real name
-      pool
-        .query(
-          `
-          SELECT
-            cp.slug,
-            COALESCE(NULLIF(TRIM(u.firstname), ''), cp.slug) AS name,
-            COALESCE(cp.registeredSortAddress, '')            AS location,
-            cp.bannerimage                                    AS image,
-            cp.rating                                         AS rating
-          FROM collegeprofile cp
-          LEFT JOIN users u ON u.id = cp.users_id
-          WHERE cp.isShowOnHome = 1
-          LIMIT 8
-        `,
-        )
-        .then(([rows]) => rows as CollegeRow[]),
+    const db = await getDb();
+    const now = new Date();
+
+    const [collegeRows, blogRows, examRows, adRows, statCounts] = await Promise.all([
+      // 1. Featured colleges
+      db.collection("collegeprofile").aggregate([
+        { $match: { isShowOnHome: 1 } },
+        { $limit: 8 },
+        { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            slug: 1,
+            name: {
+              $cond: [
+                { $and: [{ $ne: ["$user.firstname", null] }, { $ne: [{ $trim: { input: "$user.firstname" } }, ""] }] },
+                { $trim: { input: "$user.firstname" } },
+                "$slug",
+              ],
+            },
+            location: "$registeredSortAddress",
+            image: "$bannerimage",
+            rating: 1,
+          },
+        },
+      ]).toArray() as Promise<CollegeRow[]>,
 
       // 2. Latest 4 active blogs
-      pool
-        .query(
-          `
-          SELECT id, topic, featimage, description, slug, created_at
-          FROM blogs
-          WHERE isactive = 1
-          ORDER BY created_at DESC
-          LIMIT 4
-        `,
-        )
-        .then(([rows]) => rows as DbBlog[]),
+      db.collection("blogs")
+        .find({ isactive: 1 })
+        .sort({ created_at: -1 })
+        .limit(4)
+        .project({ id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 })
+        .toArray() as Promise<DbBlog[]>,
 
       // 3. Top 6 exams by views
-      pool
-        .query(
-          `
-          SELECT
-            id, title, slug, exminationDate, image,
-            functionalarea_id, courses_id, totalViews
-          FROM examination_details
-          ORDER BY totalViews DESC, created_at DESC
-          LIMIT 6
-        `,
-        )
-        .then(([rows]) => rows as DbExam[]),
+      db.collection("examination_details")
+        .find({})
+        .sort({ totalViews: -1, created_at: -1 })
+        .limit(6)
+        .project({ id: 1, title: 1, slug: 1, exminationDate: 1, image: 1, functionalarea_id: 1, courses_id: 1, totalViews: 1 })
+        .toArray() as Promise<DbExam[]>,
 
       // 4. Active home-page ads
-      pool
-        .query(
-          `SELECT id, title, description, img, redirectto
-           FROM ads_managements
-           WHERE isactive = 1 AND ads_position = 'home'
-             AND (start IS NULL OR start <= NOW())
-             AND (end IS NULL OR end >= NOW())
-           ORDER BY created_at DESC
-           LIMIT 6`,
-        )
-        .then(([rows]) => rows as AdItem[]),
+      db.collection("ads_managements")
+        .find({
+          isactive: 1,
+          ads_position: "home",
+          $or: [{ start: null }, { start: { $lte: now } }],
+          $and: [{ $or: [{ end: null }, { end: { $gte: now } }] }],
+        })
+        .sort({ created_at: -1 })
+        .limit(6)
+        .project({ id: 1, title: 1, description: 1, img: 1, redirectto: 1 })
+        .toArray() as Promise<AdItem[]>,
 
-      // 5. Approximate site stats via information_schema — near-instant.
-      //    InnoDB keeps estimated row counts in the data dictionary; this
-      //    query never scans any actual table rows.
-      pool
-        .query(
-          `
-          SELECT table_name, table_rows
-          FROM information_schema.tables
-          WHERE table_schema = DATABASE()
-            AND table_name IN (
-              'collegeprofile',
-              'next_student_signups',
-              'country',
-              'course'
-            )
-        `,
-        )
-        .then(([rows]) => rows as InfoSchemaRow[]),
+      // 5. Stats — count documents in each collection
+      Promise.all([
+        db.collection("collegeprofile").estimatedDocumentCount(),
+        db.collection("next_student_signups").estimatedDocumentCount(),
+        db.collection("country").estimatedDocumentCount(),
+        db.collection("course").estimatedDocumentCount(),
+      ]),
     ]);
 
-    return { collegeRows, blogRows, examRows, adRows, statRows };
+    return { collegeRows, blogRows, examRows, adRows, statCounts };
   },
   ["homepage-data-v4"],
-  { revalidate: 300 }, // 5-minute data-cache TTL (belt-and-suspenders with route revalidate)
+  { revalidate: 300 },
 );
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function Page() {
-  const { collegeRows, blogRows, examRows, adRows, statRows } = await getHomePageData();
+  const { collegeRows, blogRows, examRows, adRows, statCounts } = await getHomePageData();
 
   // ── Transform colleges ──────────────────────────────────────────────────
   const universities: University[] = collegeRows.map((row) => {
@@ -204,35 +184,12 @@ export default async function Page() {
     };
   });
 
-  // ── Transform stats from information_schema ─────────────────────────────
-  // Apply minimum floor values so the display never shows embarrassingly
-  // small numbers on a fresh or lightly-seeded database.
-  const tableRowMap: Record<string, number> = {};
-  for (const row of statRows) {
-    tableRowMap[row.table_name] = Number(row.table_rows) || 0;
-  }
-
+  const [collegeCount, studentCount, countryCount, courseCount] = statCounts;
   const stats: HomeStat[] = [
-    {
-      value: Math.max(tableRowMap["collegeprofile"] ?? 0, 100),
-      suffix: "+",
-      label: "Partner Colleges",
-    },
-    {
-      value: Math.max(tableRowMap["next_student_signups"] ?? 0, 500),
-      suffix: "+",
-      label: "Students Registered",
-    },
-    {
-      value: Math.max(tableRowMap["country"] ?? 0, 20),
-      suffix: "+",
-      label: "Countries",
-    },
-    {
-      value: Math.max(tableRowMap["course"] ?? 0, 100),
-      suffix: "+",
-      label: "Courses Available",
-    },
+    { value: Math.max(collegeCount, 100), suffix: "+", label: "Partner Colleges" },
+    { value: Math.max(studentCount, 500), suffix: "+", label: "Students Registered" },
+    { value: Math.max(countryCount, 20),  suffix: "+", label: "Countries" },
+    { value: Math.max(courseCount, 100),  suffix: "+", label: "Courses Available" },
   ];
 
   // ── Stream counts ────────────────────────────────────────────────────────

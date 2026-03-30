@@ -1,6 +1,5 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
@@ -22,18 +21,9 @@ function buildImageUrl(raw: string | null | undefined): string {
 
 function stripHtml(html: string | null | undefined): string {
   if (!html) return "";
-  return html
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/\s+/g, " ")
-    .trim();
+  return html.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
 }
 
-/** Derive a URL-friendly category segment from board misc / title */
 function deriveCategory(misc: string | null, title: string): string {
   if (misc && misc.trim()) {
     return misc
@@ -48,22 +38,7 @@ function deriveCategory(misc: string | null, title: string): string {
   return first.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[boards/page.tsx safeQuery]", err);
-    return [];
-  }
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface BoardRow extends RowDataPacket {
+interface BoardRow {
   id: number;
   title: string;
   name: string | null;
@@ -89,26 +64,32 @@ export const metadata: Metadata = {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function BoardsPage() {
-  const boards = await safeQuery<BoardRow>(
-    `SELECT
-       cb.id,
-       cb.title,
-       cb.name,
-       cb.status,
-       cb.misc,
-       cb.slug,
-       cbd.image       AS detail_image,
-       cbd.description AS detail_description,
-       cbd.title       AS detail_title,
-       cbd.aboutBoard  AS about_board
-     FROM counseling_boards cb
-     LEFT JOIN counseling_board_details cbd
-       ON cbd.counselingBoardId = cb.id
-     WHERE cb.status = 1
-       AND cb.slug IS NOT NULL
-       AND cb.slug != ''
-     ORDER BY cb.id ASC`,
-  );
+  const db = await getDb();
+  const boardDocs = await db.collection("counseling_boards")
+    .find({ slug: { $exists: true, $ne: "" } })
+    .sort({ id: 1 })
+    .project({ id: 1, title: 1, name: 1, status: 1, misc: 1, slug: 1 })
+    .toArray();
+
+  const boardIds = boardDocs.map((b) => b.id).filter(Boolean);
+  const detailDocs = boardIds.length
+    ? await db.collection("counseling_board_details")
+        .find({ counselingBoardId: { $in: boardIds } })
+        .project({ counselingBoardId: 1, image: 1, description: 1, title: 1, aboutBoard: 1 })
+        .toArray()
+    : [];
+  const detailMap = Object.fromEntries(detailDocs.map((d) => [d.counselingBoardId, d]));
+
+  const boards: BoardRow[] = boardDocs.map((b) => {
+    const det = detailMap[b.id];
+    return {
+      id: b.id, title: b.title, name: b.name, status: b.status, misc: b.misc, slug: b.slug,
+      detail_image: det?.image ?? null,
+      detail_description: det?.description ?? null,
+      detail_title: det?.title ?? null,
+      about_board: det?.aboutBoard ?? null,
+    };
+  });
 
   return (
     <div className="min-h-screen bg-neutral-50">

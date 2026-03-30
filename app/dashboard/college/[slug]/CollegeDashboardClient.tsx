@@ -18,11 +18,11 @@ import SettingsTab from "./tabs/SettingsTab";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface CollegeUser {
-  id: number;
+  id: string;
   name: string;
   email: string;
   slug: string;
-  collegeprofile_id: number | null;
+  collegeprofile_id: unknown | null;
 }
 
 export type TabId =

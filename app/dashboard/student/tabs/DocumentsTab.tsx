@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 
 interface Props {
-  user: { id: number; name: string; email: string } | null;
+  user: { id: string | number; name: string; email: string } | null;
 }
 
 interface StudentDocument {
@@ -118,7 +118,7 @@ function UploadModal({
   defaultCategory: string;
   onClose: () => void;
   onUploaded: (doc: StudentDocument) => void;
-  studentId: number;
+  studentId: string | number;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);

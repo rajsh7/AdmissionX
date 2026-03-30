@@ -1,8 +1,7 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
@@ -52,22 +51,10 @@ function renderParagraphs(text: string): string[] {
     .filter(Boolean);
 }
 
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[popular-careers/[slug]/page.tsx safeQuery]", err);
-    return [];
-  }
-}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface CareerDetailRow extends RowDataPacket {
+interface CareerDetailRow {
   id: number;
   title: string;
   description: string | null;
@@ -90,19 +77,19 @@ interface CareerDetailRow extends RowDataPacket {
   stream_slug: string | null;
 }
 
-interface JobRoleRow extends RowDataPacket {
+interface JobRoleRow {
   id: number;
   title: string;
   avgSalery: string | null;
   topCompany: string | null;
 }
 
-interface SkillRow extends RowDataPacket {
+interface SkillRow {
   id: number;
   title: string;
 }
 
-interface WhereToStudyRow extends RowDataPacket {
+interface WhereToStudyRow {
   id: number;
   instituteName: string | null;
   instituteUrl: string | null;
@@ -110,7 +97,7 @@ interface WhereToStudyRow extends RowDataPacket {
   programmeFees: string | null;
 }
 
-interface RelatedCareerRow extends RowDataPacket {
+interface RelatedCareerRow {
   id: number;
   title: string;
   slug: string;
@@ -135,108 +122,55 @@ const SKILL_COLORS = [
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const rows = await safeQuery<CareerDetailRow>(
-    `SELECT cd.title, cd.description, cd.jobProfileDesc,
-            fa.name AS stream_name
-     FROM counseling_career_details cd
-     LEFT JOIN functionalarea fa ON fa.id = cd.functionalarea_id
-     WHERE cd.slug = ? AND cd.status = 1
-     LIMIT 1`,
-    [slug],
-  );
-  const career = rows[0];
+  const db = await getDb();
+  const career = await db.collection("counseling_career_details").findOne({ slug, status: 1 }, { projection: { title: 1, description: 1, jobProfileDesc: 1, functionalarea_id: 1 } });
   if (!career) return { title: "Career Not Found — AdmissionX" };
-
-  const rawDesc = career.description || career.jobProfileDesc;
-  const desc = stripHtml(rawDesc).slice(0, 160);
-  const stream = career.stream_name ? ` in ${career.stream_name}` : "";
-
+  const fa = career.functionalarea_id ? await db.collection("functionalarea").findOne({ id: career.functionalarea_id }, { projection: { name: 1 } }) : null;
+  const desc = stripHtml(career.description || career.jobProfileDesc).slice(0, 160);
+  const stream = fa?.name ? ` in ${fa.name}` : "";
   return {
     title: `${career.title} — Career Profile | AdmissionX`,
-    description:
-      desc ||
-      `Explore the ${career.title} career path${stream}. Get salary insights, required skills, job roles, and top institutes.`,
-    openGraph: {
-      title: `${career.title} | AdmissionX`,
-      description: desc,
-    },
+    description: desc || `Explore the ${career.title} career path${stream}.`,
+    openGraph: { title: `${career.title} | AdmissionX`, description: desc },
   };
 }
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
-export default async function CareerDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function CareerDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const db = await getDb();
 
-  // ── Step 1: Fetch main career record ──────────────────────────────────────
-  const careerRows = await safeQuery<CareerDetailRow>(
-    `SELECT
-       cd.id, cd.title, cd.description, cd.image,
-       cd.jobProfileDesc, cd.totalLikes, cd.pros, cd.cons,
-       cd.futureGrowthPurpose, cd.employeeOpportunities,
-       cd.studyMaterial, cd.whereToStudy, cd.slug,
-       cd.purpose_desc, cd.eligibility, cd.qualification,
-       cd.other_details, cd.functionalarea_id,
-       fa.name     AS stream_name,
-       fa.pageslug AS stream_slug
-     FROM counseling_career_details cd
-     LEFT JOIN functionalarea fa ON fa.id = cd.functionalarea_id
-     WHERE cd.slug = ? AND cd.status = 1
-     LIMIT 1`,
-    [slug],
-  );
+  const careerDoc = await db.collection("counseling_career_details").findOne({ slug, status: 1 });
+  if (!careerDoc) notFound();
 
-  const career = careerRows[0];
-  if (!career) notFound();
+  const fa = careerDoc.functionalarea_id
+    ? await db.collection("functionalarea").findOne({ id: careerDoc.functionalarea_id }, { projection: { id: 1, name: 1, pageslug: 1 } })
+    : null;
 
-  // ── Step 2: Fetch sub-tables in parallel ──────────────────────────────────
-  const [jobRoles, skills, whereToStudies, relatedCareers] = await Promise.all([
-    safeQuery<JobRoleRow>(
-      `SELECT id, title, avgSalery, topCompany
-       FROM counseling_career_job_role_saleries
-       WHERE careerDetailsId = ?
-       ORDER BY id ASC`,
-      [career.id],
-    ),
-    safeQuery<SkillRow>(
-      `SELECT id, title
-       FROM counseling_career_skill_requirements
-       WHERE careerDetailsId = ?
-       ORDER BY id ASC`,
-      [career.id],
-    ),
-    safeQuery<WhereToStudyRow>(
-      `SELECT id, instituteName, instituteUrl, city, programmeFees
-       FROM counseling_career_where_to_studies
-       WHERE careerDetailsId = ?
-       ORDER BY id ASC`,
-      [career.id],
-    ),
-    career.functionalarea_id
-      ? safeQuery<RelatedCareerRow>(
-          `SELECT cd.id, cd.title, cd.slug, cd.description, cd.image,
-                  fa.name AS stream_name, fa.pageslug AS stream_slug
-           FROM counseling_career_details cd
-           LEFT JOIN functionalarea fa ON fa.id = cd.functionalarea_id
-           WHERE cd.functionalarea_id = ?
-             AND cd.id != ?
-             AND cd.status = 1
-           ORDER BY cd.totalLikes DESC
-           LIMIT 4`,
-          [career.functionalarea_id, career.id],
-        )
-      : Promise.resolve([] as RelatedCareerRow[]),
+  const [jobRoleDocs, skillDocs, whereToStudyDocs, relatedDocs] = await Promise.all([
+    db.collection("counseling_career_job_role_saleries").find({ careerDetailsId: careerDoc.id }).sort({ id: 1 }).toArray(),
+    db.collection("counseling_career_skill_requirements").find({ careerDetailsId: careerDoc.id }).sort({ id: 1 }).toArray(),
+    db.collection("counseling_career_where_to_studies").find({ careerDetailsId: careerDoc.id }).sort({ id: 1 }).toArray(),
+    careerDoc.functionalarea_id
+      ? db.collection("counseling_career_details").find({ functionalarea_id: careerDoc.functionalarea_id, id: { $ne: careerDoc.id }, status: 1 }).sort({ totalLikes: -1 }).limit(4).toArray()
+      : Promise.resolve([]),
   ]);
+
+  const career: CareerDetailRow = {
+    id: careerDoc.id, title: careerDoc.title, description: careerDoc.description ?? null,
+    image: careerDoc.image ?? null, jobProfileDesc: careerDoc.jobProfileDesc ?? null,
+    totalLikes: Number(careerDoc.totalLikes) || 0, pros: careerDoc.pros ?? null, cons: careerDoc.cons ?? null,
+    futureGrowthPurpose: careerDoc.futureGrowthPurpose ?? null, employeeOpportunities: careerDoc.employeeOpportunities ?? null,
+    studyMaterial: careerDoc.studyMaterial ?? null, whereToStudy: careerDoc.whereToStudy ?? null, slug: careerDoc.slug,
+    purpose_desc: careerDoc.purpose_desc ?? null, eligibility: careerDoc.eligibility ?? null,
+    qualification: careerDoc.qualification ?? null, other_details: careerDoc.other_details ?? null,
+    functionalarea_id: careerDoc.functionalarea_id ?? null,
+    stream_name: fa?.name ?? null, stream_slug: fa?.pageslug ?? null,
+  };
+  const jobRoles: JobRoleRow[] = jobRoleDocs.map((r) => ({ id: r.id, title: r.title, avgSalery: r.avgSalery ?? null, topCompany: r.topCompany ?? null }));
+  const skills: SkillRow[] = skillDocs.map((r) => ({ id: r.id, title: r.title }));
+  const whereToStudies: WhereToStudyRow[] = whereToStudyDocs.map((r) => ({ id: r.id, instituteName: r.instituteName ?? null, instituteUrl: r.instituteUrl ?? null, city: r.city ?? null, programmeFees: r.programmeFees ?? null }));
+  const relatedCareers: RelatedCareerRow[] = relatedDocs.map((r) => ({ id: r.id, title: r.title, slug: r.slug, description: r.description ?? null, image: r.image ?? null, stream_name: fa?.name ?? null, stream_slug: fa?.pageslug ?? null }));
 
   // ── Derived data ──────────────────────────────────────────────────────────
   const imgUrl = buildImageUrl(career.image);

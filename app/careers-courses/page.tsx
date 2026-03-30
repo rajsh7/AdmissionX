@@ -1,12 +1,7 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import type { Metadata } from "next";
-import type { RowDataPacket } from "mysql2";
 import ListingSearchV4NoSSR from "@/app/components/ListingSearchV4NoSSR";
 import type { CourseResult } from "@/app/api/search/courses/route";
-
-// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 
 export const metadata: Metadata = {
   title: "Career Courses — Find the Right Course for Your Future | AdmissionX",
@@ -14,29 +9,11 @@ export const metadata: Metadata = {
     "Explore top career-oriented courses across engineering, medicine, management, law, arts and more. Get details on eligibility, job scope, and top colleges.",
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function buildImageUrl(raw: string | null | undefined): string | null {
   if (!raw || !raw.trim()) return null;
-  if (raw.startsWith("http")) return raw;
-  if (raw.startsWith("/")) return raw;
+  if (raw.startsWith("http") || raw.startsWith("/")) return raw;
   return `/uploads/${raw}`;
 }
-
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[careers-courses/page.tsx safeQuery]", err);
-    return [];
-  }
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface FilterOption {
   id: string | number;
@@ -49,11 +26,8 @@ interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export default async function CareerCoursesPage({ searchParams }: PageProps) {
   const sp = await searchParams;
-
   const getString = (key: string, fallback = "") =>
     typeof sp[key] === "string" ? (sp[key] as string) : fallback;
 
@@ -64,98 +38,87 @@ export default async function CareerCoursesPage({ searchParams }: PageProps) {
   const limit = 12;
   const offset = (page - 1) * limit;
 
-  // ── Build filter conditions ──
-  const filterConditions: string[] = ["c.pageslug IS NOT NULL AND c.pageslug != ''"];
-  const filterParams: (string | number)[] = [];
+  const db = await getDb();
 
-  if (q.length >= 2) {
-    filterConditions.push("(c.name LIKE ? OR c.pagedescription LIKE ?)");
-    const like = `%${q}%`;
-    filterParams.push(like, like);
-  }
-
+  // Resolve level/stream slugs to integer ids
+  let degreeId: number | null = null;
   if (level) {
-    filterConditions.push("d.pageslug = ?");
-    filterParams.push(level);
+    const d = await db.collection("degree").findOne({ pageslug: level }, { projection: { id: 1 } });
+    degreeId = d?.id ?? null;
   }
-
+  let faId: number | null = null;
   if (stream) {
-    filterConditions.push("fa.pageslug = ?");
-    filterParams.push(stream);
+    const fa = await db.collection("functionalarea").findOne({ pageslug: stream }, { projection: { id: 1 } });
+    faId = fa?.id ?? null;
   }
 
-  const filterWhere = filterConditions.join(" AND ");
+  const filter: Record<string, unknown> = { pageslug: { $exists: true, $ne: "" } };
+  if (q.length >= 2) {
+    filter.$or = [
+      { name: { $regex: q, $options: "i" } },
+      { pagedescription: { $regex: q, $options: "i" } },
+    ];
+  }
+  if (degreeId !== null) filter.degree_id = degreeId;
+  if (faId !== null) filter.functionalarea_id = faId;
 
-  // ── Fetch data in parallel ──
-  const [levelRows, streamRows, courseRows, countRows] = await Promise.all([
-    // Education levels for filter (now mapped to degree)
-    safeQuery<RowDataPacket>(`
-      SELECT id, name, pageslug as slug FROM degree
-      WHERE name IS NOT NULL AND name != ''
-      ORDER BY isShowOnTop DESC, name ASC
-    `),
-
-    // Streams for filter
-    safeQuery<RowDataPacket>(`
-      SELECT id, name, pageslug as slug FROM functionalarea
-      WHERE name IS NOT NULL AND name != ''
-      ORDER BY name ASC
-    `),
-
-    // Initial courses
-    safeQuery<RowDataPacket>(`
-      SELECT
-        c.id,
-        c.name AS title,
-        c.pagedescription AS description,
-        c.logoimage AS image,
-        c.pageslug AS slug,
-        d.name      AS level_name,
-        d.pageslug  AS level_slug,
-        fa.name     AS stream_name,
-        fa.pageslug AS stream_slug
-      FROM course c
-      LEFT JOIN degree d ON d.id = c.degree_id
-      LEFT JOIN functionalarea fa ON fa.id = c.functionalarea_id
-      WHERE ${filterWhere}
-      ORDER BY c.id DESC
-      LIMIT ${limit} OFFSET ${offset}
-    `, filterParams),
-
-    // Total count
-    safeQuery<RowDataPacket>(`
-      SELECT COUNT(*) as total
-      FROM course c
-      LEFT JOIN degree d ON d.id = c.degree_id
-      LEFT JOIN functionalarea fa ON fa.id = c.functionalarea_id
-      WHERE ${filterWhere}
-    `, filterParams),
+  const [levelRows, streamRows, courseRows, total] = await Promise.all([
+    db.collection("degree")
+      .find({ name: { $exists: true, $ne: "" } })
+      .sort({ isShowOnTop: -1, name: 1 })
+      .project({ id: 1, name: 1, pageslug: 1 })
+      .toArray(),
+    db.collection("functionalarea")
+      .find({ name: { $exists: true, $ne: "" } })
+      .sort({ name: 1 })
+      .project({ id: 1, name: 1, pageslug: 1 })
+      .toArray(),
+    db.collection("course").aggregate([
+      { $match: filter },
+      { $sort: { id: -1 } },
+      { $skip: offset },
+      { $limit: limit },
+      { $lookup: { from: "degree", localField: "degree_id", foreignField: "id", as: "deg" } },
+      { $lookup: { from: "functionalarea", localField: "functionalarea_id", foreignField: "id", as: "fa" } },
+      { $unwind: { path: "$deg", preserveNullAndEmptyArrays: true } },
+      { $unwind: { path: "$fa", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          id: 1, name: 1, pageslug: 1, logoimage: 1, pagedescription: 1,
+          level_name: "$deg.name", level_slug: "$deg.pageslug",
+          stream_name: "$fa.name", stream_slug: "$fa.pageslug",
+        },
+      },
+    ]).toArray(),
+    db.collection("course").countDocuments(filter),
   ]);
 
-  const total = countRows[0]?.total ?? 0;
   const totalPages = Math.ceil(total / limit);
 
   const initialCourses: CourseResult[] = courseRows.map((row) => ({
     id: row.id,
-    title: row.title,
-    slug: row.slug,
-    image: buildImageUrl(row.image),
-    description: row.description,
-    level_name: row.level_name,
-    level_slug: row.level_slug,
-    stream_name: row.stream_name,
-    stream_slug: row.stream_slug,
+    title: row.name,
+    slug: row.pageslug,
+    image: buildImageUrl(row.logoimage),
+    description: row.pagedescription,
+    level_name: row.level_name ?? null,
+    level_slug: row.level_slug ?? null,
+    stream_name: row.stream_name ?? null,
+    stream_slug: row.stream_slug ?? null,
     bestChoiceOfCourse: null,
     jobsCareerOpportunityDesc: null,
   }));
+
+  const levels: FilterOption[] = levelRows.map((r) => ({ id: r.id, name: r.name, slug: r.pageslug }));
+  const streams: FilterOption[] = streamRows.map((r) => ({ id: r.id, name: r.name, slug: r.pageslug }));
 
   return (
     <ListingSearchV4NoSSR
       initialCourses={initialCourses}
       initialTotal={total}
       initialTotalPages={totalPages}
-      levels={levelRows as FilterOption[]}
-      streams={streamRows as FilterOption[]}
+      levels={levels}
+      streams={streams}
       initQ={q}
       initLevel={level}
       initStream={stream}

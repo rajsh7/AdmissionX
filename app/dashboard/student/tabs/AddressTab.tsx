@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 interface Props {
-  user: { id: number; name: string; email: string } | null;
+  user: { id: string | number; name: string; email: string } | null;
 }
 
 const INDIAN_STATES = [

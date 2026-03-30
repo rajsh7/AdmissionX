@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 interface Props {
-  user: { id: number; name: string; email: string } | null;
+  user: { id: string | number; name: string; email: string } | null;
 }
 
 // ── Counselling Form Types ────────────────────────────────────────────────────

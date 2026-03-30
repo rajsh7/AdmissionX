@@ -226,10 +226,10 @@ interface FAQAccordionProps {
 }
 
 export default function FAQAccordion({ faqs, collegeName }: FAQAccordionProps) {
-  const [openId, setOpenId] = useState<number | null>(faqs[0]?.id ?? null);
+  const [openId, setOpenId] = useState<string | number | null>(faqs[0]?.id ?? null);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandAll, setExpandAll] = useState(false);
-  const [openIds, setOpenIds] = useState<Set<number>>(
+  const [openIds, setOpenIds] = useState<Set<string | number>>(
     new Set(faqs[0] ? [faqs[0].id] : [])
   );
 
@@ -244,7 +244,7 @@ export default function FAQAccordion({ faqs, collegeName }: FAQAccordionProps) {
     });
   }, [faqs, searchQuery]);
 
-  const handleToggle = (id: number) => {
+  const handleToggle = (id: string | number) => {
     if (expandAll) {
       // In expand-all mode, toggle individual items in openIds set
       setOpenIds((prev) => {
@@ -261,14 +261,14 @@ export default function FAQAccordion({ faqs, collegeName }: FAQAccordionProps) {
     }
   };
 
-  const isOpen = (id: number) => {
+  const isOpen = (id: string | number) => {
     if (expandAll) return openIds.has(id);
     return openId === id;
   };
 
   const handleExpandAll = () => {
     setExpandAll(true);
-    setOpenIds(new Set(filteredFaqs.map((f) => f.id)));
+    setOpenIds(new Set<string | number>(filteredFaqs.map((f) => f.id)));
   };
 
   const handleCollapseAll = () => {

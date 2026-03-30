@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
-import pool from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server";
+import { getDb } from "@/lib/db";
 
 export interface DbBlog {
-  id: number;
+  id: string | number;
   topic: string;
   featimage: string | null;
   description: string;
@@ -12,17 +12,14 @@ export interface DbBlog {
 
 export async function GET() {
   try {
-    const conn = await pool.getConnection();
+    const db = await getDb();
 
-    const [rows] = await conn.query(`
-      SELECT id, topic, featimage, description, slug, created_at
-      FROM blogs
-      WHERE isactive = 1
-      ORDER BY created_at DESC
-      LIMIT 4
-    `) as [DbBlog[], unknown];
-
-    conn.release();
+    const rows = await db.collection("blogs")
+      .find({ isactive: 1 })
+      .sort({ created_at: -1 })
+      .limit(4)
+      .project({ _id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 })
+      .toArray();
 
     return NextResponse.json({ success: true, data: rows });
   } catch (err) {

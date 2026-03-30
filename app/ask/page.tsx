@@ -1,8 +1,7 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
@@ -39,22 +38,7 @@ function timeAgo(dateStr: string | null): string {
   }
 }
 
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[ask/page.tsx safeQuery]", err);
-    return [];
-  }
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface QuestionRow extends RowDataPacket {
+interface QuestionRow {
   id: number;
   question: string;
   questionDate: string | null;
@@ -67,15 +51,11 @@ interface QuestionRow extends RowDataPacket {
   created_at: string;
 }
 
-interface TagRow extends RowDataPacket {
+interface TagRow {
   id: number;
   name: string;
   slug: string;
   question_count: number;
-}
-
-interface CountRow extends RowDataPacket {
-  total: number;
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -92,66 +72,45 @@ export default async function AskPage({
   const q = String(sp.q ?? "").trim();
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Resolve tag filter ────────────────────────────────────────────────────
+  const db = await getDb();
+
+  // Resolve tag
   let tagId: number | null = null;
   if (tag) {
-    const tagRows = await safeQuery<TagRow>(
-      `SELECT id FROM ask_question_tags WHERE slug = ? LIMIT 1`,
-      [tag],
-    );
-    tagId = tagRows[0]?.id ?? null;
+    const tagDoc = await db.collection("ask_question_tags").findOne({ slug: tag }, { projection: { id: 1 } });
+    tagId = tagDoc?.id ?? null;
   }
 
-  // ── Build WHERE ───────────────────────────────────────────────────────────
-  const conditions: string[] = ["aq.status = 1"];
-  const qParams: (string | number)[] = [];
+  // Build filter
+  const filter: Record<string, unknown> = { status: 1 };
+  if (q) filter.question = { $regex: q, $options: "i" };
+  if (tagId !== null) filter.askQuestionTagIds = { $regex: `(^|,)\\s*${tagId}\\s*(,|$)` };
 
-  if (q) {
-    conditions.push("aq.question LIKE ?");
-    qParams.push(`%${q}%`);
-  }
-  if (tagId !== null) {
-    conditions.push("FIND_IN_SET(?, aq.askQuestionTagIds)");
-    qParams.push(tagId);
-  }
+  // Sort
+  const mongoSort: Record<string, 1 | -1> =
+    sort === "popular" ? { likes: -1, views: -1 } :
+    sort === "answered" ? { totalAnswerCount: -1, created_at: -1 } :
+    sort === "views" ? { views: -1 } :
+    { created_at: -1 };
 
-  const where = `WHERE ${conditions.join(" AND ")}`;
-
-  let orderBy = "aq.created_at DESC";
-  if (sort === "popular") orderBy = "aq.likes DESC, aq.views DESC";
-  if (sort === "answered") orderBy = "aq.totalAnswerCount DESC, aq.created_at DESC";
-  if (sort === "views") orderBy = "aq.views DESC";
-
-  // ── Fetch questions + count + tags in parallel ────────────────────────────
-  const [questions, countRows, allTags] = await Promise.all([
-    safeQuery<QuestionRow>(
-      `SELECT aq.id, aq.question, aq.questionDate, aq.slug,
-              aq.likes, aq.views, aq.totalAnswerCount,
-              aq.totalCommentsCount, aq.askQuestionTagIds, aq.created_at
-       FROM ask_questions aq
-       ${where}
-       ORDER BY ${orderBy}
-       LIMIT ? OFFSET ?`,
-      [...qParams, PAGE_SIZE, offset],
-    ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total FROM ask_questions aq ${where}`,
-      qParams,
-    ),
-    safeQuery<TagRow>(
-      `SELECT id, name, slug,
-              (SELECT COUNT(*) FROM ask_questions
-               WHERE status = 1 AND FIND_IN_SET(ask_question_tags.id, askQuestionTagIds)) AS question_count
-       FROM ask_question_tags
-       ORDER BY question_count DESC, name ASC
-       LIMIT 30`,
-    ),
+  const [questionDocs, total, allTagDocs] = await Promise.all([
+    db.collection("ask_questions").find(filter).sort(mongoSort).skip(offset).limit(PAGE_SIZE)
+      .project({ id: 1, question: 1, questionDate: 1, slug: 1, likes: 1, views: 1, totalAnswerCount: 1, totalCommentsCount: 1, askQuestionTagIds: 1, created_at: 1 }).toArray(),
+    db.collection("ask_questions").countDocuments(filter),
+    db.collection("ask_question_tags").find({}).sort({ name: 1 }).limit(30)
+      .project({ id: 1, name: 1, slug: 1 }).toArray(),
   ]);
 
-  const total = countRows[0]?.total ?? 0;
+  const questions: QuestionRow[] = questionDocs.map((d) => ({
+    id: d.id, question: d.question, questionDate: d.questionDate ?? null, slug: d.slug ?? null,
+    likes: Number(d.likes) || 0, views: Number(d.views) || 0,
+    totalAnswerCount: Number(d.totalAnswerCount) || 0, totalCommentsCount: Number(d.totalCommentsCount) || 0,
+    askQuestionTagIds: d.askQuestionTagIds ?? null, created_at: d.created_at,
+  }));
+  const allTags: TagRow[] = allTagDocs.map((t) => ({ id: t.id, name: t.name, slug: t.slug, question_count: 0 }));
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  // ── Build a tag lookup map for rendering tag chips ────────────────────────
   const tagMap = new Map(allTags.map((t) => [t.id, t]));
 
   function getTagsForQuestion(tagIds: string | null): TagRow[] {

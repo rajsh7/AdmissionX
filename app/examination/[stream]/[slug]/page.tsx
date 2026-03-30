@@ -1,6 +1,5 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { notFound } from "next/navigation";
-import { RowDataPacket } from "mysql2";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -46,22 +45,10 @@ function isUpcoming(raw: string | null | undefined): boolean {
   return !isNaN(d.getTime()) && d > new Date();
 }
 
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[examination/[stream]/[slug]/page.tsx safeQuery]", err);
-    return [];
-  }
-}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface ExamBaseRow extends RowDataPacket {
+interface ExamBaseRow {
   id: number;
   title: string;
   slug: string;
@@ -80,7 +67,7 @@ interface ExamBaseRow extends RowDataPacket {
   resultAnnounce: string | null;
 }
 
-interface ExamDateRow extends RowDataPacket {
+interface ExamDateRow {
   id: number;
   degreeId: number | null;
   degreeName: string | null;
@@ -89,14 +76,14 @@ interface ExamDateRow extends RowDataPacket {
   eventStatus: string | null;
 }
 
-interface EligibilityRow extends RowDataPacket {
+interface EligibilityRow {
   id: number;
   degreeId: number | null;
   degreeName: string | null;
   description: string | null;
 }
 
-interface PatternRow extends RowDataPacket {
+interface PatternRow {
   id: number;
   degreeId: number | null;
   degreeName: string | null;
@@ -110,7 +97,7 @@ interface PatternRow extends RowDataPacket {
   languageofpaper: string | null;
 }
 
-interface FeeRow extends RowDataPacket {
+interface FeeRow {
   id: number;
   category: string | null;
   quota: string | null;
@@ -119,7 +106,7 @@ interface FeeRow extends RowDataPacket {
   amount: string | null;
 }
 
-interface AppProcessRow extends RowDataPacket {
+interface AppProcessRow {
   id: number;
   modeofapplication: string | null;
   modeofpayment: string | null;
@@ -132,92 +119,33 @@ interface AppProcessRow extends RowDataPacket {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default async function ExamOverviewPage({
-  params,
-}: {
-  params: Promise<{ stream: string; slug: string }>;
-}) {
+export default async function ExamOverviewPage({ params }: { params: Promise<{ stream: string; slug: string }> }) {
   const { slug } = await params;
+  const db = await getDb();
 
-  // ── Step 1: get exam ID ───────────────────────────────────────────────────
-  const baseRows = await safeQuery<ExamBaseRow>(
-    `SELECT
-       id,
-       title,
-       slug,
-       description,
-       content,
-       examEligibilityCriteria,
-       examDates,
-       admidCardDesc,
-       admidCardInstructions,
-       examResultDesc,
-       mockTestDesc,
-       getMoreInfoLink,
-       applicationFrom,
-       applicationTo,
-       exminationDate,
-       resultAnnounce
-     FROM examination_details
-     WHERE slug = ?
-     LIMIT 1`,
-    [slug],
-  );
-
-  const exam = baseRows[0];
-  if (!exam) notFound();
+  const examDoc = await db.collection("examination_details").findOne({ slug });
+  if (!examDoc) notFound();
+  const exam: ExamBaseRow = {
+    id: examDoc.id, title: examDoc.title, slug: examDoc.slug,
+    description: examDoc.description ?? null, content: examDoc.content ?? null,
+    examEligibilityCriteria: examDoc.examEligibilityCriteria ?? null, examDates: examDoc.examDates ?? null,
+    admidCardDesc: examDoc.admidCardDesc ?? null, admidCardInstructions: examDoc.admidCardInstructions ?? null,
+    examResultDesc: examDoc.examResultDesc ?? null, mockTestDesc: examDoc.mockTestDesc ?? null,
+    getMoreInfoLink: examDoc.getMoreInfoLink ?? null,
+    applicationFrom: examDoc.applicationFrom ?? null, applicationTo: examDoc.applicationTo ?? null,
+    exminationDate: examDoc.exminationDate ?? null, resultAnnounce: examDoc.resultAnnounce ?? null,
+  };
 
   // ── Step 2: fetch all sub-data in parallel using exam.id ─────────────────
-  const [dateRows, eligibilityRows, patternRows, feeRows, appProcessRows] =
-    await Promise.all([
-      safeQuery<ExamDateRow>(
-        `SELECT id, degreeId, degreeName, eventName, eventDate, eventStatus
-         FROM exam_dates
-         WHERE typeOfExaminations_id = ?
-         ORDER BY eventDate ASC`,
-        [exam.id],
-      ),
+  const [dateRows, eligibilityRows, patternRows, feeRows, appProcessRows] = await Promise.all([
+    db.collection("exam_dates").find({ typeOfExaminations_id: exam.id }).sort({ eventDate: 1 }).toArray().then(docs => docs.map(r => ({ id: r.id, degreeId: r.degreeId ?? null, degreeName: r.degreeName ?? null, eventName: r.eventName ?? null, eventDate: r.eventDate ?? null, eventStatus: r.eventStatus ?? null } as ExamDateRow))),
+    db.collection("exam_eligibilities").find({ typeOfExaminations_id: exam.id }).sort({ id: 1 }).toArray().then(docs => docs.map(r => ({ id: r.id, degreeId: r.degreeId ?? null, degreeName: r.degreeName ?? null, description: r.description ?? null } as EligibilityRow))),
+    db.collection("exam_patterns").find({ typeOfExaminations_id: exam.id }).sort({ id: 1 }).toArray().then(docs => docs.map(r => ({ id: r.id, degreeId: r.degreeId ?? null, degreeName: r.degreeName ?? null, patternDesc: r.patternDesc ?? null, modeOfExam: r.modeOfExam ?? null, examDuration: r.examDuration ?? null, totalQuestion: r.totalQuestion ?? null, totalMarks: r.totalMarks ?? null, section: r.section ?? null, markingSchem: r.markingSchem ?? null, languageofpaper: r.languageofpaper ?? null } as PatternRow))),
+    db.collection("exam_application_fees").find({ typeOfExaminations_id: exam.id }).sort({ id: 1 }).toArray().then(docs => docs.map(r => ({ id: r.id, category: r.category ?? null, quota: r.quota ?? null, mode: r.mode ?? null, gender: r.gender ?? null, amount: r.amount ?? null } as FeeRow))),
+    db.collection("exam_application_processes").find({ typeOfExaminations_id: exam.id }).sort({ id: 1 }).toArray().then(docs => docs.map(r => ({ id: r.id, modeofapplication: r.modeofapplication ?? null, modeofpayment: r.modeofpayment ?? null, description: r.description ?? null, examinationtype: r.examinationtype ?? null, applicationandexamstatus: r.applicationandexamstatus ?? null, examinationmode: r.examinationmode ?? null, eligibilitycriteria: r.eligibilitycriteria ?? null } as AppProcessRow))),
+  ]);
 
-      safeQuery<EligibilityRow>(
-        `SELECT id, degreeId, degreeName, description
-         FROM exam_eligibilities
-         WHERE typeOfExaminations_id = ?
-         ORDER BY id ASC`,
-        [exam.id],
-      ),
-
-      safeQuery<PatternRow>(
-        `SELECT
-           id, degreeId, degreeName, patternDesc, modeOfExam,
-           examDuration, totalQuestion, totalMarks, section,
-           markingSchem, languageofpaper
-         FROM exam_patterns
-         WHERE typeOfExaminations_id = ?
-         ORDER BY id ASC`,
-        [exam.id],
-      ),
-
-      safeQuery<FeeRow>(
-        `SELECT id, category, quota, mode, gender, amount
-         FROM exam_application_fees
-         WHERE typeOfExaminations_id = ?
-         ORDER BY id ASC`,
-        [exam.id],
-      ),
-
-      safeQuery<AppProcessRow>(
-        `SELECT
-           id, modeofapplication, modeofpayment, description,
-           examinationtype, applicationandexamstatus, examinationmode,
-           eligibilitycriteria
-         FROM exam_application_processes
-         WHERE typeOfExaminations_id = ?
-         ORDER BY id ASC`,
-        [exam.id],
-      ),
-    ]);
-
-  // ── Normalize text fields ─────────────────────────────────────────────────
+    // ── Normalize text fields ─────────────────────────────────────────────────
   const descText = stripHtml(exam.description);
   const contentText = stripHtml(exam.content);
   const eligibilityCriteriaText = stripHtml(exam.examEligibilityCriteria);

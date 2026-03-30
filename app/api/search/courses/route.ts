@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { getDb } from "@/lib/db";
 
 export interface CourseResult {
-  id: number;
+  id: string | number;
   title: string;
   slug: string;
   image: string | null;
@@ -18,28 +15,14 @@ export interface CourseResult {
   jobsCareerOpportunityDesc: string | null;
 }
 
-interface IdRow extends RowDataPacket {
-  id: number;
-}
-
-interface CountRow extends RowDataPacket {
-  total: number;
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function buildImageUrl(raw: string | null): string | null {
   if (!raw) return null;
-  if (raw.startsWith("http")) return raw;
-  if (raw.startsWith("/")) return raw;
+  if (raw.startsWith("http") || raw.startsWith("/")) return raw;
   return `/uploads/${raw}`;
 }
 
-// ─── GET /api/search/courses ─────────────────────────────────────────────────
-
 export async function GET(req: NextRequest) {
   const sp = new URL(req.url).searchParams;
-
   const q = (sp.get("q") ?? "").trim();
   const level = (sp.get("level") ?? "").trim();
   const stream = (sp.get("stream") ?? "").trim();
@@ -47,65 +30,52 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(48, Math.max(6, parseInt(sp.get("limit") ?? "12")));
   const offset = (page - 1) * limit;
 
-  // ── Build filter conditions ───────────────────────────────────────────────
-
-  const filterConditions: string[] = ["ccd.slug IS NOT NULL AND ccd.slug != ''"];
-  const filterParams: (string | number)[] = [];
-
-  if (q.length >= 2) {
-    filterConditions.push("(ccd.title LIKE ? OR ccd.description LIKE ?)");
-    const like = `%${q}%`;
-    filterParams.push(like, like);
-  }
-
-  if (level) {
-    filterConditions.push("el.pageslug = ?");
-    filterParams.push(level);
-  }
-
-  if (stream) {
-    filterConditions.push("fa.pageslug = ?");
-    filterParams.push(stream);
-  }
-
-  const filterWhere = filterConditions.join(" AND ");
-
   try {
-    // ── Fetch data ──
-    const [rows] = await pool.query(`
-      SELECT
-        ccd.id,
-        ccd.title,
-        ccd.description,
-        ccd.image,
-        ccd.bestChoiceOfCourse,
-        ccd.jobsCareerOpportunityDesc,
-        ccd.slug,
-        el.name     AS level_name,
-        el.pageslug AS level_slug,
-        fa.name     AS stream_name,
-        fa.pageslug AS stream_slug
-      FROM counseling_courses_details ccd
-      LEFT JOIN educationlevel   el ON el.id = ccd.educationlevel_id
-      LEFT JOIN functionalarea   fa ON fa.id = ccd.functionalarea_id
-      WHERE ${filterWhere}
-      ORDER BY ccd.id DESC
-      LIMIT ${limit} OFFSET ${offset}
-    `, filterParams) as [RowDataPacket[], any];
+    const db = await getDb();
 
-    // ── Fetch total count ──
-    const [countRows] = await pool.query(`
-      SELECT COUNT(*) as total
-      FROM counseling_courses_details ccd
-      LEFT JOIN educationlevel   el ON el.id = ccd.educationlevel_id
-      LEFT JOIN functionalarea   fa ON fa.id = ccd.functionalarea_id
-      WHERE ${filterWhere}
-    `, filterParams) as [CountRow[], any];
+    // Resolve level/stream slugs
+    let elId: unknown = null;
+    if (level) {
+      const el = await db.collection("educationlevel").findOne({ pageslug: level }, { projection: { id: 1 } });
+      elId = el?.id ?? null;
+    }
+    let faId: unknown = null;
+    if (stream) {
+      const fa = await db.collection("functionalarea").findOne({ pageslug: stream }, { projection: { id: 1 } });
+      faId = fa?.id ?? null;
+    }
 
-    const total = countRows[0]?.total ?? 0;
+    const filter: Record<string, unknown> = { slug: { $exists: true, $ne: "" } };
+    if (q.length >= 2) {
+      filter.$or = [{ title: { $regex: q, $options: "i" } }, { description: { $regex: q, $options: "i" } }];
+    }
+    if (elId) filter.educationlevel_id = elId;
+    if (faId) filter.functionalarea_id = faId;
 
-    const courses: CourseResult[] = rows.map((row) => ({
-      id: row.id,
+    const [rows, total] = await Promise.all([
+      db.collection("counseling_courses_details").aggregate([
+        { $match: filter },
+        { $sort: { _id: -1 } },
+        { $skip: offset },
+        { $limit: limit },
+        { $lookup: { from: "educationlevel", localField: "educationlevel_id", foreignField: "id", as: "el" } },
+        { $lookup: { from: "functionalarea", localField: "functionalarea_id", foreignField: "id", as: "fa" } },
+        { $unwind: { path: "$el", preserveNullAndEmptyArrays: true } },
+        { $unwind: { path: "$fa", preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            title: 1, slug: 1, image: 1, description: 1,
+            bestChoiceOfCourse: 1, jobsCareerOpportunityDesc: 1,
+            level_name: "$el.name", level_slug: "$el.pageslug",
+            stream_name: "$fa.name", stream_slug: "$fa.pageslug",
+          },
+        },
+      ]).toArray(),
+      db.collection("counseling_courses_details").countDocuments(filter),
+    ]);
+
+    const courses = rows.map((row) => ({
+      id: row._id,
       title: row.title,
       slug: row.slug,
       image: buildImageUrl(row.image),
@@ -118,19 +88,9 @@ export async function GET(req: NextRequest) {
       jobsCareerOpportunityDesc: row.jobsCareerOpportunityDesc,
     }));
 
-    return NextResponse.json({
-      success: true,
-      courses,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-      limit,
-    });
+    return NextResponse.json({ success: true, courses, total, page, totalPages: Math.ceil(total / limit), limit });
   } catch (err) {
     console.error("[/api/search/courses]", err);
-    return NextResponse.json(
-      { success: false, courses: [], total: 0, page: 1, totalPages: 0, limit },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, courses: [], total: 0, page: 1, totalPages: 0, limit }, { status: 500 });
   }
 }

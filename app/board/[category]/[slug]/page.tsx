@@ -1,7 +1,6 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
@@ -59,22 +58,10 @@ function isUpcoming(raw: string | null | undefined): boolean {
   return !isNaN(d.getTime()) && d > new Date();
 }
 
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[board/[category]/[slug]/page.tsx safeQuery]", err);
-    return [];
-  }
-}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface BoardRow extends RowDataPacket {
+interface BoardRow {
   id: number;
   title: string;
   name: string | null;
@@ -83,7 +70,7 @@ interface BoardRow extends RowDataPacket {
   slug: string;
 }
 
-interface BoardDetailRow extends RowDataPacket {
+interface BoardDetailRow {
   id: number;
   title: string | null;
   description: string | null;
@@ -101,32 +88,32 @@ interface BoardDetailRow extends RowDataPacket {
   counselingBoardId: number;
 }
 
-interface HighlightRow extends RowDataPacket {
+interface HighlightRow {
   id: number;
   title: string | null;
   description: string | null;
 }
 
-interface ImpDateRow extends RowDataPacket {
+interface ImpDateRow {
   id: number;
   dates: string | null;
   description: string | null;
 }
 
-interface LatestUpdateRow extends RowDataPacket {
+interface LatestUpdateRow {
   id: number;
   dates: string | null;
   description: string | null;
 }
 
-interface SyllabusRow extends RowDataPacket {
+interface SyllabusRow {
   id: number;
   class: string | null;
   subject: string | null;
   description: string | null;
 }
 
-interface ExamDateRow extends RowDataPacket {
+interface ExamDateRow {
   id: number;
   class: string | null;
   dates: string | null;
@@ -134,14 +121,14 @@ interface ExamDateRow extends RowDataPacket {
   setting: string | null;
 }
 
-interface SamplePaperRow extends RowDataPacket {
+interface SamplePaperRow {
   id: number;
   class: string | null;
   subject: string | null;
   description: string | null;
 }
 
-interface AdmissionDateRow extends RowDataPacket {
+interface AdmissionDateRow {
   id: number;
   place: string | null;
   dates: string | null;
@@ -152,148 +139,45 @@ interface AdmissionDateRow extends RowDataPacket {
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ category: string; slug: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ category: string; slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const rows = await safeQuery<
-    BoardRow & { detail_image: string | null; about_text: string | null }
-  >(
-    `SELECT
-       cb.title, cb.name,
-       cbd.image       AS detail_image,
-       cbd.aboutBoard  AS about_text,
-       cbd.description AS detail_desc
-     FROM counseling_boards cb
-     LEFT JOIN counseling_board_details cbd ON cbd.counselingBoardId = cb.id
-     WHERE cb.slug = ? AND cb.status = 1
-     LIMIT 1`,
-    [slug],
-  );
-  const board = rows[0];
+  const db = await getDb();
+  const board = await db.collection("counseling_boards").findOne({ slug, status: 1 }, { projection: { id: 1, title: 1, name: 1 } });
   if (!board) return { title: "Board Not Found — AdmissionX" };
-
+  const det = await db.collection("counseling_board_details").findOne({ counselingBoardId: board.id }, { projection: { aboutBoard: 1, description: 1 } });
   const displayName = board.name || board.title;
-  const rawDesc =
-    (
-      board as unknown as {
-        about_text: string | null;
-        detail_desc: string | null;
-      }
-    ).about_text ??
-    (board as unknown as { detail_desc: string | null }).detail_desc;
-  const desc = stripHtml(rawDesc).slice(0, 160);
-
+  const desc = stripHtml(det?.aboutBoard ?? det?.description).slice(0, 160);
   return {
     title: `${displayName} — Board Details | AdmissionX`,
-    description:
-      desc ||
-      `Get complete details on ${displayName} — syllabus, exam dates, sample papers, important dates, and admission information.`,
-    openGraph: {
-      title: `${displayName} | AdmissionX`,
-      description: desc,
-    },
+    description: desc || `Get complete details on ${displayName} — syllabus, exam dates, sample papers, important dates, and admission information.`,
+    openGraph: { title: `${displayName} | AdmissionX`, description: desc },
   };
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default async function BoardDetailPage({
-  params,
-}: {
-  params: Promise<{ category: string; slug: string }>;
-}) {
-  // category is a soft URL segment — ignore it and look up by slug only
+export default async function BoardDetailPage({ params }: { params: Promise<{ category: string; slug: string }> }) {
   const { slug } = await params;
+  const db = await getDb();
 
-  // ── Step 1: Fetch core board record ───────────────────────────────────────
-  const boardRows = await safeQuery<BoardRow>(
-    `SELECT id, title, name, status, misc, slug
-     FROM counseling_boards
-     WHERE slug = ? AND status = 1
-     LIMIT 1`,
-    [slug],
-  );
+  const boardDoc = await db.collection("counseling_boards").findOne({ slug, status: 1 });
+  if (!boardDoc) notFound();
+  const board: BoardRow = { id: boardDoc!.id, title: boardDoc!.title, name: boardDoc!.name ?? null, status: boardDoc!.status, misc: boardDoc!.misc ?? null, slug: boardDoc!.slug };
 
-  const board = boardRows[0];
-  if (!board) notFound();
-
-  // ── Step 2: Fetch all related tables in parallel ───────────────────────────
-  const [
-    detailRows,
-    highlights,
-    impDates,
-    latestUpdates,
-    syllabus,
-    examDates,
-    samplePapers,
-    admissionDates,
-  ] = await Promise.all([
-    safeQuery<BoardDetailRow>(
-      `SELECT id, title, description, image, aboutBoard, admissionDesc,
-              boardDesc, syllabusDesc, samplePaper, admitCardDetails,
-              preprationTips, resultDesc, entranceExam, chooseRightCollege,
-              counselingBoardId
-       FROM counseling_board_details
-       WHERE counselingBoardId = ?
-       LIMIT 1`,
-      [board.id],
-    ),
-    safeQuery<HighlightRow>(
-      `SELECT id, title, description
-       FROM counseling_board_highlights
-       WHERE counselingBoardId = ?
-       ORDER BY id ASC`,
-      [board.id],
-    ),
-    safeQuery<ImpDateRow>(
-      `SELECT id, dates, description
-       FROM counseling_board_imp_dates
-       WHERE counselingBoardId = ?
-       ORDER BY id ASC`,
-      [board.id],
-    ),
-    safeQuery<LatestUpdateRow>(
-      `SELECT id, dates, description
-       FROM counseling_board_latest_updates
-       WHERE counselingBoardId = ?
-       ORDER BY id DESC`,
-      [board.id],
-    ),
-    safeQuery<SyllabusRow>(
-      `SELECT id, \`class\`, subject, description
-       FROM counseling_board_syllabus
-       WHERE counselingBoardId = ?
-       ORDER BY id ASC`,
-      [board.id],
-    ),
-    safeQuery<ExamDateRow>(
-      `SELECT id, \`class\`, dates, subject, setting
-       FROM counseling_board_exam_dates
-       WHERE counselingBoardId = ?
-       ORDER BY id ASC`,
-      [board.id],
-    ),
-    safeQuery<SamplePaperRow>(
-      `SELECT id, \`class\`, subject, description
-       FROM counseling_board_sample_papers
-       WHERE counselingBoardId = ?
-       ORDER BY id ASC`,
-      [board.id],
-    ),
-    safeQuery<AdmissionDateRow>(
-      `SELECT id, place, dates, fees, \`class\`, subjects
-       FROM counseling_board_admission_dates
-       WHERE counselingBoardId = ?
-       ORDER BY id ASC`,
-      [board.id],
-    ),
+  const [detailDocs, highlights, impDates, latestUpdates, syllabus, examDates, samplePapers, admissionDates] = await Promise.all([
+    db.collection("counseling_board_details").find({ counselingBoardId: board.id }).limit(1).toArray(),
+    db.collection("counseling_board_highlights").find({ counselingBoardId: board.id }).sort({ id: 1 }).toArray(),
+    db.collection("counseling_board_imp_dates").find({ counselingBoardId: board.id }).sort({ id: 1 }).toArray(),
+    db.collection("counseling_board_latest_updates").find({ counselingBoardId: board.id }).sort({ id: -1 }).toArray(),
+    db.collection("counseling_board_syllabus").find({ counselingBoardId: board.id }).sort({ id: 1 }).toArray(),
+    db.collection("counseling_board_exam_dates").find({ counselingBoardId: board.id }).sort({ id: 1 }).toArray(),
+    db.collection("counseling_board_sample_papers").find({ counselingBoardId: board.id }).sort({ id: 1 }).toArray(),
+    db.collection("counseling_board_admission_dates").find({ counselingBoardId: board.id }).sort({ id: 1 }).toArray(),
   ]);
 
-  // ── Derived data ──────────────────────────────────────────────────────────
-  const detail = detailRows[0] ?? null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const toRow = (d: unknown) => d as unknown;
+  const detail = detailDocs.length ? (toRow(detailDocs[0]) as BoardDetailRow) : null;
   const displayName = board.name || board.title;
   const imgUrl = buildImageUrl(detail?.image);
 

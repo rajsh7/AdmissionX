@@ -1,4 +1,4 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CollegeListItem from "../components/CollegeListItem";
@@ -27,87 +27,63 @@ export default async function CollegesPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const params = await searchParams;
-  const conn = await pool.getConnection();
-
   const qRaw = params?.q;
   const qStr = Array.isArray(qRaw) ? qRaw[0] : (qRaw || "");
   const q = qStr.trim();
-  
-  const hasTextSearch = q.length >= 2;
-  const filterParams: string[] = [];
-  let filterWhere = "1=1";
-
-  if (hasTextSearch) {
-    filterWhere = "(u.firstname LIKE ? OR cp.registeredSortAddress LIKE ? OR cp.slug LIKE ?)";
-    const like = `%${q}%`;
-    filterParams.push(like, like, like);
-  }
+  const db = await getDb();
 
   let colleges: CollegeResult[] = [];
   try {
-    const [rows] = await conn.query(`
-      SELECT
-        cp.id,
-        cp.slug,
-        COALESCE(NULLIF(TRIM(u.firstname), ''), NULLIF(TRIM(cp.slug), ''), 'College') AS name,
-        COALESCE(cp.registeredSortAddress, '') AS location,
-        c.name AS city_name,
-        c.state_id,
-        cp.bannerimage AS image,
-        COALESCE(cp.rating, 0) AS rating,
-        COALESCE(cp.totalRatingUser, 0) AS totalRatingUser,
-        cp.ranking,
-        cp.isTopUniversity,
-        cp.topUniversityRank,
-        cp.universityType,
-        cp.estyear,
-        cp.verified,
-        cp.totalStudent,
-        GROUP_CONCAT(DISTINCT fa.name ORDER BY fa.name SEPARATOR '|') AS streams_raw,
-        MIN(CASE WHEN cm.fees > 0 THEN cm.fees END) AS min_fees,
-        MAX(CASE WHEN cm.fees > 0 THEN cm.fees END) AS max_fees
-      FROM collegeprofile cp
-      LEFT JOIN users u ON u.id = cp.users_id
-      LEFT JOIN city c ON c.id = cp.registeredAddressCityId
-      LEFT JOIN collegemaster cm ON cm.collegeprofile_id = cp.id
-      LEFT JOIN functionalarea fa ON fa.id = cm.functionalarea_id
-      WHERE ${filterWhere}
-      GROUP BY cp.id, cp.slug, u.firstname, cp.registeredSortAddress, c.name, c.state_id,
-               cp.bannerimage, cp.rating, cp.totalRatingUser, cp.ranking, cp.isTopUniversity,
-               cp.topUniversityRank, cp.universityType, cp.estyear, cp.verified, cp.totalStudent
-      ORDER BY cp.rating DESC, cp.totalRatingUser DESC
-      LIMIT 20
-    `, filterParams);
+    const rows = await db.collection("collegeprofile").aggregate([
+      { $match: q.length >= 2 ? { $or: [{ slug: { $regex: q, $options: "i" } }, { registeredSortAddress: { $regex: q, $options: "i" } }] } : {} },
+      { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
+      { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
+      { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "c" } },
+      { $unwind: { path: "$c", preserveNullAndEmptyArrays: true } },
+      { $lookup: { from: "collegemaster", localField: "id", foreignField: "collegeprofile_id", as: "cm" } },
+      { $sort: { rating: -1, totalRatingUser: -1 } },
+      { $limit: 20 },
+      { $project: {
+        id: 1, slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, ranking: 1,
+        isTopUniversity: 1, topUniversityRank: 1, universityType: 1, estyear: 1, verified: 1, totalStudent: 1,
+        registeredSortAddress: 1,
+        name: "$u.firstname",
+        city_name: "$c.name",
+        state_id: "$c.state_id",
+        cm: 1,
+      }},
+    ]).toArray();
 
-    const dataRows = rows as any[];
-    colleges = dataRows.map((row) => ({
-      id: row.id,
-      slug: row.slug,
-      name: row.name && row.name !== row.slug ? row.name : slugToName(row.slug || "college"),
-      location: row.location || row.city_name || "India",
-      city_name: row.city_name,
-      state_id: row.state_id,
-      image: buildImageUrl(row.image),
-      rating: parseFloat(String(row.rating)) || 0,
-      totalRatingUser: parseInt(String(row.totalRatingUser)) || 0,
-      ranking: row.ranking ? parseInt(String(row.ranking)) : null,
-      isTopUniversity: row.isTopUniversity ?? 0,
-      topUniversityRank: row.topUniversityRank ? parseInt(String(row.topUniversityRank)) : null,
-      universityType: row.universityType || null,
-      estyear: row.estyear || null,
-      verified: row.verified ?? 0,
-      totalStudent: row.totalStudent ? parseInt(String(row.totalStudent)) : null,
-      streams: row.streams_raw ? row.streams_raw.split("|").map((s: string) => s.trim()).filter(Boolean) : [],
-      min_fees: row.min_fees ? parseInt(String(row.min_fees)) : null,
-      max_fees: row.max_fees ? parseInt(String(row.max_fees)) : null,
-    }));
+    colleges = rows.map((row) => {
+      const streams = [...new Set((row.cm || []).map((m: Record<string, unknown>) => m.functionalarea_name).filter(Boolean))] as string[];
+      const fees = (row.cm || []).map((m: Record<string, unknown>) => Number(m.fees)).filter((f: number) => f > 0);
+      return {
+        id: row.id,
+        slug: row.slug,
+        name: row.name && row.name !== row.slug ? row.name : slugToName(row.slug || "college"),
+        location: row.registeredSortAddress || row.city_name || "India",
+        city_name: row.city_name,
+        state_id: row.state_id,
+        image: buildImageUrl(row.bannerimage),
+        rating: parseFloat(String(row.rating)) || 0,
+        totalRatingUser: parseInt(String(row.totalRatingUser)) || 0,
+        ranking: row.ranking ? parseInt(String(row.ranking)) : null,
+        isTopUniversity: row.isTopUniversity ?? 0,
+        topUniversityRank: row.topUniversityRank ? parseInt(String(row.topUniversityRank)) : null,
+        universityType: row.universityType || null,
+        estyear: row.estyear || null,
+        verified: row.verified ?? 0,
+        totalStudent: row.totalStudent ? parseInt(String(row.totalStudent)) : null,
+        streams,
+        min_fees: fees.length ? Math.min(...fees) : null,
+        max_fees: fees.length ? Math.max(...fees) : null,
+      };
+    });
   } catch (err) {
     console.error("Colleges page DB error:", err);
-  } finally {
-    conn.release();
   }
 
-  return (
+    return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-display">
       <Header />
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-8 mt-16">

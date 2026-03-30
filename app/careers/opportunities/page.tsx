@@ -1,4 +1,4 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
 import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
@@ -65,29 +65,14 @@ function formatSalary(raw: string | null | undefined): string {
   return cleaned.slice(0, 40);
 }
 
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[careers/opportunities/page.tsx safeQuery]", err);
-    return [];
-  }
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface StreamRow extends RowDataPacket {
+interface StreamRow {
   id: number;
   name: string;
   pageslug: string | null;
   career_count: number;
 }
 
-interface CareerRelevantRow extends RowDataPacket {
+interface CareerRelevantRow {
   id: number;
   title: string;
   description: string | null;
@@ -150,48 +135,38 @@ function getStreamMeta(slug: string | null) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function CareerOpportunitiesPage() {
-  const [streamRows, careerRows] = await Promise.all([
-    safeQuery<StreamRow>(`
-      SELECT
-        fa.id,
-        fa.name,
-        fa.pageslug,
-        COUNT(cr.id) AS career_count
-      FROM functionalarea fa
-      INNER JOIN counseling_career_relevants cr
-        ON cr.functionalarea_id = fa.id
-        AND cr.status = 1
-      WHERE fa.name IS NOT NULL AND fa.name != ''
-      GROUP BY fa.id, fa.name, fa.pageslug
-      HAVING career_count > 0
-      ORDER BY career_count DESC, fa.name ASC
-      LIMIT 24
-    `),
+  const db = await getDb();
 
-    safeQuery<CareerRelevantRow>(`
-      SELECT
-        cr.id,
-        cr.title,
-        cr.description,
-        cr.image,
-        cr.salery,
-        cr.stream,
-        cr.mandatorySubject,
-        cr.academicDifficulty,
-        cr.careerInterest,
-        cr.functionalarea_id,
-        cr.slug,
-        fa.name     AS stream_name,
-        fa.pageslug AS stream_slug
-      FROM counseling_career_relevants cr
-      LEFT JOIN functionalarea fa ON fa.id = cr.functionalarea_id
-      WHERE cr.status = 1
-        AND cr.slug IS NOT NULL
-        AND cr.slug != ''
-      ORDER BY cr.id ASC
-      LIMIT 120
-    `),
-  ]);
+  const careerDocs = await db.collection("counseling_career_relevants")
+    .find({ status: 1, slug: { $exists: true, $ne: "" } })
+    .sort({ id: 1 }).limit(120)
+    .project({ id: 1, title: 1, description: 1, image: 1, salery: 1, stream: 1, mandatorySubject: 1, academicDifficulty: 1, careerInterest: 1, functionalarea_id: 1, slug: 1 })
+    .toArray();
+
+  const faIds = [...new Set(careerDocs.map((c) => c.functionalarea_id).filter(Boolean))];
+  const faDocs = faIds.length ? await db.collection("functionalarea").find({ id: { $in: faIds } }).project({ id: 1, name: 1, pageslug: 1 }).toArray() : [];
+  const faMap = Object.fromEntries(faDocs.map((f) => [f.id, f]));
+
+  const careerRows: CareerRelevantRow[] = careerDocs.map((c) => {
+    const fa = c.functionalarea_id ? faMap[c.functionalarea_id] : null;
+    return {
+      id: c.id, title: c.title, description: c.description ?? null, image: c.image ?? null,
+      salery: c.salery ?? null, stream: c.stream ?? null, mandatorySubject: c.mandatorySubject ?? null,
+      academicDifficulty: c.academicDifficulty ?? null, careerInterest: c.careerInterest ?? null,
+      functionalarea_id: c.functionalarea_id ?? null, slug: c.slug,
+      stream_name: fa?.name ?? null, stream_slug: fa?.pageslug ?? null,
+    };
+  });
+
+  const streamCountMap: Record<number, number> = {};
+  for (const c of careerRows) {
+    if (c.functionalarea_id) streamCountMap[c.functionalarea_id] = (streamCountMap[c.functionalarea_id] ?? 0) + 1;
+  }
+  const streamRows: StreamRow[] = faDocs
+    .filter((f) => (streamCountMap[f.id] ?? 0) > 0)
+    .map((f) => ({ id: f.id, name: f.name, pageslug: f.pageslug, career_count: streamCountMap[f.id] ?? 0 }))
+    .sort((a, b) => b.career_count - a.career_count)
+    .slice(0, 24);
 
   const totalCareers = careerRows.length;
 

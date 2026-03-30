@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { signStudentToken, STUDENT_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
@@ -10,49 +10,37 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${baseUrl}/signup/student?error=invalid_token`);
   }
 
-  const conn = await pool.getConnection();
-  try {
-    const [rows] = await conn.query(
-      `SELECT id, name, email, is_active, activation_token_exp
-       FROM next_student_signups
-       WHERE activation_token = ? LIMIT 1`,
-      [token],
-    );
-    const list = rows as { id: number; name: string; email: string; is_active: number; activation_token_exp: Date }[];
+  const db = await getDb();
+  const student = await db.collection("next_student_signups").findOne(
+    { activation_token: token },
+    { projection: { _id: 1, name: 1, email: 1, is_active: 1, activation_token_exp: 1 } }
+  );
 
-    if (!list.length) {
-      return NextResponse.redirect(`${baseUrl}/signup/student?error=invalid_token`);
-    }
-
-    const student = list[0];
-
-    if (student.is_active) {
-      // Already activated — just redirect to dashboard
-      return NextResponse.redirect(`${baseUrl}/dashboard/student`);
-    }
-
-    if (new Date() > new Date(student.activation_token_exp)) {
-      return NextResponse.redirect(`${baseUrl}/signup/student?error=token_expired`);
-    }
-
-    await conn.query(
-      `UPDATE next_student_signups
-       SET is_active = 1, activation_token = NULL, activation_token_exp = NULL
-       WHERE id = ?`,
-      [student.id],
-    );
-
-    const jwtToken = await signStudentToken({
-      id: student.id,
-      name: student.name,
-      email: student.email,
-      role: "student",
-    });
-
-    const response = NextResponse.redirect(`${baseUrl}/dashboard/student?activated=1`);
-    response.cookies.set(STUDENT_COOKIE, jwtToken, COOKIE_OPTIONS);
-    return response;
-  } finally {
-    conn.release();
+  if (!student) {
+    return NextResponse.redirect(`${baseUrl}/signup/student?error=invalid_token`);
   }
+
+  if (student.is_active) {
+    return NextResponse.redirect(`${baseUrl}/dashboard/student`);
+  }
+
+  if (new Date() > new Date(student.activation_token_exp)) {
+    return NextResponse.redirect(`${baseUrl}/signup/student?error=token_expired`);
+  }
+
+  await db.collection("next_student_signups").updateOne(
+    { _id: student._id },
+    { $set: { is_active: 1, activation_token: null, activation_token_exp: null } }
+  );
+
+  const jwtToken = await signStudentToken({
+    id: student._id.toString(),
+    name: student.name,
+    email: student.email,
+    role: "student",
+  });
+
+  const response = NextResponse.redirect(`${baseUrl}/dashboard/student?activated=1`);
+  response.cookies.set(STUDENT_COOKIE, jwtToken, COOKIE_OPTIONS);
+  return response;
 }

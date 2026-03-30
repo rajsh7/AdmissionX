@@ -1,252 +1,132 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 
-// ── GET /api/student/colleges ─────────────────────────────────────────────────
-// Returns a paginated list of colleges (with their courses) that students can
-// apply to.  Supports search, stream, and degree filtering.
-//
-// Query params:
-//   q        — full-text search on college name / course name
-//   stream   — functionalarea name  (e.g. "Engineering")
-//   degree   — degree name          (e.g. "B.Tech")
-//   page     — 1-based page number  (default: 1)
-//   limit    — results per page     (default: 12, max: 50)
 export async function GET(req: NextRequest) {
-  const sp     = req.nextUrl.searchParams;
-  const q      = sp.get("q")?.trim()      ?? "";
+  const sp = req.nextUrl.searchParams;
+  const q = sp.get("q")?.trim() ?? "";
   const stream = sp.get("stream")?.trim() ?? "";
   const degree = sp.get("degree")?.trim() ?? "";
-  const page   = Math.max(1, parseInt(sp.get("page")  ?? "1",  10));
-  const limit  = Math.min(50, Math.max(1, parseInt(sp.get("limit") ?? "12", 10)));
+  const page = Math.max(1, parseInt(sp.get("page") ?? "1", 10));
+  const limit = Math.min(50, Math.max(1, parseInt(sp.get("limit") ?? "12", 10)));
   const offset = (page - 1) * limit;
 
-  const conn = await pool.getConnection();
-  try {
-    // ── Build dynamic WHERE clauses ─────────────────────────────────────────
-    const whereParts: string[] = ["cp.verified = 1"];
-    const whereValues: unknown[] = [];
+  const db = await getDb();
 
-    if (q) {
-      whereParts.push(
-        `(COALESCE(NULLIF(TRIM(u.firstname), ''), cp.slug) LIKE ?
-          OR co.name  LIKE ?
-          OR d.name   LIKE ?
-          OR fa.name  LIKE ?)`,
-      );
-      const like = `%${q}%`;
-      whereValues.push(like, like, like, like);
-    }
-    if (stream) {
-      whereParts.push("fa.name = ?");
-      whereValues.push(stream);
-    }
-    if (degree) {
-      whereParts.push("d.name = ?");
-      whereValues.push(degree);
-    }
-
-    const whereSQL = whereParts.length
-      ? `WHERE ${whereParts.join(" AND ")}`
-      : "";
-
-    // ── Count total matching rows (college level, not course level) ──────────
-    const [countRows] = await conn.query(
-      `SELECT COUNT(DISTINCT cp.id) AS total
-       FROM collegeprofile cp
-       LEFT JOIN users         u   ON u.id   = cp.users_id
-       LEFT JOIN collegemaster cm  ON cm.collegeprofile_id = cp.id
-       LEFT JOIN course        co  ON co.id  = cm.course_id
-       LEFT JOIN degree        d   ON d.id   = cm.degree_id
-       LEFT JOIN functionalarea fa ON fa.id  = cm.functionalarea_id
-       ${whereSQL}`,
-      whereValues,
-    );
-    const total: number =
-      (countRows as { total: number }[])[0]?.total ?? 0;
-
-    // ── Fetch colleges ────────────────────────────────────────────────────────
-    const [collegeRows] = await conn.query(
-      `SELECT DISTINCT
-         cp.id                                                         AS collegeprofile_id,
-         COALESCE(NULLIF(TRIM(u.firstname), ''), cp.slug)             AS college_name,
-         cp.slug,
-         cp.bannerimage,
-         cp.registeredSortAddress                                      AS address,
-         cp.rating,
-         cp.totalRatingUser,
-         cp.universityType,
-         cp.admissionStart,
-         cp.admissionEnd,
-         ct.name                                                       AS college_type
-       FROM collegeprofile cp
-       LEFT JOIN users         u   ON u.id   = cp.users_id
-       LEFT JOIN collegetype   ct  ON ct.id  = cp.collegetype_id
-       LEFT JOIN collegemaster cm  ON cm.collegeprofile_id = cp.id
-       LEFT JOIN course        co  ON co.id  = cm.course_id
-       LEFT JOIN degree        d   ON d.id   = cm.degree_id
-       LEFT JOIN functionalarea fa ON fa.id  = cm.functionalarea_id
-       ${whereSQL}
-       ORDER BY cp.rating DESC, cp.id ASC
-       LIMIT ? OFFSET ?`,
-      [...whereValues, limit, offset],
-    );
-
-    const colleges = collegeRows as {
-      collegeprofile_id: number;
-      college_name: string;
-      slug: string;
-      bannerimage: string | null;
-      address: string | null;
-      rating: number | null;
-      totalRatingUser: number | null;
-      universityType: string | null;
-      admissionStart: string | null;
-      admissionEnd: string | null;
-      college_type: string | null;
-    }[];
-
-    if (colleges.length === 0) {
-      return NextResponse.json({
-        colleges:   [],
-        pagination: { page, limit, total, totalPages: 0 },
-        filters:    { streams: [], degrees: [] },
-      });
-    }
-
-    // ── Fetch courses for each college (batch) ────────────────────────────────
-    const collegeIds = colleges.map((c) => c.collegeprofile_id);
-    const placeholders = collegeIds.map(() => "?").join(", ");
-
-    const [courseRows] = await conn.query(
-      `SELECT
-         cm.id                AS collegemaster_id,
-         cm.collegeprofile_id,
-         cm.fees,
-         cm.seats,
-         cm.courseduration,
-         cm.twelvemarks       AS min_percent,
-         co.name              AS course_name,
-         d.name               AS degree_name,
-         fa.name              AS stream_name
-       FROM collegemaster cm
-       LEFT JOIN course        co ON co.id  = cm.course_id
-       LEFT JOIN degree        d  ON d.id   = cm.degree_id
-       LEFT JOIN functionalarea fa ON fa.id = cm.functionalarea_id
-       WHERE cm.collegeprofile_id IN (${placeholders})
-       ORDER BY fa.name ASC, d.name ASC, co.name ASC`,
-      collegeIds,
-    );
-
-    // Group courses by college
-    const coursesByCollege: Record<
-      number,
-      {
-        collegemaster_id: number;
-        course_name: string | null;
-        degree_name: string | null;
-        stream_name: string | null;
-        fees: number | null;
-        seats: number | null;
-        courseduration: string | null;
-        min_percent: string | null;
-      }[]
-    > = {};
-
-    for (const row of courseRows as Record<string, unknown>[]) {
-      const cid = Number(row.collegeprofile_id);
-      if (!coursesByCollege[cid]) coursesByCollege[cid] = [];
-      coursesByCollege[cid].push({
-        collegemaster_id: Number(row.collegemaster_id),
-        course_name:      row.course_name  as string | null,
-        degree_name:      row.degree_name  as string | null,
-        stream_name:      row.stream_name  as string | null,
-        fees:             row.fees !== null ? Number(row.fees) : null,
-        seats:            row.seats !== null ? Number(row.seats) : null,
-        courseduration:   row.courseduration as string | null,
-        min_percent:      row.min_percent as string | null,
-      });
-    }
-
-    // ── Build filter lists (streams + degrees available in result set) ────────
-    const [filterRows] = await conn.query(
-      `SELECT DISTINCT fa.name AS stream_name, d.name AS degree_name
-       FROM collegemaster cm
-       LEFT JOIN functionalarea fa ON fa.id = cm.functionalarea_id
-       LEFT JOIN degree         d  ON d.id  = cm.degree_id
-       WHERE cm.collegeprofile_id IN (${placeholders})
-         AND fa.name IS NOT NULL
-       ORDER BY fa.name ASC, d.name ASC`,
-      collegeIds,
-    );
-
-    const filterSet = filterRows as {
-      stream_name: string | null;
-      degree_name: string | null;
-    }[];
-
-    const streams = [...new Set(filterSet.map((r) => r.stream_name).filter(Boolean))] as string[];
-    const degrees = [...new Set(filterSet.map((r) => r.degree_name).filter(Boolean))] as string[];
-
-    // ── Assemble final response ───────────────────────────────────────────────
-    const IMAGE_BASE = process.env.NEXT_PUBLIC_IMAGE_BASE ?? "";
-
-    const result = colleges.map((c) => {
-      const courses = coursesByCollege[c.collegeprofile_id] ?? [];
-
-      // Pick the min fees across courses for display
-      const feesValues = courses.map((x) => x.fees).filter((f): f is number => f !== null);
-      const minFees = feesValues.length ? Math.min(...feesValues) : null;
-
-      return {
-        collegeprofile_id: c.collegeprofile_id,
-        college_name:  c.college_name,
-        slug:          c.slug,
-        image:         c.bannerimage
-          ? `${IMAGE_BASE}${c.bannerimage}`
-          : null,
-        address:       c.address ?? "",
-        rating:        c.rating ? Number(c.rating).toFixed(1) : null,
-        totalRatingUser: c.totalRatingUser ?? 0,
-        college_type:  c.college_type ?? "College",
-        university_type: c.universityType ?? "",
-        admission_open:
-          c.admissionStart && c.admissionEnd
-            ? (() => {
-                const now   = new Date();
-                const start = new Date(c.admissionStart);
-                const end   = new Date(c.admissionEnd);
-                return now >= start && now <= end;
-              })()
-            : null,
-        admission_start: c.admissionStart ?? null,
-        admission_end:   c.admissionEnd   ?? null,
-        total_courses:  courses.length,
-        min_fees:       minFees,
-        courses,
-      };
-    });
-
-    return NextResponse.json(
-      {
-        colleges:   result,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
-        },
-        filters: {
-          streams,
-          degrees,
-        },
-      },
-      {
-        headers: {
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
-        },
-      },
-    );
-  } finally {
-    conn.release();
+  // Resolve stream/degree to IDs
+  let faId: unknown = null;
+  if (stream) {
+    const fa = await db.collection("functionalarea").findOne({ name: stream }, { projection: { id: 1 } });
+    faId = fa?.id ?? null;
   }
+  let degreeId: unknown = null;
+  if (degree) {
+    const d = await db.collection("degree").findOne({ name: degree }, { projection: { id: 1 } });
+    degreeId = d?.id ?? null;
+  }
+
+  // Get college IDs matching stream/degree filters
+  let filteredCpIds: unknown[] | null = null;
+  if (faId || degreeId) {
+    const cmFilter: Record<string, unknown> = {};
+    if (faId) cmFilter.functionalarea_id = faId;
+    if (degreeId) cmFilter.degree_id = degreeId;
+    const cms = await db.collection("collegemaster").find(cmFilter).project({ collegeprofile_id: 1 }).toArray();
+    filteredCpIds = [...new Set(cms.map((c) => c.collegeprofile_id))];
+  }
+
+  const matchFilter: Record<string, unknown> = { verified: 1 };
+  if (filteredCpIds) matchFilter.id = { $in: filteredCpIds };
+
+  const pipeline: object[] = [
+    { $match: matchFilter },
+    { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
+    { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
+    { $lookup: { from: "collegetype", localField: "collegetype_id", foreignField: "id", as: "ct" } },
+    { $unwind: { path: "$ct", preserveNullAndEmptyArrays: true } },
+  ];
+
+  if (q) {
+    pipeline.push({
+      $match: {
+        $or: [
+          { "u.firstname": { $regex: q, $options: "i" } },
+          { slug: { $regex: q, $options: "i" } },
+        ],
+      },
+    });
+  }
+
+  pipeline.push({ $sort: { rating: -1, id: 1 } });
+
+  const [countResult, collegeRows] = await Promise.all([
+    db.collection("collegeprofile").aggregate([...pipeline, { $count: "total" }]).toArray(),
+    db.collection("collegeprofile").aggregate([
+      ...pipeline,
+      { $skip: offset },
+      { $limit: limit },
+      {
+        $project: {
+          slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, universityType: 1,
+          admissionStart: 1, admissionEnd: 1, id: 1,
+          college_name: { $ifNull: [{ $trim: { input: "$u.firstname" } }, "$slug"] },
+          address: "$registeredSortAddress",
+          college_type: "$ct.name",
+        },
+      },
+    ]).toArray(),
+  ]);
+
+  const total = countResult[0]?.total ?? 0;
+  const cpIds = collegeRows.map((c) => c.id);
+
+  // Fetch courses for these colleges
+  const courseRows = await db.collection("collegemaster").aggregate([
+    { $match: { collegeprofile_id: { $in: cpIds } } },
+    { $lookup: { from: "course", localField: "course_id", foreignField: "id", as: "co" } },
+    { $lookup: { from: "degree", localField: "degree_id", foreignField: "id", as: "d" } },
+    { $lookup: { from: "functionalarea", localField: "functionalarea_id", foreignField: "id", as: "fa" } },
+    { $unwind: { path: "$co", preserveNullAndEmptyArrays: true } },
+    { $unwind: { path: "$d", preserveNullAndEmptyArrays: true } },
+    { $unwind: { path: "$fa", preserveNullAndEmptyArrays: true } },
+    { $project: { collegeprofile_id: 1, course_name: "$co.name", degree_name: "$d.name", stream_name: "$fa.name", fees: 1, seats: 1, courseduration: 1, min_percent: "$twelvemarks" } },
+  ]).toArray();
+
+  const coursesByCollege: Record<string, typeof courseRows> = {};
+  for (const row of courseRows) {
+    const key = String(row.collegeprofile_id);
+    if (!coursesByCollege[key]) coursesByCollege[key] = [];
+    coursesByCollege[key].push(row);
+  }
+
+  const IMAGE_BASE = process.env.NEXT_PUBLIC_IMAGE_BASE ?? "";
+  const result = collegeRows.map((c) => {
+    const courses = coursesByCollege[String(c.id)] ?? [];
+    const feesValues = courses.map((x) => x.fees).filter((f): f is number => f !== null && f > 0);
+    const minFees = feesValues.length ? Math.min(...feesValues) : null;
+    const now = new Date();
+    const admissionOpen = c.admissionStart && c.admissionEnd ? now >= new Date(c.admissionStart) && now <= new Date(c.admissionEnd) : null;
+
+    return {
+      collegeprofile_id: c.id,
+      college_name: c.college_name,
+      slug: c.slug,
+      image: c.bannerimage ? `${IMAGE_BASE}${c.bannerimage}` : null,
+      address: c.address ?? "",
+      rating: c.rating ? Number(c.rating).toFixed(1) : null,
+      totalRatingUser: c.totalRatingUser ?? 0,
+      college_type: c.college_type ?? "College",
+      university_type: c.universityType ?? "",
+      admission_open: admissionOpen,
+      admission_start: c.admissionStart ?? null,
+      admission_end: c.admissionEnd ?? null,
+      total_courses: courses.length,
+      min_fees: minFees,
+      courses,
+    };
+  });
+
+  return NextResponse.json(
+    { colleges: result, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }, filters: { streams: [], degrees: [] } },
+    { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120" } }
+  );
 }

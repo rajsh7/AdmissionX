@@ -1,27 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { saveUpload } from "@/lib/upload-utils";
 import { revalidatePath } from "next/cache";
+import { ObjectId } from "mongodb";
 
-// POST /api/admin/blogs — create
 export async function POST(req: NextRequest) {
   try {
-    const formData  = await req.formData();
-    const topic       = formData.get("topic") as string;
-    const slug        = formData.get("slug") as string;
+    const formData = await req.formData();
+    const topic = formData.get("topic") as string;
+    const slug = formData.get("slug") as string;
     const description = formData.get("description") as string;
-    const isactive    = parseInt(formData.get("isactive") as string, 10);
-    const imageFile   = formData.get("bannerimage_file") as File | null;
+    const isactive = parseInt(formData.get("isactive") as string, 10);
+    const imageFile = formData.get("bannerimage_file") as File | null;
 
     let featimage: string | null = null;
     if (imageFile && imageFile.size > 0) {
       featimage = await saveUpload(imageFile, "blogs", "blog");
     }
 
-    await pool.query(
-      "INSERT INTO blogs (topic, slug, description, isactive, featimage) VALUES (?, ?, ?, ?, ?)",
-      [topic, slug, description, isactive, featimage]
-    );
+    const db = await getDb();
+    await db.collection("blogs").insertOne({
+      topic, slug, description, isactive, featimage, created_at: new Date(), updated_at: new Date(),
+    });
 
     revalidatePath("/admin/blogs");
     return NextResponse.json({ success: true });
@@ -31,26 +31,26 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// PUT /api/admin/blogs — update
 export async function PUT(req: NextRequest) {
   try {
-    const formData  = await req.formData();
-    const id          = formData.get("id") as string;
-    const topic       = formData.get("topic") as string;
-    const slug        = formData.get("slug") as string;
+    const formData = await req.formData();
+    const id = formData.get("id") as string;
+    const topic = formData.get("topic") as string;
+    const slug = formData.get("slug") as string;
     const description = formData.get("description") as string;
-    const isactive    = parseInt(formData.get("isactive") as string, 10);
-    const imageFile   = formData.get("bannerimage_file") as File | null;
-    const existing    = formData.get("bannerimage_existing") as string | null;
+    const isactive = parseInt(formData.get("isactive") as string, 10);
+    const imageFile = formData.get("bannerimage_file") as File | null;
+    const existing = formData.get("bannerimage_existing") as string | null;
 
     let featimage: string | null = existing || null;
     if (imageFile && imageFile.size > 0) {
       featimage = await saveUpload(imageFile, "blogs", "blog");
     }
 
-    await pool.query(
-      "UPDATE blogs SET topic = ?, slug = ?, description = ?, isactive = ?, featimage = ? WHERE id = ?",
-      [topic, slug, description, isactive, featimage, id]
+    const db = await getDb();
+    await db.collection("blogs").updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { topic, slug, description, isactive, featimage, updated_at: new Date() } }
     );
 
     revalidatePath("/admin/blogs");

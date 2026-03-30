@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
-
-interface SuggestionRow {
-  name: string;
-  location: string | null;
-  slug: string | null;
-}
+import { getDb } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -15,75 +9,41 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ suggestions: [] });
   }
 
-  const like = `%${q}%`;
-
   try {
-    const conn = await pool.getConnection();
+    const db = await getDb();
 
-    let rows: SuggestionRow[] = [];
+    const profiles = await db.collection("collegeprofile").aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "users_id",
+          foreignField: "id",
+          as: "user",
+        },
+      },
+      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+      {
+        $match: {
+          $or: [
+            { "user.firstname": { $regex: q, $options: "i" } },
+            { slug: { $regex: q, $options: "i" } },
+          ],
+        },
+      },
+      { $limit: 8 },
+      { $project: { slug: 1, "user.firstname": 1, registeredSortAddress: 1 } },
+    ]).toArray();
 
-    try {
-      // Primary: search by college name stored in users.firstname (old Laravel schema)
-      const [primary] = (await conn.query(
-        `SELECT DISTINCT
-           u.firstname                    AS name,
-           cp.registeredSortAddress       AS location,
-           cp.slug                        AS slug
-         FROM collegeprofile cp
-         JOIN users u ON cp.users_id = u.id
-         WHERE u.firstname LIKE ?
-            OR u.firstname LIKE ?
-         ORDER BY
-           CASE WHEN u.firstname LIKE ? THEN 0 ELSE 1 END,
-           u.firstname
-         LIMIT 8`,
-        [like, `${q}%`, `${q}%`],
-      )) as [SuggestionRow[], unknown];
-
-      rows = primary;
-    } catch {
-      // users table JOIN failed — fall back to slug-based search
-    }
-
-    // Fallback or supplement: search by slug if primary returned nothing
-    if (rows.length === 0) {
-      try {
-        const slugLike = `%${q.toLowerCase().replace(/\s+/g, "-")}%`;
-
-        const [bySlug] = (await conn.query(
-          `SELECT DISTINCT
-             cp.slug                        AS name,
-             cp.registeredSortAddress       AS location,
-             cp.slug                        AS slug
-           FROM collegeprofile cp
-           WHERE cp.slug LIKE ?
-           ORDER BY cp.slug
-           LIMIT 8`,
-          [slugLike],
-        )) as [SuggestionRow[], unknown];
-
-        rows = bySlug;
-      } catch {
-        // slug fallback also failed — return empty
-      }
-    }
-
-    conn.release();
-
-    const suggestions = rows.map((r) => ({
-      name: r.name
-        ? r.name
-            .split("-")
-            .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-            .join(" ")
-        : "College",
-      location:
-        (r.location ?? "India")
-          .replace(/<[^>]+>/g, "")
-          .trim()
-          .slice(0, 60) || "India",
-      slug: r.slug ?? "",
-    }));
+    const suggestions = profiles.map((r) => {
+      const rawName = r.user?.firstname?.trim() || r.slug || "";
+      return {
+        name: rawName
+          ? rawName.split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
+          : "College",
+        location: (r.registeredSortAddress ?? "India").replace(/<[^>]+>/g, "").trim().slice(0, 60) || "India",
+        slug: r.slug ?? "",
+      };
+    });
 
     return NextResponse.json({ suggestions });
   } catch (err) {

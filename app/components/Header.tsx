@@ -40,7 +40,7 @@ const navLinks = [
       { label: "Top Universities", href: "/top-university", icon: "school" },
       { label: "Streams", href: "/stream", icon: "grid_view" },
       { label: "News & Articles", href: "/news", icon: "newspaper" },
-      { label: "Latest Blogs", href: "/blog", icon: "article" },
+      { label: "Latest Blogs", href: "/education-blogs", icon: "article" },
     ]
   },
 ];

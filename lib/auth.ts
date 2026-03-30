@@ -14,7 +14,7 @@ export const ADMIN_COOKIE = "adx_admin";
 // STUDENT
 // ─────────────────────────────────────────────────────────────────────────────
 export interface StudentTokenPayload extends JWTPayload {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: "student";
@@ -45,8 +45,8 @@ export async function verifyStudentToken(
 // COLLEGE
 // ─────────────────────────────────────────────────────────────────────────────
 export interface CollegeTokenPayload extends JWTPayload {
-  id: number;
-  name: string; // college_name
+  id: string;
+  name: string;
   email: string;
   role: "college";
 }
@@ -76,7 +76,7 @@ export async function verifyCollegeToken(
 // ADMIN
 // ─────────────────────────────────────────────────────────────────────────────
 export interface AdminTokenPayload extends JWTPayload {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: "admin";

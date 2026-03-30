@@ -1,7 +1,6 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
 import Image from "next/image";
-import { RowDataPacket } from "mysql2";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import type { Metadata } from "next";
@@ -47,29 +46,14 @@ function excerpt(text: string | null | undefined, maxLen = 120): string {
   return clean.slice(0, maxLen).replace(/\s+\S*$/, "") + "…";
 }
 
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[popular-careers/page.tsx safeQuery]", err);
-    return [];
-  }
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface StreamRow extends RowDataPacket {
+interface StreamRow {
   id: number;
   name: string;
   pageslug: string | null;
   career_count: number;
 }
 
-interface CareerRow extends RowDataPacket {
+interface CareerRow {
   id: number;
   title: string;
   description: string | null;
@@ -138,51 +122,43 @@ function getStreamIcon(slug: string | null): string {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function PopularCareersPage() {
-  // Fetch streams that have careers, and all career detail cards in parallel
-  const [streamRows, careerRows] = await Promise.all([
-    safeQuery<StreamRow>(`
-      SELECT
-        fa.id,
-        fa.name,
-        fa.pageslug,
-        COUNT(cd.id) AS career_count
-      FROM functionalarea fa
-      INNER JOIN counseling_career_details cd
-        ON cd.functionalarea_id = fa.id
-        AND cd.status = 1
-      WHERE fa.name IS NOT NULL AND fa.name != ''
-      GROUP BY fa.id, fa.name, fa.pageslug
-      HAVING career_count > 0
-      ORDER BY career_count DESC, fa.name ASC
-      LIMIT 20
-    `),
+  const db = await getDb();
 
-    safeQuery<CareerRow>(`
-      SELECT
-        cd.id,
-        cd.title,
-        cd.description,
-        cd.image,
-        cd.jobProfileDesc,
-        cd.pros,
-        cd.cons,
-        cd.futureGrowthPurpose,
-        cd.employeeOpportunities,
-        cd.slug,
-        cd.status,
-        cd.functionalarea_id,
-        cd.totalLikes,
-        fa.name  AS stream_name,
-        fa.pageslug AS stream_slug
-      FROM counseling_career_details cd
-      LEFT JOIN functionalarea fa ON fa.id = cd.functionalarea_id
-      WHERE cd.status = 1
-        AND cd.slug IS NOT NULL
-        AND cd.slug != ''
-      ORDER BY cd.totalLikes DESC, cd.id DESC
-      LIMIT 60
-    `),
-  ]);
+  const careerDocs = await db.collection("counseling_career_details")
+    .find({ status: 1, slug: { $exists: true, $ne: "" } })
+    .sort({ totalLikes: -1, id: -1 })
+    .limit(60)
+    .project({ id: 1, title: 1, description: 1, image: 1, jobProfileDesc: 1, pros: 1, cons: 1, futureGrowthPurpose: 1, employeeOpportunities: 1, slug: 1, status: 1, functionalarea_id: 1, totalLikes: 1 })
+    .toArray();
+
+  const faIds = [...new Set(careerDocs.map((c) => c.functionalarea_id).filter(Boolean))];
+  const faDocs = faIds.length
+    ? await db.collection("functionalarea").find({ id: { $in: faIds } }).project({ id: 1, name: 1, pageslug: 1 }).toArray()
+    : [];
+  const faMap = Object.fromEntries(faDocs.map((f) => [f.id, f]));
+
+  const careerRows: CareerRow[] = careerDocs.map((c) => {
+    const fa = c.functionalarea_id ? faMap[c.functionalarea_id] : null;
+    return {
+      id: c.id, title: c.title, description: c.description ?? null, image: c.image ?? null,
+      jobProfileDesc: c.jobProfileDesc ?? null, pros: c.pros ?? null, cons: c.cons ?? null,
+      futureGrowthPurpose: c.futureGrowthPurpose ?? null, employeeOpportunities: c.employeeOpportunities ?? null,
+      slug: c.slug, status: c.status, functionalarea_id: c.functionalarea_id ?? null,
+      stream_name: fa?.name ?? null, stream_slug: fa?.pageslug ?? null,
+      totalLikes: Number(c.totalLikes) || 0,
+    };
+  });
+
+  // Count careers per stream
+  const streamCountMap: Record<number, number> = {};
+  for (const c of careerRows) {
+    if (c.functionalarea_id) streamCountMap[c.functionalarea_id] = (streamCountMap[c.functionalarea_id] ?? 0) + 1;
+  }
+  const streamRows: StreamRow[] = faDocs
+    .filter((f) => (streamCountMap[f.id] ?? 0) > 0)
+    .map((f) => ({ id: f.id, name: f.name, pageslug: f.pageslug, career_count: streamCountMap[f.id] ?? 0 }))
+    .sort((a, b) => b.career_count - a.career_count)
+    .slice(0, 20);
 
   const totalCareers = careerRows.length;
 

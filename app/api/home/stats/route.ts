@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 
 export interface HomeStat {
   value: number;
@@ -7,12 +7,10 @@ export interface HomeStat {
   label: string;
 }
 
-async function safeCount(sql: string): Promise<number> {
+async function safeCount(collection: string, filter: object = {}): Promise<number> {
   try {
-    const conn = await pool.getConnection();
-    const [rows] = await conn.query(sql) as [{ cnt: number }[], unknown];
-    conn.release();
-    return Number(rows[0]?.cnt ?? 0);
+    const db = await getDb();
+    return await db.collection(collection).countDocuments(filter);
   } catch {
     return 0;
   }
@@ -21,47 +19,29 @@ async function safeCount(sql: string): Promise<number> {
 export async function GET() {
   try {
     const [colleges, students, countries, courses] = await Promise.all([
-      safeCount("SELECT COUNT(*) AS cnt FROM collegeprofile"),
-      safeCount("SELECT COUNT(*) AS cnt FROM next_student_signups"),
-      safeCount("SELECT COUNT(*) AS cnt FROM country WHERE name IS NOT NULL AND name != ''"),
-      safeCount("SELECT COUNT(*) AS cnt FROM course WHERE name IS NOT NULL AND name != ''"),
+      safeCount("collegeprofile"),
+      safeCount("next_student_signups"),
+      safeCount("country", { name: { $exists: true, $ne: "" } }),
+      safeCount("course", { name: { $exists: true, $ne: "" } }),
     ]);
 
     const stats: HomeStat[] = [
-      {
-        value: Math.max(colleges, 100),
-        suffix: "+",
-        label: "Partner Colleges",
-      },
-      {
-        value: Math.max(students, 500),
-        suffix: "+",
-        label: "Students Registered",
-      },
-      {
-        value: Math.max(countries, 20),
-        suffix: "+",
-        label: "Countries",
-      },
-      {
-        value: Math.max(courses, 100),
-        suffix: "+",
-        label: "Courses Available",
-      },
+      { value: Math.max(colleges, 100), suffix: "+", label: "Partner Colleges" },
+      { value: Math.max(students, 500), suffix: "+", label: "Students Registered" },
+      { value: Math.max(countries, 20), suffix: "+", label: "Countries" },
+      { value: Math.max(courses, 100), suffix: "+", label: "Courses Available" },
     ];
 
     return NextResponse.json({ success: true, data: stats });
   } catch (err) {
     console.error("[home/stats]", err);
-
-    // Fallback stats so the page never breaks
     return NextResponse.json({
       success: false,
       data: [
-        { value: 500,   suffix: "+", label: "Partner Colleges" },
+        { value: 500, suffix: "+", label: "Partner Colleges" },
         { value: 10000, suffix: "+", label: "Students Registered" },
-        { value: 50,    suffix: "+", label: "Countries" },
-        { value: 200,   suffix: "+", label: "Courses Available" },
+        { value: 50, suffix: "+", label: "Countries" },
+        { value: 200, suffix: "+", label: "Courses Available" },
       ] satisfies HomeStat[],
     });
   }

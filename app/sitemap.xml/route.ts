@@ -1,36 +1,16 @@
 import { NextResponse } from "next/server";
-import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+import { getDb } from "@/lib/db";
 
-// Force this route to be server-rendered on every request so the sitemap
-// always reflects the latest DB content rather than a stale prerendered copy.
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-// ─── Base URL ─────────────────────────────────────────────────────────────────
 
 const BASE = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://admissionx.in"
 ).replace(/\/$/, "");
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-async function safeQuery<T extends RowDataPacket>(sql: string): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql)) as [T[], unknown];
-    return rows;
-  } catch {
-    return [];
-  }
-}
-
 function url(
   loc: string,
-  opts: {
-    lastmod?: string | null;
-    changefreq?: string;
-    priority?: string;
-  } = {},
+  opts: { lastmod?: string | null; changefreq?: string; priority?: string } = {},
 ): string {
   const lastmod =
     opts.lastmod && !isNaN(Date.parse(opts.lastmod))
@@ -45,47 +25,15 @@ function url(
   return `\n  <url>\n    <loc>${BASE}${loc}</loc>${lastmod}${changefreq}${priority}\n  </url>`;
 }
 
-// Board category slug helper (mirrors boards/page.tsx logic)
 function deriveCategory(misc: string | null, title: string): string {
   if (misc && misc.trim()) {
-    return misc
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "")
-      .slice(0, 30);
+    return misc.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").slice(0, 30);
   }
   const first = title.trim().split(/\s+/)[0] ?? "board";
   return first.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface SlugRow extends RowDataPacket {
-  slug: string;
-  updated_at: string | null;
-}
-
-interface ExamRow extends RowDataPacket {
-  slug: string;
-  stream_slug: string | null;
-  updated_at: string | null;
-}
-
-interface BoardRow extends RowDataPacket {
-  slug: string;
-  misc: string | null;
-  title: string;
-  updated_at: string | null;
-}
-
-// ─── Static pages ─────────────────────────────────────────────────────────────
-
-const STATIC_PAGES: Array<{
-  loc: string;
-  changefreq: string;
-  priority: string;
-}> = [
+const STATIC_PAGES = [
   { loc: "/", changefreq: "daily", priority: "1.0" },
   { loc: "/top-colleges", changefreq: "daily", priority: "0.9" },
   { loc: "/top-university", changefreq: "daily", priority: "0.9" },
@@ -113,203 +61,107 @@ const STATIC_PAGES: Array<{
   { loc: "/signup/college", changefreq: "yearly", priority: "0.3" },
 ];
 
-// ─── Route Handler ────────────────────────────────────────────────────────────
-
 export async function GET(): Promise<NextResponse> {
-  // ── Parallel DB fetches ────────────────────────────────────────────────────
+  const db = await getDb();
+
   const [
-    collegeRows,
-    universityRows,
-    blogRows,
-    newsRows,
-    examRows,
-    streamRows,
-    careerRows,
-    boardRows,
+    collegeDocs,
+    universityDocs,
+    blogDocs,
+    newsDocs,
+    examDocs,
+    streamDocs,
+    careerDocs,
+    boardDocs,
   ] = await Promise.all([
-    // All colleges with a slug
-    safeQuery<SlugRow>(
-      `SELECT slug, updated_at
-       FROM collegeprofile
-       WHERE slug IS NOT NULL AND slug != ''
-       ORDER BY updated_at DESC
-       LIMIT 5000`,
-    ),
+    db.collection("collegemaster")
+      .find({ slug: { $exists: true, $ne: "" } }, { projection: { slug: 1, updated_at: 1 } })
+      .sort({ updated_at: -1 }).limit(5000).toArray(),
 
-    // Top universities (subset — also in /university/[slug])
-    safeQuery<SlugRow>(
-      `SELECT slug, updated_at
-       FROM collegeprofile
-       WHERE isTopUniversity = 1
-         AND slug IS NOT NULL AND slug != ''
-       ORDER BY topUniversityRank ASC
-       LIMIT 500`,
-    ),
+    db.collection("collegemaster")
+      .find({ isTopUniversity: 1, slug: { $exists: true, $ne: "" } }, { projection: { slug: 1, updated_at: 1, topUniversityRank: 1 } })
+      .sort({ topUniversityRank: 1 }).limit(500).toArray(),
 
-    // Active blogs
-    safeQuery<SlugRow>(
-      `SELECT slug, updated_at
-       FROM blogs
-       WHERE isactive = 1 AND slug IS NOT NULL AND slug != ''
-       ORDER BY updated_at DESC
-       LIMIT 2000`,
-    ),
+    db.collection("blogs")
+      .find({ isactive: 1, slug: { $exists: true, $ne: "" } }, { projection: { slug: 1, updated_at: 1 } })
+      .sort({ updated_at: -1 }).limit(2000).toArray(),
 
-    // Active news
-    safeQuery<SlugRow>(
-      `SELECT slug, updated_at
-       FROM news
-       WHERE isactive = 1 AND slug IS NOT NULL AND slug != ''
-       ORDER BY updated_at DESC
-       LIMIT 2000`,
-    ),
+    db.collection("news")
+      .find({ isactive: 1, slug: { $exists: true, $ne: "" } }, { projection: { slug: 1, updated_at: 1 } })
+      .sort({ updated_at: -1 }).limit(2000).toArray(),
 
-    // Active exams with stream slug
-    safeQuery<ExamRow>(
-      `SELECT ed.slug, f.pageslug AS stream_slug, ed.updated_at
-       FROM examination_details ed
-       LEFT JOIN functionalarea f ON f.id = ed.functionalarea_id
-       WHERE ed.status = 1
-         AND ed.slug IS NOT NULL AND ed.slug != ''
-         AND f.pageslug IS NOT NULL AND f.pageslug != ''
-       ORDER BY ed.updated_at DESC
-       LIMIT 2000`,
-    ),
+    db.collection("examination_details").aggregate([
+      { $match: { status: 1, slug: { $exists: true, $ne: "" } } },
+      { $lookup: { from: "functionalarea", localField: "functionalarea_id", foreignField: "id", as: "fa" } },
+      { $unwind: { path: "$fa", preserveNullAndEmptyArrays: false } },
+      { $match: { "fa.pageslug": { $exists: true, $ne: "" } } },
+      { $project: { slug: 1, stream_slug: "$fa.pageslug", updated_at: 1 } },
+      { $sort: { updated_at: -1 } },
+      { $limit: 2000 },
+    ]).toArray(),
 
-    // Streams (for /careers/opportunities/[stream])
-    safeQuery<SlugRow>(
-      `SELECT pageslug AS slug, updated_at
-       FROM functionalarea
-       WHERE pageslug IS NOT NULL AND pageslug != ''
-       ORDER BY id ASC`,
-    ),
+    db.collection("functionalarea")
+      .find({ pageslug: { $exists: true, $ne: "" } }, { projection: { pageslug: 1, updated_at: 1 } })
+      .sort({ id: 1 }).toArray(),
 
-    // Popular careers
-    safeQuery<SlugRow>(
-      `SELECT slug, updated_at
-       FROM counseling_career_details
-       WHERE status = 1 AND slug IS NOT NULL AND slug != ''
-       ORDER BY updated_at DESC
-       LIMIT 500`,
-    ),
+    db.collection("counseling_career_details")
+      .find({ status: 1, slug: { $exists: true, $ne: "" } }, { projection: { slug: 1, updated_at: 1 } })
+      .sort({ updated_at: -1 }).limit(500).toArray(),
 
-    // Active boards
-    safeQuery<BoardRow>(
-      `SELECT cb.slug, cb.misc, cb.title, cb.updated_at
-       FROM counseling_boards cb
-       WHERE cb.status = 1
-         AND cb.slug IS NOT NULL AND cb.slug != ''
-       ORDER BY cb.id ASC`,
-    ),
+    db.collection("counseling_boards")
+      .find({ status: 1, slug: { $exists: true, $ne: "" } }, { projection: { slug: 1, misc: 1, title: 1, updated_at: 1 } })
+      .sort({ id: 1 }).toArray(),
   ]);
 
-  // ── Build URL blocks ───────────────────────────────────────────────────────
   const parts: string[] = [];
 
-  // Static
   for (const p of STATIC_PAGES) {
     parts.push(url(p.loc, { changefreq: p.changefreq, priority: p.priority }));
   }
 
-  // Colleges  /college/[slug]
-  for (const row of collegeRows) {
+  for (const row of collegeDocs) {
     if (!row.slug) continue;
-    parts.push(
-      url(`/college/${row.slug}`, {
-        lastmod: row.updated_at,
-        changefreq: "weekly",
-        priority: "0.7",
-      }),
-    );
+    parts.push(url(`/college/${row.slug}`, { lastmod: row.updated_at, changefreq: "weekly", priority: "0.7" }));
   }
 
-  // Universities  /university/[slug]
   const uniSlugs = new Set<string>();
-  for (const row of universityRows) {
+  for (const row of universityDocs) {
     if (!row.slug || uniSlugs.has(row.slug)) continue;
     uniSlugs.add(row.slug);
-    parts.push(
-      url(`/university/${row.slug}`, {
-        lastmod: row.updated_at,
-        changefreq: "weekly",
-        priority: "0.8",
-      }),
-    );
+    parts.push(url(`/university/${row.slug}`, { lastmod: row.updated_at, changefreq: "weekly", priority: "0.8" }));
   }
 
-  // Blogs  /blogs/[slug]
-  for (const row of blogRows) {
+  for (const row of blogDocs) {
     if (!row.slug) continue;
-    parts.push(
-      url(`/blogs/${row.slug}`, {
-        lastmod: row.updated_at,
-        changefreq: "monthly",
-        priority: "0.6",
-      }),
-    );
+    parts.push(url(`/blogs/${row.slug}`, { lastmod: row.updated_at, changefreq: "monthly", priority: "0.6" }));
   }
 
-  // News  /news/[slug]
-  for (const row of newsRows) {
+  for (const row of newsDocs) {
     if (!row.slug) continue;
-    parts.push(
-      url(`/news/${row.slug}`, {
-        lastmod: row.updated_at,
-        changefreq: "weekly",
-        priority: "0.7",
-      }),
-    );
+    parts.push(url(`/news/${row.slug}`, { lastmod: row.updated_at, changefreq: "weekly", priority: "0.7" }));
   }
 
-  // Exams  /examination/[stream]/[slug]
-  for (const row of examRows) {
+  for (const row of examDocs) {
     if (!row.slug || !row.stream_slug) continue;
-    parts.push(
-      url(`/examination/${row.stream_slug}/${row.slug}`, {
-        lastmod: row.updated_at,
-        changefreq: "weekly",
-        priority: "0.7",
-      }),
-    );
+    parts.push(url(`/examination/${row.stream_slug}/${row.slug}`, { lastmod: row.updated_at, changefreq: "weekly", priority: "0.7" }));
   }
 
-  // Streams  /careers/opportunities/[stream]
-  for (const row of streamRows) {
+  for (const row of streamDocs) {
+    if (!row.pageslug) continue;
+    parts.push(url(`/careers/opportunities/${row.pageslug}`, { changefreq: "weekly", priority: "0.6" }));
+  }
+
+  for (const row of careerDocs) {
     if (!row.slug) continue;
-    parts.push(
-      url(`/careers/opportunities/${row.slug}`, {
-        changefreq: "weekly",
-        priority: "0.6",
-      }),
-    );
+    parts.push(url(`/popular-careers/${row.slug}`, { lastmod: row.updated_at, changefreq: "monthly", priority: "0.6" }));
   }
 
-  // Popular careers  /popular-careers/[slug]
-  for (const row of careerRows) {
+  for (const row of boardDocs) {
     if (!row.slug) continue;
-    parts.push(
-      url(`/popular-careers/${row.slug}`, {
-        lastmod: row.updated_at,
-        changefreq: "monthly",
-        priority: "0.6",
-      }),
-    );
+    const category = deriveCategory(row.misc ?? null, row.title ?? "");
+    parts.push(url(`/board/${category}/${row.slug}`, { lastmod: row.updated_at, changefreq: "monthly", priority: "0.5" }));
   }
 
-  // Boards  /board/[category]/[slug]
-  for (const row of boardRows) {
-    if (!row.slug) continue;
-    const category = deriveCategory(row.misc, row.title);
-    parts.push(
-      url(`/board/${category}/${row.slug}`, {
-        lastmod: row.updated_at,
-        changefreq: "monthly",
-        priority: "0.5",
-      }),
-    );
-  }
-
-  // ── Assemble XML ───────────────────────────────────────────────────────────
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset
   xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"

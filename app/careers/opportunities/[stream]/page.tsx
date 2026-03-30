@@ -1,7 +1,6 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
@@ -56,22 +55,10 @@ function formatSalary(raw: string | null | undefined): string {
   return cleaned.slice(0, 40);
 }
 
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[careers/opportunities/[stream]/page.tsx safeQuery]", err);
-    return [];
-  }
-}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface StreamRow extends RowDataPacket {
+interface StreamRow {
   id: number;
   name: string;
   pageslug: string | null;
@@ -79,7 +66,7 @@ interface StreamRow extends RowDataPacket {
   description: string | null;
 }
 
-interface CareerRelevantRow extends RowDataPacket {
+interface CareerRelevantRow {
   id: number;
   title: string;
   description: string | null;
@@ -92,7 +79,7 @@ interface CareerRelevantRow extends RowDataPacket {
   slug: string;
 }
 
-interface RelatedStreamRow extends RowDataPacket {
+interface RelatedStreamRow {
   id: number;
   name: string;
   pageslug: string | null;
@@ -145,96 +132,48 @@ function getDifficultyMeta(raw: string | null) {
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ stream: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ stream: string }> }): Promise<Metadata> {
   const { stream } = await params;
-
-  const rows = await safeQuery<StreamRow>(
-    `SELECT fa.name FROM functionalarea fa WHERE fa.pageslug = ? LIMIT 1`,
-    [stream],
-  );
-
-  const name =
-    rows[0]?.name ??
-    stream
-      .replace(/-/g, " ")
-      .replace(/\b\w/g, (c) => c.toUpperCase());
-
+  const db = await getDb();
+  const fa = await db.collection("functionalarea").findOne({ pageslug: stream }, { projection: { name: 1 } });
+  const name = fa?.name ?? stream.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   return {
     title: `${name} Career Opportunities — Paths, Salary & More | AdmissionX`,
-    description: `Explore career opportunities in ${name}. Get salary ranges, mandatory subjects, academic difficulty levels, and the best career paths.`,
+    description: `Explore career opportunities in ${name}. Get salary ranges, mandatory subjects, difficulty levels, and more.`,
   };
 }
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
-export default async function CareerOpportunitiesByStreamPage({
-  params,
-}: {
-  params: Promise<{ stream: string }>;
-}) {
+export default async function CareerOpportunitiesByStreamPage({ params }: { params: Promise<{ stream: string }> }) {
   const { stream } = await params;
+  const db = await getDb();
 
-  // ── Fetch functionalarea by pageslug ──────────────────────────────────────
-  const streamRows = await safeQuery<StreamRow>(
-    `SELECT fa.id, fa.name, fa.pageslug, fa.bannerimage, fa.pagedescription AS description
-     FROM functionalarea fa
-     WHERE fa.pageslug = ?
-     LIMIT 1`,
-    [stream],
-  );
-
-  const streamInfo = streamRows[0];
-  if (!streamInfo) notFound();
-
+  const faDoc = await db.collection("functionalarea").findOne({ pageslug: stream });
+  if (!faDoc) notFound();
+  const streamInfo: StreamRow = { id: faDoc.id, name: faDoc.name, pageslug: faDoc.pageslug ?? null, bannerimage: faDoc.bannerimage ?? null, description: faDoc.pagedescription ?? null };
   const streamName = streamInfo.name;
 
-  // ── Fetch careers + related streams in parallel ───────────────────────────
-  const [careers, relatedStreams] = await Promise.all([
-    safeQuery<CareerRelevantRow>(
-      `SELECT
-         cr.id,
-         cr.title,
-         cr.description,
-         cr.image,
-         cr.salery,
-         cr.stream,
-         cr.mandatorySubject,
-         cr.academicDifficulty,
-         cr.careerInterest,
-         cr.slug
-       FROM counseling_career_relevants cr
-       WHERE cr.functionalarea_id = ?
-         AND cr.status = 1
-         AND cr.slug IS NOT NULL
-         AND cr.slug != ''
-       ORDER BY cr.id ASC`,
-      [streamInfo.id],
-    ),
-
-    safeQuery<RelatedStreamRow>(
-      `SELECT
-         fa.id,
-         fa.name,
-         fa.pageslug,
-         COUNT(cr.id) AS career_count
-       FROM functionalarea fa
-       INNER JOIN counseling_career_relevants cr
-         ON cr.functionalarea_id = fa.id AND cr.status = 1
-       WHERE fa.id != ?
-         AND fa.name IS NOT NULL
-         AND fa.name != ''
-       GROUP BY fa.id, fa.name, fa.pageslug
-       HAVING career_count > 0
-       ORDER BY career_count DESC
-       LIMIT 10`,
-      [streamInfo.id],
-    ),
+  const [careerDocs, relatedFaDocs] = await Promise.all([
+    db.collection("counseling_career_relevants")
+      .find({ functionalarea_id: streamInfo.id, status: 1, slug: { $exists: true, $ne: "" } })
+      .sort({ id: 1 })
+      .project({ id: 1, title: 1, description: 1, image: 1, salery: 1, stream: 1, mandatorySubject: 1, academicDifficulty: 1, careerInterest: 1, slug: 1 })
+      .toArray(),
+    db.collection("counseling_career_relevants").aggregate([
+      { $match: { status: 1, functionalarea_id: { $ne: streamInfo.id } } },
+      { $group: { _id: "$functionalarea_id", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 },
+      { $lookup: { from: "functionalarea", localField: "_id", foreignField: "id", as: "fa" } },
+      { $unwind: "$fa" },
+      { $project: { id: "$fa.id", name: "$fa.name", pageslug: "$fa.pageslug", career_count: "$count" } },
+    ]).toArray(),
   ]);
 
+  const careers: CareerRelevantRow[] = careerDocs.map((c) => ({
+    id: c.id, title: c.title, description: c.description ?? null, image: c.image ?? null,
+    salery: c.salery ?? null, stream: c.stream ?? null, mandatorySubject: c.mandatorySubject ?? null,
+    academicDifficulty: c.academicDifficulty ?? null, careerInterest: c.careerInterest ?? null, slug: c.slug,
+  }));
+  const relatedStreams: RelatedStreamRow[] = relatedFaDocs.map((r) => ({ id: r.id, name: r.name, pageslug: r.pageslug ?? null, career_count: r.career_count }));
   const totalCareers = careers.length;
 
   // ── Group careers by careerInterest ──────────────────────────────────────

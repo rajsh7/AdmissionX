@@ -1,9 +1,8 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
 import Image from "next/image";
 import BlogImage from "@/app/components/BlogImage";
 import { notFound } from "next/navigation";
-import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
@@ -57,22 +56,7 @@ function formatDate(dateStr: string | null | undefined): string {
   }
 }
 
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[blogs/[slug]/page.tsx safeQuery]", err);
-    return [];
-  }
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface BlogRow extends RowDataPacket {
+interface BlogRow {
   id: number;
   topic: string;
   featimage: string | null;
@@ -86,23 +70,13 @@ interface BlogRow extends RowDataPacket {
 
 // ─── generateMetadata ─────────────────────────────────────────────────────────
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const rows = await safeQuery<BlogRow>(
-    "SELECT topic, description FROM blogs WHERE slug = ? AND isactive = 1 LIMIT 1",
-    [slug],
-  );
-  if (!rows.length) return { title: "Blog Not Found | AdmissionX" };
-  const blog = rows[0];
-  const desc = stripHtml(blog.description).slice(0, 160);
-  return {
-    title: `${blog.topic} | AdmissionX`,
-    description: desc || "Read this article on AdmissionX.",
-  };
+  const db = await getDb();
+  const item = await db.collection("blogs").findOne({ slug, isactive: 1 }, { projection: { topic: 1, description: 1 } });
+  if (!item) return { title: "Blog Not Found | AdmissionX" };
+  const desc = stripHtml(item.description as string).slice(0, 160);
+  return { title: `${item.topic} | AdmissionX`, description: desc || "Read this article on AdmissionX." };
 }
 
 // ─── Styles & Icons ──────────────────────────────────────────────────────────
@@ -112,30 +86,19 @@ const ICO_FILL_STYLE = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0,
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default async function BlogDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const db = await getDb();
 
-  // ── Fetch blog ─────────────────────────────────────────────────────────────
-  const blogs = await safeQuery<BlogRow>(
-    "SELECT * FROM blogs WHERE slug = ? AND isactive = 1 LIMIT 1",
-    [slug],
-  );
-  if (!blogs.length) notFound();
-  const blog = blogs[0];
+  const raw = await db.collection("blogs").findOne({ slug, isactive: 1 });
+  if (!raw) notFound();
+  const blog: BlogRow = { id: raw.id, topic: raw.topic, featimage: raw.featimage ?? null, fullimage: raw.fullimage ?? null, description: raw.description ?? null, isactive: raw.isactive, slug: raw.slug, created_at: raw.created_at, updated_at: raw.updated_at ?? raw.created_at };
 
-  // ── Related posts (3 most recent, exclude current) ────────────────────────
-  const related = await safeQuery<BlogRow>(
-    `SELECT id, topic, featimage, description, slug, created_at
-     FROM blogs
-     WHERE isactive = 1 AND id != ?
-     ORDER BY created_at DESC
-     LIMIT 3`,
-    [blog.id],
-  );
+  const relatedDocs = await db.collection("blogs")
+    .find({ isactive: 1, id: { $ne: blog.id } })
+    .sort({ created_at: -1 }).limit(3)
+    .project({ id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 }).toArray();
+  const related: BlogRow[] = relatedDocs.map((r) => ({ id: r.id, topic: r.topic, featimage: r.featimage ?? null, fullimage: null, description: r.description ?? null, isactive: 1, slug: r.slug, created_at: r.created_at, updated_at: r.created_at }));
 
   const heroImg = buildImageUrl(blog.fullimage ?? blog.featimage);
   const rt = readTime(blog.description);

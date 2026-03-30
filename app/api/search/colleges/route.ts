@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { getDb } from "@/lib/db";
+import { Filter, Document } from "mongodb";
 
 export interface CollegeResult {
-  id: number;
+  id: string | number;
   slug: string;
   name: string;
   location: string;
   city_name: string | null;
-  state_id: number | null;
+  state_id: string | number | null;
   image: string | null;
   rating: number;
   totalRatingUser: number;
@@ -26,90 +24,15 @@ export interface CollegeResult {
   max_fees: number | null;
 }
 
-interface IdRow extends RowDataPacket {
-  id: number;
-}
-
-interface CollegeRow extends RowDataPacket {
-  id: number;
-  slug: string;
-  name: string;
-  location: string | null;
-  city_name: string | null;
-  state_id: number | null;
-  image: string | null;
-  rating: string | null;
-  totalRatingUser: string | null;
-  ranking: string | null;
-  isTopUniversity: number;
-  topUniversityRank: string | null;
-  universityType: string | null;
-  estyear: string | null;
-  verified: number;
-  totalStudent: string | null;
-  streams_raw: string | null;
-  min_fees: string | null;
-  max_fees: string | null;
-}
-
-interface CountRow extends RowDataPacket {
-  total: number;
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const IMAGE_BASE = "https://admin.admissionx.in"; 
-
 function buildImageUrl(raw: string | null): string | null {
   if (!raw) return null;
-  if (raw.startsWith("http")) return raw;
-  if (raw.startsWith("/")) return raw; // <--- The crucial fix. Images are in the public/ folder!
+  if (raw.startsWith("http") || raw.startsWith("/")) return raw;
   return `/uploads/${raw}`;
 }
 
 function slugToName(slug: string): string {
-  return slug
-    .replace(/-\d+$/, "")
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
+  return slug.replace(/-\d+$/, "").split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 }
-
-// ─── GET /api/search/colleges ─────────────────────────────────────────────────
-//
-// Query params:
-//   q          – free-text (college name / location)
-//   stream     – functionalarea.pageslug  e.g. "engineering"
-//   degree     – degree.pageslug          e.g. "b-tech"
-//   city_id    – city.id (integer)
-//   state_id   – city.state_id (integer)
-//   fees_max   – upper fee limit (integer, in ₹)
-//   sort       – "rating" | "ranking" | "fees" | "newest"  (default: rating)
-//   type       – "top" | "university" | "abroad"           (optional pre-filter)
-//   page       – page number (default 1)
-//   limit      – page size (default 12, max 48)
-//
-// HOW IT WORKS — two-step query:
-//
-//   Step 1  ID query  (fast — no GROUP BY, no GROUP_CONCAT):
-//     SELECT cp.id FROM collegeprofile cp
-//       [LEFT JOIN users u  ONLY when q is set — text search needs it]
-//       [LEFT JOIN collegemaster cm  ONLY for fees sort]
-//     WHERE <filter conditions via EXISTS sub-selects>
-//     ORDER BY <sort column>
-//     LIMIT limit OFFSET offset
-//
-//   Step 2  Enrich query  (cheap — only touches the returned IDs):
-//     Full JOIN + GROUP_CONCAT on WHERE cp.id IN (id1, id2, …)
-//     GROUP_CONCAT on ≤48 rows is near-instant regardless of table size.
-//
-//   Count query:
-//     Pure COUNT(*) with EXISTS sub-selects — no joins to wide tables.
-//
-// This eliminates the old bottleneck: a full GROUP BY + GROUP_CONCAT across
-// ALL matching rows before LIMIT could be applied, which caused multi-second
-// (or multi-minute) renders on large datasets.
-// ─────────────────────────────────────────────────────────────────────────────
 
 export async function GET(req: NextRequest) {
   const sp = new URL(req.url).searchParams;
@@ -117,8 +40,7 @@ export async function GET(req: NextRequest) {
   const q = (sp.get("q") ?? "").trim();
   const stream = (sp.get("stream") ?? "").trim();
   const degree = (sp.get("degree") ?? "").trim();
-  const cityId = sp.get("city_id") ? parseInt(sp.get("city_id")!) : null;
-  const stateId = sp.get("state_id") ? parseInt(sp.get("state_id")!) : null;
+  const cityId = sp.get("city_id") || null;
   const feesMax = sp.get("fees_max") ? parseInt(sp.get("fees_max")!) : null;
   const sort = sp.get("sort") ?? "rating";
   const type = (sp.get("type") ?? "").trim();
@@ -126,250 +48,151 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(48, Math.max(6, parseInt(sp.get("limit") ?? "12")));
   const offset = (page - 1) * limit;
 
-  // ── Build filter conditions (all via EXISTS — no outer JOINs needed) ────────
+  try {
+    const db = await getDb();
 
-  const filterConditions: string[] = [];
-  const filterParams: (string | number)[] = [];
-
-  // Text search — needs users JOIN in the ID query (can't use EXISTS easily
-  // since firstname lives in users, not collegeprofile)
-  const hasTextSearch = q.length >= 2;
-  if (hasTextSearch) {
-    filterConditions.push(
-      "(u.firstname LIKE ? OR cp.registeredSortAddress LIKE ? OR cp.slug LIKE ?)",
-    );
-    const like = `%${q}%`;
-    filterParams.push(like, like, like);
-  }
-
-  if (stream) {
-    filterConditions.push(`EXISTS (
-      SELECT 1 FROM collegemaster cm2
-      INNER JOIN functionalarea fa2 ON fa2.id = cm2.functionalarea_id
-      WHERE cm2.collegeprofile_id = cp.id AND fa2.pageslug = ?
-    )`);
-    filterParams.push(stream);
-  }
-
-  if (degree) {
-    filterConditions.push(`EXISTS (
-      SELECT 1 FROM collegemaster cm3
-      INNER JOIN degree d2 ON d2.id = cm3.degree_id
-      WHERE cm3.collegeprofile_id = cp.id AND d2.pageslug = ?
-    )`);
-    filterParams.push(degree);
-  }
-
-  if (feesMax != null && !isNaN(feesMax)) {
-    filterConditions.push(`EXISTS (
-      SELECT 1 FROM collegemaster cm4
-      WHERE cm4.collegeprofile_id = cp.id
-        AND cm4.fees > 0 AND cm4.fees <= ?
-    )`);
-    filterParams.push(feesMax);
-  }
-
-  if (cityId != null) {
-    filterConditions.push("cp.registeredAddressCityId = ?");
-    filterParams.push(cityId);
-  }
-
-  if (stateId != null) {
-    filterConditions.push(`EXISTS (
-      SELECT 1 FROM city c2
-      WHERE c2.id = cp.registeredAddressCityId AND c2.state_id = ?
-    )`);
-    filterParams.push(stateId);
-  }
-
-  // Type pre-filters
-  if (type === "top") {
-    filterConditions.push("cp.isShowOnTop = 1");
-  } else if (type === "university") {
-    filterConditions.push("cp.isTopUniversity = 1");
-  } else if (type === "abroad") {
-    filterConditions.push("cp.registeredAddressCountryId != 1");
-  }
-
-  const filterWhere =
-    filterConditions.length > 0 ? filterConditions.join(" AND ") : "1=1";
-
-  // ── Step 1: ID-only query ──────────────────────────────────────────────────
-  // Text search requires a users JOIN (no other way to search by name).
-  // Fees sort requires a collegemaster JOIN to compute MIN(fees).
-  // Everything else runs with no extra JOINs.
-
-  let idSql: string;
-
-  if (sort === "fees") {
-    // Need MIN(cm.fees) for ordering — lightweight GROUP BY cp.id only
-    idSql = `
-      SELECT cp.id
-      FROM collegeprofile cp
-      ${hasTextSearch ? "LEFT JOIN users u ON u.id = cp.users_id" : ""}
-      LEFT JOIN collegemaster cm_s ON cm_s.collegeprofile_id = cp.id AND cm_s.fees > 0
-      WHERE ${filterWhere}
-      GROUP BY cp.id
-      ORDER BY MIN(cm_s.fees) ASC, cp.rating DESC
-      LIMIT ${limit} OFFSET ${offset}
-    `;
-  } else {
-    let orderBy = "cp.rating DESC, cp.totalRatingUser DESC";
-    if (sort === "ranking") {
-      orderBy =
-        "CASE WHEN cp.ranking IS NULL OR cp.ranking = 0 THEN 1 ELSE 0 END, cp.ranking ASC";
-    } else if (sort === "newest") {
-      orderBy = "cp.created_at DESC";
+    // Resolve stream/degree slugs to integer ids
+    let faId: unknown = null;
+    if (stream) {
+      const fa = await db.collection("functionalarea").findOne({ pageslug: stream }, { projection: { id: 1 } });
+      faId = fa?.id ?? null;
+    }
+    let degreeId: unknown = null;
+    if (degree) {
+      const d = await db.collection("degree").findOne({ pageslug: degree }, { projection: { id: 1 } });
+      degreeId = d?.id ?? null;
+    }
+    let cityIntId: unknown = null;
+    if (cityId) {
+      const parsed = parseInt(cityId);
+      cityIntId = isNaN(parsed) ? null : parsed;
     }
 
-    // No GROUP BY, no extra JOINs (except users when searching by name)
-    idSql = `
-      SELECT cp.id
-      FROM collegeprofile cp
-      ${hasTextSearch ? "LEFT JOIN users u ON u.id = cp.users_id" : ""}
-      WHERE ${filterWhere}
-      ORDER BY ${orderBy}
-      LIMIT ${limit} OFFSET ${offset}
-    `;
-  }
+    // Collect collegeprofile_ids matching stream/degree filters via collegemaster
+    let streamCollegeIds: unknown[] | null = null;
+    if (faId) {
+      const cms = await db.collection("collegemaster").find({ functionalarea_id: faId }).project({ collegeprofile_id: 1 }).toArray();
+      streamCollegeIds = [...new Set(cms.map((c) => c.collegeprofile_id))];
+    }
+    let degreeCollegeIds: unknown[] | null = null;
+    if (degreeId) {
+      const cms = await db.collection("collegemaster").find({ degree_id: degreeId }).project({ collegeprofile_id: 1 }).toArray();
+      degreeCollegeIds = [...new Set(cms.map((c) => c.collegeprofile_id))];
+    }
+    let feesCollegeIds: unknown[] | null = null;
+    if (feesMax != null && !isNaN(feesMax)) {
+      const cms = await db.collection("collegemaster").find({ fees: { $gt: 0, $lte: feesMax } }).project({ collegeprofile_id: 1 }).toArray();
+      feesCollegeIds = [...new Set(cms.map((c) => c.collegeprofile_id))];
+    }
 
-  // ── Count query ────────────────────────────────────────────────────────────
-  // Pure COUNT — same EXISTS conditions, zero extra JOINs (except users for q)
-  const countSql = `
-    SELECT COUNT(*) AS total
-    FROM collegeprofile cp
-    ${hasTextSearch ? "LEFT JOIN users u ON u.id = cp.users_id" : ""}
-    WHERE ${filterWhere}
-  `;
+    // Build match filter — collegemaster stores integer collegeprofile_id matching collegeprofile.id
+    const match: Record<string, unknown> = {};
+    if (streamCollegeIds) match.id = { $in: streamCollegeIds };
+    if (degreeCollegeIds) {
+      match.id = match.id ? { $in: (match.id as { $in: unknown[] }).$in.filter((id) => (degreeCollegeIds as unknown[]).some((d) => String(d) === String(id))) } : { $in: degreeCollegeIds };
+    }
+    if (feesCollegeIds) {
+      const existing = (match.id as { $in: unknown[] } | undefined)?.$in;
+      match.id = { $in: existing ? existing.filter((id) => (feesCollegeIds as unknown[]).some((f) => String(f) === String(id))) : feesCollegeIds };
+    }
+    if (cityIntId) match.registeredAddressCityId = cityIntId;
+    if (type === "top") match.isShowOnTop = 1;
+    else if (type === "university") match.isTopUniversity = 1;
+    else if (type === "abroad") match.registeredAddressCountryId = { $ne: 1 };
 
-  try {
-    // Run ID fetch + count in parallel
-    const [[idRows], [countRows]] = await Promise.all([
-      pool.query(idSql, filterParams) as Promise<[IdRow[], unknown]>,
-      pool.query(countSql, filterParams) as Promise<[CountRow[], unknown]>,
-    ]);
+    // Text search needs user join — do it via aggregation
+    const pipeline: object[] = [
+      { $match: match },
+      { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    ];
 
-    const total = countRows[0]?.total ?? 0;
-
-    if (idRows.length === 0) {
-      return NextResponse.json({
-        success: true,
-        colleges: [],
-        total,
-        page,
-        totalPages: Math.ceil(total / limit),
-        limit,
+    if (q.length >= 2) {
+      pipeline.push({
+        $match: {
+          $or: [
+            { "user.firstname": { $regex: q, $options: "i" } },
+            { registeredSortAddress: { $regex: q, $options: "i" } },
+            { slug: { $regex: q, $options: "i" } },
+          ],
+        },
       });
     }
 
-    // ── Step 2: Enrich the page IDs ──────────────────────────────────────────
-    // GROUP_CONCAT + MIN/MAX across ≤48 rows is effectively free.
-    // IDs are integers from the DB — safe to inline (no injection risk).
-    const ids = idRows.map((r) => r.id);
-    const idList = ids.join(",");
+    // Sort
+    const sortStage: Record<string, 1 | -1> =
+      sort === "ranking" ? { ranking: 1 } :
+      sort === "newest" ? { created_at: -1 } :
+      { rating: -1, totalRatingUser: -1 };
 
-    const enrichSql = `
-      SELECT
-        cp.id,
-        cp.slug,
-        COALESCE(
-          NULLIF(TRIM(u.firstname), ''),
-          NULLIF(TRIM(cp.slug),     ''),
-          'College'
-        )                                                  AS name,
-        COALESCE(cp.registeredSortAddress, '')             AS location,
-        c.name                                             AS city_name,
-        c.state_id,
-        cp.bannerimage                                     AS image,
-        COALESCE(cp.rating, 0)                             AS rating,
-        COALESCE(cp.totalRatingUser, 0)                    AS totalRatingUser,
-        cp.ranking,
-        cp.isTopUniversity,
-        cp.topUniversityRank,
-        cp.universityType,
-        cp.estyear,
-        cp.verified,
-        cp.totalStudent,
-        GROUP_CONCAT(DISTINCT fa.name ORDER BY fa.name SEPARATOR '|') AS streams_raw,
-        MIN(CASE WHEN cm.fees > 0 THEN cm.fees END)        AS min_fees,
-        MAX(CASE WHEN cm.fees > 0 THEN cm.fees END)        AS max_fees
-      FROM collegeprofile cp
-      LEFT JOIN users u           ON u.id  = cp.users_id
-      LEFT JOIN city c            ON c.id  = cp.registeredAddressCityId
-      LEFT JOIN collegemaster cm  ON cm.collegeprofile_id  = cp.id
-      LEFT JOIN functionalarea fa ON fa.id = cm.functionalarea_id
-      WHERE cp.id IN (${idList})
-      GROUP BY
-        cp.id, cp.slug, u.firstname, cp.registeredSortAddress,
-        c.name, c.state_id, cp.bannerimage, cp.rating, cp.totalRatingUser,
-        cp.ranking, cp.isTopUniversity, cp.topUniversityRank, cp.universityType,
-        cp.estyear, cp.verified, cp.totalStudent
-      ORDER BY FIELD(cp.id, ${idList})
-    `;
+    pipeline.push({ $sort: sortStage });
 
-    // No params — IDs are inlined as integer literals above
-    const [dataRows] = (await pool.query(enrichSql)) as [CollegeRow[], unknown];
+    // Count + paginate
+    const countPipeline = [...pipeline, { $count: "total" }];
+    const dataPipeline = [
+      ...pipeline,
+      { $skip: offset },
+      { $limit: limit },
+      { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "city" } },
+      { $unwind: { path: "$city", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, ranking: 1,
+          isTopUniversity: 1, topUniversityRank: 1, universityType: 1, estyear: 1,
+          verified: 1, totalStudent: 1, registeredSortAddress: 1, id: 1,
+          name: { $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"] },
+          city_name: "$city.name",
+        },
+      },
+    ];
 
-    const colleges: CollegeResult[] = dataRows.map((row) => {
-      const name =
-        row.name && row.name !== row.slug
-          ? row.name
-          : slugToName(row.slug || "college");
+    const [countResult, dataRows] = await Promise.all([
+      db.collection("collegeprofile").aggregate(countPipeline).toArray(),
+      db.collection("collegeprofile").aggregate(dataPipeline).toArray(),
+    ]);
 
-      const streams = row.streams_raw
-        ? row.streams_raw
-            .split("|")
-            .map((s) => s.trim())
-            .filter(Boolean)
-        : [];
+    const total = countResult[0]?.total ?? 0;
 
+    // Enrich with streams — join via integer id field
+    const cpIntIds = dataRows.map((r) => r.id);
+    const cmRows = await db.collection("collegemaster").aggregate([
+      { $match: { collegeprofile_id: { $in: cpIntIds } } },
+      { $lookup: { from: "functionalarea", localField: "functionalarea_id", foreignField: "id", as: "fa" } },
+      { $unwind: { path: "$fa", preserveNullAndEmptyArrays: true } },
+      { $group: { _id: "$collegeprofile_id", streams: { $addToSet: "$fa.name" }, min_fees: { $min: "$fees" }, max_fees: { $max: "$fees" } } },
+    ]).toArray();
+
+    const cmMap: Record<string, { streams: string[]; min_fees: number; max_fees: number }> = {};
+    cmRows.forEach((r) => { cmMap[String(r._id)] = { streams: (r.streams as string[]) ?? [], min_fees: Number(r.min_fees ?? 0), max_fees: Number(r.max_fees ?? 0) }; });
+
+    const colleges = dataRows.map((row) => {
+      const cm = cmMap[String(row.id)];
+      const name = row.name && row.name !== row.slug ? row.name : slugToName(row.slug || "college");
       return {
-        id: row.id,
+        id: row.id ?? row._id,
         slug: row.slug,
         name,
-        location: row.location || row.city_name || "India",
+        location: row.registeredSortAddress || row.city_name || "India",
         city_name: row.city_name,
-        state_id: row.state_id,
-        image: buildImageUrl(row.image),
+        image: buildImageUrl(row.bannerimage),
         rating: parseFloat(String(row.rating)) || 0,
         totalRatingUser: parseInt(String(row.totalRatingUser)) || 0,
         ranking: row.ranking ? parseInt(String(row.ranking)) : null,
         isTopUniversity: row.isTopUniversity ?? 0,
-        topUniversityRank: row.topUniversityRank
-          ? parseInt(String(row.topUniversityRank))
-          : null,
+        topUniversityRank: row.topUniversityRank ? parseInt(String(row.topUniversityRank)) : null,
         universityType: row.universityType || null,
         estyear: row.estyear || null,
         verified: row.verified ?? 0,
-        totalStudent: row.totalStudent
-          ? parseInt(String(row.totalStudent))
-          : null,
-        streams,
-        min_fees: row.min_fees ? parseInt(String(row.min_fees)) : null,
-        max_fees: row.max_fees ? parseInt(String(row.max_fees)) : null,
+        totalStudent: row.totalStudent ? parseInt(String(row.totalStudent)) : null,
+        streams: cm?.streams?.filter(Boolean) ?? [],
+        min_fees: cm?.min_fees ? parseInt(String(cm.min_fees)) : null,
+        max_fees: cm?.max_fees ? parseInt(String(cm.max_fees)) : null,
       };
     });
 
-    return NextResponse.json({
-      success: true,
-      colleges,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-      limit,
-    });
+    return NextResponse.json({ success: true, colleges, total, page, totalPages: Math.ceil(total / limit), limit });
   } catch (err) {
     console.error("[/api/search/colleges]", err);
-    return NextResponse.json(
-      {
-        success: false,
-        colleges: [],
-        total: 0,
-        page: 1,
-        totalPages: 0,
-        limit,
-      },
-      { status: 500 },
-    );
+    return NextResponse.json({ success: false, colleges: [], total: 0, page: 1, totalPages: 0, limit }, { status: 500 });
   }
 }
