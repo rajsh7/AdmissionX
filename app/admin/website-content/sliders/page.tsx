@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import AdminImg from "@/app/admin/_components/AdminImg";
 import SlidersClient from "./SlidersClient";
@@ -84,7 +83,7 @@ async function updateSlider(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number | boolean)[] = [],
 ): Promise<T[]> {
@@ -97,7 +96,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface SliderRow extends RowDataPacket {
+interface SliderRow  {
   id: number;
   sliderTitle: string | null;
   bottomText: string | null;
@@ -158,3 +157,7 @@ export default async function SliderManagerPage({
     </div>
   );
 }
+
+
+
+

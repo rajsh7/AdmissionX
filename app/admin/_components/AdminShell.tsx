@@ -123,48 +123,60 @@ export default function AdminShell({
             </span>
           </button>
 
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hidden sm:block">
-              AdmissionX
-            </span>
-            <span className="text-slate-300 hidden sm:block">/</span>
-            <span className="text-sm font-semibold text-slate-700 truncate" suppressHydrationWarning>
-              {currentLabel}
-            </span>
+          {/* Search bar (Mockup) */}
+          <div className="flex-1 flex items-center px-4">
+            <div className="flex items-center gap-2 bg-slate-100 text-slate-500 px-4 py-2 rounded-lg w-full max-w-md">
+              <span className="material-symbols-rounded text-[20px]" style={ICO}>search</span>
+              <input 
+                type="text" 
+                placeholder="Location, universities, courses..." 
+                className="bg-transparent border-none outline-none text-sm w-full text-slate-700 placeholder-slate-400 font-medium"
+              />
+            </div>
           </div>
 
           {/* Right side actions */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-
-            {/* Admin ID badge */}
-            <span className="hidden md:inline-flex items-center text-[10px] font-mono font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-lg">
-              ADX-A-{String(admin.id).padStart(4, "0")}
-            </span>
-
-            {/* Divider */}
-            <div className="hidden sm:block w-px h-5 bg-slate-200" />
-
-            {/* Avatar + name */}
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                {admin.name.charAt(0).toUpperCase()}
-              </div>
-              <span className="hidden sm:block text-sm font-semibold text-slate-700 truncate max-w-[120px]">
-                {admin.name.split(" ")[0]}
-              </span>
+          <div className="flex items-center gap-5 flex-shrink-0 pr-2">
+            
+            {/* Action Icons */}
+            <div className="flex items-center gap-3 text-slate-600">
+              <button className="hover:text-slate-900 transition-colors p-1">
+                <span className="material-symbols-rounded text-[24px]" style={ICO}>chat_bubble_outline</span>
+              </button>
+              <button className="hover:text-slate-900 transition-colors p-1 relative">
+                <span className="material-symbols-rounded text-[24px]" style={ICO}>notifications</span>
+                <span className="absolute top-0 right-0 -mt-1 -mr-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
+                  3
+                </span>
+              </button>
             </div>
 
-            {/* Sign out (topbar, desktop) */}
+            {/* Divider */}
+            <div className="w-px h-6 bg-slate-300" />
+
+            {/* Avatar + name */}
+            <div className="flex items-center gap-3 cursor-pointer group">
+              <div className="w-9 h-9 rounded bg-slate-200 overflow-hidden border border-slate-300 shadow-sm flex items-center justify-center text-slate-500 font-bold overflow-hidden relative">
+                 {/* Provide fallback initials if no image */}
+                 <span className="absolute z-0">{admin.name.charAt(0).toUpperCase()}</span>
+                 {/* Pretend we have a user avatar image to match the mockup */}
+                 <img src="/api/image-proxy?url=https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="" className="w-full h-full object-cover z-10" />
+              </div>
+              <div className="flex items-center gap-1 text-slate-600 group-hover:text-slate-900 transition-colors">
+                <span className="hidden sm:block text-sm font-semibold">
+                  Admin
+                </span>
+                <span className="material-symbols-rounded text-[18px]" style={ICO}>expand_more</span>
+              </div>
+            </div>
+
+            {/* Hidden logout for functional completeness */}
             <button
               onClick={handleLogout}
               title="Sign out"
-              className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-red-500 px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+              className="hidden"
             >
-              <span className="material-symbols-rounded text-[16px]" style={ICO}>
-                logout
-              </span>
-              <span className="hidden md:inline">Sign out</span>
+              Sign out
             </button>
           </div>
         </header>
@@ -177,3 +189,7 @@ export default function AdminShell({
     </div>
   );
 }
+
+
+
+

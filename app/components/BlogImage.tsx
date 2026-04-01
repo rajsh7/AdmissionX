@@ -20,3 +20,7 @@ export default function BlogImage({ src, alt, className }: BlogImageProps) {
     />
   );
 }
+
+
+
+

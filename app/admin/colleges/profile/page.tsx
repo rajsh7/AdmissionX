@@ -1,5 +1,5 @@
-import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+import { getDb } from "@/lib/db";
+import { ObjectId } from "mongodb";
 import { revalidatePath } from "next/cache";
 import { Suspense } from "react";
 import ProfileClient from "./ProfileClient";
@@ -7,10 +7,12 @@ import { saveUpload } from "@/lib/upload-utils";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
-async function deleteProfileRow(id: number) {
+async function deleteProfileRow(id: string) {
   "use server";
   try {
-    await pool.query("DELETE FROM collegeprofile WHERE id = ?", [id]);
+    const db = await getDb();
+    const filter = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: parseInt(id, 10) };
+    await db.collection("collegeprofile").deleteOne(filter);
   } catch (e) {
     console.error("[admin/colleges/profile deleteAction]", e);
   }
@@ -23,34 +25,25 @@ async function addProfileRow(formData: FormData) {
   try {
     const bannerFile = formData.get("bannerimage_file") as File;
     let bannerimage = "";
-
     if (bannerFile && bannerFile.size > 0) {
       const slug = (formData.get("slug") as string) || "college";
       bannerimage = await saveUpload(bannerFile, `college/${slug}`, "banner");
     }
-
     const data = Object.fromEntries(formData.entries());
-    const users_id = data.users_id ? parseInt(data.users_id as string, 10) : null;
-    const rating = data.rating ? parseFloat(data.rating as string) : 0;
-    const ranking = data.ranking ? parseInt(data.ranking as string, 10) : null;
-    const topUniversityRank = data.topUniversityRank ? parseInt(data.topUniversityRank as string, 10) : null;
-    const cityId = data.registeredAddressCityId ? parseInt(data.registeredAddressCityId as string, 10) : null;
-
-    const sql = `
-      INSERT INTO collegeprofile (
-        users_id, slug, bannerimage, rating, ranking, 
-        verified, isTopUniversity, topUniversityRank, 
-        universityType, registeredAddressCityId, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
-    `;
-    await pool.query(sql, [
-      users_id, data.slug, bannerimage, rating, ranking,
-      data.verified === "on" ? 1 : 0,
-      data.isTopUniversity === "on" ? 1 : 0,
-      topUniversityRank,
-      data.universityType,
-      cityId
-    ]);
+    const db = await getDb();
+    await db.collection("collegeprofile").insertOne({
+      users_id:               data.users_id ? parseInt(data.users_id as string, 10) : null,
+      slug:                   data.slug,
+      bannerimage,
+      rating:                 data.rating ? parseFloat(data.rating as string) : 0,
+      ranking:                data.ranking ? parseInt(data.ranking as string, 10) : null,
+      verified:               data.verified === "on" ? 1 : 0,
+      isTopUniversity:        data.isTopUniversity === "on" ? 1 : 0,
+      topUniversityRank:      data.topUniversityRank ? parseInt(data.topUniversityRank as string, 10) : null,
+      universityType:         data.universityType,
+      registeredAddressCityId: data.registeredAddressCityId ? parseInt(data.registeredAddressCityId as string, 10) : null,
+      created_at:             new Date(),
+    });
   } catch (e) {
     console.error("[admin/colleges/profile addAction]", e);
   }
@@ -63,36 +56,27 @@ async function updateProfileRow(formData: FormData) {
   try {
     const bannerFile = formData.get("bannerimage_file") as File;
     let bannerimage = formData.get("bannerimage_existing") as string;
-
+    const data = Object.fromEntries(formData.entries());
     if (bannerFile && bannerFile.size > 0) {
-      const slug = (formData.get("slug") as string) || "college";
+      const slug = (data.slug as string) || "college";
       bannerimage = await saveUpload(bannerFile, `college/${slug}`, "banner");
     }
-
-    const data = Object.fromEntries(formData.entries());
-    const id = data.id ? parseInt(data.id as string, 10) : null;
-    const users_id = data.users_id ? parseInt(data.users_id as string, 10) : null;
-    const rating = data.rating ? parseFloat(data.rating as string) : 0;
-    const ranking = data.ranking ? parseInt(data.ranking as string, 10) : null;
-    const topUniversityRank = data.topUniversityRank ? parseInt(data.topUniversityRank as string, 10) : null;
-    const cityId = data.registeredAddressCityId ? parseInt(data.registeredAddressCityId as string, 10) : null;
-
-    const sql = `
-      UPDATE collegeprofile SET 
-        users_id = ?, slug = ?, bannerimage = ?, rating = ?, ranking = ?, 
-        verified = ?, isTopUniversity = ?, topUniversityRank = ?, 
-        universityType = ?, registeredAddressCityId = ?, updated_at = NOW()
-      WHERE id = ?
-    `;
-    await pool.query(sql, [
-      users_id, data.slug, bannerimage, rating, ranking,
-      data.verified === "on" ? 1 : 0,
-      data.isTopUniversity === "on" ? 1 : 0,
-      topUniversityRank,
-      data.universityType,
-      cityId,
-      id
-    ]);
+    const id = data.id as string;
+    const db = await getDb();
+    const filter = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: parseInt(id, 10) };
+    await db.collection("collegeprofile").updateOne(filter, { $set: {
+      users_id:               data.users_id ? parseInt(data.users_id as string, 10) : null,
+      slug:                   data.slug,
+      bannerimage,
+      rating:                 data.rating ? parseFloat(data.rating as string) : 0,
+      ranking:                data.ranking ? parseInt(data.ranking as string, 10) : null,
+      verified:               data.verified === "on" ? 1 : 0,
+      isTopUniversity:        data.isTopUniversity === "on" ? 1 : 0,
+      topUniversityRank:      data.topUniversityRank ? parseInt(data.topUniversityRank as string, 10) : null,
+      universityType:         data.universityType,
+      registeredAddressCityId: data.registeredAddressCityId ? parseInt(data.registeredAddressCityId as string, 10) : null,
+      updated_at:             new Date(),
+    }});
   } catch (e) {
     console.error("[admin/colleges/profile updateAction]", e);
   }
@@ -104,23 +88,10 @@ async function updateProfileRow(formData: FormData) {
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/colleges/profile safeQuery]", err);
-    return [];
-  }
-}
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface ProfileRow extends RowDataPacket {
-  id: number;
+interface ProfileRow {
+  id: string;
   users_id: number;
   slug: string;
   name: string;
@@ -146,10 +117,6 @@ interface ProfileRow extends RowDataPacket {
   count_sports: number;
 }
 
-interface CountRow extends RowDataPacket {
-  total: number;
-}
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function CollegeProfilePage({
@@ -162,63 +129,78 @@ export default async function CollegeProfilePage({
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Build WHERE clause ─────────────────────────────────────────────────────
-  const conditions: string[] = [];
-  const params: (string | number)[] = [];
+  const db  = await getDb();
+  const col = db.collection("collegeprofile");
 
+  const mongoFilter: Record<string, unknown> = {};
   if (q) {
-    conditions.push(
-      "(u.firstname LIKE ? OR cp.slug LIKE ? OR cp.registeredSortAddress LIKE ?)",
-    );
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`);
+    mongoFilter.$or = [
+      { slug:                    { $regex: q, $options: "i" } },
+      { registeredSortAddress:   { $regex: q, $options: "i" } },
+      { contactpersonname:       { $regex: q, $options: "i" } },
+    ];
   }
 
-  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-
-  // ── Query profiles ─────────────────────────────────────────────────────────
-  const [profiles, countRows] = await Promise.all([
-    safeQuery<ProfileRow>(
-      `SELECT 
-        cp.id,
-        cp.users_id,
-        cp.slug,
-        COALESCE(u.firstname, 'Unnamed College') as name,
-        cp.bannerimage,
-        cp.rating,
-        cp.ranking,
-        cp.verified,
-        cp.isTopUniversity,
-        cp.topUniversityRank,
-        cp.universityType,
-        cp.registeredAddressCityId,
-        c.name as city_name,
-        (SELECT COUNT(*) FROM collegemaster WHERE collegeprofile_id = cp.id) as count_courses,
-        (SELECT COUNT(*) FROM collegefacilities WHERE collegeprofile_id = cp.id) as count_facilities,
-        (SELECT COUNT(*) FROM faculty WHERE collegeprofile_id = cp.id) as count_faculty,
-        (SELECT COUNT(*) FROM placement WHERE collegeprofile_id = cp.id) as count_placements,
-        (SELECT COUNT(*) FROM college_admission_procedures WHERE collegeprofile_id = cp.id) as count_admissions,
-        (SELECT COUNT(*) FROM college_cut_offs WHERE collegeprofile_id = cp.id) as count_cutoffs,
-        (SELECT COUNT(*) FROM event WHERE collegeprofile_id = cp.id) as count_events,
-        (SELECT COUNT(*) FROM college_faqs WHERE collegeprofile_id = cp.id) as count_faqs,
-        (SELECT COUNT(*) FROM college_management_details WHERE collegeprofile_id = cp.id) as count_management,
-        (SELECT COUNT(*) FROM college_reviews WHERE collegeprofile_id = cp.id) as count_reviews,
-        (SELECT COUNT(*) FROM college_scholarships WHERE collegeprofile_id = cp.id) as count_scholarships,
-        (SELECT COUNT(*) FROM college_sports_activities WHERE collegeprofile_id = cp.id) as count_sports
-       FROM collegeprofile cp
-       JOIN users u ON u.id = cp.users_id
-       LEFT JOIN city c ON c.id = cp.registeredAddressCityId
-       ${where}
-       ORDER BY cp.created_at DESC
-       LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
-    ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ${where}`,
-      params,
-    ),
+  const [total, rawProfiles] = await Promise.all([
+    col.countDocuments(mongoFilter),
+    col.find(mongoFilter).sort({ created_at: -1 }).skip(offset).limit(PAGE_SIZE).toArray(),
   ]);
 
-  const total = Number(countRows[0]?.total ?? 0);
+  // Fetch city names for the profiles that have a city id
+  const cityIds = [...new Set(rawProfiles.map(p => p.registeredAddressCityId).filter(Boolean))];
+  const cities = cityIds.length
+    ? await db.collection("city").find({ id: { $in: cityIds } }).toArray()
+    : [];
+  const cityMap = Object.fromEntries(cities.map(c => [c.id, c.name ?? c.city_name ?? ""]));
+
+  // Count related docs per profile
+  const profileIds = rawProfiles.map(p => p.id).filter(Boolean);
+  const countCol = async (name: string) => {
+    if (!profileIds.length) return {} as Record<number, number>;
+    const docs = await db.collection(name).aggregate([
+      { $match: { collegeprofile_id: { $in: profileIds } } },
+      { $group: { _id: "$collegeprofile_id", n: { $sum: 1 } } },
+    ]).toArray();
+    return Object.fromEntries(docs.map(d => [d._id, d.n]));
+  };
+
+  const [cCourses, cFaculty, cPlacements, cEvents, cScholarships, cFaqs, cReviews] = await Promise.all([
+    countCol("collegemaster"),
+    countCol("faculty"),
+    countCol("placement"),
+    countCol("event"),
+    countCol("college_scholarships"),
+    countCol("college_faqs"),
+    countCol("college_reviews"),
+  ]);
+
+  const profiles: ProfileRow[] = rawProfiles.map(p => ({
+    id:                      String(p._id),
+    users_id:                p.users_id,
+    slug:                    String(p.slug ?? "").trim(),
+    name:                    String(p.contactpersonname ?? p.slug ?? "Unnamed College").trim(),
+    bannerimage:             p.bannerimage && String(p.bannerimage).trim() !== "NULL" ? String(p.bannerimage).trim() : null,
+    rating:                  parseFloat(String(p.rating ?? 0)) || 0,
+    ranking:                 p.ranking ? parseInt(String(p.ranking), 10) : null,
+    verified:                p.verified ? 1 : 0,
+    isTopUniversity:         p.isTopUniversity ? 1 : 0,
+    topUniversityRank:       p.topUniversityRank ? parseInt(String(p.topUniversityRank), 10) : null,
+    universityType:          p.universityType && String(p.universityType).trim() !== "NULL" ? String(p.universityType).trim() : null,
+    registeredAddressCityId: p.registeredAddressCityId ?? null,
+    city_name:               cityMap[p.registeredAddressCityId] ?? null,
+    count_courses:           cCourses[p.id]     ?? 0,
+    count_facilities:        0,
+    count_faculty:           cFaculty[p.id]     ?? 0,
+    count_placements:        cPlacements[p.id]  ?? 0,
+    count_admissions:        0,
+    count_events:            cEvents[p.id]      ?? 0,
+    count_faqs:              cFaqs[p.id]        ?? 0,
+    count_management:        0,
+    count_reviews:           cReviews[p.id]     ?? 0,
+    count_scholarships:      cScholarships[p.id] ?? 0,
+    count_sports:            0,
+  }));
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
@@ -238,3 +220,7 @@ export default async function CollegeProfilePage({
     </Suspense>
   );
 }
+
+
+
+

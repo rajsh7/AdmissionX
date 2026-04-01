@@ -52,9 +52,9 @@ export default function CollegeTabs({ slug, counts = {} }: CollegeTabsProps) {
               href={href}
               className="relative flex-shrink-0 px-6 py-4 text-sm font-semibold whitespace-nowrap transition-colors duration-150"
               style={{
-                color: isActive ? "#008080" : "#6b7280",
+                color: isActive ? "#FF3C3C" : "#6b7280",
                 borderBottom: isActive
-                  ? "2px solid #008080"
+                  ? "2px solid #FF3C3C"
                   : "2px solid transparent",
                 marginBottom: "-1px",
               }}
@@ -67,3 +67,7 @@ export default function CollegeTabs({ slug, counts = {} }: CollegeTabsProps) {
     </div>
   );
 }
+
+
+
+

@@ -59,3 +59,7 @@ export default function AdminModal({ isOpen, onClose, title, children }: AdminMo
     </div>
   );
 }
+
+
+
+

@@ -8,102 +8,110 @@ const categories = [
     title: "Engineering", 
     icon: "engineering", 
     color: "text-blue-600", 
-    bg: "bg-blue-50",
+    bg: "border-blue-500",
+    description: "Explore top engineering schools and diverse specializations for a future-ready career.",
     href: "/search?stream=engineering"
   },
   { 
     title: "Management", 
     icon: "business_center", 
     color: "text-emerald-600", 
-    bg: "bg-emerald-50",
+    bg: "border-emerald-500",
+    description: "Transform into a global business leader with top-tier MBA and leadership programs.",
     href: "/search?stream=management"
   },
   { 
     title: "Medical", 
     icon: "medical_services", 
     color: "text-rose-600", 
-    bg: "bg-rose-50",
+    bg: "border-rose-500",
+    description: "Shape the future of healthcare with premier medical university and research paths.",
     href: "/search?stream=medicine"
   },
   { 
     title: "Design", 
     icon: "palette", 
     color: "text-purple-600", 
-    bg: "bg-purple-50",
+    bg: "border-purple-500",
+    description: "Unleash your creativity at world-renowned design studios and architecture schools.",
     href: "/search?stream=design"
   },
   { 
     title: "Science", 
     icon: "biotech", 
     color: "text-cyan-600", 
-    bg: "bg-cyan-50",
+    bg: "border-cyan-500",
+    description: "Dive into research and innovation with leading science and technology institutions.",
     href: "/search?stream=science"
-  },
-  { 
-    title: "Arts", 
-    icon: "history_edu", 
-    color: "text-amber-600", 
-    bg: "bg-amber-50",
-    href: "/search?stream=arts"
   },
   { 
     title: "Commerce", 
     icon: "payments", 
     color: "text-orange-600", 
-    bg: "bg-orange-50",
+    bg: "border-orange-500",
+    description: "Master the dynamics of trade, finance, and accounting at top commerce colleges.",
     href: "/search?stream=commerce"
   },
   { 
-    title: "Pharmacy", 
-    icon: "medications", 
-    color: "text-teal-600", 
-    bg: "bg-teal-50",
-    href: "/search?stream=pharmacy"
+    title: "Law", 
+    icon: "gavel", 
+    color: "text-amber-700", 
+    bg: "border-amber-600",
+    description: "Uphold justice and the rule of law. Explore premier legal studies and judicial services paths.",
+    href: "/search?stream=law"
+  },
+  { 
+    title: "Arts", 
+    icon: "history_edu", 
+    color: "text-indigo-600", 
+    bg: "border-indigo-500",
+    description: "Discover the richness of human expression with top-tier humanities and social science programs.",
+    href: "/search?stream=arts"
   },
 ];
 
 export default function FieldsOfStudy() {
   return (
-    <section className="w-full py-16 lg:py-24 bg-white overflow-hidden">
+    <section className="w-full py-24 lg:py-32 bg-[#f8fafc] overflow-hidden">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
-        <div className="text-center mb-16">
-           <h2 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter">Top Categories</h2>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 lg:gap-6">
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-14">
           {categories.map((cat, i) => (
             <motion.div
               key={cat.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.05 }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
             >
               <Link 
                 href={cat.href}
-                className={`group flex flex-col items-center justify-center p-6 rounded-[32px] border border-slate-100 bg-white transition-all hover:shadow-2xl hover:shadow-black/5 hover:-translate-y-1 active:scale-95 h-full`}
+                className={`group flex flex-col p-12 rounded-[10px] bg-white border-t-4 ${cat.bg} shadow-[0_20px_50px_-10px_rgba(0,0,0,0.03)] transition-all hover:shadow-2xl hover:shadow-black/5 hover:-translate-y-2 active:scale-95 h-full`}
               >
-                <div className={`w-14 h-14 rounded-2xl ${cat.bg} flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
-                  <span className={`material-symbols-rounded text-[28px] ${cat.color}`}>
+                <div className={`w-16 h-16 rounded-[10px] bg-slate-50 flex items-center justify-center mb-10 transition-transform group-hover:scale-110 group-hover:bg-primary group-hover:text-white`}>
+                  <span className={`material-symbols-rounded text-[32px] ${cat.color} group-hover:text-white transition-colors`}>
                     {cat.icon}
                   </span>
                 </div>
-                <h3 className={`text-[13px] font-black text-slate-800 text-center leading-tight transition-colors group-hover:text-[#008080]`}>
-                  {cat.title}
+                <h3 className="text-[28px] font-normal text-slate-900 mb-5 tracking-tight uppercase leading-tight">
+                   {cat.title}
                 </h3>
+                <p className="text-[17px] text-slate-500 font-normal leading-relaxed mb-10 flex-1">
+                   {cat.description}
+                </p>
+                <div className="flex items-center gap-2 text-primary font-normal text-sm uppercase tracking-widest group-hover:translate-x-2 transition-transform">
+                   <span>View More</span>
+                   <span className="material-symbols-rounded text-[18px]">arrow_forward</span>
+                </div>
               </Link>
             </motion.div>
           ))}
-        </div>
-
-        {/* Ads Banner - Grey Minimalist Box */}
-        <div className="mt-20 w-full h-40 bg-slate-200 rounded-[32px] flex items-center justify-center relative group overflow-hidden">
-           <div className="absolute inset-0 bg-slate-300 transform -translate-x-full transition-transform duration-1000 group-hover:translate-x-0 opacity-20" />
-           <span className="text-[72px] lg:text-[96px] font-black text-white uppercase tracking-tighter antialiased transition-all group-hover:scale-105 group-hover:tracking-[0.2em]">
-             ads
-           </span>
         </div>
       </div>
     </section>
   );
 }
+
+
+
+

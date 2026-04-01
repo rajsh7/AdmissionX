@@ -94,7 +94,7 @@ export default function PaginationFixed({
         onClick={() => goTo(currentPage - 1)}
         disabled={currentPage === 1}
         aria-label="Previous page"
-        className="flex items-center gap-1.5 px-3 py-2 rounded-[10px] text-sm font-semibold text-neutral-600 bg-white border border-neutral-200 hover:border-[#008080]/30 hover:text-[#008080] hover:bg-[#008080]/5 disabled:opacity-40 disabled:pointer-events-none transition-all duration-200"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-[10px] text-sm font-semibold text-neutral-600 bg-white border border-neutral-200 hover:border-[#FF3C3C]/30 hover:text-[#FF3C3C] hover:bg-[#FF3C3C]/5 disabled:opacity-40 disabled:pointer-events-none transition-all duration-200"
       >
         <span className="material-symbols-outlined text-[16px]">
           chevron_left
@@ -121,8 +121,8 @@ export default function PaginationFixed({
               aria-current={p === currentPage ? "page" : undefined}
               className={`w-9 h-9 rounded-[10px] text-sm font-bold transition-all duration-200 ${
                 p === currentPage
-                  ? "bg-[#008080] text-white shadow-md shadow-[#008080]/25 scale-105"
-                  : "bg-white border border-neutral-200 text-neutral-600 hover:border-[#008080]/30 hover:text-[#008080] hover:bg-[#008080]/5"
+                  ? "bg-[#FF3C3C] text-white shadow-md shadow-[#FF3C3C]/25 scale-105"
+                  : "bg-white border border-neutral-200 text-neutral-600 hover:border-[#FF3C3C]/30 hover:text-[#FF3C3C] hover:bg-[#FF3C3C]/5"
               }`}
             >
               {p}
@@ -137,7 +137,7 @@ export default function PaginationFixed({
         onClick={() => goTo(currentPage + 1)}
         disabled={currentPage === totalPages}
         aria-label="Next page"
-        className="flex items-center gap-1.5 px-3 py-2 rounded-[10px] text-sm font-semibold text-neutral-600 bg-white border border-neutral-200 hover:border-[#008080]/30 hover:text-[#008080] hover:bg-[#008080]/5 disabled:opacity-40 disabled:pointer-events-none transition-all duration-200"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-[10px] text-sm font-semibold text-neutral-600 bg-white border border-neutral-200 hover:border-[#FF3C3C]/30 hover:text-[#FF3C3C] hover:bg-[#FF3C3C]/5 disabled:opacity-40 disabled:pointer-events-none transition-all duration-200"
       >
         <span className="hidden sm:inline">Next</span>
         <span className="material-symbols-outlined text-[16px]">
@@ -147,3 +147,7 @@ export default function PaginationFixed({
     </nav>
   );
 }
+
+
+
+

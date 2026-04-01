@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import Header from "./components/Header";
+const Header = dynamic(() => import("./components/Header"), { ssr: false });
 import HeroSection from "./components/HeroSection";
 import FieldsOfStudy from "./components/FieldsOfStudy";
 import TopUniversities from "./components/TopUniversities";
 import TopCourse from "./components/TopCourse";
 import type { FilterCollegeResult } from "@/lib/college-filter";
+import type { AdItem } from "./components/AdsSection";
 
 // Below-the-fold components loaded lazily – they won't block the first paint
 const EntranceExams = dynamic(() => import("./components/EntranceExams"), {
@@ -17,8 +18,9 @@ const NewsSection = dynamic(() => import("./components/NewsSection"), {
   ssr: true,
 });
 import ContactSection from "./components/ContactSection";
-import AdsSection from "./components/AdsSection";
-import type { AdItem } from "./components/AdsSection";
+import StatsBar from "./components/StatsBar";
+import CareerGuidance from "./components/CareerGuidance";
+import Testimonials from "./components/Testimonials";
 
 const Footer = dynamic(() => import("./components/Footer"), { ssr: true });
 
@@ -57,7 +59,7 @@ export default function HomePageClient({
   const switchMode = (mode: "login" | "register") => setAuthModal(mode);
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 selection:bg-teal selection:text-white">
+    <div className="min-h-screen bg-white text-slate-900 selection:bg-primary selection:text-white">
       {/* Auth Modal – only rendered when user clicks login */}
       {authModal && (
         <AuthModal
@@ -74,28 +76,31 @@ export default function HomePageClient({
         {/* 1. Hero Section */}
         <HeroSection />
 
-        {/* 2. Top Categories (Fields of Study) */}
-        <FieldsOfStudy />
+        {/* 2. Stats Bar */}
+        <StatsBar />
 
-        {/* 3. Ads Section */}
-        <AdsSection ads={ads} />
-
-        {/* 4. Discover the Top Universities */}
+        {/* 3. Discover the Top Universities */}
         <TopUniversities
           universities={universities}
           initialStreamColleges={initialStreamColleges}
         />
 
-        {/* 5. Discover the Top Course */}
+        {/* 4. Discover the Top Course */}
         <TopCourse />
 
-        {/* 6. Recent coming exams */}
-        <EntranceExams dbExams={dbExams} />
+        {/* 5. Career Guidance */}
+        <CareerGuidance />
 
-        {/* 7. Student Life & Beyond (News/Blogs) */}
+        {/* 6. Article Grid (Updated FieldsOfStudy) */}
+        <FieldsOfStudy />
+
+        {/* 7. Student Life & Beyond (Blogs) */}
         <NewsSection dbBlogs={dbBlogs} />
 
-        {/* 8. Get in Touch Section */}
+        {/* 8. Unfiltered Student Voices */}
+        <Testimonials />
+
+        {/* 9. Get in Touch */}
         <ContactSection />
       </main>
 
@@ -104,3 +109,7 @@ export default function HomePageClient({
     </div>
   );
 }
+
+
+
+

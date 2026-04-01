@@ -110,3 +110,7 @@ export default async function CollegesPage({
     </div>
   );
 }
+
+
+
+

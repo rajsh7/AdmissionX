@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import CareerStreamListClient from "./CareerStreamListClient";
 
@@ -66,7 +65,7 @@ async function deleteCareer(id: number) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number | boolean)[] = []
 ): Promise<T[]> {
@@ -79,7 +78,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface CareerStreamRow extends RowDataPacket {
+interface CareerStreamRow  {
   id: number;
   title: string;
   slug: string | null;
@@ -91,7 +90,7 @@ interface CareerStreamRow extends RowDataPacket {
   updated_at: string;
 }
 
-interface StreamOption extends RowDataPacket {
+interface StreamOption  {
   id: number;
   name: string;
 }
@@ -146,3 +145,7 @@ export default async function CareerStreamsPage({
     </div>
   );
 }
+
+
+
+

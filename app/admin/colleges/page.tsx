@@ -1,6 +1,6 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
+import { ObjectId } from "mongodb";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 
@@ -8,72 +8,74 @@ import DeleteButton from "@/app/admin/_components/DeleteButton";
 
 async function approveCollegeAction(formData: FormData) {
   "use server";
-  const id = parseInt(formData.get("id") as string, 10);
+  const id  = formData.get("id")  as string;
+  const src = formData.get("src") as string;
   if (!id) return;
   try {
-    await pool.query(
-      "UPDATE next_college_signups SET status = 'approved', updated_at = NOW() WHERE id = ?",
-      [id],
-    );
-  } catch (e) {
-    console.error("[admin/colleges approveAction]", e);
-  }
+    const db  = await getDb();
+    const col = src === "old" ? "request_for_create_college_accounts" : "next_college_signups";
+    const filter = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: parseInt(id, 10) };
+    const newStatus = src === "old" ? "1" : "approved";
+    await db.collection(col).updateOne(filter, { $set: { status: newStatus, updated_at: new Date() } });
+  } catch (e) { console.error("[admin/colleges approveAction]", e); }
   revalidatePath("/admin/colleges");
   revalidatePath("/", "layout");
 }
 
 async function rejectCollegeAction(formData: FormData) {
   "use server";
-  const id = parseInt(formData.get("id") as string, 10);
+  const id  = formData.get("id")  as string;
+  const src = formData.get("src") as string;
   if (!id) return;
   try {
-    await pool.query(
-      "UPDATE next_college_signups SET status = 'rejected', updated_at = NOW() WHERE id = ?",
-      [id],
-    );
-  } catch (e) {
-    console.error("[admin/colleges rejectAction]", e);
-  }
+    const db  = await getDb();
+    const col = src === "old" ? "request_for_create_college_accounts" : "next_college_signups";
+    const filter = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: parseInt(id, 10) };
+    const newStatus = src === "old" ? "0" : "rejected";
+    await db.collection(col).updateOne(filter, { $set: { status: newStatus, updated_at: new Date() } });
+  } catch (e) { console.error("[admin/colleges rejectAction]", e); }
   revalidatePath("/admin/colleges");
   revalidatePath("/", "layout");
 }
 
 async function pendingCollegeAction(formData: FormData) {
   "use server";
-  const id = parseInt(formData.get("id") as string, 10);
+  const id  = formData.get("id")  as string;
+  const src = formData.get("src") as string;
   if (!id) return;
   try {
-    await pool.query(
-      "UPDATE next_college_signups SET status = 'pending', updated_at = NOW() WHERE id = ?",
-      [id],
-    );
-  } catch (e) {
-    console.error("[admin/colleges pendingAction]", e);
-  }
+    const db  = await getDb();
+    const col = src === "old" ? "request_for_create_college_accounts" : "next_college_signups";
+    const filter = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: parseInt(id, 10) };
+    const newStatus = src === "old" ? "2" : "pending";
+    await db.collection(col).updateOne(filter, { $set: { status: newStatus, updated_at: new Date() } });
+  } catch (e) { console.error("[admin/colleges pendingAction]", e); }
   revalidatePath("/admin/colleges");
   revalidatePath("/", "layout");
 }
 
-async function deleteCollegeById(id: number): Promise<void> {
+async function deleteCollegeById(id: string, src: string): Promise<void> {
   "use server";
   try {
-    await pool.query("DELETE FROM next_college_signups WHERE id = ?", [id]);
-  } catch (e) {
-    console.error("[admin/colleges deleteAction]", e);
-  }
+    const db  = await getDb();
+    const col = src === "old" ? "request_for_create_college_accounts" : "next_college_signups";
+    const filter = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: parseInt(id, 10) };
+    await db.collection(col).deleteOne(filter);
+  } catch (e) { console.error("[admin/colleges deleteAction]", e); }
   revalidatePath("/admin/colleges");
   revalidatePath("/", "layout");
 }
 
 async function toggleCollegeLoginAction(formData: FormData): Promise<void> {
   "use server";
-  const usersId = parseInt(formData.get("users_id") as string, 10);
-  const cur     = parseInt(formData.get("cur")     as string, 10);
-  if (!usersId) return;
+  const email = formData.get("email") as string;
+  const cur   = parseInt(formData.get("cur") as string, 10);
+  if (!email) return;
   try {
-    await pool.query(
-      "UPDATE users SET userstatus_id = ? WHERE id = ?",
-      [cur === 1 ? 2 : 1, usersId],
+    const db = await getDb();
+    await db.collection("users").updateOne(
+      { email },
+      { $set: { userstatus_id: cur === 1 ? 2 : 1 } },
     );
   } catch (e) {
     console.error("[admin/colleges toggleLoginAction]", e);
@@ -85,20 +87,7 @@ async function toggleCollegeLoginAction(formData: FormData): Promise<void> {
 
 const PAGE_SIZE = 20;
 
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/colleges safeQuery]", err);
-    return [];
-  }
-}
-
-function formatDate(d: string | null | undefined): string {
+function formatDate(d: string | Date | null | undefined): string {
   if (!d) return "—";
   try {
     return new Date(d).toLocaleDateString("en-IN", {
@@ -113,21 +102,17 @@ function formatDate(d: string | null | undefined): string {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface CollegeRow extends RowDataPacket {
-  id: number;
+interface CollegeRow {
+  _id: string;
   college_name: string;
   email: string;
   contact_name: string;
   phone: string;
   status: string;
-  created_at: string;
-  updated_at: string;
-  users_id: number | null;
-  user_is_active: number;
-}
-
-interface CountRow extends RowDataPacket {
-  total: number;
+  created_at: Date | string;
+  updated_at: Date | string;
+  user_is_active?: number;
+  _source?: "old" | "new";
 }
 
 // ─── Status config ────────────────────────────────────────────────────────────
@@ -172,70 +157,96 @@ export default async function AdminCollegesPage({
   const status = sp.status ?? "all"; // all | pending | approved | rejected
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Build WHERE clause ─────────────────────────────────────────────────────
-  const conditions: string[] = [];
-  const params: (string | number)[] = [];
+  // ── MongoDB queries ────────────────────────────────────────────────────────
+  const db = await getDb();
 
-  if (q) {
-    conditions.push(
-      "(college_name LIKE ? OR email LIKE ? OR contact_name LIKE ? OR phone LIKE ?)",
-    );
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
+  // Normalize old `request_for_create_college_accounts` docs to CollegeRow shape
+  // Old status: " 1" = approved, " 0" = rejected, anything else = pending
+  function normalizeOld(doc: Record<string, unknown>): CollegeRow {
+    const rawStatus = String(doc.status ?? "").trim();
+    const mappedStatus = rawStatus === "1" ? "approved" : rawStatus === "0" ? "rejected" : "pending";
+    return {
+      _id:          String(doc._id),
+      college_name: String(doc.collegeName  ?? doc.college_name ?? "").trim(),
+      email:        String(doc.email        ?? "").trim(),
+      contact_name: String(doc.contactPersonName ?? doc.contact_name ?? "").trim(),
+      phone:        String(doc.phone        ?? "").trim(),
+      status:       mappedStatus,
+      created_at:   String(doc.created_at   ?? "").trim(),
+      updated_at:   String(doc.updated_at   ?? "").trim(),
+      _source:      "old",
+    } as CollegeRow;
   }
-  if (status !== "all") {
-    conditions.push("status = ?");
-    params.push(status);
+
+  function normalizeNew(doc: Record<string, unknown>): CollegeRow {
+    return {
+      _id:          String(doc._id),
+      college_name: String(doc.college_name ?? ""),
+      email:        String(doc.email        ?? ""),
+      contact_name: String(doc.contact_name ?? ""),
+      phone:        String(doc.phone        ?? ""),
+      status:       String(doc.status       ?? "pending"),
+      created_at:   doc.created_at as Date | string,
+      updated_at:   doc.updated_at as Date | string,
+      _source:      "new",
+    } as CollegeRow;
   }
 
-  const where = conditions.length
-    ? `WHERE ${conditions.join(" AND ")}`
-    : "";
-
-  // ── Parallel queries ───────────────────────────────────────────────────────
-  const [colleges, countRows, totals] = await Promise.all([
-    safeQuery<CollegeRow>(
-      `SELECT ncs.id, ncs.college_name, ncs.email, ncs.contact_name, ncs.phone,
-              ncs.status, ncs.created_at, ncs.updated_at,
-              cp.users_id,
-              COALESCE(u.userstatus_id, 1) AS user_is_active
-       FROM next_college_signups ncs
-       LEFT JOIN collegeprofile cp ON cp.id = (
-         SELECT id FROM collegeprofile WHERE users_id = (
-           SELECT id FROM users WHERE email = ncs.email LIMIT 1
-         ) LIMIT 1
-       )
-       LEFT JOIN users u ON u.id = cp.users_id
-       ${where}
-       ORDER BY
-         FIELD(ncs.status, 'pending', 'approved', 'rejected'),
-         ncs.created_at DESC
-       LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
-    ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total FROM next_college_signups ${where}`,
-      params,
-    ),
-    safeQuery<CountRow & { status: string }>(
-      `SELECT status, COUNT(*) AS total
-       FROM next_college_signups
-       GROUP BY status`,
-    ),
+  const [oldDocs, newDocs] = await Promise.all([
+    db.collection("request_for_create_college_accounts").find({}).toArray(),
+    db.collection("next_college_signups").find({}).toArray(),
   ]);
 
-  const total      = Number(countRows[0]?.total ?? 0);
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  let allDocs: CollegeRow[] = [
+    ...newDocs.map(d => normalizeNew(d as Record<string, unknown>)),
+    ...oldDocs.map(d => normalizeOld(d as Record<string, unknown>)),
+  ];
 
-  // Build status counts map
-  const statusCounts: Record<string, number> = { pending: 0, approved: 0, rejected: 0 };
-  let grandTotal = 0;
-  for (const row of totals) {
-    const r = row as any;
-    const key = r.status;
-    const cnt = Number(r.total ?? 0);
-    if (key in statusCounts) statusCounts[key] = cnt;
-    grandTotal += cnt;
+  // Apply search filter
+  if (q) {
+    try {
+      const re = new RegExp(q, "i");
+      allDocs = allDocs.filter(c =>
+        re.test(c.college_name) || re.test(c.email) || re.test(c.contact_name) || re.test(c.phone)
+      );
+    } catch {
+      // invalid regex — fall back to plain string match
+      const lq = q.toLowerCase();
+      allDocs = allDocs.filter(c =>
+        c.college_name.toLowerCase().includes(lq) ||
+        c.email.toLowerCase().includes(lq) ||
+        c.contact_name.toLowerCase().includes(lq) ||
+        c.phone.toLowerCase().includes(lq)
+      );
+    }
   }
+  if (status !== "all") {
+    allDocs = allDocs.filter(c => c.status === status);
+  }
+
+  // Status counts (from full unfiltered set)
+  const allNormalized: CollegeRow[] = [
+    ...newDocs.map(d => normalizeNew(d as Record<string, unknown>)),
+    ...oldDocs.map(d => normalizeOld(d as Record<string, unknown>)),
+  ];
+  const statusCounts = { pending: 0, approved: 0, rejected: 0 };
+  for (const c of allNormalized) {
+    if (c.status in statusCounts) statusCounts[c.status as keyof typeof statusCounts]++;
+  }
+  const grandTotal = allNormalized.length;
+
+  // Sort: pending first, then approved, then rejected; newest first within each
+  const STATUS_ORDER: Record<string, number> = { pending: 0, approved: 1, rejected: 2 };
+  allDocs.sort((a, b) => {
+    const sa = STATUS_ORDER[a.status] ?? 3;
+    const sb = STATUS_ORDER[b.status] ?? 3;
+    if (sa !== sb) return sa - sb;
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+
+  const total      = allDocs.length;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const colleges   = allDocs.slice(offset, offset + PAGE_SIZE);
 
   // ── URL builder ────────────────────────────────────────────────────────────
   function buildUrl(overrides: Record<string, string | number>) {
@@ -443,11 +454,11 @@ export default async function AdminCollegesPage({
         ) : (
           <>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 px-1 mb-1">
-          {colleges.map((college, idx) => {
+          {colleges.map((college) => {
             const cfg = STATUS_CONFIG[college.status] ?? STATUS_CONFIG.pending;
             return (
               <div 
-                key={college.id} 
+                key={String(college._id)} 
                 className="group relative bg-white border border-slate-200/60 rounded-[2rem] p-6 shadow-sm hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-200 transition-all duration-500 flex flex-col h-full bg-gradient-to-b from-white to-slate-50/30"
               >
                 {/* Status Badge + Date */}
@@ -464,7 +475,7 @@ export default async function AdminCollegesPage({
                 {/* College Info */}
                 <div className="flex items-start gap-4 mb-6">
                   <div className="w-16 h-16 rounded-[1.25rem] bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm flex-shrink-0">
-                    <span className="text-2xl font-black">{college.college_name.charAt(0).toUpperCase()}</span>
+                    <span className="text-2xl font-black">{(college.college_name || "?").charAt(0).toUpperCase()}</span>
                   </div>
                   <div className="min-w-0 flex-1 pt-1">
                     <h3 className="font-extrabold text-slate-800 line-clamp-2 leading-[1.2] group-hover:text-indigo-600 transition-colors text-lg">
@@ -505,24 +516,20 @@ export default async function AdminCollegesPage({
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Login Access</span>
                     <form action={toggleCollegeLoginAction} className="inline-block">
-                      <input type="hidden" name="users_id" value={college.users_id ?? ""} />
-                      <input type="hidden" name="cur"      value={college.user_is_active} />
+                      <input type="hidden" name="email" value={college.email} />
+                      <input type="hidden" name="cur"   value={college.user_is_active ?? 1} />
                       <button
                         type="submit"
-                        disabled={!college.users_id}
-                        title={college.users_id ? (college.user_is_active ? "Disable login" : "Enable login") : "No linked user account"}
                         className={`inline-flex items-center gap-1 text-[10px] font-black px-3 py-1.5 rounded-xl transition-all ${
-                          !college.users_id
-                            ? "bg-slate-100 text-slate-300 cursor-not-allowed"
-                            : college.user_is_active
+                          (college.user_is_active ?? 1) === 1
                             ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
                             : "bg-red-100 text-red-600 hover:bg-red-200"
                         }`}
                       >
                         <span className="material-symbols-rounded text-[12px]" style={ICO_FILL}>
-                          {college.user_is_active ? "lock_open" : "lock"}
+                          {(college.user_is_active ?? 1) === 1 ? "lock_open" : "lock"}
                         </span>
-                        {college.user_is_active ? "Enabled" : "Disabled"}
+                        {(college.user_is_active ?? 1) === 1 ? "Enabled" : "Disabled"}
                       </button>
                     </form>
                   </div>
@@ -531,7 +538,8 @@ export default async function AdminCollegesPage({
                   <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
                     {college.status !== "approved" && (
                       <form action={approveCollegeAction}>
-                        <input type="hidden" name="id" value={college.id} />
+                        <input type="hidden" name="id"  value={String(college._id)} />
+                        <input type="hidden" name="src" value={college._source ?? "new"} />
                         <button type="submit" className="text-[10px] font-black px-3 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 hover:shadow-lg hover:shadow-green-500/30 transition-all uppercase tracking-tighter">
                           Approve
                         </button>
@@ -539,7 +547,8 @@ export default async function AdminCollegesPage({
                     )}
                     {college.status !== "rejected" && (
                       <form action={rejectCollegeAction}>
-                        <input type="hidden" name="id" value={college.id} />
+                        <input type="hidden" name="id"  value={String(college._id)} />
+                        <input type="hidden" name="src" value={college._source ?? "new"} />
                         <button type="submit" className="text-[10px] font-black px-3 py-2 rounded-xl bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all uppercase tracking-tighter">
                           Reject
                         </button>
@@ -547,14 +556,15 @@ export default async function AdminCollegesPage({
                     )}
                     {college.status !== "pending" && (
                       <form action={pendingCollegeAction}>
-                        <input type="hidden" name="id" value={college.id} />
+                        <input type="hidden" name="id"  value={String(college._id)} />
+                        <input type="hidden" name="src" value={college._source ?? "new"} />
                         <button type="submit" className="text-[10px] font-black px-3 py-2 rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 transition-all uppercase tracking-tighter">
                           Reset
                         </button>
                       </form>
                     )}
                   </div>
-                  <DeleteButton action={deleteCollegeById.bind(null, college.id)} size="sm" />
+                  <DeleteButton action={deleteCollegeById.bind(null, String(college._id), college._source ?? "new")} size="sm" />
                 </div>
               </div>
             );
@@ -638,3 +648,7 @@ export default async function AdminCollegesPage({
     </div>
   );
 }
+
+
+
+

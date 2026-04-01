@@ -20,24 +20,15 @@ interface AuthUser {
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "Top colleges", href: "/top-colleges" },
+  { label: "Top Universities", href: "/top-university" },
   { label: "Top Courses", href: "/careers-courses" },
-  {
-    label: "Study Abroad",
-    href: "/study-abroad",
-    subItems: [
-      { label: "UK", href: "/study-abroad/uk", icon: "public" },
-      { label: "USA", href: "/study-abroad/usa", icon: "public" },
-      { label: "Canada", href: "/study-abroad/canada", icon: "public" },
-      { label: "Australia", href: "/study-abroad/australia", icon: "public" },
-    ]
-  },
+  { label: "Study Abroad", href: "/study-abroad" },
   {
     label: "More",
     href: "#",
     subItems: [
       { label: "Counselling", href: "/counselling", icon: "support_agent" },
       { label: "Examination", href: "/examination", icon: "engineering" },
-      { label: "Top Universities", href: "/top-university", icon: "school" },
       { label: "Streams", href: "/stream", icon: "grid_view" },
       { label: "News & Articles", href: "/news", icon: "newspaper" },
       { label: "Latest Blogs", href: "/education-blogs", icon: "article" },
@@ -73,14 +64,14 @@ function Dropdown({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 8, scale: 0.96 }}
           transition={{ duration: 0.18, ease: "easeOut" }}
-          className="absolute top-full right-0 mt-2 w-52 rounded-xl bg-white shadow-2xl shadow-black/15 border border-neutral-100 overflow-hidden z-50"
+          className="absolute top-full right-0 mt-2 w-52 rounded-[10px] bg-white shadow-2xl shadow-black/15 border border-neutral-100 overflow-hidden z-50"
         >
           {items.map((item) => (
             <Link
               key={item.label}
               href={item.href}
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-[#008080]/5 hover:text-[#008080] transition-colors"
+              className="flex items-center gap-3 px-4 py-3 text-[16px] font-normal text-slate-700 hover:bg-primary/5 hover:text-primary transition-colors"
             >
               <span className="material-symbols-outlined text-[20px] text-neutral-400">
                 {item.icon}
@@ -136,16 +127,16 @@ function UserMenuDropdown({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 8, scale: 0.96 }}
           transition={{ duration: 0.18, ease: "easeOut" }}
-          className="absolute top-full right-0 mt-2 w-60 rounded-xl bg-white shadow-2xl shadow-black/15 border border-neutral-100 overflow-hidden z-50"
+          className="absolute top-full right-0 mt-2 w-60 rounded-[10px] bg-white shadow-2xl shadow-black/15 border border-neutral-100 overflow-hidden z-50"
         >
           {/* User Info Header */}
-          <div className="px-4 py-3 bg-[#008080]/5 border-b border-neutral-100">
+          <div className="px-4 py-3 bg-primary/5 border-b border-neutral-100">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#008080] flex items-center justify-center text-white text-sm font-bold shrink-0">
+              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-sm font-normal shrink-0">
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-bold text-neutral-800 truncate">
+                <p className="text-sm font-normal text-neutral-800 truncate">
                   {user.name}
                 </p>
                 <p className="text-[11px] text-neutral-500 truncate">
@@ -161,7 +152,7 @@ function UserMenuDropdown({
               key={item.label}
               href={item.href}
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-neutral-700 hover:bg-[#008080]/5 hover:text-[#008080] transition-colors"
+              className="flex items-center gap-3 px-4 py-3 text-[16px] font-normal text-neutral-700 hover:bg-primary/5 hover:text-primary transition-colors"
             >
               <span className="material-symbols-outlined text-[20px] text-neutral-400">
                 {item.icon}
@@ -177,7 +168,7 @@ function UserMenuDropdown({
                 onLogout();
                 onClose();
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 text-[16px] font-normal text-rose-600 hover:bg-rose-50 transition-colors"
             >
               <span className="material-symbols-outlined text-[20px]">
                 logout
@@ -205,6 +196,7 @@ export default function Header({ }: HeaderProps) {
   const [mobileSignupOpen, setMobileSignupOpen] = useState(false);
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const loginRef = useRef<HTMLDivElement>(null);
   const signupRef = useRef<HTMLDivElement>(null);
@@ -232,6 +224,12 @@ export default function Header({ }: HeaderProps) {
   useEffect(() => {
     setMounted(true);
     checkAuth();
+
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [checkAuth]);
 
   // ── Logout ────────────────────────────────────────────────────────────────
@@ -299,16 +297,22 @@ export default function Header({ }: HeaderProps) {
       {mounted && (
         <motion.div
           className="scroll-progress-bar h-1 fixed top-0 left-0 right-0 z-[60] origin-left"
-          style={{ scaleX: scrollYProgress, backgroundColor: '#008080' }}
+          style={{ scaleX: scrollYProgress, backgroundColor: '#FF3C3C' }}
         />
       )}
 
-      <motion.header className="fixed top-0 left-0 right-0 z-50 w-full min-h-[80px] flex items-center bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] transition-colors">
+      <motion.header 
+        className={`fixed top-0 left-0 right-0 z-50 w-full flex items-center transition-all duration-300 ${
+          isScrolled 
+            ? "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.08)] py-4 min-h-[80px]" 
+            : "bg-white/90 backdrop-blur-md py-5 min-h-[90px]"
+        }`}
+      >
         <div className="flex items-center justify-between px-6 sm:px-12 w-full max-w-[1920px] mx-auto">
           {/* Logo Area */}
           <div className="shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
-              <img src="/admissionx-v2-logo.png" alt="AdmissionX logo" className="h-9 w-auto object-contain" />
+              <img src="/admissionx-logo.png" alt="AdmissionX logo" className="h-9 w-auto object-contain" />
             </Link>
           </div>
 
@@ -320,11 +324,11 @@ export default function Header({ }: HeaderProps) {
                 <div key={link.label} className="relative group/nav">
                   <Link
                     href={link.href}
-                    className="flex items-center gap-1.5 px-4 py-2 text-[14px] font-bold text-slate-700 hover:text-[#008080] transition-colors relative"
+                    className="flex items-center gap-1.5 px-4 py-2 text-[16px] font-medium text-slate-700 hover:text-primary transition-colors relative"
                   >
                     {link.label}
-                    {link.subItems && (
-                      <span className="material-symbols-outlined text-[16px] text-slate-300 group-hover/nav:text-[#008080] transition-colors">
+                    {link.subItems && mounted && (
+                      <span className="material-symbols-outlined text-[18px] text-slate-300 group-hover/nav:text-primary transition-colors">
                         expand_more
                       </span>
                     )}
@@ -332,16 +336,18 @@ export default function Header({ }: HeaderProps) {
 
                   {link.subItems && (
                     <div className="absolute top-full left-1/2 -translate-x-1/2 w-56 pt-3 opacity-0 translate-y-2 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:pointer-events-auto transition-all duration-200 z-50">
-                      <div className="bg-white rounded-2xl shadow-2xl shadow-black/10 border border-slate-50 overflow-hidden py-1.5">
+                      <div className="bg-white rounded-[10px] shadow-2xl shadow-black/10 border border-slate-50 overflow-hidden py-1.5">
                         {link.subItems.map((sub) => (
                           <Link
                             key={sub.label}
                             href={sub.href}
-                            className="flex items-center gap-3 px-4 py-2.5 text-[14px] font-medium text-slate-600 hover:bg-[#008080]/5 hover:text-[#008080] transition-colors"
+                            className="flex items-center gap-3 px-4 py-2.5 text-[16px] font-normal text-slate-600 hover:bg-primary/5 hover:text-primary transition-colors"
                           >
-                            <span className="material-symbols-outlined text-[18px] text-slate-400">
-                              {sub.icon}
-                            </span>
+                            {mounted && (
+                              <span className="material-symbols-outlined text-[18px] text-slate-400">
+                                {sub.icon}
+                              </span>
+                            )}
                             {sub.label}
                           </Link>
                         ))}
@@ -354,20 +360,16 @@ export default function Header({ }: HeaderProps) {
 
             {/* Right Area (Actions) */}
             <div className="flex items-center gap-3">
-              <button className="text-slate-500 hover:text-[#008080] transition-colors flex items-center justify-center p-2 rounded-full hover:bg-slate-50">
-                <span className="material-symbols-outlined text-[22px]">search</span>
-              </button>
-
-              {!authChecked ? (
+              {(!mounted || !authChecked) ? (
                 <div className="h-9 w-24 bg-slate-100 rounded-full animate-pulse" />
               ) : authUser ? (
                 <div ref={userMenuRef} className="relative">
                   <button
                     onClick={() => setUserMenuOpen((o) => !o)}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#008080] text-white hover:bg-[#006666] transition-all shadow-lg shadow-[#008080]/10"
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-[10px] bg-primary text-white hover:bg-primary-dark transition-all shadow-lg shadow-primary/10"
                   >
                     <span className="material-symbols-outlined text-[18px]">account_circle</span>
-                    <span className="text-[14px] font-bold">Account</span>
+                    <span className="text-[14px] font-normal">Account</span>
                     <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${userMenuOpen ? "rotate-180" : ""}`}>
                       expand_more
                     </span>
@@ -379,7 +381,7 @@ export default function Header({ }: HeaderProps) {
                   {/* Login Dropdown */}
                   <div ref={loginRef} className="relative" onMouseEnter={openLogin} onMouseLeave={closeLogin}>
                     <button
-                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-slate-700 hover:bg-slate-50 transition-all font-bold text-[15px]"
+                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-[10px] text-slate-700 hover:bg-slate-50 transition-all font-medium text-[16px]"
                     >
                       Login
                       <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${loginOpen ? "rotate-180" : ""}`}>expand_more</span>
@@ -390,7 +392,7 @@ export default function Header({ }: HeaderProps) {
                   {/* Sign Up Dropdown */}
                   <div ref={signupRef} className="relative" onMouseEnter={openSignup} onMouseLeave={closeSignup}>
                     <button
-                      className="flex items-center gap-1.5 px-6 py-2.5 rounded-full bg-[#008080] text-white hover:bg-[#006666] transition-all shadow-lg shadow-[#008080]/10 font-bold text-[14px]"
+                      className="flex items-center gap-1.5 px-6 py-2.5 rounded-[10px] bg-primary text-white hover:bg-primary-dark transition-all shadow-lg shadow-primary/10 font-medium text-[16px]"
                     >
                       Sign Up
                       <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${signupOpen ? "rotate-180" : ""}`}>expand_more</span>
@@ -421,7 +423,7 @@ export default function Header({ }: HeaderProps) {
                       <div className="flex items-center justify-between py-3">
                         <Link
                           href={item.href}
-                          className="text-sm font-bold text-slate-800 uppercase tracking-tight"
+                          className="text-[16px] font-medium text-slate-800 uppercase tracking-tight"
                           onClick={() => {
                             if (!item.subItems) setMobileMenuOpen(false);
                             else setExpandedMobileItem(isExpanded ? null : item.label);
@@ -432,7 +434,7 @@ export default function Header({ }: HeaderProps) {
                         {item.subItems && (
                           <button
                             onClick={() => setExpandedMobileItem(isExpanded ? null : item.label)}
-                            className="p-1 hover:bg-slate-50 rounded-lg transition-colors"
+                            className="p-1 hover:bg-slate-50 rounded-[10px] transition-colors"
                           >
                             <span className={`material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>
                               expand_more
@@ -451,19 +453,21 @@ export default function Header({ }: HeaderProps) {
                               className="overflow-hidden bg-slate-50/50 rounded-2xl"
                             >
                               <div className="py-2 px-3 space-y-1">
-                                {item.subItems.map((sub) => (
-                                  <Link
-                                    key={sub.label}
-                                    href={sub.href}
-                                    className="flex items-center gap-3 px-3 py-3 text-[13px] font-medium text-slate-600 hover:text-teal-600 transition-colors"
-                                    onClick={() => setMobileMenuOpen(false)}
-                                  >
-                                    <span className="material-symbols-outlined text-[18px] text-slate-400">
-                                      {sub.icon}
-                                    </span>
-                                    {sub.label}
-                                  </Link>
-                                ))}
+                                  {item.subItems.map((sub) => (
+                                    <Link
+                                      key={sub.label}
+                                      href={sub.href}
+                                      className="flex items-center gap-3 px-3 py-3 text-[16px] font-normal text-slate-600 hover:text-primary transition-colors"
+                                      onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                      {mounted && (
+                                        <span className="material-symbols-outlined text-[18px] text-slate-400">
+                                          {sub.icon}
+                                        </span>
+                                      )}
+                                      {sub.label}
+                                    </Link>
+                                  ))}
                               </div>
                             </motion.div>
                           )}
@@ -486,15 +490,15 @@ export default function Header({ }: HeaderProps) {
                           ? `/dashboard/college/${authUser.id}`
                           : `/dashboard/student/${authUser.id}`
                     }
-                    className="flex items-center gap-3 px-3 py-4 text-sm font-bold text-slate-800"
+                    className="flex items-center gap-3 px-3 py-4 text-sm font-normal text-slate-800"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <span className="material-symbols-outlined text-teal-600">
+                    <span className="material-symbols-outlined text-primary">
                       {authUser.role?.toLowerCase() === "admin" ? "admin_panel_settings" : "dashboard"}
                     </span>
                     {authUser.role?.toLowerCase() === "admin" ? "Admin Dashboard" : authUser.role?.toLowerCase() === "college" ? "College Dashboard" : "My Dashboard"}
                   </Link>
-                  <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="flex items-center gap-3 py-4 px-3 text-sm font-bold text-rose-500 w-full text-left">
+                  <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="flex items-center gap-3 py-4 px-3 text-sm font-normal text-rose-500 w-full text-left">
                     <span className="material-symbols-outlined">logout</span>
                     Sign Out
                   </button>
@@ -504,15 +508,15 @@ export default function Header({ }: HeaderProps) {
                   <div className="grid grid-cols-2 gap-3">
                     <Link
                       href="/login/student"
-                      className="flex items-center justify-center py-3.5 rounded-2xl bg-slate-50 text-slate-800 text-[13px] font-bold border border-slate-100 shadow-sm"
+                      className="flex items-center justify-center py-3.5 rounded-[10px] bg-slate-50 text-slate-800 text-[16px] font-medium border border-slate-100 shadow-sm"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Login
                     </Link>
                     <Link
                       href="/signup/student"
-                      className="flex items-center justify-center py-3.5 rounded-2xl text-white text-[13px] font-bold shadow-lg shadow-teal-500/20"
-                      style={{ backgroundColor: '#008080' }}
+                      className="flex items-center justify-center py-3.5 rounded-[10px] text-white text-[16px] font-medium shadow-lg shadow-primary/20"
+                      style={{ backgroundColor: '#FF3C3C' }}
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Sign Up
@@ -527,3 +531,7 @@ export default function Header({ }: HeaderProps) {
     </>
   );
 }
+
+
+
+

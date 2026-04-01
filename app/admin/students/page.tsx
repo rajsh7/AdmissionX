@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 
 // ─── Server Action ────────────────────────────────────────────────────────────
@@ -25,7 +24,7 @@ async function toggleStudentAction(formData: FormData): Promise<void> {
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -91,7 +90,7 @@ function obfuscatePhone(phone: string | null | undefined): string {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface StudentRow extends RowDataPacket {
+interface StudentRow  {
   id: number;
   name: string;
   email: string;
@@ -100,11 +99,11 @@ interface StudentRow extends RowDataPacket {
   created_at: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
-interface StatsRow extends RowDataPacket {
+interface StatsRow  {
   total: number;
   today: number;
   this_week: number;
@@ -631,3 +630,7 @@ export default async function AdminStudentsPage({
     </div>
   );
 }
+
+
+
+

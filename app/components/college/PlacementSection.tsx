@@ -220,3 +220,7 @@ export default function PlacementSection({ placement }: PlacementSectionProps) {
     </section>
   );
 }
+
+
+
+

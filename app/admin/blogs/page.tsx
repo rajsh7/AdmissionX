@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import DeleteButton from "../_components/DeleteButton";
 import BlogClient from "./BlogClient";
@@ -35,7 +34,7 @@ async function deleteBlogById(id: number): Promise<void> {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -68,7 +67,7 @@ function stripHtml(html: string | null | undefined): string {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface BlogRow extends RowDataPacket {
+interface BlogRow  {
   id: number;
   topic: string;
   slug: string | null;
@@ -79,11 +78,11 @@ interface BlogRow extends RowDataPacket {
   updated_at: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
-interface StatsRow extends RowDataPacket {
+interface StatsRow  {
   total: number;
   active: number;
   inactive: number;
@@ -332,3 +331,7 @@ export default async function AdminBlogsPage({
     </div>
   );
 }
+
+
+
+

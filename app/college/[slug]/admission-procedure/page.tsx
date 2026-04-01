@@ -3,7 +3,6 @@ export const revalidate = 300;
 
 import pool from "@/lib/db";
 import { notFound } from "next/navigation";
-import { RowDataPacket } from "mysql2";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -50,7 +49,7 @@ function isUpcoming(dateStr: string | null | undefined): boolean {
   }
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T>(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -65,7 +64,7 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface CollegeBaseRow extends RowDataPacket {
+interface CollegeBaseRow {
   id: number;
   slug: string;
   college_name: string;
@@ -73,7 +72,7 @@ interface CollegeBaseRow extends RowDataPacket {
   admissionEnd: string | null;
 }
 
-interface ProcedureRow extends RowDataPacket {
+interface ProcedureRow {
   id: number;
   title: string | null;
   description: string | null;
@@ -82,7 +81,7 @@ interface ProcedureRow extends RowDataPacket {
   stream_name: string | null;
 }
 
-interface ImportantDateRow extends RowDataPacket {
+interface ImportantDateRow {
   id: number;
   eventName: string | null;
   fromdate: string | null;

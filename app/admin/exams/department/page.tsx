@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
 
@@ -14,7 +13,7 @@ async function deleteDepartment(id: number) {
   revalidatePath("/", "layout");
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number | boolean)[] = [],
 ): Promise<T[]> {
@@ -28,7 +27,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface DeptRow extends RowDataPacket {
+interface DeptRow  {
   id: number;
   collegeName: string | null;
   functionalArea: string | null;
@@ -136,3 +135,7 @@ export default async function ExamDeptPage({
     </div>
   );
 }
+
+
+
+

@@ -1,7 +1,6 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
-import { RowDataPacket } from "mysql2";
 import AdminImg from "@/app/admin/_components/AdminImg";
 import FacilitiesClient from "./FacilitiesClient";
 
@@ -61,7 +60,7 @@ async function updateFacility(formData: FormData) {
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -76,7 +75,7 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface FacilityRow extends RowDataPacket {
+interface FacilityRow  {
   id: number;
   college_name: string;
   facility_name: string;
@@ -87,7 +86,7 @@ interface FacilityRow extends RowDataPacket {
   facilities_id: number | null;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
@@ -174,10 +173,10 @@ export default async function CollegeFacilitiesPage({
           params,
         )
       : safeQuery<CountRow>("SELECT COUNT(*) AS total FROM collegefacilities"),
-    safeQuery<{ id: number; name: string } & RowDataPacket>(
+    safeQuery<{ id: number; name: string }>(
       "SELECT cp.id, u.firstname as name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
     ),
-    safeQuery<{ id: number; name: string } & RowDataPacket>(
+    safeQuery<{ id: number; name: string }>(
       "SELECT id, name FROM facilities ORDER BY name ASC"
     ),
   ]);
@@ -246,3 +245,7 @@ export default async function CollegeFacilitiesPage({
     </div>
   );
 }
+
+
+
+

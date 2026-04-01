@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function HeroSection() {
@@ -56,187 +57,158 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative w-full min-h-screen flex items-center pt-32 pb-16 overflow-hidden bg-[#fdfdfd]">
-      {/* Abstract Background Shapes */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-         <div className="absolute top-[10%] left-[10%] w-32 h-32 rounded-full bg-orange-100/40 blur-2xl animate-pulse" />
-         <div className="absolute top-[5%] right-[20%] w-80 h-80 rounded-full bg-blue-50/40 blur-[100px]" />
-         <div className="absolute bottom-[20%] right-[10%] w-64 h-64 rounded-full bg-[#008080]/5 blur-[80px]" />
-         
-         {/* Large Blob behind the image area */}
-         <div className="absolute top-[15%] right-[5%] w-[500px] h-[500px] rounded-full bg-gradient-to-br from-orange-200/20 via-teal-100/10 to-transparent blur-[120px] z-0" />
-         
-         {/* Floating Spheres */}
-         <motion.div 
-           animate={{ y: [0, -20, 0] }}
-           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-           className="absolute top-[25%] right-[25%] w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200/50 shadow-inner z-0" 
+    <section className="relative w-full h-screen min-h-[850px] flex items-center overflow-hidden">
+      {/* Raw Group 1.png Background */}
+      <div className="absolute inset-0 z-0">
+         <img 
+           src="/Background-images/Group 1.png" 
+           alt="Hero Background" 
+           className="w-full h-full object-cover object-left lg:object-center"
          />
-         <motion.div 
-           animate={{ y: [0, 20, 0] }}
-           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-           className="absolute top-[15%] left-[10%] w-12 h-12 rounded-full bg-gradient-to-br from-orange-100 to-orange-200/50 shadow-inner z-0" 
-         />
-
-         {/* Wavy lines decorative element (SVG) */}
-         <div className="absolute bottom-[5%] left-[5%] opacity-20">
-           <svg width="300" height="100" viewBox="0 0 300 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-             <path d="M0 50 C50 20 100 80 150 50 C200 20 250 80 300 50" stroke="#008080" strokeWidth="4" strokeLinecap="round" strokeDasharray="1 12" />
-             <path d="M0 70 C50 40 100 100 150 70 C200 40 250 100 300 70" stroke="#f97316" strokeWidth="4" strokeLinecap="round" strokeDasharray="1 12" />
-           </svg>
-         </div>
-         
-         {/* Textured rectangle on the right (Yellow) */}
-         <div className="absolute top-[15%] right-[2%] w-32 h-64 bg-yellow-400/10 rounded-[30px] border-2 border-yellow-200/30 z-0 rotate-12" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="text-[48px] sm:text-[64px] lg:text-[76px] font-black leading-[1.05] text-slate-900 tracking-tight">
-              Architect Your <br />
-              <span className="text-[#008080]">Academic Future</span>
-            </h1>
+      <div className="relative z-10 mx-auto max-w-[1920px] w-full">
+        {/* Frame 2: Sub-nav Bar */}
+        <div className="w-full h-[50px] bg-[#181C35]/58 backdrop-blur-md flex items-center justify-center gap-10 px-6 sm:px-12 lg:px-24 overflow-hidden">
+          {["Top Universities", "Top Universities", "Top Universities", "Top Universities", "Top Universities", "Top Colleges"].map((item, i) => (
+            <Link 
+              key={i} 
+              href={item === "Top Colleges" ? "/top-colleges" : "/top-university"}
+              className="text-white text-sm font-normal whitespace-nowrap hover:text-primary transition-colors"
+            >
+              {item}
+            </Link>
+          ))}
+        </div>
 
-            <p className="mt-8 text-lg text-slate-500 max-w-lg leading-relaxed font-medium">
-              The world's most comprehensive academic discovery platform. Search 50,000+ universities, get exam guidance, and read unfiltered student reviews.
-            </p>
+        <div className="px-6 sm:px-12 lg:px-24 py-24 lg:py-32">
+          <div className="grid grid-cols-1 lg:grid-cols-12 lg:items-center">
+            
+            {/* Moved slightly left (col-start-6) to match the user's request for "little left" */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="lg:col-start-6 lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left pt-20"
+            >
+              <div className="mb-4">
+                <img 
+                  src="/images/Architect Your  Academic Future.png" 
+                  alt="Architect Your Academic Future" 
+                  className="h-auto w-full max-w-[320px] sm:max-w-[450px] lg:max-w-[650px] object-contain"
+                />
+              </div>
 
-            <div className="mt-10 max-w-3xl">
-               <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center gap-4">
-                  <div ref={dropdownRef} className="relative flex-1 w-full group bg-white rounded-full border-[1.5px] border-black shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)]">
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500">
-                      <span className="material-symbols-outlined text-[24px]">location_on</span>
-                    </span>
-                    <input 
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => {
-                        setSearchQuery(e.target.value);
-                        setShowDropdown(true);
-                      }}
-                      onFocus={() => {
-                        if (suggestions.length > 0) setShowDropdown(true);
-                      }}
-                      placeholder="Location, universities, courses..."
-                      className="w-full h-16 pl-14 pr-6 bg-transparent text-slate-800 placeholder:text-slate-400 focus:outline-none text-[16px] font-bold"
-                    />
+              <p className="mt-8 text-[22px] text-white/90 w-full max-w-xl lg:w-[763px] lg:h-[132px] leading-relaxed font-normal drop-shadow-sm">
+                The world's most comprehensive academic discovery platform. Search 50,000+ universities, get exam guidance, and read unfiltered student reviews.
+              </p>
 
-                    {/* Autocomplete Dropdown */}
-                    <AnimatePresence>
-                      {showDropdown && (searchQuery.trim().length >= 2) && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-slate-100 shadow-2xl overflow-hidden z-50 max-h-[300px] overflow-y-auto"
-                        >
-                          {isLoading ? (
-                            <div className="p-4 text-center text-slate-500 text-sm font-medium">Searching...</div>
-                          ) : suggestions.length > 0 ? (
-                            <div className="py-2">
-                              {suggestions.map((item, idx) => (
-                                <button
-                                  key={idx}
-                                  type="button"
-                                  onClick={() => {
-                                    setSearchQuery(item.name);
-                                    setShowDropdown(false);
-                                    if (item.slug) {
-                                       router.push(`/college/${item.slug}`);
-                                    } else {
-                                       router.push(`/search?q=${encodeURIComponent(item.name)}`);
-                                    }
-                                  }}
-                                  className="w-full text-left px-4 py-3 hover:bg-teal-50 flex items-center gap-3 transition-colors border-b border-slate-50 last:border-0"
-                                >
-                                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
-                                    <span className="material-symbols-outlined text-slate-400 text-[20px]">
-                                      {item.slug ? "school" : "search"}
-                                    </span>
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="text-[15px] font-bold text-slate-800 truncate">{item.name}</div>
-                                    <div className="text-[12px] font-medium text-slate-500 truncate">{item.location}</div>
-                                  </div>
-                                </button>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="p-4 text-center text-slate-500 text-sm font-medium">No results found for "{searchQuery}"</div>
-                          )}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+              <div className="mt-12 w-full max-w-2xl">
+                  <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center gap-4">
+                    <div ref={dropdownRef} className="relative flex-1 w-full bg-white/10 backdrop-blur-md rounded-[10px] border border-white/20 p-1 shadow-2xl">
+                      <span className="absolute left-6 top-1/2 -translate-y-1/2 text-white/60">
+                        <span className="material-symbols-outlined text-[20px]">location_on</span>
+                      </span>
+                      <input 
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => {
+                          setSearchQuery(e.target.value);
+                          setShowDropdown(true);
+                        }}
+                        onFocus={() => {
+                          if (suggestions.length > 0) setShowDropdown(true);
+                        }}
+                        placeholder="Location, universities, courses..."
+                        className="w-full h-12 pl-12 pr-6 bg-transparent text-white placeholder:text-white/40 focus:outline-none text-[15px] font-normal rounded-[10px]"
+                      />
 
+                      {/* Autocomplete Dropdown */}
+                      <AnimatePresence>
+                        {showDropdown && (searchQuery.trim().length >= 2) && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="absolute top-full left-0 right-0 mt-2 bg-white rounded-[10px] border border-slate-100 shadow-2xl overflow-hidden z-50 max-h-[300px] overflow-y-auto"
+                          >
+                            {isLoading ? (
+                              <div className="p-4 text-center text-slate-500 text-sm font-normal">Searching...</div>
+                            ) : suggestions.length > 0 ? (
+                              <div className="py-2">
+                                {suggestions.map((item, idx) => (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => {
+                                      setSearchQuery(item.name);
+                                      setShowDropdown(false);
+                                      if (item.slug) {
+                                         router.push(`/college/${item.slug}`);
+                                      } else {
+                                         router.push(`/search?q=${encodeURIComponent(item.name)}`);
+                                      }
+                                    }}
+                                    className="w-full text-left px-4 py-3 hover:bg-rose-50 flex items-center gap-3 transition-colors border-b border-slate-50 last:border-0"
+                                  >
+                                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                                      <span className="material-symbols-outlined text-slate-400 text-[20px]">
+                                        {item.slug ? "school" : "search"}
+                                      </span>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="text-[15px] font-normal text-slate-800 truncate">{item.name}</div>
+                                      <div className="text-[12px] font-normal text-slate-500 truncate">{item.location}</div>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="p-4 text-center text-slate-500 text-sm font-normal">No results found for "{searchQuery}"</div>
+                            )}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                    </div>
+                    <button 
+                      type="submit"
+                      className="w-full sm:w-auto px-10 h-14 rounded-[10px] bg-[#FF3C3C] text-white font-medium text-[13px] uppercase tracking-widest hover:brightness-105 transition-all active:scale-95 shadow-xl shadow-[#FF3C3C]/30 shrink-0"
+                    >
+                      Search Now
+                    </button>
+                  </form>
+               </div>
+
+              {/* Social Proof / Students Count */}
+              <div className="mt-14 flex items-center gap-6">
+                <div className="flex -space-x-5 items-center">
+                  {[
+                    "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=100&h=100&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&h=100&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=100&h=100&auto=format&fit=crop"
+                  ].map((src, i) => (
+                    <div key={i} className="w-14 h-14 rounded-full border-4 border-white overflow-hidden bg-slate-100 shadow-lg ring-1 ring-slate-100/50">
+                      <img src={src} alt="student" className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                  <div className="w-14 h-14 rounded-full border-4 border-white bg-slate-900 flex items-center justify-center text-white text-[15px] font-normal shadow-lg ring-1 ring-slate-100/50">
+                    23k
                   </div>
-                  <button 
-                    type="submit"
-                    className="w-full sm:w-auto px-12 h-16 rounded-full text-white font-black text-sm uppercase tracking-widest hover:brightness-105 transition-all active:scale-95 shadow-xl shadow-[#008080]/30"
-                    style={{ backgroundColor: '#008080', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    Search Now
-                  </button>
-               </form>
-            </div>
-
-            {/* Social Proof / Students Count */}
-            <div className="mt-14 flex items-center gap-6">
-              <div className="flex -space-x-5 items-center">
-                {[
-                  "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=100&h=100&auto=format&fit=crop",
-                  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&h=100&auto=format&fit=crop",
-                  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=100&h=100&auto=format&fit=crop"
-                ].map((src, i) => (
-                  <div key={i} className="w-14 h-14 rounded-full border-4 border-white overflow-hidden bg-slate-100 shadow-lg ring-1 ring-slate-100/50">
-                    <img src={src} alt="student" className="w-full h-full object-cover" />
-                  </div>
-                ))}
-                <div className="w-14 h-14 rounded-full border-4 border-white bg-slate-900 flex items-center justify-center text-white text-[15px] font-black shadow-lg ring-1 ring-slate-100/50">
-                  23k
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-white text-[22px] font-normal leading-tight tracking-tight">12,450+ Students</span>
+                  <span className="text-white/70 text-[17px] font-normal antialiased">found their dream college last month</span>
                 </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-slate-900 text-2xl font-black tracking-tight leading-none">12,450+ Students</span>
-                <span className="text-slate-500 text-sm font-bold mt-1.5 antialiased">found their dream college last month</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Right Column: Hero Image */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="relative hidden lg:block"
-          >
-            <div className="relative z-10 w-full h-[700px] flex items-center justify-center">
-               <img 
-                 src="/images/hero-student.png"
-                 alt="Student"
-                 className="w-full h-full object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.15)]"
-               />
-            </div>
-
-            {/* Floating Badge (Updated style) */}
-            <div className="absolute top-[20%] -right-4 z-20 bg-white/90 backdrop-blur-md p-5 rounded-[2rem] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] border border-white flex items-center gap-4">
-               <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-[#008080]/30" style={{ backgroundColor: '#008080' }}>
-                 <span className="material-symbols-outlined">school</span>
-               </div>
-               <div>
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Global Ranking</div>
-                  <div className="text-base font-black text-slate-800 mt-1">Top 1% Institutions</div>
-               </div>
-            </div>
-          </motion.div>
-
+            </motion.div>
+          </div>
         </div>
       </div>
     </section>
   );
 }
+
+
+
+

@@ -4,6 +4,9 @@ import Image from "next/image";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
+// Dynamic page (requires database access at request time)
+export const dynamic = 'force-dynamic';
+
 interface StreamCard {
   id: number;
   name: string;
@@ -278,3 +281,7 @@ export default async function StreamPage() {
     </div>
   );
 }
+
+
+
+

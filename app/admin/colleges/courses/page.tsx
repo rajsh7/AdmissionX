@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import CourseListClient from "./CourseListClient";
 
@@ -71,7 +70,7 @@ async function deleteCourse(id: number) {
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -86,7 +85,7 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface CourseRow extends RowDataPacket {
+interface CourseRow  {
   id: number;
   collegeprofile_id: number;
   course_id: number | null;
@@ -101,11 +100,11 @@ interface CourseRow extends RowDataPacket {
   courseduration: string | null;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
-interface OptionRow extends RowDataPacket {
+interface OptionRow  {
   id: number;
   name: string;
 }
@@ -267,3 +266,7 @@ export default async function CollegeCoursesPage({
     </div>
   );
 }
+
+
+
+

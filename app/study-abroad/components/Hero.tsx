@@ -90,7 +90,7 @@ export default function Hero({ totalColleges, totalCountries }: HeroProps) {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/study-abroad?stream=engineering"
-              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-6 py-3.5 rounded-2xl transition-colors shadow-lg shadow-red-600/20"
+              className="inline-flex items-center gap-2 bg-[#FF3C3C] hover:bg-[#E63636] text-white font-bold text-sm px-6 py-3.5 rounded-2xl transition-colors shadow-lg shadow-[#FF3C3C]/20"
             >
               <span className="material-symbols-outlined text-[18px]">
                 search
@@ -112,3 +112,7 @@ export default function Hero({ totalColleges, totalCountries }: HeroProps) {
     </div>
   );
 }
+
+
+
+

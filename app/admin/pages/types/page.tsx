@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import PageTypeListClient from "./PageTypeListClient";
 
@@ -94,4 +93,8 @@ export default async function PageTypesPage() {
     </div>
   );
 }
+
+
+
+
 

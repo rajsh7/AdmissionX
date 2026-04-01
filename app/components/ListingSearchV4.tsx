@@ -27,6 +27,11 @@ interface CourseSearchClientProps {
   initLevel: string;
   initStream: string;
   initPage: number;
+  heroImage?: string;
+  heroRightImage?: string;
+  heroHeight?: string;
+  heroObjectPosition?: string;
+  heroFit?: "cover" | "contain";
 }
 
 export default function ListingSearchV4({
@@ -39,6 +44,11 @@ export default function ListingSearchV4({
   initLevel,
   initStream,
   initPage,
+  heroImage = "/images/hero-student.png",
+  heroRightImage = "/images/2999ec4e5233aa8cb9dbf010e3c51149ae41f951.png",
+  heroHeight = "641px",
+  heroObjectPosition,
+  heroFit = "cover",
 }: CourseSearchClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -99,58 +109,75 @@ export default function ListingSearchV4({
 
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
+      <Header />
       {/* ── Hero section ── */}
-      <div className="relative w-full overflow-hidden" style={{ height: "560px" }}>
+      <div className="relative w-full overflow-hidden" style={{ height: heroHeight }}>
         {/* ── Hero Background ── */}
         <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
             <Image
-              src="/images/hero-student.png"
+              src={heroImage}
               alt="Campus Background"
               fill
               priority
-              className="object-cover"
+              className={heroFit === "contain" ? "object-contain" : "object-cover"}
+              style={{ objectPosition: heroObjectPosition || "center" }}
             />
             <div className="absolute inset-0 bg-neutral-900/50" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
         </div>
         
         <div className="relative z-10 w-full h-full flex flex-col">
-            <Header />
-            <div className="flex-1 flex items-center justify-start relative">
-            <div className="mx-auto w-full px-4 lg:px-12 xl:px-16">
-                    <div className="max-w-4xl text-left transition-opacity duration-700 mt-6" style={{ opacity: mounted ? 1 : 0 }}>
-                        <h1 className="font-poppins text-white leading-[1.05] tracking-[0.02em] mb-4 drop-shadow-2xl">
-                          <span className="text-[36px] sm:text-[48px] lg:text-[64px] font-extrabold block mb-0">Finds your</span>
-                          <span className="text-[40px] sm:text-[54px] lg:text-[72px] font-black text-[#00a4a4]">perfect course!</span>
-                        </h1>
-                        <p className="text-white text-lg sm:text-2xl font-bold mb-8 max-w-2xl leading-relaxed opacity-90">
-                          Search thousands of courses and universities worldwide
-                        </p>
-                        <div className="max-w-2xl">
-                            <form
-                              onSubmit={(e) => { e.preventDefault(); handleSearch((e.target as any).q.value); }}
-                              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full"
-                            >
-                              <div className="flex-1 flex items-center gap-3 bg-white/40 backdrop-blur-md rounded-[10px] border border-white/30 shadow-2xl focus-within:border-[#008080] focus-within:ring-4 focus-within:ring-[#008080]/10 transition-all duration-300 px-6 py-1">
-                                <span className="material-symbols-outlined text-[20px] text-white flex-shrink-0">search</span>
-                                <input
-                                  name="q"
-                                  type="text"
-                                  defaultValue={q}
-                                  placeholder="Location, universities, courses..."
-                                  className="flex-1 py-3 text-sm sm:text-base text-white placeholder:text-white/80 bg-transparent outline-none min-w-0 font-medium"
-                                />
-                              </div>
-                              <button
-                                type="submit"
-                                className="flex-shrink-0 bg-[#008080] hover:bg-[#006666] text-white text-base font-bold px-10 py-3 rounded-[10px] transition-all active:scale-[0.98] shadow-xl shadow-[#008080]/30 min-w-max"
-                              >
-                                Search Now
-                              </button>
-                            </form>
+            <div className="flex-1 relative">
+              <div className="mx-auto w-full px-4 lg:px-12 xl:px-16 h-full">
+                <div className="flex flex-col justify-center h-full relative z-20 lg:pl-[270px]">
+                  <div className={`transition-opacity duration-700 mt-6 flex flex-col justify-center ${heroRightImage ? "lg:max-w-[55%] lg:text-left" : "lg:col-span-12 lg:max-w-4xl"}`} style={{ opacity: mounted ? 1 : 0 }}>
+                    <h1 className="font-poppins text-white leading-[1.05] tracking-[0.02em] mb-4 drop-shadow-2xl">
+                      <span className="text-[36px] sm:text-[48px] lg:text-[64px] font-extrabold block mb-0">Finds your</span>
+                      <span className="text-[40px] sm:text-[54px] lg:text-[72px] font-black text-[#FF3C3C]">perfect course!</span>
+                    </h1>
+                    <p className="text-white text-lg sm:text-2xl font-bold mb-8 max-w-2xl leading-relaxed opacity-90">
+                      Search thousands of courses and universities worldwide
+                    </p>
+                    <div className="max-w-2xl">
+                      <form
+                        onSubmit={(e) => { e.preventDefault(); handleSearch((e.target as any).q.value); }}
+                        className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full"
+                      >
+                        <div className="flex-1 flex items-center gap-3 bg-white/40 backdrop-blur-md rounded-[10px] border border-white/30 shadow-2xl focus-within:border-[#FF3C3C] focus-within:ring-4 focus-within:ring-[#FF3C3C]/10 transition-all duration-300 px-6 py-1">
+                          <span className="material-symbols-outlined text-[20px] text-white flex-shrink-0">search</span>
+                          <input
+                            name="q"
+                            type="text"
+                            defaultValue={q}
+                            placeholder="Location, universities, courses..."
+                            className="flex-1 py-3 text-sm sm:text-base text-white placeholder:text-white/80 bg-transparent outline-none min-w-0 font-medium"
+                          />
                         </div>
+                        <button
+                          type="submit"
+                          className="flex-shrink-0 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-base font-bold px-10 py-3 rounded-[10px] transition-all active:scale-[0.98] shadow-xl shadow-[#FF3C3C]/30 min-w-max"
+                        >
+                          Search Now
+                        </button>
+                      </form>
                     </div>
+                  </div>
                 </div>
+
+                {heroRightImage && (
+                  <div className="hidden lg:block absolute bottom-0 right-0 w-[45%] h-[90%] z-10">
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={heroRightImage}
+                        alt="Hero Illustration"
+                        fill
+                        className="object-contain object-bottom drop-shadow-2xl"
+                        priority
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
         </div>
       </div>
@@ -216,8 +243,8 @@ export default function ListingSearchV4({
                 </div>
               </div>
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-5 gap-x-[10px]">
-                  {Array.from({ length: 9 }).map((_, i) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-5 gap-x-[10px]">
+                  {Array.from({ length: 12 }).map((_, i) => (
                     <div key={i} className="bg-white rounded-[10px] border border-neutral-100 aspect-[4/5] animate-pulse" />
                   ))}
                 </div>
@@ -226,7 +253,7 @@ export default function ListingSearchV4({
                     <h3 className="text-2xl font-black text-neutral-900 mb-2">No courses match your search</h3>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-5 gap-x-[10px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-5 gap-x-[10px]">
                   {courses.map((course, i) => (
                     <CourseCardV3 key={course.id} course={course} index={i} />
                   ))}
@@ -245,3 +272,7 @@ export default function ListingSearchV4({
     </div>
   );
 }
+
+
+
+

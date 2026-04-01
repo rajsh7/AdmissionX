@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
+export const dynamic = 'force-dynamic';
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
@@ -516,3 +517,8 @@ export default async function AskPage({
     </div>
   );
 }
+
+
+
+
+

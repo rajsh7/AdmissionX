@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export interface AskQuestionRow extends RowDataPacket {
+export interface AskQuestionRow {
   id: number;
   question: string;
   questionDate: string | null;
@@ -19,13 +18,13 @@ export interface AskQuestionRow extends RowDataPacket {
   status: number;
 }
 
-export interface AskTagRow extends RowDataPacket {
+export interface AskTagRow {
   id: number;
   name: string;
   slug: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow {
   total: number;
 }
 

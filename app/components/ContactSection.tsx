@@ -1,92 +1,95 @@
-// v2 – cache bust
-"use client";
-
 export default function ContactSection() {
   return (
-    <section className="w-full py-16 lg:py-24 bg-[#fdfdfd] overflow-hidden">
+    <section className="w-full py-24 lg:py-32 bg-white overflow-hidden">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
-        <div className="bg-white rounded-[32px] p-8 lg:p-12 shadow-[0_4px_40px_-12px_rgba(0,0,0,0.08)] border border-slate-100">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
+        <div className="bg-white rounded-[10px] p-12 lg:p-24 shadow-[0_30px_100px_-20px_rgba(0,0,0,0.08)] border border-slate-50">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
 
-            {/* ── Left: Contact Form ─────────────────────────────── */}
-            <div>
-              <h3 className="text-xl font-bold text-slate-800 mb-6">Send a message</h3>
-              <form className="space-y-5">
+            {/* ── Left: Contact Info ────────────────────────────── */}
+            <div className="flex flex-col justify-center">
+              <h2 className="text-[40px] lg:text-[56px] font-normal text-slate-900 tracking-tight leading-[1.1] mb-8">
+                Get in <span className="text-primary">Touch</span>
+              </h2>
+              <p className="text-[22px] text-slate-500 font-normal leading-relaxed mb-12 max-w-xl">
+                Get the real story about campus life, professors, and placements from people who've actually been there.
+              </p>
+
+              <div className="space-y-10">
+                {/* Email */}
+                <div className="flex items-start gap-8 group">
+                  <div className="w-16 h-16 rounded-[10px] bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 transition-transform group-hover:scale-110">
+                    <span className="material-symbols-rounded text-[28px] text-white">mail</span>
+                  </div>
+                  <div>
+                    <h4 className="font-normal text-slate-900 text-[18px] mb-1">Email Us</h4>
+                    <a href="mailto:support@admissionx.com" className="text-base text-slate-500 hover:text-primary transition-colors font-normal">
+                      support@admissionx.com
+                    </a>
+                  </div>
+                </div>
+
+                {/* Call */}
+                <div className="flex items-start gap-8 group">
+                  <div className="w-16 h-16 rounded-[10px] bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 transition-transform group-hover:scale-110">
+                    <span className="material-symbols-rounded text-[28px] text-white">call</span>
+                  </div>
+                  <div>
+                    <h4 className="font-normal text-slate-900 text-[18px] mb-1">Call Us</h4>
+                    <p className="text-base text-slate-500 font-normal">+91 767-888-9792</p>
+                    <p className="text-sm text-slate-400 mt-1 font-normal">Mon-Fri (9:00 AM - 6:00 PM IST)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Right: Contact Form ─────────────────────────────── */}
+            <div className="bg-[#f8fafc] rounded-[10px] p-10 lg:p-14 border border-slate-50">
+              <h3 className="text-2xl font-normal text-slate-900 mb-10 uppercase tracking-tight">Send a message</h3>
+              <form className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-[10px] font-normal text-slate-400 uppercase tracking-widest mb-2">Name</label>
+                    <input
+                      type="text"
+                      placeholder="John Doe"
+                      className="w-full h-16 px-6 rounded-[10px] border border-slate-100 bg-white text-base text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-primary/30 transition-all font-normal"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-normal text-slate-400 uppercase tracking-widest mb-2">Email</label>
+                    <input
+                      type="email"
+                      placeholder="john@example.com"
+                      className="w-full h-16 px-6 rounded-[10px] border border-slate-100 bg-white text-base text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-primary/30 transition-all font-normal"
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-sm font-semibold text-slate-600 mb-1.5">Email</label>
+                  <label className="block text-[10px] font-normal text-slate-400 uppercase tracking-widest mb-2">Subject</label>
                   <input
-                    type="email"
-                    placeholder="your.email@example.com"
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008080]/20 focus:border-[#008080] transition-all"
+                    type="text"
+                    placeholder="General Inquiry"
+                    className="w-full h-16 px-6 rounded-[10px] border border-slate-100 bg-white text-base text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-primary/30 transition-all font-normal"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-600 mb-1.5">Your Message</label>
+                  <label className="block text-[10px] font-normal text-slate-400 uppercase tracking-widest mb-2">Message</label>
                   <textarea
-                    rows={5}
-                    placeholder="Tell us about your inquiry..."
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008080]/20 focus:border-[#008080] transition-all resize-none"
+                    rows={4}
+                    placeholder="How can we help you?"
+                    className="w-full px-6 py-5 rounded-[10px] border border-slate-100 bg-white text-base text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-primary/30 transition-all resize-none font-normal"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl bg-[#008080] text-white text-sm font-bold hover:bg-[#006666] transition-colors"
+                  className="w-full h-16 rounded-[10px] bg-primary text-white text-[15px] font-normal uppercase tracking-widest hover:brightness-105 transition-all shadow-xl shadow-primary/20"
                 >
                   Send Message
                 </button>
               </form>
-            </div>
-
-            {/* ── Right: Contact Info ────────────────────────────── */}
-            <div className="flex flex-col justify-center">
-              <h2 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight mb-3">
-                Get in Touch
-              </h2>
-              <p className="text-slate-500 font-medium leading-relaxed mb-10 max-w-md">
-                Get the real story about campus life, professors, and placements from people who&apos;ve actually been there.
-              </p>
-
-              <div className="space-y-6">
-                {/* Email */}
-                <div className="flex items-start gap-4">
-                  <div className="w-11 h-11 rounded-xl bg-[#008080] flex items-center justify-center shrink-0">
-                    <span className="material-symbols-rounded text-[20px] text-white">mail</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-slate-800 text-sm">Email Us</h4>
-                    <a href="mailto:supportseg1@sgin.com" className="text-sm text-slate-500 hover:text-[#008080] transition-colors">
-                      supportseg1@sgin.com
-                    </a>
-                    <p className="text-xs text-slate-400 mt-0.5">General Inquiries &amp; support</p>
-                  </div>
-                </div>
-
-                {/* Call */}
-                <div className="flex items-start gap-4">
-                  <div className="w-11 h-11 rounded-xl bg-[#008080] flex items-center justify-center shrink-0">
-                    <span className="material-symbols-rounded text-[20px] text-white">call</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-slate-800 text-sm">Call Us</h4>
-                    <p className="text-sm text-slate-500">+91 767-888-9792</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Mon to Fri ( 9:00 am to 5:00 pm  IST )</p>
-                  </div>
-                </div>
-
-                {/* Visit */}
-                <div className="flex items-start gap-4">
-                  <div className="w-11 h-11 rounded-xl bg-[#008080] flex items-center justify-center shrink-0">
-                    <span className="material-symbols-rounded text-[20px] text-white">location_on</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-slate-800 text-sm">Visit Us</h4>
-                    <p className="text-sm text-slate-500">Lajpat Nagar, Delhi.</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Mon to Fri ( 9:00 am to 5:00 pm  IST )</p>
-                  </div>
-                </div>
-              </div>
             </div>
 
           </div>
@@ -95,3 +98,7 @@ export default function ContactSection() {
     </section>
   );
 }
+
+
+
+

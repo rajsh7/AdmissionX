@@ -576,3 +576,7 @@ export default function ApplicationsTab({ user, initialFilter = "all" }: Props) 
     </div>
   );
 }
+
+
+
+

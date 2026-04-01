@@ -123,6 +123,15 @@ export default async function CareerCoursesPage({ searchParams }: PageProps) {
       initLevel={level}
       initStream={stream}
       initPage={page}
+      heroImage="/Background-images/student-hero-bg.png"
+      heroRightImage="/images/2999ec4e5233aa8cb9dbf010e3c51149ae41f951.png"
+      heroHeight="641px"
+      heroObjectPosition="center"
+      heroFit="cover"
     />
   );
 }
+
+
+
+

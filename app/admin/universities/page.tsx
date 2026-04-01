@@ -1,14 +1,12 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -32,7 +30,7 @@ function formatDate(d: string | null | undefined): string {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface UniversityRow extends RowDataPacket {
+interface UniversityRow  {
   id: number;
   slug: string | null;
   college_name: string | null;
@@ -49,8 +47,10 @@ interface UniversityRow extends RowDataPacket {
   created_at: string;
 }
 
-interface CountRow extends RowDataPacket {
-  total: number;
+interface CountRow  {
+  total?: number;
+  verified_count?: number;
+  paid_count?: number;
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -441,3 +441,7 @@ export default async function AdminUniversitiesPage({
     </div>
   );
 }
+
+
+
+

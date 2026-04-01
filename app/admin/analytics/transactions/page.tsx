@@ -1,14 +1,12 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -44,7 +42,7 @@ function formatDate(d: string | null | undefined): string {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface TransactionRow extends RowDataPacket {
+interface TransactionRow  {
   id: number;
   amount: number;
   status_name: string;
@@ -53,7 +51,7 @@ interface TransactionRow extends RowDataPacket {
   created_at: string;
 }
 
-interface CountRow extends RowDataPacket { total: number; }
+interface CountRow  { total: number; }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -103,7 +101,7 @@ export default async function TransactionsAnalyticsPage({
        ${where}`,
       params,
     ),
-    safeQuery<RowDataPacket>(`
+    safeQuery<any>(`
       SELECT 
         COUNT(*) AS total_count,
         SUM(CAST(COALESCE(a.byafees, '0') AS DECIMAL(10,2))) AS total_volume,
@@ -249,3 +247,7 @@ export default async function TransactionsAnalyticsPage({
     </div>
   );
 }
+
+
+
+

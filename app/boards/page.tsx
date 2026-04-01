@@ -5,6 +5,9 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Image from "next/image";
 
+// ─── Dynamic page (requires database access at request time)
+export const dynamic = 'force-dynamic';
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
@@ -375,3 +378,7 @@ function EmptyState() {
     </div>
   );
 }
+
+
+
+

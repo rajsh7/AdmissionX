@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import ReviewsListClient from "./ReviewsListClient";
 
@@ -77,7 +76,7 @@ async function deleteReview(id: number) {
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -92,7 +91,7 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface ReviewRow extends RowDataPacket {
+interface ReviewRow  {
   id: number;
   college_name: string;
   collegeprofile_id: number;
@@ -106,8 +105,8 @@ interface ReviewRow extends RowDataPacket {
   social: number;
 }
 
-interface CountRow extends RowDataPacket { total: number; }
-interface CollegeOption extends RowDataPacket { id: number; name: string; }
+interface CountRow  { total: number; }
+interface CollegeOption  { id: number; name: string; }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -189,3 +188,7 @@ export default async function CollegeReviewsPage({
     </div>
   );
 }
+
+
+
+

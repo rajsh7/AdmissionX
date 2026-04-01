@@ -80,81 +80,109 @@ async function safeQuery<T>(collection: string): Promise<T[]> {
 
 const getHomePageData = unstable_cache(
   async () => {
-    const db = await getDb();
-    const now = new Date();
+    try {
+      const db = await getDb();
+      const now = new Date();
 
-    const [collegeRows, blogRows, examRows, adRows, statCounts] = await Promise.all([
-      // 1. Featured colleges
-      db.collection("collegeprofile").aggregate([
-        { $match: { isShowOnHome: 1 } },
-        { $limit: 8 },
-        { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
-        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-        {
-          $project: {
-            slug: 1,
-            name: {
-              $cond: [
-                { $and: [{ $ne: ["$user.firstname", null] }, { $ne: [{ $trim: { input: "$user.firstname" } }, ""] }] },
-                { $trim: { input: "$user.firstname" } },
-                "$slug",
-              ],
+      const [collegeRows, blogRows, examRows, adRows, statCounts] = await Promise.all([
+        // 1. Featured colleges
+        db.collection("collegeprofile").aggregate([
+          { $match: { isShowOnHome: 1 } },
+          { $limit: 8 },
+          { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+          { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+          {
+            $project: {
+              slug: 1,
+              name: {
+                $cond: [
+                  { $and: [{ $ne: ["$user.firstname", null] }, { $ne: [{ $trim: { input: "$user.firstname" } }, ""] }] },
+                  { $trim: { input: "$user.firstname" } },
+                  "$slug",
+                ],
+              },
+              location: "$registeredSortAddress",
+              image: "$bannerimage",
+              rating: 1,
             },
-            location: "$registeredSortAddress",
-            image: "$bannerimage",
-            rating: 1,
           },
-        },
-      ]).toArray() as Promise<CollegeRow[]>,
+        ]).toArray() as Promise<CollegeRow[]>,
 
-      // 2. Latest 4 active blogs
-      db.collection("blogs")
-        .find({ isactive: 1 })
-        .sort({ created_at: -1 })
-        .limit(4)
-        .project({ id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 })
-        .toArray() as Promise<DbBlog[]>,
+        // 2. Latest 4 active blogs
+        db.collection("blogs")
+          .find({ isactive: 1 })
+          .sort({ created_at: -1 })
+          .limit(8)
+          .project({ id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 })
+          .toArray() as Promise<DbBlog[]>,
 
-      // 3. Top 6 exams by views
-      db.collection("examination_details")
-        .find({})
-        .sort({ totalViews: -1, created_at: -1 })
-        .limit(6)
-        .project({ id: 1, title: 1, slug: 1, exminationDate: 1, image: 1, functionalarea_id: 1, courses_id: 1, totalViews: 1 })
-        .toArray() as Promise<DbExam[]>,
+        // 3. Top 6 exams by views
+        db.collection("examination_details")
+          .find({})
+          .sort({ totalViews: -1, created_at: -1 })
+          .limit(8)
+          .project({ id: 1, title: 1, slug: 1, exminationDate: 1, image: 1, functionalarea_id: 1, courses_id: 1, totalViews: 1 })
+          .toArray() as Promise<DbExam[]>,
 
-      // 4. Active home-page ads
-      db.collection("ads_managements")
-        .find({
-          isactive: 1,
-          ads_position: "home",
-          $or: [{ start: null }, { start: { $lte: now } }],
-          $and: [{ $or: [{ end: null }, { end: { $gte: now } }] }],
-        })
-        .sort({ created_at: -1 })
-        .limit(6)
-        .project({ id: 1, title: 1, description: 1, img: 1, redirectto: 1 })
-        .toArray() as Promise<AdItem[]>,
+        // 4. Active home-page ads
+        db.collection("ads_managements")
+          .find({
+            isactive: 1,
+            ads_position: "home",
+            $or: [{ start: null }, { start: { $lte: now } }],
+            $and: [{ $or: [{ end: null }, { end: { $gte: now } }] }],
+          })
+          .sort({ created_at: -1 })
+          .limit(8)
+          .project({ id: 1, title: 1, description: 1, img: 1, redirectto: 1 })
+          .toArray() as Promise<AdItem[]>,
 
-      // 5. Stats — count documents in each collection
-      Promise.all([
-        db.collection("collegeprofile").estimatedDocumentCount(),
-        db.collection("next_student_signups").estimatedDocumentCount(),
-        db.collection("country").estimatedDocumentCount(),
-        db.collection("course").estimatedDocumentCount(),
-      ]),
-    ]);
+        // 5. Stats — count documents in each collection
+        Promise.all([
+          db.collection("collegeprofile").estimatedDocumentCount(),
+          db.collection("next_student_signups").estimatedDocumentCount(),
+          db.collection("country").estimatedDocumentCount(),
+          db.collection("course").estimatedDocumentCount(),
+        ]),
+      ]);
 
-    return { collegeRows, blogRows, examRows, adRows, statCounts };
+      return { collegeRows, blogRows, examRows, adRows, statCounts };
+    } catch (error) {
+      console.error("[getHomePageData] Database error:", error);
+      // Return empty data instead of crashing
+      return {
+        collegeRows: [],
+        blogRows: [],
+        examRows: [],
+        adRows: [],
+        statCounts: [0, 0, 0, 0],
+      };
+    }
   },
-  ["homepage-data-v4"],
+  ["homepage-data-v6"],
   { revalidate: 300 },
 );
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function Page() {
-  const { collegeRows, blogRows, examRows, adRows, statCounts } = await getHomePageData();
+  let collegeRows: CollegeRow[] = [];
+  let blogRows: DbBlog[] = [];
+  let examRows: DbExam[] = [];
+  let adRows: AdItem[] = [];
+  let statCounts = [0, 0, 0, 0];
+
+  try {
+    const data = await getHomePageData();
+    collegeRows = data.collegeRows;
+    blogRows = data.blogRows;
+    examRows = data.examRows;
+    adRows = data.adRows;
+    statCounts = data.statCounts;
+  } catch (error) {
+    console.error("[homepage] Failed to fetch data:", error);
+    // Return page with empty/fallback data instead of crashing
+  }
 
   // ── Transform colleges ──────────────────────────────────────────────────
   const universities: University[] = collegeRows.map((row) => {
@@ -242,3 +270,7 @@ export default async function Page() {
     />
   );
 }
+
+
+
+

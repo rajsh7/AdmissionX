@@ -1,16 +1,19 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
+import { ObjectId } from "mongodb";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import ContactActions from "./ContactActions";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
-async function deleteContactRow(id: number) {
+async function deleteContactRow(id: string, src: string) {
   "use server";
   try {
-    await pool.query("DELETE FROM next_college_signups WHERE id = ?", [id]);
+    const db  = await getDb();
+    const col = src === "old" ? "request_for_create_college_accounts" : "next_college_signups";
+    const filter = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: parseInt(id, 10) };
+    await db.collection(col).deleteOne(filter);
   } catch (e) {
     console.error("[admin/colleges/contact deleteAction]", e);
   }
@@ -22,35 +25,17 @@ async function deleteContactRow(id: number) {
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T extends RowDataPacket>(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/colleges/contact safeQuery]", err);
-    return [];
-  }
-}
+const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
+const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface ContactRow extends RowDataPacket {
-  id: number;
+interface ContactRow {
+  _id: string;
   college_name: string;
   contact_name: string;
   email: string;
   phone: string;
+  _source: "old" | "new";
 }
-
-interface CountRow extends RowDataPacket {
-  total: number;
-}
-
-const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
-const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -59,77 +44,92 @@ export default async function CollegeContactPage({
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
-  const sp   = await searchParams;
-  const q    = (sp.q ?? "").trim();
-  const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
+  const sp     = await searchParams;
+  const q      = (sp.q ?? "").trim();
+  const page   = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Build WHERE clause ─────────────────────────────────────────────────────
-  const conditions: string[] = [];
-  const params: (string | number)[] = [];
+  const db = await getDb();
 
-  if (q) {
-    conditions.push(
-      "(college_name LIKE ? OR contact_name LIKE ? OR email LIKE ? OR phone LIKE ?)",
-    );
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
-  }
-
-  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-
-  // ── Query contacts ─────────────────────────────────────────────────────────
-  const [contacts, countRows] = await Promise.all([
-    safeQuery<ContactRow>(
-      `SELECT id, college_name, contact_name, email, phone
-       FROM next_college_signups
-       ${where}
-       ORDER BY college_name ASC
-       LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
-    ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total FROM next_college_signups ${where}`,
-      params,
-    ),
+  const [oldDocs, newDocs] = await Promise.all([
+    db.collection("request_for_create_college_accounts").find({}).toArray(),
+    db.collection("next_college_signups").find({}).toArray(),
   ]);
 
-  const total = Number(countRows[0]?.total ?? 0);
+  let contacts: ContactRow[] = [
+    ...newDocs.map(d => ({
+      _id:          String(d._id),
+      college_name: String(d.college_name ?? "").trim(),
+      contact_name: String(d.contact_name ?? "").trim(),
+      email:        String(d.email ?? "").trim(),
+      phone:        String(d.phone ?? "").trim(),
+      _source:      "new" as const,
+    })),
+    ...oldDocs.map(d => ({
+      _id:          String(d._id),
+      college_name: String(d.collegeName ?? d.college_name ?? "").trim(),
+      contact_name: String(d.contactPersonName ?? d.contact_name ?? "").trim(),
+      email:        String(d.email ?? "").trim(),
+      phone:        String(d.phone ?? "").trim(),
+      _source:      "old" as const,
+    })),
+  ].sort((a, b) => a.college_name.localeCompare(b.college_name));
+
+  if (q) {
+    const lq = q.toLowerCase();
+    contacts = contacts.filter(c =>
+      c.college_name.toLowerCase().includes(lq) ||
+      c.contact_name.toLowerCase().includes(lq) ||
+      c.email.toLowerCase().includes(lq) ||
+      c.phone.includes(lq)
+    );
+  }
+
+  const total      = contacts.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
+  const rows       = contacts.slice(offset, offset + PAGE_SIZE);
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
-      
+
       {/* ── Header ───────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>contact_mail</span>
-            College contacts
+            College Contacts
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">Manage college inquiries and send welcome communications.</p>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {total.toLocaleString()} contact{total !== 1 ? "s" : ""} — manage inquiries and send welcome communications.
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          <form method="GET" action="/admin/colleges/contact" className="w-full sm:w-80">
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
-              <input 
-                type="text" 
-                name="q" 
-                defaultValue={q}
-                placeholder="Search name, email, college..." 
-                className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
-              />
-            </div>
-          </form>
-        </div>
+        <form method="GET" action="/admin/colleges/contact" className="w-full sm:w-80">
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
+            <input
+              type="text"
+              name="q"
+              defaultValue={q}
+              placeholder="Search name, email, college..."
+              className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
+            />
+          </div>
+        </form>
       </div>
 
       {/* ── Table ─────────────────────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {contacts.length === 0 ? (
+        {rows.length === 0 ? (
           <div className="py-20 text-center">
             <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>contact_mail</span>
-            <p className="text-slate-500 font-semibold text-sm">No contact records found.</p>
+            <p className="text-slate-500 font-semibold text-sm">
+              {q ? `No contacts matching "${q}"` : "No contact records found."}
+            </p>
+            {q && (
+              <Link href="/admin/colleges/contact" className="mt-3 inline-block text-sm text-blue-600 hover:underline">
+                Clear search
+              </Link>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -144,30 +144,30 @@ export default async function CollegeContactPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {contacts.map((c, idx) => (
-                  <tr key={c.id} className="hover:bg-blue-50/20 transition-colors">
+                {rows.map((c, idx) => (
+                  <tr key={c._id} className="hover:bg-blue-50/20 transition-colors">
                     <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
                     <td className="px-4 py-4">
                       <div className="flex flex-col">
-                        <span className="font-semibold text-slate-800 leading-snug">{c.college_name}</span>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight mt-0.5">{c.contact_name}</span>
+                        <span className="font-semibold text-slate-800 leading-snug">{c.college_name || "—"}</span>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight mt-0.5">{c.contact_name || "—"}</span>
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      <span className="text-slate-600 font-medium">{c.email}</span>
+                      <span className="text-slate-600 font-medium">{c.email || "—"}</span>
                     </td>
                     <td className="px-4 py-4">
                       <span className="text-xs text-slate-500 font-mono tracking-tight">{c.phone || "Not Available"}</span>
                     </td>
                     <td className="px-4 py-4 text-right">
                       <div className="flex items-center justify-end gap-3">
-                        <ContactActions 
-                          email={c.email} 
-                          collegeName={c.college_name} 
-                          contactName={c.contact_name} 
+                        <ContactActions
+                          email={c.email}
+                          collegeName={c.college_name}
+                          contactName={c.contact_name}
                         />
                         <div className="h-4 w-px bg-slate-100" />
-                        <DeleteButton action={deleteContactRow.bind(null, c.id)} size="sm" />
+                        <DeleteButton action={deleteContactRow.bind(null, c._id, c._source)} size="sm" />
                       </div>
                     </td>
                   </tr>
@@ -185,12 +185,12 @@ export default async function CollegeContactPage({
             </p>
             <div className="flex items-center gap-1">
               {page > 1 ? (
-                <Link href={`/admin/colleges/contact?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
+                <Link href={`/admin/colleges/contact?page=${page - 1}${q ? `&q=${encodeURIComponent(q)}` : ""}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
               ) : (
                 <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
               )}
               {page < totalPages ? (
-                <Link href={`/admin/colleges/contact?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
+                <Link href={`/admin/colleges/contact?page=${page + 1}${q ? `&q=${encodeURIComponent(q)}` : ""}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
               ) : (
                 <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
               )}
@@ -201,3 +201,7 @@ export default async function CollegeContactPage({
     </div>
   );
 }
+
+
+
+

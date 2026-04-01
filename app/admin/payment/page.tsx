@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
 
@@ -22,7 +21,7 @@ async function deletePaymentRecord(id: number) {
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -37,7 +36,7 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface PaymentRow extends RowDataPacket {
+interface PaymentRow  {
   id: number;
   college_name: string;
   course_name: string;
@@ -45,7 +44,7 @@ interface PaymentRow extends RowDataPacket {
   seats: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
@@ -229,3 +228,7 @@ export default async function ApplicationPaymentPage({
     </div>
   );
 }
+
+
+
+

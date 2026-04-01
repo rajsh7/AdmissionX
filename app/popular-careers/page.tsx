@@ -5,6 +5,7 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import type { Metadata } from "next";
 
+export const dynamic = 'force-dynamic';
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
@@ -617,3 +618,8 @@ function CareerCard({ career }: { career: CareerRow }) {
     </Link>
   );
 }
+
+
+
+
+

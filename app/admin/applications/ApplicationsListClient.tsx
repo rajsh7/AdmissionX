@@ -149,3 +149,7 @@ export default function ApplicationsListClient({ initialRows, offset }: Applicat
     </div>
   );
 }
+
+
+
+

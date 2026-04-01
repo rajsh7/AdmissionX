@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import PlacementListClient from "./PlacementListClient";
 
@@ -66,7 +65,7 @@ async function deletePlacementRow(id: number) {
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -81,7 +80,7 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface PlacementRow extends RowDataPacket {
+interface PlacementRow  {
   id: number;
   collegeprofile_id: number;
   college_name: string;
@@ -92,11 +91,11 @@ interface PlacementRow extends RowDataPacket {
   placement_info: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
-interface OptionRow extends RowDataPacket {
+interface OptionRow  {
   id: number;
   name: string;
 }
@@ -228,3 +227,7 @@ export default async function CollegePlacementsPage({
     </div>
   );
 }
+
+
+
+

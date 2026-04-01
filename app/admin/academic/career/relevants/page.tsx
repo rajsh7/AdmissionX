@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import RelevantListClient from "./RelevantListClient";
 
@@ -74,7 +73,7 @@ async function deleteRelevant(id: number) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number | boolean | null)[] = []
 ): Promise<T[]> {
@@ -87,7 +86,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface RelevantRow extends RowDataPacket {
+interface RelevantRow  {
   id: number;
   title: string;
   salery: string | null;
@@ -101,12 +100,12 @@ interface RelevantRow extends RowDataPacket {
   slug: string | null;
 }
 
-interface StreamOption extends RowDataPacket {
+interface StreamOption  {
   id: number;
   name: string;
 }
 
-interface InterestOption extends RowDataPacket {
+interface InterestOption  {
   id: number;
   title: string;
 }
@@ -167,3 +166,7 @@ export default async function CareerRelevantsPage({
     </div>
   );
 }
+
+
+
+

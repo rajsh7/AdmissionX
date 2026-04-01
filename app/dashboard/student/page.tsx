@@ -16,3 +16,7 @@ export default async function StudentDashboardRedirect() {
   // No valid token — send to login
   redirect("/login/student");
 }
+
+
+
+

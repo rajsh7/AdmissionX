@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import ManagementListClient from "./ManagementListClient";
 
@@ -68,7 +67,7 @@ async function deleteManagementRow(id: number) {
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -83,7 +82,7 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface ManagementRow extends RowDataPacket {
+interface ManagementRow  {
   id: number;
   collegeprofile_id: number;
   name: string;
@@ -95,11 +94,11 @@ interface ManagementRow extends RowDataPacket {
   college_name: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
-interface OptionRow extends RowDataPacket {
+interface OptionRow  {
   id: number;
   name: string;
 }
@@ -232,3 +231,7 @@ export default async function CollegeManagementPage({
     </div>
   );
 }
+
+
+
+

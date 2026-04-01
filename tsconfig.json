@@ -43,6 +43,7 @@
     "inspect-*.ts",
     "list-tables.ts",
     "seed-*.ts",
-    "**/*.bak"
+    "**/*.bak",
+    "scripts"
   ]
 }

@@ -116,3 +116,7 @@ export default function AdmissionFormModal({
     </AdminModal>
   );
 }
+
+
+
+

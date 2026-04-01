@@ -226,3 +226,7 @@ export default function CourseList({ courses, collegeName }: CourseListProps) {
     </section>
   );
 }
+
+
+
+

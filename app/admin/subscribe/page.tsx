@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
 
@@ -15,7 +14,7 @@ async function deleteSubscription(id: number) {
   revalidatePath("/", "layout");
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -28,7 +27,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface SubscribeRow extends RowDataPacket {
+interface SubscribeRow  {
   id: number;
   email: string;
   source: string;
@@ -114,3 +113,7 @@ export default async function SubscribePage({
     </div>
   );
 }
+
+
+
+

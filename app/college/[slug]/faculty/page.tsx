@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import { notFound } from "next/navigation";
-import { RowDataPacket } from "mysql2";
 import Image from "next/image";
 
 // Cache the fully-rendered page for 5 minutes (same TTL as the layout).
@@ -28,13 +27,13 @@ function slugToName(slug: string): string {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface CollegeRow extends RowDataPacket {
+interface CollegeRow {
   id: number;
   slug: string;
   college_name: string;
 }
 
-interface FacultyRow extends RowDataPacket {
+interface FacultyRow {
   id: number;
   name: string | null;
   designation: string | null;
@@ -49,7 +48,7 @@ interface FacultyRow extends RowDataPacket {
   stream_name: string | null;
 }
 
-interface ManagementRow extends RowDataPacket {
+interface ManagementRow {
   id: number;
   suffix: string | null;
   name: string | null;
@@ -63,7 +62,7 @@ interface ManagementRow extends RowDataPacket {
 
 // ─── Safe query helper ────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T>(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {

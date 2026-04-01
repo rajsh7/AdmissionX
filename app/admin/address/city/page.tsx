@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import CityClient from "./CityClient";
 import { revalidatePath } from "next/cache";
@@ -49,7 +48,7 @@ async function updateCity(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number | boolean)[] = [],
 ): Promise<T[]> {
@@ -62,7 +61,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface CityRow extends RowDataPacket {
+interface CityRow  {
   id: number;
   name: string;
   stateName: string | null;
@@ -109,17 +108,17 @@ export default async function CityPage({
        LIMIT ? OFFSET ?`,
       [...queryParams, PAGE_SIZE, offset]
     ),
-    safeQuery<{ total: number } & RowDataPacket>(
+    safeQuery<{ total: number }>(
       `SELECT COUNT(*) as total FROM city ci 
        LEFT JOIN state s ON s.id = ci.state_id
        LEFT JOIN country c ON c.id = s.country_id 
        ${where}`,
       queryParams
     ),
-    safeQuery<{ id: number; name: string } & RowDataPacket>(
+    safeQuery<{ id: number; name: string }>(
       "SELECT id, name FROM country ORDER BY name ASC"
     ),
-    safeQuery<{ id: number; name: string; country_id: number | null } & RowDataPacket>(
+    safeQuery<{ id: number; name: string; country_id: number | null }>(
       "SELECT id, name, country_id FROM state ORDER BY name ASC"
     )
   ]);
@@ -167,3 +166,7 @@ export default async function CityPage({
     </div>
   );
 }
+
+
+
+

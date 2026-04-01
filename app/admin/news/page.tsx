@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { RowDataPacket } from "mysql2";
 import { formatDate } from "@/lib/utils";
 import { saveUpload } from "@/lib/upload-utils";
 import NewsListClientV2 from "./NewsListClient";
@@ -101,7 +100,7 @@ async function deleteNewsItem(id: number): Promise<void> {
 
 const PAGE_SIZE = 20;
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -118,21 +117,21 @@ async function safeQuery<T extends RowDataPacket>(
 
 import { NewsRow } from "./NewsListClient";
 
-interface NewsRowDb extends NewsRow, RowDataPacket {}
+interface NewsRowDb extends NewsRow {}
 
-interface NewsTypeRow extends RowDataPacket {
+interface NewsTypeRow  {
   id: number;
   name: string;
   slug: string;
 }
 
-interface NewsTagRow extends RowDataPacket {
+interface NewsTagRow  {
   id: number;
   name: string;
   slug: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
@@ -316,3 +315,8 @@ export default async function AdminNewsPage({
     </div>
   );
 }
+
+
+
+
+

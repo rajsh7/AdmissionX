@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import GroupListClient from "./GroupListClient";
@@ -75,7 +74,7 @@ async function deleteGroup(id: number) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = []
 ): Promise<T[]> {
@@ -88,7 +87,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface GroupRow extends RowDataPacket {
+interface GroupRow  {
   id: number;
   name: string;
   user_name: string;
@@ -104,24 +103,24 @@ interface GroupRow extends RowDataPacket {
   allTableInformation_id: string;
 }
 
-interface UserRow extends RowDataPacket {
+interface UserRow  {
   id: number;
   firstname: string;
   lastname: string;
   email: string;
 }
 
-interface TableRow extends RowDataPacket {
+interface TableRow  {
   id: number;
   name: string;
 }
 
-interface StatsRow extends RowDataPacket {
+interface StatsRow  {
   total: number;
   users_with_groups: number;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
@@ -261,3 +260,7 @@ export default async function MembersGroupsPage({
     </div>
   );
 }
+
+
+
+

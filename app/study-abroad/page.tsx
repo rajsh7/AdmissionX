@@ -1,22 +1,17 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
-import Image from "next/image";
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer";
 import SearchClient from "@/app/search/SearchClient";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 import { Suspense } from "react";
 import { unstable_cache } from "next/cache";
 
-// Modular Components
-import Hero from "./components/Hero";
-import WhyStudyAbroad from "./components/WhyStudyAbroad";
-import Destinations from "./components/Destinations";
-import StreamList from "./components/StreamList";
+// Premium Components
+import HeroSection from "./components/HeroSection";
+import TopDestinations from "./components/TopDestinations";
+import CostCalculator from "./components/CostCalculator";
+import JourneySteps from "./components/JourneySteps";
+import StudyAbroadFooter from "./components/StudyAbroadFooter";
 import CollegeGrid from "./components/CollegeGrid";
-
-// Utils
-import { getDestinationMeta } from "./utils/destinationMeta";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -27,7 +22,7 @@ interface FilterOption {
   count?: number;
 }
 
-interface CollegeRow extends RowDataPacket {
+interface CollegeRow {
   id: number;
   slug: string;
   name: string;
@@ -49,28 +44,19 @@ interface CollegeRow extends RowDataPacket {
   max_fees: string | null;
 }
 
-interface StreamRow extends RowDataPacket {
-  id: number;
-  name: string;
-  pageslug: string | null;
-  college_count: number;
-}
-
-interface DegreeRow extends RowDataPacket {
+interface StreamRow {
   id: number;
   name: string;
   pageslug: string | null;
 }
 
-interface CountryRow extends RowDataPacket {
+interface DegreeRow {
   id: number;
   name: string;
   pageslug: string | null;
-  logoimage: string | null;
-  college_count: number;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow {
   total: number;
 }
 
@@ -94,7 +80,7 @@ function slugToName(slug: string): string {
     .join(" ");
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T>(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -162,7 +148,6 @@ async function fetchAbroadCollegesBase(opts: {
   const { stream, degree, feesMax, sort, page, limit } = opts;
   const offset = (page - 1) * limit;
 
-  // 1. Build filter conditions
   const conditions: string[] = [
     "(cp.registeredAddressCountryId != 1 OR cp.campusAddressCountryId != 1)",
     "(cp.registeredAddressCountryId IS NOT NULL OR cp.campusAddressCountryId IS NOT NULL)",
@@ -202,7 +187,6 @@ async function fetchAbroadCollegesBase(opts: {
     orderBy = "(cp.ranking IS NULL OR cp.ranking = 0) ASC, cp.ranking ASC";
   }
 
-  // 2. ID-only query (Fast)
   const idSql = `
     SELECT cp.id
     FROM collegeprofile cp
@@ -211,7 +195,6 @@ async function fetchAbroadCollegesBase(opts: {
     LIMIT ${limit} OFFSET ${offset}
   `;
 
-  // 3. Count query
   const countSql = `
     SELECT COUNT(*) AS total
     FROM collegeprofile cp
@@ -229,7 +212,6 @@ async function fetchAbroadCollegesBase(opts: {
       return { colleges: [], total, totalPages: 0 };
     }
 
-    // 4. Enrich query (Touching only the needed IDs)
     const idList = idRows.map((r) => r.id).join(",");
     const enrichSql = `
       SELECT
@@ -297,8 +279,6 @@ interface PageProps {
 
 export const revalidate = 300; // Cache for 5 minutes
 
-// ─── Data Components for Streaming ──────────────────────────────────────────
-
 async function CollegeSection() {
   const { colleges, total } = await fetchAbroadColleges({
     stream: "",
@@ -309,74 +289,17 @@ async function CollegeSection() {
     limit: 12,
   });
 
-  return <CollegeGrid colleges={colleges} total={total} />;
-}
-
-const getDestinationSectionData = unstable_cache(
-  async () => {
-    return safeQuery<CountryRow>(`
-      SELECT c.id, c.name, c.pageslug, c.logoimage,
-             COALESCE(counts.college_count, 0) AS college_count
-      FROM country c
-      LEFT JOIN (
-        SELECT country_id, COUNT(*) AS college_count
-        FROM (
-          SELECT id, registeredAddressCountryId AS country_id FROM collegeprofile WHERE registeredAddressCountryId != 1 AND registeredAddressCountryId IS NOT NULL
-          UNION
-          SELECT id, campusAddressCountryId AS country_id FROM collegeprofile WHERE campusAddressCountryId != 1 AND campusAddressCountryId IS NOT NULL
-        ) AS unique_colleges
-        GROUP BY country_id
-      ) counts ON counts.country_id = c.id
-      WHERE c.id != 1 AND c.name IS NOT NULL AND c.name != ''
-      ORDER BY c.isShowOnHome DESC, c.name ASC
-      LIMIT 12
-    `);
-  },
-  ["study-abroad-destinations"],
-  { revalidate: 600 }
-);
-
-async function DestinationSection() {
-  const countryRows = await getDestinationSectionData();
-
   return (
-    <Destinations countries={countryRows} getDestinationMeta={getDestinationMeta} />
+    <section className="py-24 bg-slate-50/50">
+      <div className="max-w-[1400px] mx-auto px-6">
+        <div className="mb-12">
+          <h2 className="text-4xl font-bold text-slate-900 mb-4">International Universities</h2>
+          <p className="text-slate-500">Pick from over {total.toLocaleString()} institutions worldwide.</p>
+        </div>
+        <CollegeGrid colleges={colleges} total={total} />
+      </div>
+    </section>
   );
-}
-
-const getStreamSectionData = unstable_cache(
-  async () => {
-    return safeQuery<StreamRow>(`
-      SELECT fa.id, fa.name, fa.pageslug,
-             COALESCE(counts.college_count, 0) AS college_count
-      FROM functionalarea fa
-      LEFT JOIN (
-        SELECT cm.functionalarea_id, COUNT(DISTINCT cp.id) AS college_count
-        FROM collegemaster cm
-        INNER JOIN collegeprofile cp ON cp.id = cm.collegeprofile_id
-        WHERE cp.registeredAddressCountryId != 1 OR cp.campusAddressCountryId != 1
-        GROUP BY cm.functionalarea_id
-      ) counts ON counts.functionalarea_id = fa.id
-      WHERE fa.name IS NOT NULL AND fa.name != ''
-      ORDER BY fa.isShowOnTop DESC, fa.name ASC
-      LIMIT 20
-    `);
-  },
-  ["study-abroad-streams"],
-  { revalidate: 600 }
-);
-
-async function StreamSection() {
-  const streamRows = await getStreamSectionData();
-
-  const streamOptions: FilterOption[] = streamRows.map((r) => ({
-    id: r.id,
-    name: r.name,
-    slug: r.pageslug ?? r.name.toLowerCase().replace(/\s+/g, "-"),
-    count: r.college_count,
-  }));
-
-  return <StreamList streams={streamOptions} />;
 }
 
 export default async function StudyAbroadPage({ searchParams }: PageProps) {
@@ -392,13 +315,12 @@ export default async function StudyAbroadPage({ searchParams }: PageProps) {
   const page = Math.max(1, parseInt(getString("page", "1")));
   const showSearchResults = !!(stream || degree || feesMax || page > 1);
 
-  // If filters are active, show search results directly (blocking search render)
   if (showSearchResults) {
     const [{ colleges, total, totalPages }, streamRows, degreeRows] =
       await Promise.all([
         fetchAbroadColleges({ stream, degree, feesMax, sort, page, limit: 12 }),
         safeQuery<StreamRow>(`
-          SELECT id, name, pageslug, 0 AS college_count
+          SELECT id, name, pageslug
           FROM functionalarea
           ORDER BY isShowOnTop DESC, name ASC LIMIT 20
         `),
@@ -445,52 +367,31 @@ export default async function StudyAbroadPage({ searchParams }: PageProps) {
     );
   }
 
-  // ── Landing page view (Streaming enabled via Suspense) ───────────────────
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col relative">
-      {/* ── Hero Background ── */}
-      <div className="absolute top-0 left-0 w-full h-[450px] z-0 overflow-hidden text-[0px] font-[0] leading-[0]">
-        <Image
-          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
-          alt="Campus Background"
-          fill
-          priority
-          sizes="100vw"
-          quality={80}
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
-      </div>
+    <div className="min-h-screen bg-white flex flex-col relative font-[family-name:var(--font-outfit)]">
+      <Header />
+      
+      <main className="flex-1">
+        <HeroSection />
+        
+        <TopDestinations />
+        
+        <CostCalculator />
+        
+        <JourneySteps />
 
-      <div className="relative z-10">
-        <Header />
+        <Suspense fallback={<div className="py-24 text-center">Loading Universities...</div>}>
+          <CollegeSection />
+        </Suspense>
+      </main>
 
-        {/* Hero section: renders immediately */}
-        <Hero totalColleges={0} totalCountries={0} />
-
-      {/* Why Study Abroad: static content, renders immediately */}
-      <WhyStudyAbroad />
-
-      {/* Dynamic sections wrapped in Suspense for streaming */}
-      <Suspense fallback={<div className="h-40 animate-pulse bg-neutral-100 w-full px-4 lg:px-8 xl:px-12 rounded-3xl my-8" />}>
-        <DestinationSection />
-      </Suspense>
-
-      <Suspense fallback={<div className="h-20 animate-pulse bg-neutral-100 w-full px-4 lg:px-8 xl:px-12 rounded-2xl my-8" />}>
-        <StreamSection />
-      </Suspense>
-
-      <Suspense fallback={<div className="py-12 px-4 lg:px-8 xl:px-12 w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-64 animate-pulse bg-neutral-100 rounded-2xl" />
-        ))}
-      </div>}>
-        <CollegeSection />
-      </Suspense>
-
-      </div>
-      <Footer />
+      <StudyAbroadFooter />
     </div>
   );
 }
+
 // Force cache invalidation 3
+
+
+
+

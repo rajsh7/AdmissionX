@@ -171,3 +171,7 @@ export default function FacultyFormModal({ isOpen, onClose, onSubmit, faculty, c
     </AdminModal>
   );
 }
+
+
+
+

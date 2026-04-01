@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
 
@@ -21,7 +20,7 @@ async function deleteAdmissionXQuery(id: number) {
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -36,7 +35,7 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface QueryRow extends RowDataPacket {
+interface QueryRow  {
   id: number;
   name: string;
   email: string;
@@ -159,3 +158,7 @@ export default async function AdmissionXQueryPage({
     </div>
   );
 }
+
+
+
+

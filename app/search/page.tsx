@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import SearchClient from "./SearchClient";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
@@ -12,7 +11,7 @@ interface FilterOption {
   count?: number;
 }
 
-interface CollegeRow extends RowDataPacket {
+interface CollegeRow  {
   id: number;
   slug: string;
   name: string;
@@ -34,25 +33,25 @@ interface CollegeRow extends RowDataPacket {
   max_fees: string | null;
 }
 
-interface StreamRow extends RowDataPacket {
+interface StreamRow  {
   id: number;
   name: string;
   pageslug: string | null;
   college_count: number;
 }
 
-interface DegreeRow extends RowDataPacket {
+interface DegreeRow  {
   id: number;
   name: string;
   pageslug: string | null;
 }
 
-interface CityRow extends RowDataPacket {
+interface CityRow  {
   id: number;
   name: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
@@ -77,7 +76,7 @@ function slugToName(slug: string): string {
     .join(" ");
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -419,3 +418,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     />
   );
 }
+
+
+
+

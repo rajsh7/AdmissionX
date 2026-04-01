@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import QuestionListClient from "./QuestionListClient";
 
@@ -62,7 +61,7 @@ async function deleteQuestion(id: number) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number | boolean)[] = []
 ): Promise<T[]> {
@@ -75,7 +74,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface QuestionRow extends RowDataPacket {
+interface QuestionRow  {
   id: number;
   question: string;
   questionDate: string | null;
@@ -128,3 +127,7 @@ export default async function AskQaPage({
     </div>
   );
 }
+
+
+
+

@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import GalleryClient from "./GalleryClient";
 import { saveUpload } from "@/lib/upload-utils";
@@ -78,7 +77,7 @@ async function updateGalleryItem(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number | boolean)[] = [],
 ): Promise<T[]> {
@@ -91,7 +90,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface GalleryRow extends RowDataPacket {
+interface GalleryRow  {
   id: number;
   name: string;
   fullimage: string | null;
@@ -152,3 +151,7 @@ export default async function GalleryPage({
     </div>
   );
 }
+
+
+
+

@@ -91,6 +91,7 @@ export default function CourseSearchClient({
 
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
+      <Header />
       {/* ── Hero section ── */}
       <div className="relative w-full overflow-hidden" style={{ height: '560px' }}>
         {/* ── Hero Background ── */}
@@ -108,7 +109,6 @@ export default function CourseSearchClient({
         </div>
 
         <div className="relative z-10 w-full h-full flex flex-col">
-          <Header />
 
           {/* ── Hero / Search Banner ── */}
           <div className="flex-1 flex items-center justify-start relative">
@@ -116,7 +116,7 @@ export default function CourseSearchClient({
               <div className="max-w-4xl text-left transition-opacity duration-700" style={{ opacity: mounted ? 1 : 0 }}>
                 <h1 className="font-poppins text-white leading-[1.05] tracking-[0.02em] mb-4 drop-shadow-2xl">
                   <span className="text-[36px] sm:text-[48px] lg:text-[64px] font-extrabold block mb-0">Finds your</span>
-                  <span className="text-[40px] sm:text-[54px] lg:text-[72px] font-black text-[#008080]">perfect course!</span>
+                  <span className="text-[40px] sm:text-[54px] lg:text-[72px] font-black text-[#FF3C3C]">perfect course!</span>
                 </h1>
                 <p className="text-white text-lg sm:text-2xl font-bold mb-10 max-w-2xl leading-relaxed opacity-90">
                   Search thousands of courses and universities worldwide
@@ -128,7 +128,7 @@ export default function CourseSearchClient({
                     onSubmit={(e) => { e.preventDefault(); handleSearch((e.target as any).q.value); }}
                     className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full"
                   >
-                    <div className="flex-1 flex items-center gap-3 bg-white/95 backdrop-blur-sm rounded-2xl border border-white/20 shadow-2xl focus-within:border-[#008080] focus-within:ring-4 focus-within:ring-[#008080]/10 transition-all duration-300 px-6 py-1">
+                    <div className="flex-1 flex items-center gap-3 bg-white/95 backdrop-blur-sm rounded-2xl border border-white/20 shadow-2xl focus-within:border-[#FF3C3C] focus-within:ring-4 focus-within:ring-[#FF3C3C]/10 transition-all duration-300 px-6 py-1">
                       <span className="material-symbols-outlined text-[20px] text-neutral-400 flex-shrink-0">search</span>
                       <input
                         name="q"
@@ -140,7 +140,7 @@ export default function CourseSearchClient({
                     </div>
                     <button
                       type="submit"
-                      className="flex-shrink-0 bg-[#008080] hover:bg-[#006666] text-white text-sm font-black px-12 py-5 rounded-2xl transition-all active:scale-[0.98] shadow-xl shadow-[#008080]/30 min-w-max"
+                      className="flex-shrink-0 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-sm font-black px-12 py-5 rounded-2xl transition-all active:scale-[0.98] shadow-xl shadow-[#FF3C3C]/30 min-w-max"
                     >
                       Search Now
                     </button>
@@ -185,7 +185,7 @@ export default function CourseSearchClient({
                     <span className="text-xs font-black text-neutral-400 whitespace-nowrap uppercase tracking-widest">
                       Sort By:
                     </span>
-                    <select className="bg-white border border-neutral-200 rounded-xl px-5 py-3 text-xs font-black text-neutral-700 shadow-sm focus:outline-none focus:border-[#008080] cursor-pointer">
+                    <select className="bg-white border border-neutral-200 rounded-xl px-5 py-3 text-xs font-black text-neutral-700 shadow-sm focus:outline-none focus:border-[#FF3C3C] cursor-pointer">
                       <option>Most Popular</option>
                       <option>Newest First</option>
                       <option>Level (A-Z)</option>
@@ -226,8 +226,8 @@ export default function CourseSearchClient({
 
               {/* â”€â”€ Course grid â”€â”€ */}
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {Array.from({ length: 9 }).map((_, i) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                  {Array.from({ length: 12 }).map((_, i) => (
                     <div key={i} className="bg-white rounded-3xl border border-neutral-100 aspect-[4/5] animate-pulse" />
                   ))}
                 </div>
@@ -240,13 +240,13 @@ export default function CourseSearchClient({
                   <p className="text-neutral-400 max-w-sm mb-8 font-medium">Try adjusting your filters or using different keywords to explore more options.</p>
                   <button
                     onClick={() => router.push(pathname)}
-                    className="bg-[#008080] text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-[#006666] transition-all"
+                    className="bg-[#FF3C3C] text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-[#E63636] transition-all"
                   >
                     Clear All Filters
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                   {courses.map((course, i) => (
                     <CourseCardV3 key={course.id} course={course} index={i} />
                   ))}
@@ -272,3 +272,7 @@ export default function CourseSearchClient({
     </div>
   );
 }
+
+
+
+

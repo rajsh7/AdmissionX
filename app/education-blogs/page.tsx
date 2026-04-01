@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
+export const dynamic = 'force-dynamic';
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const PAGE_SIZE = 12;
 
@@ -342,3 +343,8 @@ export default async function EducationBlogsPage({
     </div>
   );
 }
+
+
+
+
+

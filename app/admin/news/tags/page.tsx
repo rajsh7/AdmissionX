@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import NewsTagListClient from "./NewsTagListClient";
 
@@ -113,3 +112,7 @@ export default async function NewsTagsPage({
     </div>
   );
 }
+
+
+
+

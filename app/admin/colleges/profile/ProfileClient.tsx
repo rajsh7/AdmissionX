@@ -1,14 +1,13 @@
 "use client";
 
-// Force refresh search bar structure to div to fix hydration mismatch
 import { useState, useEffect, useRef } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import ProfileModal from "./ProfileModal";
 
 interface ProfileRow {
-  id: number;
+  id: string;
   users_id: number;
   slug: string;
   name: string;
@@ -44,7 +43,7 @@ interface ProfileClientProps {
   q: string;
   onAdd: (formData: FormData) => Promise<void>;
   onUpdate: (formData: FormData) => Promise<void>;
-  onDelete: (id: number) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
 }
 
 const REMOTE_IMAGE_BASE = "https://admin.admissionx.in/uploads/";
@@ -113,34 +112,23 @@ export default function ProfileClient({
 }: ProfileClientProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProfile, setEditingProfile] = useState<ProfileRow | null>(null);
   const [searchQuery, setSearchQuery] = useState(q);
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // Debounced search effect
   useEffect(() => {
     if (searchQuery === q) return;
-
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
-
     searchTimeout.current = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (searchQuery) {
-        params.set("q", searchQuery);
-      } else {
-        params.delete("q");
-      }
-      params.set("page", "1"); // Reset to page 1 on new search
+      const params = new URLSearchParams();
+      if (searchQuery) params.set("q", searchQuery);
+      params.set("page", "1");
       router.push(`${pathname}?${params.toString()}`);
     }, 400);
-
-    return () => {
-      if (searchTimeout.current) clearTimeout(searchTimeout.current);
-    };
-  }, [searchQuery, q, pathname, router, searchParams]);
+    return () => { if (searchTimeout.current) clearTimeout(searchTimeout.current); };
+  }, [searchQuery, q, pathname, router]);
 
   const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
   const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
@@ -357,3 +345,7 @@ export default function ProfileClient({
     </div>
   );
 }
+
+
+
+

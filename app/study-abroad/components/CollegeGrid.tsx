@@ -105,3 +105,7 @@ export default function CollegeGrid({ colleges, total }: CollegeGridProps) {
     </div>
   );
 }
+
+
+
+

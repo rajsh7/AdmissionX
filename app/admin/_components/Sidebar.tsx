@@ -78,28 +78,27 @@ export function SidebarContent({
   };
 
   return (
-    <nav className="flex flex-col h-full select-none">
-      {/* Logo */}
-      <div className="px-5 py-5 border-b border-white/10 flex-shrink-0">
-        <Link href="/admin/dashboard" className="flex items-center gap-2">
-          <span className="text-white font-black text-lg tracking-tight">
-            Admission<span className="text-red-400">X</span>
-          </span>
-          <span className="text-[10px] font-bold bg-red-600 text-white px-1.5 py-0.5 rounded-full tracking-wider uppercase">
-            Admin
-          </span>
-        </Link>
+    <nav className="flex flex-col h-full select-none bg-[#3b3b3b]">
+      {/* Logo Area */}
+      <div className="p-4 flex-shrink-0">
+        <div className="bg-white rounded p-3 flex items-center justify-center border-2 border-cyan-400">
+          <Link href="/admin/dashboard" className="flex items-center">
+            <span className="text-black font-extrabold text-2xl tracking-tighter">
+              admissi<span className="text-red-500">o</span>n<span className="text-cyan-400">X</span>
+            </span>
+          </Link>
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
+      <div className="flex-1 overflow-y-auto py-2 space-y-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
         {NAV_GROUPS.map((group, gIdx) => (
           <div key={`nav-group-${group.label || gIdx}`}>
             {group.label && (
-              <p className="text-[10px] font-bold text-white/35 uppercase tracking-widest px-3 mb-1.5 mt-1">
+              <p className="text-[11px] font-semibold text-white/50 uppercase tracking-wider px-6 mb-2 mt-2">
                 {group.label}
               </p>
             )}
-            <ul className="space-y-0.5">
+            <ul className="space-y-0 text-[13px] font-medium">
               {group.items.map((item, iIdx) => {
                 const hasSubItems = !!(item.subItems && item.subItems.length > 0);
                 const isSubItemActive = hasSubItems && item.subItems?.some(sub => pathname === sub.href);
@@ -113,28 +112,19 @@ export function SidebarContent({
                       <div>
                         <button
                           onClick={() => toggleExpand(item.label)}
-                          className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${active
-                            ? "bg-red-600 text-white shadow-lg shadow-red-900/30"
-                            : "text-white/55 hover:text-white hover:bg-white/8"
+                          className={`w-full flex items-center justify-between gap-3 px-6 py-3 transition-all duration-150 ${active
+                            ? "bg-[#963737] text-white border-l-4 border-red-800"
+                            : "text-white/80 hover:text-white hover:bg-white/5 border-l-4 border-transparent"
                             }`}
                         >
-                          <div className="flex items-center gap-3 truncate">
+                          <div className="flex items-center gap-4 truncate">
                             <span
-                              className="material-symbols-rounded text-[19px] flex-shrink-0"
+                              className="material-symbols-rounded text-[20px] flex-shrink-0"
                               style={active ? ICO_FILL : ICO}
                             >
                               {item.icon}
                             </span>
                             <span className="truncate flex-1 text-left">{item.label}</span>
-                            {item.badge && (
-                              <span className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter ${
-                                item.badge.variant === 'new' ? 'bg-red-400 text-white' :
-                                item.badge.variant === 'updated' ? 'bg-emerald-500 text-white' :
-                                'bg-blue-400 text-white'
-                              }`}>
-                                {item.badge.text}
-                              </span>
-                            )}
                           </div>
                           <span
                             className={`material-symbols-rounded text-base transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
@@ -145,22 +135,22 @@ export function SidebarContent({
                         </button>
 
                         {isExpanded && (
-                          <ul className="mt-1 ml-4 border-l border-white/10 pl-2 space-y-0.5">
+                          <ul className="bg-black/10 py-1">
                             {item.subItems?.map((sub, sIdx) => {
-                              const subActive = pathname === sub.href;
-                              return (
-                                <li key={`sub-item-${item.label}-${sub.label}-${sIdx}`}>
-                                  <Link
-                                    href={sub.href}
-                                    className={`flex items-center px-3 py-2 rounded-lg text-[13px] font-medium transition-all ${subActive
-                                      ? "text-red-400 bg-red-400/10"
-                                      : "text-white/40 hover:text-white hover:bg-white/5"
-                                      }`}
-                                  >
-                                    {sub.label}
-                                  </Link>
-                                </li>
-                              );
+                               const subActive = pathname === sub.href;
+                               return (
+                                 <li key={`sub-item-${item.label}-${sub.label}-${sIdx}`}>
+                                   <Link
+                                     href={sub.href}
+                                     className={`flex items-center px-14 py-2 text-[12px] font-medium transition-all ${subActive
+                                       ? "text-white"
+                                       : "text-white/60 hover:text-white"
+                                       }`}
+                                   >
+                                     {sub.label}
+                                   </Link>
+                                 </li>
+                               );
                             })}
                           </ul>
                         )}
@@ -168,27 +158,18 @@ export function SidebarContent({
                     ) : (
                       <Link
                         href={item.href}
-                        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${active
-                          ? "bg-red-600 text-white shadow-lg shadow-red-900/30"
-                          : "text-white/55 hover:text-white hover:bg-white/8"
+                        className={`flex items-center gap-4 px-6 py-3 transition-all duration-150 ${active
+                          ? "bg-[#963737] text-white border-l-4 border-[#6e2222]"
+                          : "text-white/80 hover:text-white hover:bg-white/5 border-l-4 border-transparent"
                           }`}
                       >
                         <span
-                          className="material-symbols-rounded text-[19px] flex-shrink-0"
+                          className="material-symbols-rounded text-[20px] flex-shrink-0"
                           style={active ? ICO_FILL : ICO}
                         >
                           {item.icon}
                         </span>
                         <span className="truncate flex-1">{item.label}</span>
-                        {item.badge && (
-                          <span className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter ${
-                            item.badge.variant === 'new' ? 'bg-red-400 text-white' :
-                            item.badge.variant === 'updated' ? 'bg-emerald-500 text-white' :
-                            'bg-blue-400 text-white'
-                          }`}>
-                            {item.badge.text}
-                          </span>
-                        )}
                       </Link>
                     )}
                   </li>
@@ -198,47 +179,10 @@ export function SidebarContent({
           </div>
         ))}
       </div>
-
-      {/* Admin user footer */}
-      <div className="px-3 py-4 border-t border-white/10 flex-shrink-0 space-y-1">
-        {/* View site link */}
-        <Link
-          href="/"
-          target="_blank"
-          className="flex items-center gap-3 px-3 py-2 text-white/40 hover:text-white/70 hover:bg-white/5 rounded-xl text-xs font-medium transition-all"
-        >
-          <span className="material-symbols-rounded text-[17px]" style={ICO}>
-            open_in_new
-          </span>
-          View Public Site
-        </Link>
-
-        {/* User row */}
-        <div className="flex items-center gap-3 px-3 py-2">
-          <div className="w-7 h-7 rounded-full bg-red-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
-            {admin.name.charAt(0).toUpperCase()}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-white text-xs font-semibold truncate leading-tight">
-              {admin.name}
-            </p>
-            <p className="text-white/35 text-[10px] truncate leading-tight">
-              {admin.email}
-            </p>
-          </div>
-        </div>
-
-        {/* Logout */}
-        <button
-          onClick={onLogout}
-          className="w-full flex items-center gap-3 px-3 py-2 text-white/40 hover:text-red-400 hover:bg-red-900/20 rounded-xl text-xs font-medium transition-all"
-        >
-          <span className="material-symbols-rounded text-[17px]" style={ICO}>
-            logout
-          </span>
-          Sign out
-        </button>
-      </div>
     </nav>
   );
 }
+
+
+
+

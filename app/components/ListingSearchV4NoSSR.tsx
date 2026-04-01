@@ -20,6 +20,11 @@ interface ListingSearchV4Props {
   initLevel: string;
   initStream: string;
   initPage: number;
+  heroImage?: string;
+  heroRightImage?: string;
+  heroHeight?: string;
+  heroObjectPosition?: string;
+  heroFit?: "cover" | "contain";
 }
 
 const ListingSearchV4 = dynamic(() => import("./ListingSearchV4"), {
@@ -29,4 +34,8 @@ const ListingSearchV4 = dynamic(() => import("./ListingSearchV4"), {
 export default function ListingSearchV4NoSSR(props: ListingSearchV4Props) {
   return <ListingSearchV4 {...props} />;
 }
+
+
+
+
 

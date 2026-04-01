@@ -1,11 +1,10 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import BookmarkClient from "./BookmarkClient";
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = []
 ): Promise<T[]> {
@@ -87,7 +86,7 @@ async function deleteBookmark(id: number) {
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 
-interface BookmarkRow extends RowDataPacket {
+interface BookmarkRow  {
   id: number;
   student_id: number;
   college_id: number;
@@ -102,17 +101,17 @@ interface BookmarkRow extends RowDataPacket {
   created_at: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
-interface UserRow extends RowDataPacket {
+interface UserRow  {
   id: number;
   name: string;
   email: string;
 }
 
-interface TypeRow extends RowDataPacket {
+interface TypeRow  {
   id: number;
   name: string;
 }
@@ -180,3 +179,7 @@ export default async function StudentBookmarksPage({
     </div>
   );
 }
+
+
+
+

@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import PrivilegeListClient from "./PrivilegeListClient";
@@ -73,7 +72,7 @@ async function deletePrivilege(id: number) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = []
 ): Promise<T[]> {
@@ -86,7 +85,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface PrivilegeRow extends RowDataPacket {
+interface PrivilegeRow  {
   id: number;
   user_name: string;
   user_lastname: string;
@@ -101,25 +100,25 @@ interface PrivilegeRow extends RowDataPacket {
   users_id: string | number;
 }
 
-interface UserRow extends RowDataPacket {
+interface UserRow  {
   id: number;
   firstname: string;
   lastname: string;
   email: string;
 }
 
-interface TableRow extends RowDataPacket {
+interface TableRow  {
   id: number;
   name: string;
 }
 
-interface StatsRow extends RowDataPacket {
+interface StatsRow  {
   total: number;
   tables: number;
   users: number;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
@@ -261,3 +260,7 @@ export default async function MembersPrivilegePage({
     </div>
   );
 }
+
+
+
+

@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { RowDataPacket } from "mysql2";
 import { saveUpload } from "@/lib/upload-utils";
 import TestimonialListClient from "./TestimonialListClient";
 
@@ -77,7 +76,7 @@ async function deleteTestimonial(id: number) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -92,7 +91,7 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface TestimonialRow extends RowDataPacket {
+interface TestimonialRow  {
   id: number;
   author: string;
   misc: string;
@@ -103,7 +102,7 @@ interface TestimonialRow extends RowDataPacket {
   created_at: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
@@ -201,3 +200,7 @@ export default async function TestimonialsPage({
     </div>
   );
 }
+
+
+
+

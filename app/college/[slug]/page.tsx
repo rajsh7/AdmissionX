@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import { notFound } from "next/navigation";
-import { RowDataPacket } from "mysql2";
 
 import HeroSection from "./components/HeroSection";
 import TabsNav from "./components/TabsNav";
@@ -53,7 +52,7 @@ function stripHtml(html: string | null | undefined): string {
     .trim();
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T>(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -87,7 +86,7 @@ function toParagraphs(text: string): string[] {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface CollegeRow extends RowDataPacket {
+interface CollegeRow {
   id: number;
   slug: string;
   college_name: string;
@@ -131,7 +130,7 @@ export default async function CollegeOverviewPage({
     ),
 
     // Courses — for count stat
-    safeQuery<RowDataPacket>(
+    safeQuery<any>(
       `SELECT
            cm.id,
            co.name  AS course_name,
@@ -153,7 +152,7 @@ export default async function CollegeOverviewPage({
     ),
 
     // Placement — for avg CTC stat
-    safeQuery<RowDataPacket>(
+    safeQuery<any>(
       `SELECT
            p.id,
            p.numberofrecruitingcompany,
@@ -169,7 +168,7 @@ export default async function CollegeOverviewPage({
     ),
 
     // Gallery — for image mosaic (first 3 used)
-    safeQuery<RowDataPacket>(
+    safeQuery<any>(
       `SELECT g.id, g.name, g.fullimage, g.caption
          FROM gallery g
          JOIN collegeprofile cp ON cp.users_id = g.users_id AND cp.slug = ?

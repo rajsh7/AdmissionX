@@ -106,15 +106,15 @@ export default function CollegeCard({
               className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#008080]/10 to-[#008080]/5 flex flex-col items-center justify-center p-4 text-center">
-              <span className="material-symbols-outlined text-4xl text-[#008080]/30 mb-2">account_balance</span>
-              <span className="text-sm font-bold text-[#008080]/40 uppercase tracking-widest leading-tight line-clamp-2">{name}</span>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FF3C3C]/10 to-[#FF3C3C]/5 flex flex-col items-center justify-center p-4 text-center">
+              <span className="material-symbols-outlined text-4xl text-[#FF3C3C]/30 mb-2">account_balance</span>
+              <span className="text-sm font-bold text-[#FF3C3C]/40 uppercase tracking-widest leading-tight line-clamp-2">{name}</span>
             </div>
           )}
 
           {/* Top-left: Rank badge */}
           {displayRank ? (
-            <div className="absolute top-3 left-3 flex items-center gap-1 bg-[#008080] text-white text-[10px] font-black px-2.5 py-1 rounded-[10px] shadow-lg">
+            <div className="absolute top-3 left-3 flex items-center gap-1 bg-[#FF3C3C] text-white text-[10px] font-black px-2.5 py-1 rounded-[10px] shadow-lg">
               #{displayRank}
             </div>
           ) : null}
@@ -126,7 +126,7 @@ export default function CollegeCard({
         {/* ── Body ── */}
         <div className="flex flex-col flex-1 p-5">
           {/* Name */}
-          <h3 className="text-[17px] font-medium text-[#333333] mb-1 group-hover:text-[#008080] transition-colors line-clamp-2">
+          <h3 className="text-[17px] font-medium text-[#333333] mb-1 group-hover:text-[#FF3C3C] transition-colors line-clamp-2">
             {name}
           </h3>
 
@@ -142,7 +142,7 @@ export default function CollegeCard({
               {streams.slice(0, 2).map((s) => (
                 <span
                   key={s}
-                  className="px-3 py-1.5 bg-transparent text-neutral-600 text-[11px] font-bold rounded-full border border-neutral-100 transition-all group-hover:bg-[#008080]/10 group-hover:text-[#008080] group-hover:border-[#008080]/20"
+                  className="px-3 py-1.5 bg-transparent text-neutral-600 text-[11px] font-bold rounded-full border border-neutral-100 transition-all group-hover:bg-[#FF3C3C]/10 group-hover:text-[#FF3C3C] group-hover:border-[#FF3C3C]/20"
                 >
                   {s}
                 </span>
@@ -161,12 +161,12 @@ export default function CollegeCard({
           <div className="mt-auto pt-4 border-t border-neutral-50 flex items-center justify-between">
             <div>
               <span className="block text-[11px] text-neutral-400 font-bold uppercase tracking-wider mb-0.5">Avg. Package</span>
-              <span className="text-base font-black text-[#008080]">
+              <span className="text-base font-black text-[#FF3C3C]">
                 {feesLabel}
               </span>
             </div>
 
-            <span className="flex items-center gap-1 text-[13px] font-black text-[#008080] group-hover:gap-1.5 transition-all">
+            <span className="flex items-center gap-1 text-[13px] font-black text-[#FF3C3C] group-hover:gap-1.5 transition-all">
               View Details
               <span className="material-symbols-outlined text-[16px] mt-0.5">arrow_forward</span>
             </span>
@@ -176,3 +176,7 @@ export default function CollegeCard({
     </motion.div>
   );
 }
+
+
+
+

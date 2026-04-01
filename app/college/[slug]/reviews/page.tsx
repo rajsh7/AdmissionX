@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import { notFound } from "next/navigation";
-import { RowDataPacket } from "mysql2";
 import ReviewSection from "@/app/components/college/ReviewSection";
 import type { ReviewData } from "@/app/api/college/[slug]/route";
 
@@ -17,7 +16,7 @@ function slugToName(slug: string): string {
     .join(" ");
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T>(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -32,7 +31,7 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface CollegeBaseRow extends RowDataPacket {
+interface CollegeBaseRow {
   id: number;
   slug: string;
   college_name: string;
@@ -40,7 +39,7 @@ interface CollegeBaseRow extends RowDataPacket {
   totalRatingUser: string | null;
 }
 
-interface ReviewRow extends RowDataPacket {
+interface ReviewRow {
   id: number;
   title: string | null;
   review: string | null;

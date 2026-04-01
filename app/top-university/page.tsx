@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import SearchClient from "@/app/search/SearchClient";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 300;
 
 interface FilterOption {
@@ -55,11 +56,11 @@ const getFilterData = unstable_cache(
 
     const cityRows = uniqueCityIds.length > 0
       ? await db.collection("city")
-          .find({ _id: { $in: uniqueCityIds }, name: { $exists: true, $ne: "" } })
-          .sort({ name: 1 })
-          .limit(100)
-          .project({ _id: 1, name: 1 })
-          .toArray()
+        .find({ _id: { $in: uniqueCityIds }, name: { $exists: true, $ne: "" } })
+        .sort({ name: 1 })
+        .limit(100)
+        .project({ _id: 1, name: 1 })
+        .toArray()
       : [];
 
     return { streamRows, degreeRows, cityRows };
@@ -119,7 +120,7 @@ async function fetchTopUniversities(opts: {
 
   const sortStage: Record<string, 1 | -1> =
     sort === "rating" ? { rating: -1, totalRatingUser: -1 }
-    : { topUniversityRank: 1, ranking: 1, rating: -1 };
+      : { topUniversityRank: 1, ranking: 1, rating: -1 };
 
   const [total, idRows] = await Promise.all([
     db.collection("collegeprofile").countDocuments(match),
@@ -277,6 +278,13 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
       pageSubtitle={pageSubtitle}
       entityName="University"
       entityNamePlural="Universities"
+      gridCols={4}
+      heroImage="/Background-images/student-hero-bg.png"
+      heroRightImage="/images/2999ec4e5233aa8cb9dbf010e3c51149ae41f951.png"
+      heroHeight="641px"
+      heroObjectPosition="center"
+      heroFit="cover"
+      filterWidth="370px"
     />
   );
 }

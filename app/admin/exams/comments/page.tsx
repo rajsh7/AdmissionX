@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
 
@@ -14,7 +13,7 @@ async function deleteComment(id: number) {
   revalidatePath("/", "layout");
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number | boolean)[] = [],
 ): Promise<T[]> {
@@ -27,7 +26,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface CommentRow extends RowDataPacket {
+interface CommentRow  {
   id: number;
   replyanswer: string;
   answerDate: string | null;
@@ -144,3 +143,7 @@ export default async function ExamCommentsPage({
     </div>
   );
 }
+
+
+
+

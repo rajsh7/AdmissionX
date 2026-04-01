@@ -32,97 +32,102 @@ export const CATEGORY_SLUG: Record<string, string> = {
 export async function fetchCollegesForSlug(
   slug: string,
 ): Promise<FilterCollegeResult[]> {
-  const db = await getDb();
+  try {
+    const db = await getDb();
 
-  // Step 1: resolve pageslug → functionalarea id
-  const fa = await db
-    .collection("functionalarea")
-    .findOne({ pageslug: slug }, { projection: { id: 1 } });
-  if (!fa) return [];
+    // Step 1: resolve pageslug → functionalarea id
+    const fa = await db
+      .collection("functionalarea")
+      .findOne({ pageslug: slug }, { projection: { id: 1 } });
+    if (!fa) return [];
 
-  const faId = fa.id;
+    const faId = fa.id;
 
-  // Step 2: collect up to 300 distinct college ids for this stream
-  const cmRows = await db
-    .collection("collegemaster")
-    .find({ functionalarea_id: faId }, { projection: { collegeprofile_id: 1 } })
-    .limit(300)
-    .toArray();
-  if (!cmRows.length) return [];
+    // Step 2: collect up to 300 distinct college ids for this stream
+    const cmRows = await db
+      .collection("collegemaster")
+      .find({ functionalarea_id: faId }, { projection: { collegeprofile_id: 1 } })
+      .limit(300)
+      .toArray();
+    if (!cmRows.length) return [];
 
-  const candidateIds = [...new Set(cmRows.map((r) => r.collegeprofile_id))];
+    const candidateIds = [...new Set(cmRows.map((r) => r.collegeprofile_id))];
 
-  // Step 3: rank by rating, keep top 8
-  const topRows = await db
-    .collection("collegeprofile")
-    .find({ id: { $in: candidateIds } })
-    .sort({ rating: -1, totalRatingUser: -1 })
-    .limit(8)
-    .project({ id: 1 })
-    .toArray();
-  if (!topRows.length) return [];
+    // Step 3: rank by rating, keep top 8
+    const topRows = await db
+      .collection("collegeprofile")
+      .find({ id: { $in: candidateIds } })
+      .sort({ rating: -1, totalRatingUser: -1 })
+      .limit(8)
+      .project({ id: 1 })
+      .toArray();
+    if (!topRows.length) return [];
 
-  const topIds = topRows.map((r) => r.id);
+    const topIds = topRows.map((r) => r.id);
 
-  // Step 4: enrich with user name
-  const dataRows = await db
-    .collection("collegeprofile")
-    .aggregate([
-      { $match: { id: { $in: topIds } } },
-      {
-        $lookup: {
-          from: "users",
-          localField: "users_id",
-          foreignField: "id",
-          as: "user",
-        },
-      },
-      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-      {
-        $project: {
-          slug: 1,
-          name: {
-            $cond: [
-              { $and: [{ $ne: ["$user.firstname", null] }, { $ne: [{ $trim: { input: "$user.firstname" } }, ""] }] },
-              { $trim: { input: "$user.firstname" } },
-              "$slug",
-            ],
+    // Step 4: enrich with user name
+    const dataRows = await db
+      .collection("collegeprofile")
+      .aggregate([
+        { $match: { id: { $in: topIds } } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "users_id",
+            foreignField: "id",
+            as: "user",
           },
-          location: "$registeredSortAddress",
-          image: "$bannerimage",
-          rating: 1,
         },
-      },
-    ])
-    .toArray();
+        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            slug: 1,
+            name: {
+              $cond: [
+                { $and: [{ $ne: ["$user.firstname", null] }, { $ne: [{ $trim: { input: "$user.firstname" } }, ""] }] },
+                { $trim: { input: "$user.firstname" } },
+                "$slug",
+              ],
+            },
+            location: "$registeredSortAddress",
+            image: "$bannerimage",
+            rating: 1,
+          },
+        },
+      ])
+      .toArray();
 
-  return dataRows.map((row) => {
-    const name = row.name || "University";
-    const words = name.split(" ");
-    const abbr =
-      words.length > 1
-        ? (words[0][0] + words[1][0]).toUpperCase()
-        : name.substring(0, 2).toUpperCase();
+    return dataRows.map((row) => {
+      const name = row.name || "University";
+      const words = name.split(" ");
+      const abbr =
+        words.length > 1
+          ? (words[0][0] + words[1][0]).toUpperCase()
+          : name.substring(0, 2).toUpperCase();
 
-    const rawImage = row.image ?? "";
-    const image = rawImage
-      ? rawImage.startsWith("http") || rawImage.startsWith("/")
-        ? rawImage
-        : `/uploads/${rawImage}`
-      : "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600";
+      const rawImage = row.image ?? "";
+      const image = rawImage
+        ? rawImage.startsWith("http") || rawImage.startsWith("/")
+          ? rawImage
+          : `/uploads/${rawImage}`
+        : "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600";
 
-    return {
-      name,
-      location: row.location || "India",
-      image,
-      rating: Math.round((Number(row.rating) || 4.5) * 10) / 10,
-      abbr,
-      abbrBg: "bg-primary",
-      tags: ["Featured", "Top Ranked"],
-      tuition: "View Fees",
-      href: `/university/${row.slug || ""}`,
-    };
-  });
+      return {
+        name,
+        location: row.location || "India",
+        image,
+        rating: Math.round((Number(row.rating) || 4.5) * 10) / 10,
+        abbr,
+        abbrBg: "bg-primary",
+        tags: ["Featured", "Top Ranked"],
+        tuition: "View Fees",
+        href: `/university/${row.slug || ""}`,
+      };
+    });
+  } catch (error) {
+    console.error("[fetchCollegesForSlug] Error fetching colleges:", error);
+    return [];
+  }
 }
 
 // ─── Cached wrapper ───────────────────────────────────────────────────────────

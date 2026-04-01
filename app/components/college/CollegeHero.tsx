@@ -65,7 +65,7 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
       <div className="absolute bottom-0 left-0 px-8 pb-8 flex items-end gap-5 z-10">
         {/* Logo box — white rounded square with teal initial */}
         <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-white flex items-center justify-center shadow-lg">
-          <span className="text-2xl font-black" style={{ color: "#008080" }}>
+          <span className="text-2xl font-black" style={{ color: "#FF3C3C" }}>
             {initial}
           </span>
         </div>
@@ -78,7 +78,7 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
           <Link
             href={`/college/${slug}`}
             className="text-sm font-semibold transition-opacity hover:opacity-80"
-            style={{ color: "#008080" }}
+            style={{ color: "#FF3C3C" }}
           >
             Take a look →
           </Link>
@@ -87,3 +87,7 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
     </div>
   );
 }
+
+
+
+

@@ -3,7 +3,6 @@ export const revalidate = 300;
 
 import pool from "@/lib/db";
 import { notFound } from "next/navigation";
-import { RowDataPacket } from "mysql2";
 import FAQAccordion from "@/app/college/[slug]/faqs/FAQAccordion";
 import type { FAQData } from "@/app/api/college/[slug]/route";
 
@@ -17,7 +16,7 @@ function slugToName(slug: string): string {
     .join(" ");
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T>(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -32,13 +31,13 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface CollegeBaseRow extends RowDataPacket {
+interface CollegeBaseRow {
   id: number;
   slug: string;
   college_name: string;
 }
 
-interface FAQRow extends RowDataPacket {
+interface FAQRow {
   id: number;
   question: string | null;
   answer: string | null;

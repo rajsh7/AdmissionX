@@ -378,3 +378,7 @@ export default async function NewsPage({
     </div>
   );
 }
+
+
+
+

@@ -1,11 +1,10 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import StudentProfileClient from "./StudentProfileClient";
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = []
 ): Promise<T[]> {
@@ -90,7 +89,7 @@ async function deleteProfile(id: number) {
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 
-interface StudentProfileRow extends RowDataPacket {
+interface StudentProfileRow  {
   id: number;
   users_id: number;
   student_name: string;
@@ -108,11 +107,11 @@ interface StudentProfileRow extends RowDataPacket {
   updated_at: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
-interface UserRow extends RowDataPacket {
+interface UserRow  {
   id: number;
   name: string;
   email: string;
@@ -178,3 +177,7 @@ export default async function StudentProfilePage({
     </div>
   );
 }
+
+
+
+

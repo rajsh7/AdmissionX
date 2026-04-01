@@ -87,6 +87,28 @@ const STATIC_EXAMS: Exam[] = [
     border: "border-orange-100",
     href: "/examination/arts/cuet",
   },
+  {
+    abbr: "XAT",
+    name: "XAT",
+    fullName: "Xavier Aptitude Test",
+    date: "05 Jan 2026",
+    registration: "Registration Started",
+    color: "text-red-600",
+    bg: "bg-red-50",
+    border: "border-red-100",
+    href: "/examination/management/xat",
+  },
+  {
+    abbr: "BITSAT",
+    name: "BITSAT",
+    fullName: "Birla Institute of Technology Aptitude Test",
+    date: "20 May 2026",
+    registration: "Registration Started",
+    color: "text-blue-600",
+    bg: "bg-blue-50",
+    border: "border-blue-100",
+    href: "/examination/engineering/bitsat",
+  },
 ];
 
 export default function EntranceExams({ dbExams }: EntranceExamsProps) {
@@ -100,17 +122,17 @@ export default function EntranceExams({ dbExams }: EntranceExamsProps) {
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
            <div>
-              <h2 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">Recent coming exams</h2>
-              <p className="mt-3 text-slate-500 font-medium max-w-lg">
+              <h2 className="text-3xl lg:text-4xl font-normal text-slate-900 tracking-tight">Recent coming exams</h2>
+              <p className="mt-3 text-slate-500 font-normal max-w-lg">
                 Stay updated with the latest entrance examinations, registration dates, and results.
               </p>
            </div>
-           <Link href="/examination" className="text-sm font-black text-[#008080] hover:underline underline-offset-4 uppercase tracking-widest">
+           <Link href="/examination" className="text-sm font-normal text-[#FF3C3C] hover:underline underline-offset-4 uppercase tracking-widest">
               View All Exams
            </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
            {exams.map((exam, i) => (
              <motion.div
                key={exam.abbr}
@@ -126,26 +148,26 @@ export default function EntranceExams({ dbExams }: EntranceExamsProps) {
                    {/* Logo/Icon Container */}
                    <div className="flex items-start justify-between mb-4">
                       <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shadow-sm transition-transform group-hover:scale-110">
-                         <span className={`text-sm font-black tracking-tight ${exam.color}`}>
+                         <span className={`text-sm font-normal tracking-tight ${exam.color}`}>
                             {exam.abbr.split(' ')[0]}
                          </span>
                       </div>
-                      <div className={`px-3 py-1 rounded-full bg-white/50 text-[10px] font-black uppercase tracking-wider ${exam.color} group-hover:bg-white transition-colors`}>
+                      <div className={`px-3 py-1 rounded-full bg-white/50 text-[10px] font-normal uppercase tracking-wider ${exam.color} group-hover:bg-white transition-colors`}>
                          {exam.registration}
                       </div>
                    </div>
 
                    {/* Exam Info */}
                    <div className="flex-1">
-                      <h3 className="text-lg font-black text-slate-900 leading-tight mb-1">{exam.name}</h3>
-                      <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{exam.fullName}</p>
+                      <h3 className="text-lg font-normal text-slate-900 leading-tight mb-1">{exam.name}</h3>
+                      <p className="text-xs text-slate-400 font-normal uppercase tracking-widest">{exam.fullName}</p>
                    </div>
 
                    {/* Footer Info */}
                    <div className="mt-6 flex items-center justify-between pt-4 border-t border-black/5">
                       <div className="flex items-center gap-2">
                          <span className="material-symbols-rounded text-slate-400 text-[18px]">calendar_today</span>
-                         <span className="text-xs font-bold text-slate-600">Exam: {exam.date}</span>
+                         <span className="text-xs font-normal text-slate-600">Exam: {exam.date}</span>
                       </div>
                       <div className={`w-8 h-8 rounded-full bg-white flex items-center justify-center ${exam.color} shadow-sm transition-transform group-hover:translate-x-1`}>
                          <span className="material-symbols-rounded text-[20px]">arrow_forward</span>
@@ -153,7 +175,7 @@ export default function EntranceExams({ dbExams }: EntranceExamsProps) {
                    </div>
 
                    {/* Watermark */}
-                   <span className="absolute -bottom-4 -right-2 text-6xl font-black text-black/[0.03] select-none pointer-events-none group-hover:text-black/[0.05] transition-colors uppercase">
+                   <span className="absolute -bottom-4 -right-2 text-6xl font-normal text-black/[0.03] select-none pointer-events-none group-hover:text-black/[0.05] transition-colors uppercase">
                       {exam.abbr.split(' ')[0]}
                    </span>
                 </Link>
@@ -164,3 +186,7 @@ export default function EntranceExams({ dbExams }: EntranceExamsProps) {
     </section>
   );
 }
+
+
+
+

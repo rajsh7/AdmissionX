@@ -1,14 +1,12 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -36,7 +34,7 @@ function formatDate(d: string | null | undefined): string {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface CourseRow extends RowDataPacket {
+interface CourseRow  {
   id: number;
   name: string;
   pageslug: string | null;
@@ -47,11 +45,11 @@ interface CourseRow extends RowDataPacket {
   created_at: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
-interface StatsRow extends RowDataPacket {
+interface StatsRow  {
   total: number;
   on_top: number;
   on_home: number;
@@ -520,3 +518,7 @@ export default async function AdminCoursesPage({
     </div>
   );
 }
+
+
+
+

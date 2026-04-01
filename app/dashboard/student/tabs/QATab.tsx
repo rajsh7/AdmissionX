@@ -427,3 +427,7 @@ export default function QATab({ user, type }: Props) {
     </div>
   );
 }
+
+
+
+

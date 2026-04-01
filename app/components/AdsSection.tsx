@@ -18,7 +18,7 @@ export default function AdsSection({ ads }: AdsSectionProps) {
 
   return (
     <section className="w-full py-8 px-4 sm:px-6 max-w-7xl mx-auto">
-      <div className={`grid gap-4 ${ads.length === 1 ? "grid-cols-1" : ads.length === 2 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
+      <div className={`grid gap-4 ${ads.length === 1 ? "grid-cols-1" : ads.length === 2 ? "grid-cols-1 sm:grid-cols-2" : ads.length === 3 ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"}`}>
         {ads.map((ad) => {
           const imgSrc = ad.img
             ? ad.img.startsWith("/") ? ad.img : `/uploads/${ad.img}`
@@ -69,3 +69,7 @@ export default function AdsSection({ ads }: AdsSectionProps) {
     </section>
   );
 }
+
+
+
+

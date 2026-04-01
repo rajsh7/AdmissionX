@@ -4,12 +4,12 @@
 
 @layer base {
   :root {
-    --color-primary: #dc2626;
-    --color-primary-dark: #b91c1c;
-    --color-accent-violet: #8b5cf6;
+    --color-primary: #FF3C3C;
+    --color-primary-dark: #E63535;
+    --color-accent-violet: #7c3aed;
     --color-accent-cyan: #06b6d4;
     --color-accent-teal: #00b5ad;
-    --color-accent-rose: #f43f5e;
+    --color-accent-rose: #FF3C3C;
     --color-bg-light: #f8fafc;
     --color-bg-white: #ffffff;
   }
@@ -145,7 +145,7 @@ html.dark {
 
 /* ─── Gradient Text ─────────────────────────────────────────── */
 .gradient-text {
-    background: linear-gradient(135deg, #dc2626 0%, #e11d48 50%, #fb7185 100%);
+    background: linear-gradient(135deg, #FF3C3C 0%, #E63535 50%, #FF6B6B 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -160,27 +160,19 @@ html.dark {
 
 /* ─── Glow Effects ──────────────────────────────────────────── */
 .glow-red {
-    box-shadow:
-        0 0 30px rgba(220, 38, 38, 0.3),
-        0 0 60px rgba(220, 38, 38, 0.1);
+    box-shadow: 0 0 30px rgba(255, 60, 60, 0.3), 0 0 60px rgba(255, 60, 60, 0.1);
 }
 
 .glow-blue {
-    box-shadow:
-        0 0 30px rgba(220, 38, 38, 0.3),
-        0 0 60px rgba(220, 38, 38, 0.1);
+    box-shadow: 0 0 30px rgba(255, 60, 60, 0.3), 0 0 60px rgba(255, 60, 60, 0.1);
 }
 
 .glow-violet {
-    box-shadow:
-        0 0 30px rgba(159, 18, 57, 0.3),
-        0 0 60px rgba(159, 18, 57, 0.1);
+    box-shadow: 0 0 30px rgba(230, 53, 53, 0.3), 0 0 60px rgba(230, 53, 53, 0.1);
 }
 
 .glow-cyan {
-    box-shadow:
-        0 0 30px rgba(251, 113, 133, 0.3),
-        0 0 60px rgba(251, 113, 133, 0.1);
+    box-shadow: 0 0 30px rgba(255, 107, 107, 0.3), 0 0 60px rgba(255, 107, 107, 0.1);
 }
 
 /* ─── Hero Gradient Mesh ────────────────────────────────────── */
@@ -212,12 +204,7 @@ html.dark {
 /* ─── Story Section Dividers ────────────────────────────────── */
 .section-divider {
     height: 1px;
-    background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(220, 38, 38, 0.3) 50%,
-        transparent 100%
-    );
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 60, 60, 0.3) 50%, transparent 100%);
 }
 
 /* ─── Custom Color Utilities ─────────────────────────────────── */
@@ -227,40 +214,33 @@ html.dark {
 .bg-primary-dark { background-color: var(--color-primary-dark); }
 .border-primary { border-color: var(--color-primary); }
 
-/* AdmissionX Teal */
-.text-teal { color: var(--color-accent-teal); }
-.bg-teal { background-color: var(--color-accent-teal); }
-.border-teal { border-color: var(--color-accent-teal); }
-.hover\:bg-teal-dark:hover { background-color: #009b95; }
-.hover\:bg-teal:hover { background-color: var(--color-accent-teal); }
-
 .hover\:text-primary:hover {
-    color: #dc2626;
+    color: var(--color-primary);
 }
 .hover\:text-primary-dark:hover {
-    color: #b91c1c;
+    color: var(--color-primary-dark);
 }
 .hover\:bg-primary-dark:hover {
-    background-color: #b91c1c;
+    background-color: var(--color-primary-dark);
 }
 .hover\:bg-primary:hover {
-    background-color: #dc2626;
+    background-color: var(--color-primary);
 }
 .hover\:border-primary:hover {
-    border-color: #dc2626;
+    border-color: var(--color-primary);
 }
 
 .dark\:bg-primary:is(.dark *) {
-    background-color: #dc2626;
+    background-color: var(--color-primary);
 }
 .dark\:hover\:bg-primary-dark:is(.dark *):hover {
-    background-color: #b91c1c;
+    background-color: var(--color-primary-dark);
 }
 .dark\:hover\:border-primary:is(.dark *):hover {
-    border-color: #dc2626;
+    border-color: var(--color-primary);
 }
 .dark\:hover\:text-primary:is(.dark *):hover {
-    color: #dc2626;
+    color: var(--color-primary);
 }
 
 .focus\:border-primary:focus {
@@ -321,13 +301,13 @@ html.dark {
     0%,
     100% {
         box-shadow:
-            0 0 20px rgba(220, 38, 38, 0.4),
-            0 0 40px rgba(220, 38, 38, 0.1);
+            0 0 20px rgba(255, 60, 60, 0.4),
+            0 0 40px rgba(255, 60, 60, 0.1);
     }
     50% {
         box-shadow:
-            0 0 30px rgba(220, 38, 38, 0.6),
-            0 0 60px rgba(220, 38, 38, 0.2);
+            0 0 30px rgba(255, 60, 60, 0.6),
+            0 0 60px rgba(255, 60, 60, 0.2);
     }
 }
 
@@ -474,7 +454,7 @@ html.dark {
     top: 0;
     left: 0;
     height: 3px;
-    background: linear-gradient(90deg, #dc2626, #e11d48, #fb7185);
+    background: linear-gradient(90deg, #FF3C3C, #E63535, #FF6B6B);
     z-index: 9999;
     transform-origin: left;
     will-change: transform;
@@ -487,7 +467,7 @@ html.dark {
     top: 0;
     bottom: 0;
     width: 2px;
-    background: linear-gradient(to bottom, #dc2626, #e11d48);
+    background: linear-gradient(to bottom, #FF3C3C, #E63535);
 }
 
 .timeline-dot {
@@ -496,7 +476,7 @@ html.dark {
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: #dc2626;
+    background: #FF3C3C;
     border: 3px solid #0a0a0a;
     z-index: 1;
 }
@@ -526,24 +506,18 @@ html.dark {
 
 /* ─── CTA Gradient BG ───────────────────────────────────────── */
 .cta-gradient {
-    background: linear-gradient(
-        135deg,
-        #991b1b 0%,
-        #dc2626 30%,
-        #e11d48 70%,
-        #9f1239 100%
-    );
+    background: linear-gradient(135deg, #E63535 0%, #FF3C3C 30%, #FF6B6B 70%, #B91C1C 100%);
 }
 
 /* ─── Interactive Button Styles ─────────────────────────────── */
 .btn-primary {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.35);
+    background: linear-gradient(135deg, #FF3C3C 0%, #E63535 100%);
+    box-shadow: 0 4px 15px rgba(255, 60, 60, 0.35);
     transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-    box-shadow: 0 6px 25px rgba(220, 38, 38, 0.5);
+    box-shadow: 0 6px 25px rgba(255, 60, 60, 0.5);
     transform: translateY(-2px);
 }
 
@@ -607,13 +581,13 @@ html.dark {
 }
 
 .rich-text a {
-    color: #dc2626;
+    color: var(--color-primary);
     text-decoration: underline;
     text-underline-offset: 2px;
 }
 
 .rich-text a:hover {
-    color: #b91c1c;
+    color: var(--color-primary-dark);
 }
 
 .rich-text strong,
@@ -628,10 +602,10 @@ html.dark {
 }
 
 .rich-text blockquote {
-    border-left: 3px solid #dc2626;
+    border-left: 3px solid var(--color-primary);
     margin: 1.5em 0;
     padding: 0.75em 1.25em;
-    background: #fef2f2;
+    background: #FFF3F3;
     border-radius: 0 0.5rem 0.5rem 0;
     color: #374151;
     font-style: italic;

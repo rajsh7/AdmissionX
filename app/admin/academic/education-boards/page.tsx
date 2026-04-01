@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import BoardListClient from "./BoardListClient";
 
@@ -66,7 +65,7 @@ async function deleteBoard(id: number) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number | boolean)[] = []
 ): Promise<T[]> {
@@ -79,7 +78,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface BoardRow extends RowDataPacket {
+interface BoardRow  {
   id: number;
   name: string;
   title: string | null;
@@ -135,3 +134,7 @@ export default async function EducationBoardsPage({
     </div>
   );
 }
+
+
+
+

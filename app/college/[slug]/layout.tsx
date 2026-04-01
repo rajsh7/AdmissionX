@@ -1,7 +1,6 @@
 import pool from "@/lib/db";
 import { notFound } from "next/navigation";
 import { unstable_cache } from "next/cache";
-import { RowDataPacket } from "mysql2";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -39,9 +38,10 @@ function slugToName(slug: string): string {
     .join(" ");
 }
 
+
 // ─── DB queries ───────────────────────────────────────────────────────────────
 
-interface CollegeLayoutRow extends RowDataPacket {
+interface CollegeLayoutRow {
   id: number;
   slug: string;
   college_name: string;
@@ -78,7 +78,7 @@ interface CollegeLayoutRow extends RowDataPacket {
   college_type_name: string | null;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow {
   courses: number;
   faculty: number;
   reviews: number;

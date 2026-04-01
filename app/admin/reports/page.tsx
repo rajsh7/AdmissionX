@@ -1,7 +1,5 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeCount(
@@ -19,7 +17,7 @@ async function safeCount(
   }
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -40,7 +38,7 @@ const ICO = {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface AppStatusRow extends RowDataPacket {
+interface AppStatusRow  {
   status_name: string | null;
   cnt: number;
 }
@@ -981,3 +979,7 @@ export default async function AdminReportsPage() {
     </div>
   );
 }
+
+
+
+

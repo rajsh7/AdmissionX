@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import DegreeListClient from "./DegreeListClient";
@@ -105,7 +104,7 @@ async function toggleDegreeHome(formData: FormData) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = []
 ): Promise<T[]> {
@@ -118,7 +117,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface DegreeRow extends RowDataPacket {
+interface DegreeRow  {
   id: number;
   name: string;
   pageslug: string | null;
@@ -130,12 +129,12 @@ interface DegreeRow extends RowDataPacket {
   updated_at: string;
 }
 
-interface StreamOption extends RowDataPacket {
+interface StreamOption  {
   id: number;
   name: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
@@ -293,3 +292,7 @@ export default async function AdminDegreesPage({
     </div>
   );
 }
+
+
+
+

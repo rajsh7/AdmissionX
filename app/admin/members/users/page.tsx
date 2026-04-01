@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket, ResultSetHeader } from "mysql2";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
@@ -85,7 +84,7 @@ async function deleteUser(id: number) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = []
 ): Promise<T[]> {
@@ -98,7 +97,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface UserRow extends RowDataPacket {
+interface UserRow  {
   id: number;
   firstname: string;
   lastname: string;
@@ -112,11 +111,11 @@ interface UserRow extends RowDataPacket {
   created_at: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
-interface StatsRow extends RowDataPacket {
+interface StatsRow  {
   total: number;
   active: number;
   inactive: number;
@@ -172,8 +171,8 @@ export default async function MembersUsersPage({
         SUM(created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) AS new_last_7d
       FROM users
     `),
-    safeQuery<RowDataPacket & { id: number; name: string }>("SELECT id, name FROM userrole"),
-    safeQuery<RowDataPacket & { id: number; name: string }>("SELECT id, name FROM userstatus"),
+    safeQuery<{ id: number; name: string }>("SELECT id, name FROM userrole"),
+    safeQuery<{ id: number; name: string }>("SELECT id, name FROM userstatus"),
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
@@ -285,4 +284,8 @@ export default async function MembersUsersPage({
     </div>
   );
 }
+
+
+
+
 

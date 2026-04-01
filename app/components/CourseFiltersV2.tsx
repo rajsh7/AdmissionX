@@ -71,10 +71,10 @@ export default function CourseFiltersV2({
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3.5 bg-[#1A1A1A]">
           <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px] text-[#008080]">filter_alt</span>
+            <span className="material-symbols-outlined text-[18px] text-[#FF3C3C]">filter_alt</span>
             Filters
           </h2>
-          <button type="button" onClick={resetAll} className="text-xs text-[#008080] font-semibold hover:text-white transition-colors">
+          <button type="button" onClick={resetAll} className="text-xs text-[#FF3C3C] font-semibold hover:text-white transition-colors">
             Clear all
           </button>
         </div>
@@ -87,7 +87,7 @@ export default function CourseFiltersV2({
             <input
               type="text"
               placeholder="Search course name"
-              className="w-full px-3 py-2.5 text-xs border border-neutral-200 rounded-[6px] focus:outline-none focus:border-[#008080] bg-white placeholder:text-neutral-400 transition-all"
+              className="w-full px-3 py-2.5 text-xs border border-neutral-200 rounded-[6px] focus:outline-none focus:border-[#FF3C3C] bg-white placeholder:text-neutral-400 transition-all"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   applyFilters({ q: (e.target as HTMLInputElement).value });
@@ -117,7 +117,7 @@ export default function CourseFiltersV2({
               <select
                 value={level}
                 onChange={(e) => { const val = e.target.value; setLevel(val); applyFilters({ level: val }); }}
-                className="w-full px-3 pr-8 py-2.5 text-xs border border-neutral-200 rounded-[6px] focus:outline-none focus:border-[#008080] bg-white appearance-none cursor-pointer transition-all text-neutral-600"
+                className="w-full px-3 pr-8 py-2.5 text-xs border border-neutral-200 rounded-[6px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all text-neutral-600"
               >
                 <option value="">Accounting and finance</option>
                 {levels.map((l) => (
@@ -135,7 +135,7 @@ export default function CourseFiltersV2({
               <select
                 value={stream}
                 onChange={(e) => { const val = e.target.value; setStream(val); applyFilters({ stream: val }); }}
-                className="w-full px-3 pr-8 py-2.5 text-xs border border-neutral-200 rounded-[6px] focus:outline-none focus:border-[#008080] bg-white appearance-none cursor-pointer transition-all text-neutral-600"
+                className="w-full px-3 pr-8 py-2.5 text-xs border border-neutral-200 rounded-[6px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all text-neutral-600"
               >
                 <option value="">Computer science</option>
                 {streams.map((s) => (
@@ -151,7 +151,7 @@ export default function CourseFiltersV2({
             <button
               type="button"
               onClick={() => applyFilters()}
-              className="w-full bg-[#008080] hover:bg-[#006666] text-white text-xs font-bold py-2.5 rounded-[6px] transition-all"
+              className="w-full bg-[#FF3C3C] hover:bg-[#E63636] text-white text-xs font-bold py-2.5 rounded-[6px] transition-all"
             >
               Apply filter
             </button>
@@ -168,3 +168,7 @@ export default function CourseFiltersV2({
     </aside>
   );
 }
+
+
+
+

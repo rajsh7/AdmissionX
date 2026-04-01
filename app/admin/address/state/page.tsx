@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import StateClient from "./StateClient";
 import { revalidatePath } from "next/cache";
@@ -42,7 +41,7 @@ async function updateState(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number | boolean)[] = [],
 ): Promise<T[]> {
@@ -55,7 +54,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface StateRow extends RowDataPacket {
+interface StateRow  {
   id: number;
   name: string;
   countryName: string | null;
@@ -86,7 +85,7 @@ export default async function StatePage({
        LIMIT 100`,
       params
     ),
-    safeQuery<{ id: number; name: string } & RowDataPacket>(
+    safeQuery<{ id: number; name: string }>(
       "SELECT id, name FROM country ORDER BY name ASC"
     )
   ]);
@@ -122,3 +121,7 @@ export default async function StatePage({
     </div>
   );
 }
+
+
+
+

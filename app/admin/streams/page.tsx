@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { formatDate } from "@/lib/utils";
@@ -123,7 +122,7 @@ async function toggleStreamHome(formData: FormData) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = []
 ): Promise<T[]> {
@@ -136,7 +135,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface StreamRow extends RowDataPacket {
+interface StreamRow  {
   id: number;
   name: string;
   pageslug: string | null;
@@ -150,7 +149,7 @@ interface StreamRow extends RowDataPacket {
   updated_at: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
@@ -302,3 +301,7 @@ export default async function AdminStreamsPage({
     </div>
   );
 }
+
+
+
+

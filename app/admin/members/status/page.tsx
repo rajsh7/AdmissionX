@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import StatusListClient from "./StatusListClient";
@@ -55,7 +54,7 @@ async function deleteStatus(id: number) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = []
 ): Promise<T[]> {
@@ -68,13 +67,13 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface StatusRow extends RowDataPacket {
+interface StatusRow  {
   id: number;
   name: string;
   created_at: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
@@ -199,3 +198,7 @@ export default async function MembersStatusPage({
     </div>
   );
 }
+
+
+
+

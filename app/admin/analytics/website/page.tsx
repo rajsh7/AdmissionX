@@ -1,12 +1,10 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -21,7 +19,7 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface MetricRow extends RowDataPacket {
+interface MetricRow  {
   id: number;
   label: string;
   value: string;
@@ -114,3 +112,7 @@ export default async function WebsiteMetricsPage() {
     </div>
   );
 }
+
+
+
+

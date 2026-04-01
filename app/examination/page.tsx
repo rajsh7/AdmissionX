@@ -5,6 +5,9 @@ import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
+// ─── Dynamic page (requires database access at request time)
+export const dynamic = 'force-dynamic';
+
 const DEFAULT_EXAM_IMAGE =
   "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=600";
 
@@ -286,3 +289,7 @@ export default async function ExaminationHubPage() {
     </div>
   );
 }
+
+
+
+

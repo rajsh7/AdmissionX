@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
 
@@ -14,7 +13,7 @@ async function deleteOffer(id: number) {
   revalidatePath("/", "layout");
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number | boolean)[] = [],
 ): Promise<T[]> {
@@ -27,7 +26,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface OfferRow extends RowDataPacket {
+interface OfferRow  {
   id: number;
   title: string | null;
   bannerText: string | null;
@@ -120,3 +119,7 @@ export default async function OffersPage({
     </div>
   );
 }
+
+
+
+

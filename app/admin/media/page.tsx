@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
 
@@ -31,7 +30,7 @@ function buildImageUrl(raw: string | null): string {
     return `${IMAGE_BASE}${raw}`;
 }
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number)[] = [],
 ): Promise<T[]> {
@@ -46,14 +45,14 @@ async function safeQuery<T extends RowDataPacket>(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface MediaRow extends RowDataPacket {
+interface MediaRow  {
   id: number;
   college_name: string;
   banner_image: string | null;
   slug: string;
 }
 
-interface CountRow extends RowDataPacket {
+interface CountRow  {
   total: number;
 }
 
@@ -244,3 +243,7 @@ export default async function MediaInformationPage({
     </div>
   );
 }
+
+
+
+

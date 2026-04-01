@@ -1,10 +1,12 @@
 import { getDb } from "@/lib/db";
 import Link from "next/link";
-import { RowDataPacket } from "mysql2";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Image from "next/image";
+
+// ─── Dynamic page (requires database access at request time)
+export const dynamic = 'force-dynamic';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -499,3 +501,7 @@ function EmptyState() {
     </div>
   );
 }
+
+
+
+

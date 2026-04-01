@@ -42,9 +42,9 @@ const getFilterData = unstable_cache(
     const [streamRows, degreeRows, cityIdRows] = await Promise.all([
       faIds.length > 0
         ? db.collection("functionalarea")
-            .find({ _id: { $in: faIds }, name: { $exists: true, $ne: "" } })
-            .project({ _id: 1, name: 1, pageslug: 1 })
-            .toArray()
+          .find({ _id: { $in: faIds }, name: { $exists: true, $ne: "" } })
+          .project({ _id: 1, name: 1, pageslug: 1 })
+          .toArray()
         : Promise.resolve([]),
 
       db.collection("degree")
@@ -69,16 +69,16 @@ const getFilterData = unstable_cache(
     const uniqueCityIds = [...new Set(cityIdRows.map((r) => r.registeredAddressCityId))].slice(0, 400);
     const cityRows = uniqueCityIds.length > 0
       ? await db.collection("city")
-          .find({ _id: { $in: uniqueCityIds }, name: { $exists: true, $ne: "" } })
-          .sort({ name: 1 })
-          .limit(100)
-          .project({ _id: 1, name: 1 })
-          .toArray()
+        .find({ _id: { $in: uniqueCityIds }, name: { $exists: true, $ne: "" } })
+        .sort({ name: 1 })
+        .limit(100)
+        .project({ _id: 1, name: 1 })
+        .toArray()
       : [];
 
     return { streamRows: sortedStreamRows, degreeRows, cityRows };
   },
-  ["top-colleges-filters-mongo-v1"],
+  ["top-colleges-filters-mongo-v2"],
   { revalidate: 600 },
 );
 
@@ -133,8 +133,8 @@ async function fetchTopColleges(opts: {
 
   const sortStage: Record<string, 1 | -1> =
     sort === "ranking" ? { ranking: 1, rating: -1 }
-    : sort === "newest" ? { created_at: -1 }
-    : { rating: -1, totalRatingUser: -1 };
+      : sort === "newest" ? { created_at: -1 }
+        : { rating: -1, totalRatingUser: -1 };
 
   const [total, idRows] = await Promise.all([
     db.collection("collegeprofile").countDocuments(match),
@@ -217,7 +217,7 @@ async function fetchTopColleges(opts: {
 
 const getCachedTopColleges = unstable_cache(
   fetchTopColleges,
-  ["top-colleges-mongo-v1"],
+  ["top-colleges-mongo-v2"],
   { revalidate: 300 },
 );
 
@@ -289,6 +289,13 @@ export default async function TopCollegesPage({ searchParams }: PageProps) {
       initType="top"
       pageTitle="Top Colleges in India"
       pageSubtitle={pageSubtitle}
+      gridCols={4}
+      heroImage="/Background-images/student-hero-bg.png"
+      heroRightImage="/images/2999ec4e5233aa8cb9dbf010e3c51149ae41f951.png"
+      heroHeight="641px"
+      heroObjectPosition="center"
+      heroFit="cover"
+      filterWidth="370px"
     />
   );
 }

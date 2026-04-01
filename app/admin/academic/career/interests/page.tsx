@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import InterestListClient from "./InterestListClient";
 
@@ -66,7 +65,7 @@ async function deleteInterest(id: number) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T >(
   sql: string,
   params: (string | number | boolean)[] = []
 ): Promise<T[]> {
@@ -79,7 +78,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface InterestRow extends RowDataPacket {
+interface InterestRow  {
   id: number;
   title: string;
   description: string | null;
@@ -89,7 +88,7 @@ interface InterestRow extends RowDataPacket {
   functionalArea: string | null;
 }
 
-interface StreamOption extends RowDataPacket {
+interface StreamOption  {
   id: number;
   name: string;
 }
@@ -146,3 +145,7 @@ export default async function CareerInterestsPage({
     </div>
   );
 }
+
+
+
+

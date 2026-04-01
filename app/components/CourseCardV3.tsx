@@ -47,9 +47,9 @@ export default function CourseCardV3({
               className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-teal-50 to-teal-100 flex flex-col items-center justify-center p-4 text-center">
-              <span className="material-symbols-outlined text-4xl text-teal-400/60 mb-2">menu_book</span>
-              <span className="text-xs font-bold text-teal-600/50 uppercase tracking-widest leading-tight line-clamp-2">{title}</span>
+            <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-red-100 flex flex-col items-center justify-center p-4 text-center">
+              <span className="material-symbols-outlined text-4xl text-primary/60 mb-2">menu_book</span>
+              <span className="text-xs font-bold text-primary/50 uppercase tracking-widest leading-tight line-clamp-2">{title}</span>
             </div>
           )}
 
@@ -66,22 +66,25 @@ export default function CourseCardV3({
             {title}
           </h3>
 
-          {/* Duration + Degree row */}
-          <div className="flex items-center gap-4 mb-2">
-            <div className="flex items-center gap-1 text-neutral-500">
-              <span className="material-symbols-outlined text-[14px]">schedule</span>
-              <span className="text-[11px] font-medium">{duration}</span>
+          {/* Info blocks: Duration, Level (Row 1) + Package (Row 2) */}
+          <div className="flex flex-col gap-2 mb-4">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 flex items-center justify-center gap-2 bg-neutral-50 border border-neutral-100 py-2 px-2 rounded-[6px] transition-colors group-hover:bg-white group-hover:border-neutral-200">
+                <span className="material-symbols-outlined text-[16px] text-neutral-400">schedule</span>
+                <span className="text-[11px] font-bold text-neutral-600 truncate">{duration}</span>
+              </div>
+              <div className="flex-1 flex items-center justify-center gap-2 bg-neutral-50 border border-neutral-100 py-2 px-2 rounded-[6px] transition-colors group-hover:bg-white group-hover:border-neutral-200">
+                <span className="material-symbols-outlined text-[16px] text-neutral-400">school</span>
+                <span className="text-[11px] font-bold text-neutral-600 truncate">{degreeLevel === "Bachelor" ? "Certificate Course" : degreeLevel}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1 text-neutral-500">
-              <span className="material-symbols-outlined text-[14px]">school</span>
-              <span className="text-[11px] font-medium">{degreeLevel}</span>
+            <div className="flex items-center gap-3 bg-neutral-50 border border-neutral-100 py-2.5 px-3 rounded-[6px] transition-colors group-hover:bg-white group-hover:border-neutral-200">
+              <span className="material-symbols-outlined text-[18px] text-[#FF3C3C]">payments</span>
+              <div className="flex items-center justify-between flex-1">
+                <span className="text-[12px] font-bold text-neutral-400 uppercase tracking-tight">Avg. Package</span>
+                <span className="text-[13px] font-black text-[#FF3C3C]">{avgPackage}</span>
+              </div>
             </div>
-          </div>
-
-          {/* Avg Package row */}
-          <div className="flex items-center gap-1 mb-3">
-            <span className="text-[11px] text-neutral-600">Avg. Package:</span>
-            <span className="text-[11px] text-[#008080] font-bold">{avgPackage}</span>
           </div>
 
           {/* Student discussion forum button */}
@@ -93,7 +96,7 @@ export default function CourseCardV3({
           <div className="flex gap-2">
             <Link
               href={`/careers-courses/${slug}`}
-              className="flex-1 bg-[#008080] hover:bg-[#006666] text-white text-[11px] font-bold py-2 rounded-[6px] transition-all text-center"
+              className="flex-1 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-[11px] font-bold py-2 rounded-[6px] transition-all text-center"
             >
               View details
             </Link>
@@ -106,3 +109,7 @@ export default function CourseCardV3({
     </motion.div>
   );
 }
+
+
+
+

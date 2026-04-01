@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
 import { revalidatePath } from "next/cache";
 import AnswerListClient from "./AnswerListClient";
 
@@ -62,7 +61,7 @@ async function deleteAnswer(id: number) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function safeQuery<T extends RowDataPacket>(
+async function safeQuery<T>(
   sql: string,
   params: (string | number | boolean)[] = []
 ): Promise<T[]> {
@@ -75,7 +74,7 @@ async function safeQuery<T extends RowDataPacket>(
   }
 }
 
-interface AnswerRow extends RowDataPacket {
+interface AnswerRow {
   id: number;
   answer: string;
   answerDate: string | null;
@@ -85,7 +84,7 @@ interface AnswerRow extends RowDataPacket {
   userName: string | null;
 }
 
-interface QuestionOption extends RowDataPacket {
+interface QuestionOption {
   id: number;
   question: string;
 }
@@ -148,3 +147,7 @@ export default async function AskAnswersPage({
     </div>
   );
 }
+
+
+
+
