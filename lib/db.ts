@@ -1,4 +1,11 @@
 import { MongoClient, Db } from "mongodb";
+import dns from "node:dns";
+
+// Fix for Windows DNS resolution issues with MongoDB Atlas
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder("ipv4first");
+}
 
 declare global {
   var _mongoClient: MongoClient | undefined;
@@ -209,7 +216,8 @@ async function mongoQuery(sql: string, params: unknown[] = []): Promise<QueryRes
       const { limit, skip } = extractLimitOffset(trimmed, params);
 
       const rows = await collection.find(filter).sort(sort).skip(skip).limit(limit).toArray();
-      return [rows as Record<string, unknown>[], null];
+      const cleanRows = rows.map(({ _id, ...rest }: any) => rest);
+      return [cleanRows as Record<string, unknown>[], null];
     }
 
     // ── INSERT ──────────────────────────────────────────────────────────────
@@ -228,7 +236,8 @@ async function mongoQuery(sql: string, params: unknown[] = []): Promise<QueryRes
         doc[f] = params[pIdx++] ?? null;
       }
       await collection.insertOne(doc);
-      return [[{ ...doc, insertId: doc.id as number, affectedRows: 1 }], null];
+      const { _id, ...cleanDoc } = doc as any;
+      return [[{ ...cleanDoc, insertId: doc.id as number, affectedRows: 1 }], null];
     }
 
     // ── UPDATE ──────────────────────────────────────────────────────────────
@@ -280,3 +289,4 @@ async function getConnection(): Promise<MockConnection> {
 
 const pool = { query: mongoQuery, getConnection };
 export default pool;
+  

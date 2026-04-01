@@ -39,6 +39,13 @@ export default function ProfileModal({
 
   const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
+  const safeNum = (val: any, fallback?: any) => {
+    if (val === null || val === undefined) return fallback;
+    const n = Number(val);
+    if (isNaN(n)) return fallback;
+    return val;
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
       <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-blue-500/10 w-full max-w-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-300">
@@ -68,7 +75,7 @@ export default function ProfileModal({
                 type="number"
                 name="users_id"
                 required
-                defaultValue={initialData?.users_id}
+                defaultValue={safeNum(initialData?.users_id, "")}
                 className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-semibold text-slate-700"
                 placeholder="e.g. 1502"
               />
@@ -109,7 +116,7 @@ export default function ProfileModal({
                 min="0"
                 max="5"
                 name="rating"
-                defaultValue={initialData?.rating || 0}
+                defaultValue={safeNum(initialData?.rating, 0)}
                 className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-semibold text-slate-700"
               />
             </div>
@@ -118,7 +125,7 @@ export default function ProfileModal({
               <input
                 type="number"
                 name="ranking"
-                defaultValue={initialData?.ranking || 999}
+                defaultValue={safeNum(initialData?.ranking, 999)}
                 className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-semibold text-slate-700"
               />
             </div>
@@ -144,7 +151,7 @@ export default function ProfileModal({
               <input
                 type="number"
                 name="registeredAddressCityId"
-                defaultValue={initialData?.registeredAddressCityId}
+                defaultValue={safeNum(initialData?.registeredAddressCityId, "")}
                 className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-semibold text-slate-700"
                 placeholder="City ID"
               />
@@ -177,7 +184,7 @@ export default function ProfileModal({
                 <input
                   type="number"
                   name="topUniversityRank"
-                  defaultValue={initialData?.topUniversityRank}
+                  defaultValue={safeNum(initialData?.topUniversityRank, "")}
                   className="w-20 px-3 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all font-bold text-slate-700 text-xs"
                   placeholder="Rank"
                 />

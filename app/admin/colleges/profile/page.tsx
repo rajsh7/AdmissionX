@@ -174,19 +174,26 @@ export default async function CollegeProfilePage({
     countCol("college_reviews"),
   ]);
 
+  // ─── Data Mapping ──────────────────────────────────────────────────────────
+  const parseNum = (val: any) => {
+    if (val === null || val === undefined || String(val).trim() === "" || String(val).toUpperCase() === "NULL") return null;
+    const n = parseInt(String(val), 10);
+    return isNaN(n) ? null : n;
+  };
+
   const profiles: ProfileRow[] = rawProfiles.map(p => ({
     id:                      String(p._id),
-    users_id:                p.users_id,
+    users_id:                parseNum(p.users_id) ?? 0,
     slug:                    String(p.slug ?? "").trim(),
     name:                    String(p.contactpersonname ?? p.slug ?? "Unnamed College").trim(),
     bannerimage:             p.bannerimage && String(p.bannerimage).trim() !== "NULL" ? String(p.bannerimage).trim() : null,
     rating:                  parseFloat(String(p.rating ?? 0)) || 0,
-    ranking:                 p.ranking ? parseInt(String(p.ranking), 10) : null,
+    ranking:                 parseNum(p.ranking),
     verified:                p.verified ? 1 : 0,
     isTopUniversity:         p.isTopUniversity ? 1 : 0,
-    topUniversityRank:       p.topUniversityRank ? parseInt(String(p.topUniversityRank), 10) : null,
+    topUniversityRank:       parseNum(p.topUniversityRank),
     universityType:          p.universityType && String(p.universityType).trim() !== "NULL" ? String(p.universityType).trim() : null,
-    registeredAddressCityId: p.registeredAddressCityId ?? null,
+    registeredAddressCityId: parseNum(p.registeredAddressCityId),
     city_name:               cityMap[p.registeredAddressCityId] ?? null,
     count_courses:           cCourses[p.id]     ?? 0,
     count_facilities:        0,
