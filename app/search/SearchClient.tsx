@@ -17,6 +17,7 @@ import CollegeCard from "@/app/components/CollegeCard";
 import CollegeListItem from "@/app/components/CollegeListItem";
 import SearchFilters from "@/app/components/SearchFilters";
 import PaginationFixed from "@/app/components/PaginationFixed";
+import SearchBar from "@/app/components/SearchBar";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -49,6 +50,13 @@ interface SearchClientProps {
   pageSubtitle: string;
   entityName?: string;
   entityNamePlural?: string;
+  gridCols?: number;
+  heroImage?: string;
+  heroRightImage?: string;
+  heroHeight?: string;
+  heroObjectPosition?: string;
+  heroFit?: string;
+  filterWidth?: string;
 }
 
 type ViewMode = "grid" | "list";
@@ -62,151 +70,7 @@ const SORT_OPTIONS = [
 
 // ─── Search bar with typeahead ────────────────────────────────────────────────
 
-interface Suggestion {
-  name: string;
-  location: string;
-  slug: string;
-}
 
-function SearchBar({
-  defaultValue,
-  onSearch,
-}: {
-  defaultValue: string;
-  onSearch: (q: string) => void;
-}) {
-  const [value, setValue] = useState(defaultValue);
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const fetchSuggestions = useCallback(async (q: string) => {
-    if (q.length < 2) {
-      setSuggestions([]);
-      return;
-    }
-    setLoadingSuggestions(true);
-    try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
-      const data = await res.json();
-      setSuggestions(data.suggestions ?? []);
-    } catch {
-      setSuggestions([]);
-    } finally {
-      setLoadingSuggestions(false);
-    }
-  }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = e.target.value;
-    setValue(v);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => fetchSuggestions(v), 250);
-    setShowSuggestions(true);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setShowSuggestions(false);
-    onSearch(value.trim());
-  };
-
-  const handleSuggestionClick = (s: Suggestion) => {
-    setValue(s.name);
-    setShowSuggestions(false);
-    onSearch(s.name);
-  };
-
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full"
-      autoComplete="off"
-    >
-      <div className="flex-1 flex items-center gap-3 bg-white rounded-[10px] border border-neutral-200 shadow-xl focus-within:border-[#008080] focus-within:ring-4 focus-within:ring-[#008080]/5 transition-all duration-300 px-6 py-1">
-        <span className="material-symbols-outlined text-[20px] text-neutral-400 flex-shrink-0">
-          search
-        </span>
-        <input
-          ref={inputRef}
-          type="text"
-          value={value}
-          onChange={handleChange}
-          onFocus={() => value.length >= 2 && setShowSuggestions(true)}
-          onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-          placeholder="Location, universities, courses..."
-          className="flex-1 py-3 text-sm sm:text-base text-neutral-800 placeholder:text-neutral-400 bg-transparent outline-none min-w-0"
-        />
-        {value && (
-          <button
-            type="button"
-            onClick={() => {
-              setValue("");
-              setSuggestions([]);
-              onSearch("");
-              inputRef.current?.focus();
-            }}
-            className="flex-shrink-0 text-neutral-400 hover:text-neutral-700 transition-colors pt-1"
-          >
-            <span className="material-symbols-outlined text-[18px]">close</span>
-          </button>
-        )}
-      </div>
-
-      <button
-        type="submit"
-        className="flex-shrink-0 bg-[#008080] hover:bg-[#006666] text-white text-base font-bold px-10 py-3 rounded-[10px] transition-all active:scale-[0.98] shadow-lg shadow-[#008080]/20 min-w-max"
-      >
-        Search Now
-      </button>
-
-      {/* Suggestions dropdown */}
-      {showSuggestions && value.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-[10px] border border-neutral-100 shadow-xl overflow-hidden z-40">
-          {loadingSuggestions ? (
-            <div className="flex items-center gap-2 px-4 py-3 text-sm text-neutral-400">
-              <div className="w-4 h-4 border-2 border-neutral-300 border-t-[#008080] rounded-full animate-spin" />
-              Searching...
-            </div>
-          ) : suggestions.length > 0 ? (
-            <ul>
-              {suggestions.map((s) => (
-                <li key={s.slug}>
-                  <button
-                    type="button"
-                    onMouseDown={() => handleSuggestionClick(s)}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#008080]/5 transition-colors text-left group"
-                  >
-                    <span className="material-symbols-outlined text-[18px] text-neutral-300 group-hover:text-[#008080] transition-colors flex-shrink-0">
-                      account_balance
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-neutral-800 group-hover:text-[#008080] truncate">
-                        {s.name}
-                      </p>
-                      <p className="text-xs text-neutral-400 truncate">
-                        {s.location}
-                      </p>
-                    </div>
-                    <span className="material-symbols-outlined text-[16px] text-neutral-300 group-hover:text-[#008080] flex-shrink-0 transition-colors">
-                      north_west
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="px-4 py-3 text-sm text-neutral-400">
-              No colleges found for &quot;{value}&quot;
-            </div>
-          )}
-        </div>
-      )}
-    </form>
-  );
-}
 
 // ─── Results skeleton ─────────────────────────────────────────────────────────
 
@@ -263,6 +127,13 @@ export default function SearchClient({
   pageSubtitle,
   entityName = "College",
   entityNamePlural = "Colleges",
+  heroImage = "/images/hero-student.png",
+  heroRightImage,
+  heroHeight = "700px",
+  heroObjectPosition = "center",
+  heroFit = "cover",
+  filterWidth = "300px",
+  gridCols = 3,
 }: SearchClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -340,15 +211,16 @@ export default function SearchClient({
 
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
-      <div className="relative w-full overflow-hidden" style={{ height: "560px" }}>
+      <div className="relative w-full overflow-hidden" style={{ height: heroHeight }}>
         <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
           <Image
-            src="/images/hero-student.png"
+            src={heroImage}
             alt="Campus Background"
             fill
             priority
             sizes="100vw"
-            className="object-cover"
+            style={{ objectFit: heroFit as "cover" | "contain" | "fill" | "none" | "scale-down", objectPosition: heroObjectPosition }}
+            className=""
           />
           <div className="absolute inset-0 bg-neutral-900/60" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
@@ -356,19 +228,35 @@ export default function SearchClient({
         <div className="relative z-10 w-full h-full flex flex-col">
           <Header />
           <div className="flex-1 flex items-center justify-start relative">
-            <div className="mx-auto w-full px-4 lg:px-12 xl:px-16">
-              <div className={`max-w-4xl text-left transition-opacity duration-300 mt-6 ${hasMounted ? "opacity-100" : "opacity-0"}`}>
-                <h1 className="font-poppins text-white leading-[1.05] tracking-[0.02em] mb-4 drop-shadow-2xl">
-                  <span className="text-[36px] sm:text-[48px] lg:text-[64px] font-extrabold block mb-0">Finds your</span>
-                  <span className="text-[40px] sm:text-[54px] lg:text-[72px] font-black text-[#00a4a4]">Dream college</span>
-                </h1>
-                <p className="text-white text-lg sm:text-2xl font-bold mb-8 max-w-2xl leading-relaxed opacity-90">
-                  Search thousands of courses and universities worldwide
-                </p>
-                <div className="max-w-2xl">
-                  <SearchBar defaultValue={q} onSearch={handleSearch} />
+            <div className="mx-auto max-w-[1920px] w-full px-8 lg:px-12 xl:px-20 h-full relative">
+              <div className="flex flex-col justify-center h-full relative z-20">
+                <div className={`transition-opacity duration-300 mt-6 flex flex-col justify-center ${heroRightImage ? "lg:max-w-[55%] text-left" : "max-w-4xl text-left"} ${hasMounted ? "opacity-100" : "opacity-0"}`}>
+                  <h1 className="font-poppins text-white leading-[1.05] tracking-[0.02em] mb-4 drop-shadow-2xl">
+                    <span className="text-[36px] sm:text-[48px] lg:text-[64px] font-extrabold block mb-0">Finds your</span>
+                    <span className="text-[40px] sm:text-[54px] lg:text-[72px] font-black text-[#FF3C3C]">Dream college</span>
+                  </h1>
+                  <p className="text-white text-lg sm:text-2xl font-bold mb-8 max-w-2xl leading-relaxed opacity-90">
+                    Search thousands of courses and universities worldwide
+                  </p>
+                  <div className="max-w-2xl">
+                    <SearchBar defaultValue={q} onSearch={handleSearch} />
+                  </div>
                 </div>
               </div>
+
+              {heroRightImage && (
+                <div className="hidden lg:block absolute bottom-0 right-0 w-[45%] h-[90%] z-10">
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={heroRightImage}
+                      alt="Hero illustration"
+                      fill
+                      className="object-contain object-bottom drop-shadow-2xl"
+                      priority
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -376,10 +264,10 @@ export default function SearchClient({
 
       <div className="relative z-10 flex-1 flex flex-col min-h-screen">
         {/* ── Main content ── */}
-        <div className="mx-auto w-full px-4 lg:px-6 xl:px-8 pt-8 pb-8">
+        <div className="mx-auto max-w-[1920px] w-full px-8 lg:px-12 xl:px-20 pt-8 pb-8">
           <div className="flex gap-5">
             {/* ── Filters sidebar ── */}
-            <div className="hidden lg:flex flex-col gap-6 basis-[300px] min-w-[300px] max-w-[300px] flex-shrink-0">
+            <div className="hidden lg:flex flex-col gap-6 flex-shrink-0 lg:sticky lg:top-28 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto lg:pr-2" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
               <SearchFilters
                 streams={streams}
                 degrees={degrees}
@@ -405,7 +293,7 @@ export default function SearchClient({
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-1 pb-4 border-b border-neutral-100">
                   {/* Active Filters Row */}
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-sm font-black text-neutral-400 whitespace-nowrap uppercase tracking-wider">
+                    <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap uppercase tracking-wider">
                       Active Filters:
                     </span>
                     <div className="flex flex-wrap gap-2">
@@ -442,7 +330,7 @@ export default function SearchClient({
                   {/* Sort Row */}
                   <div className="flex items-center gap-4 ml-auto">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-black text-neutral-400 whitespace-nowrap uppercase tracking-wider">
+                      <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap uppercase tracking-wider">
                         Short by:
                       </span>
                       <div className="relative">
@@ -456,7 +344,7 @@ export default function SearchClient({
                             p.delete("page");
                             router.push(`${pathname}?${p.toString()}`);
                           }}
-                          className="appearance-none bg-white border border-neutral-200 rounded-[10px] px-4 pr-10 py-2.5 text-xs font-black text-neutral-700 shadow-sm focus:outline-none focus:border-[#008080] transition-all cursor-pointer min-w-[180px]"
+                          className="appearance-none bg-white border border-neutral-200 rounded-[10px] px-4 pr-10 py-2.5 text-[13px] font-black text-neutral-700 shadow-sm focus:outline-none focus:border-[#008080] transition-all cursor-pointer min-w-[180px]"
                         >
                           {SORT_OPTIONS.map((opt) => (
                             <option key={opt.value} value={opt.value}>
@@ -506,7 +394,7 @@ export default function SearchClient({
               {/* ── College grid / list ── */}
               {loading ? (
                 viewMode === "grid" ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-5 gap-x-[10px]">
+                  <div className={`grid grid-cols-1 sm:grid-cols-2 ${gridCols === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-y-5 gap-x-[10px]`}>
                     {Array.from({ length: 12 }).map((_, i) => (
                       <CollegeCardSkeleton key={i} />
                     ))}
@@ -547,7 +435,7 @@ export default function SearchClient({
                   )}
                 </div>
               ) : viewMode === "grid" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-5 gap-x-[10px]">
+                <div className={`grid grid-cols-1 sm:grid-cols-2 ${gridCols === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-y-5 gap-x-[10px]`}>
                   {colleges.map((college, i) => (
                     <CollegeCard
                       key={college.id}

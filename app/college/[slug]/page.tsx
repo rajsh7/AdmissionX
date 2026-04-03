@@ -94,6 +94,7 @@ interface CollegeRow {
   users_id: number;
   totalStudent: string | null;
   registeredSortAddress: string | null;
+  logo_url: string | null;
   city_name: string | null;
 }
 
@@ -119,6 +120,7 @@ export default async function CollegeOverviewPage({
            cp.description,
            cp.totalStudent,
            cp.registeredSortAddress,
+           u.profileimage AS logo_url,
            COALESCE(NULLIF(TRIM(u.firstname), ''), cp.slug) AS college_name,
            c.name AS city_name
          FROM collegeprofile cp
@@ -249,6 +251,7 @@ export default async function CollegeOverviewPage({
       <HeroSection 
         coverImage={mosaicImages[0] || DEFAULT_BANNER} 
         collegeName={collegeName} 
+        logoUrl={base.logo_url ? buildImageUrl(base.logo_url) : null}
       />
       <TabsNav />
       <div className="flex-grow w-full">

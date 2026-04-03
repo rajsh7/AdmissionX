@@ -70,7 +70,7 @@ export default function CourseFiltersV2({
       <div className="sticky top-6 w-full bg-white rounded-[10px] border border-neutral-200 shadow-md overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3.5 bg-[#1A1A1A]">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+          <h2 className="text-[25px] font-bold text-white flex items-center gap-2">
             <span className="material-symbols-outlined text-[18px] text-[#FF3C3C]">filter_alt</span>
             Filters
           </h2>

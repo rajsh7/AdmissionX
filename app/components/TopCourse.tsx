@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { Search } from "lucide-react";
 
 const courses = [
   {
@@ -69,31 +70,37 @@ const courses = [
 ];
 
 export default function TopCourse() {
-  const [active, setActive] = useState(1);
-  const current = courses[active];
+  const [active, setActive] = useState(0); // Start with Medical as per Figma
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const filteredCourses = courses.filter(course => 
+    course.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  const current = courses[active] || courses[0];
 
   return (
     <section className="w-full py-24 lg:py-32 bg-[#fdfdfd] relative overflow-hidden">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24 relative z-10">
         <div className="mb-16">
           <div className="flex items-center justify-between gap-12 mb-6">
-            <h2 className="text-[40px] lg:text-[68px] font-normal text-slate-900 tracking-tight leading-[1.1]">
-              Discover the Top <span className="text-primary">Course</span>
+            <h2 className="text-[40px] lg:text-[68px] font-semibold text-slate-900 tracking-tight leading-[1.1]">
+              Discover the Top <span style={{ color: '#DD8D8F' }}>Course</span>
             </h2>
-            <Link href="/courses" className="px-8 py-3.5 rounded-[10px] bg-white border border-slate-100 shadow-sm text-slate-600 font-normal text-sm hover:bg-slate-50 transition-all active:scale-95 whitespace-nowrap">
+            <Link href="/courses" className="px-8 py-3.5 rounded-none bg-white border border-slate-100 shadow-sm text-slate-600 font-normal text-sm hover:bg-slate-50 transition-all active:scale-95 whitespace-nowrap">
               View All Course
             </Link>
           </div>
-          <p className="text-slate-500 font-normal text-[25px] max-w-4xl leading-relaxed">
-            Explore specialized programs and certifications designed to accelerate your professional growth.
+          <p className="text-slate-500 font-medium text-[25px] max-w-4xl leading-relaxed">
+            Filter through thousands of institutions worldwide based on your specific academic preferences and <span className="text-blue-500">career</span> goals.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
           {/* ── Left Column: Featured Course ──────────────────────────── */}
-          <div className="lg:col-span-7 flex flex-col gap-10">
-            <div className="relative aspect-[16/10] rounded-[10px] overflow-hidden group shadow-2xl shadow-black/5">
+          <div className="lg:col-span-8 flex flex-col gap-10">
+            <div className="relative aspect-[16/10] rounded-none overflow-hidden group shadow-2xl shadow-black/5">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={current.id}
@@ -115,64 +122,94 @@ export default function TopCourse() {
             </div>
 
             <div className="flex flex-col gap-6">
-               <h3 className="text-[40px] lg:text-[56px] font-normal text-slate-900 tracking-tight leading-none uppercase">
+               <h3 className="text-[40px] lg:text-[56px] font-bold text-slate-900 tracking-tight leading-none">
                   {current.name}
                </h3>
                <p className="text-xl text-slate-500 font-normal leading-relaxed max-w-2xl">
                   {current.description}
                </p>
-               <div className="flex flex-wrap gap-4 mt-2">
-                 <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100">
-                    <span className="material-symbols-outlined text-primary text-[24px]">school</span>
-                    <span className="text-base font-normal text-slate-700">{current.stats.colleges} Colleges</span>
+               <div className="flex flex-wrap gap-12 mt-4 items-center">
+                 <div className="flex flex-col">
+                    <span className="text-[28px] font-bold text-slate-900">{current.stats.colleges}</span>
+                    <span className="text-sm font-medium text-slate-400">Colleges</span>
                  </div>
-                 <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-slate-50 border border-slate-100">
-                    <span className="material-symbols-outlined text-primary text-[24px]">payments</span>
-                    <span className="text-base font-normal text-slate-700">{current.stats.salary} Avg. Salary</span>
+                 <div className="flex flex-col">
+                    <span className="text-[28px] font-bold text-slate-900">{current.stats.salary}</span>
+                    <span className="text-sm font-medium text-slate-400">Avg. Salary</span>
                  </div>
+                 <div className="flex flex-col">
+                    <span className="text-[28px] font-bold text-slate-900">{current.stats.growth}</span>
+                    <span className="text-sm font-medium text-slate-400">Job Growth</span>
+                 </div>
+                 <Link 
+                   href={`/courses/${current.slug}`} 
+                   className="flex items-center gap-2 hover:translate-x-1 transition-transform ml-4" 
+                   style={{ color: '#FF3C3C', fontSize: '25px', fontWeight: 700 }}
+                 >
+                    View more <span className="material-symbols-outlined" style={{ fontSize: '25px', fontWeight: 700 }}>arrow_forward</span>
+                 </Link>
               </div>
-              <Link href={`/courses/${current.slug}`} className="mt-4 px-12 py-5 w-fit rounded-[10px] bg-primary text-white font-normal hover:brightness-105 shadow-xl shadow-primary/20 transition-all active:scale-95 flex items-center gap-3 uppercase tracking-widest text-sm">
-                 Explore Programs
-                 <span className="material-symbols-outlined">arrow_forward</span>
-              </Link>
             </div>
           </div>
 
           {/* ── Right Column: Selector List ───────────────────────────── */}
-          <div className="lg:col-span-5 bg-white rounded-[10px] border border-slate-100 p-10 shadow-xl shadow-black/5">
-             <div className="mb-10">
-                <h3 className="text-2xl font-normal text-slate-900 mb-2 uppercase tracking-tight">Select Stream</h3>
-                <div className="w-12 h-1.5 bg-primary rounded-[10px]" />
+          <div className="lg:col-span-4 bg-white rounded-[10px] border border-slate-100 p-0 shadow-xl shadow-black/5 flex flex-col h-full overflow-hidden">
+             <div className="p-6 pb-4 border-b border-slate-50">
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    <Search className="w-5 h-5" />
+                  </span>
+                  <input 
+                    type="text"
+                    placeholder="Search your course"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full h-12 pl-12 pr-6 bg-slate-50 border border-slate-100 focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none rounded-none text-[14px] font-medium transition-all"
+                  />
+                </div>
              </div>
-             <div className="flex flex-col gap-4">
-               {courses.map((course, idx) => (
-                 <button
-                   key={course.id}
-                   onClick={() => setActive(idx)}
-                   className={`flex items-center gap-6 p-6 rounded-[24px] transition-all duration-300 text-left border-[2px] ${
-                     active === idx 
-                       ? 'bg-slate-950 border-slate-950 text-white shadow-2xl scale-[1.02]' 
-                       : 'bg-slate-50 border-transparent text-slate-600 hover:bg-slate-100'
-                   }`}
-                 >
-                   <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 transition-colors ${
-                     active === idx ? 'bg-primary text-white' : 'bg-white text-slate-400 border border-slate-100'
-                   }`}>
-                     <span className="material-symbols-outlined text-[32px]">{course.icon}</span>
-                   </div>
-                   <div className="flex-1">
-                      <div className={`text-[18px] font-normal mb-0.5 leading-none ${active === idx ? 'text-white' : 'text-slate-800'}`}>
-                        {course.name}
-                      </div>
-                      <div className={`text-xs font-normal uppercase tracking-[0.15em] ${active === idx ? 'text-white/60' : 'text-slate-400'}`}>
-                        {course.count}
-                      </div>
-                   </div>
-                   {active === idx && (
-                      <span className="material-symbols-outlined text-primary text-[28px]">chevron_right</span>
-                   )}
-                 </button>
-               ))}
+             <div className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-2 max-h-[400px]">
+               <style jsx>{`
+                 div::-webkit-scrollbar { width: 4px; }
+                 div::-webkit-scrollbar-track { background: transparent; }
+                 div::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+                 div::-webkit-scrollbar-thumb:hover { background: #CBD5E0; }
+               `}</style>
+               {filteredCourses.map((course, idx) => {
+                 const originalIdx = courses.findIndex(c => c.id === course.id);
+                 return (
+                  <button
+                    key={course.id}
+                    onMouseEnter={() => setActive(originalIdx)}
+                    className={`flex items-center gap-4 p-3 rounded-[10px] transition-all duration-300 text-left ${
+                      active === originalIdx 
+                        ? 'text-white translate-x-2' 
+                        : 'bg-transparent text-slate-600 hover:bg-slate-100'
+                    }`}
+                    style={{ 
+                      backgroundColor: active === originalIdx ? '#DD8D8F' : 'transparent',
+                      boxShadow: active === originalIdx ? '0 10px 25px -5px rgba(221, 141, 143, 0.4)' : 'none'
+                    }}
+                  >
+                    <div className={`w-12 h-12 rounded-[10px] flex items-center justify-center shrink-0 transition-colors ${
+                      active === originalIdx ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'
+                    }`}>
+                      <span className="material-symbols-outlined text-[24px]">{course.icon}</span>
+                    </div>
+                    <div className="flex-1">
+                       <div className={`text-[16px] font-bold leading-none ${active === originalIdx ? 'text-white' : 'text-slate-800'}`}>
+                         {course.name}
+                       </div>
+                       <div className={`text-[11px] mt-1 font-medium uppercase tracking-[0.1em] ${active === originalIdx ? 'text-white/80' : 'text-slate-400'}`}>
+                         {course.count}
+                       </div>
+                    </div>
+                    {active === originalIdx && (
+                       <span className="material-symbols-outlined text-white text-[20px]">arrow_forward</span>
+                    )}
+                  </button>
+                 );
+               })}
              </div>
           </div>
         </div>

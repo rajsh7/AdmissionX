@@ -13,6 +13,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import CourseCardV3 from "./CourseCardV3";
+import SearchBar from "./SearchBar";
 import CourseFiltersV2 from "./CourseFiltersV2";
 import PaginationFixed from "./PaginationFixed";
 import type { CourseResult } from "@/app/api/search/courses/route";
@@ -46,7 +47,7 @@ export default function ListingSearchV4({
   initPage,
   heroImage = "/images/hero-student.png",
   heroRightImage = "/images/2999ec4e5233aa8cb9dbf010e3c51149ae41f951.png",
-  heroHeight = "641px",
+  heroHeight = "700px",
   heroObjectPosition,
   heroFit = "cover",
 }: CourseSearchClientProps) {
@@ -128,8 +129,8 @@ export default function ListingSearchV4({
         
         <div className="relative z-10 w-full h-full flex flex-col">
             <div className="flex-1 relative">
-              <div className="mx-auto w-full px-4 lg:px-12 xl:px-16 h-full">
-                <div className="flex flex-col justify-center h-full relative z-20 lg:pl-[270px]">
+              <div className="mx-auto max-w-[1920px] w-full px-8 lg:px-12 xl:px-20 h-full relative">
+                <div className="flex flex-col justify-center h-full relative z-20">
                   <div className={`transition-opacity duration-700 mt-6 flex flex-col justify-center ${heroRightImage ? "lg:max-w-[55%] lg:text-left" : "lg:col-span-12 lg:max-w-4xl"}`} style={{ opacity: mounted ? 1 : 0 }}>
                     <h1 className="font-poppins text-white leading-[1.05] tracking-[0.02em] mb-4 drop-shadow-2xl">
                       <span className="text-[36px] sm:text-[48px] lg:text-[64px] font-extrabold block mb-0">Finds your</span>
@@ -139,27 +140,7 @@ export default function ListingSearchV4({
                       Search thousands of courses and universities worldwide
                     </p>
                     <div className="max-w-2xl">
-                      <form
-                        onSubmit={(e) => { e.preventDefault(); handleSearch((e.target as any).q.value); }}
-                        className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full"
-                      >
-                        <div className="flex-1 flex items-center gap-3 bg-white/40 backdrop-blur-md rounded-[10px] border border-white/30 shadow-2xl focus-within:border-[#FF3C3C] focus-within:ring-4 focus-within:ring-[#FF3C3C]/10 transition-all duration-300 px-6 py-1">
-                          <span className="material-symbols-outlined text-[20px] text-white flex-shrink-0">search</span>
-                          <input
-                            name="q"
-                            type="text"
-                            defaultValue={q}
-                            placeholder="Location, universities, courses..."
-                            className="flex-1 py-3 text-sm sm:text-base text-white placeholder:text-white/80 bg-transparent outline-none min-w-0 font-medium"
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          className="flex-shrink-0 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-base font-bold px-10 py-3 rounded-[10px] transition-all active:scale-[0.98] shadow-xl shadow-[#FF3C3C]/30 min-w-max"
-                        >
-                          Search Now
-                        </button>
-                      </form>
+                      <SearchBar defaultValue={q} onSearch={handleSearch} />
                     </div>
                   </div>
                 </div>
@@ -183,7 +164,7 @@ export default function ListingSearchV4({
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col pt-0">
-        <div className="mx-auto w-full px-4 lg:px-6 xl:px-8 pt-8 pb-16">
+        <div className="mx-auto max-w-[1920px] w-full px-8 lg:px-12 xl:px-20 pt-8 pb-16">
           <div className="flex gap-8">
             <div className="hidden lg:block basis-[370px] min-w-[370px] max-w-[370px] flex-shrink-0">
                 <CourseFiltersV2
@@ -203,7 +184,7 @@ export default function ListingSearchV4({
                 <div className="flex flex-wrap items-center gap-2">
                   {(level || stream || q) ? (
                     <>
-                      <span className="text-xs font-bold text-neutral-500 mr-1">Active Filters:</span>
+                      <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap uppercase tracking-wider mr-1">Active Filters:</span>
                       {q && (
                         <div className="flex items-center gap-1.5 bg-white border border-neutral-200 px-3 py-1 rounded-[6px] text-[11px] font-semibold text-neutral-700 shadow-sm">
                           {q}
@@ -235,9 +216,9 @@ export default function ListingSearchV4({
                 </div>
                 {/* Sort By */}
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-neutral-500 whitespace-nowrap">Short by:</span>
+                  <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap uppercase tracking-wider">Short by:</span>
                   <div className="flex items-center gap-1.5 bg-white border border-neutral-200 rounded-[6px] px-3 py-1.5 shadow-sm cursor-pointer">
-                    <span className="text-[11px] font-semibold text-neutral-700">Most Popular</span>
+                    <span className="text-[13px] font-semibold text-neutral-700">Most Popular</span>
                     <span className="material-symbols-outlined text-[16px] text-neutral-400">expand_more</span>
                   </div>
                 </div>

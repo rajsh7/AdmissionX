@@ -11,7 +11,6 @@ import TopDestinations from "./components/TopDestinations";
 import CostCalculator from "./components/CostCalculator";
 import JourneySteps from "./components/JourneySteps";
 import StudyAbroadFooter from "./components/StudyAbroadFooter";
-import CollegeGrid from "./components/CollegeGrid";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -271,38 +270,11 @@ export const metadata: import("next").Metadata = {
     "Explore top international colleges and universities for study abroad. Find the best programs, fees, and admission details for studying outside India.",
 };
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
-interface PageProps {
+interface StudyAbroadPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export const revalidate = 300; // Cache for 5 minutes
-
-async function CollegeSection() {
-  const { colleges, total } = await fetchAbroadColleges({
-    stream: "",
-    degree: "",
-    feesMax: "",
-    sort: "rating",
-    page: 1,
-    limit: 12,
-  });
-
-  return (
-    <section className="py-24 bg-slate-50/50">
-      <div className="max-w-[1400px] mx-auto px-6">
-        <div className="mb-12">
-          <h2 className="text-4xl font-bold text-slate-900 mb-4">International Universities</h2>
-          <p className="text-slate-500">Pick from over {total.toLocaleString()} institutions worldwide.</p>
-        </div>
-        <CollegeGrid colleges={colleges} total={total} />
-      </div>
-    </section>
-  );
-}
-
-export default async function StudyAbroadPage({ searchParams }: PageProps) {
+export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageProps) {
   const sp = await searchParams;
 
   const getString = (key: string, fallback = "") =>
@@ -369,7 +341,7 @@ export default async function StudyAbroadPage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-white flex flex-col relative font-[family-name:var(--font-outfit)]">
-      <Header />
+      <Header theme="dark" />
       
       <main className="flex-1">
         <HeroSection />
@@ -379,10 +351,6 @@ export default async function StudyAbroadPage({ searchParams }: PageProps) {
         <CostCalculator />
         
         <JourneySteps />
-
-        <Suspense fallback={<div className="py-24 text-center">Loading Universities...</div>}>
-          <CollegeSection />
-        </Suspense>
       </main>
 
       <StudyAbroadFooter />

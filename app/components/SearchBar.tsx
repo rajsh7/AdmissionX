@@ -1,0 +1,161 @@
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+
+interface Suggestion {
+  type: "college" | "course" | "stream" | "city";
+  name: string;
+  location: string;
+  slug?: string;
+  id?: number | string;
+}
+
+interface SearchBarProps {
+  defaultValue?: string;
+  placeholder?: string;
+  onSearch?: (query: string) => void;
+  className?: string;
+}
+
+export default function SearchBar({
+  defaultValue = "",
+  placeholder = "Location, universities, courses...",
+  onSearch,
+  className = "",
+}: SearchBarProps) {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState(defaultValue);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchQuery.trim().length >= 2) {
+        setIsLoading(true);
+        fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`)
+          .then((res) => res.json())
+          .then((data) => {
+            setSuggestions(data.suggestions || []);
+            setShowDropdown(true);
+          })
+          .catch((err) => console.error("Search fetch error:", err))
+          .finally(() => setIsLoading(false));
+      } else {
+        setSuggestions([]);
+        setShowDropdown(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onSearch) {
+      onSearch(searchQuery);
+    } else {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+    setShowDropdown(false);
+  };
+
+  const navigateToItem = (item: Suggestion) => {
+    setSearchQuery(item.name);
+    setShowDropdown(false);
+    if (item.type === "college") {
+      router.push(`/college/${item.slug}`);
+    } else if (item.type === "course") {
+      router.push(`/careers-courses?q=${encodeURIComponent(item.name)}`);
+    } else if (item.type === "stream") {
+      router.push(`/top-colleges?stream=${item.slug}`);
+    } else if (item.type === "city") {
+      router.push(`/top-colleges?city_id=${item.id}`);
+    } else {
+      router.push(`/search?q=${encodeURIComponent(item.name)}`);
+    }
+  };
+
+  return (
+    <div className={`relative w-full ${className}`}>
+      <form
+        onSubmit={handleSearch}
+        className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full"
+      >
+        <div className="flex-1 flex items-center gap-3 bg-white/40 backdrop-blur-md rounded-[10px] border border-white/30 shadow-2xl focus-within:border-[#FF3C3C] focus-within:ring-4 focus-within:ring-[#FF3C3C]/10 transition-all duration-300 px-6 py-1">
+          <span className="material-symbols-outlined text-[20px] text-white flex-shrink-0">search</span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => searchQuery.length >= 2 && setShowDropdown(true)}
+            placeholder={placeholder}
+            className="flex-1 py-3 text-sm sm:text-base text-white placeholder:text-white/80 bg-transparent outline-none min-w-0 font-medium"
+          />
+        </div>
+        <button
+          type="submit"
+          className="flex-shrink-0 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-base font-bold px-10 py-3 rounded-[10px] transition-all active:scale-[0.98] shadow-xl shadow-[#FF3C3C]/30 min-w-max"
+        >
+          {isLoading ? "Searching..." : "Search Now"}
+        </button>
+      </form>
+
+      {/* Suggestions Dropdown */}
+      {showDropdown && (
+        <div
+          ref={dropdownRef}
+          className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100 z-[100] animate-in fade-in slide-in-from-top-2 duration-200"
+        >
+          {suggestions.length > 0 ? (
+            <div className="py-2">
+              {suggestions.map((item, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => navigateToItem(item)}
+                  className="w-full text-left px-4 py-3 hover:bg-rose-50 flex items-center gap-3 transition-colors border-b border-slate-50 last:border-0"
+                >
+                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-slate-400 text-[20px]">
+                      {item.type === "college" ? "school" : 
+                       item.type === "course" ? "menu_book" :
+                       item.type === "stream" ? "category" :
+                       item.type === "city" ? "location_on" : "search"}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[15px] font-medium text-slate-800 truncate">{item.name}</div>
+                    <div className="text-[12px] font-normal text-slate-500 flex items-center gap-1">
+                      <span className="capitalize px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-bold text-slate-400">
+                        {item.type}
+                      </span>
+                      <span className="truncate">{item.location}</span>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="p-4 text-center text-slate-500 text-sm font-normal">
+              No results found for "{searchQuery}"
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

@@ -102,7 +102,7 @@ function StarRating({ rating }: { rating: string | null }) {
         </span>
       ))}
       {r > 0 && (
-        <span className="text-xs font-bold text-slate-600 dark:text-slate-400 ml-1">
+        <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1">
           {r.toFixed(1)}
         </span>
       )}
@@ -127,59 +127,46 @@ function SkeletonCollegeCard() {
 // ── Step indicator bar ────────────────────────────────────────────────────────
 function StepBar({ step }: { step: Step }) {
   const steps: { key: Step; label: string; icon: string }[] = [
-    { key: "browse", label: "Browse", icon: "search" },
-    { key: "form", label: "Apply", icon: "edit" },
-    { key: "payment", label: "Payment", icon: "payments" },
+    { key: "browse",  label: "Browse",    icon: "search"       },
+    { key: "form",    label: "Apply",     icon: "edit"         },
+    { key: "payment", label: "Payment",   icon: "payments"     },
     { key: "receipt", label: "Confirmed", icon: "check_circle" },
   ];
 
   const currentIdx = steps.findIndex((s) => s.key === step);
 
   return (
-    <div className="flex items-center w-full max-w-2xl mx-auto mb-10">
+    <div className="flex items-center w-full max-w-2xl mx-auto mb-16 relative">
+      <div className="absolute top-[20px] left-0 right-0 h-0.5 bg-gray-100 -z-10" />
+      <div 
+        className="absolute top-[20px] left-0 h-0.5 bg-[#e31e24] -z-10 transition-all duration-700" 
+        style={{ width: `${(currentIdx / (steps.length - 1)) * 100}%` }}
+      />
       {steps.map((s, i) => {
         const done = i < currentIdx;
         const active = i === currentIdx;
         return (
-          <div key={s.key} className="flex items-center flex-1 last:flex-none">
-            <div className="flex flex-col items-center gap-1.5">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-                  done
-                    ? "bg-primary text-white shadow-lg shadow-primary/30"
-                    : active
-                      ? "bg-primary text-white ring-4 ring-primary/20 shadow-lg shadow-primary/30"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-400 border-2 border-slate-200 dark:border-slate-700"
-                }`}
-              >
-                <span
-                  className="material-symbols-outlined text-[18px]"
-                  style={
-                    done || active ? { fontVariationSettings: "'FILL' 1" } : {}
-                  }
-                >
-                  {done ? "check" : s.icon}
-                </span>
-              </div>
-              <span
-                className={`text-[10px] font-bold uppercase tracking-wide whitespace-nowrap ${
-                  active
-                    ? "text-primary"
-                    : done
-                      ? "text-slate-500 dark:text-slate-400"
-                      : "text-slate-400"
-                }`}
-              >
-                {s.label}
+          <div key={s.key} className="flex-1 flex flex-col items-center">
+            <div
+              className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
+                done
+                  ? "bg-[#e31e24] text-white shadow-lg shadow-red-100"
+                  : active
+                    ? "bg-[#e31e24] text-white ring-4 ring-red-50 shadow-lg shadow-red-100"
+                    : "bg-white text-gray-300 border-2 border-gray-100"
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                {done ? "check" : s.icon}
               </span>
             </div>
-            {i < steps.length - 1 && (
-              <div
-                className={`flex-1 h-0.5 mx-2 mb-5 rounded-full transition-all ${
-                  done ? "bg-primary" : "bg-slate-200 dark:bg-slate-700"
-                }`}
-              />
-            )}
+            <span
+              className={`text-[10px] font-semibold uppercase tracking-widest mt-3 ${
+                active ? "text-[#e31e24]" : done ? "text-gray-600" : "text-gray-300"
+              }`}
+            >
+              {s.label}
+            </span>
           </div>
         );
       })}
@@ -246,47 +233,31 @@ function BrowseStep({
   return (
     <div className="space-y-6">
       {/* Search + filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-4 mb-10">
         <div className="relative flex-1">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary text-xl">
-            search
-          </span>
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-[20px]">search</span>
           <input
             type="text"
-            placeholder="Search colleges or courses…"
+            placeholder="Search colleges, degrees or streams..."
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium outline-none transition-all"
+            className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-gray-100 rounded-xl text-[14px] font-medium text-[#333] outline-none transition-all focus:border-[#e31e24]/30"
           />
         </div>
         <select
           value={stream}
-          onChange={(e) => {
-            setStream(e.target.value);
-            setPage(1);
-          }}
-          className="px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-primary/20 transition-all min-w-[160px]"
+          onChange={(e) => { setStream(e.target.value); setPage(1); }}
+          className="px-4 py-3 bg-white border-2 border-gray-100 rounded-xl text-[13px] font-semibold text-[#555] uppercase tracking-wider outline-none appearance-none cursor-pointer hover:border-gray-200"
         >
           <option value="">All Streams</option>
-          {filters.streams.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
+          {filters.streams.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
         <select
           value={degree}
-          onChange={(e) => {
-            setDegree(e.target.value);
-            setPage(1);
-          }}
-          className="px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-primary/20 transition-all min-w-[150px]"
+          onChange={(e) => { setDegree(e.target.value); setPage(1); }}
+          className="px-4 py-3 bg-white border-2 border-gray-100 rounded-xl text-[13px] font-semibold text-[#555] uppercase tracking-wider outline-none appearance-none cursor-pointer hover:border-gray-200"
         >
           <option value="">All Degrees</option>
-          {filters.degrees.map((d) => (
-            <option key={d} value={d}>
-              {d}
-            </option>
-          ))}
+          {filters.degrees.map((d) => <option key={d} value={d}>{d}</option>)}
         </select>
       </div>
 
@@ -295,7 +266,7 @@ function BrowseStep({
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-semibold text-slate-500">Active:</span>
           {stream && (
-            <span className="flex items-center gap-1.5 bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full">
+            <span className="flex items-center gap-1.5 bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full">
               {stream}
               <button
                 onClick={() => {
@@ -311,7 +282,7 @@ function BrowseStep({
             </span>
           )}
           {degree && (
-            <span className="flex items-center gap-1.5 bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full">
+            <span className="flex items-center gap-1.5 bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full">
               {degree}
               <button
                 onClick={() => {
@@ -343,11 +314,11 @@ function BrowseStep({
       {!loading && !error && pagination && (
         <p className="text-sm text-slate-500 font-medium">
           Showing{" "}
-          <span className="font-bold text-slate-700 dark:text-slate-300">
+          <span className="font-semibold text-slate-700 dark:text-slate-300">
             {colleges.length}
           </span>{" "}
           of{" "}
-          <span className="font-bold text-slate-700 dark:text-slate-300">
+          <span className="font-semibold text-slate-700 dark:text-slate-300">
             {pagination.total}
           </span>{" "}
           college{pagination.total !== 1 ? "s" : ""}
@@ -404,7 +375,7 @@ function BrowseStep({
                     )}
                     {college.admission_open !== null && (
                       <span
-                        className={`absolute top-3 right-3 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                        className={`absolute top-3 right-3 text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full ${
                           college.admission_open
                             ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
                             : "bg-slate-700 text-slate-300"
@@ -436,22 +407,14 @@ function BrowseStep({
 
                     <StarRating rating={college.rating} />
 
-                    <div className="flex items-center justify-between mt-3 mb-4">
+                    <div className="flex items-center justify-between mt-4 py-3 border-y border-gray-50 mb-4">
                       <div>
-                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
-                          Fees from
-                        </p>
-                        <p className="text-sm font-black text-primary">
-                          {formatCurrency(college.min_fees)}
-                        </p>
+                        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Fee Starts</p>
+                        <p className="text-[15px] font-bold text-[#e31e24]">{formatCurrency(college.min_fees)}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
-                          Courses
-                        </p>
-                        <p className="text-sm font-black text-slate-700 dark:text-slate-200">
-                          {college.total_courses}
-                        </p>
+                        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Courses</p>
+                        <p className="text-[15px] font-bold text-[#333]">{college.total_courses}</p>
                       </div>
                     </div>
 
@@ -507,7 +470,7 @@ function BrowseStep({
                                 </div>
                               </div>
                               <div className="text-right shrink-0">
-                                <p className="text-xs font-black text-primary">
+                                <p className="text-xs font-bold text-primary">
                                   {formatCurrency(course.fees)}
                                 </p>
                                 <span className="material-symbols-outlined text-primary text-[14px] mt-1 block opacity-0 group-hover/course:opacity-100 transition-opacity">
@@ -526,30 +489,23 @@ function BrowseStep({
                       </div>
                     )}
 
-                    <div className="mt-auto flex gap-2">
+                    <div className="mt-auto pt-4 flex gap-3">
                       <button
-                        onClick={() =>
-                          setExpandedId(
-                            isExpanded ? null : college.collegeprofile_id,
-                          )
-                        }
-                        className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${
+                        onClick={() => setExpandedId(isExpanded ? null : college.collegeprofile_id)}
+                        className={`flex-1 py-3 rounded-lg font-bold text-[12px] uppercase tracking-wider transition-all ${
                           isExpanded
-                            ? "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
-                            : "bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/20"
+                            ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                            : "bg-[#e31e24] text-white shadow-lg shadow-red-50 hover:bg-[#c0191e]"
                         }`}
                       >
-                        {isExpanded ? "Collapse" : "View Courses & Apply"}
+                        {isExpanded ? "Collapse" : "View Courses"}
                       </button>
                       {!isExpanded && (
                         <button
                           onClick={() => onSelectCourse(college, null)}
-                          title="Apply without specific course"
-                          className="px-3 py-2.5 bg-slate-100 dark:bg-slate-700 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                          className="px-4 py-3 bg-[#1a1a1a] text-white rounded-lg hover:bg-black transition-all flex items-center justify-center"
                         >
-                          <span className="material-symbols-outlined text-[18px]">
-                            arrow_forward
-                          </span>
+                          <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                         </button>
                       )}
                     </div>
@@ -792,7 +748,7 @@ function ApplicationFormStep({
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-4 left-6 right-6">
-            <h2 className="text-white font-black text-xl leading-tight">
+            <h2 className="text-white font-bold text-xl leading-tight">
               {college.college_name}
             </h2>
             {college.address && (
@@ -807,7 +763,7 @@ function ApplicationFormStep({
         </div>
 
         <div className="p-8">
-          <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 mb-6">
+          <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">
             Confirm Your Application
           </h3>
 
@@ -832,10 +788,10 @@ function ApplicationFormStep({
               </div>
             )}
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                 Annual Fees
               </span>
-              <span className="font-black text-primary text-base">
+              <span className="font-bold text-primary text-base">
                 {formatCurrency(fees)}
               </span>
             </div>
@@ -843,7 +799,7 @@ function ApplicationFormStep({
 
           {/* Required Documents */}
           <div className="mb-6">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
               Required Documents
             </p>
             <div className="space-y-3">
@@ -871,7 +827,7 @@ function ApplicationFormStep({
                       {uploaded ? "check_circle" : isUploading ? "upload" : doc.icon}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                         {doc.type}
                       </p>
                       {uploaded && (
@@ -906,7 +862,7 @@ function ApplicationFormStep({
           {/* Notes */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                 Notes / Special Requirements
                 <span className="ml-1 font-normal text-slate-400">
                   (optional)
@@ -936,14 +892,14 @@ function ApplicationFormStep({
               <button
                 type="button"
                 onClick={onBack}
-                className="flex-1 py-3.5 border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-xl font-bold text-sm hover:border-slate-300 dark:hover:border-slate-600 transition-all"
+                className="flex-1 py-3.5 border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-xl font-semibold text-sm hover:border-slate-300 dark:hover:border-slate-600 transition-all"
               >
                 Back
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex-1 py-3.5 bg-primary text-white rounded-xl font-black text-sm shadow-lg shadow-primary/25 hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                className="flex-1 py-3.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/25 hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
                 {submitting ? (
                   <>
@@ -1045,7 +1001,7 @@ function PaymentStep({
     <div className="max-w-4xl mx-auto">
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors mb-8 font-semibold text-sm"
+        className="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors mb-8 font-medium text-sm"
       >
         <span className="material-symbols-outlined text-[18px]">
           arrow_back
@@ -1057,7 +1013,7 @@ function PaymentStep({
         {/* Left: Summary */}
         <div className="lg:col-span-2 flex flex-col gap-6">
           <div>
-            <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
               Checkout
             </h2>
             <p className="text-slate-500 text-sm mt-1">
@@ -1067,7 +1023,7 @@ function PaymentStep({
 
           {/* Order summary */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-4 shadow-sm">
-            <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm uppercase tracking-wider">
+            <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-sm uppercase tracking-wider">
               Order Summary
             </h4>
             <div className="flex items-start gap-3">
@@ -1094,13 +1050,13 @@ function PaymentStep({
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-slate-500">Application Fee</span>
-                <span className="font-bold text-slate-900 dark:text-slate-100">
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
                   {formatCurrency(application.fees)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Processing Fee</span>
-                <span className="font-bold text-emerald-600">Free</span>
+                <span className="font-semibold text-emerald-600">Free</span>
               </div>
             </div>
             <div className="h-px bg-slate-100 dark:bg-slate-700" />
@@ -1108,7 +1064,7 @@ function PaymentStep({
               <span className="font-bold text-slate-900 dark:text-slate-100">
                 Total
               </span>
-              <span className="text-2xl font-black text-primary">
+              <span className="text-2xl font-bold text-primary">
                 {formatCurrency(application.fees)}
               </span>
             </div>
@@ -1138,7 +1094,7 @@ function PaymentStep({
 
         {/* Right: Card form */}
         <div className="lg:col-span-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-lg p-8">
-          <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 mb-6">
+          <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">
             Payment Details
           </h3>
 
@@ -1163,7 +1119,7 @@ function PaymentStep({
                 <p className="text-[8px] uppercase tracking-tighter opacity-60">
                   Card Holder
                 </p>
-                <p className="text-sm font-bold uppercase truncate max-w-[160px]">
+                <p className="text-sm font-semibold uppercase truncate max-w-[160px]">
                   {cardName || user?.name || "YOUR NAME"}
                 </p>
               </div>
@@ -1171,7 +1127,7 @@ function PaymentStep({
                 <p className="text-[8px] uppercase tracking-tighter opacity-60">
                   Expires
                 </p>
-                <p className="text-sm font-bold">{expiry || "MM/YY"}</p>
+                <p className="text-sm font-semibold">{expiry || "MM/YY"}</p>
               </div>
             </div>
             <div className="absolute -bottom-8 -right-8 w-36 h-36 bg-white/5 rounded-full blur-3xl" />
@@ -1252,7 +1208,7 @@ function PaymentStep({
                 onChange={(e) => setSaveCard(e.target.checked)}
                 className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
               />
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-slate-500 font-medium">
                 Save card for future payments
               </span>
             </label>
@@ -1271,7 +1227,7 @@ function PaymentStep({
             <button
               type="submit"
               disabled={processing}
-              className="w-full py-4 bg-primary hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-black rounded-2xl shadow-xl shadow-primary/25 transition-all flex items-center justify-center gap-2"
+              className="w-full py-4 bg-primary hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-2xl shadow-xl shadow-primary/25 transition-all flex items-center justify-center gap-2"
             >
               {processing ? (
                 <>
@@ -1323,7 +1279,7 @@ function ReceiptStep({
         </span>
       </div>
 
-      <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 mb-2">
+      <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
         Payment Successful!
       </h2>
       <p className="text-slate-500 mb-8">
@@ -1333,7 +1289,7 @@ function ReceiptStep({
 
       {/* Receipt card */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-lg p-6 text-left space-y-4 mb-8">
-        <h3 className="font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+        <h3 className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
           <span className="material-symbols-outlined text-primary">
             receipt_long
           </span>
@@ -1384,11 +1340,11 @@ function ReceiptStep({
               {row.label}
             </span>
             <span
-              className={`text-sm font-bold text-right break-all ${
+              className={`text-sm font-semibold text-right break-all ${
                 row.mono
                   ? "font-mono text-slate-600 dark:text-slate-300 text-xs"
                   : row.highlight
-                    ? "text-primary text-base"
+                    ? "text-primary text-base font-bold"
                     : "text-slate-900 dark:text-slate-100"
               }`}
             >
@@ -1408,7 +1364,7 @@ function ReceiptStep({
         </button>
         <button
           onClick={onDone}
-          className="flex-1 py-3 bg-primary text-white rounded-xl font-black text-sm shadow-lg shadow-primary/25 hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
+          className="flex-1 py-3 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/25 hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
         >
           View My Applications
           <span className="material-symbols-outlined text-[18px]">
@@ -1464,7 +1420,7 @@ export default function ApplyTab({ user }: Props) {
     <div className="pb-24">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+        <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
           Apply &amp; Pay
         </h1>
         <p className="text-slate-500 mt-1">

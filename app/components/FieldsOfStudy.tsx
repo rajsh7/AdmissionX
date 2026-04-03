@@ -3,107 +3,79 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-const categories = [
+const searchOptions = [
   { 
-    title: "Engineering", 
-    icon: "engineering", 
-    color: "text-blue-600", 
-    bg: "border-blue-500",
-    description: "Explore top engineering schools and diverse specializations for a future-ready career.",
-    href: "/search?stream=engineering"
+    title: "Find a course", 
+    description: "Search by subject, course or region to find the right course for you.",
+    href: "/search?type=course"
   },
   { 
-    title: "Management", 
-    icon: "business_center", 
-    color: "text-emerald-600", 
-    bg: "border-emerald-500",
-    description: "Transform into a global business leader with top-tier MBA and leadership programs.",
-    href: "/search?stream=management"
+    title: "Find a university", 
+    description: "Search for universities to find out about courses and more.",
+    href: "/search?type=university"
   },
   { 
-    title: "Medical", 
-    icon: "medical_services", 
-    color: "text-rose-600", 
-    bg: "border-rose-500",
-    description: "Shape the future of healthcare with premier medical university and research paths.",
-    href: "/search?stream=medicine"
+    title: "Find an open day", 
+    description: "Search and book open days to help you make the right choice.",
+    href: "/search?type=openday"
   },
   { 
-    title: "Design", 
-    icon: "palette", 
-    color: "text-purple-600", 
-    bg: "border-purple-500",
-    description: "Unleash your creativity at world-renowned design studios and architecture schools.",
-    href: "/search?stream=design"
+    title: "Global Search", 
+    description: "Discover top-ranked institutions across the globe with our advanced filters.",
+    href: "/search"
   },
   { 
-    title: "Science", 
-    icon: "biotech", 
-    color: "text-cyan-600", 
-    bg: "border-cyan-500",
-    description: "Dive into research and innovation with leading science and technology institutions.",
-    href: "/search?stream=science"
+    title: "Admission Guidance", 
+    description: "Get expert advice and 1-on-1 counseling for your higher education journey.",
+    href: "/counselling"
   },
   { 
-    title: "Commerce", 
-    icon: "payments", 
-    color: "text-orange-600", 
-    bg: "border-orange-500",
-    description: "Master the dynamics of trade, finance, and accounting at top commerce colleges.",
-    href: "/search?stream=commerce"
-  },
-  { 
-    title: "Law", 
-    icon: "gavel", 
-    color: "text-amber-700", 
-    bg: "border-amber-600",
-    description: "Uphold justice and the rule of law. Explore premier legal studies and judicial services paths.",
-    href: "/search?stream=law"
-  },
-  { 
-    title: "Arts", 
-    icon: "history_edu", 
-    color: "text-indigo-600", 
-    bg: "border-indigo-500",
-    description: "Discover the richness of human expression with top-tier humanities and social science programs.",
-    href: "/search?stream=arts"
+    title: "Scholarship Finder", 
+    description: "Find and apply for scholarships that match your academic profile.",
+    href: "/scholarships"
   },
 ];
 
 export default function FieldsOfStudy() {
   return (
-    <section className="w-full py-24 lg:py-32 bg-[#f8fafc] overflow-hidden">
-      <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
+    <section className="relative w-full py-24 lg:py-32 overflow-hidden">
+      {/* Background Image without Overlay */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/Background-images/20ae9a1c8117e707bfd14ba61097b9db0707fc62.jpg"
+          alt="Fields of Study Background"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      <div className="relative mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24 z-10">
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-14">
-          {categories.map((cat, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+          {searchOptions.map((opt, i) => (
             <motion.div
-              key={cat.title}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
             >
-              <Link 
-                href={cat.href}
-                className={`group flex flex-col p-12 rounded-[10px] bg-white border-t-4 ${cat.bg} shadow-[0_20px_50px_-10px_rgba(0,0,0,0.03)] transition-all hover:shadow-2xl hover:shadow-black/5 hover:-translate-y-2 active:scale-95 h-full`}
+              <div 
+                className="group flex flex-col p-8 lg:p-10 rounded-[12px] bg-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.2)] transition-all hover:shadow-2xl hover:-translate-y-2 h-full border border-slate-100"
               >
-                <div className={`w-16 h-16 rounded-[10px] bg-slate-50 flex items-center justify-center mb-10 transition-transform group-hover:scale-110 group-hover:bg-primary group-hover:text-white`}>
-                  <span className={`material-symbols-rounded text-[32px] ${cat.color} group-hover:text-white transition-colors`}>
-                    {cat.icon}
-                  </span>
-                </div>
-                <h3 className="text-[28px] font-normal text-slate-900 mb-5 tracking-tight uppercase leading-tight">
-                   {cat.title}
+                <h3 className="text-[24px] font-bold text-[#1F2937] mb-4 tracking-tight leading-tight">
+                   {opt.title}
                 </h3>
-                <p className="text-[17px] text-slate-500 font-normal leading-relaxed mb-10 flex-1">
-                   {cat.description}
+                <p className="text-[17px] text-[#4B5563] font-normal leading-relaxed mb-6 flex-1">
+                   {opt.description}
                 </p>
-                <div className="flex items-center gap-2 text-primary font-normal text-sm uppercase tracking-widest group-hover:translate-x-2 transition-transform">
-                   <span>View More</span>
-                   <span className="material-symbols-rounded text-[18px]">arrow_forward</span>
-                </div>
-              </Link>
+                <Link 
+                  href={opt.href}
+                  className="inline-flex items-center gap-2 text-[#FF3C3C] font-semibold text-[17px] hover:gap-3 transition-all"
+                >
+                   <span>see more</span>
+                   <span className="material-symbols-rounded text-[20px]">arrow_forward</span>
+                </Link>
+              </div>
             </motion.div>
           ))}
         </div>

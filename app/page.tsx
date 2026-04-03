@@ -93,6 +93,7 @@ const getHomePageData = unstable_cache(
           { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
           {
             $project: {
+              _id: 0,
               slug: 1,
               name: {
                 $cond: [
@@ -113,7 +114,7 @@ const getHomePageData = unstable_cache(
           .find({ isactive: 1 })
           .sort({ created_at: -1 })
           .limit(8)
-          .project({ id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 })
+          .project({ _id: 0, id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 })
           .toArray() as Promise<DbBlog[]>,
 
         // 3. Top 6 exams by views
@@ -121,7 +122,7 @@ const getHomePageData = unstable_cache(
           .find({})
           .sort({ totalViews: -1, created_at: -1 })
           .limit(8)
-          .project({ id: 1, title: 1, slug: 1, exminationDate: 1, image: 1, functionalarea_id: 1, courses_id: 1, totalViews: 1 })
+          .project({ _id: 0, id: 1, title: 1, slug: 1, exminationDate: 1, image: 1, functionalarea_id: 1, courses_id: 1, totalViews: 1 })
           .toArray() as Promise<DbExam[]>,
 
         // 4. Active home-page ads
@@ -134,7 +135,7 @@ const getHomePageData = unstable_cache(
           })
           .sort({ created_at: -1 })
           .limit(8)
-          .project({ id: 1, title: 1, description: 1, img: 1, redirectto: 1 })
+          .project({ _id: 0, id: 1, title: 1, description: 1, img: 1, redirectto: 1 })
           .toArray() as Promise<AdItem[]>,
 
         // 5. Stats — count documents in each collection

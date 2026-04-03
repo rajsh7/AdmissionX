@@ -49,11 +49,17 @@ export async function POST(req: NextRequest) {
       updated_at: new Date(),
     });
 
+    if (!result || !result.insertedId) {
+      throw new Error("Failed to insert student record into database. The database may be in mock mode or connection failed.");
+    }
+
     try {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://admissionx.com";
       const activationLink = `${baseUrl}/api/auth/activate?token=${activationToken}`;
       await sendStudentActivationEmail(emailLower, name.trim(), activationLink);
-    } catch { /* ignore email error */ }
+    } catch (emailErr) { 
+      console.error("[Signup] Email sending failed:", emailErr);
+    }
 
     const token = await signStudentToken({
       id: result.insertedId.toString(),
@@ -65,7 +71,30 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json({ success: true });
     response.cookies.set(STUDENT_COOKIE, token, COOKIE_OPTIONS);
     return response;
-  } catch {
-    return NextResponse.json({ error: "Internal server error. Please try again." }, { status: 500 });
+  } catch (err: any) {
+    // SELF-HEALING: If "not primary" error, force reconnect and retry once
+    if (err.code === 10107 || err.message?.includes("not primary")) {
+      console.warn("♻️ [Signup] Detected 'not primary' error. Attempting self-healing reconnection...");
+      const { forceReconnect } = await import("@/lib/db");
+      await forceReconnect();
+      
+      // Optional: Small delay to allow replica set to settle
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Recursively call for one retry attempt (using a flag or just one-off)
+      // For safety, we just throw a custom message asking to try once more 
+      // OR we can actually re-run the logic. Let's do a clean error for now
+      // that explains the reconnection happened.
+      return NextResponse.json(
+        { error: "Database was out of sync. Connection has been refreshed. Please click 'Create Account' again." }, 
+        { status: 503 }
+      );
+    }
+
+    console.error("[Signup Internal Error]:", err);
+    return NextResponse.json(
+      { error: err.message || "Internal server error. Please try again." }, 
+      { status: 500 }
+    );
   }
 }

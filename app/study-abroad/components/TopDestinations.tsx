@@ -21,11 +21,8 @@ const DestinationCard = ({
   fees,
   visaSuccess,
   postStudyWork,
-  feesProgress,
-  visaProgress,
-  workProgress,
-}: DestinationCardProps) => (
-  <div className="bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group">
+}: Omit<DestinationCardProps, "feesProgress" | "visaProgress" | "workProgress">) => (
+  <div className="bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 group">
     <div className="relative h-[240px] overflow-hidden">
       <Image 
         src={image} 
@@ -33,57 +30,44 @@ const DestinationCard = ({
         fill 
         className="object-cover transition-transform duration-700 group-hover:scale-110" 
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
       <div className="absolute bottom-6 left-6">
-        <h3 className="text-3xl font-black text-white tracking-tight">{country}</h3>
+        <h3 className="text-xl font-bold text-white tracking-tight">{country}</h3>
       </div>
     </div>
     
-    <div className="p-8">
-      <div className="space-y-6">
-        <div>
-          <div className="flex justify-between text-sm mb-2.5">
-            <span className="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">currency_rupee</span>
-              Avg. Fees
-            </span>
-            <span className="font-black text-slate-900">{fees}</span>
+    <div className="p-6">
+      <div className="space-y-4">
+        {/* Fees */}
+        <div className="flex items-center justify-between text-[14px]">
+          <div className="flex items-center gap-2.5 text-slate-400 font-medium">
+            <span className="material-symbols-rounded text-[20px] opacity-70">payments</span>
+            <span>Avg. Fees</span>
           </div>
-          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-             <div className="h-full bg-primary rounded-full" style={{ width: `${feesProgress}%` }} />
-          </div>
+          <span className="font-bold text-slate-700">{fees}</span>
         </div>
 
-        <div>
-          <div className="flex justify-between text-sm mb-2.5">
-            <span className="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">verified</span>
-              Visa Success
-            </span>
-            <span className="font-black text-slate-900">{visaSuccess}</span>
+        {/* Visa Success */}
+        <div className="flex items-center justify-between text-[14px]">
+          <div className="flex items-center gap-2.5 text-slate-400 font-medium">
+            <span className="material-symbols-rounded text-[20px] opacity-70">assignment_ind</span>
+            <span>Visa Success</span>
           </div>
-          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-             <div className="h-full bg-green-500 rounded-full" style={{ width: `${visaProgress}%` }} />
-          </div>
+          <span className="font-bold text-[#22C55E]">{visaSuccess}</span>
         </div>
 
-        <div>
-          <div className="flex justify-between text-sm mb-2.5">
-            <span className="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">work</span>
-              Post Study Work
-            </span>
-            <span className="font-black text-slate-900">{postStudyWork}</span>
+        {/* Post Study Work */}
+        <div className="flex items-center justify-between text-[14px]">
+          <div className="flex items-center gap-2.5 text-slate-400 font-medium">
+            <span className="material-symbols-rounded text-[20px] opacity-70">work</span>
+            <span>Post-Study Work</span>
           </div>
-          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-             <div className="h-full bg-blue-500 rounded-full" style={{ width: `${workProgress}%` }} />
-          </div>
+          <span className="font-bold text-slate-700">{postStudyWork}</span>
         </div>
       </div>
 
-      <button className="w-full mt-10 py-4 border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-[16px] font-black text-lg transition-all flex items-center justify-center gap-3 active:scale-[0.98]">
+      <button className="w-full mt-8 py-3.5 border border-[#FF3C3C] text-[#FF3C3C] hover:bg-[#FF3C3C] hover:text-white rounded-xl font-bold text-[15px] transition-all flex items-center justify-center active:scale-[0.98]">
         Explore {country}
-        <span className="material-symbols-outlined font-bold">arrow_forward</span>
       </button>
     </div>
   </div>
@@ -94,67 +78,57 @@ export default function TopDestinations() {
     {
       country: "United States",
       image: "https://images.unsplash.com/photo-1501446522555-304675543ec5?auto=format&fit=crop&q=80&w=800",
-      fees: "$20k - $45k/yr",
-      visaSuccess: "92%",
-      postStudyWork: "Up to 3 Years",
-      feesProgress: 65,
-      visaProgress: 92,
-      workProgress: 85,
+      fees: "$25k - $45/yr",
+      visaSuccess: "95%",
+      postStudyWork: "Up to 3 years",
     },
     {
       country: "United Kingdom",
       image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=800",
       fees: "£15k - £35k/yr",
       visaSuccess: "95%",
-      postStudyWork: "Up to 2 Years",
-      feesProgress: 55,
-      visaProgress: 95,
-      workProgress: 70,
+      postStudyWork: "Up to 2 years",
     },
     {
       country: "Canada",
       image: "https://images.unsplash.com/photo-1503614472666-60707c772ed2?auto=format&fit=crop&q=80&w=800",
       fees: "CA$15k - $35k/yr",
-      visaSuccess: "88%",
-      postStudyWork: "Up to 3 Years",
-      feesProgress: 50,
-      visaProgress: 88,
-      workProgress: 90,
+      visaSuccess: "95%",
+      postStudyWork: "Up to 3 years",
     },
     {
       country: "Australia",
       image: "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?auto=format&fit=crop&q=80&w=800",
       fees: "AU$20k - $45k/yr",
-      visaSuccess: "90%",
-      postStudyWork: "Up to 4 Years",
-      feesProgress: 60,
-      visaProgress: 90,
-      workProgress: 95,
+      visaSuccess: "95%",
+      postStudyWork: "Up to 4 years",
     },
   ];
 
   return (
-    <section className="py-32 bg-white">
-      <div className="max-w-[1400px] mx-auto px-8">
-        <div className="flex items-end justify-between mb-20">
-          <div>
-            <h2 className="text-[56px] font-black text-slate-900 leading-tight mb-6 tracking-tight">Top Destination</h2>
-            <p className="text-[19px] text-slate-500 max-w-3xl leading-relaxed">
-              Explore the most popular countries for international students based on quality <br />
-              of education, post study work right, and living standards.
+    <section className="pt-48 pb-32 bg-white">
+      <div className="max-w-[1920px] mx-auto px-8 lg:px-12">
+        
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+          <div className="space-y-4">
+            <h2 className="text-[44px] font-bold text-slate-800 leading-tight tracking-tight">Top Destination</h2>
+            <p className="text-[17px] text-slate-400 max-w-2xl leading-relaxed">
+              Explore the most popular countries for international student based on <br className="hidden lg:block" />
+              quality of education, post study work right, and living standards.
             </p>
           </div>
-          <Link href="/search" className="flex items-center gap-3 text-primary font-black text-xl hover:gap-5 transition-all mb-4 group">
+          <Link href="/search" className="flex items-center gap-2 text-[#FF3C3C] font-bold text-[18px] group transition-all">
             View All
-            <span className="material-symbols-outlined font-black">arrow_forward</span>
+            <span className="material-symbols-rounded font-bold text-[22px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {destinations.map((dest) => (
             <DestinationCard key={dest.country} {...dest} />
           ))}
         </div>
+
       </div>
     </section>
   );

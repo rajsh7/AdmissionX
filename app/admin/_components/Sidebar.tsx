@@ -74,7 +74,13 @@ export function SidebarContent({
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
   const toggleExpand = (label: string) => {
-    setExpandedItems((prev) => ({ ...prev, [label]: !prev[label] }));
+    setExpandedItems((prev) => {
+      const groupWithItem = NAV_GROUPS.find(g => g.items.some(i => i.label === label));
+      const item = groupWithItem?.items.find(i => i.label === label);
+      const isSubItemActive = !!(item?.subItems?.some(sub => pathname === sub.href));
+      const currentVal = prev[label] !== undefined ? prev[label] : isSubItemActive;
+      return { ...prev, [label]: !currentVal };
+    });
   };
 
   return (
@@ -104,7 +110,7 @@ export function SidebarContent({
                 const isSubItemActive = hasSubItems && item.subItems?.some(sub => pathname === sub.href);
                 const isItemActive = pathname === item.href || (item.href !== "/admin/dashboard" && pathname.startsWith(item.href + "/"));
                 const active = isItemActive || isSubItemActive;
-                const isExpanded = expandedItems[item.label] || isSubItemActive;
+                const isExpanded = expandedItems[item.label] !== undefined ? expandedItems[item.label] : isSubItemActive;
 
                 return (
                   <li key={`nav-item-${group.label || gIdx}-${item.label}-${iIdx}`}>

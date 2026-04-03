@@ -8,56 +8,63 @@ interface HeroSectionProps {
 
 export default function HeroSection({ coverImage, collegeName, logoUrl }: HeroSectionProps) {
   return (
-    <div className="relative w-full h-[350px] sm:h-[450px]">
-      <Image 
-        src={coverImage} 
-        alt={`${collegeName} Campus`} 
-        fill 
-        unoptimized
-        className="object-cover" 
-        priority
-      />
-      {/* Dark overlay for better text readability */}
-      <div className="absolute inset-0 bg-black/10" />
+    <section className="relative w-full h-[500px] lg:h-[650px] overflow-hidden">
+      {/* Background Image with optimized loading */}
+      <div className="absolute inset-0 z-0">
+        <Image 
+          src={coverImage} 
+          alt={`${collegeName} Campus`} 
+          fill 
+          priority
+          unoptimized
+          className="object-cover scale-105" 
+        />
+        {/* Cinematic gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+      </div>
       
-      {/* Content over image */}
-      <div className="absolute z-10 bottom-12 left-4 sm:left-12 max-w-2xl text-white">
-        <div 
-          className="inline-flex items-center gap-4 px-5 sm:px-6 py-3 sm:py-4 rounded-lg shadow-xl shadow-black/20"
-          style={{ backgroundColor: "#064e3b" }} /* Dark green/teal background matching design */
-        >
-          {/* Logo Box */}
-          <div className="relative w-10 h-10 sm:w-12 sm:h-12 bg-white rounded overflow-hidden p-1 flex-shrink-0 flex items-center justify-center">
-            {logoUrl && logoUrl !== "" ? (
-              <Image 
-                src={logoUrl} 
-                alt={`${collegeName} Logo`} 
-                fill 
-                unoptimized
-                className="object-contain p-1" 
-              />
-            ) : (
-              <span className="text-teal-900 font-extrabold text-xl sm:text-2xl">
-                {collegeName.charAt(0).toUpperCase()}
-              </span>
-            )}
+      {/* Floating Content Container */}
+      <div className="relative z-10 h-full max-w-[1920px] mx-auto px-8 lg:px-12 flex flex-col justify-end pb-24">
+        <div className="flex flex-col items-start gap-8 max-w-4xl">
+          
+          {/* Glassmorphism Badge */}
+          <div className="backdrop-blur-md bg-[#FF3C3C]/80 inline-flex items-center gap-6 px-8 py-5 rounded-[12px] shadow-2xl border border-white/20">
+            {/* White Logo Container */}
+            <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-full overflow-hidden p-2 flex-shrink-0 flex items-center justify-center shadow-lg border-2 border-white/50">
+              {logoUrl ? (
+                <Image 
+                  src={logoUrl} 
+                  alt={`${collegeName} Logo`} 
+                  fill 
+                  unoptimized
+                  className="object-contain p-1" 
+                />
+              ) : (
+                <span className="text-[#FF3C3C] font-black text-2xl">
+                  {collegeName.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
+            
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight drop-shadow-md">
+              {collegeName}
+            </h1>
           </div>
           
-          <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight">
-            {collegeName}
-          </h1>
-        </div>
-        
-        {/* Take a look link */}
-        <div className="mt-6 ml-6 flex items-center gap-4">
-          <button 
-            type="button" 
-            className="text-sm font-bold hover:text-gray-200 transition focus:outline-none flex items-center gap-2"
-          >
-            Take a look <span className="text-lg">⟶</span>
-          </button>
+          {/* Action Link with Red Glow Outline */}
+          <div className="ml-2 group">
+            <button 
+              type="button" 
+              className="px-8 py-3 rounded-md border-2 border-[#FF3C3C] text-white font-bold text-lg flex items-center gap-3 transition-all duration-300 hover:bg-[#FF3C3C] hover:shadow-[0_0_20px_rgba(255,60,60,0.5)] focus:outline-none"
+            >
+              Take a look 
+              <span className="material-symbols-rounded text-2xl transition-transform group-hover:translate-x-1.5">
+                arrow_right_alt
+              </span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

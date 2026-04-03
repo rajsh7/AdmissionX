@@ -73,11 +73,11 @@ function RingProgress({ percent }: { percent: number }) {
         style={{ transition: "stroke-dashoffset 0.8s ease" }}
       />
       <text x="50%" y="44%" textAnchor="middle" dominantBaseline="central"
-        fontSize="18" fontWeight="900" fill={color} fontFamily="Lexend, sans-serif">
+        fontSize="18" fontWeight="700" fill={color} fontFamily="Lexend, sans-serif">
         {clamped}%
       </text>
       <text x="50%" y="64%" textAnchor="middle" dominantBaseline="central"
-        fontSize="8" fontWeight="700" fill="#94a3b8" fontFamily="Lexend, sans-serif">
+        fontSize="8" fontWeight="600" fill="#94a3b8" fontFamily="Lexend, sans-serif">
         PROFILE
       </text>
     </svg>
@@ -92,8 +92,8 @@ function InfoRow({ icon, label, value }: { icon: string; label: string; value: s
         <span className="material-symbols-outlined text-green-600 text-[15px]">{icon}</span>
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</p>
-        <p className="text-sm font-semibold text-slate-700 mt-0.5 break-words">{value}</p>
+        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{label}</p>
+        <p className="text-sm font-medium text-slate-700 mt-0.5 break-words">{value}</p>
       </div>
     </div>
   );
@@ -105,9 +105,9 @@ function SectionHeader({ icon, title, count }: { icon: string; title: string; co
       <div className="w-7 h-7 bg-green-50 rounded-lg flex items-center justify-center">
         <span className="material-symbols-outlined text-green-600 text-[16px]">{icon}</span>
       </div>
-      <h2 className="font-black text-slate-800 text-[15px]">{title}</h2>
+      <h2 className="font-bold text-slate-800 text-[15px]">{title}</h2>
       {count && (
-        <span className="ml-auto text-[10px] font-black text-green-700 bg-green-100 px-2.5 py-0.5 rounded-full">
+        <span className="ml-auto text-[10px] font-bold text-green-700 bg-green-100 px-2.5 py-0.5 rounded-full">
           {count}
         </span>
       )}
@@ -201,10 +201,10 @@ export default function ProfileViewTab({ user }: Props) {
         <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center">
           <span className="material-symbols-outlined text-3xl text-red-400">error_outline</span>
         </div>
-        <p className="text-slate-600 font-semibold">{error}</p>
+        <p className="text-slate-600 font-medium">{error}</p>
         <button
           onClick={load}
-          className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-bold text-sm hover:bg-green-700 transition-colors shadow-md shadow-green-200"
+          className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-semibold text-sm hover:bg-green-700 transition-colors shadow-md shadow-green-200"
         >
           Retry
         </button>
@@ -235,7 +235,7 @@ export default function ProfileViewTab({ user }: Props) {
           />
           {/* Edit profile button */}
           <div className="absolute top-3 right-4">
-            <span className="text-[10px] font-black text-white/70 bg-white/15 px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1">
+            <span className="text-[10px] font-semibold text-white/70 bg-white/15 px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1">
               <span className="material-symbols-outlined text-[13px]">visibility</span>
               Profile View
             </span>
@@ -248,7 +248,7 @@ export default function ProfileViewTab({ user }: Props) {
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-green-500 to-green-700 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
-                <span className="text-white font-black text-2xl sm:text-3xl">
+                <span className="text-white font-bold text-2xl sm:text-3xl">
                   {initials}
                 </span>
               </div>
@@ -267,11 +267,11 @@ export default function ProfileViewTab({ user }: Props) {
             {/* Name + meta */}
             <div className="flex-1 min-w-0 pt-2 sm:pt-0 sm:pb-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl font-black text-slate-900 leading-tight">
+                <h1 className="text-xl font-bold text-slate-900 leading-tight">
                   {profile?.name ?? user?.name ?? "Student"}
                 </h1>
                 {profilePct >= 80 && (
-                  <span className="flex items-center gap-1 text-[10px] font-black text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                  <span className="flex items-center gap-1 text-[10px] font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
                     <span
                       className="material-symbols-outlined text-[11px]"
                       style={{ fontVariationSettings: "'FILL' 1" }}
@@ -286,7 +286,7 @@ export default function ProfileViewTab({ user }: Props) {
                 {user?.email}
               </p>
               <div className="flex items-center gap-3 mt-2 flex-wrap">
-                <span className="flex items-center gap-1 text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg">
+                <span className="flex items-center gap-1 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg">
                   <span className="material-symbols-outlined text-[14px]">badge</span>
                   ADX-{String(user?.id ?? 0).padStart(5, "0")}
                 </span>
@@ -335,7 +335,7 @@ export default function ProfileViewTab({ user }: Props) {
                 </span>
               </div>
               <div>
-                <p className="text-2xl font-black text-slate-800 leading-none">{s.value}</p>
+                <p className="text-2xl font-bold text-slate-800 leading-none">{s.value}</p>
                 <p className="text-[10px] font-semibold text-slate-400 mt-0.5">{s.label}</p>
               </div>
             </div>
@@ -399,10 +399,10 @@ export default function ProfileViewTab({ user }: Props) {
                         <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center">
                           <span className="material-symbols-outlined text-blue-600 text-[15px]">school</span>
                         </div>
-                        <span className="text-sm font-black text-slate-800">Class 10 — Secondary</span>
+                        <span className="text-sm font-bold text-slate-800">Class 10 — Secondary</span>
                       </div>
                       {marks.class10_percent && (
-                        <span className="text-lg font-black text-green-600 bg-green-50 px-3 py-1 rounded-xl border border-green-200">
+                        <span className="text-lg font-bold text-green-600 bg-green-50 px-3 py-1 rounded-xl border border-green-200">
                           {marks.class10_percent}%
                         </span>
                       )}
@@ -411,19 +411,19 @@ export default function ProfileViewTab({ user }: Props) {
                       {marks.class10_board && (
                         <div>
                           <p className="text-slate-400 font-semibold">Board</p>
-                          <p className="text-slate-700 font-bold mt-0.5">{marks.class10_board}</p>
+                          <p className="text-slate-700 font-semibold mt-0.5">{marks.class10_board}</p>
                         </div>
                       )}
                       {marks.class10_school && (
                         <div>
                           <p className="text-slate-400 font-semibold">School</p>
-                          <p className="text-slate-700 font-bold mt-0.5">{marks.class10_school}</p>
+                          <p className="text-slate-700 font-semibold mt-0.5">{marks.class10_school}</p>
                         </div>
                       )}
                       {marks.class10_year && (
                         <div>
                           <p className="text-slate-400 font-semibold">Year</p>
-                          <p className="text-slate-700 font-bold mt-0.5">{marks.class10_year}</p>
+                          <p className="text-slate-700 font-semibold mt-0.5">{marks.class10_year}</p>
                         </div>
                       )}
                     </div>
@@ -438,10 +438,10 @@ export default function ProfileViewTab({ user }: Props) {
                         <div className="w-7 h-7 bg-purple-100 rounded-lg flex items-center justify-center">
                           <span className="material-symbols-outlined text-purple-600 text-[15px]">school</span>
                         </div>
-                        <span className="text-sm font-black text-slate-800">Class 12 — Senior Secondary</span>
+                        <span className="text-sm font-bold text-slate-800">Class 12 — Senior Secondary</span>
                       </div>
                       {marks.class12_percent && (
-                        <span className="text-lg font-black text-green-600 bg-green-50 px-3 py-1 rounded-xl border border-green-200">
+                        <span className="text-lg font-bold text-green-600 bg-green-50 px-3 py-1 rounded-xl border border-green-200">
                           {marks.class12_percent}%
                         </span>
                       )}
@@ -450,25 +450,25 @@ export default function ProfileViewTab({ user }: Props) {
                       {marks.class12_board && (
                         <div>
                           <p className="text-slate-400 font-semibold">Board</p>
-                          <p className="text-slate-700 font-bold mt-0.5">{marks.class12_board}</p>
+                          <p className="text-slate-700 font-semibold mt-0.5">{marks.class12_board}</p>
                         </div>
                       )}
                       {marks.class12_school && (
                         <div>
                           <p className="text-slate-400 font-semibold">School</p>
-                          <p className="text-slate-700 font-bold mt-0.5">{marks.class12_school}</p>
+                          <p className="text-slate-700 font-semibold mt-0.5">{marks.class12_school}</p>
                         </div>
                       )}
                       {marks.class12_year && (
                         <div>
                           <p className="text-slate-400 font-semibold">Year</p>
-                          <p className="text-slate-700 font-bold mt-0.5">{marks.class12_year}</p>
+                          <p className="text-slate-700 font-semibold mt-0.5">{marks.class12_year}</p>
                         </div>
                       )}
                       {marks.class12_stream && (
                         <div>
                           <p className="text-slate-400 font-semibold">Stream</p>
-                          <p className="text-slate-700 font-bold mt-0.5">{marks.class12_stream}</p>
+                          <p className="text-slate-700 font-semibold mt-0.5">{marks.class12_stream}</p>
                         </div>
                       )}
                     </div>
@@ -483,10 +483,10 @@ export default function ProfileViewTab({ user }: Props) {
                         <div className="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center">
                           <span className="material-symbols-outlined text-green-600 text-[15px]">account_balance</span>
                         </div>
-                        <span className="text-sm font-black text-slate-800">Graduation</span>
+                        <span className="text-sm font-bold text-slate-800">Graduation</span>
                       </div>
                       {marks.grad_percent && (
-                        <span className="text-lg font-black text-green-600 bg-green-50 px-3 py-1 rounded-xl border border-green-200">
+                        <span className="text-lg font-bold text-green-600 bg-green-50 px-3 py-1 rounded-xl border border-green-200">
                           {marks.grad_percent}%
                         </span>
                       )}
@@ -495,25 +495,25 @@ export default function ProfileViewTab({ user }: Props) {
                       {marks.grad_university && (
                         <div>
                           <p className="text-slate-400 font-semibold">University</p>
-                          <p className="text-slate-700 font-bold mt-0.5">{marks.grad_university}</p>
+                          <p className="text-slate-700 font-semibold mt-0.5">{marks.grad_university}</p>
                         </div>
                       )}
                       {marks.grad_college && (
                         <div>
                           <p className="text-slate-400 font-semibold">College</p>
-                          <p className="text-slate-700 font-bold mt-0.5">{marks.grad_college}</p>
+                          <p className="text-slate-700 font-semibold mt-0.5">{marks.grad_college}</p>
                         </div>
                       )}
                       {marks.grad_program && (
                         <div>
                           <p className="text-slate-400 font-semibold">Program</p>
-                          <p className="text-slate-700 font-bold mt-0.5">{marks.grad_program}</p>
+                          <p className="text-slate-700 font-semibold mt-0.5">{marks.grad_program}</p>
                         </div>
                       )}
                       {marks.grad_year && (
                         <div>
                           <p className="text-slate-400 font-semibold">Year</p>
-                          <p className="text-slate-700 font-bold mt-0.5">{marks.grad_year}</p>
+                          <p className="text-slate-700 font-semibold mt-0.5">{marks.grad_year}</p>
                         </div>
                       )}
                     </div>
@@ -530,14 +530,14 @@ export default function ProfileViewTab({ user }: Props) {
               <div className="space-y-4">
                 {profile?.interest && (
                   <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">
                       Fields of Interest
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {profile.interest.split(",").map((t) => t.trim()).filter(Boolean).map((tag) => (
                         <span
                           key={tag}
-                          className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-full"
+                          className="text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-full"
                         >
                           {tag}
                         </span>
@@ -547,14 +547,14 @@ export default function ProfileViewTab({ user }: Props) {
                 )}
                 {profile?.hobbies && (
                   <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">
                       Hobbies
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {profile.hobbies.split(",").map((t) => t.trim()).filter(Boolean).map((tag) => (
                         <span
                           key={tag}
-                          className="text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full"
+                          className="text-xs font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full"
                         >
                           {tag}
                         </span>
@@ -575,7 +575,7 @@ export default function ProfileViewTab({ user }: Props) {
             <SectionHeader icon="manage_accounts" title="Profile Completion" />
             <div className="flex flex-col items-center py-3">
               <RingProgress percent={profilePct} />
-              <p className="text-sm font-black text-slate-700 mt-3 text-center">
+              <p className="text-sm font-bold text-slate-700 mt-3 text-center">
                 {profilePct >= 100
                   ? "Profile Complete!"
                   : profilePct >= 80
@@ -610,9 +610,9 @@ export default function ProfileViewTab({ user }: Props) {
                     {item.label}
                   </span>
                   {item.done ? (
-                    <span className="ml-auto text-[9px] font-black text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full">Done</span>
+                    <span className="ml-auto text-[9px] font-semibold text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full">Done</span>
                   ) : (
-                    <span className="ml-auto text-[9px] font-black text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded-full">Pending</span>
+                    <span className="ml-auto text-[9px] font-semibold text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded-full">Pending</span>
                   )}
                 </div>
               ))}
@@ -652,11 +652,11 @@ export default function ProfileViewTab({ user }: Props) {
               <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-3">
                 <span className="material-symbols-outlined text-white text-[22px]">share</span>
               </div>
-              <h3 className="font-black text-base mb-1">Share Your Profile</h3>
+              <h3 className="font-bold text-base mb-1">Share Your Profile</h3>
               <p className="text-white/70 text-xs mb-4 leading-relaxed">
                 Share your AdmissionX profile with colleges and counselors to get personalised guidance.
               </p>
-              <button className="w-full py-2.5 bg-white text-green-700 text-xs font-black rounded-xl shadow hover:bg-green-50 transition-colors flex items-center justify-center gap-2">
+              <button className="w-full py-2.5 bg-white text-green-700 text-xs font-semibold rounded-xl shadow hover:bg-green-50 transition-colors flex items-center justify-center gap-2">
                 <span className="material-symbols-outlined text-[16px]">content_copy</span>
                 Copy Profile Link
               </button>

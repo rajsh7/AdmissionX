@@ -281,7 +281,7 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
       gridCols={4}
       heroImage="/Background-images/student-hero-bg.png"
       heroRightImage="/images/2999ec4e5233aa8cb9dbf010e3c51149ae41f951.png"
-      heroHeight="641px"
+      heroHeight="700px"
       heroObjectPosition="center"
       heroFit="cover"
       filterWidth="370px"

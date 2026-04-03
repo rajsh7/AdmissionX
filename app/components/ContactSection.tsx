@@ -1,95 +1,124 @@
 export default function ContactSection() {
   return (
-    <section className="w-full py-24 lg:py-32 bg-white overflow-hidden">
+    <section className="w-full py-24 lg:py-32 overflow-hidden" style={{ backgroundColor: '#F8FAFC' }}>
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
-        <div className="bg-white rounded-[10px] p-12 lg:p-24 shadow-[0_30px_100px_-20px_rgba(0,0,0,0.08)] border border-slate-50">
+        <div className="bg-white p-2 sm:p-4 lg:p-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
 
             {/* ── Left: Contact Info ────────────────────────────── */}
             <div className="flex flex-col justify-center">
-              <h2 className="text-[40px] lg:text-[56px] font-normal text-slate-900 tracking-tight leading-[1.1] mb-8">
-                Get in <span className="text-primary">Touch</span>
+              <h2 className="tracking-tight leading-[1.1] mb-4" style={{ fontSize: '50px', fontWeight: '700', color: '#3E3E3E' }}>
+                Get in Touch
               </h2>
-              <p className="text-[22px] text-slate-500 font-normal leading-relaxed mb-12 max-w-xl">
+              <p className="tracking-relaxed mb-12 max-w-xl" style={{ fontSize: '20px', fontWeight: '500', color: '#3E3E3E' }}>
                 Get the real story about campus life, professors, and placements from people who've actually been there.
               </p>
-
-              <div className="space-y-10">
+              <div className="space-y-8">
                 {/* Email */}
-                <div className="flex items-start gap-8 group">
-                  <div className="w-16 h-16 rounded-[10px] bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 transition-transform group-hover:scale-110">
-                    <span className="material-symbols-rounded text-[28px] text-white">mail</span>
+                <div className="flex items-start gap-4 group">
+                  <div className="w-[35px] h-[35px] rounded-[6px] bg-[#FF3C3C40] flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-primary/5">
+                    <span className="material-symbols-rounded text-[18px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>mail</span>
                   </div>
                   <div>
-                    <h4 className="font-normal text-slate-900 text-[18px] mb-1">Email Us</h4>
-                    <a href="mailto:support@admissionx.com" className="text-base text-slate-500 hover:text-primary transition-colors font-normal">
-                      support@admissionx.com
-                    </a>
+                    <h4 className="font-bold mb-0.5" style={{ fontSize: '20px', fontWeight: '700', color: '#222222' }}>Email Us</h4>
+                    <p className="font-medium leading-tight mb-0.5" style={{ fontSize: '16px', color: '#6C6C6C' }}>support@admissionx.com</p>
+                    <p className="font-normal" style={{ fontSize: '16px', color: '#6C6C6C' }}>General inquiries & support</p>
                   </div>
                 </div>
 
                 {/* Call */}
-                <div className="flex items-start gap-8 group">
-                  <div className="w-16 h-16 rounded-[10px] bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 transition-transform group-hover:scale-110">
-                    <span className="material-symbols-rounded text-[28px] text-white">call</span>
+                <div className="flex items-start gap-4 group">
+                  <div className="w-[35px] h-[35px] rounded-[6px] bg-[#FF3C3C40] flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-primary/5">
+                    <span className="material-symbols-rounded text-[18px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>call</span>
                   </div>
                   <div>
-                    <h4 className="font-normal text-slate-900 text-[18px] mb-1">Call Us</h4>
-                    <p className="text-base text-slate-500 font-normal">+91 767-888-9792</p>
-                    <p className="text-sm text-slate-400 mt-1 font-normal">Mon-Fri (9:00 AM - 6:00 PM IST)</p>
+                    <h4 className="font-bold mb-0.5" style={{ fontSize: '20px', fontWeight: '700', color: '#222222' }}>Call Us</h4>
+                    <p className="font-medium leading-tight mb-0.5" style={{ fontSize: '16px', color: '#6C6C6C' }}>+91 767-888-9792</p>
+                    <p className="font-normal" style={{ fontSize: '16px', color: '#6C6C6C' }}>Mon to Fri (9:00 am to 5:00 pm IST)</p>
+                  </div>
+                </div>
+
+                {/* Visit */}
+                <div className="flex items-start gap-4 group">
+                  <div className="w-[35px] h-[35px] rounded-[6px] bg-[#FF3C3C40] flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-primary/5">
+                    <span className="material-symbols-rounded text-[18px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>location_on</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold mb-0.5" style={{ fontSize: '20px', fontWeight: '700', color: '#222222' }}>Visit Us</h4>
+                    <p className="font-medium leading-tight mb-0.5" style={{ fontSize: '16px', color: '#6C6C6C' }}>Lajpat Nagar, Delhi.</p>
+                    <p className="font-normal" style={{ fontSize: '16px', color: '#6C6C6C' }}>Mon to Fri (9:00 am to 5:00 pm IST)</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* ── Right: Contact Form ─────────────────────────────── */}
-            <div className="bg-[#f8fafc] rounded-[10px] p-10 lg:p-14 border border-slate-50">
-              <h3 className="text-2xl font-normal text-slate-900 mb-10 uppercase tracking-tight">Send a message</h3>
+            <div className="bg-white rounded-[20px] p-10 lg:p-12 border border-slate-200/60 relative" style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
+              <h3 className="font-bold mb-10 tracking-tight" style={{ fontSize: '30px', fontWeight: '700', color: '#6C6C6C' }}>Send a message</h3>
               <form className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-[10px] font-normal text-slate-400 uppercase tracking-widest mb-2">Name</label>
+                    <label className="block mb-2 px-1" style={{ fontSize: '18px', fontWeight: '700', color: '#6C6C6C' }}>Name</label>
                     <input
                       type="text"
-                      placeholder="John Doe"
-                      className="w-full h-16 px-6 rounded-[10px] border border-slate-100 bg-white text-base text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-primary/30 transition-all font-normal"
+                      placeholder="Your name"
+                      className="w-full h-14 px-6 rounded-[10px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-normal text-slate-400 uppercase tracking-widest mb-2">Email</label>
+                    <label className="block mb-2 px-1" style={{ fontSize: '18px', fontWeight: '700', color: '#6C6C6C' }}>Email</label>
                     <input
                       type="email"
-                      placeholder="john@example.com"
-                      className="w-full h-16 px-6 rounded-[10px] border border-slate-100 bg-white text-base text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-primary/30 transition-all font-normal"
+                      placeholder="your.email@example.com"
+                      className="w-full h-14 px-6 rounded-[10px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm"
                     />
                   </div>
                 </div>
-
+ 
                 <div>
-                  <label className="block text-[10px] font-normal text-slate-400 uppercase tracking-widest mb-2">Subject</label>
+                  <label className="block mb-2 px-1" style={{ fontSize: '18px', fontWeight: '700', color: '#6C6C6C' }}>Subject</label>
                   <input
                     type="text"
-                    placeholder="General Inquiry"
-                    className="w-full h-16 px-6 rounded-[10px] border border-slate-100 bg-white text-base text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-primary/30 transition-all font-normal"
+                    placeholder="How can we help you?"
+                    className="w-full h-14 px-6 rounded-[10px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm"
                   />
                 </div>
-
+ 
                 <div>
-                  <label className="block text-[10px] font-normal text-slate-400 uppercase tracking-widest mb-2">Message</label>
+                  <label className="block mb-2 px-1" style={{ fontSize: '18px', fontWeight: '700', color: '#6C6C6C' }}>Message</label>
                   <textarea
                     rows={4}
-                    placeholder="How can we help you?"
-                    className="w-full px-6 py-5 rounded-[10px] border border-slate-100 bg-white text-base text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-primary/30 transition-all resize-none font-normal"
+                    placeholder="Tell us about your inquiry..."
+                    className="w-full px-6 py-5 rounded-[10px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none font-medium shadow-sm"
                   />
                 </div>
-
-                <button
-                  type="submit"
-                  className="w-full h-16 rounded-[10px] bg-primary text-white text-[15px] font-normal uppercase tracking-widest hover:brightness-105 transition-all shadow-xl shadow-primary/20"
-                >
-                  Send Message
-                </button>
+ 
+                <div className="flex justify-center pt-4">
+                    <button
+                      type="submit"
+                      className="h-14 rounded-[10px] bg-primary text-white tracking-wider hover:brightness-105 transition-all shadow-xl shadow-primary/20"
+                      style={{ width: '317.86px', fontSize: '24px', fontWeight: '700' }}
+                    >
+                      Send Message
+                    </button>
+                </div>
               </form>
+ 
+              {/* Floating Robot Illustration */}
+              <div className="absolute -bottom-10 -right-10 w-32 h-32 pointer-events-none hidden lg:block animate-float">
+                 <img src="/images/Frame 155.png" alt="robot" className="w-full h-full object-contain" />
+              </div>
+
+              <style jsx>{`
+                @keyframes float {
+                  0% { transform: translateY(0px); }
+                  50% { transform: translateY(-15px); }
+                  100% { transform: translateY(0px); }
+                }
+                .animate-float {
+                  animation: float 3s ease-in-out infinite;
+                }
+              `}</style>
             </div>
 
           </div>

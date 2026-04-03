@@ -177,7 +177,7 @@ export default function SearchFilters({
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="flex items-center justify-between p-4 bg-[#1A1A1A] -mx-5 -mt-5 mb-8 rounded-t-[10px] shadow-lg border-b border-white/5">
-        <h2 className="text-sm font-black text-white flex items-center gap-2">
+        <h2 className="text-[25px] font-black text-white flex items-center gap-2">
           <span className="material-symbols-outlined text-[20px] text-[#FF3C3C]">filter_alt</span>
           Filters
         </h2>

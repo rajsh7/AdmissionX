@@ -14,112 +14,151 @@ interface CoursesTabProps {
 export default function CoursesTab({ courses }: CoursesTabProps) {
   // Hardcoded sub-tabs to match UI
   const subTabs = ["Undergraduate", "Postgraduate", "Phd", "Diploma", "Certificate Programs"];
-  const instructors = [1, 2, 3, 4]; // Dummy array for matching 4 instructor cards
+  const instructors = [
+    { name: "Meet Our Instructor", role: "Teacher", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400" },
+    { name: "Meet Our Instructor", role: "Teacher", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400" },
+    { name: "Meet Our Instructor", role: "Teacher", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400" },
+    { name: "Meet Our Instructor", role: "Teacher", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400" },
+  ];
 
   return (
-    <div className="w-full">
-      <div className="max-w-7xl mx-auto px-4 sm:px-12 py-8 mt-2">
-         {/* Sub Tabs Container */}
-         <div className="flex flex-wrap gap-2 mb-6">
-           {subTabs.map((tab, idx) => (
-             <button 
-               key={idx} 
-               className={`px-6 py-2 text-sm font-bold border transition ${
-                 idx === 0 
-                   ? 'bg-[#8bc6ba] text-[#00473a] border-[#8bc6ba]' 
-                   : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
-               }`}
-             >
-               {tab}
-             </button>
-           ))}
-         </div>
+    <div className="w-full bg-white pb-24">
+      <div className="max-w-[1920px] mx-auto px-8 lg:px-12 xl:px-20 py-12">
+        
+        {/* ─── PHASE 1: SUB-TABS FILTERS ─── */}
+        <div className="flex flex-wrap items-center gap-3 mb-10 overflow-x-auto scrollbar-hide pb-2">
+          {subTabs.map((tab, idx) => (
+            <button 
+              key={idx} 
+              className={`px-8 py-3 text-sm font-black whitespace-nowrap transition-all duration-300 border-2 rounded-sm ${
+                idx === 0 
+                  ? 'bg-slate-700 text-white border-slate-700 shadow-lg' 
+                  : 'bg-white text-slate-500 border-neutral-100 hover:border-slate-300 hover:text-slate-900'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
 
-         {/* Courses List */}
-         <div className="space-y-4 mb-8">
-            {courses.length > 0 ? courses.slice(0, 5).map((course, idx) => (
+        {/* ─── PHASE 2: COURSES LISTING GRID ─── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+          <div className="space-y-6">
+            {courses.length > 0 ? courses.slice(0, 3).map((course, idx) => (
               <div 
                 key={idx} 
-                className="rounded-lg p-5 flex flex-col md:flex-row justify-between items-start md:items-center relative overflow-hidden"
-                style={{ backgroundColor: "#243447" }}
+                className="bg-white rounded-xl shadow-xl shadow-slate-200/50 border border-neutral-100 overflow-hidden transition-all hover:border-[#FF3C3C] hover:-translate-y-1"
               >
-                <div className="flex flex-col gap-1 z-10 text-white">
-                  <h4 className="text-sm font-extrabold">{course.course_name}</h4>
-                  <span className="text-xs text-gray-400">
-                    {course.courseduration ? `${course.courseduration} ` : ''}{course.degree_name || 'Undergraduate'}
-                  </span>
-                  <span className="text-xs text-gray-400 mt-2">
-                    Placement - {idx === 0 ? '85%' : '80%'}
-                  </span>
+                {/* Course Header */}
+                <div className="p-8 border-b border-neutral-100 flex justify-between items-start">
+                  <div>
+                    <h4 className="text-xl font-black text-slate-900 leading-tight mb-2 uppercase tracking-tight">
+                      {course.course_name}
+                    </h4>
+                    <span className="inline-block px-3 py-1 bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-widest rounded">
+                      {course.courseduration || "4 Years"} {course.degree_name || 'Undergraduate'}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-black text-slate-500 block uppercase tracking-widest">Fees</span>
+                    <span className="text-lg font-black text-slate-900">
+                      {course.fees ? `₹ ${course.fees}` : '₹ 1,35,000'} <span className="text-xs text-slate-400">/ annual</span>
+                    </span>
+                  </div>
                 </div>
                 
-                <div className="flex flex-col md:items-end mt-4 md:mt-0 z-10 text-white">
-                  <span className="text-sm font-extrabold mb-4">
-                    Fees : {course.fees ? course.fees : 'On Request'} rs annual
-                  </span>
-                  <button className="px-6 py-2 rounded text-xs font-extrabold transition-opacity hover:opacity-90 mt-2 text-white" style={{ backgroundColor: "#00bfa5" }}>
+                {/* Course Footer Info */}
+                <div className="px-8 py-4 bg-slate-50/50 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-rounded text-[#FF3C3C] text-xl">verified</span>
+                    <span className="text-sm font-black text-slate-600">Placement – {idx === 0 ? '85%' : '80%'}</span>
+                  </div>
+                  <button className="px-10 py-3 bg-[#FF3C3C] text-white font-black text-xs uppercase tracking-widest rounded transition-all hover:bg-slate-900 shadow-lg shadow-red-500/20 active:scale-95">
                     Apply Now
                   </button>
                 </div>
               </div>
             )) : (
-              <div className="text-gray-500 py-10 text-center text-sm">No courses currently listed.</div>
+              <div className="text-slate-400 py-20 text-center font-bold">No courses available for this selection.</div>
             )}
+            
+            <div className="pt-4">
+              <button className="px-12 py-4 bg-slate-900 text-white font-black text-sm uppercase tracking-widest rounded-lg shadow-2xl transition-all hover:bg-[#FF3C3C] hover:shadow-red-500/20">
+                View All Courses
+              </button>
+            </div>
+          </div>
 
-            {courses.length > 5 && (
-               <button className="px-5 py-2 rounded text-xs font-extrabold text-white mt-4 transition" style={{ backgroundColor: "#00bfa5" }}>
-                 View All
-               </button>
-            )}
-         </div>
-
-         {/* Instructors Section */}
-         <div className="rounded-xl overflow-hidden shadow-sm p-6 sm:p-8" style={{ backgroundColor: "#6c7a89" }}>
-           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-             <div>
-               <div className="flex items-center gap-2 text-gray-200 text-xs font-bold uppercase tracking-widest mb-2">
-                 <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
-                 TEACHER
-               </div>
-               <h3 className="text-2xl font-extrabold text-white">Meet Our Instructor</h3>
+          {/* Right side placeholder or decorative element to match 2-column layout in design */}
+          <div className="hidden lg:block">
+             <div className="relative h-full min-h-[500px] w-full bg-slate-100 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center border-2 border-dashed border-slate-200">
+                <span className="material-symbols-rounded text-6xl text-slate-300">school</span>
              </div>
-             <button className="mt-4 md:mt-0 px-6 py-2 rounded text-sm font-extrabold text-white shadow-sm transition-opacity hover:opacity-90" style={{ backgroundColor: "#00bfa5" }}>
-               View All
-             </button>
-           </div>
+          </div>
+        </div>
 
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-             {instructors.map((idx) => (
-               <div key={idx} className="bg-white rounded-lg overflow-hidden flex flex-col group relative">
-                 <div className="h-48 relative bg-gray-100 flex items-end justify-center pt-8">
-                    {/* Abstract yellow graphic mimicking the design */}
-                    <div className="absolute top-0 left-0 right-0 h-16" style={{ background: "linear-gradient(135deg, #eab308 0%, #ca8a04 100%)" }} />
-                    <svg className="absolute top-0 w-full h-16 opacity-30 mix-blend-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
-                       <path d="M0,0 L100,0 L50,100 Z" fill="white" />
-                    </svg>
+        {/* ─── PHASE 3: INSTRUCTORS SECTION ─── */}
+        <div className="bg-slate-500 rounded-[24px] overflow-hidden p-12 lg:p-20 relative shadow-2xl">
+          {/* Section Header */}
+          <div className="flex flex-col lg:flex-row justify-between items-end gap-10 mb-16 relative z-10">
+            <div>
+              <div className="flex items-center gap-3 text-white/70 text-xs font-black uppercase tracking-[0.3em] mb-4">
+                <span className="w-10 h-[2px] bg-[#FF3C3C]" />
+                TEACHER
+              </div>
+              <h3 className="text-5xl lg:text-7xl font-black text-white leading-none tracking-tight">Meet Our <br /><span className="text-slate-100/90">Instructor</span></h3>
+            </div>
+            <button className="px-12 py-5 bg-[#FF3C3C] text-white font-black text-sm uppercase tracking-widest rounded-lg shadow-2xl transition-all hover:bg-white hover:text-slate-900 active:scale-95">
+              View All Instructors
+            </button>
+          </div>
 
-                    {/* Instructor Placeholder image */}
-                    <div className="relative w-32 h-40 z-10 bottom-0">
-                       <Image 
-                         src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=256&h=320" 
-                         alt="Instructor" 
-                         fill 
-                         className="object-cover object-top filter group-hover:brightness-110 transition rounded-t-lg"
-                       />
-                    </div>
-                 </div>
-                 <div className="p-4 bg-white relative text-center">
-                    <button className="absolute -top-4 right-4 w-8 h-8 rounded flex items-center justify-center text-white shadow shadow-black/20 z-20" style={{ backgroundColor: "#00bfa5" }}>
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M15.75 4.5a3 3 0 11.896 5.365C16.806 9.906 17 10.18 17 10.5v8.25a3 3 0 11-6 0v-8.25c0-.32.194-.594.354-.635a3 3 0 11-1.25-.09c.142.126.315.22" clipRule="evenodd" /></svg>
-                      {/* Using a standard share icon approximation for the design's icon */}
-                    </button>
-                    <h5 className="text-sm font-extrabold text-gray-900 mb-1">Meet Our Instructor</h5>
-                    <span className="text-xs text-red-500 font-semibold">Teacher</span>
-                 </div>
-               </div>
-             ))}
-           </div>
-         </div>
+          {/* Background Decorative Pattern */}
+          <div className="absolute top-0 right-0 w-1/3 h-full opacity-10 pointer-events-none">
+             <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+               <defs>
+                 <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                   <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.5"/>
+                 </pattern>
+               </defs>
+               <rect width="100" height="100" fill="url(#grid)" />
+             </svg>
+          </div>
+
+          {/* Instructor Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+            {instructors.map((inst, idx) => (
+              <div key={idx} className="bg-white rounded-2xl overflow-hidden flex flex-col group relative shadow-2xl transition-all duration-500 hover:-translate-y-3">
+                <div className="h-[320px] relative bg-slate-100 overflow-hidden">
+                   {/* Design's Header Pattern */}
+                   <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-br from-yellow-400 to-amber-600 opacity-90 transition-all duration-500 group-hover:h-full group-hover:opacity-100 z-0" />
+                   
+                   {/* Avatar */}
+                   <div className="relative w-full h-full flex items-end justify-center z-10 p-4">
+                      <div className="relative w-full h-[85%] rounded-2xl overflow-hidden shadow-2xl group-hover:scale-110 transition-transform duration-700">
+                        <Image 
+                          src={inst.image} 
+                          alt={inst.name} 
+                          fill 
+                          className="object-cover"
+                        />
+                      </div>
+                   </div>
+
+                   {/* Share/Action Button */}
+                   <button className="absolute bottom-6 right-6 w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-2xl border-2 border-white/20 transition-all hover:bg-[#FF3C3C] hover:rotate-12 active:scale-90 z-20">
+                      <span className="material-symbols-rounded text-xl font-black">share</span>
+                   </button>
+                </div>
+
+                <div className="p-8 text-center bg-white border-t border-neutral-50 relative z-20">
+                   <h5 className="text-lg font-black text-slate-900 mb-1 group-hover:text-[#FF3C3C] transition-colors">{inst.name}</h5>
+                   <span className="text-xs text-[#FF3C3C] font-black uppercase tracking-widest">{inst.role}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

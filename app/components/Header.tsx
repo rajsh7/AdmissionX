@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { motion, useScroll, AnimatePresence } from "framer-motion";
 
 interface HeaderProps {
+  theme?: "light" | "dark";
 }
 
 interface AuthUser {
@@ -19,8 +20,8 @@ interface AuthUser {
 
 const navLinks = [
   { label: "Home", href: "/" },
-  { label: "Top colleges", href: "/top-colleges" },
-  { label: "Top Universities", href: "/top-university" },
+  { label: "Colleges", href: "/top-colleges" },
+  { label: "Top University", href: "/top-university" },
   { label: "Top Courses", href: "/careers-courses" },
   { label: "Study Abroad", href: "/study-abroad" },
   {
@@ -182,7 +183,7 @@ function UserMenuDropdown({
   );
 }
 
-export default function Header({ }: HeaderProps) {
+export default function Header({ theme }: HeaderProps) {
   // Trigger cache invalidation for hydration mismatch
   const router = useRouter();
 
@@ -228,9 +229,15 @@ export default function Header({ }: HeaderProps) {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
+    
+    // If theme is specifically "dark", we don't strictly need to track scroll for color,
+    // but we can still track it for shrinking padding.
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [checkAuth]);
+
+  // Determine if we should show the "active/scrolled" state (white bg, dark text)
+  const showActiveState = theme === "dark" || isScrolled;
 
   // ── Logout ────────────────────────────────────────────────────────────────
   const handleLogout = async () => {
@@ -303,9 +310,9 @@ export default function Header({ }: HeaderProps) {
 
       <motion.header 
         className={`fixed top-0 left-0 right-0 z-50 w-full flex items-center transition-all duration-300 ${
-          isScrolled 
+          showActiveState 
             ? "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.08)] py-4 min-h-[80px]" 
-            : "bg-white/90 backdrop-blur-md py-5 min-h-[90px]"
+            : "bg-transparent py-5 min-h-[90px]"
         }`}
       >
         <div className="flex items-center justify-between px-6 sm:px-12 w-full max-w-[1920px] mx-auto">
@@ -324,11 +331,15 @@ export default function Header({ }: HeaderProps) {
                 <div key={link.label} className="relative group/nav">
                   <Link
                     href={link.href}
-                    className="flex items-center gap-1.5 px-4 py-2 text-[16px] font-medium text-slate-700 hover:text-primary transition-colors relative"
+                    className={`flex items-center gap-1.5 px-4 py-2 text-[16px] font-medium transition-colors relative ${
+                      showActiveState ? "text-slate-700 hover:text-primary" : "text-white hover:text-white/80"
+                    }`}
                   >
                     {link.label}
                     {link.subItems && mounted && (
-                      <span className="material-symbols-outlined text-[18px] text-slate-300 group-hover/nav:text-primary transition-colors">
+                      <span className={`material-symbols-outlined text-[18px] transition-colors ${
+                        showActiveState ? "text-slate-300 group-hover/nav:text-primary" : "text-white/70 group-hover/nav:text-white"
+                      }`}>
                         expand_more
                       </span>
                     )}
@@ -381,7 +392,9 @@ export default function Header({ }: HeaderProps) {
                   {/* Login Dropdown */}
                   <div ref={loginRef} className="relative" onMouseEnter={openLogin} onMouseLeave={closeLogin}>
                     <button
-                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-[10px] text-slate-700 hover:bg-slate-50 transition-all font-medium text-[16px]"
+                      className={`flex items-center gap-1.5 px-4 py-2.5 rounded-[10px] transition-all font-medium text-[16px] ${
+                        isScrolled ? "text-slate-700 hover:bg-slate-50" : "text-white hover:bg-white/10"
+                      }`}
                     >
                       Login
                       <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${loginOpen ? "rotate-180" : ""}`}>expand_more</span>
@@ -404,7 +417,9 @@ export default function Header({ }: HeaderProps) {
             </div>
           </div>
 
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden h-10 w-10 flex items-center justify-center rounded-full text-slate-700 hover:bg-slate-50 transition-all">
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className={`lg:hidden h-10 w-10 flex items-center justify-center rounded-full transition-all ${
+            isScrolled ? "text-slate-700 hover:bg-slate-50" : "text-white hover:bg-white/10"
+          }`}>
             <span className="material-symbols-outlined">{mobileMenuOpen ? "close" : "menu"}</span>
           </button>
         </div>
