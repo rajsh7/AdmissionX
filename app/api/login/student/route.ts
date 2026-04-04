@@ -14,11 +14,19 @@ export async function POST(req: NextRequest) {
     const db = await getDb();
     const user = await db.collection("next_student_signups").findOne(
       { email: email.trim().toLowerCase() },
-      { projection: { _id: 1, name: 1, email: 1, password_hash: 1 } }
+      { projection: { _id: 1, name: 1, email: 1, password_hash: 1, is_active: 1 } }
     );
 
     if (!user) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    }
+
+    // Block unverified students — must click activation email first
+    if (!user.is_active) {
+      return NextResponse.json(
+        { error: "Please verify your email address before logging in. Check your inbox for the activation link." },
+        { status: 403 }
+      );
     }
 
     const ok = await bcrypt.compare(password, user.password_hash);

@@ -86,7 +86,7 @@ async function updateProfileRow(formData: FormData) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 6;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

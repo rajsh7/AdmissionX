@@ -21,6 +21,7 @@ import ProfileViewTab from "./tabs/ProfileViewTab";
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Props {
   user: { id: string | number; name: string; email: string } | null;
+  activated?: boolean;
 }
 
 type TabId =
@@ -36,9 +37,10 @@ type TabId =
 interface NavItem { id: TabId; label: string; icon: string; groupId?: string }
 
 // ── Main Component ────────────────────────────────────────────────────────────
-export default function StudentDashboardClient({ user }: Props) {
+export default function StudentDashboardClient({ user, activated }: Props) {
   const [activeTab, setActiveTab]     = useState<TabId>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showActivatedBanner, setShowActivatedBanner] = useState(!!activated);
 
   function navigate(id: TabId) {
     setActiveTab(id);
@@ -186,6 +188,18 @@ export default function StudentDashboardClient({ user }: Props) {
       </header>
 
       <div className="flex flex-1 overflow-hidden relative">
+        {/* Email Activated Banner */}
+        {showActivatedBanner && (
+          <div className="fixed top-[80px] left-0 right-0 z-50 flex items-center justify-between gap-3 px-6 py-3 bg-emerald-500 text-white text-sm font-semibold shadow-lg">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+              Your email has been verified! Welcome to AdmissionX, {user?.name?.split(" ")[0] ?? "Student"}.
+            </div>
+            <button onClick={() => setShowActivatedBanner(false)} className="shrink-0 hover:opacity-70 transition-opacity">
+              <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
+          </div>
+        )}
         {/* Mobile Sidebar Overlay */}
         {sidebarOpen && (
           <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm lg:hidden" onClick={() => setSidebarOpen(false)} />

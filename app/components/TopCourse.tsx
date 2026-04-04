@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search } from "lucide-react";
+import FadeIn from "./FadeIn";
 
 const courses = [
   {
@@ -82,24 +83,26 @@ export default function TopCourse() {
   return (
     <section className="w-full py-24 lg:py-32 bg-[#fdfdfd] relative overflow-hidden">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24 relative z-10">
-        <div className="mb-16">
-          <div className="flex items-center justify-between gap-12 mb-6">
-            <h2 className="text-[40px] lg:text-[68px] font-semibold text-slate-900 tracking-tight leading-[1.1]">
-              Discover the Top <span style={{ color: '#DD8D8F' }}>Course</span>
-            </h2>
-            <Link href="/courses" className="px-8 py-3.5 rounded-none bg-white border border-slate-100 shadow-sm text-slate-600 font-normal text-sm hover:bg-slate-50 transition-all active:scale-95 whitespace-nowrap">
-              View All Course
-            </Link>
+        <FadeIn>
+          <div className="mb-16">
+            <div className="flex items-center justify-between gap-12 mb-6">
+              <h2 className="text-[40px] lg:text-[68px] font-semibold text-slate-900 tracking-tight leading-[1.1]">
+                Discover the Top <span style={{ color: '#DD8D8F' }}>Course</span>
+              </h2>
+              <Link href="/courses" className="px-8 py-3.5 rounded-[10px] bg-white border border-slate-100 shadow-sm text-slate-600 font-normal text-sm hover:bg-slate-50 transition-all active:scale-95 whitespace-nowrap">
+                View All Course
+              </Link>
+            </div>
+            <p className="text-slate-500 font-medium text-[25px] max-w-4xl leading-relaxed">
+              Filter through thousands of institutions worldwide based on your specific academic preferences and <span className="text-blue-500">career</span> goals.
+            </p>
           </div>
-          <p className="text-slate-500 font-medium text-[25px] max-w-4xl leading-relaxed">
-            Filter through thousands of institutions worldwide based on your specific academic preferences and <span className="text-blue-500">career</span> goals.
-          </p>
-        </div>
+        </FadeIn>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
           {/* ── Left Column: Featured Course ──────────────────────────── */}
-          <div className="lg:col-span-8 flex flex-col gap-10">
+          <FadeIn className="lg:col-span-8 flex flex-col gap-10" direction="left">
             <div className="relative aspect-[16/10] rounded-none overflow-hidden group shadow-2xl shadow-black/5">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -150,10 +153,10 @@ export default function TopCourse() {
                  </Link>
               </div>
             </div>
-          </div>
+          </FadeIn>
 
           {/* ── Right Column: Selector List ───────────────────────────── */}
-          <div className="lg:col-span-4 bg-white rounded-[10px] border border-slate-100 p-0 shadow-xl shadow-black/5 flex flex-col h-full overflow-hidden">
+          <FadeIn className="lg:col-span-4 bg-white rounded-[10px] border border-slate-100 p-0 shadow-xl shadow-black/5 flex flex-col h-full overflow-hidden" direction="right" delay={0.1}>
              <div className="p-6 pb-4 border-b border-slate-50">
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -164,7 +167,7 @@ export default function TopCourse() {
                     placeholder="Search your course"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-12 pl-12 pr-6 bg-slate-50 border border-slate-100 focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none rounded-none text-[14px] font-medium transition-all"
+                    className="w-full h-12 pl-12 pr-6 bg-slate-50 border border-slate-100 focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none rounded-[10px] text-[14px] font-medium transition-all"
                   />
                 </div>
              </div>
@@ -211,13 +214,9 @@ export default function TopCourse() {
                  );
                })}
              </div>
-          </div>
+          </FadeIn>
         </div>
       </div>
     </section>
   );
 }
-
-
-
-

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import FadeIn, { StaggerContainer, StaggerItem } from "./FadeIn";
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
@@ -112,10 +113,10 @@ export default function Footer() {
   return (
     <footer className="w-full bg-black pt-24 pb-16">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-12 lg:gap-8 overflow-hidden">
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-12 lg:gap-8 overflow-hidden" stagger={0.07}>
 
           {/* Brand Column */}
-          <div className="lg:col-span-2">
+          <StaggerItem className="lg:col-span-2">
             <Link href="/" className="inline-block mb-10 bg-white px-5 py-2.5 rounded-[10px]">
               <img
                 src="/admissionx-logo.png"
@@ -140,11 +141,11 @@ export default function Footer() {
                 <FacebookIcon />
               </a>
             </div>
-          </div>
+          </StaggerItem>
 
           {/* Links Columns */}
           {Object.entries(footerLinks).map(([title, links]) => (
-            <div key={title} className="lg:col-span-1">
+            <StaggerItem key={title} className="lg:col-span-1">
               <h4 className="text-[17px] font-normal text-white mb-10">{title}</h4>
               <ul className="space-y-5">
                 {links.map(link => (
@@ -158,20 +159,22 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </StaggerItem>
           ))}
 
-        </div>
+        </StaggerContainer>
 
-        <div className="mt-24 pt-10 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <p className="text-sm font-normal text-slate-500">
-            © 2026 AdmissionX. All rights reserved.
-          </p>
-          <div className="flex gap-8">
-            <Link href="/privacy-policy" className="text-sm font-normal text-slate-500 hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="/terms-and-conditions" className="text-sm font-normal text-slate-500 hover:text-white transition-colors">Terms of Service</Link>
+        <FadeIn delay={0.2}>
+          <div className="mt-24 pt-10 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <p className="text-sm font-normal text-slate-500">
+              © 2026 AdmissionX. All rights reserved.
+            </p>
+            <div className="flex gap-8">
+              <Link href="/privacy-policy" className="text-sm font-normal text-slate-500 hover:text-white transition-colors">Privacy Policy</Link>
+              <Link href="/terms-and-conditions" className="text-sm font-normal text-slate-500 hover:text-white transition-colors">Terms of Service</Link>
+            </div>
           </div>
-        </div>
+        </FadeIn>
       </div>
     </footer>
   );

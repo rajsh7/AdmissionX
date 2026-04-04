@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 import { verifyCollegeToken } from "@/lib/auth";
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 
 // ── Auth helper ───────────────────────────────────────────────────────────────
 async function checkAuth(slug: string) {
@@ -11,23 +11,14 @@ async function checkAuth(slug: string) {
   if (!token) return null;
   const payload = await verifyCollegeToken(token);
   if (!payload) return null;
-
-  const conn = await pool.getConnection();
-  try {
-    const [rows] = await conn.query(
-      `SELECT cp.id AS collegeprofile_id, cp.users_id
-       FROM collegeprofile cp
-       JOIN users u ON u.id = cp.users_id
-       WHERE cp.slug = ? AND TRIM(LOWER(u.email)) = LOWER(?)
-       LIMIT 1`,
-      [slug, payload.email],
-    );
-    const list = rows as { collegeprofile_id: number; users_id: number }[];
-    if (!list.length) return null;
-    return { payload, collegeprofile_id: list[0].collegeprofile_id };
-  } finally {
-    conn.release();
-  }
+  // Verify the slug belongs to this college via MongoDB
+  const db = await getDb();
+  const profile = await db.collection("collegeprofile").findOne(
+    { email: payload.email.toLowerCase(), slug },
+    { projection: { _id: 1 } }
+  );
+  if (!profile) return null;
+  return { payload, slug };
 }
 
 // ── PUT /api/college/dashboard/[slug]/settings ────────────────────────────────
@@ -58,68 +49,37 @@ export async function PUT(
   // ── Action: change_password ───────────────────────────────────────────────
   if (action === "change_password") {
     if (!currentPassword || !newPassword) {
-      return NextResponse.json(
-        { error: "currentPassword and newPassword are required." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "currentPassword and newPassword are required." }, { status: 400 });
     }
-
     if (newPassword.length < 8) {
-      return NextResponse.json(
-        { error: "New password must be at least 8 characters." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "New password must be at least 8 characters." }, { status: 400 });
     }
-
     if (currentPassword === newPassword) {
-      return NextResponse.json(
-        { error: "New password must differ from the current password." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "New password must differ from the current password." }, { status: 400 });
     }
 
-    const conn = await pool.getConnection();
-    try {
-      // Fetch current hash from next_college_signups using the email in the JWT
-      const [rows] = await conn.query(
-        `SELECT id, password_hash
-         FROM next_college_signups
-         WHERE LOWER(email) = LOWER(?)
-         LIMIT 1`,
-        [auth.payload.email],
-      );
-      const list = rows as { id: number; password_hash: string | null }[];
+    const db = await getDb();
+    const signup = await db.collection("next_college_signups").findOne(
+      { email: auth.payload.email.toLowerCase() },
+      { projection: { _id: 1, password_hash: 1 } }
+    );
 
-      if (!list.length || !list[0].password_hash) {
-        return NextResponse.json(
-          { error: "College account not found or no password set." },
-          { status: 404 },
-        );
-      }
-
-      const isMatch = await bcrypt.compare(currentPassword, list[0].password_hash);
-      if (!isMatch) {
-        return NextResponse.json(
-          { error: "Current password is incorrect." },
-          { status: 403 },
-        );
-      }
-
-      const newHash = await bcrypt.hash(newPassword, 12);
-
-      await conn.query(
-        `UPDATE next_college_signups SET password_hash = ?, updated_at = CURRENT_TIMESTAMP
-         WHERE id = ?`,
-        [newHash, list[0].id],
-      );
-
-      return NextResponse.json({
-        success: true,
-        message: "Password changed successfully.",
-      });
-    } finally {
-      conn.release();
+    if (!signup?.password_hash) {
+      return NextResponse.json({ error: "College account not found or no password set." }, { status: 404 });
     }
+
+    const isMatch = await bcrypt.compare(currentPassword, signup.password_hash);
+    if (!isMatch) {
+      return NextResponse.json({ error: "Current password is incorrect." }, { status: 403 });
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 12);
+    await db.collection("next_college_signups").updateOne(
+      { _id: signup._id },
+      { $set: { password_hash: newHash, updated_at: new Date() } }
+    );
+
+    return NextResponse.json({ success: true, message: "Password changed successfully." });
   }
 
   // ── Unknown action ────────────────────────────────────────────────────────

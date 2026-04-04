@@ -31,29 +31,20 @@ export default async function CollegeDashboardPage({ params }: PageProps) {
   let collegeName = payload.name;
   let collegeSlug = slug;
 
-  const cpRows = await db.collection("collegeprofile").aggregate([
-    { $match: { slug } },
-    { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
-    { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
-    { $match: { "u.email": { $regex: `^${payload.email}$`, $options: "i" } } },
-    { $project: { _id: 1, id: 1, slug: 1, college_name: { $ifNull: [{ $trim: { input: "$u.firstname" } }, "$slug"] } } },
-    { $limit: 1 },
-  ]).toArray();
+  // Look up collegeprofile by email (set during approval flow)
+  const profile = await db.collection("collegeprofile").findOne(
+    { email: payload.email.toLowerCase() },
+    { projection: { _id: 1, slug: 1, college_name: 1 } }
+  );
 
-  if (cpRows.length) {
-    collegeprofile_id = cpRows[0]._id;
-    collegeName = cpRows[0].college_name || payload.name;
-    collegeSlug = cpRows[0].slug;
-  } else {
-    // Try to find their actual slug by email
-    const ownRows = await db.collection("collegeprofile").aggregate([
-      { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
-      { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
-      { $match: { "u.email": { $regex: `^${payload.email}$`, $options: "i" } } },
-      { $project: { slug: 1 } },
-      { $limit: 1 },
-    ]).toArray();
-    if (ownRows.length) redirect(`/dashboard/college/${ownRows[0].slug}`);
+  if (profile) {
+    collegeprofile_id = profile._id;
+    collegeName = profile.college_name || payload.name;
+    collegeSlug = profile.slug || slug;
+    // If URL slug doesn't match their actual slug, redirect
+    if (profile.slug && profile.slug !== slug) {
+      redirect(`/dashboard/college/${profile.slug}`);
+    }
   }
 
   const college: CollegeUser = {

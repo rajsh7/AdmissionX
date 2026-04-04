@@ -5,9 +5,10 @@ import StudentDashboardClient from "../StudentDashboardClient";
 
 interface PageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ activated?: string }>;
 }
 
-export default async function StudentDashboardPage({ params }: PageProps) {
+export default async function StudentDashboardPage({ params, searchParams }: PageProps) {
   const { id } = await params;
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_student")?.value;
@@ -29,11 +30,13 @@ export default async function StudentDashboardPage({ params }: PageProps) {
     redirect(`/dashboard/student/${payload.id}`);
   }
 
+  const { activated } = await searchParams;
+
   const user = {
     id: payload.id,
     name: payload.name,
     email: payload.email,
   };
 
-  return <StudentDashboardClient user={user} />;
+  return <StudentDashboardClient user={user} activated={activated === "1"} />;
 }
