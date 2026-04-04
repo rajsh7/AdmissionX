@@ -49,6 +49,13 @@ interface SearchClientProps {
   pageSubtitle: string;
   entityName?: string;
   entityNamePlural?: string;
+  gridCols?: number;
+  heroImage?: string;
+  heroRightImage?: string;
+  heroHeight?: string;
+  heroObjectPosition?: string;
+  heroFit?: string;
+  filterWidth?: string;
 }
 
 type ViewMode = "grid" | "list";
@@ -263,6 +270,13 @@ export default function SearchClient({
   pageSubtitle,
   entityName = "College",
   entityNamePlural = "Colleges",
+  gridCols = 3,
+  heroImage = "/images/hero-student.png",
+  heroRightImage = "",
+  heroHeight = "560px",
+  heroObjectPosition = "cover",
+  heroFit = "cover",
+  filterWidth = "300px",
 }: SearchClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -340,15 +354,15 @@ export default function SearchClient({
 
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
-      <div className="relative w-full overflow-hidden" style={{ height: "560px" }}>
+      <div className="relative w-full overflow-hidden" style={{ height: heroHeight }}>
         <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
           <Image
-            src="/images/hero-student.png"
+            src={heroImage}
             alt="Campus Background"
             fill
             priority
             sizes="100vw"
-            className="object-cover"
+            className={`object-${heroObjectPosition}`}
           />
           <div className="absolute inset-0 bg-neutral-900/60" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
