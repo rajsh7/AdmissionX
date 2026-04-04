@@ -24,7 +24,6 @@ import Testimonials from "./components/Testimonials";
 
 const Footer = dynamic(() => import("./components/Footer"), { ssr: true });
 
-// AuthModal is rarely shown – load it only when needed
 const AuthModal = dynamic(() => import("./components/AuthModal"), {
   ssr: false,
 });
@@ -106,6 +105,7 @@ export default function HomePageClient({
 
       {/* Footer */}
       <Footer />
+
     </div>
   );
 }

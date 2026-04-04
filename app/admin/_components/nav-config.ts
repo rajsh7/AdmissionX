@@ -78,6 +78,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/admin/pages", icon: "layers", label: "Page Content" },
       { href: "/admin/seo", icon: "search", label: "SEO Content" },
       { href: "/admin/website-content", icon: "web", label: "Website Content" },
+      { href: "/admin/website-content/homepage", icon: "home", label: "Homepage Manager" },
     ],
   },
   {
@@ -106,6 +107,15 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/admin/queries/admissionx", icon: "contact_support", label: "Query to Admission X" },
       { href: "/admin/academic/ask-qa", icon: "question_answer", label: "Ask Question & Answers" },
       { href: "/admin/landing-page-query", icon: "feed", label: "Landing Page Query Form" },
+    ],
+  },
+  {
+    label: "Members",
+    items: [
+      { href: "/admin/members/registrations", icon: "how_to_reg", label: "Registrations" },
+      { href: "/admin/members/users", icon: "group", label: "Platform Users" },
+      { href: "/admin/members/roles", icon: "manage_accounts", label: "Roles" },
+      { href: "/admin/members/status", icon: "toggle_on", label: "Status" },
     ],
   },
   {

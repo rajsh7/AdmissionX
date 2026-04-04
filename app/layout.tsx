@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Lexend, Poppins } from "next/font/google";
 import "./globals.css";
+import ChatbotWidget from "./components/ChatbotWidget";
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -72,6 +73,7 @@ export default function RootLayout({
         className={`${lexend.variable} ${poppins.variable} font-display antialiased overflow-x-hidden`}
       >
         {children}
+        <ChatbotWidget />
       </body>
     </html>
   );

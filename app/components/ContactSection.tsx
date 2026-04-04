@@ -104,21 +104,7 @@ export default function ContactSection() {
                 </div>
               </form>
  
-              {/* Floating Robot Illustration */}
-              <div className="absolute -bottom-10 -right-10 w-32 h-32 pointer-events-none hidden lg:block animate-float">
-                 <img src="/images/Frame 155.png" alt="robot" className="w-full h-full object-contain" />
-              </div>
 
-              <style jsx>{`
-                @keyframes float {
-                  0% { transform: translateY(0px); }
-                  50% { transform: translateY(-15px); }
-                  100% { transform: translateY(0px); }
-                }
-                .animate-float {
-                  animation: float 3s ease-in-out infinite;
-                }
-              `}</style>
             </div>
 
           </div>

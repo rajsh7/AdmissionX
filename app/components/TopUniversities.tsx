@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import type { FilterCollegeResult } from "@/lib/college-filter";
+import FadeIn from "./FadeIn";
 
 export interface University {
   name: string;
@@ -125,15 +126,17 @@ export default function TopUniversities({
   return (
     <section className="w-full py-24 lg:py-32 bg-[#f8fafc]/30">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
-        <div className="mb-12">
-          <h2 className="text-[40px] lg:text-[68px] font-semibold text-slate-900 tracking-tight leading-[1.1]">
-            Discover the Top <span className="text-primary">Universities</span>
-          </h2>
-          <p className="mt-6 text-[25px] text-slate-500 font-medium max-w-4xl leading-relaxed antialiased">
-            Filter through thousands of institutions worldwide based on your
-            specific academic preferences and career goals.
-          </p>
-        </div>
+        <FadeIn>
+          <div className="mb-12">
+            <h2 className="text-[40px] lg:text-[68px] font-semibold text-slate-900 tracking-tight leading-[1.1]">
+              Discover the Top <span className="text-primary">Universities</span>
+            </h2>
+            <p className="mt-6 text-[25px] text-slate-500 font-medium max-w-4xl leading-relaxed antialiased">
+              Filter through thousands of institutions worldwide based on your
+              specific academic preferences and career goals.
+            </p>
+          </div>
+        </FadeIn>
 
         {/* Section Search & Filters - Separated into Blocks */}
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 mb-12">

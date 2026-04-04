@@ -15,6 +15,7 @@ import ApplicationsTab from "./tabs/ApplicationsTab";
 import CutoffsTab from "./tabs/CutoffsTab";
 import SportsTab from "./tabs/SportsTab";
 import SettingsTab from "./tabs/SettingsTab";
+import QueriesTab from "./tabs/QueriesTab";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface CollegeUser {
@@ -38,6 +39,7 @@ export type TabId =
   | "applications"
   | "cutoffs"
   | "sports"
+  | "queries"
   | "settings";
 
 interface Tab {
@@ -100,18 +102,9 @@ const TABS: Tab[] = [
     icon: "content_cut",
     mobileLabel: "Cutoffs",
   },
-  {
-    id: "sports",
-    label: "Sports & Activities",
-    icon: "sports",
-    mobileLabel: "Sports",
-  },
-  {
-    id: "settings",
-    label: "Settings",
-    icon: "settings",
-    mobileLabel: "Settings",
-  },
+  { id: "sports", label: "Sports & Activities", icon: "sports", mobileLabel: "Sports" },
+  { id: "queries", label: "Queries", icon: "forum", mobileLabel: "Queries" },
+  { id: "settings", label: "Settings", icon: "settings", mobileLabel: "Settings" },
 ];
 
 const PRIMARY_TABS = TABS.slice(0, 4); // visible in mobile bottom bar
@@ -160,6 +153,8 @@ export default function CollegeDashboardClient({
         return <CutoffsTab college={college} />;
       case "sports":
         return <SportsTab college={college} />;
+      case "queries":
+        return <QueriesTab college={college} />;
       case "settings":
         return <SettingsTab college={college} />;
       default:

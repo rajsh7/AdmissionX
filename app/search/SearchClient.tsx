@@ -50,6 +50,7 @@ interface SearchClientProps {
   pageSubtitle: string;
   entityName?: string;
   entityNamePlural?: string;
+  // Optional styling props
   gridCols?: number;
   heroImage?: string;
   heroRightImage?: string;

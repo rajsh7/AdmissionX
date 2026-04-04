@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
     const user = await db.collection("next_college_signups").findOne(
       { email: emailLower },
-      { projection: { _id: 1, college_name: 1, email: 1, password_hash: 1, status: 1 } }
+      { projection: { _id: 1, college_name: 1, email: 1, password_hash: 1, status: 1, slug: 1 } }
     );
 
     if (!user) {
@@ -42,15 +42,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
     }
 
-    // Look up slug from collegeprofile
-    let slug: string | null = null;
-    try {
-      const profile = await db.collection("collegeprofile").findOne(
-        { users_id: user._id },
-        { projection: { slug: 1 } }
-      );
-      slug = profile?.slug ?? null;
-    } catch { /* non-fatal */ }
+    // Slug: stored on signup record after approval, fallback to collegeprofile lookup by email
+    let slug: string | null = user.slug ?? null;
+    if (!slug) {
+      try {
+        const profile = await db.collection("collegeprofile").findOne(
+          { email: emailLower },
+          { projection: { slug: 1 } }
+        );
+        slug = profile?.slug ?? null;
+      } catch { /* non-fatal */ }
+    }
 
     const token = await signCollegeToken({
       id: user._id.toString(),

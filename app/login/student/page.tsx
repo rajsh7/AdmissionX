@@ -14,6 +14,9 @@ function StudentLoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,6 +45,9 @@ function StudentLoginForm() {
           : redirectTo;
         router.push(destination);
         router.refresh();
+      } else if (res.status === 403) {
+        setError(data.error || "Please verify your email before logging in.");
+        setUnverifiedEmail(body.email);
       } else {
         setError(data.error || "Login failed. Please check your credentials.");
       }
@@ -90,11 +96,40 @@ function StudentLoginForm() {
 
           {/* Error Banner */}
           {error && (
-            <div className="mb-6 flex items-center gap-3 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm font-medium">
-              <span className="material-symbols-outlined text-xl shrink-0">
-                error
-              </span>
-              {error}
+            <div className="mb-6 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+              <div className="flex items-center gap-3 text-red-600 dark:text-red-400 text-sm font-medium">
+                <span className="material-symbols-outlined text-xl shrink-0">error</span>
+                {error}
+              </div>
+              {unverifiedEmail && (
+                <div className="mt-3 pt-3 border-t border-red-200 dark:border-red-800">
+                  <p className="text-xs text-red-500 dark:text-red-400 mb-2">Didn&apos;t receive the email?</p>
+                  <button
+                    type="button"
+                    disabled={resendLoading || resendSent}
+                    onClick={async () => {
+                      setResendLoading(true);
+                      setResendSent(false);
+                      try {
+                        await fetch("/api/auth/resend-activation", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ email: unverifiedEmail }),
+                        });
+                        setResendSent(true);
+                      } finally {
+                        setResendLoading(false);
+                      }
+                    }}
+                    className="flex items-center gap-1.5 text-xs font-bold text-red-600 dark:text-red-400 hover:underline disabled:opacity-60"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">
+                      {resendSent ? "check_circle" : resendLoading ? "progress_activity" : "forward_to_inbox"}
+                    </span>
+                    {resendSent ? "Activation email sent! Check your inbox." : resendLoading ? "Sending…" : "Resend activation email"}
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
