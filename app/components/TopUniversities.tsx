@@ -126,23 +126,25 @@ export default function TopUniversities({
     <section className="w-full py-24 lg:py-32 bg-[#f8fafc]/30">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
         <div className="mb-12">
-          <h2 className="text-[40px] lg:text-[68px] font-normal text-slate-900 tracking-tight leading-[1.1]">
+          <h2 className="text-[40px] lg:text-[68px] font-semibold text-slate-900 tracking-tight leading-[1.1]">
             Discover the Top <span className="text-primary">Universities</span>
           </h2>
-          <p className="mt-6 text-[25px] text-slate-500 font-normal max-w-4xl leading-relaxed antialiased">
+          <p className="mt-6 text-[25px] text-slate-500 font-medium max-w-4xl leading-relaxed antialiased">
             Filter through thousands of institutions worldwide based on your
             specific academic preferences and career goals.
           </p>
         </div>
 
-        {/* Section Search & Filters */}
-        <div className="flex flex-col lg:flex-row items-center gap-4 bg-white border border-slate-100 rounded-[10px] p-3 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] mb-12">
-          <div className="relative flex-1 w-full group">
+        {/* Section Search & Filters - Separated into Blocks */}
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 mb-12">
+          
+          {/* Block 1: Search Input */}
+          <div className="flex-1 relative bg-white border border-slate-100 rounded-[10px] shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all hover:shadow-lg group">
             <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="22"
-                height="22"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -159,84 +161,80 @@ export default function TopUniversities({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search your college, universities, courses..."
-              className="w-full h-14 pl-14 pr-4 bg-transparent text-slate-800 placeholder:text-slate-400 focus:outline-none text-base font-normal"
+              className="w-full h-14 pl-14 pr-4 bg-transparent text-slate-800 placeholder:text-slate-400 focus:outline-none text-base font-normal rounded-[10px]"
             />
           </div>
 
-          <div className="w-px h-10 bg-slate-100 hidden lg:block mx-2" />
-
-          <div className="flex items-center gap-3 w-full lg:w-auto relative">
-            {/* Filters Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className={`flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3.5 rounded-[10px] font-normal text-sm transition-all active:scale-95 ${
-                  selectedCity !== "All Cities"
-                    ? "bg-primary text-white"
-                    : "bg-slate-50 text-slate-600 border border-slate-100 hover:bg-slate-100"
-                }`}
-              >
-                <span className="material-symbols-rounded text-[20px]">
-                  tune
-                </span>
-                {selectedCity === "All Cities" ? "Filters" : selectedCity}
-              </button>
-
-              <AnimatePresence>
-                {isFilterOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setIsFilterOpen(false)}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-2 w-56 bg-white border border-slate-100 rounded-[10px] shadow-xl z-50 overflow-hidden"
-                    >
-                      <div className="p-2 max-h-60 overflow-y-auto hide-scrollbar">
-                        <div className="px-3 py-2 text-[10px] font-normal text-slate-400 uppercase tracking-widest">
-                          Filter by City
-                        </div>
-                        {uniqueCities.map((city) => (
-                          <button
-                            key={city}
-                            onClick={() => {
-                              setSelectedCity(city);
-                              setIsFilterOpen(false);
-                            }}
-                            className={`w-full text-left px-4 py-2.5 rounded-[10px] text-sm font-normal transition-colors ${
-                              selectedCity === city
-                                ? "bg-primary/10 text-primary"
-                                : "text-slate-600 hover:bg-slate-50"
-                            }`}
-                          >
-                            {city}
-                          </button>
-                        ))}
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Sort Button */}
+          {/* Block 2: Filters */}
+          <div className="relative h-full">
             <button
-              onClick={() => setSortBy(sortBy === "rank" ? null : "rank")}
-              className={`flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3.5 rounded-[10px] font-normal text-sm transition-all active:scale-95 ${
-                sortBy === "rank"
-                  ? "bg-primary text-white"
-                  : "bg-slate-50 text-slate-600 border border-slate-100 hover:bg-slate-100"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className={`h-14 flex items-center justify-center gap-2 px-8 rounded-[10px] font-medium text-sm transition-all active:scale-95 border shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] hover:shadow-lg ${
+                selectedCity !== "All Cities"
+                  ? "bg-primary text-white border-primary"
+                  : "bg-white text-slate-600 border-slate-100"
               }`}
             >
               <span className="material-symbols-rounded text-[20px]">
-                swap_vert
+                tune
               </span>
-              Short By: rank
+              {selectedCity === "All Cities" ? "Filters" : selectedCity}
             </button>
+
+            <AnimatePresence>
+              {isFilterOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsFilterOpen(false)}
+                  />
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute right-0 top-full mt-3 w-56 bg-white border border-slate-100 rounded-[10px] shadow-2xl z-50 overflow-hidden"
+                  >
+                    <div className="p-2 max-h-60 overflow-y-auto hide-scrollbar">
+                      <div className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        Filter by City
+                      </div>
+                      {uniqueCities.map((city) => (
+                        <button
+                          key={city}
+                          onClick={() => {
+                            setSelectedCity(city);
+                            setIsFilterOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2.5 rounded-[10px] text-sm font-normal transition-colors ${
+                            selectedCity === city
+                              ? "bg-primary/10 text-primary"
+                              : "text-slate-600 hover:bg-slate-50"
+                          }`}
+                        >
+                          {city}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
           </div>
+
+          {/* Block 3: Sort Button */}
+          <button
+            onClick={() => setSortBy(sortBy === "rank" ? null : "rank")}
+            className={`h-14 flex items-center justify-center gap-2 px-8 rounded-[10px] font-medium text-sm transition-all active:scale-95 border shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] hover:shadow-lg ${
+              sortBy === "rank"
+                ? "bg-primary text-white border-primary"
+                : "bg-white text-slate-600 border-slate-100"
+            }`}
+          >
+            <span className="material-symbols-rounded text-[20px]">
+              swap_vert
+            </span>
+            Short By: rank
+          </button>
         </div>
 
         {/* Categories Tabs */}
@@ -254,6 +252,14 @@ export default function TopUniversities({
               {cat}
             </button>
           ))}
+        </div>
+
+        {/* Universities Section Heading */}
+        <div className="mb-8 flex items-center gap-4">
+          <h3 className="text-[25px] font-bold text-slate-900 uppercase tracking-wider whitespace-nowrap">
+            Top rank universities !
+          </h3>
+          <div className="h-px bg-slate-100 flex-1" />
         </div>
 
         {/* Universities Grid */}
@@ -302,16 +308,16 @@ export default function TopUniversities({
                     {/* Card Content */}
                     <div className="p-8 flex flex-col flex-1">
                       <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-[22px] font-normal text-slate-900 leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                        <h3 className="text-[22px] font-bold text-[#6C6C6C] leading-snug group-hover:text-primary transition-colors line-clamp-2">
                           {uni.name}
                         </h3>
                       </div>
 
-                      <div className="flex items-center gap-1.5 text-slate-400 mb-4">
-                        <span className="material-symbols-rounded text-[18px]">
+                      <div className="flex items-center gap-1.5 text-[#6C6C6C] mb-4">
+                        <span className="material-symbols-rounded text-[20px]">
                           location_on
                         </span>
-                        <span className="text-xs font-normal truncate">
+                        <span className="text-[16px] font-medium truncate">
                           {uni.location}
                         </span>
                       </div>

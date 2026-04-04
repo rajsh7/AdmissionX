@@ -14,14 +14,13 @@ interface CollegeCardProps {
 function StarRating({ rating, count }: { rating: number; count: number }) {
   if (rating === 0) return null;
   return (
-    <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-[10px] shadow-lg border border-white/20">
-      <span className="material-symbols-outlined text-[14px] text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>
+    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur rounded-[10px] px-2.5 py-1 flex items-center gap-1 shadow-sm">
+      <span className="material-symbols-rounded text-yellow-500 text-[18px]">
         star
       </span>
-      <span className="text-[11px] font-black text-neutral-800">
+      <span className="text-sm font-normal text-slate-800">
         {rating.toFixed(1)}
       </span>
-      {count > 0 && <span className="text-[10px] text-neutral-400">({count}+)</span>}
     </div>
   );
 }
@@ -83,93 +82,74 @@ export default function CollegeCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
       transition={{
-        duration: 0.45,
-        ease: [0.22, 1, 0.36, 1],
-        delay: Math.min(index * 0.04, 0.24),
+        duration: 0.4,
+        delay: Math.min(index * 0.05, 0.24),
       }}
     >
       <Link
         href={`/college/${slug}`}
-        className="group flex flex-col bg-white rounded-[10px] border border-neutral-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden h-full"
+        className="group flex flex-col bg-white rounded-[10px] border border-slate-100 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300 overflow-hidden h-full"
       >
         {/* ── Image ── */}
-        <div className="relative h-48 overflow-hidden bg-neutral-50 flex-shrink-0 flex items-center justify-center">
+        <div className="relative aspect-[4/3] overflow-hidden bg-neutral-50 flex-shrink-0">
           {image && image !== "" ? (
             <Image
               src={image}
               alt={name}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
-              className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FF3C3C]/10 to-[#FF3C3C]/5 flex flex-col items-center justify-center p-4 text-center">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FF3C3C]/10 to-[#FF3C3C]/5 flex flex-col items-center justify-center p-4 text-center group-hover:scale-110 transition-transform duration-700">
               <span className="material-symbols-outlined text-4xl text-[#FF3C3C]/30 mb-2">account_balance</span>
               <span className="text-sm font-bold text-[#FF3C3C]/40 uppercase tracking-widest leading-tight line-clamp-2">{name}</span>
             </div>
           )}
 
-          {/* Top-left: Rank badge */}
-          {displayRank ? (
-            <div className="absolute top-3 left-3 flex items-center gap-1 bg-[#FF3C3C] text-white text-[10px] font-black px-2.5 py-1 rounded-[10px] shadow-lg">
-              #{displayRank}
-            </div>
-          ) : null}
+          {/* Tag Overlay (Dynamic Rank / Featured) */}
+          <div className="absolute bottom-4 left-4">
+            <span className="px-3 py-1 rounded-[10px] bg-[#FF3C3C] text-white text-[10px] font-normal uppercase tracking-wider shadow-lg">
+              {displayRank ? `#${displayRank} Ranked` : "Featured"}
+            </span>
+          </div>
 
           {/* Top-right: Rating Badge */}
           <StarRating rating={rating} count={totalRatingUser} />
         </div>
 
         {/* ── Body ── */}
-        <div className="flex flex-col flex-1 p-5">
-          {/* Name */}
-          <h3 className="text-[17px] font-medium text-[#333333] mb-1 group-hover:text-[#FF3C3C] transition-colors line-clamp-2">
-            {name}
-          </h3>
-
-          {/* Location below name */}
-          <div className="flex items-center gap-1 text-neutral-400 mb-4">
-            <span className="material-symbols-outlined text-[16px]">location_on</span>
-            <span className="text-[13px] font-medium truncate">{location || "India"}</span>
+        <div className="p-8 flex flex-col flex-1">
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="text-[22px] font-bold text-[#6C6C6C] leading-snug group-hover:text-[#FF3C3C] transition-colors line-clamp-2">
+              {name}
+            </h3>
           </div>
 
-          {/* Streams (Outlined pills) */}
-          {streams.length > 0 ? (
-            <div className="flex flex-wrap gap-2 mb-6">
-              {streams.slice(0, 2).map((s) => (
-                <span
-                  key={s}
-                  className="px-3 py-1.5 bg-transparent text-neutral-600 text-[11px] font-bold rounded-full border border-neutral-100 transition-all group-hover:bg-[#FF3C3C]/10 group-hover:text-[#FF3C3C] group-hover:border-[#FF3C3C]/20"
-                >
-                  {s}
-                </span>
-              ))}
-              {streams.length > 2 && (
-                <span className="px-3 py-1.5 bg-transparent text-neutral-400 text-[11px] font-bold rounded-full border border-neutral-50 italic">
-                  +{streams.length - 2} more
-                </span>
-              )}
-            </div>
-          ) : (
-            <div className="mb-6 h-[34px]" /> // Spacer if no streams
-          )}
-
-          {/* Footer: Fees */}
-          <div className="mt-auto pt-4 border-t border-neutral-50 flex items-center justify-between">
-            <div>
-              <span className="block text-[11px] text-neutral-400 font-bold uppercase tracking-wider mb-0.5">Avg. Package</span>
-              <span className="text-base font-black text-[#FF3C3C]">
-                {feesLabel}
-              </span>
-            </div>
-
-            <span className="flex items-center gap-1 text-[13px] font-black text-[#FF3C3C] group-hover:gap-1.5 transition-all">
-              View Details
-              <span className="material-symbols-outlined text-[16px] mt-0.5">arrow_forward</span>
+          <div className="flex items-center gap-1.5 text-[#6C6C6C] mb-4">
+            <span className="material-symbols-rounded text-[20px]">
+              location_on
             </span>
+            <span className="text-[16px] font-medium truncate">
+              {location || "India"}
+            </span>
+          </div>
+
+          <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-50">
+            <div>
+              <div className="text-[10px] font-normal text-slate-400 uppercase tracking-widest leading-none">
+                Best Course
+              </div>
+              <div className="text-sm font-normal text-slate-800 mt-1">
+                {streams.length > 0 ? streams[0] : "Engineering"}
+              </div>
+            </div>
+            <div className="px-4 py-2 rounded-[10px] bg-slate-900 text-white text-xs font-normal group-hover:bg-[#FF3C3C] transition-all active:scale-95">
+              Apply Now
+            </div>
           </div>
         </div>
       </Link>

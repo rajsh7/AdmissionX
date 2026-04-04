@@ -27,34 +27,88 @@ const steps = [
 
 export default function JourneySteps() {
   return (
-    <section className="py-32 bg-white border-t border-slate-50">
-      <div className="max-w-[1400px] mx-auto px-8">
-        <div className="mb-24">
-          <h2 className="text-[56px] font-black text-slate-900 mb-6 tracking-tight">Your Journey to Study Abroad</h2>
-          <p className="text-[19px] text-slate-500 max-w-3xl leading-relaxed">
-            Explore the most popular countries for international students based on quality of education, post study work right, and living standards.
+    <section className="py-24 bg-white">
+      <div className="max-w-[1920px] mx-auto px-8 lg:px-12">
+        
+        <div className="mb-20">
+          <h2 className="text-[40px] font-bold text-slate-800 mb-4 tracking-tight text-center lg:text-left">Your Journey to Study Abroad</h2>
+          <p className="text-[17px] text-slate-400 max-w-2xl leading-relaxed text-center lg:text-left">
+            Explore the most popular countries for international student based on quality of education, post study work right, and living standards.
           </p>
         </div>
 
-        {/* Timeline Desktop */}
-        <div className="relative">
-          {/* Connector Line */}
-          <div className="absolute top-12 left-0 w-full h-[3px] bg-red-100 hidden md:block" />
+        {/* Stepper Grid Container */}
+        <div className="max-w-full mx-auto mb-20 px-4">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-16 relative z-10">
-            {steps.map((step) => (
-              <div key={step.number} className="group">
-                <div className="w-24 h-24 bg-primary text-white rounded-[24px] flex items-center justify-center text-4xl font-black mb-10 shadow-2xl shadow-primary/30 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                  {step.number}
+          <div className="relative">
+            {/* Background Line */}
+            <div className="absolute top-[36px] left-[12.5%] right-[12.5%] h-[2px] bg-slate-100 -z-10" />
+            
+            {/* Red Active Line Segment (from step 1 to 2) */}
+            <div className="absolute top-[36px] left-[12.5%] w-[25%] h-[2px] bg-[#FF3C3C] -z-10" />
+
+            <div className="grid grid-cols-4 gap-8">
+              
+              {/* Step 1 */}
+              <div className="flex flex-col items-center text-center space-y-8">
+                <div className="w-[72px] h-[72px] bg-[#FF3C3C] rounded-xl flex items-center justify-center text-white text-[24px] font-bold shadow-xl shadow-red-500/20">
+                  1
                 </div>
-                <h3 className="text-2xl font-black text-slate-900 mb-5 tracking-tight group-hover:text-primary transition-colors">{step.title}</h3>
-                <p className="text-lg text-slate-400 leading-relaxed font-medium">
-                  {step.description}
-                </p>
+                <div className="space-y-4 px-4">
+                  <h3 className="text-[18px] font-bold text-slate-800">Profile Evaluation</h3>
+                  <p className="text-[14px] text-slate-400 leading-relaxed max-w-[200px]">
+                    We assess your academic background, test scores, and career goals to find the best match.
+                  </p>
+                </div>
               </div>
-            ))}
+
+              {/* Step 2 */}
+              <div className="flex flex-col items-center text-center space-y-8">
+                <div className="w-[72px] h-[72px] bg-white border border-slate-100 rounded-xl flex items-center justify-center text-slate-300 text-[24px] font-bold shadow-sm">
+                  2
+                </div>
+                <div className="space-y-4 px-4">
+                  <h3 className="text-[18px] font-bold text-slate-800">Shortlisting</h3>
+                  <p className="text-[14px] text-slate-400 leading-relaxed max-w-[200px]">
+                    Get a curated list of universities and courses that align perfectly with your profile and budget.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="flex flex-col items-center text-center space-y-8">
+                <div className="w-[72px] h-[72px] bg-white border border-slate-100 rounded-xl flex items-center justify-center text-slate-300 text-[24px] font-bold shadow-sm">
+                  3
+                </div>
+                <div className="space-y-4 px-4">
+                  <h3 className="text-[18px] font-bold text-slate-800">Application & Visas</h3>
+                  <p className="text-[14px] text-slate-400 leading-relaxed max-w-[200px]">
+                    Expert assistance with SOPs, LORs, and navigating the visa process smoothly.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 4 */}
+              <div className="flex flex-col items-center text-center space-y-8">
+                <div className="w-[72px] h-[72px] bg-white border border-slate-100 rounded-xl flex items-center justify-center text-slate-300 text-[24px] font-bold shadow-sm">
+                  4
+                </div>
+                <div className="space-y-4 px-4">
+                  <h3 className="text-[18px] font-bold text-slate-800">Pr-Departure</h3>
+                  <p className="text-[14px] text-slate-400 leading-relaxed max-w-[200px]">
+                    Help with accommodation, flights, forex, and networking with others student
+                  </p>
+                </div>
+              </div>
+
+            </div>
           </div>
+
         </div>
+
+        {/* Large Placeholder Box */}
+        <div className="w-full h-[320px] bg-[#EAEAEA] rounded-[32px] border border-slate-100/50" />
+
       </div>
     </section>
   );

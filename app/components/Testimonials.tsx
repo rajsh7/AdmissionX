@@ -66,12 +66,20 @@ export default function Testimonials() {
     <section className="w-full py-24 lg:py-32 bg-white overflow-hidden">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
         
-        <div className="flex items-center justify-between gap-12 mb-20">
-            <h2 className="text-[40px] lg:text-[56px] font-normal text-slate-900 tracking-tight leading-[1.1]">
-              Unfiltered <span className="text-primary">Student Voices</span>
-            </h2>
-            <button className="hidden sm:block px-8 py-3.5 rounded-[10px] bg-white border border-slate-100 shadow-sm text-slate-600 font-normal text-sm hover:bg-slate-50 transition-all">
-                View All Reviews
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
+            <div className="max-w-2xl">
+                <h2 className="text-[40px] font-semibold tracking-tight leading-[1.1] mb-4">
+                  <span className="text-[#6C6C6C]">Unfiltered</span> <span className="text-primary">Student Voices</span>
+                </h2>
+                <p className="text-slate-500 font-normal text-lg">
+                  Get the real story about campus life, professors, and placements from people who've actually been there.
+                </p>
+            </div>
+            <button 
+              className="hidden sm:flex items-center justify-center px-10 h-[59px] bg-white shadow-[0_10px_30px_-5px_rgba(0,0,0,0.15),0_5px_15px_-5px_rgba(0,0,0,0.1)] border border-slate-200 whitespace-nowrap transition-all rounded-[10px]"
+              style={{ fontSize: '24px', fontWeight: 500, color: '#6C6C6C' }}
+            >
+                Read all reviews
             </button>
         </div>
 
@@ -83,32 +91,39 @@ export default function Testimonials() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="p-10 lg:p-12 rounded-[10px] bg-[#f8fafc] border border-slate-50 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] flex flex-col h-full relative group"
+              className="p-8 rounded-[10px] bg-white border border-slate-100 shadow-[0_15px_40px_-20px_rgba(0,0,0,0.1)] flex flex-col h-full group transition-all hover:shadow-xl hover:border-slate-200"
             >
-              <div className="absolute top-10 right-12 text-primary/10 group-hover:text-primary/20 transition-colors">
-                 <span className="material-symbols-rounded text-[64px]">format_quote</span>
+              {/* Card Header: Profile Info & Quote */}
+              <div className="flex items-start justify-between mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full border border-slate-100 overflow-hidden bg-slate-50 shrink-0">
+                    <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <h4 className="text-[16px] font-bold text-slate-900 leading-none mb-1">{t.name}</h4>
+                    <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">{t.college}</p>
+                  </div>
+                </div>
+                <div className="shrink-0 opacity-100 transition-opacity mt-1 flex items-center gap-1">
+                  <img src="/images/Vector.png" alt="quote" className="w-[18px] h-auto" />
+                  <img src="/images/Vector.png" alt="quote" className="w-[18px] h-auto" />
+                </div>
               </div>
 
-              <div className="flex gap-1 mb-8 text-yellow-400">
+              {/* Card Body: Testimonial Text with Red Accent Line */}
+              <div className="border-l-2 border-primary pl-4 mb-8 flex-1">
+                <p className="text-slate-600 font-normal leading-relaxed text-[15px] italic">
+                  "{t.text}"
+                </p>
+              </div>
+
+              {/* Card Footer: Star Ratings */}
+              <div className="flex gap-0.5 pt-6 border-t border-[#3D3D3D] text-yellow-400 mt-auto">
                 {[...Array(5)].map((_, i) => (
-                  <span key={i} className={`material-symbols-rounded text-[20px] ${i < t.rating ? 'fill-current' : 'text-slate-200'}`}>
+                  <span key={i} className={`material-symbols-rounded text-[18px] ${i < t.rating ? 'fill-current' : 'text-slate-200'}`}>
                     star
                   </span>
                 ))}
-              </div>
-
-              <p className="text-slate-600 font-normal leading-relaxed mb-10 flex-1 italic text-[22px]">
-                "{t.text}"
-              </p>
-
-              <div className="flex items-center gap-5 pt-8 border-t border-slate-100/50">
-                <div className="w-16 h-16 rounded-[10px] border-2 border-white shadow-lg overflow-hidden bg-slate-200 shrink-0">
-                   <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" />
-                </div>
-                <div>
-                   <h4 className="text-[18px] font-normal text-slate-900 leading-none mb-1.5">{t.name}</h4>
-                   <p className="text-xs font-normal text-slate-400 uppercase tracking-widest">{t.college}</p>
-                </div>
               </div>
             </motion.div>
           ))}

@@ -5,9 +5,9 @@ import AnimatedCounter from "./AnimatedCounter";
 
 const stats = [
   { label: "Universities", target: 500, suffix: "+", prefix: "" },
-  { label: "Students", target: 10000, suffix: "+", prefix: "" },
+  { label: "Students", target: 1000, suffix: "+", prefix: "" },
   { label: "Cities", target: 50, suffix: "+", prefix: "" },
-  { label: "Admission Rate", target: 95, suffix: "%", prefix: "" },
+  { label: "Admission Rate", target: 95, suffix: "+", prefix: "" },
 ];
 
 export default function StatsBar() {
@@ -24,14 +24,14 @@ export default function StatsBar() {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="group"
             >
-              <div className="text-[40px] lg:text-[48px] font-normal text-primary mb-1 tracking-tight group-hover:scale-105 transition-transform">
+              <div className="text-[40px] lg:text-[48px] font-bold text-primary mb-1 tracking-tight group-hover:scale-105 transition-transform">
                 <AnimatedCounter 
                   target={stat.target} 
                   suffix={stat.suffix} 
                   prefix={stat.prefix} 
                 />
               </div>
-              <div className="text-[12px] font-normal text-slate-400 uppercase tracking-[0.2em] antialiased">
+              <div className="text-[20px] font-semibold text-slate-400 uppercase tracking-[0.2em] antialiased">
                 {stat.label}
               </div>
             </motion.div>

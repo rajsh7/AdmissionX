@@ -14,18 +14,16 @@ declare global {
 const uri = process.env.MONGODB_URI!;
 if (!uri) throw new Error("MONGODB_URI is not defined in environment variables");
 
-const client: MongoClient = globalThis._mongoClient ?? new MongoClient(uri);
-
-if (process.env.NODE_ENV !== "production") {
-  globalThis._mongoClient = client;
+// Use a custom property to track which URI the cached client is using
+declare global {
+  var _mongoClient: MongoClient | undefined;
+  var _mongoUri: string | undefined;
 }
 
 let _db: Db | null = null;
 let _connectionFailed = false;
 
 function createMockDb(): Db {
-  // Create a mock Db object that returns empty collections
-  // This allows the app to continue running when MongoDB is unavailable
   const makeCursor = () => {
     const cursor = {
       toArray: async () => [],
@@ -60,21 +58,49 @@ function createMockDb(): Db {
   } as any;
 }
 
+export async function forceReconnect() {
+  console.log("♻️ [db] Forcing database reconnection...");
+  if (globalThis._mongoClient) {
+    try { await globalThis._mongoClient.close(); } catch {}
+  }
+  globalThis._mongoClient = undefined;
+  globalThis._mongoUri = undefined;
+  _db = null;
+  _connectionFailed = false;
+}
+
 export async function getDb(): Promise<Db> {
+  const currentUri = process.env.MONGODB_URI!;
+  
+  // If URI changed or client missing, re-initialize
+  if (!globalThis._mongoClient || globalThis._mongoUri !== currentUri) {
+    const hostInfo = currentUri.split('@')[1]?.split('/')[0] || "unknown-host";
+    console.log(`🔌 [db] Initializing new connection to: ${hostInfo}`);
+    
+    globalThis._mongoClient = new MongoClient(currentUri, {
+      connectTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 10000,
+      retryWrites: true,
+    });
+    globalThis._mongoUri = currentUri;
+    _db = null;
+    _connectionFailed = false;
+  }
+
   if (!_db) {
     if (_connectionFailed) {
-      // Connection already failed, return mock to avoid repeated connection attempts
+      console.warn("⚠️ [db] Previous connection attempt failed. Using mock DB.");
       return createMockDb();
     }
     
     try {
-      await client.connect();
-      _db = client.db(process.env.MONGODB_DB ?? "admissionx");
+      console.log("⏳ [db] Connecting to MongoDB...");
+      await globalThis._mongoClient.connect();
+      _db = globalThis._mongoClient.db(process.env.MONGODB_DB ?? "admissionx");
+      console.log("✅ [db] Connected successfully.");
     } catch (error) {
-      console.error("[getDb] Failed to connect to MongoDB:", error);
+      console.error("❌ [db] Connection failed:", error);
       _connectionFailed = true;
-      // Return mock database instead of throwing
-      // This allows the app to run with empty data instead of crashing
       return createMockDb();
     }
   }

@@ -7,73 +7,97 @@ export default function CareerGuidance() {
   return (
     <section className="w-full py-16 lg:py-24 bg-white overflow-hidden">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
-        <div className="relative rounded-[10px] p-8 lg:p-16 flex flex-col lg:flex-row items-center gap-12 border border-slate-100 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] overflow-hidden">
-          
+        <div
+          className="relative rounded-[20px] pt-8 px-8 lg:pt-16 lg:px-16 pb-0 flex flex-col lg:flex-row items-center lg:items-stretch gap-12 border border-slate-300 overflow-hidden bg-white"
+          style={{ boxShadow: '0px 20px 50px rgba(0, 0, 0, 0.15)' }}
+        >
+
           {/* Background Image Overlay */}
           <div className="absolute inset-0 z-0">
-             <img 
-               src="/images/98dbd696a8ef9396310ca4d2788bf46b8b3d5435.jpg" 
-               alt="Section Background" 
-               className="w-full h-full object-cover"
-             />
-             <div className="absolute inset-0 bg-white/20 backdrop-blur-[2px]" />
+            <img
+              src="/images/98dbd696a8ef9396310ca4d2788bf46b8b3d5435.jpg"
+              alt="Section Background"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-white/20 backdrop-blur-[2px]" />
           </div>
 
           <div className="absolute -top-12 -left-12 w-64 h-64 bg-[#FF3C3C]/5 rounded-full blur-3xl opacity-40 z-0" />
 
           {/* ── Left Content (60% width) ─────────────────────────────────── */}
-          <div className="flex-[1.2] text-center lg:text-left z-10">
-            <h2 className="text-[36px] lg:text-[48px] font-bold text-[#1F2937] leading-[1.2] mb-6 tracking-tight">
+          <div className="flex-[1.2] text-center lg:text-left z-10 pb-8 lg:pb-16 flex flex-col justify-center">
+            <h2 className="text-[#1F2937] leading-[1.2] mb-6 tracking-tight" style={{ fontSize: '45px', fontWeight: 600 }}>
               Confused about your <span className="text-[#FF3C3C]">career path?</span>
             </h2>
-            <p className="text-[17px] text-[#6B7280] font-normal leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
+            <p
+              className="leading-relaxed mb-8 mx-auto lg:mx-0 w-full"
+              style={{ maxWidth: '773px', fontSize: '25px', fontWeight: 500, color: '#222222' }}
+            >
               Filter through thousands of institutions worldwide based on your specific academic preferences and career goals.
             </p>
-            
+
             {/* Features List (Mockup bullets) */}
-            <ul className="mb-10 flex flex-col gap-3 text-[16px] font-medium text-[#374151]">
-               <li className="flex items-center gap-3 justify-center lg:justify-start">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#1F2937]/30" />
-                  Helps up to finds the talent
-               </li>
-               <li className="flex items-center gap-3 justify-center lg:justify-start">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#1F2937]/30" />
-                  Save your time
-               </li>
-               <li className="flex items-center gap-3 justify-center lg:justify-start">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#1F2937]/30" />
-                  self assessment
-               </li>
+            <ul
+              className="mb-10 flex flex-col gap-4"
+              style={{ fontSize: '25px', fontWeight: 500, color: '#222222' }}
+            >
+              <li className="flex items-center gap-4 justify-center lg:justify-start">
+                <span style={{ minWidth: '10px', height: '10px', backgroundColor: '#222222', borderRadius: '50%', display: 'block' }} />
+                Helps up to finds the talent
+              </li>
+              <li className="flex items-center gap-4 justify-center lg:justify-start">
+                <span style={{ minWidth: '10px', height: '10px', backgroundColor: '#222222', borderRadius: '50%', display: 'block' }} />
+                Save your time
+              </li>
+              <li className="flex items-center gap-4 justify-center lg:justify-start">
+                <span style={{ minWidth: '10px', height: '10px', backgroundColor: '#222222', borderRadius: '50%', display: 'block' }} />
+                self assessment
+              </li>
             </ul>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-              <Link 
-                href="/counselling" 
-                className="w-full sm:w-auto px-8 py-4 rounded-[10px] bg-[#FF3C3C] text-white font-bold text-[14px] shadow-lg shadow-[#FF3C3C]/20 hover:brightness-105 transition-all text-center"
+              <Link
+                href="/counselling"
+                className="w-full sm:w-auto px-8 py-4 rounded-[10px] bg-[#FF3C3C] text-white shadow-lg shadow-[#FF3C3C]/20 hover:brightness-105 transition-all text-center"
+                style={{ fontSize: '24px', fontWeight: 600 }}
               >
                 Start Free Assessment
               </Link>
-              <button className="w-full sm:w-auto px-8 py-4 rounded-[10px] bg-neutral-800 text-white font-bold text-[14px] shadow-lg shadow-black/10 hover:bg-neutral-900 transition-all text-center">
+              <button
+                className="w-full sm:w-auto px-8 py-4 rounded-[10px] bg-neutral-800 text-white shadow-lg shadow-black/10 hover:bg-neutral-900 transition-all text-center"
+                style={{ fontSize: '24px', fontWeight: 600 }}
+              >
                 Watch how its work
               </button>
             </div>
           </div>
 
           {/* ── Right Content: Illustration (40% width) ────────────────────── */}
-          <div className="flex-1 relative z-10 w-full flex items-center justify-center lg:justify-end">
-             <motion.div
-               initial={{ opacity: 0, scale: 0.95, x: 20 }}
-               whileInView={{ opacity: 1, scale: 1, x: 0 }}
-               viewport={{ once: true }}
-               transition={{ duration: 0.7 }}
-               className="relative w-full max-w-[480px]"
-             >
-                <img 
-                   src="/images/3718e82201e432bd5219be08e1391c20ad9829af.png" 
-                   alt="Confused Career Path Boy Illustration" 
-                   className="w-full h-auto object-contain drop-shadow-xl"
+          <div className="flex-1 relative z-10 w-full flex items-end justify-center lg:justify-end pb-0">
+            {/* Entry animation wrapper */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, x: 40 }}
+              whileInView={{ opacity: 1, scale: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="relative w-full max-w-[480px]"
+            >
+              {/* Continuous floating animation wrapper */}
+              <motion.div
+                animate={{ y: [0, -16, 0] }}
+                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+              >
+                {/* Subtle head-scratch wobble */}
+                <motion.img
+                  src="/images/3718e82201e432bd5219be08e1391c20ad9829af.png"
+                  alt="Confused Career Path Boy"
+                  className="w-full h-auto object-contain block object-bottom"
+                  style={{ filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.18))' }}
+                  animate={{ rotate: [0, -1.5, 1.5, -1, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                 />
-             </motion.div>
+              </motion.div>
+            </motion.div>
           </div>
 
         </div>

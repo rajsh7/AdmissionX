@@ -16,6 +16,77 @@ const INDIAN_STATES = [
   "Daman and Diu","Delhi","Jammu and Kashmir","Ladakh","Lakshadweep","Puducherry",
 ];
 
+// ── Shared Tab Navigation (Matching ProfileTab) ────────────────────────────────
+function ProfileTabs({ active = "address" }: { active?: string }) {
+  const tabs = [
+    { id: "profile", label: "Profile", icon: "person" },
+    { id: "address", label: "Address", icon: "location_on" },
+    { id: "academic", label: "Academic Certificates", icon: "workspace_premium" },
+    { id: "projects", label: "Projects", icon: "work" },
+    { id: "settings", label: "Account Settings", icon: "settings" },
+  ];
+
+  return (
+    <div className="flex border-b border-gray-200 mb-10 overflow-x-auto no-scrollbar">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          className={`flex items-center gap-2 px-6 py-4 text-[13px] font-semibold uppercase tracking-wider transition-all whitespace-nowrap border-b-2 ${
+            active === tab.id 
+              ? "border-[#e31e24] text-[#e31e24]" 
+              : "border-transparent text-gray-400 hover:text-gray-600"
+          }`}
+        >
+          <span className="material-symbols-outlined text-[18px]">{tab.icon}</span>
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ── Premium Input Field ──────────────────────────────────────────────────────
+function InputField({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  disabled = false,
+  icon,
+}: {
+  label: string;
+  value: string;
+  onChange?: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+  disabled?: boolean;
+  icon?: string;
+}) {
+  return (
+    <div className="relative pt-2">
+      <label className="absolute left-4 -top-0.5 px-1.5 bg-white text-[11px] font-semibold text-gray-400 uppercase tracking-widest z-10">
+        {label}
+      </label>
+      <div className="relative">
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange?.(e.target.value)}
+          placeholder={placeholder}
+          disabled={disabled}
+          className="w-full bg-white border-2 border-gray-100 rounded-[8px] px-4 py-3.5 text-[14px] font-medium text-[#333] placeholder:text-gray-300 focus:border-[#e31e24]/30 focus:ring-4 focus:ring-[#e31e24]/5 outline-none transition-all disabled:bg-gray-50 disabled:text-gray-400"
+        />
+        {icon && (
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-300 text-[20px]">
+            {icon}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function AddressTab({ user }: Props) {
   const [city,    setCity]    = useState("");
   const [state,   setState]   = useState("");
@@ -33,7 +104,6 @@ export default function AddressTab({ user }: Props) {
     setLoading(true);
     try {
       const res  = await fetch(`/api/student/${user.id}/profile`);
-      if (!res.ok) throw new Error("Failed to load address");
       const data = await res.json();
       setCity(data.city    ?? "");
       setState(data.state  ?? "");
@@ -41,7 +111,7 @@ export default function AddressTab({ user }: Props) {
       setPincode(data.pincode ?? "");
       setAddress(data.address ?? "");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load");
+      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -51,234 +121,109 @@ export default function AddressTab({ user }: Props) {
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    if (!user?.id) return;
     setSaving(true);
-    setError(null);
     setSuccess(false);
     try {
-      const res = await fetch(`/api/student/${user.id}/profile`, {
+      const res = await fetch(`/api/student/${user?.id}/profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ city, state, country, pincode, address }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Save failed");
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      if (res.ok) {
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 3000);
+      }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Save failed");
+      setError("Save failed");
     } finally {
       setSaving(false);
     }
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="h-10 bg-green-50 rounded-2xl animate-pulse w-1/3" />
-        <div className="bg-white rounded-2xl p-6 border border-green-50 shadow-sm space-y-5">
-          {[1,2,3,4].map(i => (
-            <div key={i} className="space-y-2">
-              <div className="h-3 bg-green-50 rounded w-1/4 animate-pulse" />
-              <div className="h-10 bg-green-50 rounded-xl animate-pulse" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className="animate-pulse space-y-8 bg-white p-8 rounded-xl border border-gray-100">
+    <div className="h-10 bg-gray-100 rounded w-1/4" />
+    <div className="space-y-6">
+       {[1,2,3].map(i => <div key={i} className="h-14 bg-gray-50 rounded" />)}
+    </div>
+  </div>;
 
   return (
-    <div className="space-y-6 max-w-3xl">
-
-      {/* Page header */}
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
-          <span className="material-symbols-outlined text-green-600 text-[22px]">location_on</span>
-        </div>
-        <div>
-          <h1 className="text-xl font-black text-slate-800">Address</h1>
-          <p className="text-xs text-slate-400 font-medium">Your current residential address details</p>
-        </div>
+    <div className="animate-in slide-in-from-bottom-4 duration-500">
+      <div className="mb-8">
+        <h2 className="text-[26px] font-bold text-[#222]">Student Address</h2>
+        <p className="text-gray-400 font-semibold uppercase text-[12px] tracking-widest mt-1">Update your delivery and permanent address</p>
       </div>
 
-      {/* Alert banner */}
-      {success && (
-        <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
-          <span className="material-symbols-outlined text-green-500 text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-          <p className="text-green-700 text-sm font-semibold">Address saved successfully!</p>
-        </div>
-      )}
-      {error && (
-        <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-          <span className="material-symbols-outlined text-red-400 text-[20px]">error_outline</span>
-          <p className="text-red-600 text-sm font-semibold">{error}</p>
-        </div>
-      )}
+      <div className="bg-white rounded-[10px] shadow-sm border border-gray-100 overflow-hidden">
+        <ProfileTabs active="address" />
+        
+        <form onSubmit={handleSave} className="p-10 space-y-10">
+          <div className="space-y-8">
+            <div className="relative pt-2">
+              <label className="absolute left-4 -top-0.5 px-1.5 bg-white text-[11px] font-semibold text-gray-400 uppercase tracking-widest z-10">
+                Full Street Address
+              </label>
+              <textarea
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="House No., Building, Area, Street Name"
+                className="w-full bg-white border-2 border-gray-100 rounded-[8px] px-4 py-3.5 text-[14px] font-medium text-[#333] placeholder:text-gray-300 focus:border-[#e31e24]/30 focus:ring-4 focus:ring-[#e31e24]/5 outline-none transition-all min-h-[100px] resize-none"
+              />
+            </div>
 
-      <form onSubmit={handleSave} className="space-y-5">
-
-        {/* Map placeholder */}
-        <div className="bg-white rounded-2xl border border-green-50 shadow-sm overflow-hidden">
-          <div className="h-40 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex flex-col items-center justify-center gap-2 relative">
-            <div className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage: "radial-gradient(circle at 1px 1px, #16a34a 1px, transparent 0)",
-                backgroundSize: "24px 24px",
-              }}
-            />
-            <div className="relative z-10 flex flex-col items-center gap-2">
-              <div className="w-12 h-12 bg-white rounded-full shadow-md flex items-center justify-center">
-                <span className="material-symbols-outlined text-green-600 text-[26px]" style={{ fontVariationSettings: "'FILL' 1" }}>location_on</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+              <InputField label="City / Town" value={city} onChange={setCity} icon="location_city" />
+              <InputField label="Pincode" value={pincode} onChange={setPincode} icon="pin_drop" />
+              
+              <div className="relative pt-2">
+                <label className="absolute left-4 -top-0.5 px-1.5 bg-white text-[11px] font-semibold text-gray-400 uppercase tracking-widest z-10">
+                  State
+                </label>
+                <select 
+                  value={state} 
+                  onChange={(e) => setState(e.target.value)}
+                  className="w-full bg-white border-2 border-gray-100 rounded-[8px] px-4 py-3.5 text-[14px] font-medium text-[#333] focus:border-[#e31e24]/30 outline-none transition-all appearance-none"
+                >
+                  <option value="">Select State</option>
+                  {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-300 pointer-events-none">expand_more</span>
               </div>
-              {city || state ? (
-                <p className="text-sm font-bold text-slate-700 bg-white/80 px-3 py-1 rounded-full shadow-sm">
-                  {[city, state, country].filter(Boolean).join(", ")}
-                </p>
-              ) : (
-                <p className="text-xs text-slate-400 font-medium">Fill in your address below</p>
+
+              <InputField label="Country" value={country} onChange={setCountry} icon="public" />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-6 border-t border-gray-50">
+            <div className="flex items-center gap-3">
+              {success && (
+                <span className="flex items-center gap-1.5 text-green-600 text-[13px] font-semibold">
+                  <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                  Address saved!
+                </span>
               )}
+              {error && <span className="text-red-500 text-[13px] font-semibold">{error}</span>}
             </div>
-          </div>
-        </div>
-
-        {/* Form card */}
-        <div className="bg-white rounded-2xl border border-green-50 shadow-sm p-6 space-y-5">
-          <div className="flex items-center gap-2 pb-3 border-b border-slate-50">
-            <span className="material-symbols-outlined text-green-600 text-[18px]">home</span>
-            <h2 className="font-black text-slate-800 text-sm">Residential Details</h2>
-          </div>
-
-          {/* Address line */}
-          <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-              Full Address / Street
-            </label>
-            <textarea
-              rows={3}
-              value={address}
-              onChange={e => setAddress(e.target.value)}
-              placeholder="House No., Street, Area, Landmark..."
-              className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 transition-all resize-none bg-slate-50/50"
-            />
-          </div>
-
-          {/* City + Pincode */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                City / Town <span className="text-red-400">*</span>
-              </label>
-              <input
-                type="text"
-                value={city}
-                onChange={e => setCity(e.target.value)}
-                placeholder="e.g. Mumbai"
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 transition-all bg-slate-50/50"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                PIN Code
-              </label>
-              <input
-                type="text"
-                value={pincode}
-                onChange={e => setPincode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                placeholder="e.g. 400001"
-                maxLength={6}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 transition-all bg-slate-50/50"
-              />
-            </div>
-          </div>
-
-          {/* State + Country */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                State <span className="text-red-400">*</span>
-              </label>
-              <select
-                value={state}
-                onChange={e => setState(e.target.value)}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 transition-all bg-slate-50/50 appearance-none"
+            
+            <div className="flex gap-4">
+              <button 
+                type="button"
+                onClick={load}
+                className="px-6 py-3 bg-gray-50 text-gray-500 text-[13px] font-semibold uppercase tracking-wider rounded-lg hover:bg-gray-100 transition-all"
               >
-                <option value="">Select State</option>
-                {INDIAN_STATES.map(s => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                Country <span className="text-red-400">*</span>
-              </label>
-              <select
-                value={country}
-                onChange={e => setCountry(e.target.value)}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 transition-all bg-slate-50/50 appearance-none"
+                Reset
+              </button>
+              <button 
+                type="submit"
+                disabled={saving}
+                className="px-10 py-3 bg-[#e31e24] text-white text-[13px] font-semibold uppercase tracking-wider rounded-lg shadow-lg shadow-red-100 hover:bg-[#c0191e] transition-all active:scale-95 disabled:opacity-50"
               >
-                <option value="India">India</option>
-                <option value="USA">USA</option>
-                <option value="UK">UK</option>
-                <option value="Canada">Canada</option>
-                <option value="Australia">Australia</option>
-                <option value="Other">Other</option>
-              </select>
+                {saving ? "Saving..." : "Save Address"}
+              </button>
             </div>
           </div>
-
-          {/* Current location display */}
-          {(city || state) && (
-            <div className="flex items-center gap-2 px-4 py-3 bg-green-50 border border-green-100 rounded-xl">
-              <span className="material-symbols-outlined text-green-600 text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                location_on
-              </span>
-              <p className="text-xs font-semibold text-green-700">
-                {[address, city, state, pincode, country].filter(Boolean).join(", ")}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Save button */}
-        <div className="flex items-center justify-between pt-2">
-          <p className="text-xs text-slate-400">
-            <span className="text-red-400">*</span> Required fields
-          </p>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={load}
-              disabled={saving}
-              className="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors disabled:opacity-50"
-            >
-              Reset
-            </button>
-            <button
-              type="submit"
-              disabled={saving || !city || !state}
-              className="px-6 py-2.5 bg-green-600 text-white rounded-xl text-sm font-black hover:bg-green-700 transition-colors shadow-md shadow-green-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {saving ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <span className="material-symbols-outlined text-[16px]">save</span>
-                  Save Address
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
-
-
-
-

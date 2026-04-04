@@ -49,7 +49,23 @@ export async function POST(req: NextRequest) {
     } catch { /* ignore */ }
 
     return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "Internal server error. Please try again." }, { status: 500 });
+  } catch (err: any) {
+    // SELF-HEALING: If "not primary" error, force reconnect
+    if (err.code === 10107 || err.message?.includes("not primary")) {
+      console.warn("♻️ [College Signup] Detected 'not primary' error. Attempting self-healing reconnection...");
+      const { forceReconnect } = await import("@/lib/db");
+      await forceReconnect();
+      
+      return NextResponse.json(
+        { error: "Database was out of sync. Connection has been refreshed. Please try again." }, 
+        { status: 503 }
+      );
+    }
+
+    console.error("[College Signup Internal Error]:", err);
+    return NextResponse.json(
+      { error: err.message || "Internal server error. Please try again." }, 
+      { status: 500 }
+    );
   }
 }

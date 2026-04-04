@@ -76,11 +76,11 @@ interface QAItem {
 
 export default function QATab({ user, type }: Props) {
   const meta = TYPE_META[type];
-  const [items]    = useState<QAItem[]>([]);
+  const [items] = useState<QAItem[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ title: "", content: "", college: "", rating: 5, tags: "" });
   const [submitting, setSubmitting] = useState(false);
-  const [submitted,  setSubmitted]  = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -114,12 +114,12 @@ export default function QATab({ user, type }: Props) {
             </span>
           </div>
           <div>
-            <h1 className="text-xl font-black text-slate-800">{meta.label}</h1>
+            <h1 className="text-xl font-bold text-slate-800">{meta.label}</h1>
             <p className="text-xs text-slate-400 font-medium">
-              {type === "questions"  && "Questions you have asked on AdmissionX"}
-              {type === "answers"    && "Questions you have answered"}
-              {type === "comments"   && "Comments you have posted"}
-              {type === "reviews"    && "College and course reviews you have written"}
+              {type === "questions" && "Questions you have asked on AdmissionX"}
+              {type === "answers" && "Questions you have answered"}
+              {type === "comments" && "Comments you have posted"}
+              {type === "reviews" && "College and course reviews you have written"}
             </p>
           </div>
         </div>
@@ -127,7 +127,7 @@ export default function QATab({ user, type }: Props) {
         {canSubmit && !showForm && (
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 transition-colors shadow-md shadow-green-200"
+            className="flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition-colors shadow-md shadow-green-200"
           >
             <span className="material-symbols-outlined text-[18px]">{meta.actionIcon}</span>
             {meta.actionLabel}
@@ -164,12 +164,12 @@ export default function QATab({ user, type }: Props) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <p className="text-sm font-black text-slate-800">Q&amp;A Community — Coming Soon</p>
-            <span className="text-[10px] font-black text-green-600 bg-green-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            <p className="text-sm font-bold text-slate-800">Q&amp;A Community — Coming Soon</p>
+            <span className="text-[10px] font-semibold text-green-600 bg-green-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
               Beta
             </span>
           </div>
-          <p className="text-xs text-slate-500 leading-relaxed">
+          <p className="text-xs text-slate-500 leading-relaxed font-medium">
             The full community Q&amp;A platform is under development. You will be able to ask questions,
             post answers, comment on college pages, and write detailed reviews — all synced with your
             AdmissionX profile.
@@ -177,10 +177,10 @@ export default function QATab({ user, type }: Props) {
           {/* Stats preview */}
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { icon: "quiz",            label: "Questions",    count: "0", color: "text-blue-500"   },
-              { icon: "question_answer", label: "Answers",      count: "0", color: "text-green-500"  },
-              { icon: "comment",         label: "Comments",     count: "0", color: "text-purple-500" },
-              { icon: "star",            label: "Reviews",      count: "0", color: "text-amber-500"  },
+              { icon: "quiz", label: "Questions", count: "0", color: "text-blue-500" },
+              { icon: "question_answer", label: "Answers", count: "0", color: "text-green-500" },
+              { icon: "comment", label: "Comments", count: "0", color: "text-purple-500" },
+              { icon: "star", label: "Reviews", count: "0", color: "text-amber-500" },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -190,8 +190,8 @@ export default function QATab({ user, type }: Props) {
                   {stat.icon}
                 </span>
                 <div>
-                  <p className="text-xs font-bold text-slate-400">{stat.label}</p>
-                  <p className="text-lg font-black text-slate-700">{stat.count}</p>
+                  <p className="text-xs font-semibold text-slate-400">{stat.label}</p>
+                  <p className="text-lg font-bold text-slate-700">{stat.count}</p>
                 </div>
               </div>
             ))}
@@ -209,7 +209,7 @@ export default function QATab({ user, type }: Props) {
                   {meta.actionIcon}
                 </span>
               </div>
-              <h2 className="font-black text-slate-800 text-[15px]">{meta.formTitle}</h2>
+              <h2 className="font-bold text-slate-800 text-[15px]">{meta.formTitle}</h2>
             </div>
             <button
               onClick={() => setShowForm(false)}
@@ -224,7 +224,7 @@ export default function QATab({ user, type }: Props) {
             {/* Title (for questions) */}
             {type === "questions" && (
               <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">
                   Question Title <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -234,7 +234,7 @@ export default function QATab({ user, type }: Props) {
                   onChange={handleChange}
                   placeholder={meta.placeholder}
                   required
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 transition-all bg-slate-50/50"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 transition-all bg-slate-50/50 font-medium"
                 />
               </div>
             )}
@@ -242,7 +242,7 @@ export default function QATab({ user, type }: Props) {
             {/* College (for reviews) */}
             {type === "reviews" && (
               <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">
                   College / Course Name <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -252,7 +252,7 @@ export default function QATab({ user, type }: Props) {
                   onChange={handleChange}
                   placeholder="e.g. IIT Bombay — B.Tech Computer Science"
                   required
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 transition-all bg-slate-50/50"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 transition-all bg-slate-50/50 font-medium"
                 />
               </div>
             )}
@@ -260,7 +260,7 @@ export default function QATab({ user, type }: Props) {
             {/* Star Rating (for reviews) */}
             {type === "reviews" && (
               <div>
-                <label className="block text-xs font-bold text-slate-600 mb-2 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wider">
                   Overall Rating <span className="text-red-400">*</span>
                 </label>
                 <div className="flex items-center gap-2">
@@ -285,7 +285,7 @@ export default function QATab({ user, type }: Props) {
                       </span>
                     </button>
                   ))}
-                  <span className="ml-2 text-sm font-bold text-slate-600">
+                  <span className="ml-2 text-sm font-semibold text-slate-600">
                     {formData.rating === 5
                       ? "Excellent"
                       : formData.rating === 4
@@ -302,7 +302,7 @@ export default function QATab({ user, type }: Props) {
 
             {/* Description / Content */}
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">
                 {type === "questions" ? "Describe your question" : "Your Review"}
                 <span className="text-red-400"> *</span>
               </label>
@@ -317,9 +317,9 @@ export default function QATab({ user, type }: Props) {
                     ? "Provide more details about your question. Include specific context like year, branch, location, etc."
                     : "Share your honest experience — academics, faculty, placements, infrastructure, campus life..."
                 }
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 transition-all bg-slate-50/50 resize-none"
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 transition-all bg-slate-50/50 resize-none font-medium"
               />
-              <p className="text-[10px] text-slate-400 mt-1">
+              <p className="text-[10px] text-slate-400 mt-1 font-medium">
                 {formData.content.length} / 2000 characters
               </p>
             </div>
@@ -327,7 +327,7 @@ export default function QATab({ user, type }: Props) {
             {/* Tags (for questions) */}
             {type === "questions" && (
               <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">
                   Tags (comma-separated)
                 </label>
                 <input
@@ -336,7 +336,7 @@ export default function QATab({ user, type }: Props) {
                   value={formData.tags}
                   onChange={handleChange}
                   placeholder="e.g. B.Tech, Admission, Cutoff, Maharashtra"
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 transition-all bg-slate-50/50"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400 transition-all bg-slate-50/50 font-medium"
                 />
               </div>
             )}
@@ -345,14 +345,14 @@ export default function QATab({ user, type }: Props) {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors"
+                className="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2.5 bg-green-600 text-white rounded-xl text-sm font-black hover:bg-green-700 transition-colors shadow-md shadow-green-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-6 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition-colors shadow-md shadow-green-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {submitting ? (
                   <>
@@ -384,14 +384,14 @@ export default function QATab({ user, type }: Props) {
             </div>
 
             <div className="text-center space-y-2 max-w-sm">
-              <h3 className="text-lg font-black text-slate-700">{meta.emptyTitle}</h3>
-              <p className="text-sm text-slate-400 leading-relaxed">{meta.emptyDesc}</p>
+              <h3 className="text-lg font-bold text-slate-700">{meta.emptyTitle}</h3>
+              <p className="text-sm text-slate-400 leading-relaxed font-medium">{meta.emptyDesc}</p>
             </div>
 
             {canSubmit ? (
               <button
                 onClick={() => setShowForm(true)}
-                className="mt-2 flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 transition-colors shadow-md shadow-green-200"
+                className="mt-2 flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition-colors shadow-md shadow-green-200"
               >
                 <span className="material-symbols-outlined text-[18px]">{meta.actionIcon}</span>
                 {meta.actionLabel}
@@ -399,7 +399,7 @@ export default function QATab({ user, type }: Props) {
             ) : (
               <a
                 href="/colleges"
-                className="mt-2 flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 transition-colors shadow-md shadow-green-200"
+                className="mt-2 flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition-colors shadow-md shadow-green-200"
               >
                 <span className="material-symbols-outlined text-[18px]">{meta.actionIcon}</span>
                 {meta.actionLabel}
@@ -427,7 +427,3 @@ export default function QATab({ user, type }: Props) {
     </div>
   );
 }
-
-
-
-
