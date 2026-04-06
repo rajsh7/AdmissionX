@@ -68,83 +68,79 @@ export default function CourseListClient({
   return (
     <>
       {/* Add button */}
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-start mb-4">
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/25 transition-all"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
         >
-          <span className="material-symbols-rounded text-[20px]" style={ICO_FILL}>add_circle</span>
-          Add Course
+          Add new college course +
         </button>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white border-[3px] border-[#3498db] shadow-sm overflow-hidden">
         {courses.length === 0 ? (
+          /* Empty state */
           <div className="py-20 text-center">
             <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>menu_book</span>
             <p className="text-slate-500 font-semibold text-sm">No course records found.</p>
-            <button
-              onClick={openAdd}
-              className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
-            >
-              <span className="material-symbols-rounded text-[18px]" style={ICO_FILL}>add_circle</span>
-              Add first course
-            </button>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-center border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-left">
-                  <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Course Detail</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Fees &amp; Seats</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+                <tr className="bg-[#444444] text-white uppercase text-[11px] font-black tracking-widest">
+                  <th className="px-4 py-4 border-r border-white/10 w-16">ID</th>
+                  <th className="px-4 py-4 border-r border-white/10">Course Name</th>
+                  <th className="px-4 py-4 border-r border-white/10">Details</th>
+                  <th className="px-4 py-4 border-r border-white/10">College</th>
+                  <th className="px-4 py-4 border-r border-white/10">Fees</th>
+                  <th className="px-4 py-4 border-r border-white/10">Seats</th>
+                  <th className="px-4 py-4 border-r border-white/10">Last Update by</th>
+                  <th className="px-4 py-5">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-slate-100">
                 {courses.map((c, idx) => (
-                  <tr key={c.id} className="hover:bg-blue-50/20 transition-colors group">
-                    <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-slate-800 leading-snug">
-                          {c.course_name || "General Program"}
-                        </span>
-                        <span className="text-[11px] text-blue-600 font-bold uppercase tracking-tighter mt-0.5">
-                          {[c.degree_name, c.stream_name].filter(Boolean).join(" • ")}
-                          {c.courseduration && (
-                            <span className="text-slate-400 ml-1.5 font-medium normal-case">({c.courseduration})</span>
-                          )}
-                        </span>
-                      </div>
+                  <tr 
+                    key={c.id} 
+                    className={`transition-colors text-[13px] font-medium ${idx % 2 === 0 ? "bg-[#e8f4fd]" : "bg-white"} hover:bg-blue-100/30`}
+                  >
+                    <td className="px-4 py-3.5 border-r border-slate-200/60 font-bold text-slate-400">
+                      {String(idx + 1).padStart(4, '0')}
                     </td>
-                    <td className="px-4 py-4">
-                      <span className="text-slate-600 font-medium truncate max-w-[180px] block">{c.college_name}</span>
+                    <td className="px-4 py-3.5 border-r border-slate-200/60 font-bold text-slate-700">
+                      {c.course_name || "General Program"}
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col text-xs space-y-0.5">
-                        <span className="text-slate-700 font-bold">
-                          {c.fees ? `₹ ${c.fees}` : <span className="text-slate-400 font-normal">N/A</span>}
-                        </span>
-                        <span className="text-slate-400 font-semibold uppercase tracking-widest text-[9px]">
-                          {c.seats ? `${c.seats} Seats` : "N/A"}
-                        </span>
-                      </div>
+                    <td className="px-4 py-3.5 border-r border-slate-200/60 font-semibold text-slate-500 text-xs">
+                      {[c.degree_name, c.stream_name].filter(Boolean).join(" • ")}
                     </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => openEdit(c)}
-                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                          title="Edit"
-                        >
-                          <span className="material-symbols-rounded text-[18px]">edit</span>
-                        </button>
-                        <DeleteButton action={onDelete.bind(null, c.id)} size="sm" />
-                      </div>
+                    <td className="px-4 py-3.5 border-r border-slate-200/60 text-slate-600">
+                      {c.college_name}
+                    </td>
+                    <td className="px-4 py-3.5 border-r border-slate-200/60 font-black text-slate-700">
+                      {c.fees ? `₹${c.fees}` : "—"}
+                    </td>
+                    <td className="px-4 py-3.5 border-r border-slate-200/60 font-black text-slate-700">
+                      {c.seats || "—"}
+                    </td>
+                    <td className="px-4 py-3.5 border-r border-slate-200/60 text-blue-400 font-bold">
+                      Amit Tyagi
+                    </td>
+                    <td className="px-4 py-3.5 flex items-center justify-center gap-1.5 min-w-[100px]">
+                      <button
+                        onClick={() => openEdit(c)}
+                        className="w-10 h-10 flex items-center justify-center bg-[#444444] text-white rounded hover:bg-black transition-all"
+                        title="Edit"
+                      >
+                        <span className="material-symbols-rounded text-[20px]" style={ICO_FILL}>edit_square</span>
+                      </button>
+                      <button
+                        className="w-10 h-10 flex items-center justify-center bg-[#0799fb] text-white rounded hover:bg-blue-600 transition-all"
+                        title="Details"
+                      >
+                        <span className="material-symbols-rounded text-[20px]" style={ICO_FILL}>description</span>
+                      </button>
                     </td>
                   </tr>
                 ))}

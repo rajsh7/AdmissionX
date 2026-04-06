@@ -115,6 +115,7 @@ interface ProfileRow {
   count_reviews: number;
   count_scholarships: number;
   count_sports: number;
+  created_at: Date | string | null;
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -206,6 +207,7 @@ export default async function CollegeProfilePage({
     count_reviews:           cReviews[p.id]     ?? 0,
     count_scholarships:      cScholarships[p.id] ?? 0,
     count_sports:            0,
+    created_at:              p.created_at || null,
   }));
 
   const totalPages = Math.ceil(total / PAGE_SIZE);

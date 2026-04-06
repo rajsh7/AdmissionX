@@ -44,3 +44,11 @@ async function main() {
 }
 
 main().catch(console.error);
+
+console.log("  Email   :", email);
+console.log("  Password:", password);
+
+await client.close();
+}
+
+main().catch(console.error);

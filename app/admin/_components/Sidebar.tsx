@@ -62,7 +62,7 @@ export function SidebarSkeleton() {
   );
 }
 
-export function SidebarContent({
+export function AdminSidebarContentV2({
   admin,
   pathname,
   onLogout,
@@ -148,12 +148,20 @@ export function SidebarContent({
                                  <li key={`sub-item-${item.label}-${sub.label}-${sIdx}`}>
                                    <Link
                                      href={sub.href}
-                                     className={`flex items-center px-14 py-2 text-[12px] font-medium transition-all ${subActive
+                                     className={`flex items-center gap-3 px-10 py-2 text-[12px] font-medium transition-all ${subActive
                                        ? "text-white"
                                        : "text-white/60 hover:text-white"
                                        }`}
                                    >
-                                     {sub.label}
+                                     {sub.icon && (
+                                       <span
+                                         className="material-symbols-rounded text-[18px] flex-shrink-0"
+                                         style={subActive ? ICO_FILL : ICO}
+                                       >
+                                         {sub.icon}
+                                       </span>
+                                     )}
+                                     <span className="truncate">{sub.label}</span>
                                    </Link>
                                  </li>
                                );

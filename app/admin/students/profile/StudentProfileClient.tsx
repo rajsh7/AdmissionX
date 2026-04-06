@@ -49,109 +49,128 @@ export default function StudentProfileClient({
     }
   }
 
-  const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
-  const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
-
   return (
     <>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-emerald-600 text-[22px]" style={ICO_FILL}>
-              badge
-            </span>
-            Student Profiles
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Detailed profile information for registered students.
-          </p>
+      {/* Top Header & Actions */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 px-2">
+        <div className="flex items-center gap-4 flex-1 max-w-xl">
+          <form method="GET" className="relative flex-1 group">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[20px] group-focus-within:text-admin-blue transition-colors">search</span>
+            <input 
+              name="q"
+              defaultValue={q}
+              placeholder="Search students..."
+              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-admin-blue/20 focus:border-admin-blue transition-all"
+            />
+          </form>
+          <button 
+            onClick={openAddModal}
+            className="flex items-center gap-2 bg-admin-blue text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-600 transition-colors shadow-sm whitespace-nowrap"
+          >
+            <span className="material-symbols-outlined text-[18px]">add_circle</span>
+            Add Profile
+          </button>
         </div>
-        <button
-          onClick={openAddModal}
-          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
-        >
-          <span className="material-symbols-rounded text-[18px]" style={ICO_FILL}>
-            add
-          </span>
-          Add Profile
+      </div>
+
+      {/* Tabs */}
+      <div className="flex items-center gap-1 mb-0 mt-2 px-2">
+        <button className="flex items-center justify-between !bg-admin-dark !text-white px-8 py-3 rounded-t-lg font-bold text-[13px] min-w-[200px]">
+          Profile Information
+          <span className="material-symbols-outlined text-[18px] ml-4">expand_more</span>
+        </button>
+        <button className="flex items-center justify-between !bg-admin-dark !text-white px-8 py-3 rounded-t-lg font-bold text-[13px] min-w-[200px]">
+          Bookmarks
+          <span className="material-symbols-outlined text-[18px] ml-4">chevron_right</span>
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-        <form method="GET" className="flex-1 flex gap-2">
-          <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[18px]" style={ICO}>
-              search
-            </span>
-            <input
-              name="q"
-              defaultValue={q}
-              placeholder="Search by name, email, or parent name..."
-              className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-slate-50"
-            />
-          </div>
-          <button type="submit" className="px-4 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-colors">
-            Search
-          </button>
-        </form>
-      </div>
-
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      {/* Main Table Interface */}
+      <div className="bg-white border-[2.5px] border-admin-blue overflow-hidden shadow-sm mx-2">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-[13px] border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Student</th>
-                <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Parent Details</th>
-                <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Birth/Gender</th>
-                <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Exam Info</th>
-                <th className="text-right px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+              <tr className="bg-admin-header text-white">
+                <th className="px-2 py-3.5 font-bold border-r border-[#666666] w-16 text-center text-[12px] uppercase">ID</th>
+                <th className="px-4 py-3.5 font-bold border-r border-[#666666] text-center text-[12px] uppercase">Student name</th>
+                <th className="px-4 py-3.5 font-bold border-r border-[#666666] text-center text-[12px] uppercase">Phone No.</th>
+                <th className="px-4 py-3.5 font-bold border-r border-[#666666] text-center text-[12px] uppercase">Email Address</th>
+                <th className="px-3 py-3.5 font-bold border-r border-[#666666] text-center text-[12px] uppercase">Gender</th>
+                <th className="px-3 py-3.5 font-bold border-r border-[#666666] text-center text-[12px] uppercase">DOB</th>
+                <th className="px-4 py-3.5 font-bold border-r border-[#666666] text-center text-[12px] uppercase">Last Update by</th>
+                <th className="px-4 py-3.5 font-bold text-center text-[12px] uppercase">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
-              {profiles.map((profile) => (
-                <tr key={profile.id} className="hover:bg-slate-50/70 transition-colors">
-                  <td className="px-4 py-3.5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xs">
-                        {(profile.student_name || "U")[0].toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-slate-800">{profile.student_name || "Unknown User"}</p>
-                        <p className="text-xs text-slate-400">{profile.student_email || "N/A"}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <p className="text-slate-700 font-medium">{profile.parentsname || "—"}</p>
-                    <p className="text-xs text-slate-400">{profile.parentsnumber || "—"}</p>
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <p className="text-slate-600">{profile.gender || "—"}</p>
-                    <p className="text-xs text-slate-400">
+            <tbody className="border-t border-admin-blue">
+              {profiles.length > 0 ? (
+                profiles.map((profile, i) => (
+                  <tr key={profile.id} className={`${i % 2 === 1 ? "bg-admin-stripe" : "bg-white"} border-b border-[#D1E1F5] last:border-0`}>
+                    <td className="px-2 py-3.5 text-center border-r border-[#D1E1F5] text-slate-500 font-medium">
+                      {String(profile.id).padStart(4, '0')}
+                    </td>
+                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] font-normal text-slate-700">
+                      {profile.student_name}
+                    </td>
+                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] text-slate-600">
+                      {profile.parentsnumber ? (profile.parentsnumber.startsWith('+') ? profile.parentsnumber : `+91 ${profile.parentsnumber}`) : "—"}
+                    </td>
+                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] text-slate-500">
+                      {profile.student_email}
+                    </td>
+                    <td className="px-3 py-3.5 text-center border-r border-[#D1E1F5] text-slate-600">
+                      {profile.gender}
+                    </td>
+                    <td className="px-3 py-3.5 text-center border-r border-[#D1E1F5] text-slate-500">
                       {formatDate(profile.dateofbirth)}
-                    </p>
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <p className="text-slate-600 font-medium">{profile.entranceexamname || "—"}</p>
-                    <p className="text-xs text-slate-400">{profile.entranceexamnumber || "—"}</p>
-                  </td>
-                  <td className="px-4 py-3.5 text-right flex items-center flex-row gap-2 justify-end">
-                    <button onClick={() => openEditModal(profile)} className="text-emerald-600 hover:text-emerald-700 font-semibold text-xs py-1 px-2 border border-emerald-100 bg-emerald-50 hover:bg-emerald-100 rounded">
-                      Edit
-                    </button>
-                    <button onClick={() => handleDelete(profile.id)} className="text-red-600 hover:text-red-700 font-semibold text-xs py-1 px-2 border border-red-100 bg-red-50 hover:bg-red-100 rounded">
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {profiles.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="text-center py-6 text-slate-500 text-sm">
-                    No student profiles found.
-                  </td>
-                </tr>
+                    </td>
+                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] text-slate-600">
+                      Amit Tyagi
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <div className="flex items-center justify-center gap-2.5">
+                        <button 
+                          onClick={() => openEditModal(profile)} 
+                          className="w-[32px] h-[32px] flex items-center justify-center bg-admin-dark text-white rounded-[4px] hover:bg-black transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">edit_square</span>
+                        </button>
+                        <div className="w-[1px] h-5 bg-slate-300 mx-1" />
+                        <button 
+                          onClick={() => handleDelete(profile.id)} 
+                          className="w-[32px] h-[32px] flex items-center justify-center bg-admin-blue text-white rounded-[4px] hover:bg-blue-600 transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">description</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                offset === 0 && Array(15).fill(null).map((_, i) => (
+                  <tr key={`placeholder-${i}`} className={`${i % 2 === 1 ? "bg-admin-stripe" : "bg-white"} border-b border-[#D1E1F5] last:border-0 opacity-40 grayscale`}>
+                    <td className="px-2 py-3.5 text-center border-r border-[#D1E1F5] text-slate-400 font-medium">0101</td>
+                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] font-normal text-slate-400">Ankarya</td>
+                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] text-slate-400">+91 823-281-8292</td>
+                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] text-slate-400">ankarya@gmail...</td>
+                    <td className="px-3 py-3.5 text-center border-r border-[#D1E1F5] text-slate-400">Female</td>
+                    <td className="px-3 py-3.5 text-center border-r border-[#D1E1F5] text-slate-400">11 Jan 2002</td>
+                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] text-slate-400">Amit Tyagi</td>
+                    <td className="px-4 py-3.5">
+                      <div className="flex items-center justify-center gap-2.5">
+                        <div className="w-[30px] h-[30px] bg-slate-200 rounded-[4px]" />
+                        <div className="w-[1px] h-5 bg-slate-200 mx-1" />
+                        <div className="w-[30px] h-[30px] bg-slate-200 rounded-[4px]" />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+              {profiles.length === 0 && offset > 0 && (
+                 <tr>
+                    <td colSpan={8} className="text-center py-20 text-slate-400 font-medium">
+                      No more records found on this page.
+                    </td>
+                 </tr>
               )}
             </tbody>
           </table>
@@ -164,12 +183,12 @@ export default function StudentProfileClient({
             </p>
             <div className="flex gap-1">
               {offset / PAGE_SIZE + 1 > 1 && (
-                <Link href={`?page=${offset / PAGE_SIZE}&q=${q}`} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
+                <Link href={`?page=${offset / PAGE_SIZE}&q=${q}`} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded hover:bg-slate-50">
                   Prev
                 </Link>
               )}
               {offset / PAGE_SIZE + 1 < totalPages && (
-                <Link href={`?page=${offset / PAGE_SIZE + 2}&q=${q}`} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
+                <Link href={`?page=${offset / PAGE_SIZE + 2}&q=${q}`} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded hover:bg-slate-50 transition-colors">
                   Next
                 </Link>
               )}
@@ -188,7 +207,3 @@ export default function StudentProfileClient({
     </>
   );
 }
-
-
-
-

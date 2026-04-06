@@ -178,7 +178,7 @@ async function fetchTopUniversities(opts: {
   dataRows.sort((a, b) => (orderMap.get(String(a._id)) ?? 0) - (orderMap.get(String(b._id)) ?? 0));
 
   const universities: CollegeResult[] = dataRows.map((row) => ({
-    id: row._id,
+    id: String(row._id),
     slug: row.slug,
     name: row.name && row.name !== row.slug ? row.name : slugToName(row.slug || "university"),
     location: row.registeredSortAddress || row.city_name || "India",
@@ -241,16 +241,16 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
     ]);
 
   const streamOptions: FilterOption[] = streamRows.map((r) => ({
-    id: r._id, name: r.name,
+    id: String(r._id), name: r.name,
     slug: r.pageslug ?? r.name.toLowerCase().replace(/\s+/g, "-"),
   }));
 
   const degreeOptions: FilterOption[] = degreeRows.map((r) => ({
-    id: r._id, name: r.name,
+    id: String(r._id), name: r.name,
     slug: r.pageslug ?? r.name.toLowerCase().replace(/\s+/g, "-"),
   }));
 
-  const cityOptions: FilterOption[] = cityRows.map((r) => ({ id: r._id, name: r.name }));
+  const cityOptions: FilterOption[] = cityRows.map((r) => ({ id: String(r._id), name: r.name }));
 
   const streamName = streamOptions.find((s) => s.slug === stream)?.name ?? stream;
   const pageSubtitle = stream

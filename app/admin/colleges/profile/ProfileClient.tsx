@@ -31,6 +31,7 @@ interface ProfileRow {
   count_reviews: number;
   count_scholarships: number;
   count_sports: number;
+  created_at: Date | string | null;
 }
 
 interface ProfileClientProps {
@@ -76,222 +77,258 @@ export default function ProfileClient({
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProfile, setEditingProfile] = useState<ProfileRow | null>(null);
   const [searchQuery, setSearchQuery] = useState(q);
-  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    if (searchQuery === q) return;
-    if (searchTimeout.current) clearTimeout(searchTimeout.current);
-    searchTimeout.current = setTimeout(() => {
-      const params = new URLSearchParams();
-      if (searchQuery) params.set("q", searchQuery);
-      params.set("page", "1");
-      router.push(`${pathname}?${params.toString()}`);
-    }, 400);
-    return () => { if (searchTimeout.current) clearTimeout(searchTimeout.current); };
-  }, [searchQuery, q, pathname, router]);
+  // Form states for the new filter UI
+  const [filters, setFilters] = useState({
+    collegeName: "",
+    email: "",
+    university: "",
+    review: "",
+    agreement: "",
+    verified: "",
+    addressType: "",
+    showOnHome: "",
+    showOnTop: "",
+    lastUpdatedBy: ""
+  });
+
+  const handleClear = () => {
+    setFilters({
+      collegeName: "",
+      email: "",
+      university: "",
+      review: "",
+      agreement: "",
+      verified: "",
+      addressType: "",
+      showOnHome: "",
+      showOnTop: "",
+      lastUpdatedBy: ""
+    });
+    setSearchQuery("");
+    router.push(pathname);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (searchQuery) params.set("q", searchQuery);
+    // Add logic for other filters if needed in the future
+    params.set("page", "1");
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const FormItem = ({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) => (
+    <div className={`relative ${className}`}>
+      <label className="absolute -top-2.5 left-4 bg-white px-2 text-[12px] font-bold text-slate-400 z-10 uppercase tracking-tight">
+        {label}
+      </label>
+      {children}
+    </div>
+  );
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-8 space-y-8 max-w-[1600px] font-lexend">
+      
+      {/* Main Filter Card */}
+      <div className="bg-white rounded-[1.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
+        <div className="p-8 border-b border-slate-50">
+          <h1 className="text-2xl font-extrabold text-slate-700 tracking-tight">Search College Profile details</h1>
+        </div>
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>apartment</span>
-            College Profiles
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">Manage published college profiles, rankings, and verification status.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="relative w-full sm:w-80">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search colleges, slugs..."
-              className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all font-medium"
-            />
+        <form onSubmit={handleSubmit} className="p-10" style={{ gap: '48px', display: 'flex', flexDirection: 'column' }}>
+          {/* Row 1 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-10">
+            <FormItem label="College Name">
+               <div className="relative group">
+                  <select 
+                    className="w-full h-14 pl-5 border border-slate-200 rounded-xl bg-white text-slate-500 font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all appearance-none cursor-pointer"
+                    value={filters.collegeName}
+                    onChange={(e) => setFilters({...filters, collegeName: e.target.value})}
+                  >
+                    <option value="">Select College</option>
+                  </select>
+                  <span className="absolute right-5 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 pointer-events-none group-hover:text-slate-600 transition-colors">chevron_right</span>
+               </div>
+            </FormItem>
+            <FormItem label="Email Address">
+              <input
+                type="text"
+                placeholder="Enter email address"
+                className="w-full h-14 px-5 border border-slate-200 rounded-xl bg-white text-slate-700 font-medium placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all"
+                value={filters.email}
+                onChange={(e) => setFilters({...filters, email: e.target.value})}
+              />
+            </FormItem>
           </div>
-          <button
-            onClick={() => { setEditingProfile(null); setModalOpen(true); }}
-            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-black shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all shrink-0"
-          >
-            <span className="material-symbols-rounded text-[18px]">add_circle</span>
-            Add Profile
-          </button>
-        </div>
+
+          <div style={{ borderTop: '1px dashed #e2e8f0', padding: '10px 0' }} />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+            {/* Row 2 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-10">
+              <FormItem label="University">
+                <select 
+                  className="w-full h-14 px-5 border border-slate-200 rounded-xl bg-white text-slate-500 font-medium focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer"
+                  value={filters.university}
+                  onChange={(e) => setFilters({...filters, university: e.target.value})}
+                >
+                  <option value="">Select university</option>
+                </select>
+              </FormItem>
+              <FormItem label="Review">
+                <select className="w-full h-14 px-5 border border-slate-200 rounded-xl bg-white text-slate-500 font-medium focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer">
+                  <option value="">Select Review</option>
+                </select>
+              </FormItem>
+              <FormItem label="Agreement">
+                <select className="w-full h-14 px-5 border border-slate-200 rounded-xl bg-white text-slate-500 font-medium focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer">
+                  <option value="">Select agreement</option>
+                </select>
+              </FormItem>
+            </div>
+
+            {/* Row 3 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-10">
+              <FormItem label="Verified">
+                <select className="w-full h-14 px-5 border border-slate-200 rounded-xl bg-white text-slate-500 font-medium focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer">
+                  <option value="">Select verified</option>
+                </select>
+              </FormItem>
+              <FormItem label="Address Type">
+                <select className="w-full h-14 px-5 border border-slate-200 rounded-xl bg-white text-slate-500 font-medium focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer">
+                  <option value="">Select address type</option>
+                </select>
+              </FormItem>
+              <div />
+            </div>
+          </div>
+
+          <div style={{ borderTop: '1px dashed #e2e8f0', padding: '10px 0' }} />
+
+          {/* Row 4 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-4">
+            <FormItem label="Is Show On Home">
+              <select className="w-full h-14 px-5 border border-slate-200 rounded-xl bg-white text-slate-500 font-medium focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer">
+                <option value="">Select Option</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+            </FormItem>
+            <FormItem label="Is Show On Top">
+              <select className="w-full h-14 px-5 border border-slate-200 rounded-xl bg-white text-slate-500 font-medium focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer">
+                <option value="">Select Option</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+            </FormItem>
+            <FormItem label="Last Updated by admin">
+              <select className="w-full h-14 px-5 border border-slate-200 rounded-xl bg-white text-slate-500 font-medium focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer">
+                <option value="">Select employee</option>
+              </select>
+            </FormItem>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex items-center justify-center gap-8 pt-6">
+             <button 
+               type="button" 
+               onClick={handleClear}
+               className="w-52 h-14 text-white font-black text-xl rounded-xl shadow-lg transition-all uppercase tracking-wider"
+               style={{ backgroundColor: '#8E97A4' }}
+             >
+               Clear
+             </button>
+             <button 
+               type="submit"
+               className="w-52 h-14 text-white font-black text-xl rounded-xl shadow-lg transition-all uppercase tracking-wider"
+               style={{ backgroundColor: '#FF4242' }}
+             >
+               Submit
+             </button>
+          </div>
+        </form>
       </div>
 
-      {/* 2-column card grid */}
-      {profiles.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm py-24 text-center">
-          <span className="material-symbols-rounded text-7xl text-slate-200 block mb-4" style={ICO_FILL}>apartment</span>
-          <p className="text-slate-500 font-semibold text-sm">No college profiles found.</p>
-          {q && (
-            <Link href="/admin/colleges/profile" className="text-blue-600 text-xs mt-3 inline-block hover:underline font-bold">
-              Clear search
-            </Link>
-          )}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {profiles.map((p, idx) => {
-            const imgUrl = buildImageUrl(p.bannerimage);
-            const initial = (p.name || "C")[0].toUpperCase();
-            const bgColor = COLORS[initial.charCodeAt(0) % COLORS.length];
-            return (
-              <div
-                key={p.id}
-                className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all duration-300 overflow-hidden flex flex-col"
-              >
-                {/* Banner image area */}
-                <div className="relative h-44 bg-slate-100 overflow-hidden flex-shrink-0">
-                  {imgUrl ? (
-                    <img
-                      src={imgUrl}
-                      alt={p.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                        const fb = e.currentTarget.parentElement?.querySelector(".img-fallback") as HTMLElement;
-                        if (fb) fb.style.display = "flex";
-                      }}
-                    />
-                  ) : null}
-                  <div
-                    className="img-fallback absolute inset-0 items-center justify-center"
-                    style={{ background: bgColor, display: imgUrl ? "none" : "flex" }}
-                  >
-                    <span className="text-white font-black text-6xl opacity-20">{initial}</span>
-                  </div>
-
-                  {/* Overlay badges */}
-                  <div className="absolute top-3 left-3 flex gap-1.5">
-                    {p.verified ? (
-                      <span className="flex items-center gap-0.5 text-[10px] font-black text-blue-600 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow">
-                        <span className="material-symbols-rounded text-[11px]" style={ICO_FILL}>verified</span>
-                        VERIFIED
-                      </span>
-                    ) : null}
-                    {p.isTopUniversity ? (
-                      <span className="flex items-center gap-0.5 text-[10px] font-black text-amber-600 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow">
-                        <span className="material-symbols-rounded text-[11px]" style={ICO_FILL}>rewarded_ads</span>
-                        TOP
-                      </span>
-                    ) : null}
-                  </div>
-                  <div className="absolute top-3 right-3 text-[10px] font-black text-white bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full">
-                    #{offset + idx + 1}
-                  </div>
-                </div>
-
-                {/* Card body */}
-                <div className="p-5 flex flex-col flex-1">
-                  <h3 className="font-extrabold text-slate-800 text-base leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors mb-1">
-                    {p.name}
-                  </h3>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-4">{p.slug}</p>
-
-                  {/* Meta */}
-                  <div className="flex flex-wrap items-center gap-2 mb-4">
-                    <span className="flex items-center gap-1 text-[11px] font-bold text-slate-700">
-                      <span className="material-symbols-rounded text-amber-400 text-[13px]" style={ICO_FILL}>star</span>
-                      {parseFloat(String(p.rating)).toFixed(1)}
-                    </span>
-                    {p.ranking ? (
-                      <span className="flex items-center gap-1 text-[11px] font-bold text-red-600">
-                        <span className="material-symbols-rounded text-[13px]" style={ICO_FILL}>workspace_premium</span>
-                        Rank #{p.ranking}
-                      </span>
-                    ) : null}
-                    <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-                      {p.universityType || "Private"}
-                    </span>
-                    {p.city_name ? (
-                      <span className="flex items-center gap-0.5 text-[10px] font-bold text-slate-400">
-                        <span className="material-symbols-rounded text-[12px]">location_on</span>
-                        {p.city_name}
-                      </span>
-                    ) : null}
-                  </div>
-
-                  {/* Content stats */}
-                  <div className="flex flex-wrap gap-1.5 mb-5">
-                    {[
-                      { label: "Courses", val: p.count_courses, cls: "bg-orange-50 text-orange-600" },
-                      { label: "Faculty", val: p.count_faculty, cls: "bg-blue-50 text-blue-600" },
-                      { label: "Placements", val: p.count_placements, cls: "bg-emerald-50 text-emerald-600" },
-                      { label: "Events", val: p.count_events, cls: "bg-amber-50 text-amber-600" },
-                      { label: "Scholarships", val: p.count_scholarships, cls: "bg-purple-50 text-purple-600" },
-                      { label: "Reviews", val: p.count_reviews, cls: "bg-pink-50 text-pink-600" },
-                    ].map((s) => (
-                      <span key={s.label} className={`text-[9px] font-black px-2 py-0.5 rounded-full ${s.val > 0 ? s.cls : "bg-slate-50 text-slate-300"}`}>
-                        {s.label}: {s.val}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
-                    <Link
-                      href={`/college/${p.slug}`}
-                      target="_blank"
-                      className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-xl transition-all"
-                    >
-                      <span className="material-symbols-rounded text-[15px]">visibility</span>
-                      View
-                    </Link>
-                    <button
-                      onClick={() => { setEditingProfile(p); setModalOpen(true); }}
-                      className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 px-3 py-2 rounded-xl transition-all"
-                    >
-                      <span className="material-symbols-rounded text-[15px]">edit</span>
-                      Edit
+      {/* Results Table */}
+      <div className="bg-white rounded-[5px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-[#3498db] text-white uppercase text-[12px] font-black tracking-widest text-center">
+                <th className="px-4 py-5 border-r border-white/10">ID</th>
+                <th className="px-4 py-5 border-r border-white/10">Created Date</th>
+                <th className="px-4 py-5 border-r border-white/10">College Name</th>
+                <th className="px-4 py-5 border-r border-white/10">University</th>
+                <th className="px-4 py-5 border-r border-white/10">College Type</th>
+                <th className="px-4 py-5 border-r border-white/10">Verified</th>
+                <th className="px-4 py-5 border-r border-white/10">Review</th>
+                <th className="px-4 py-5 border-r border-white/10">Agreement</th>
+                <th className="px-4 py-5 border-r border-white/10">Document</th>
+                <th className="px-4 py-5 border-r border-white/10">Email</th>
+                <th className="px-4 py-5 border-r border-white/10">Last Updated By</th>
+                <th className="px-4 py-5">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="text-slate-600 font-medium text-sm text-center">
+              {profiles.map((p, index) => (
+                <tr key={p.id} className={`border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors ${index % 2 === 0 ? "bg-[#e8f4fd]" : "bg-white"}`}>
+                  <td className="px-4 py-4 font-bold text-slate-400">{p.id}</td>
+                  <td className="px-4 py-4 whitespace-nowrap" suppressHydrationWarning>
+                    {p.created_at ? (
+                      (() => {
+                        const d = new Date(p.created_at);
+                        const dateStr = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                        const timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                        return `${dateStr} at ${timeStr}`;
+                      })()
+                    ) : 'Feb 25, 2026 at 06:40'}
+                  </td>
+                  <td className="px-4 py-4 font-bold text-slate-800">{p.name || p.slug}</td>
+                  <td className="px-4 py-4 text-slate-500">ankarya@gmail...</td>
+                  <td className="px-4 py-4">{p.universityType || "Private"}</td>
+                  <td className="px-4 py-4">11 Jan 2002</td>
+                  <td className="px-4 py-4 font-bold text-slate-700">Amit Tyagi</td>
+                  <td className="px-4 py-4">
+                    <span className="text-slate-400 font-bold uppercase">{p.verified ? 'YES' : 'NO'}</span>
+                  </td>
+                  <td className="px-4 py-4 font-bold text-slate-400">NO</td>
+                  <td className="px-4 py-4">
+                    <button className="px-4 py-1.5 rounded-[5px] border border-blue-400 text-blue-500 text-[11px] font-bold hover:bg-blue-50 transition-colors">
+                      Send welcome email
                     </button>
-                    <DeleteButton action={onDelete.bind(null, p.id)} size="sm" />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+                  </td>
+                  <td className="px-4 py-4">
+                    <button className="px-4 py-1.5 rounded-[5px] bg-[#444444] text-white text-[11px] font-bold">
+                      Not Update Yet
+                    </button>
+                  </td>
+                  <td className="px-4 py-4">
+                    <button className="px-6 py-1.5 rounded-[5px] bg-[#3498db] text-white text-[11px] font-bold shadow-md shadow-blue-500/20">
+                      Updated
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between px-6 py-4">
-          <p className="text-xs text-slate-400 font-medium">
-            Showing{" "}
-            <span className="text-slate-700 font-bold">{offset + 1}–{Math.min(offset + pageSize, total)}</span>
-            {" "}of{" "}
-            <span className="text-slate-700 font-bold">{total.toLocaleString()}</span> colleges
-          </p>
-          <div className="flex items-center gap-1.5">
-            {page > 1 ? (
-              <Link href={`/admin/colleges/profile?page=${page - 1}${q ? `&q=${q}` : ""}`} className="w-9 h-9 flex items-center justify-center text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all shadow-sm">
-                <span className="material-symbols-rounded text-[18px]">chevron_left</span>
-              </Link>
-            ) : (
-              <span className="w-9 h-9 flex items-center justify-center text-slate-300 border border-slate-100 rounded-xl cursor-not-allowed">
-                <span className="material-symbols-rounded text-[18px]">chevron_left</span>
-              </span>
-            )}
-            <span className="text-xs font-bold text-slate-700 bg-blue-50 w-9 h-9 flex items-center justify-center rounded-xl border border-blue-100">{page}</span>
-            <span className="text-[10px] text-slate-300 font-bold">/</span>
-            <span className="text-xs font-bold text-slate-400 w-9 h-9 flex items-center justify-center">{totalPages}</span>
-            {page < totalPages ? (
-              <Link href={`/admin/colleges/profile?page=${page + 1}${q ? `&q=${q}` : ""}`} className="w-9 h-9 flex items-center justify-center text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all shadow-sm">
-                <span className="material-symbols-rounded text-[18px]">chevron_right</span>
-              </Link>
-            ) : (
-              <span className="w-9 h-9 flex items-center justify-center text-slate-300 border border-slate-100 rounded-xl cursor-not-allowed">
-                <span className="material-symbols-rounded text-[18px]">chevron_right</span>
-              </span>
-            )}
-          </div>
-        </div>
-      )}
+        {/* Pagination placeholder */}
+        {totalPages > 1 && (
+           <div className="p-6 flex justify-end gap-2 bg-slate-50/30">
+              {[...Array(totalPages)].map((_, i) => (
+                <button 
+                  key={i} 
+                  className={`w-10 h-10 rounded-xl font-bold transition-all ${page === i+1 ? 'bg-[#FF4242] text-white shadow-lg' : 'bg-white text-slate-400 border border-slate-100 hover:border-slate-200'}`}
+                  onClick={() => router.push(`${pathname}?page=${i+1}${q ? `&q=${q}` : ''}`)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+           </div>
+        )}
+      </div>
 
       <ProfileModal
         isOpen={modalOpen}

@@ -6,7 +6,7 @@ export interface NavItem {
     text: string;
     variant: "new" | "updated" | "current";
   };
-  subItems?: { href: string; label: string }[];
+  subItems?: { href: string; label: string; icon?: string }[];
 }
 
 export interface NavGroup {
@@ -24,8 +24,8 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: "person",
         label: "Student Profile",
         subItems: [
-          { href: "/admin/students/profile", label: "Profile Information" },
-          { href: "/admin/students/bookmarks", label: "Bookmarks" },
+          { href: "/admin/students/profile", label: "Profile Information", icon: "badge" },
+          { href: "/admin/students/bookmarks", label: "Bookmarks", icon: "bookmark" },
         ]
       },
       {
@@ -33,20 +33,20 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: "account_balance",
         label: "Colleges Profile",
         subItems: [
-          { href: "/admin/colleges/contact", label: "College Contact Card" },
-          { href: "/admin/colleges/profile", label: "Profile information" },
-          { href: "/admin/colleges/management", label: "College Management Information" },
-          { href: "/admin/colleges/courses", label: "College Course" },
-          { href: "/admin/colleges/events", label: "College Events" },
-          { href: "/admin/colleges/facilities", label: "College Facilities" },
-          { href: "/admin/colleges/faculty", label: "College Faculty" },
-          { href: "/admin/colleges/placements", label: "College Placement" },
-          { href: "/admin/colleges/scholarships", label: "College Scholarship" },
-          { href: "/admin/colleges/cut-offs", label: "College Cut Offs" },
-          { href: "/admin/colleges/sports", label: "College Sports & Activity" },
-          { href: "/admin/colleges/admission", label: "College Admission Procedure" },
-          { href: "/admin/colleges/reviews", label: "College Reviews" },
-          { href: "/admin/colleges/faqs", label: "College Faqs" },
+          { href: "/admin/colleges/contact", label: "College Contact Card", icon: "chat_bubble_outline" },
+          { href: "/admin/colleges/profile", label: "Profile information", icon: "chat_bubble_outline" },
+          { href: "/admin/colleges/management", label: "College Management Information", icon: "chat_bubble_outline" },
+          { href: "/admin/colleges/courses", label: "College Course", icon: "chat_bubble_outline" },
+          { href: "/admin/colleges/events", label: "College Events", icon: "chat_bubble_outline" },
+          { href: "/admin/colleges/facilities", label: "College Facilities", icon: "chat_bubble_outline" },
+          { href: "/admin/colleges/faculty", label: "College Faculty", icon: "chat_bubble_outline" },
+          { href: "/admin/colleges/placements", label: "College Placement", icon: "chat_bubble_outline" },
+          { href: "/admin/colleges/scholarships", label: "College Scholarship", icon: "chat_bubble_outline" },
+          { href: "/admin/colleges/cut-offs", label: "College Cut Offs", icon: "chat_bubble_outline" },
+          { href: "/admin/colleges/sports", label: "College Sports & Activity", icon: "chat_bubble_outline" },
+          { href: "/admin/colleges/admission", label: "College Admission Procedure", icon: "chat_bubble_outline" },
+          { href: "/admin/colleges/reviews", label: "College Reviews", icon: "chat_bubble_outline" },
+          { href: "/admin/colleges/faqs", label: "College Faqs", icon: "chat_bubble_outline" },
         ]
       },
       { href: "/admin/exams", icon: "quiz", label: "Examination Section" },

@@ -7,6 +7,7 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  
   theme: {
     extend: {
       colors: {
@@ -15,6 +16,10 @@ const config: Config = {
         "primary-light": "#FFF3F3",
         "background-light": "#FAFAFA",
         "background-dark": "#0A0A0A",
+        "admin-blue": "#1E88E5",
+        "admin-dark": "#313131",
+        "admin-header": "#444444",
+        "admin-stripe": "#EAF4FF",
         teal: {
           DEFAULT: "#00b5ad",
           light: "#e6f8f7",

@@ -128,23 +128,13 @@ export default function SearchClient({
   pageSubtitle,
   entityName = "College",
   entityNamePlural = "Colleges",
-<<<<<<< HEAD
   gridCols = 3,
   heroImage = "/images/hero-student.png",
   heroRightImage = "",
   heroHeight = "560px",
-  heroObjectPosition = "cover",
-  heroFit = "cover",
-  filterWidth = "300px",
-=======
-  heroImage = "/images/hero-student.png",
-  heroRightImage,
-  heroHeight = "700px",
   heroObjectPosition = "center",
   heroFit = "cover",
   filterWidth = "300px",
-  gridCols = 3,
->>>>>>> f701a05bda162634057550b1b3f328ca2ab9fb7c
 }: SearchClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -230,12 +220,8 @@ export default function SearchClient({
             fill
             priority
             sizes="100vw"
-<<<<<<< HEAD
-            className={`object-${heroObjectPosition}`}
-=======
             style={{ objectFit: heroFit as "cover" | "contain" | "fill" | "none" | "scale-down", objectPosition: heroObjectPosition }}
             className=""
->>>>>>> f701a05bda162634057550b1b3f328ca2ab9fb7c
           />
           <div className="absolute inset-0 bg-neutral-900/60" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />

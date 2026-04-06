@@ -191,31 +191,6 @@ export default async function CollegeCoursesPage({
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
 
-      {/* ── Header ───────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>menu_book</span>
-            College Courses
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Manage course programs offered by various colleges.
-          </p>
-        </div>
-        <form method="GET" action="/admin/colleges/courses" className="w-full sm:w-80">
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
-            <input
-              type="text"
-              name="q"
-              defaultValue={q}
-              placeholder="Search colleges, courses…"
-              className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
-            />
-          </div>
-        </form>
-      </div>
-
       {/* ── Client list (table + modal) ───────────────────────────────────── */}
       <CourseListClient
         courses={courses}

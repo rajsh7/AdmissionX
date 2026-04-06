@@ -1,4 +1,5 @@
 "use client";
+// Force rebuild to refresh Sidebar icons
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -8,7 +9,7 @@ import { Admin, SidebarSkeleton, ICO } from "./Sidebar";
 
 // ─── Dynamic components ────────────────────────────────────────────────────────
 
-const SidebarContent = dynamic(() => import("./Sidebar").then(mod => mod.SidebarContent), {
+const UnifiedSidebarV3 = dynamic(() => import("./UnifiedSidebarV3").then(mod => mod.UnifiedSidebarV3), {
   ssr: false,
   loading: () => <SidebarSkeleton />,
 });
@@ -87,8 +88,8 @@ export default function AdminShell({
     <div className="flex h-screen bg-slate-50 overflow-hidden font-display">
 
       {/* ── Desktop sidebar (always visible ≥ lg) ──────────────────────────── */}
-      <aside className="hidden lg:flex w-56 xl:w-60 bg-slate-900 flex-col flex-shrink-0 overflow-hidden">
-        <SidebarContent admin={admin} pathname={pathname} onLogout={handleLogout} />
+      <aside className="hidden lg:flex w-56 xl:w-60 flex-col flex-shrink-0 overflow-hidden" style={{ backgroundColor: "#313131" }}>
+        <UnifiedSidebarV3 admin={admin} pathname={pathname} onLogout={handleLogout} />
       </aside>
 
       {/* ── Mobile sidebar overlay ─────────────────────────────────────────── */}
@@ -100,8 +101,8 @@ export default function AdminShell({
             onClick={() => setSidebarOpen(false)}
           />
           {/* Drawer */}
-          <aside className="absolute left-0 top-0 bottom-0 w-60 bg-slate-900 shadow-2xl">
-            <SidebarContent admin={admin} pathname={pathname} onLogout={handleLogout} />
+          <aside className="absolute left-0 top-0 bottom-0 w-60 shadow-2xl" style={{ backgroundColor: "#313131" }}>
+            <UnifiedSidebarV3 admin={admin} pathname={pathname} onLogout={handleLogout} />
           </aside>
         </div>
       )}

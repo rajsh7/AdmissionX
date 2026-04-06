@@ -36,18 +36,19 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
   return (
     <section className="w-full py-16 lg:py-24 bg-white">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
-        <div className="flex flex-row items-center justify-between gap-6 mb-12 flex-wrap sm:flex-nowrap">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
            <div className="flex-1">
-              <h2 className="text-[40px] font-semibold text-[#6C6C6C] tracking-tight">Student Life & Beyond</h2>
-              <p className="mt-3 text-slate-500 font-normal max-w-lg hidden sm:block">
-                Expert advice on everything from dorm life to corporate ladders.
+              <h2 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">Student Life & Beyond</h2>
+              <p className="mt-3 text-slate-500 font-medium max-w-lg">
+                Explore our latest articles, guides, and student stories to stay ahead in your academic journey.
               </p>
            </div>
            <Link 
              href="/education-blogs" 
-             className="px-8 h-[59px] flex items-center justify-center rounded-[10px] bg-white border border-slate-100 shadow-sm text-[24px] font-medium text-[#6C6C6C] hover:bg-slate-50 transition-all whitespace-nowrap shrink-0"
+             className="inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-all shadow-sm hover:shadow-md group/btn"
            >
-              Explore all blogs
+              Explore All Articles
+              <span className="ml-2 material-symbols-rounded transition-transform group-hover/btn:translate-x-1">arrow_right_alt</span>
            </Link>
         </div>
 
