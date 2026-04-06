@@ -54,106 +54,99 @@ export default function BookmarkClient({
   const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
   return (
-    <>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-emerald-600 text-[22px]" style={ICO_FILL}>
-              bookmarks
-            </span>
-            Student Bookmarks
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            List of colleges, courses, and blogs bookmarked by students.
-          </p>
-        </div>
-        <button
-          onClick={openAddModal}
-          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
+    <div className="w-full">
+      {/* ── Top Tabs ──────────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-1 mb-4">
+        <div 
+          className="text-white px-5 py-2 text-[13px] font-semibold flex items-center gap-2 rounded-md"
+          style={{ backgroundColor: '#3b3b3b', width: 'max-content' }}
         >
-          <span className="material-symbols-rounded text-[18px]" style={ICO_FILL}>
-            add
-          </span>
-          Add Bookmark
-        </button>
+          Bookmarks
+          <span className="material-symbols-rounded text-[16px]">expand_more</span>
+        </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-        <form method="GET" className="flex-1 flex gap-2">
-          <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[18px]" style={ICO}>
-              search
-            </span>
-            <input
-              name="q"
-              defaultValue={q}
-              placeholder="Search by student or bookmark title..."
-              className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-slate-50"
-            />
-          </div>
-          <button type="submit" className="px-4 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-colors">
-            Search
-          </button>
-        </form>
-      </div>
-
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      {/* ── Main Table ────────────────────────────────────────────────────── */}
+      <div className="bg-white border border-slate-200 shadow-sm overflow-hidden min-h-[600px] rounded-md">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-[13px] text-center border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Student</th>
-                <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Bookmark Title</th>
-                <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Type</th>
-                <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Saved On</th>
-                <th className="text-right px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+              <tr className="text-white border-b border-slate-200" style={{ backgroundColor: '#4a4a4a' }}>
+                <th className="font-semibold py-3 px-4 border-r border-slate-500">ID</th>
+                <th className="font-semibold py-3 px-4 border-r border-slate-500">Student name</th>
+                <th className="font-semibold py-3 px-4 border-r border-slate-500">College Name</th>
+                <th className="font-semibold py-3 px-4 border-r border-slate-500">Course Name</th>
+                <th className="font-semibold py-3 px-4 border-r border-slate-500">Blogs</th>
+                <th className="font-semibold py-3 px-4 border-r border-slate-500">Last Update by</th>
+                <th className="font-semibold py-3 px-4">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
-              {bookmarks.map((bookmark) => (
-                <tr key={bookmark.id} className="hover:bg-slate-50/70 transition-colors">
-                  <td className="px-4 py-3.5">
-                    <div>
-                      <p className="font-semibold text-slate-800">{bookmark.student_name || "Unknown Student"}</p>
-                      <p className="text-xs text-slate-400">{bookmark.student_email || "N/A"}</p>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3.5 max-w-md">
-                    <p className="text-slate-700 font-medium truncate" title={bookmark.title}>
-                      {bookmark.title || "—"}
-                    </p>
-                    <a href={bookmark.url || "#"} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 hover:underline flex items-center gap-1 w-max mt-1">
-                      View Page
-                      <span className="material-symbols-rounded text-[12px]">open_in_new</span>
-                    </a>
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                      bookmark.type_name === 'College' ? 'bg-blue-100 text-blue-600' :
-                      bookmark.type_name === 'Courses' ? 'bg-orange-100 text-orange-600' :
-                      bookmark.type_name === 'Blog' ? 'bg-purple-100 text-purple-600' :
-                      'bg-slate-100 text-slate-600'
-                    }`}>
-                      {bookmark.type_name || "Unknown"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3.5 text-slate-500 text-xs">
-                    {bookmark.created_at ? new Date(bookmark.created_at).toLocaleDateString() : "—"}
-                  </td>
-                  <td className="px-4 py-3.5 text-right flex items-center flex-row gap-2 justify-end">
-                    <button onClick={() => openEditModal(bookmark)} className="text-emerald-600 hover:text-emerald-700 font-semibold text-xs py-1 px-2 border border-emerald-100 bg-emerald-50 hover:bg-emerald-100 rounded">
-                      Edit
-                    </button>
-                    <button onClick={() => handleDelete(bookmark.id)} className="text-red-600 hover:text-red-700 font-semibold text-xs py-1 px-2 border border-red-100 bg-red-50 hover:bg-red-100 rounded">
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+            <tbody>
+              {bookmarks.map((bookmark, idx) => {
+                // Alternating rows
+                const rowClass = idx % 2 === 0 ? "bg-blue-50" : "bg-white";
+                
+                // Map the bookmark object
+                const isCollege = bookmark.type_name === 'College';
+                const isCourse = bookmark.type_name === 'Courses';
+                const isBlog = bookmark.type_name === 'Blog';
+
+                return (
+                  <tr key={bookmark.id} className={`${rowClass} border-b border-slate-200 text-slate-600`}>
+                    <td className="py-4 px-4 font-medium border-r border-slate-200">
+                      {String(bookmark.id).padStart(4, '0')}
+                    </td>
+                    <td className="py-4 px-4 font-medium border-r border-slate-200">
+                      {bookmark.student_name || "Unknown"}
+                    </td>
+                    <td className="py-4 px-4 border-r border-slate-200">
+                      {isCollege ? bookmark.title : "- - - - -"}
+                    </td>
+                    <td className="py-4 px-4 border-r border-slate-200">
+                      {isCourse ? bookmark.title : "- - - - -"}
+                    </td>
+                    <td className="py-4 px-4 border-r border-slate-200">
+                      {isBlog ? bookmark.title : (bookmark.created_at ? new Date(bookmark.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "- - - - -")}
+                    </td>
+                    <td className="py-4 px-4 border-r border-slate-200">
+                      {bookmark.student_name || "Admin"}
+                    </td>
+                    <td className="py-4 px-4 flex items-center justify-center gap-2">
+                       {/* Edit Box */}
+                      <button 
+                        onClick={() => openEditModal(bookmark)} 
+                        className="text-white p-1.5 rounded transition-opacity hover:opacity-90"
+                        title="Edit"
+                        style={{ backgroundColor: '#464646' }}
+                      >
+                        <span className="material-symbols-rounded text-[18px] block">edit_square</span>
+                      </button>
+
+                      {/* Delete Box (matches the blue document icon from mockup, but performs delete) */}
+                      <button 
+                        onClick={() => handleDelete(bookmark.id)} 
+                        className="text-white p-1.5 rounded transition-opacity hover:opacity-90"
+                        title="Delete"
+                        style={{ backgroundColor: '#1890ff' }}
+                      >
+                        <span className="material-symbols-rounded text-[18px] block">delete</span>
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+
+              {/* Pad with empty rows to match the tall mockup table if < 5 items */}
               {bookmarks.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="text-center py-6 text-slate-500 text-sm">
+                <tr className="bg-white">
+                  <td colSpan={7} className="py-10 text-center text-slate-500">
                     No bookmarks found.
+                    <button
+                      onClick={openAddModal}
+                      className="mt-3 block mx-auto text-blue-600 hover:underline font-semibold"
+                    >
+                      + Add first record
+                    </button>
                   </td>
                 </tr>
               )}
@@ -161,19 +154,20 @@ export default function BookmarkClient({
           </table>
         </div>
 
+        {/* ── Pagination ───────────────────────────────────────────────────── */}
         {totalPages > 1 && (
-          <div className="px-5 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-            <p className="text-xs text-slate-500">
+          <div className="px-5 py-4 border-t border-[#dddddd] bg-white flex items-center justify-between">
+            <p className="text-[13px] text-slate-500">
               Showing <strong>{offset + 1}</strong> to <strong>{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total}</strong> bookmarks
             </p>
-            <div className="flex gap-1">
+            <div className="flex gap-1 text-[13px]">
               {offset / PAGE_SIZE + 1 > 1 && (
-                <Link href={`?page=${offset / PAGE_SIZE}&q=${q}`} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
+                <Link href={`?page=${offset / PAGE_SIZE}&q=${q}`} className="px-3 py-1.5 font-semibold bg-white border border-[#dddddd] rounded hover:bg-slate-50">
                   Prev
                 </Link>
               )}
               {offset / PAGE_SIZE + 1 < totalPages && (
-                <Link href={`?page=${offset / PAGE_SIZE + 2}&q=${q}`} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
+                <Link href={`?page=${offset / PAGE_SIZE + 2}&q=${q}`} className="px-3 py-1.5 font-semibold bg-white border border-[#dddddd] rounded hover:bg-slate-50">
                   Next
                 </Link>
               )}
@@ -190,7 +184,7 @@ export default function BookmarkClient({
         users={users}
         types={types}
       />
-    </>
+    </div>
   );
 }
 

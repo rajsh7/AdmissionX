@@ -122,11 +122,18 @@ export default async function CollegeManagementPage({
   const conditions: string[] = [];
   const filterParams: (string | number)[] = [];
 
+  const collegeId = sp.collegeId ?? "";
+
   if (q) {
     conditions.push(
       "(m.name LIKE ? OR m.designation LIKE ? OR u.firstname LIKE ? OR m.emailaddress LIKE ? OR m.phoneno LIKE ?)",
     );
     filterParams.push(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
+  }
+
+  if (collegeId) {
+    conditions.push("m.collegeprofile_id = ?");
+    filterParams.push(collegeId);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -168,37 +175,91 @@ export default async function CollegeManagementPage({
   const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
+  // Deeply map to plain objects to strip hidden Buffer/Date fields from the DB shim
+  const cleanMembers = members.map((m: any, idx: number) => ({
+    id: Number(m.id) || (idx + 1),
+    collegeprofile_id: Number(m.collegeprofile_id),
+    name: String(m.name || ""),
+    suffix: String(m.suffix || ""),
+    designation: String(m.designation || ""),
+    emailaddress: String(m.emailaddress || ""),
+    phoneno: String(m.phoneno || ""),
+    picture: String(m.picture || ""),
+    college_name: String(m.college_name || "")
+  }));
+
+  const cleanColleges = colleges.map((c: any, idx: number) => ({
+    id: Number(c.id) || (idx + 1),
+    name: String(c.name || "")
+  }));
+
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 w-full overflow-x-hidden">
       
-      {/* ── Header ───────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>groups</span>
-            College management
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">Manage key personnel, directors, and administrative staff.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <form method="GET" action="/admin/colleges/management" className="w-full sm:w-80">
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
-              <input 
-                type="text" 
-                name="q" 
-                defaultValue={q}
-                placeholder="Search staff, roles, colleges..." 
-                className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
-              />
-            </div>
-          </form>
-        </div>
+      {/* ── Header Area (Search Box Match Design) ───────────────────── */}
+      <div className="bg-white rounded-md border border-slate-200 shadow-sm p-6 mb-6">
+        <h1 className="text-[22px] font-semibold text-slate-500 mb-8 border-b border-slate-100 pb-3">
+          Search College  Management Details
+        </h1>
+        
+        <form method="GET" action="/admin/colleges/management" className="flex flex-col sm:flex-row items-start sm:items-end gap-6 sm:gap-8">
+          {/* College Name Select */}
+          <div className="relative flex-1 w-full relative">
+            <label className="absolute -top-2.5 left-3 bg-white px-1 text-sm font-semibold text-slate-500">
+              College Name
+            </label>
+            <select
+              name="collegeId"
+              defaultValue={collegeId}
+              className="w-full border border-slate-200 rounded-md px-3 py-3 text-sm text-slate-600 bg-transparent focus:outline-none focus:border-red-500 appearance-none cursor-pointer"
+            >
+              <option value="">Select college</option>
+              {cleanColleges.map((c, idx) => (
+                <option key={`college-opt-${c.id}-${idx}`} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none material-symbols-rounded text-xl">
+              keyboard_arrow_down
+            </span>
+          </div>
+
+          {/* Search Input */}
+          <div className="relative flex-1 w-full">
+            <label className="absolute -top-2.5 left-3 bg-white px-1 text-sm font-semibold text-slate-500">
+              Search
+            </label>
+            <input
+              type="text"
+              name="q"
+              defaultValue={q}
+              placeholder="Enter name, email, phone..."
+              className="w-full border border-slate-200 rounded-md px-3 py-3 text-sm text-slate-600 bg-transparent focus:outline-none focus:border-red-500"
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex items-center gap-4 w-full sm:w-auto h-[46px]">
+            <Link
+              href="/admin/colleges/management"
+              className="flex items-center justify-center px-6 h-full rounded-md bg-[#9CA3AF] hover:bg-[#8A9ba8] text-white font-medium text-[15px] transition-colors w-full sm:w-auto min-w-[100px]"
+            >
+              Clear
+            </Link>
+            <button
+              type="submit"
+              className="flex items-center justify-center px-6 h-full rounded-md bg-[#FF3C3C] hover:bg-red-600 text-white font-medium text-[15px] transition-colors w-full sm:w-auto min-w-[100px]"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
       </div>
 
       <ManagementListClient
-        members={members}
-        colleges={colleges}
+        members={cleanMembers}
+        colleges={cleanColleges}
         offset={offset}
         onAdd={createManagementMember}
         onEdit={updateManagementMember}

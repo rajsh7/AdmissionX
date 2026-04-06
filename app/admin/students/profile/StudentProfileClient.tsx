@@ -79,10 +79,6 @@ export default function StudentProfileClient({
           Profile Information
           <span className="material-symbols-outlined text-[18px] ml-4">expand_more</span>
         </button>
-        <button className="flex items-center justify-between !bg-admin-dark !text-white px-8 py-3 rounded-t-lg font-bold text-[13px] min-w-[200px]">
-          Bookmarks
-          <span className="material-symbols-outlined text-[18px] ml-4">chevron_right</span>
-        </button>
       </div>
 
       {/* Main Table Interface */}

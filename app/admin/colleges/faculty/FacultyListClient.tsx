@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import FacultyFormModal from "./FacultyFormModal";
 
@@ -16,6 +17,11 @@ interface FacultyListClientProps {
   offset: number;
   pageSize: number;
   q: string;
+  collegeId?: string;
+  facultyName?: string;
+  email?: string;
+  phone?: string;
+  collegeName?: string;
   createFaculty: (data: FormData) => Promise<void>;
   updateFaculty: (data: FormData) => Promise<void>;
   deleteFaculty: (id: number) => Promise<void>;
@@ -70,117 +76,238 @@ const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz
 const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
 export default function FacultyListClient({
-  facultyMembers, colleges, total, page, totalPages, offset, pageSize, q,
+  facultyMembers, colleges, total, page, totalPages, offset, pageSize, q, collegeId,
+  facultyName, email, phone, collegeName,
   createFaculty, updateFaculty, deleteFaculty,
 }: FacultyListClientProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  function handleSearch(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const params = new URLSearchParams(searchParams.toString());
+    
+    params.set("page", "1"); // Always reset to page 1 on new search
+    
+    const fields = ["facultyName", "email", "phone", "collegeName", "q"];
+    fields.forEach(field => {
+      const val = formData.get(field) as string;
+      if (val && val.trim() !== "") {
+        params.set(field, val.trim());
+      } else {
+        params.delete(field);
+      }
+    });
+
+    router.push(`/admin/colleges/faculty?${params.toString()}`);
+  }
 
   function openAdd() { setEditing(null); setModalOpen(true); }
   function openEdit(f: any) { setEditing(f); setModalOpen(true); }
 
   return (
     <>
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>school</span>
-            College Faculty
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">Manage academic staff and professors across colleges.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <form method="GET" action="/admin/colleges/faculty" className="w-full sm:w-72">
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
-              <input type="text" name="q" defaultValue={q} placeholder="Search faculty, colleges..." className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all" />
-            </div>
-          </form>
-          <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-black shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all shrink-0">
-            <span className="material-symbols-rounded text-[18px]">add_circle</span>
-            Add Faculty
-          </button>
-        </div>
+      {/* Header Button */}
+      <div className="mb-6">
+        <button
+          onClick={openAdd}
+          className="bg-[#3F434A] hover:bg-slate-700 text-white font-semibold text-[13px] px-5 py-2.5 rounded-sm transition-colors flex items-center tracking-wide"
+        >
+          Add new college course +
+        </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {facultyMembers.length === 0 ? (
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>school</span>
-            <p className="text-slate-500 font-semibold text-sm">No faculty records found.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-left">
-                  <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Faculty Name</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Contact Info</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {facultyMembers.map((f, idx) => (
-                  <tr key={f.id} className="hover:bg-blue-50/20 transition-colors group">
-                    <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-3">
-                        <FacultyAvatar name={f.name} imagename={f.imagename} />
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-slate-800 leading-snug">{f.suffix ? `${f.suffix} ` : ""}{f.name}</span>
-                          <span className="text-[11px] text-blue-600 font-bold uppercase tracking-tighter">{f.designation_name || "Academician"}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-slate-600 font-medium truncate max-w-[200px] block">{f.college_name}</span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col text-xs space-y-0.5">
-                        <span className="text-slate-700 font-medium truncate max-w-[180px]">{f.email || "No Email"}</span>
-                        <span className="text-slate-400 font-mono text-[10px]">{f.phone || "No Phone"}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => openEdit(f)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Edit">
-                          <span className="material-symbols-rounded text-[18px]">edit</span>
-                        </button>
-                        <DeleteButton action={deleteFaculty.bind(null, f.id)} size="sm" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+      {/* ── Search Box Match Design ───────────────────── */}
+      <div className="bg-white border border-slate-100/60 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] p-6 mb-6">
+        <h1 className="text-[22px] font-medium text-slate-500 mb-8 border-b border-slate-100 pb-4">
+          Search College Faculty
+        </h1>
+        
+        <form method="GET" action="/admin/colleges/faculty" onSubmit={handleSearch} className="flex flex-col gap-8">
+          {/* Row 1 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="relative w-full">
+              <label className="absolute -top-2.5 left-3 bg-white px-1 text-[13px] font-semibold text-slate-500">
+                Faculty Name
+              </label>
+              <input type="text" name="facultyName" defaultValue={facultyName} placeholder="Dr. John Doe" className="w-full border border-slate-200 rounded-sm px-3 py-2.5 text-sm text-slate-600 bg-transparent focus:outline-none focus:border-red-500" />
+            </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-            <p className="text-xs text-slate-500">
-              Showing <strong>{offset + 1}–{Math.min(offset + pageSize, total)}</strong> of <strong>{total.toLocaleString()}</strong> faculty members
-            </p>
-            <div className="flex items-center gap-1">
-              {page > 1 ? (
-                <Link href={`/admin/colleges/faculty?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">← Prev</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-              )}
-              {page < totalPages ? (
-                <Link href={`/admin/colleges/faculty?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Next →</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-              )}
+            <div className="relative w-full">
+              <label className="absolute -top-2.5 left-3 bg-white px-1 text-[13px] font-semibold text-slate-500">
+                Faculty Email
+              </label>
+              <input type="text" name="email" defaultValue={email} placeholder="john@example.com" className="w-full border border-slate-200 rounded-sm px-3 py-2.5 text-sm text-slate-600 bg-transparent focus:outline-none focus:border-red-500" />
+            </div>
+
+            <div className="relative w-full">
+              <label className="absolute -top-2.5 left-3 bg-white px-1 text-[13px] font-semibold text-slate-500">
+                Faculty Phone
+              </label>
+              <input type="text" name="phone" defaultValue={phone} placeholder="+91..." className="w-full border border-slate-200 rounded-sm px-3 py-2.5 text-sm text-slate-600 bg-transparent focus:outline-none focus:border-red-500" />
             </div>
           </div>
-        )}
+
+          {/* Row 2 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="relative w-full">
+              <label className="absolute -top-2.5 left-3 bg-white px-1 text-[13px] font-semibold text-slate-500">
+                College Name
+              </label>
+              <input type="text" name="collegeName" defaultValue={collegeName} placeholder="Asian Institute..." className="w-full border border-slate-200 rounded-sm px-3 py-2.5 text-sm text-slate-600 bg-transparent focus:outline-none focus:border-red-500" />
+            </div>
+
+            <div className="relative w-full">
+              <label className="absolute -top-2.5 left-3 bg-white px-1 text-[13px] font-semibold text-slate-500">
+                Search Any
+              </label>
+              <input type="text" name="q" defaultValue={q} placeholder="Search anything..." className="w-full border border-slate-200 rounded-sm px-3 py-2.5 text-sm text-slate-600 bg-transparent focus:outline-none focus:border-red-500" />
+            </div>
+            
+            {/* Empty column to maintain grid structure if needed, or just let it span 2 columns out of 3. We let the grid handle the missing 3rd column naturally */}
+          </div>
+
+          {/* Buttons Centered Below Filters */}
+          <div className="flex items-center justify-center gap-6 mt-4">
+            <Link
+              href="/admin/colleges/faculty"
+              className="flex items-center justify-center px-10 py-2.5 rounded-[4px] bg-[#9CA3AF] hover:bg-[#8A9ba8] text-white font-semibold text-[15px] transition-colors w-full sm:w-auto min-w-[120px]"
+            >
+              Clear
+            </Link>
+            <button
+              type="submit"
+              className="flex items-center justify-center px-10 py-2.5 rounded-[4px] bg-[#FF3C3C] hover:bg-red-600 text-white font-semibold text-[15px] transition-colors w-full sm:w-auto min-w-[120px]"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
       </div>
+
+      {/* Cards List */}
+      <div className="flex flex-col gap-6 w-full">
+        {facultyMembers.map((f, idx) => (
+          <div key={f.id} className="bg-[#fafafa] border border-slate-200 rounded-[4px] p-5 flex flex-col xl:flex-row gap-6 w-full">
+            
+            {/* Left Image */}
+            <div 
+              className="relative flex-shrink-0 flex items-center justify-center text-[100px] font-serif shadow-inner overflow-hidden rounded-[2px]"
+              style={{ width: "269px", minWidth: "269px", height: "265px", backgroundColor: "#D77809", color: "white" }}
+            >
+               <span className="font-bold tracking-widest z-0" style={{ textShadow: "4px 4px 0px rgba(0,0,0,0.15), 6px 6px 8px rgba(0,0,0,0.3)" }}>
+                AKT
+              </span>
+              {f.imagename && (
+                <img 
+                  src={buildAvatarUrl(f.imagename)} 
+                  alt={f.name} 
+                  className="absolute inset-0 w-full h-full object-cover z-10 bg-white" 
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              )}
+            </div>
+
+            {/* Middle Details Box */}
+            <div className="flex-1 flex flex-col justify-between py-1 overflow-hidden min-w-[280px]">
+              <div className="flex flex-col gap-3 font-medium" style={{ fontSize: "14px", color: "#64748b" }}>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-rounded" style={{ fontSize: "18px", color: "#334155" }}>location_on</span>
+                  <p>College Name : <span style={{ color: "#475569" }}>{f.college_name}</span></p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-rounded" style={{ fontSize: "18px", color: "#334155" }}>mail</span>
+                  <p>Name : <span style={{ color: "#475569" }}>{f.name}</span></p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-rounded" style={{ fontSize: "18px", color: "#334155" }}>call</span>
+                  <p>Designation : <span style={{ color: "#475569" }}>{f.designation_name || ""}</span></p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-rounded" style={{ fontSize: "18px", color: "#334155" }}>location_on</span>
+                  <p>Email : <span style={{ color: "#475569" }}>{f.email || ""}</span></p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-rounded" style={{ fontSize: "18px", color: "#334155" }}>mail</span>
+                  <p>Phone : <span style={{ color: "#475569" }}>{f.phone || ""}</span></p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-rounded" style={{ fontSize: "18px", color: "#334155" }}>call</span>
+                  <p>Gender : <span style={{ color: "#475569" }}>{f.gender === 1 ? "Male" : f.gender === 2 ? "Female" : ""}</span></p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-rounded" style={{ fontSize: "18px", color: "#334155" }}>mail</span>
+                  <p>Date of Birth : <span style={{ color: "#475569" }}>{f.dob || ""}</span></p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-rounded" style={{ fontSize: "18px", color: "#334155" }}>call</span>
+                  <p>Language Known : <span style={{ color: "#475569" }}>{f.languageKnown || ""}</span></p>
+                </div>
+              </div>
+              
+              {/* Actions at bottom centerish */}
+              <div className="flex items-center justify-center mt-6 gap-3 w-full flex-wrap">
+                <button onClick={() => router.push(`/admin/colleges/faculty/${f.id}`)} className="text-white px-7 py-2.5 rounded-[4px] font-semibold transition-colors shadow-sm hover:opacity-90" style={{ backgroundColor: "#9aa0b0", fontSize: "15px" }}>
+                  Show
+                </button>
+                <button onClick={() => openEdit(f)} className="text-white px-8 py-2.5 rounded-[4px] font-semibold transition-colors shadow-sm hover:opacity-90" style={{ backgroundColor: "#0ea5e9", fontSize: "15px" }}>
+                  Edit
+                </button>
+                <button onClick={async () => { if (confirm("Are you sure you want to delete this faculty member?")) await deleteFaculty(f.id); }} className="text-white px-6 py-2.5 rounded-[4px] font-semibold transition-colors flex items-center justify-center gap-1.5 min-w-[100px] shadow-sm hover:opacity-90 cursor-pointer" style={{ backgroundColor: "#fa434d", fontSize: "15px" }}>
+                  <span className="material-symbols-rounded" style={{ fontSize: "18px", ...ICO_FILL }}>delete</span>
+                  Delete
+                </button>
+              </div>
+            </div>
+
+            {/* Right Buttons Stack */}
+            <div className="flex flex-col flex-shrink-0" style={{ width: "280px", gap: "10px" }}>
+              <div className="text-white font-medium px-3 text-center rounded-[3px]" style={{ backgroundColor: "#24b29b", fontSize: "13px", padding: "8.5px 0" }}>
+                Qualification Details
+              </div>
+              <div className="text-white font-medium px-3 text-center rounded-[3px]" style={{ backgroundColor: "#fbca40", fontSize: "13px", padding: "8.5px 0" }}>
+                Experience Details
+              </div>
+              <div className="text-white font-medium px-3 text-center rounded-[3px]" style={{ backgroundColor: "#fa4366", fontSize: "13px", padding: "8.5px 0" }}>
+                Associate Department Details
+              </div>
+              <div className="text-white font-medium px-3 text-center rounded-[3px]" style={{ backgroundColor: "#fbca40", fontSize: "13px", padding: "8.5px 0" }}>
+                Address Details
+              </div>
+              <div className="text-white font-medium px-3 text-center rounded-[3px]" style={{ backgroundColor: "#fa4366", fontSize: "13px", padding: "8.5px 0" }}>
+                College Public View
+              </div>
+            </div>
+
+          </div>
+        ))}
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-8">
+          <p className="text-xs text-slate-500">
+            Showing <strong>{offset + 1}–{Math.min(offset + pageSize, total)}</strong> of <strong>{total.toLocaleString()}</strong> faculty members
+          </p>
+          <div className="flex items-center gap-1">
+            {page > 1 ? (
+              <Link href={`/admin/colleges/faculty?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">← Prev</Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
+            )}
+            {page < totalPages ? (
+              <Link href={`/admin/colleges/faculty?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Next →</Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
+            )}
+          </div>
+        </div>
+      )}
 
       <FacultyFormModal
         isOpen={modalOpen}

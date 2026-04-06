@@ -195,8 +195,8 @@ export default async function AdminCollegesPage({
       contact_name: String(doc.contactPersonName ?? doc.contact_name ?? "").trim(),
       phone:        String(doc.phone        ?? "").trim(),
       status:       mappedStatus,
-      created_at:   String(doc.created_at   ?? "").trim(),
-      updated_at:   String(doc.updated_at   ?? "").trim(),
+      created_at:   doc.created_at ? new Date(doc.created_at as any).toISOString() : "",
+      updated_at:   doc.updated_at ? new Date(doc.updated_at as any).toISOString() : "",
       _source:      "old",
     } as CollegeRow;
   }
@@ -209,8 +209,8 @@ export default async function AdminCollegesPage({
       contact_name: String(doc.contact_name ?? ""),
       phone:        String(doc.phone        ?? ""),
       status:       String(doc.status       ?? "pending"),
-      created_at:   doc.created_at as Date | string,
-      updated_at:   doc.updated_at as Date | string,
+      created_at:   doc.created_at ? new Date(doc.created_at as any).toISOString() : "",
+      updated_at:   doc.updated_at ? new Date(doc.updated_at as any).toISOString() : "",
       _source:      "new",
     } as CollegeRow;
   }

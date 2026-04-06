@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 
 export default function CareerGuidance() {
@@ -74,30 +73,14 @@ export default function CareerGuidance() {
 
           {/* ── Right Content: Illustration (40% width) ────────────────────── */}
           <div className="flex-1 relative z-10 w-full flex items-end justify-center lg:justify-end pb-0">
-            {/* Entry animation wrapper */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, x: 40 }}
-              whileInView={{ opacity: 1, scale: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="relative w-full max-w-[480px]"
-            >
-              {/* Continuous floating animation wrapper */}
-              <motion.div
-                animate={{ y: [0, -16, 0] }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-              >
-                {/* Subtle head-scratch wobble */}
-                <motion.img
-                  src="/images/3718e82201e432bd5219be08e1391c20ad9829af.png"
-                  alt="Confused Career Path Boy"
-                  className="w-full h-auto object-contain block object-bottom"
-                  style={{ filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.18))' }}
-                  animate={{ rotate: [0, -1.5, 1.5, -1, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                />
-              </motion.div>
-            </motion.div>
+            <div className="relative w-full max-w-[480px] flex items-end">
+              <img
+                src="/images/3718e82201e432bd5219be08e1391c20ad9829af.png"
+                alt="Confused Career Path Boy"
+                className="w-full h-auto object-contain block object-bottom translate-y-[2px]"
+                style={{ filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.18))' }}
+              />
+            </div>
           </div>
 
         </div>

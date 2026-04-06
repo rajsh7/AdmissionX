@@ -188,16 +188,52 @@ export default async function CollegeCoursesPage({
   const total      = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
+  // Deeply map to plain objects to strip hidden Buffer/Date fields from the DB shim
+  const cleanCourses = (courses as any[]).map((c, idx) => ({
+    id: Number(c.id) || (idx + 1),
+    collegeprofile_id: Number(c.collegeprofile_id) || 0,
+    course_id: c.course_id ? Number(c.course_id) : null,
+    degree_id: c.degree_id ? Number(c.degree_id) : null,
+    functionalarea_id: c.functionalarea_id ? Number(c.functionalarea_id) : null,
+    college_name: String(c.college_name || "Unnamed College"),
+    course_name: c.course_name ? String(c.course_name) : null,
+    degree_name: c.degree_name ? String(c.degree_name) : null,
+    stream_name: c.stream_name ? String(c.stream_name) : null,
+    fees: c.fees ? String(c.fees) : null,
+    seats: c.seats ? String(c.seats) : null,
+    courseduration: c.courseduration ? String(c.courseduration) : null,
+  }));
+
+  const cleanColleges = (colleges as any[]).map((c, idx) => ({
+    id: Number(c.id) || (idx + 1),
+    name: String(c.name || ""),
+  }));
+
+  const cleanCourseOptions = (courseOptions as any[]).map((c, idx) => ({
+    id: Number(c.id) || (idx + 1),
+    name: String(c.name || ""),
+  }));
+
+  const cleanDegrees = (degrees as any[]).map((d, idx) => ({
+    id: Number(d.id) || (idx + 1),
+    name: String(d.name || ""),
+  }));
+
+  const cleanStreams = (streams as any[]).map((s, idx) => ({
+    id: Number(s.id) || (idx + 1),
+    name: String(s.name || ""),
+  }));
+
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
 
       {/* ── Client list (table + modal) ───────────────────────────────────── */}
       <CourseListClient
-        courses={courses}
-        colleges={colleges}
-        courseOptions={courseOptions}
-        degrees={degrees}
-        streams={streams}
+        courses={cleanCourses}
+        colleges={cleanColleges}
+        courseOptions={cleanCourseOptions}
+        degrees={cleanDegrees}
+        streams={cleanStreams}
         offset={offset}
         onAdd={createCourse}
         onEdit={updateCourse}

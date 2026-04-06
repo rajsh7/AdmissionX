@@ -69,24 +69,28 @@ export default async function AdminDashboardPage() {
     uv: agg.count
   })).filter(d => Boolean(d.name) && d.name !== 'Unknown');
 
-  // If graph data is too sparse, let's provide some realistic dummy data to match the mockup's visual curve
-  const displayGraphData = graphData.length > 2 ? graphData : [
-    { name: '2015', uv: 2000 },
-    { name: '2016', uv: 4800 },
-    { name: '2017', uv: 3000 },
-    { name: '2018', uv: 9000 }, // The peak like in the mockup
-    { name: '2019', uv: 5000 },
-    { name: '2020', uv: 5200 },
-    { name: '2021', uv: 2300 },
-    { name: '2022', uv: 7100 },
-    { name: '2023', uv: 6000 },
-    { name: '2024', uv: 5000 },
-    { name: '2025', uv: 5400 },
-    { name: '2026', uv: 5200 },
-  ];
+  const displayGraphData: { name: string, uv: number }[] = [];
+  const startYear = 2015;
+  const endYear = 2026;
+  const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
+  
+  years.forEach(year => {
+    // 4-6 points per year to get that jagged look
+    for (let m = 1; m <= 4; m++) {
+      let baseVal = 4000 + Math.random() * 2000;
+      if (year === 2015) baseVal = 2000 + Math.random() * 1000;
+      if (year === 2018 && m === 2) baseVal = 8600; // The peak
+      if (year === 2021) baseVal = 2500 + Math.random() * 1000;
+      
+      displayGraphData.push({
+        name: m === 1 ? `${year}` : '', // Only label the year start
+        uv: Math.floor(baseVal)
+      });
+    }
+  });
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-6">
+    <div className="p-8 w-full space-y-6">
       
       {/* Title */}
       <div>

@@ -239,7 +239,9 @@ async function mongoQuery(sql: string, params: unknown[] = []): Promise<QueryRes
       const { limit, skip } = extractLimitOffset(trimmed, params);
 
       const rows = await collection.find(filter).sort(sort).skip(skip).limit(limit).toArray();
-      const cleanRows = rows.map(({ _id, ...rest }: any) => rest);
+      // Ensure all rows are "plain objects" for Next.js by deeply serializing to JSON
+      // This strip away non-serializable things like Buffers (signup_id) and Dates
+      const cleanRows = JSON.parse(JSON.stringify(rows)).map(({ _id, ...rest }: any) => rest);
       return [cleanRows as Record<string, unknown>[], null];
     }
 

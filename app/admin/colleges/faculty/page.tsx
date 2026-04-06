@@ -73,7 +73,7 @@ async function deleteFaculty(id: number) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 15;
 
 async function safeQuery<T >(
   sql: string,
@@ -119,6 +119,11 @@ export default async function CollegeFacultyPage({
 }) {
   const sp   = await searchParams;
   const q    = (sp.q ?? "").trim();
+  const collegeId = sp.collegeId ?? "";
+  const facultyName = (sp.facultyName ?? "").trim();
+  const email = (sp.email ?? "").trim();
+  const phone = (sp.phone ?? "").trim();
+  const collegeName = (sp.collegeName ?? "").trim();
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
@@ -126,8 +131,33 @@ export default async function CollegeFacultyPage({
   const params: (string | number)[] = [];
 
   if (q) {
-    conditions.push("(f.name LIKE ? OR u.firstname LIKE ?)");
-    params.push(`%${q}%`, `%${q}%`);
+    conditions.push("(f.name LIKE ? OR u.firstname LIKE ? OR f.email LIKE ? OR f.phone LIKE ?)");
+    params.push(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
+  }
+
+  if (collegeId) {
+    conditions.push("f.collegeprofile_id = ?");
+    params.push(collegeId);
+  }
+
+  if (facultyName) {
+    conditions.push("f.name LIKE ?");
+    params.push(`%${facultyName}%`);
+  }
+
+  if (email) {
+    conditions.push("f.email LIKE ?");
+    params.push(`%${email}%`);
+  }
+
+  if (phone) {
+    conditions.push("f.phone LIKE ?");
+    params.push(`%${phone}%`);
+  }
+
+  if (collegeName) {
+    conditions.push("u.firstname LIKE ?");
+    params.push(`%${collegeName}%`);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -145,7 +175,8 @@ export default async function CollegeFacultyPage({
         f.languageKnown,
         f.sortorder,
         f.gender,
-        f.dob,
+        CASE WHEN f.dob IS NULL OR f.dob = '0000-00-00' OR f.dob = '0000-00-00 00:00:00' THEN NULL
+             ELSE DATE_FORMAT(f.dob, '%Y-%m-%d') END as dob,
         f.collegeprofile_id,
         COALESCE(u.firstname, 'Unnamed College') as college_name,
         'Senior Professor' as designation_name
@@ -176,7 +207,7 @@ export default async function CollegeFacultyPage({
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 w-full overflow-x-hidden">
       <FacultyListClient
         facultyMembers={JSON.parse(JSON.stringify(facultyMembers))}
         colleges={JSON.parse(JSON.stringify(colleges))}
@@ -186,6 +217,11 @@ export default async function CollegeFacultyPage({
         offset={offset}
         pageSize={PAGE_SIZE}
         q={q}
+        collegeId={collegeId}
+        facultyName={facultyName}
+        email={email}
+        phone={phone}
+        collegeName={collegeName}
         createFaculty={createFaculty}
         updateFaculty={updateFaculty}
         deleteFaculty={deleteFaculty}

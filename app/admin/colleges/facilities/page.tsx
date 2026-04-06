@@ -84,6 +84,7 @@ interface FacilityRow  {
   icon: string | null;
   collegeprofile_id: number;
   facilities_id: number | null;
+  created_at?: string;
 }
 
 interface CountRow  {
@@ -102,6 +103,7 @@ export default async function CollegeFacilitiesPage({
 }) {
   const sp = await searchParams;
   const q = (sp.q ?? "").trim();
+  const collegeId = sp.collegeId ?? "";
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
@@ -116,63 +118,44 @@ export default async function CollegeFacilitiesPage({
     params.push(`%${q}%`, `%${q}%`, `%${q}%`);
   }
 
+  if (collegeId) {
+    conditions.push("cf.collegeprofile_id = ?");
+    params.push(collegeId);
+  }
+
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
   // ── Query facilities ───────────────────────────────────────────────────────
   const [facilitiesList, countRows, colleges, facilityTypes] = await Promise.all([
-    q
-      ? safeQuery<FacilityRow>(
-          `SELECT 
-            cf.id,
-            cf.collegeprofile_id,
-            cf.facilities_id,
-            cf.name as facility_name_raw,
-            COALESCE(u.firstname, 'Unnamed College') as college_name,
-            COALESCE(cf.name, f.name) as facility_name,
-            cf.description,
-            f.iconname as icon
-           FROM collegefacilities cf
-           JOIN collegeprofile cp ON cp.id = cf.collegeprofile_id
-           JOIN users u ON u.id = cp.users_id
-           LEFT JOIN facilities f ON f.id = cf.facilities_id
-           ${where}
-           ORDER BY cf.created_at DESC
-           LIMIT ? OFFSET ?`,
-          [...params, PAGE_SIZE, offset],
-        )
-      : safeQuery<FacilityRow>(
-          `SELECT 
-            cf.id,
-            cf.collegeprofile_id,
-            cf.facilities_id,
-            cf.name as facility_name_raw,
-            COALESCE(u.firstname, 'Unnamed College') as college_name,
-            COALESCE(cf.name, f.name) as facility_name,
-            cf.description,
-            f.iconname as icon
-           FROM (
-             SELECT id, collegeprofile_id, facilities_id, name, description, created_at
-             FROM collegefacilities
-             ORDER BY created_at DESC
-             LIMIT ? OFFSET ?
-           ) cf
-           JOIN collegeprofile cp ON cp.id = cf.collegeprofile_id
-           JOIN users u ON u.id = cp.users_id
-           LEFT JOIN facilities f ON f.id = cf.facilities_id
-           ORDER BY cf.created_at DESC`,
-          [PAGE_SIZE, offset],
-        ),
-    q
-      ? safeQuery<CountRow>(
-          `SELECT COUNT(*) AS total 
-           FROM collegefacilities cf 
-           JOIN collegeprofile cp ON cp.id = cf.collegeprofile_id
-           JOIN users u ON u.id = cp.users_id
-           LEFT JOIN facilities f ON f.id = cf.facilities_id
-           ${where}`,
-          params,
-        )
-      : safeQuery<CountRow>("SELECT COUNT(*) AS total FROM collegefacilities"),
+    safeQuery<FacilityRow>(
+      `SELECT 
+        cf.id,
+        cf.collegeprofile_id,
+        cf.facilities_id,
+        cf.name as facility_name_raw,
+        COALESCE(u.firstname, 'Unnamed College') as college_name,
+        COALESCE(cf.name, f.name) as facility_name,
+        cf.description,
+        cf.created_at,
+        f.iconname as icon
+       FROM collegefacilities cf
+       JOIN collegeprofile cp ON cp.id = cf.collegeprofile_id
+       JOIN users u ON u.id = cp.users_id
+       LEFT JOIN facilities f ON f.id = cf.facilities_id
+       ${where}
+       ORDER BY cf.created_at DESC
+       LIMIT ? OFFSET ?`,
+      [...params, PAGE_SIZE, offset],
+    ),
+    safeQuery<CountRow>(
+      `SELECT COUNT(*) AS total 
+       FROM collegefacilities cf 
+       JOIN collegeprofile cp ON cp.id = cf.collegeprofile_id
+       JOIN users u ON u.id = cp.users_id
+       LEFT JOIN facilities f ON f.id = cf.facilities_id
+       ${where}`,
+      params,
+    ),
     safeQuery<{ id: number; name: string }>(
       "SELECT cp.id, u.firstname as name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
     ),
@@ -185,31 +168,15 @@ export default async function CollegeFacilitiesPage({
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
-
-      {/* ── Header ───────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>category</span>
-            College facilities
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">Manage campus amenities and infrastructure.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <form method="GET" action="/admin/colleges/facilities" className="w-full sm:w-80">
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
-              <input
-                type="text"
-                name="q"
-                defaultValue={q}
-                placeholder="Search facilities, colleges..."
-                className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
-              />
-            </div>
-          </form>
-        </div>
+    <div className="p-8 space-y-0 w-full overflow-x-hidden min-h-screen bg-slate-50">
+      
+      {/* Page Title & Add Button */}
+      <div className="flex items-center justify-between mb-10">
+        <h1 className="text-[28px] font-light text-slate-500 tracking-tight">
+          College Facilities Details
+        </h1>
+        {/* We'll handle the Add button inside FacilitiesClient for easier state access, 
+            but we'll pass a prop to tell it to render in this 'Legacy' style. */}
       </div>
 
       <FacilitiesClient 
@@ -220,29 +187,47 @@ export default async function CollegeFacilitiesPage({
          onAdd={createFacility}
          onEdit={updateFacility}
          onDelete={deleteFacilityRow}
+         q={q}
+         collegeId={collegeId}
       />
 
-        {/* ── Pagination ───────────────────────────────────────────────────── */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-            <p className="text-xs text-slate-500">
-              Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> facilities
-            </p>
-            <div className="flex items-center gap-1">
-              {page > 1 ? (
-                <Link href={`/admin/colleges/facilities?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-              )}
-              {page < totalPages ? (
-                <Link href={`/admin/colleges/facilities?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
-              ) : (
-                <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-              )}
-            </div>
+      {/* ── Pagination ───────────────────────────────────────────────────── */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
+          <p className="text-xs text-slate-500">
+            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of{" "}
+            <strong>{total.toLocaleString()}</strong> facilities
+          </p>
+          <div className="flex items-center gap-1">
+            {page > 1 ? (
+              <Link
+                href={`/admin/colleges/facilities?page=${page - 1}${q ? `&q=${q}` : ''}${collegeId ? `&collegeId=${collegeId}` : ''}`}
+                className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                ← Prev
+              </Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
+            )}
+            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">
+              {page} / {totalPages}
+            </span>
+            {page < totalPages ? (
+              <Link
+                href={`/admin/colleges/facilities?page=${page + 1}${q ? `&q=${q}` : ''}${collegeId ? `&collegeId=${collegeId}` : ''}`}
+                className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Next →
+              </Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
+            )}
           </div>
-        )}
+        </div>
+      )}
     </div>
+
+
   );
 }
 

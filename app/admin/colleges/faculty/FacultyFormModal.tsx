@@ -13,6 +13,27 @@ interface FacultyFormModalProps {
   colleges?: CollegeOption[];
 }
 
+/** Safely format a date value to YYYY-MM-DD for <input type="date"> */
+function safeDateValue(val: string | null | undefined): string {
+  if (!val || val.trim() === "" || val.trim() === "0000-00-00" || val.trim().startsWith("0000")) return "";
+  // If already in YYYY-MM-DD format and valid, use directly
+  const trimmed = val.trim().slice(0, 10); // grab YYYY-MM-DD part
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed) && !trimmed.startsWith("0000")) {
+    // Validate it creates a real date
+    try {
+      const d = new Date(trimmed);
+      if (!isNaN(d.getTime())) return trimmed;
+    } catch { return ""; }
+  }
+  try {
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return "";
+    return d.toISOString().split("T")[0];
+  } catch {
+    return "";
+  }
+}
+
 export default function FacultyFormModal({ isOpen, onClose, onSubmit, faculty, colleges }: FacultyFormModalProps) {
   const [isPending, setIsPending] = useState(false);
 
@@ -96,7 +117,7 @@ export default function FacultyFormModal({ isOpen, onClose, onSubmit, faculty, c
             <input
               type="date"
               name="dob"
-              defaultValue={faculty?.dob ? new Date(faculty.dob).toISOString().split("T")[0] : ""}
+              defaultValue={safeDateValue(faculty?.dob)}
               className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
             />
           </div>

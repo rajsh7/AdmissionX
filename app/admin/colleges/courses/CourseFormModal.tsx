@@ -16,10 +16,10 @@ interface CourseFormModalProps {
   streams?: Option[];
 }
 
-const INPUT =
-  "w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-medium text-slate-700";
-const SELECT = INPUT + " appearance-none";
-const LABEL = "text-xs font-bold text-slate-500 uppercase tracking-wider ml-0.5 block mb-1.5";
+const OUTLINED_WRAPPER = "relative mb-6 w-full";
+const OUTLINED_LABEL = "absolute -top-2.5 left-3 bg-white px-1 text-[13px] font-semibold text-slate-500 z-10 block pointer-events-none";
+const OUTLINED_INPUT = "w-full border border-slate-200 rounded-sm px-3 py-3 text-[14px] text-slate-600 bg-white focus:outline-none focus:border-red-500 transition-colors shadow-sm placeholder:text-slate-300";
+const OUTLINED_SELECT = OUTLINED_INPUT + " appearance-none cursor-pointer";
 
 export default function CourseFormModal({
   isOpen,
@@ -50,151 +50,237 @@ export default function CourseFormModal({
     <AdminModal
       isOpen={isOpen}
       onClose={onClose}
-      title={course ? "Edit College Course" : "Add College Course"}
+      title="Update college course details"
     >
-      <form action={handleAction} className="space-y-4 px-1">
+      <form action={handleAction} className="pt-2 pb-6 px-1">
         {course && <input type="hidden" name="id" value={course.id} />}
 
-        {/* College */}
-        <div>
-          <label className={LABEL}>College *</label>
+        {/* Row 1: Stream + Title */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className={OUTLINED_WRAPPER}>
+            <label className={OUTLINED_LABEL}>Stream</label>
+            <div className="relative">
+              <select
+                name="functionalarea_id"
+                defaultValue={course?.functionalarea_id || ""}
+                className={OUTLINED_SELECT}
+              >
+                <option value="">Select stream</option>
+                {streams.map((s, idx) => (
+                  <option key={`stream-${s.id}-${idx}`} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+          <div className={OUTLINED_WRAPPER}>
+            <label className={OUTLINED_LABEL}>Title</label>
+            <input
+              name="course_title_custom"
+              placeholder="Enter title"
+              className={OUTLINED_INPUT}
+              defaultValue={course?.course_name || ""}
+            />
+          </div>
+        </div>
+
+        {/* Course Eligibility */}
+        <div className={OUTLINED_WRAPPER}>
+          <label className={OUTLINED_LABEL}>Course Eligibility</label>
+          <div className="relative">
+            <select name="course_eligibility" className={OUTLINED_SELECT}>
+              <option value="">Select Status</option>
+            </select>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        {/* Other Course Eligibility */}
+        <div className={OUTLINED_WRAPPER}>
+          <label className={OUTLINED_LABEL}>Other Course Eligibility</label>
+          <div className="relative">
+            <select name="other_course_eligibility" className={OUTLINED_SELECT}>
+              <option value="">Select Status</option>
+            </select>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        {/* Total Fees */}
+        <div className={OUTLINED_WRAPPER}>
+          <label className={OUTLINED_LABEL}>Total fees ( per year in inr )</label>
+          <input
+            name="fees"
+            defaultValue={course?.fees || ""}
+            placeholder="Select Status"
+            className={OUTLINED_INPUT}
+          />
+        </div>
+
+        {/* Seats */}
+        <div className={OUTLINED_WRAPPER}>
+          <label className={OUTLINED_LABEL}>Seats Allocated To Admission X</label>
+          <input
+            type="number"
+            name="seats"
+            defaultValue={course?.seats || ""}
+            placeholder="Select Status"
+            className={OUTLINED_INPUT}
+          />
+        </div>
+
+        {/* College Profile */}
+        <div className={OUTLINED_WRAPPER}>
+          <label className={OUTLINED_LABEL}>College Profile</label>
           <div className="relative">
             <select
               name="collegeprofile_id"
               defaultValue={course?.collegeprofile_id || ""}
               required
-              className={SELECT}
+              className={OUTLINED_SELECT}
             >
-              <option value="">Select a college…</option>
-              {colleges.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
+              <option value="">Select Status</option>
+              {colleges.map((c, idx) => (
+                <option key={`college-${c.id}-${idx}`} value={c.id}>{c.name}</option>
               ))}
             </select>
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[18px]">
-              expand_more
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        {/* Stream (Middle) */}
+        <div className={OUTLINED_WRAPPER}>
+          <label className={OUTLINED_LABEL}>Stream</label>
+          <div className="relative">
+            <select
+              name="functionalarea_id_duplicate"
+              defaultValue={course?.functionalarea_id || ""}
+              className={OUTLINED_SELECT}
+            >
+              <option value="">Select stream</option>
+              {streams.map((s, idx) => (
+                <option key={`stream-dup-${s.id}-${idx}`} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        {/* Degree */}
+        <div className={OUTLINED_WRAPPER}>
+          <label className={OUTLINED_LABEL}>Degree</label>
+          <div className="relative">
+            <select
+              name="degree_id"
+              defaultValue={course?.degree_id || ""}
+              className={OUTLINED_SELECT}
+            >
+              <option value="">Select degree</option>
+              {degrees.map((d, idx) => (
+                <option key={`degree-${d.id}-${idx}`} value={d.id}>{d.name}</option>
+              ))}
+            </select>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </span>
           </div>
         </div>
 
         {/* Course */}
-        <div>
-          <label className={LABEL}>Course *</label>
+        <div className={OUTLINED_WRAPPER}>
+          <label className={OUTLINED_LABEL}>Course</label>
           <div className="relative">
             <select
               name="course_id"
               defaultValue={course?.course_id || ""}
               required
-              className={SELECT}
+              className={OUTLINED_SELECT}
             >
-              <option value="">Select a course…</option>
-              {courseOptions.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
+              <option value="">Select Course</option>
+              {courseOptions.map((c, idx) => (
+                <option key={`course-opt-${c.id}-${idx}`} value={c.id}>{c.name}</option>
               ))}
             </select>
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[18px]">
-              expand_more
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </span>
           </div>
         </div>
 
-        {/* Degree + Stream */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className={LABEL}>Degree</label>
-            <div className="relative">
-              <select
-                name="degree_id"
-                defaultValue={course?.degree_id || ""}
-                className={SELECT}
-              >
-                <option value="">None</option>
-                {degrees.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.name}
-                  </option>
-                ))}
-              </select>
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[18px]">
-                expand_more
-              </span>
-            </div>
-          </div>
-          <div>
-            <label className={LABEL}>Stream</label>
-            <div className="relative">
-              <select
-                name="functionalarea_id"
-                defaultValue={course?.functionalarea_id || ""}
-                className={SELECT}
-              >
-                <option value="">None</option>
-                {streams.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[18px]">
-                expand_more
-              </span>
-            </div>
+        {/* Degree Level */}
+        <div className={OUTLINED_WRAPPER}>
+          <label className={OUTLINED_LABEL}>Degree Level</label>
+          <div className="relative">
+            <select name="degree_level" className={OUTLINED_SELECT}>
+              <option value="">Select Course</option>
+            </select>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
           </div>
         </div>
 
-        {/* Fees + Seats */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className={LABEL}>Fees (₹)</label>
-            <input
-              name="fees"
-              defaultValue={course?.fees || ""}
-              placeholder="e.g. 120000"
-              className={INPUT}
-            />
-          </div>
-          <div>
-            <label className={LABEL}>Seats</label>
-            <input
-              type="number"
-              name="seats"
-              defaultValue={course?.seats || ""}
-              placeholder="e.g. 60"
-              min={0}
-              className={INPUT}
-            />
+        {/* Course Type */}
+        <div className={OUTLINED_WRAPPER}>
+          <label className={OUTLINED_LABEL}>Course Type</label>
+          <div className="relative">
+            <select name="course_type" className={OUTLINED_SELECT}>
+              <option value="">Select Course</option>
+            </select>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
           </div>
         </div>
 
-        {/* Duration */}
-        <div>
-          <label className={LABEL}>Duration</label>
-          <input
-            name="courseduration"
-            defaultValue={course?.courseduration || ""}
-            placeholder="e.g. 4 Years, 2 Semesters"
-            className={INPUT}
+        {/* Description */}
+        <div className={OUTLINED_WRAPPER}>
+          <label className={OUTLINED_LABEL}>Description</label>
+          <textarea
+            name="description"
+            rows={6}
+            placeholder="Select Course"
+            className={OUTLINED_INPUT + " resize-none"}
+            defaultValue={course?.description || ""}
           />
         </div>
 
-        {/* Actions */}
-        <div className="flex gap-3 pt-4 sticky bottom-0 bg-white pb-1">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 px-4 py-2.5 border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-50 transition-colors"
-          >
-            Cancel
-          </button>
+        {/* Action Button */}
+        <div className="flex justify-center mt-4">
           <button
             type="submit"
             disabled={isPending}
-            className="flex-1 px-4 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="px-10 py-2.5 bg-[#a3a8b6] text-white text-[14px] font-bold rounded-sm shadow-md hover:bg-[#8e94a5] transition-all disabled:opacity-50 uppercase tracking-wide"
           >
-            {isPending ? "Saving…" : course ? "Update Course" : "Add Course"}
+            {isPending ? "Updating…" : "Update"}
           </button>
         </div>
       </form>
