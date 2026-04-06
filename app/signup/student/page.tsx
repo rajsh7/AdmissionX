@@ -4,6 +4,7 @@ import { useState } from "react";
 import Header from "../../components/Header";
 import { AuthBackgroundSlider } from "../../components/AuthBackgroundSlider";
 import { useRouter } from "next/navigation";
+import Footer from "../../components/Footer";
 
 export default function StudentSignupPage() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function StudentSignupPage() {
       <Header />
 
       {/* Main Content */}
-      <main className="relative flex-1 flex flex-col items-center justify-center px-4 pt-32 pb-12 overflow-hidden">
+      <main className="relative flex-1 flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
         {/* Decorations */}
         <div className="absolute top-20 left-10 opacity-10 pointer-events-none">
           <span className="material-symbols-outlined text-9xl">school</span>
@@ -222,6 +223,7 @@ export default function StudentSignupPage() {
           </p>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import Image from "next/image";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface CollegeHeroData {
-  id: number;
+  id: unknown;
   slug: string;
   college_name: string;
   image: string;

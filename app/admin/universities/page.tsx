@@ -1,5 +1,34 @@
 import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
+import { ObjectId } from "mongodb";
+import { revalidatePath } from "next/cache";
+import { saveUpload } from "@/lib/upload-utils";
 import Link from "next/link";
+import UniversityListClient from "./UniversityListClient";
+
+async function updateUniversityImages(formData: FormData) {
+  "use server";
+  try {
+    const id         = formData.get("id") as string;
+    const bannerFile = formData.get("bannerimage_file") as File;
+    const logoFile   = formData.get("logoimage_file") as File;
+    let bannerimage  = formData.get("bannerimage_existing") as string || "";
+    let logoimage    = formData.get("logoimage_existing") as string || "";
+    if (bannerFile && bannerFile.size > 0)
+      bannerimage = await saveUpload(bannerFile, `college/${id}`, "banner");
+    if (logoFile && logoFile.size > 0)
+      logoimage = await saveUpload(logoFile, `college/${id}`, "logo");
+    const db = await getDb();
+    const filter = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: parseInt(id, 10) };
+    await db.collection("collegeprofile").updateOne(filter, {
+      $set: { bannerimage, logoimage, updated_at: new Date() },
+    });
+  } catch (e) {
+    console.error("[admin/universities updateImages]", e);
+  }
+  revalidatePath("/admin/universities");
+  revalidatePath("/", "layout");
+}
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
@@ -44,6 +73,8 @@ interface UniversityRow  {
   estyear: string | null;
   city_name: string | null;
   payment_status: string | null;
+  bannerimage: string | null;
+  logoimage: string | null;
   created_at: string;
 }
 
@@ -94,6 +125,8 @@ export default async function AdminUniversitiesPage({
          cp.rating,
          cp.totalStudent,
          cp.estyear,
+         cp.bannerimage,
+         cp.logoimage,
          cp.payment_status,
          c.name AS city_name,
          cp.created_at
@@ -256,136 +289,7 @@ export default async function AdminUniversitiesPage({
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="px-5 py-3 text-left w-8">Rank</th>
-                    <th className="px-4 py-3 text-left">University</th>
-                    <th className="px-4 py-3 text-left hidden md:table-cell">Type</th>
-                    <th className="px-4 py-3 text-left hidden lg:table-cell">Location</th>
-                    <th className="px-4 py-3 text-left hidden lg:table-cell">Rating</th>
-                    <th className="px-4 py-3 text-center">Verified</th>
-                    <th className="px-4 py-3 text-left hidden xl:table-cell">Est.</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {rows.map((uni, idx) => (
-                    <tr key={uni.id} className="hover:bg-indigo-50/20 transition-colors group">
-
-                      {/* Rank */}
-                      <td className="px-5 py-4">
-                        {uni.topUniversityRank ? (
-                          <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 text-xs font-black">
-                            #{uni.topUniversityRank}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-slate-300 font-mono">
-                            {offset + idx + 1}
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Name + slug */}
-                      <td className="px-4 py-4 max-w-[220px]">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                            <span className="material-symbols-rounded text-indigo-600 text-[18px]" style={ICO_FILL}>account_balance</span>
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-semibold text-slate-800 truncate leading-tight">
-                              {uni.college_name ?? "Unnamed University"}
-                            </p>
-                            {uni.slug && (
-                              <p className="text-[11px] text-slate-400 font-mono truncate mt-0.5">
-                                /{uni.slug}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* University type */}
-                      <td className="px-4 py-4 hidden md:table-cell">
-                        {uni.universityType ? (
-                          <span className="text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-full capitalize">
-                            {uni.universityType}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-slate-300">—</span>
-                        )}
-                      </td>
-
-                      {/* City */}
-                      <td className="px-4 py-4 hidden lg:table-cell">
-                        <span className="text-sm text-slate-600">
-                          {uni.city_name ?? "—"}
-                        </span>
-                      </td>
-
-                      {/* Rating */}
-                      <td className="px-4 py-4 hidden lg:table-cell">
-                        {uni.rating ? (
-                          <div className="flex items-center gap-1">
-                            <span className="material-symbols-rounded text-amber-400 text-[14px]" style={ICO_FILL}>star</span>
-                            <span className="text-sm font-semibold text-slate-700">{parseFloat(uni.rating).toFixed(1)}</span>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-slate-300">—</span>
-                        )}
-                      </td>
-
-                      {/* Verified badge */}
-                      <td className="px-4 py-4 text-center">
-                        {uni.verified ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-green-100 text-green-700 px-2.5 py-1 rounded-full">
-                            <span className="material-symbols-rounded text-[12px]" style={ICO_FILL}>verified</span>
-                            Yes
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full">
-                            <span className="material-symbols-rounded text-[12px]" style={ICO}>radio_button_unchecked</span>
-                            No
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Est. year */}
-                      <td className="px-4 py-4 hidden xl:table-cell">
-                        <span className="text-sm text-slate-500">
-                          {uni.estyear ?? "—"}
-                        </span>
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-4 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          {uni.slug && (
-                            <Link
-                              href={`/university/${uni.slug}`}
-                              target="_blank"
-                              className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-2.5 py-1.5 rounded-lg transition-colors"
-                              title="View university page"
-                            >
-                              <span className="material-symbols-rounded text-[14px]" style={ICO}>open_in_new</span>
-                              View
-                            </Link>
-                          )}
-                          <Link
-                            href={`/admin/colleges?q=${encodeURIComponent(uni.college_name ?? "")}`}
-                            className="text-xs font-semibold text-slate-400 hover:text-slate-600 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg transition-colors"
-                            title="Manage in Colleges"
-                          >
-                            Manage
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <UniversityListClient rows={rows} offset={offset} updateImages={updateUniversityImages} />
 
             {/* ── Pagination ──────────────────────────────────────────────── */}
             {totalPages > 1 && (

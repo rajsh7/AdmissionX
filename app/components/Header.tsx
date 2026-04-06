@@ -309,7 +309,7 @@ export default function Header({ theme }: HeaderProps) {
       )}
 
       <motion.header 
-        className={`fixed top-0 left-0 right-0 z-50 w-full flex items-center transition-all duration-300 ${
+        className={`site-header fixed top-0 left-0 right-0 z-50 w-full flex items-center transition-all duration-300 ${
           showActiveState 
             ? "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.08)] py-4 min-h-[80px]" 
             : "bg-transparent py-5 min-h-[90px]"
@@ -319,7 +319,7 @@ export default function Header({ theme }: HeaderProps) {
           {/* Logo Area */}
           <div className="shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
-              <img src="/admissionx-logo.png" alt="AdmissionX logo" className="h-9 w-auto object-contain" />
+              <div className="bg-white rounded-xl px-3 py-1.5 shadow-sm"><img src="/admissionx-logo.png" alt="AdmissionX logo" className="h-9 w-auto object-contain" /></div>
             </Link>
           </div>
 

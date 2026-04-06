@@ -76,31 +76,47 @@ export default function HomePageClient({
         <HeroSection />
 
         {/* 2. Stats Bar */}
-        <StatsBar />
+        <div data-gsap="fade-up">
+          <StatsBar />
+        </div>
 
         {/* 3. Discover the Top Universities */}
-        <TopUniversities
-          universities={universities}
-          initialStreamColleges={initialStreamColleges}
-        />
+        <div data-gsap="fade-up">
+          <TopUniversities
+            universities={universities}
+            initialStreamColleges={initialStreamColleges}
+          />
+        </div>
 
         {/* 4. Discover the Top Course */}
-        <TopCourse />
+        <div data-gsap="fade-up">
+          <TopCourse />
+        </div>
 
         {/* 5. Career Guidance */}
-        <CareerGuidance />
+        <div data-gsap="fade-up">
+          <CareerGuidance />
+        </div>
 
         {/* 6. Article Grid (Updated FieldsOfStudy) */}
-        <FieldsOfStudy />
+        <div data-gsap="fade-up">
+          <FieldsOfStudy />
+        </div>
 
         {/* 7. Student Life & Beyond (Blogs) */}
-        <NewsSection dbBlogs={dbBlogs} />
+        <div data-gsap="fade-up">
+          <NewsSection dbBlogs={dbBlogs} />
+        </div>
 
         {/* 8. Unfiltered Student Voices */}
-        <Testimonials />
+        <div data-gsap="fade-up">
+          <Testimonials />
+        </div>
 
         {/* 9. Get in Touch */}
-        <ContactSection />
+        <div data-gsap="fade-up">
+          <ContactSection />
+        </div>
       </main>
 
       {/* Footer */}

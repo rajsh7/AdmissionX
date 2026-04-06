@@ -1,236 +1,145 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const GREETINGS = ["hi", "hello", "hey", "hii", "good morning", "good evening"];
-const FAREWELLS = ["bye", "goodbye", "thanks", "thank you", "ok thanks"];
+const SYSTEM_PROMPT = `You are AdmissionX AI — a smart, friendly, and professional education counsellor assistant for AdmissionX, India's leading college admissions platform.
 
-function matchesAny(text: string, keywords: string[]) {
-  return keywords.some((k) => text.includes(k));
-}
+Your role:
+- Help students find colleges, courses, entrance exams, and scholarships
+- Guide them through the admission process
+- Answer questions about study abroad, career guidance, and education in India
+- Be concise, helpful, and encouraging
 
-function buildLinks(items: { name: string; path: string }[]) {
-  return items
-    .slice(0, 5)
-    .map((i) => `• [${i.name}](${i.path})`)
-    .join("\n");
-}
+Platform links you can reference:
+- Colleges: /colleges or /top-colleges
+- Courses: /careers-courses
+- Exams: /examination
+- Study Abroad: /study-abroad
+- Blogs: /education-blogs
+- News: /news
+- Q&A Community: /ask
+- Student Signup: /signup/student
+
+Rules:
+- Keep responses under 150 words
+- Use bullet points for lists
+- Be warm but professional
+- If asked something unrelated to education, politely redirect
+- Format links as markdown: [text](url)
+- Don't make up specific college rankings or fees — say "check the college page for exact details"`;
+
+const SUGGESTIONS = [
+  "Top engineering colleges in India",
+  "How to prepare for JEE?",
+  "MBA admission process",
+  "Scholarships for students",
+  "Study abroad options",
+];
 
 export async function POST(req: NextRequest) {
-  const { message } = await req.json();
+  const { message, history, sessionId } = await req.json();
   if (!message?.trim()) {
     return NextResponse.json({ reply: "Please type a message." });
   }
 
-  const text = message.toLowerCase().trim();
+  const apiKey = process.env.GEMINI_API_KEY;
 
-  if (matchesAny(text, GREETINGS)) {
-    return NextResponse.json({
-      reply:
-        "👋 Hi! I'm AdmissionX Assistant. I can help you with:\n• Finding colleges & courses\n• Entrance exams info\n• Admission process\n• Scholarships\n\nWhat would you like to know?",
-    });
+  // ── Try Gemini first ──────────────────────────────────────────────────────
+  if (apiKey && apiKey !== "your_gemini_api_key_here") {
+    try {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      // Build chat history for context
+      const chatHistory = (history || []).slice(-6).map((m: { role: string; text: string }) => ({
+        role: m.role === "user" ? "user" : "model",
+        parts: [{ text: m.text }],
+      }));
+
+      const chat = model.startChat({
+        history: [
+          { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
+          { role: "model", parts: [{ text: "Understood! I'm AdmissionX AI, ready to help students with college admissions, courses, exams, and more." }] },
+          ...chatHistory,
+        ],
+        generationConfig: { maxOutputTokens: 300, temperature: 0.7 },
+      });
+
+      const result = await chat.sendMessage(message);
+      const reply = result.response.text();
+
+      // Save to session
+      if (sessionId) {
+        const db2 = await getDb();
+        await db2.collection("chatbot_sessions").updateOne(
+          { sessionId },
+          {
+            $push: { messages: { $each: [
+              { role: "user", text: message, time: new Date() },
+              { role: "bot", text: reply, time: new Date() },
+            ]} } as never,
+            $set: { updated_at: new Date() },
+          }
+        );
+      }
+
+      return NextResponse.json({ reply, source: "gemini" });
+    } catch (err) {
+      console.error("[chatbot/gemini]", err);
+      // Fall through to DB fallback
+    }
   }
 
-  if (matchesAny(text, FAREWELLS)) {
-    return NextResponse.json({
-      reply: "You're welcome! Best of luck with your admissions. Feel free to ask anytime! 🎓",
-    });
+  // ── DB fallback (keyword-based) ───────────────────────────────────────────
+  const text = message.toLowerCase().trim();
+
+  const match = (keywords: string[]) => keywords.some((k) => text.includes(k));
+
+  if (match(["hi", "hello", "hey", "hii"])) {
+    return NextResponse.json({ reply: "👋 Hi! I'm AdmissionX AI.\n\nAsk me about colleges, courses, exams, or admissions!", source: "db" });
+  }
+  if (match(["bye", "thanks", "thank you"])) {
+    return NextResponse.json({ reply: "You're welcome! Best of luck with your admissions. 🎓", source: "db" });
   }
 
   try {
     const db = await getDb();
 
-    const STOP_WORDS = new Set(["top", "best", "find", "search", "about", "show", "give", "list", "what", "which", "tell", "me", "the", "a", "an", "is", "are", "for", "in", "of", "and", "or", "to", "i", "want"]);
+    if (match(["college", "university", "institute"])) {
+      const colleges = await db.collection("collegeprofile").aggregate([
+        { $lookup: { from: "users", localField: "users_id", foreignField: "_id", as: "u" } },
+        { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
+        { $sort: { rating: -1 } }, { $limit: 5 },
+        { $project: { slug: 1, name: { $ifNull: ["$u.firstname", "$slug"] } } },
+      ]).toArray();
 
-    function extractSearchTerm(input: string, stripWords: string[]): string {
-      return input
-        .split(/\s+/)
-        .filter((w) => !STOP_WORDS.has(w) && !stripWords.includes(w) && w.length > 1)
-        .join(" ")
-        .trim();
+      const links = colleges.map((c) => `• [${c.name}](/college/${c.slug})`).join("\n");
+      return NextResponse.json({ reply: `🏫 Top colleges on AdmissionX:\n\n${links}\n\n[Browse all colleges →](/colleges)`, source: "db" });
     }
 
-    // Colleges
-    if (matchesAny(text, ["college", "university", "institute", "admission", "top college", "best college"])) {
-      const searchTerm = extractSearchTerm(text, ["college", "university", "institute", "admission", "colleges", "universities"]);
-
-      const colleges = await db
-        .collection("collegeprofile")
-        .aggregate([
-          { $match: searchTerm ? { $or: [
-            { slug: { $regex: searchTerm, $options: "i" } },
-            { registeredSortAddress: { $regex: searchTerm, $options: "i" } },
-          ]} : {} },
-          { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
-          { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
-          { $sort: { rating: -1 } },
-          { $limit: 5 },
-          { $project: { slug: 1, registeredSortAddress: 1, name: "$u.firstname" } },
-        ])
-        .toArray();
-
-      if (colleges.length === 0) {
-        return NextResponse.json({
-          reply: `I couldn't find colleges matching "${searchTerm || "your query"}". Try browsing all colleges at [/colleges](/colleges).`,
-        });
-      }
-
-      const links = buildLinks(
-        colleges.map((c) => ({
-          name: c.name || c.slug,
-          path: `/college/${c.slug}`,
-        }))
-      );
-
-      return NextResponse.json({
-        reply: `🏫 Here are some colleges I found:\n\n${links}\n\n[Browse all colleges →](/colleges)`,
-      });
+    if (match(["exam", "jee", "neet", "cat", "gate", "entrance"])) {
+      const exams = await db.collection("examination_details").find({ status: 1 }).sort({ totalViews: -1 }).limit(5).project({ title: 1, slug: 1 }).toArray();
+      const links = exams.map((e) => `• [${e.title}](/examination)`).join("\n");
+      return NextResponse.json({ reply: `📝 Popular entrance exams:\n\n${links}\n\n[Browse all exams →](/examination)`, source: "db" });
     }
 
-    // Courses
-    if (matchesAny(text, ["course", "degree", "program", "btech", "mba", "bsc", "msc", "bca", "mca", "engineering", "medical", "law", "arts", "commerce", "science"])) {
-      const searchTerm = extractSearchTerm(text, ["course", "degree", "program", "courses", "degrees"]);
-
-      const filter = searchTerm
-        ? { $or: [
-            { name: { $regex: searchTerm, $options: "i" } },
-            { coursename: { $regex: searchTerm, $options: "i" } },
-          ]}
-        : {};
-
-      const courses = await db
-        .collection("course")
-        .find(filter)
-        .sort({ name: 1 })
-        .limit(5)
-        .project({ name: 1, coursename: 1, slug: 1 })
-        .toArray();
-
-      if (courses.length === 0) {
-        return NextResponse.json({
-          reply: `I couldn't find courses matching "${searchTerm || "your query"}". Explore all courses at [/careers-courses](/careers-courses).`,
-        });
-      }
-
-      const links = buildLinks(
-        courses.map((c) => ({ name: c.name || c.coursename, path: `/careers-courses` }))
-      );
-
-      return NextResponse.json({
-        reply: `📚 Here are some courses I found:\n\n${links}\n\n[Browse all courses →](/careers-courses)`,
-      });
+    if (match(["course", "degree", "mba", "btech", "mbbs"])) {
+      return NextResponse.json({ reply: "📚 Explore thousands of courses:\n\n• Engineering (B.Tech/M.Tech)\n• Management (MBA/PGDM)\n• Medical (MBBS/BDS)\n• Law (LLB/LLM)\n• Commerce (B.Com/M.Com)\n\n[Browse all courses →](/careers-courses)", source: "db" });
     }
 
-    // Exams
-    if (matchesAny(text, ["exam", "entrance", "jee", "neet", "cat", "mat", "gate", "clat", "cuet", "test", "examination"])) {
-      const searchTerm = extractSearchTerm(text, ["exam", "entrance", "test", "examination", "exams"]);
-
-      const examFilter = searchTerm
-        ? { $or: [
-            { title: { $regex: searchTerm, $options: "i" } },
-            { slug: { $regex: searchTerm, $options: "i" } },
-          ]}
-        : { status: 1 };
-
-      const exams = await db
-        .collection("examination_details")
-        .find(examFilter)
-        .sort({ totalViews: -1 })
-        .limit(5)
-        .project({ title: 1, slug: 1 })
-        .toArray();
-
-      if (exams.length === 0) {
-        return NextResponse.json({
-          reply: `I couldn't find exams matching "${searchTerm || "your query"}". Browse all exams at [/examination](/examination).`,
-        });
-      }
-
-      const links = buildLinks(
-        exams.map((e) => ({ name: e.title, path: `/examination` }))
-      );
-
-      return NextResponse.json({
-        reply: `📝 Here are some entrance exams:\n\n${links}\n\n[Browse all exams →](/examination)`,
-      });
+    if (match(["scholarship", "financial", "fee waiver"])) {
+      return NextResponse.json({ reply: "🎓 Scholarships are available on many college profile pages.\n\nVisit a college's page and look for the **Scholarships** section.\n\n[Browse colleges →](/colleges)", source: "db" });
     }
 
-    // Scholarships
-    if (matchesAny(text, ["scholarship", "financial aid", "fee waiver", "stipend", "grant"])) {
-      return NextResponse.json({
-        reply:
-          "🎓 Many colleges on AdmissionX offer scholarships based on merit and need.\n\n• Visit a college's profile page\n• Look for the Scholarships section\n• Contact the college directly for eligibility\n\n[Browse colleges →](/colleges)",
-      });
+    if (match(["abroad", "foreign", "international", "usa", "uk", "canada"])) {
+      return NextResponse.json({ reply: "🌍 Interested in studying abroad?\n\n[Explore Study Abroad →](/study-abroad)\n\nFind international universities, visa guidance, and more.", source: "db" });
     }
 
-    // Admission process
-    if (matchesAny(text, ["how to apply", "apply", "application", "process", "procedure", "eligibility", "criteria", "documents"])) {
-      return NextResponse.json({
-        reply:
-          "📋 General admission process on AdmissionX:\n\n1. Search for your desired college or course\n2. Check eligibility criteria on the college page\n3. Register as a student on AdmissionX\n4. Apply through the college's application form\n5. Track your application in your dashboard\n\n[Sign up as student →](/signup/student)\n[Browse colleges →](/colleges)",
-      });
-    }
-
-    // Study abroad
-    if (matchesAny(text, ["abroad", "foreign", "international", "usa", "uk", "canada", "australia", "germany", "overseas"])) {
-      return NextResponse.json({
-        reply:
-          "🌍 Interested in studying abroad? AdmissionX has a dedicated Study Abroad section!\n\n[Explore Study Abroad →](/study-abroad)\n\nFind universities, courses, and guidance for international admissions.",
-      });
-    }
-
-    // Counselling
-    if (matchesAny(text, ["counselling", "counseling", "guidance", "career", "help me choose", "which college", "which course"])) {
-      return NextResponse.json({
-        reply:
-          "🧭 Need personalized guidance? Our counselling service can help!\n\n[Get Counselling →](/counselling)\n\nOur experts will guide you based on your interests, scores, and career goals.",
-      });
-    }
-
-    // News / Blogs
-    if (matchesAny(text, ["news", "blog", "article", "update", "latest"])) {
-      return NextResponse.json({
-        reply:
-          "📰 Stay updated with the latest in education:\n\n• [Education Blogs →](/education-blogs)\n• [Latest News →](/news)\n• [Community Q&A →](/ask)",
-      });
-    }
-
-    // Q&A search fallback
-    const words = text.split(" ").filter((w: string) => w.length > 3).slice(0, 4);
-    if (words.length > 0) {
-      const qaResults = await db
-        .collection("ask_questions")
-        .find({
-          question: { $regex: words.join("|"), $options: "i" },
-          status: 1,
-        })
-        .sort({ totalAnswerCount: -1 })
-        .limit(3)
-        .project({ question: 1, slug: 1, id: 1 })
-        .toArray();
-
-      if (qaResults.length > 0) {
-        const links = qaResults
-          .map(
-            (q) =>
-              `• [${String(q.question).slice(0, 80)}${String(q.question).length > 80 ? "…" : ""}](${q.slug ? `/ask/${q.slug}` : `/ask/${q.id}`})`
-          )
-          .join("\n");
-
-        return NextResponse.json({
-          reply: `💬 I found some related questions from our community:\n\n${links}\n\n[Browse all Q&A →](/ask)`,
-        });
-      }
-    }
-
-    // Fallback
     return NextResponse.json({
-      reply:
-        "I'm not sure about that, but here are some helpful links:\n\n• [Find Colleges →](/colleges)\n• [Browse Courses →](/careers-courses)\n• [Entrance Exams →](/examination)\n• [Community Q&A →](/ask)\n• [Get Counselling →](/counselling)\n\nTry rephrasing your question!",
+      reply: "I can help with:\n\n• [Find Colleges →](/colleges)\n• [Browse Courses →](/careers-courses)\n• [Entrance Exams →](/examination)\n• [Study Abroad →](/study-abroad)\n• [Community Q&A →](/ask)\n\nTry asking something specific!",
+      source: "db",
     });
-  } catch (err) {
-    console.error("[chatbot]", err);
-    return NextResponse.json({
-      reply: "Sorry, I'm having trouble right now. Please try again in a moment.",
-    });
+  } catch {
+    return NextResponse.json({ reply: "Sorry, I'm having trouble right now. Please try again in a moment." });
   }
 }

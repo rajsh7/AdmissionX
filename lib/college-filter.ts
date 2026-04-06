@@ -133,6 +133,6 @@ export async function fetchCollegesForSlug(
 // ─── Cached wrapper ───────────────────────────────────────────────────────────
 export const getCachedCollegesForSlug = unstable_cache(
   fetchCollegesForSlug,
-  ["home-filter-colleges-v1"],
+  ["home-filter-colleges-v2"],
   { revalidate: 300 },
 );

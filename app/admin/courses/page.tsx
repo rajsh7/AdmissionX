@@ -1,5 +1,34 @@
 import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
+import { revalidatePath } from "next/cache";
+import { saveUpload } from "@/lib/upload-utils";
 import Link from "next/link";
+import CourseListClient from "./CourseListClient";
+
+async function updateCourse(formData: FormData) {
+  "use server";
+  try {
+    const id        = parseInt(formData.get("id") as string, 10);
+    const name      = formData.get("name") as string;
+    const pageslug  = formData.get("pageslug") as string;
+    const imageFile = formData.get("image_file") as File;
+    let image       = formData.get("image_existing") as string || "";
+    if (imageFile && imageFile.size > 0)
+      image = await saveUpload(imageFile, "courses", `course_${id}`);
+    const isShowOnTop  = formData.get("isShowOnTop")  === "on" ? 1 : 0;
+    const isShowOnHome = formData.get("isShowOnHome") === "on" ? 1 : 0;
+    if (isNaN(id)) return;
+    const db = await getDb();
+    await db.collection("course").updateOne(
+      { id },
+      { $set: { name, pageslug, image, isShowOnTop, isShowOnHome, updated_at: new Date() } },
+    );
+  } catch (e) {
+    console.error("[admin/courses updateCourse]", e);
+  }
+  revalidatePath("/admin/courses");
+  revalidatePath("/", "layout");
+}
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
@@ -19,20 +48,7 @@ async function safeQuery<T >(
   }
 }
 
-function formatDate(d: string | null | undefined): string {
-  if (!d) return "—";
-  try {
-    return new Date(d).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  } catch {
-    return "—";
-  }
-}
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface CourseRow  {
   id: number;
@@ -42,6 +58,7 @@ interface CourseRow  {
   isShowOnHome: number;
   degree_name: string | null;
   degree_id: number | null;
+  image: string | null;
   created_at: string;
 }
 
@@ -91,6 +108,7 @@ export default async function AdminCoursesPage({
          c.isShowOnTop,
          c.isShowOnHome,
          c.degree_id,
+         c.image,
          c.created_at,
          d.name AS degree_name
        FROM course c
@@ -271,169 +289,23 @@ export default async function AdminCoursesPage({
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         {courses.length === 0 ? (
           <div className="py-24 text-center">
-            <span
-              className="material-symbols-rounded text-6xl text-slate-200 mb-4 block"
-              style={ICO_FILL}
-            >
-              menu_book
-            </span>
+            <span className="material-symbols-rounded text-6xl text-slate-200 mb-4 block" style={ICO_FILL}>menu_book</span>
             <p className="text-slate-500 font-semibold text-sm">
-              {q
-                ? `No courses matching "${q}"`
-                : filter !== "all"
-                ? `No courses with filter "${filter}".`
-                : "No courses found."}
+              {q ? `No courses matching "${q}"` : filter !== "all" ? `No courses with filter "${filter}".` : "No courses found."}
             </p>
             {(q || filter !== "all") && (
-              <Link
-                href="/admin/courses"
-                className="mt-3 inline-block text-sm text-orange-500 hover:underline"
-              >
-                View all courses
-              </Link>
+              <Link href="/admin/courses" className="mt-3 inline-block text-sm text-orange-500 hover:underline">View all courses</Link>
             )}
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3 w-10">
-                      #
-                    </th>
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3">
-                      Course Name
-                    </th>
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3 hidden md:table-cell">
-                      Degree
-                    </th>
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3 hidden lg:table-cell">
-                      Slug
-                    </th>
-                    <th className="text-center text-[11px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3 hidden sm:table-cell">
-                      Featured
-                    </th>
-                    <th className="text-center text-[11px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3 hidden sm:table-cell">
-                      On Home
-                    </th>
-                    <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-4 py-3 hidden xl:table-cell">
-                      Added
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {courses.map((course, idx) => (
-                    <tr
-                      key={course.id}
-                      className="hover:bg-orange-50/20 transition-colors"
-                    >
-                      {/* Row # */}
-                      <td className="px-5 py-4 text-xs text-slate-400 font-mono">
-                        {offset + idx + 1}
-                      </td>
-
-                      {/* Course name */}
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
-                            <span
-                              className="material-symbols-rounded text-orange-500 text-[16px]"
-                              style={ICO_FILL}
-                            >
-                              menu_book
-                            </span>
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-semibold text-slate-800 truncate max-w-[200px] leading-snug">
-                              {course.name}
-                            </p>
-                            {/* Degree shown under name on mobile */}
-                            {course.degree_name && (
-                              <p className="text-[11px] text-slate-400 truncate md:hidden">
-                                {course.degree_name}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Degree */}
-                      <td className="px-4 py-4 hidden md:table-cell">
-                        {course.degree_name ? (
-                          <Link
-                            href={buildUrl({ q: course.degree_name, filter: "all" })}
-                            className="inline-flex items-center gap-1 text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-full hover:bg-indigo-100 transition-colors whitespace-nowrap max-w-[180px] truncate"
-                          >
-                            <span
-                              className="material-symbols-rounded text-[13px]"
-                              style={ICO_FILL}
-                            >
-                              workspace_premium
-                            </span>
-                            <span className="truncate">{course.degree_name}</span>
-                          </Link>
-                        ) : (
-                          <span className="text-xs text-slate-300 italic">No degree</span>
-                        )}
-                      </td>
-
-                      {/* Slug */}
-                      <td className="px-4 py-4 hidden lg:table-cell">
-                        {course.pageslug ? (
-                          <span className="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded truncate block max-w-[180px]">
-                            /{course.pageslug}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-slate-300 italic">no slug</span>
-                        )}
-                      </td>
-
-                      {/* Is Show On Top */}
-                      <td className="px-4 py-4 text-center hidden sm:table-cell">
-                        {course.isShowOnTop ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
-                            <span
-                              className="material-symbols-rounded text-[12px]"
-                              style={ICO_FILL}
-                            >
-                              star
-                            </span>
-                            Yes
-                          </span>
-                        ) : (
-                          <span className="text-xs text-slate-300">—</span>
-                        )}
-                      </td>
-
-                      {/* Is Show On Home */}
-                      <td className="px-4 py-4 text-center hidden sm:table-cell">
-                        {course.isShowOnHome ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                            <span
-                              className="material-symbols-rounded text-[12px]"
-                              style={ICO_FILL}
-                            >
-                              check_circle
-                            </span>
-                            Yes
-                          </span>
-                        ) : (
-                          <span className="text-xs text-slate-300">—</span>
-                        )}
-                      </td>
-
-                      {/* Added date */}
-                      <td className="px-4 py-4 hidden xl:table-cell">
-                        <span className="text-xs text-slate-400 whitespace-nowrap">
-                          {formatDate(course.created_at)}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <CourseListClient
+              courses={courses}
+              offset={offset}
+              total={total}
+              updateCourse={updateCourse}
+              buildUrl={buildUrl}
+            />
 
             {/* ── Pagination ──────────────────────────────────────────────── */}
             <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
@@ -508,12 +380,9 @@ export default async function AdminCoursesPage({
         )}
       </div>
 
-      {/* ── Footer note ───────────────────────────────────────────────────── */}
       <p className="text-[11px] text-slate-400 flex items-center gap-1.5 pb-2">
-        <span className="material-symbols-rounded text-[13px]" style={ICO}>
-          info
-        </span>
-        Course editing is managed in the legacy admin panel. This view is read-only.
+        <span className="material-symbols-rounded text-[13px]" style={ICO}>info</span>
+        Course images are stored in <code className="bg-slate-100 px-1 rounded">public/uploads/courses/</code>.
       </p>
     </div>
   );

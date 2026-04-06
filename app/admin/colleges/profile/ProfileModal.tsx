@@ -92,8 +92,8 @@ export default function ProfileModal({
               />
             </div>
 
-            {/* Banner Image */}
-            <div className="md:col-span-2">
+            {/* Images */}
+            <div className="space-y-1.5">
               <ImageUpload 
                 name="bannerimage_file"
                 label="Banner Image"
@@ -104,6 +104,19 @@ export default function ProfileModal({
                   `https://admin.admissionx.in/uploads/${initialData.bannerimage}`
                 }
                 existingName="bannerimage_existing"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <ImageUpload 
+                name="logoimage_file"
+                label="Logo Image"
+                initialImage={
+                  !initialData?.logoimage ? null :
+                  initialData.logoimage.startsWith('http') ? initialData.logoimage :
+                  initialData.logoimage.startsWith('/') ? initialData.logoimage :
+                  `https://admin.admissionx.in/uploads/${initialData.logoimage}`
+                }
+                existingName="logoimage_existing"
               />
             </div>
 

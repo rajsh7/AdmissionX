@@ -160,7 +160,7 @@ const getHomePageData = unstable_cache(
       };
     }
   },
-  ["homepage-data-v6"],
+  ["homepage-data-v7"],
   { revalidate: 300 },
 );
 

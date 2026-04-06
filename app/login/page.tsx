@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AuthBackgroundSlider } from "../components/AuthBackgroundSlider";
 import Header from "../components/Header";
 import Link from "next/link";
+import Footer from "../components/Footer";
 
 function AdminLoginForm() {
   const router = useRouter();
@@ -50,11 +51,11 @@ function AdminLoginForm() {
   };
 
   return (
-    <div className="min-h-screen text-slate-900 dark:text-slate-100 font-display relative overflow-hidden">
+    <div className="min-h-screen text-slate-900 dark:text-slate-100 font-display relative flex flex-col">
       <AuthBackgroundSlider />
       <Header />
 
-      <main className="relative flex-1 flex flex-col items-center justify-center px-4 pt-40 pb-12 md:pb-20 overflow-hidden">
+      <main className="relative flex-1 flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
         {/* Background decorations */}
         <div className="absolute top-20 left-10 opacity-10 pointer-events-none select-none">
           <span className="material-symbols-outlined text-9xl">
@@ -249,6 +250,7 @@ function AdminLoginForm() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

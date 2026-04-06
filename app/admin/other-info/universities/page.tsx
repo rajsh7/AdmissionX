@@ -1,6 +1,9 @@
 import pool from "@/lib/db";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
+import { getDb } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { saveUpload } from "@/lib/upload-utils";
+import DeleteButton from "@/app/admin/_components/DeleteButton";
+import OtherInfoUniversityClient from "./OtherInfoUniversityClient";
 
 async function deleteUniversity(id: number) {
   "use server";
@@ -13,7 +16,44 @@ async function deleteUniversity(id: number) {
   revalidatePath("/", "layout");
 }
 
-async function safeQuery<T >(
+async function createUniversity(formData: FormData) {
+  "use server";
+  try {
+    const name      = formData.get("name") as string;
+    const imageFile = formData.get("image_file") as File;
+    let image = "";
+    if (imageFile && imageFile.size > 0)
+      image = await saveUpload(imageFile, "universities", "uni");
+    if (!name) return;
+    const db = await getDb();
+    await db.collection("university").insertOne({ name, image, created_at: new Date() });
+  } catch (e) {
+    console.error("[admin/other-info/universities createAction]", e);
+  }
+  revalidatePath("/admin/other-info/universities");
+  revalidatePath("/", "layout");
+}
+
+async function updateUniversity(formData: FormData) {
+  "use server";
+  try {
+    const id        = parseInt(formData.get("id") as string, 10);
+    const name      = formData.get("name") as string;
+    const imageFile = formData.get("image_file") as File;
+    let image       = formData.get("image_existing") as string || "";
+    if (imageFile && imageFile.size > 0)
+      image = await saveUpload(imageFile, "universities", "uni");
+    if (isNaN(id) || !name) return;
+    const db = await getDb();
+    await db.collection("university").updateOne({ id }, { $set: { name, image, updated_at: new Date() } });
+  } catch (e) {
+    console.error("[admin/other-info/universities updateAction]", e);
+  }
+  revalidatePath("/admin/other-info/universities");
+  revalidatePath("/", "layout");
+}
+
+async function safeQuery<T>(
   sql: string,
   params: (string | number | boolean)[] = [],
 ): Promise<T[]> {
@@ -26,9 +66,10 @@ async function safeQuery<T >(
   }
 }
 
-interface UniversityRow  {
+interface UniversityRow {
   id: number;
   name: string;
+  image: string | null;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -46,12 +87,8 @@ export default async function UniversitiesPage({
   const params = q ? [`%${q}%`] : [];
 
   const data = await safeQuery<UniversityRow>(
-    `SELECT id, name
-     FROM university
-     ${where}
-     ORDER BY name ASC
-     LIMIT 100`,
-    params
+    `SELECT id, name, image FROM university ${where} ORDER BY name ASC LIMIT 100`,
+    params,
   );
 
   return (
@@ -65,50 +102,22 @@ export default async function UniversitiesPage({
           <p className="text-sm text-slate-500 mt-0.5">Manage the master list of universities and academic institutions.</p>
         </div>
         <form method="GET" className="relative max-w-sm w-full">
-           <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[20px]" style={ICO}>search</span>
-           <input 
-             name="q" 
-             defaultValue={q}
-             placeholder="Search universities..." 
-             className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-           />
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[20px]" style={ICO}>search</span>
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Search universities..."
+            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          />
         </form>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-50/50 border-b border-slate-100 text-left">
-                <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">University Name</th>
-                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {data.length === 0 ? (
-                <tr>
-                  <td colSpan={2} className="px-5 py-10 text-center text-slate-400">
-                     No universities found.
-                  </td>
-                </tr>
-              ) : (
-                data.map((r) => (
-                  <tr key={r.id} className="hover:bg-indigo-50/20 transition-colors group">
-                    <td className="px-5 py-4 font-bold text-slate-800">{r.name}</td>
-                    <td className="px-4 py-4 text-right">
-                       <DeleteButton action={deleteUniversity.bind(null, r.id)} size="sm" />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <OtherInfoUniversityClient
+        data={data}
+        createUniversity={createUniversity}
+        updateUniversity={updateUniversity}
+        deleteUniversity={deleteUniversity}
+      />
     </div>
   );
 }
-
-
-
-

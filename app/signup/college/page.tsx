@@ -5,12 +5,10 @@ import { useRouter } from "next/navigation";
 import Header from "../../components/Header";
 import { AuthBackgroundSlider } from "../../components/AuthBackgroundSlider";
 import Link from "next/link";
+import Footer from "../../components/Footer";
 
 export default function CollegeSignupPage() {
   const router = useRouter();
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -27,21 +25,10 @@ export default function CollegeSignupPage() {
     const phone = String(formData.get("phone") || "").trim();
     const address = String(formData.get("address") || "").trim();
     const courses = String(formData.get("courses") || "").trim();
-    const password = String(formData.get("password") || "");
-    const confirmPassword = String(formData.get("confirmPassword") || "");
     const captchaOk = formData.get("captcha") === "on";
 
-    // Client-side validation
-    if (!collegeName || !email || !contactName || !phone || !address || !courses || !password) {
+    if (!collegeName || !email || !contactName || !phone || !address || !courses) {
       setError("Please fill in all required fields.");
-      return;
-    }
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
       return;
     }
     if (!captchaOk) {
@@ -54,18 +41,8 @@ export default function CollegeSignupPage() {
       const res = await fetch("/api/signup/college", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          collegeName,
-          email,
-          contactName,
-          phone,
-          address,
-          courses,
-          password,
-          captchaOk,
-        }),
+        body: JSON.stringify({ collegeName, email, contactName, phone, address, courses, captchaOk, password: "pending_admin_approval" }),
       });
-
       const data = await res.json();
       if (res.ok) {
         router.push("/signup/college/success");
@@ -84,325 +61,166 @@ export default function CollegeSignupPage() {
       <AuthBackgroundSlider />
       <Header />
 
-      <main className="relative flex-1 flex flex-col items-center justify-center px-4 pt-32 pb-12 overflow-hidden">
-        {/* Background decorations */}
-        <div className="absolute top-20 left-10 opacity-10 pointer-events-none select-none">
-          <span className="material-symbols-outlined text-9xl">apartment</span>
-        </div>
-        <div className="absolute bottom-10 right-10 opacity-10 pointer-events-none select-none">
-          <span className="material-symbols-outlined text-[12rem]">
-            workspace_premium
-          </span>
-        </div>
+      <main className="relative flex-1 flex items-center justify-center px-4 py-24 overflow-hidden">
+        <div className="w-full max-w-[1100px] grid grid-cols-1 lg:grid-cols-2 gap-0 rounded-2xl overflow-hidden shadow-2xl shadow-black/10 z-10">
 
-        {/* Signup Card */}
-        <div className="w-full max-w-[520px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-primary/5 p-8 md:p-10 border border-slate-100 dark:border-slate-800 z-10">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-14 h-14 bg-primary/10 rounded-2xl mb-4">
-              <span
-                className="material-symbols-outlined text-primary text-3xl"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                apartment
-              </span>
-            </div>
-            <h1 className="text-slate-900 dark:text-slate-100 text-3xl font-bold mb-2">
-              College Signup
-            </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
-              Register your institution to receive verified leads and manage
-              applications on AdmissionX.
-            </p>
-          </div>
+          {/* ── Left: Promo Panel ── */}
+          <div className="hidden lg:flex flex-col justify-between p-10 relative overflow-hidden"
+            style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}>
+            {/* Decorative circles */}
+            <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-10" style={{ background: "radial-gradient(circle, #FF3C3C, transparent)" }} />
+            <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full opacity-10" style={{ background: "radial-gradient(circle, #FF3C3C, transparent)" }} />
 
-          {/* Error Banner */}
-          {error && (
-            <div className="mb-5 flex items-start gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3">
-              <span
-                className="material-symbols-outlined text-red-500 text-[20px] mt-0.5 shrink-0"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                error
-              </span>
-              <p className="text-sm text-red-700 dark:text-red-400 font-medium">
-                {error}
+            <div>
+              <Link href="/" className="inline-block mb-10 bg-white px-4 py-2 rounded-xl">
+                <img src="/admissionx-logo.png" className="h-7 w-auto object-contain" alt="AdmissionX" />
+              </Link>
+              <h2 className="text-3xl font-black text-white leading-tight mb-4">
+                Partner with India&apos;s Most Trusted Admissions Platform
+              </h2>
+              <p className="text-slate-400 text-sm leading-relaxed mb-8">
+                Join 16,000+ institutions already on AdmissionX. Reach thousands of qualified students actively searching for colleges like yours.
               </p>
             </div>
-          )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* College Name */}
-            <div className="flex flex-col gap-2">
-              <label className="text-slate-700 dark:text-slate-300 text-sm font-semibold">
-                College / University Name{" "}
-                <span className="text-primary">*</span>
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
-                  corporate_fare
-                </span>
-                <input
-                  name="collegeName"
-                  type="text"
-                  placeholder="e.g. Delhi Institute of Technology"
-                  required
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
-                />
-              </div>
+            {/* Benefits */}
+            <div className="space-y-4">
+              {[
+                { icon: "groups", title: "10,000+ Active Students", desc: "Reach students searching for your courses daily" },
+                { icon: "verified", title: "Verified College Profile", desc: "Build trust with a verified badge on your listing" },
+                { icon: "description", title: "Application Management", desc: "Manage all student applications in one dashboard" },
+                { icon: "analytics", title: "Analytics & Insights", desc: "Track profile views, applications, and conversions" },
+              ].map((b) => (
+                <div key={b.title} className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <span className="material-symbols-outlined text-primary text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>{b.icon}</span>
+                  </div>
+                  <div>
+                    <p className="text-white text-sm font-bold">{b.title}</p>
+                    <p className="text-slate-500 text-xs">{b.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            {/* Official Email */}
-            <div className="flex flex-col gap-2">
-              <label className="text-slate-700 dark:text-slate-300 text-sm font-semibold">
-                Official Email <span className="text-primary">*</span>
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
-                  mail
-                </span>
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="admissions@yourcollege.com"
-                  required
-                  autoComplete="email"
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
-                />
-              </div>
-            </div>
-
-            {/* Contact Person */}
-            <div className="flex flex-col gap-2">
-              <label className="text-slate-700 dark:text-slate-300 text-sm font-semibold">
-                Contact Person Name <span className="text-primary">*</span>
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
-                  person
-                </span>
-                <input
-                  name="contactName"
-                  type="text"
-                  placeholder="Admissions Head / Principal"
-                  required
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
-                />
-              </div>
-            </div>
-
-            {/* Phone */}
-            <div className="flex flex-col gap-2">
-              <label className="text-slate-700 dark:text-slate-300 text-sm font-semibold">
-                Phone Number <span className="text-primary">*</span>
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
-                  call
-                </span>
-                <input
-                  name="phone"
-                  type="tel"
-                  placeholder="+91 98765 43210"
-                  required
-                  autoComplete="tel"
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
-                />
-              </div>
-            </div>
-
-            {/* Address */}
-            <div className="flex flex-col gap-2">
-              <label className="text-slate-700 dark:text-slate-300 text-sm font-semibold">
-                Complete Address <span className="text-primary">*</span>
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-4 text-slate-400 text-[20px]">
-                  location_on
-                </span>
-                <textarea
-                  name="address"
-                  placeholder="Street, City, State, ZIP"
-                  required
-                  rows={2}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400 resize-none"
-                />
-              </div>
-            </div>
-
-            {/* Courses Offered */}
-            <div className="flex flex-col gap-2">
-              <label className="text-slate-700 dark:text-slate-300 text-sm font-semibold">
-                Courses Offered (Basic Info) <span className="text-primary">*</span>
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
-                  school
-                </span>
-                <input
-                  name="courses"
-                  type="text"
-                  placeholder="e.g. B.Tech, MBA, Ph.D"
-                  required
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
-                />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div className="flex flex-col gap-2">
-              <label className="text-slate-700 dark:text-slate-300 text-sm font-semibold">
-                Password <span className="text-primary">*</span>
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
-                  lock
-                </span>
-                <input
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Min. 8 characters"
-                  required
-                  minLength={8}
-                  autoComplete="new-password"
-                  className="w-full pl-11 pr-12 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((p) => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-                  tabIndex={-1}
-                >
-                  <span className="material-symbols-outlined text-[20px]">
-                    {showPassword ? "visibility" : "visibility_off"}
-                  </span>
-                </button>
-              </div>
-            </div>
-
-            {/* Confirm Password */}
-            <div className="flex flex-col gap-2">
-              <label className="text-slate-700 dark:text-slate-300 text-sm font-semibold">
-                Confirm Password <span className="text-primary">*</span>
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
-                  lock_reset
-                </span>
-                <input
-                  name="confirmPassword"
-                  type={showConfirm ? "text" : "password"}
-                  placeholder="Re-enter your password"
-                  required
-                  minLength={8}
-                  autoComplete="new-password"
-                  className="w-full pl-11 pr-12 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirm((p) => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-                  tabIndex={-1}
-                >
-                  <span className="material-symbols-outlined text-[20px]">
-                    {showConfirm ? "visibility" : "visibility_off"}
-                  </span>
-                </button>
-              </div>
-            </div>
-
-            {/* Captcha checkbox */}
-            <div className="flex items-start gap-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3">
-              <input
-                id="college-captcha"
-                name="captcha"
-                type="checkbox"
-                className="h-4 w-4 mt-0.5 rounded border-slate-300 text-primary focus:ring-primary shrink-0"
-              />
-              <label
-                htmlFor="college-captcha"
-                className="text-sm text-slate-600 dark:text-slate-400 leading-snug"
-              >
-                I confirm that the information provided is accurate and I am
-                authorised to register this institution on AdmissionX.
-              </label>
-            </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-primary hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <svg
-                    className="animate-spin h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v8H4z"
-                    />
-                  </svg>
-                  Submitting…
-                </>
-              ) : (
-                <>
-                  <span
-                    className="material-symbols-outlined text-[20px]"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    how_to_reg
-                  </span>
-                  Submit College Request
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Info note */}
-          <div className="mt-5 flex items-start gap-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl px-4 py-3">
-            <span
-              className="material-symbols-outlined text-blue-500 text-[18px] shrink-0 mt-0.5"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              info
-            </span>
-            <p className="text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
-              Your account will be reviewed and activated within{" "}
-              <strong>1–2 business days</strong>. You will receive an email
-              confirmation once approved.
+            <p className="text-slate-600 text-xs mt-8">
+              Already registered?{" "}
+              <Link href="/login/college" className="text-primary font-semibold hover:underline">College Login →</Link>
             </p>
           </div>
 
-          {/* Login link */}
-          <p className="mt-6 text-center text-slate-600 dark:text-slate-400 text-sm">
-            Already registered?{" "}
-            <Link
-              href="/login/college"
-              className="text-primary font-bold hover:underline"
-            >
-              College Login
-            </Link>
-          </p>
+          {/* ── Right: Signup Form ── */}
+          <div className="bg-white p-8 lg:p-10 flex flex-col justify-center">
+            <div className="mb-6">
+              <h1 className="text-2xl font-black text-slate-900 mb-1">Register Your College</h1>
+              <p className="text-slate-500 text-sm">Submit your details. Our team will review and send your login credentials within 1–2 business days.</p>
+            </div>
+
+            {error && (
+              <div className="mb-4 flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                <span className="material-symbols-outlined text-red-500 text-[18px] mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>error</span>
+                <p className="text-sm text-red-700 font-medium">{error}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* College Name */}
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 block">College / University Name <span className="text-primary">*</span></label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">corporate_fare</span>
+                  <input name="collegeName" type="text" placeholder="e.g. Delhi Institute of Technology" required
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all" />
+                </div>
+              </div>
+
+              {/* Email + Phone */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 block">Official Email <span className="text-primary">*</span></label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">mail</span>
+                    <input name="email" type="email" placeholder="admissions@college.com" required
+                      className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 block">Phone <span className="text-primary">*</span></label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">call</span>
+                    <input name="phone" type="tel" placeholder="+91 98765 43210" required
+                      className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Person */}
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 block">Contact Person <span className="text-primary">*</span></label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">person</span>
+                  <input name="contactName" type="text" placeholder="Admissions Head / Principal" required
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all" />
+                </div>
+              </div>
+
+              {/* Address */}
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 block">Address <span className="text-primary">*</span></label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-3.5 text-slate-400 text-[18px]">location_on</span>
+                  <textarea name="address" placeholder="Street, City, State, ZIP" required rows={2}
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all resize-none" />
+                </div>
+              </div>
+
+              {/* Courses */}
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 block">Courses Offered <span className="text-primary">*</span></label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">school</span>
+                  <input name="courses" type="text" placeholder="e.g. B.Tech, MBA, Ph.D" required
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all" />
+                </div>
+              </div>
+
+              {/* Captcha */}
+              <div className="flex items-start gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                <input id="college-captcha" name="captcha" type="checkbox"
+                  className="h-4 w-4 mt-0.5 rounded border-slate-300 text-primary focus:ring-primary shrink-0" />
+                <label htmlFor="college-captcha" className="text-xs text-slate-600 leading-snug">
+                  I confirm the information is accurate and I am authorised to register this institution on AdmissionX.
+                </label>
+              </div>
+
+              {/* Info note */}
+              <div className="flex items-start gap-2 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
+                <span className="material-symbols-outlined text-blue-500 text-[16px] shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>info</span>
+                <p className="text-xs text-blue-700 leading-relaxed">
+                  After approval, you will receive your <strong>login credentials via email</strong> within 1–2 business days. No password needed now.
+                </p>
+              </div>
+
+              <button type="submit" disabled={loading}
+                className="w-full bg-primary hover:bg-red-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
+                {loading ? (
+                  <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                ) : (
+                  <><span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>how_to_reg</span>Submit Registration Request</>
+                )}
+              </button>
+            </form>
+
+            <p className="mt-4 text-center text-slate-500 text-xs lg:hidden">
+              Already registered? <Link href="/login/college" className="text-primary font-bold hover:underline">College Login</Link>
+            </p>
+          </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
-
-
-
-

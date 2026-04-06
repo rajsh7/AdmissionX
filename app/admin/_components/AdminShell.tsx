@@ -27,6 +27,12 @@ export default function AdminShell({
   const pathname = usePathname();
   const router = useRouter();
 
+  // Mark body so global scrollbar-hide CSS is skipped for admin
+  useEffect(() => {
+    document.body.classList.add("admin-layout");
+    return () => document.body.classList.remove("admin-layout");
+  }, []);
+
   // Close mobile sidebar on route change
   useEffect(() => {
     setSidebarOpen(false);
@@ -183,7 +189,7 @@ export default function AdminShell({
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-slate-100 scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400">
           {children}
         </main>
       </div>

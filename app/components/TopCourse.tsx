@@ -89,7 +89,7 @@ export default function TopCourse() {
               <h2 className="text-[40px] lg:text-[68px] font-semibold text-slate-900 tracking-tight leading-[1.1]">
                 Discover the Top <span style={{ color: '#DD8D8F' }}>Course</span>
               </h2>
-              <Link href="/courses" className="px-8 py-3.5 rounded-[10px] bg-white border border-slate-100 shadow-sm text-slate-600 font-normal text-sm hover:bg-slate-50 transition-all active:scale-95 whitespace-nowrap">
+              <Link href="/careers-courses" className="px-8 py-3.5 rounded-[10px] bg-white border border-slate-100 shadow-sm text-slate-600 font-normal text-sm hover:bg-slate-50 transition-all active:scale-95 whitespace-nowrap">
                 View All Course
               </Link>
             </div>
@@ -145,7 +145,7 @@ export default function TopCourse() {
                     <span className="text-sm font-medium text-slate-400">Job Growth</span>
                  </div>
                  <Link 
-                   href={`/courses/${current.slug}`} 
+                   href={`/careers-courses?stream=${current.slug}`} 
                    className="flex items-center gap-2 hover:translate-x-1 transition-transform ml-4" 
                    style={{ color: '#FF3C3C', fontSize: '25px', fontWeight: 700 }}
                  >

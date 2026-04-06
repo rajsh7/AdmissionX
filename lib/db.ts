@@ -7,10 +7,6 @@ if (dns.setDefaultResultOrder) {
   dns.setDefaultResultOrder("ipv4first");
 }
 
-declare global {
-  var _mongoClient: MongoClient | undefined;
-}
-
 const uri = process.env.MONGODB_URI!;
 if (!uri) throw new Error("MONGODB_URI is not defined in environment variables");
 
@@ -18,10 +14,9 @@ if (!uri) throw new Error("MONGODB_URI is not defined in environment variables")
 declare global {
   var _mongoClient: MongoClient | undefined;
   var _mongoUri: string | undefined;
+  var _mongoDb: Db | null;
+  var _connectionFailedAt: number | null;
 }
-
-let _db: Db | null = null;
-let _connectionFailed = false;
 
 function createMockDb(): Db {
   const makeCursor = () => {
@@ -65,8 +60,8 @@ export async function forceReconnect() {
   }
   globalThis._mongoClient = undefined;
   globalThis._mongoUri = undefined;
-  _db = null;
-  _connectionFailed = false;
+  globalThis._mongoDb = null;
+  globalThis._connectionFailedAt = null;
 }
 
 export async function getDb(): Promise<Db> {
@@ -83,28 +78,30 @@ export async function getDb(): Promise<Db> {
       retryWrites: true,
     });
     globalThis._mongoUri = currentUri;
-    _db = null;
-    _connectionFailed = false;
+    globalThis._mongoDb = null;
+    globalThis._connectionFailedAt = null;
   }
 
-  if (!_db) {
-    if (_connectionFailed) {
+  if (!globalThis._mongoDb) {
+    const failedAt = globalThis._connectionFailedAt;
+    if (failedAt && Date.now() - failedAt < 30_000) {
       console.warn("⚠️ [db] Previous connection attempt failed. Using mock DB.");
       return createMockDb();
     }
-    
+
     try {
       console.log("⏳ [db] Connecting to MongoDB...");
       await globalThis._mongoClient.connect();
-      _db = globalThis._mongoClient.db(process.env.MONGODB_DB ?? "admissionx");
+      globalThis._mongoDb = globalThis._mongoClient.db(process.env.MONGODB_DB ?? "admissionx");
+      globalThis._connectionFailedAt = null;
       console.log("✅ [db] Connected successfully.");
     } catch (error) {
       console.error("❌ [db] Connection failed:", error);
-      _connectionFailed = true;
+      globalThis._connectionFailedAt = Date.now();
       return createMockDb();
     }
   }
-  return _db;
+  return globalThis._mongoDb;
 }
 
 // ── SQL → MongoDB translator ──────────────────────────────────────────────────

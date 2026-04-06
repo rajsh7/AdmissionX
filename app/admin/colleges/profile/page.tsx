@@ -24,25 +24,29 @@ async function addProfileRow(formData: FormData) {
   "use server";
   try {
     const bannerFile = formData.get("bannerimage_file") as File;
+    const logoFile   = formData.get("logoimage_file") as File;
+    const slug = (formData.get("slug") as string) || "college";
     let bannerimage = "";
-    if (bannerFile && bannerFile.size > 0) {
-      const slug = (formData.get("slug") as string) || "college";
+    let logoimage   = "";
+    if (bannerFile && bannerFile.size > 0)
       bannerimage = await saveUpload(bannerFile, `college/${slug}`, "banner");
-    }
+    if (logoFile && logoFile.size > 0)
+      logoimage = await saveUpload(logoFile, `college/${slug}`, "logo");
     const data = Object.fromEntries(formData.entries());
     const db = await getDb();
     await db.collection("collegeprofile").insertOne({
-      users_id:               data.users_id ? parseInt(data.users_id as string, 10) : null,
-      slug:                   data.slug,
+      users_id:                data.users_id ? parseInt(data.users_id as string, 10) : null,
+      slug,
       bannerimage,
-      rating:                 data.rating ? parseFloat(data.rating as string) : 0,
-      ranking:                data.ranking ? parseInt(data.ranking as string, 10) : null,
-      verified:               data.verified === "on" ? 1 : 0,
-      isTopUniversity:        data.isTopUniversity === "on" ? 1 : 0,
-      topUniversityRank:      data.topUniversityRank ? parseInt(data.topUniversityRank as string, 10) : null,
-      universityType:         data.universityType,
+      logoimage,
+      rating:                  data.rating ? parseFloat(data.rating as string) : 0,
+      ranking:                 data.ranking ? parseInt(data.ranking as string, 10) : null,
+      verified:                data.verified === "on" ? 1 : 0,
+      isTopUniversity:         data.isTopUniversity === "on" ? 1 : 0,
+      topUniversityRank:       data.topUniversityRank ? parseInt(data.topUniversityRank as string, 10) : null,
+      universityType:          data.universityType,
       registeredAddressCityId: data.registeredAddressCityId ? parseInt(data.registeredAddressCityId as string, 10) : null,
-      created_at:             new Date(),
+      created_at:              new Date(),
     });
   } catch (e) {
     console.error("[admin/colleges/profile addAction]", e);
@@ -55,27 +59,31 @@ async function updateProfileRow(formData: FormData) {
   "use server";
   try {
     const bannerFile = formData.get("bannerimage_file") as File;
-    let bannerimage = formData.get("bannerimage_existing") as string;
+    const logoFile   = formData.get("logoimage_file") as File;
+    let bannerimage  = formData.get("bannerimage_existing") as string;
+    let logoimage    = formData.get("logoimage_existing") as string;
     const data = Object.fromEntries(formData.entries());
-    if (bannerFile && bannerFile.size > 0) {
-      const slug = (data.slug as string) || "college";
+    const slug = (data.slug as string) || "college";
+    if (bannerFile && bannerFile.size > 0)
       bannerimage = await saveUpload(bannerFile, `college/${slug}`, "banner");
-    }
+    if (logoFile && logoFile.size > 0)
+      logoimage = await saveUpload(logoFile, `college/${slug}`, "logo");
     const id = data.id as string;
     const db = await getDb();
     const filter = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: parseInt(id, 10) };
     await db.collection("collegeprofile").updateOne(filter, { $set: {
-      users_id:               data.users_id ? parseInt(data.users_id as string, 10) : null,
-      slug:                   data.slug,
+      users_id:                data.users_id ? parseInt(data.users_id as string, 10) : null,
+      slug,
       bannerimage,
-      rating:                 data.rating ? parseFloat(data.rating as string) : 0,
-      ranking:                data.ranking ? parseInt(data.ranking as string, 10) : null,
-      verified:               data.verified === "on" ? 1 : 0,
-      isTopUniversity:        data.isTopUniversity === "on" ? 1 : 0,
-      topUniversityRank:      data.topUniversityRank ? parseInt(data.topUniversityRank as string, 10) : null,
-      universityType:         data.universityType,
+      logoimage,
+      rating:                  data.rating ? parseFloat(data.rating as string) : 0,
+      ranking:                 data.ranking ? parseInt(data.ranking as string, 10) : null,
+      verified:                data.verified === "on" ? 1 : 0,
+      isTopUniversity:         data.isTopUniversity === "on" ? 1 : 0,
+      topUniversityRank:       data.topUniversityRank ? parseInt(data.topUniversityRank as string, 10) : null,
+      universityType:          data.universityType,
       registeredAddressCityId: data.registeredAddressCityId ? parseInt(data.registeredAddressCityId as string, 10) : null,
-      updated_at:             new Date(),
+      updated_at:              new Date(),
     }});
   } catch (e) {
     console.error("[admin/colleges/profile updateAction]", e);

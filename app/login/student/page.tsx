@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthBackgroundSlider } from "../../components/AuthBackgroundSlider";
 import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 function StudentLoginForm() {
   const router = useRouter();
@@ -59,11 +60,11 @@ function StudentLoginForm() {
   };
 
   return (
-    <div className="min-h-screen text-slate-900 dark:text-slate-100 font-display relative overflow-hidden">
+    <div className="min-h-screen text-slate-900 dark:text-slate-100 font-display relative flex flex-col">
       <AuthBackgroundSlider />
       <Header />
 
-      <main className="relative flex-1 flex flex-col items-center justify-center px-4 pt-50 pb-12 md:pb-20 overflow-hidden">
+      <main className="relative flex-1 flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
         {/* Background decorations */}
         <div className="absolute top-16 left-8 opacity-10 pointer-events-none select-none">
           <span className="material-symbols-outlined text-9xl">school</span>
@@ -243,6 +244,7 @@ function StudentLoginForm() {
           </p>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

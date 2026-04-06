@@ -3,6 +3,8 @@ import { ObjectId } from "mongodb";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
+import bcrypt from "bcryptjs";
+import { sendCollegeApprovalEmail } from "@/lib/email";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
@@ -15,8 +17,29 @@ async function approveCollegeAction(formData: FormData) {
     const db  = await getDb();
     const col = src === "old" ? "request_for_create_college_accounts" : "next_college_signups";
     const filter = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: parseInt(id, 10) };
+
+    // Generate temp password: Adx@{year}#{random6}
+    const year = new Date().getFullYear();
+    const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+    const tempPassword = `Adx@${year}#${rand}`;
+    const hashedPassword = await bcrypt.hash(tempPassword, 12);
+
     const newStatus = src === "old" ? "1" : "approved";
-    await db.collection(col).updateOne(filter, { $set: { status: newStatus, updated_at: new Date() } });
+    await db.collection(col).updateOne(filter, {
+      $set: { status: newStatus, password_hash: hashedPassword, updated_at: new Date() }
+    });
+
+    // Send approval email with temp password
+    const college = await db.collection(col).findOne(filter);
+    if (college?.email) {
+      const collegeName = String(college.college_name || college.collegeName || "Your College");
+      const contactName = String(college.contact_name || college.contactPersonName || "Admin");
+      try {
+        await sendCollegeApprovalEmail(college.email, collegeName, contactName, tempPassword);
+      } catch (emailErr) {
+        console.error("[approveCollege] email failed:", emailErr);
+      }
+    }
   } catch (e) { console.error("[admin/colleges approveAction]", e); }
   revalidatePath("/admin/colleges");
   revalidatePath("/", "layout");
