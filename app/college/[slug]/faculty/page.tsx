@@ -245,7 +245,7 @@ export default async function FacultyPage({
   const hasManagement = managementRows.length > 0;
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-7xl mx-auto px-6 md:px-10 py-8 space-y-8">
       {/* ── Management / Leadership section ── */}
       {hasManagement && (
         <section>

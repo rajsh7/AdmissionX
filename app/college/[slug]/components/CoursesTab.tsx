@@ -2,9 +2,13 @@ import Image from "next/image";
 
 interface CourseRow {
   course_name: string;
-  degree_name: string;
+  degree_name: string | null;
+  stream_name?: string | null;
   fees: string | null;
+  seats?: string | null;
   courseduration: string | null;
+  twelvemarks?: string | null;
+  description?: string | null;
 }
 
 interface CoursesTabProps {
@@ -24,15 +28,15 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
   return (
     <div className="w-full bg-white pb-24">
       <div className="max-w-[1920px] mx-auto px-8 lg:px-12 xl:px-20 py-12">
-        
+
         {/* ─── PHASE 1: SUB-TABS FILTERS ─── */}
         <div className="flex flex-wrap items-center gap-3 mb-10 overflow-x-auto scrollbar-hide pb-2">
           {subTabs.map((tab, idx) => (
-            <button 
-              key={idx} 
+            <button
+              key={idx}
               className={`px-8 py-3 text-sm font-black whitespace-nowrap transition-all duration-300 border-2 rounded-sm ${
-                idx === 0 
-                  ? 'bg-slate-700 text-white border-slate-700 shadow-lg' 
+                idx === 0
+                  ? 'bg-slate-700 text-white border-slate-700 shadow-lg'
                   : 'bg-white text-slate-500 border-neutral-100 hover:border-slate-300 hover:text-slate-900'
               }`}
             >
@@ -45,8 +49,8 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           <div className="space-y-6">
             {courses.length > 0 ? courses.slice(0, 3).map((course, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className="bg-white rounded-xl shadow-xl shadow-slate-200/50 border border-neutral-100 overflow-hidden transition-all hover:border-[#FF3C3C] hover:-translate-y-1"
               >
                 {/* Course Header */}
@@ -66,7 +70,7 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
                     </span>
                   </div>
                 </div>
-                
+
                 {/* Course Footer Info */}
                 <div className="px-8 py-4 bg-slate-50/50 flex justify-between items-center">
                   <div className="flex items-center gap-2">
@@ -81,7 +85,7 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
             )) : (
               <div className="text-slate-400 py-20 text-center font-bold">No courses available for this selection.</div>
             )}
-            
+
             <div className="pt-4">
               <button className="px-12 py-4 bg-slate-900 text-white font-black text-sm uppercase tracking-widest rounded-lg shadow-2xl transition-all hover:bg-[#FF3C3C] hover:shadow-red-500/20">
                 View All Courses
@@ -132,14 +136,14 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
                 <div className="h-[320px] relative bg-slate-100 overflow-hidden">
                    {/* Design's Header Pattern */}
                    <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-br from-yellow-400 to-amber-600 opacity-90 transition-all duration-500 group-hover:h-full group-hover:opacity-100 z-0" />
-                   
+
                    {/* Avatar */}
                    <div className="relative w-full h-full flex items-end justify-center z-10 p-4">
                       <div className="relative w-full h-[85%] rounded-2xl overflow-hidden shadow-2xl group-hover:scale-110 transition-transform duration-700">
-                        <Image 
-                          src={inst.image} 
-                          alt={inst.name} 
-                          fill 
+                        <Image
+                          src={inst.image}
+                          alt={inst.name}
+                          fill
                           className="object-cover"
                         />
                       </div>

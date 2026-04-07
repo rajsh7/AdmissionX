@@ -1,16 +1,31 @@
 import Image from "next/image";
 
-export default function ReviewsTab() {
-  const reviews = Array.from({ length: 6 }).map((_, i) => ({
-     id: i,
-     name: i % 2 === 0 ? "Lara Smith" : "John Doe",
-     role: i % 2 === 0 ? "Harvard Medical" : "Stanford University",
-     text: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters.",
-     rating: 4,
-     avatar: i % 2 === 0 
-       ? "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=60&w=150&h=150"
-       : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=60&w=150&h=150"
-  }));
+interface Review {
+  id: string | number;
+  name: string;
+  text: string;
+  rating: number;
+  avatar: string;
+  role: string;
+}
+
+interface ReviewsTabProps {
+  reviews?: Review[];
+}
+
+const fallbackReviews: Review[] = Array.from({ length: 6 }).map((_, i) => ({
+  id: i,
+  name: i % 2 === 0 ? "Lara Smith" : "John Doe",
+  role: i % 2 === 0 ? "Harvard Medical" : "Stanford University",
+  text: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters.",
+  rating: 4,
+  avatar: i % 2 === 0
+    ? "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=60&w=150&h=150"
+    : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=60&w=150&h=150",
+}));
+
+export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {}) {
+  const reviews = propReviews && propReviews.length > 0 ? propReviews : fallbackReviews;
 
   const ratingStats = [
     { star: 5, pct: 71 },
@@ -23,17 +38,17 @@ export default function ReviewsTab() {
   return (
     <div className="w-full bg-[#f8fafc] pb-24">
       <div className="max-w-[1920px] mx-auto px-8 lg:px-12 xl:px-20 py-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-        
+
         {/* ─── PHASE 1: LEFT SIDEBAR (RATING SUMMARY) ─── */}
         <aside className="lg:col-span-4 space-y-8">
-          
+
           {/* Overall Rating Card */}
           <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-8 border border-neutral-100">
             <h4 className="text-slate-900 font-black text-sm uppercase tracking-widest mb-6 flex items-center gap-2">
               <span className="w-2 h-2 bg-[#FF3C3C] rounded-full" />
               Overall Rating
             </h4>
-            
+
             <div className="flex items-center gap-6 mb-8">
               <div className="text-6xl font-black text-slate-900 leading-none tracking-tighter">4.8</div>
               <div className="flex flex-col gap-1">
@@ -45,16 +60,16 @@ export default function ReviewsTab() {
                 <span className="text-[11px] text-slate-400 font-black uppercase tracking-wider">Based on 5,249 reviews</span>
               </div>
             </div>
-            
+
             {/* Rating Bars Breakout */}
             <div className="space-y-4">
               {ratingStats.map((stat, idx) => (
                 <div key={idx} className="flex items-center gap-4">
                   <span className="text-xs font-black text-slate-500 w-12">{stat.star} Stars</span>
                   <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-[#FF3C3C] rounded-full" 
-                      style={{ width: `${stat.pct}%` }} 
+                    <div
+                      className="h-full bg-[#FF3C3C] rounded-full"
+                      style={{ width: `${stat.pct}%` }}
                     />
                   </div>
                   <span className="text-xs font-black text-slate-900 w-10 text-right">{stat.pct}%</span>
@@ -67,10 +82,10 @@ export default function ReviewsTab() {
           <div className="bg-slate-900 rounded-2xl shadow-2xl p-8 text-white relative overflow-hidden">
             {/* Decorative pattern */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-            
+
             <span className="text-[#FF3C3C] text-[10px] font-black tracking-[0.3em] uppercase block mb-2">STUDENT</span>
             <h4 className="text-2xl font-black mb-8">Student Satisfaction</h4>
-            
+
             <div className="flex gap-4">
                <div className="flex-1 bg-white/5 backdrop-blur-md rounded-xl p-6 border border-white/10 text-center transition-all hover:bg-white/10">
                   <span className="material-symbols-rounded text-[#FF3C3C] text-4xl mb-3">thumb_up</span>
@@ -88,15 +103,15 @@ export default function ReviewsTab() {
 
         {/* ─── PHASE 2: REVIEWS CONTENT AREA ─── */}
         <main className="lg:col-span-8">
-          
+
           {/* Main Filter Tabs */}
           <div className="flex flex-wrap items-center gap-3 mb-10 overflow-x-auto scrollbar-hide pb-2">
             {["All Reviews", "Student", "Alumni", "Campus Life", "Placements"].map((tag, idx) => (
-              <button 
-                key={idx} 
+              <button
+                key={idx}
                 className={`px-8 py-3 text-xs font-black whitespace-nowrap transition-all duration-300 border-2 rounded-full uppercase tracking-widest ${
-                  idx === 0 
-                    ? 'bg-slate-900 text-white border-slate-900 shadow-xl' 
+                  idx === 0
+                    ? 'bg-slate-900 text-white border-slate-900 shadow-xl'
                     : 'bg-white text-slate-500 border-neutral-100 hover:border-slate-300 hover:text-slate-900'
                 }`}
               >
@@ -108,8 +123,8 @@ export default function ReviewsTab() {
           {/* Modern Review Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {reviews.map((rev) => (
-              <div 
-                key={rev.id} 
+              <div
+                key={rev.id}
                 className="bg-white rounded-2xl p-8 shadow-2xl shadow-slate-200/40 border border-neutral-50 relative group transition-all duration-500 hover:-translate-y-2 hover:shadow-red-500/10"
               >
                 {/* Visual Quote Accent */}

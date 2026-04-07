@@ -1,8 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 export interface CollegeHeroData {
   id: unknown;
   slug: string;
@@ -39,55 +37,28 @@ export interface CollegeHeroData {
   college_type_name: string | null;
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
-
 export default function CollegeHero({ college }: { college: CollegeHeroData }) {
   const { slug, college_name, image } = college;
-
   const initial = college_name.trim().charAt(0).toUpperCase();
 
   return (
-    <div className="relative w-full h-[380px] overflow-hidden bg-neutral-900">
-      {/* Banner image */}
-      <Image
-        src={image}
-        alt={college_name}
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover"
-      />
-
-      {/* Dark gradient overlay — transparent at top, black/80 at bottom */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-
-      {/* Bottom-left overlay content */}
-      <div className="absolute bottom-0 left-0 px-8 pb-8 flex items-end gap-5 z-10">
-        {/* Logo box — white rounded square with teal initial */}
-        <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-white flex items-center justify-center shadow-lg">
-          <span className="text-2xl font-black" style={{ color: "#FF3C3C" }}>
-            {initial}
-          </span>
+    <div className="relative w-full overflow-hidden bg-neutral-900" style={{ height: 400 }}>
+      <Image src={image} alt={college_name} fill priority sizes="100vw" className="object-cover" unoptimized />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
+      <div className="absolute bottom-0 left-0 px-6 md:px-12 lg:px-16 pb-8 z-10 flex flex-col items-start gap-3">
+        <div className="flex items-center gap-3 bg-[#FF3C3C] px-5 py-3.5 rounded-md shadow-xl max-w-xs md:max-w-sm">
+          <div className="flex-shrink-0 w-9 h-9 rounded-full bg-white flex items-center justify-center shadow">
+            <span className="text-base font-black" style={{ color: "#FF3C3C" }}>{initial}</span>
+          </div>
+          <h1 className="text-base md:text-lg font-black text-white leading-tight">{college_name}</h1>
         </div>
-
-        {/* College name + link */}
-        <div className="flex flex-col gap-1.5">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight drop-shadow-md">
-            {college_name}
-          </h1>
-          <Link
-            href={`/college/${slug}`}
-            className="text-sm font-semibold transition-opacity hover:opacity-80"
-            style={{ color: "#FF3C3C" }}
-          >
-            Take a look →
-          </Link>
-        </div>
+        <Link href={`/college/${slug}`} className="text-sm font-semibold text-white/80 hover:text-white flex items-center gap-1.5 ml-1 transition-colors">
+          Take a look
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </Link>
       </div>
     </div>
   );
 }
-
-
-
-

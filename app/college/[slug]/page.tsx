@@ -1,12 +1,7 @@
 import { getDb } from "@/lib/db";
 import { notFound } from "next/navigation";
 
-import HeroSection from "./components/HeroSection";
-import TabsNav from "./components/TabsNav";
 import AboutTab from "./components/AboutTab";
-import CoursesTab from "./components/CoursesTab";
-import PlacementsTab from "./components/PlacementsTab";
-import ReviewsTab from "./components/ReviewsTab";
 
 export const dynamic = "force-dynamic";
 
@@ -51,21 +46,18 @@ function toParagraphs(text: string): string[] {
 
 export default async function CollegeOverviewPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ tab?: string }>;
 }) {
   const { slug: rawSlug } = await params;
   const slug = rawSlug.trim();
-  const tab = searchParams ? (await searchParams).tab || "about" : "about";
 
   const db = await getDb();
 
   // Step 1: Get college profile (fast — indexed slug)
   const cp = await db.collection("collegeprofile").findOne(
     { slug },
-    { projection: { _id: 1, users_id: 1, description: 1, totalStudent: 1, registeredSortAddress: 1, bannerimage: 1, city_name: 1 } }
+    { projection: { _id: 1, users_id: 1, description: 1, totalStudent: 1, registeredSortAddress: 1, registeredAddressCityId: 1, bannerimage: 1, city_name: 1 } }
   );
 
   if (!cp) notFound();
@@ -133,8 +125,6 @@ export default async function CollegeOverviewPage({
     galleryRows[2]?.fullimage ? buildImageUrl(galleryRows[2].fullimage as string) : MOSAIC_FALLBACKS[2],
   ];
 
-  const coverImage = cp.bannerimage ? buildImageUrl(cp.bannerimage as string) : mosaicImages[0];
-
   const stats = [
     { value: totalStudentDisplay, label: "Total students" },
     { value: courseDisplay, label: "Courses offered" },
@@ -143,40 +133,18 @@ export default async function CollegeOverviewPage({
   ];
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
-      <HeroSection
-        coverImage={coverImage}
-        collegeName={collegeName}
-        logoUrl={user?.profileimage ? buildImageUrl(user.profileimage as string) : null}
-      />
-      <TabsNav />
-      <div className="flex-grow w-full">
-        {tab === "about" && (
-          <AboutTab
-            collegeName={collegeName}
-            slug={slug}
-            location={location}
-            stats={stats}
-            mosaicImages={mosaicImages}
-            aboutPara1={aboutPara1}
-            aboutPara2={paragraphs[1] || "The institution provides a vibrant campus environment with state-of-the-art facilities, experienced faculty, and strong industry connections."}
-            missionText={missionText}
-            visionText={visionText}
-            descriptionText={descriptionText}
-            paragraphs={paragraphs}
-          />
-        )}
-        {tab === "courses" && <CoursesTab courses={courseRows as never[]} />}
-        {tab === "placements" && (
-          <PlacementsTab
-            collegeName={collegeName}
-            location={location}
-            avgPackage={avgCTCDisplay}
-            mosaicImage={coverImage}
-          />
-        )}
-        {tab === "reviews" && <ReviewsTab />}
-      </div>
-    </main>
+    <AboutTab
+      collegeName={collegeName}
+      slug={slug}
+      location={location}
+      stats={stats}
+      mosaicImages={mosaicImages}
+      aboutPara1={aboutPara1}
+      aboutPara2={paragraphs[1] || "The institution provides a vibrant campus environment with state-of-the-art facilities, experienced faculty, and strong industry connections."}
+      missionText={missionText}
+      visionText={visionText}
+      descriptionText={descriptionText}
+      paragraphs={paragraphs}
+    />
   );
 }

@@ -102,33 +102,26 @@ async function fetchTopColleges(opts: {
 
   if (cityId) match.registeredAddressCityId = isNaN(Number(cityId)) ? cityId : Number(cityId);
 
-  // Stream filter
-  if (stream) {
-    const fa = await db.collection("functionalarea").findOne({ pageslug: stream }, { projection: { _id: 1 } });
-    if (fa) {
-      const cmIds = await db.collection("collegemaster")
-        .find({ functionalarea_id: fa._id })
-        .limit(5000)
-        .project({ collegeprofile_id: 1 })
-        .toArray();
-      match._id = { $in: [...new Set(cmIds.map((r) => r.collegeprofile_id))] };
-    }
-  }
+  // Resolve stream + degree filters in parallel
+  const [faDoc, degDoc] = await Promise.all([
+    stream ? db.collection("functionalarea").findOne({ pageslug: stream }, { projection: { _id: 1 } }) : null,
+    degree ? db.collection("degree").findOne({ pageslug: degree }, { projection: { _id: 1 } }) : null,
+  ]);
 
-  // Degree filter
-  if (degree) {
-    const deg = await db.collection("degree").findOne({ pageslug: degree }, { projection: { _id: 1 } });
-    if (deg) {
-      const cmIds = await db.collection("collegemaster")
-        .find({ degree_id: deg._id })
-        .limit(5000)
-        .project({ collegeprofile_id: 1 })
-        .toArray();
-      const degIds = [...new Set(cmIds.map((r) => r.collegeprofile_id))];
-      match._id = match._id
-        ? { $in: (match._id as { $in: unknown[] }).$in.filter((id) => degIds.includes(id)) }
-        : { $in: degIds };
-    }
+  // Resolve collegemaster IDs in parallel
+  const [streamIds, degreeIds] = await Promise.all([
+    faDoc ? db.collection("collegemaster").find({ functionalarea_id: faDoc._id }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
+      .then((r) => [...new Set(r.map((x) => x.collegeprofile_id))]) : null,
+    degDoc ? db.collection("collegemaster").find({ degree_id: degDoc._id }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
+      .then((r) => [...new Set(r.map((x) => x.collegeprofile_id))]) : null,
+  ]);
+
+  if (streamIds) {
+    match._id = { $in: streamIds };
+  }
+  if (degreeIds) {
+    const existing = (match._id as { $in: unknown[] } | undefined)?.$in;
+    match._id = { $in: existing ? existing.filter((id) => degreeIds.includes(id)) : degreeIds };
   }
 
   const sortStage: Record<string, 1 | -1> =

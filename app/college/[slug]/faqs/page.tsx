@@ -93,7 +93,7 @@ export default async function CollegeFAQsPage({
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto px-6 md:px-10 py-8 space-y-6">
       {/* ── Page header ── */}
       <div className="bg-white rounded-2xl border border-neutral-100 p-6">
         <div className="flex items-start gap-4">

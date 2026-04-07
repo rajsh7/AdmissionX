@@ -1,11 +1,63 @@
 "use client";
 // Force rebuild to refresh Sidebar icons
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { NAV_GROUPS } from "./nav-config";
 import { Admin, SidebarSkeleton, ICO } from "./Sidebar";
+
+function AvatarDropdown({ admin, onLogout }: { admin: Admin; onLogout: () => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-3 cursor-pointer group"
+      >
+        <div className="w-9 h-9 rounded bg-slate-200 overflow-hidden border border-slate-300 shadow-sm flex items-center justify-center text-slate-500 font-bold relative">
+          <span className="absolute z-0 text-sm font-bold">{admin.name.charAt(0).toUpperCase()}</span>
+        </div>
+        <div className="flex items-center gap-1 text-slate-600 group-hover:text-slate-900 transition-colors">
+          <span className="hidden sm:block text-sm font-semibold">{admin.name}</span>
+          <span className="material-symbols-rounded text-[18px]" style={ICO}>expand_more</span>
+        </div>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-44 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-50">
+          <Link
+            href="/admin/profile"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+          >
+            <span className="material-symbols-rounded text-[18px]" style={ICO}>manage_accounts</span>
+            My Profile
+          </Link>
+          <div className="border-t border-slate-100 my-1" />
+          <button
+            onClick={onLogout}
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+          >
+            <span className="material-symbols-rounded text-[18px]" style={ICO}>logout</span>
+            Sign Out
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ─── Dynamic components ────────────────────────────────────────────────────────
 
@@ -161,30 +213,8 @@ export default function AdminShell({
             {/* Divider */}
             <div className="w-px h-6 bg-slate-300" />
 
-            {/* Avatar + name */}
-            <div className="flex items-center gap-3 cursor-pointer group">
-              <div className="w-9 h-9 rounded bg-slate-200 overflow-hidden border border-slate-300 shadow-sm flex items-center justify-center text-slate-500 font-bold overflow-hidden relative">
-                 {/* Provide fallback initials if no image */}
-                 <span className="absolute z-0">{admin.name.charAt(0).toUpperCase()}</span>
-                 {/* Pretend we have a user avatar image to match the mockup */}
-                 <img src="/api/image-proxy?url=https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="" className="w-full h-full object-cover z-10" />
-              </div>
-              <div className="flex items-center gap-1 text-slate-600 group-hover:text-slate-900 transition-colors">
-                <span className="hidden sm:block text-sm font-semibold">
-                  Admin
-                </span>
-                <span className="material-symbols-rounded text-[18px]" style={ICO}>expand_more</span>
-              </div>
-            </div>
-
-            {/* Hidden logout for functional completeness */}
-            <button
-              onClick={handleLogout}
-              title="Sign out"
-              className="hidden"
-            >
-              Sign out
-            </button>
+            {/* Avatar + dropdown */}
+            <AvatarDropdown admin={admin} onLogout={handleLogout} />
           </div>
         </header>
 

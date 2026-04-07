@@ -357,9 +357,7 @@ export default async function CollegeLayout({
           faqs: tabCounts?.faqs ?? 0,
         }}
       />
-      <div className="bg-white">
-        <main className="w-full">{children}</main>
-      </div>
+      <main className="w-full bg-white">{children}</main>
       <Footer />
     </div>
   );

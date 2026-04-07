@@ -138,4 +138,10 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/admin/other-info", icon: "info_i", label: "Other Information" },
     ],
   },
+  {
+    label: "Account",
+    items: [
+      { href: "/admin/profile", icon: "manage_accounts", label: "My Profile" },
+    ],
+  },
 ];
