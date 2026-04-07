@@ -105,12 +105,14 @@ export async function fetchCollegesForSlug(
           ? (words[0][0] + words[1][0]).toUpperCase()
           : name.substring(0, 2).toUpperCase();
 
-      const rawImage = row.image ?? "";
-      const image = rawImage
+      const FALLBACK = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600";
+      const rawImage = (row.image ?? "").trim();
+      const isValid = rawImage && rawImage.toUpperCase() !== "NULL" && !rawImage.toUpperCase().includes("NULL");
+      const image = isValid
         ? rawImage.startsWith("http") || rawImage.startsWith("/")
           ? rawImage
           : `/uploads/${rawImage}`
-        : "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600";
+        : FALLBACK;
 
       return {
         name,
@@ -133,6 +135,6 @@ export async function fetchCollegesForSlug(
 // ─── Cached wrapper ───────────────────────────────────────────────────────────
 export const getCachedCollegesForSlug = unstable_cache(
   fetchCollegesForSlug,
-  ["home-filter-colleges-v2"],
+  ["home-filter-colleges-v3"],
   { revalidate: 300 },
 );

@@ -160,7 +160,7 @@ const getHomePageData = unstable_cache(
       };
     }
   },
-  ["homepage-data-v7"],
+  ["homepage-data-v8"],
   { revalidate: 300 },
 );
 
@@ -196,14 +196,19 @@ export default async function Page() {
         ? (words[0][0] + words[1][0]).toUpperCase()
         : name.substring(0, 2).toUpperCase();
 
+    const FALLBACK = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600";
+    const raw = (row.image ?? "").trim();
+    const isValid = raw && raw.toUpperCase() !== "NULL" && !raw.toUpperCase().includes("NULL");
+    const image = isValid
+      ? raw.startsWith("http") || raw.startsWith("/")
+        ? raw
+        : `/uploads/${raw}`
+      : FALLBACK;
+
     return {
       name,
       location: row.location || "India",
-      image: row.image
-        ? row.image.startsWith("/")
-          ? row.image
-          : `/uploads/${row.image}`
-        : "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600",
+      image,
       rating: Number(row.rating) || 4.5,
       abbr: abbreviation,
       abbrBg: "bg-primary",

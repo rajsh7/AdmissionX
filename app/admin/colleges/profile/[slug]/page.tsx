@@ -3,6 +3,8 @@ import { redirect, notFound } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { saveUpload } from "@/lib/upload-utils";
+import ImageUpload from "@/app/admin/_components/ImageUpload";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +31,20 @@ async function updateCollegeProfile(formData: FormData) {
   };
   const bool = (key: string) => (formData.get(key) === "on" ? 1 : 0);
 
+  // ── Handle image uploads ──────────────────────────────────────────────────
+  const bannerFile = formData.get("bannerimage_file") as File | null;
+  const logoFile   = formData.get("logoimage_file") as File | null;
+  let bannerimage  = (formData.get("bannerimage_existing") as string) || "";
+  let logoimage    = (formData.get("logoimage_existing") as string) || "";
+
+  if (bannerFile && bannerFile.size > 0)
+    bannerimage = await saveUpload(bannerFile, `college/${slug}`, "banner");
+  if (logoFile && logoFile.size > 0)
+    logoimage = await saveUpload(logoFile, `college/${slug}`, "logo");
+
   const $set: Record<string, unknown> = {
+    ...(bannerimage ? { bannerimage } : {}),
+    ...(logoimage   ? { logoimage }   : {}),
     description:            str("description"),
     estyear:                str("estyear"),
     website:                str("website"),
@@ -239,7 +254,7 @@ export default async function EditCollegeProfilePage({
 
   return (
     <div className="min-h-screen bg-slate-50/60 p-4 sm:p-6 lg:p-8">
-      <form action={updateCollegeProfile}>
+      <form action={updateCollegeProfile} encType="multipart/form-data">
         <input type="hidden" name="slug" value={college.slug} />
 
         {/* ── Header ── */}
@@ -557,26 +572,24 @@ export default async function EditCollegeProfilePage({
             <Card>
               <SectionHeading icon="tune" title="Profile Settings" />
 
-              {/* Banner preview */}
-              <div className="rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mb-5 aspect-video flex items-center justify-center">
-                {bannerUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={bannerUrl}
-                    alt="Banner"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center gap-2 text-slate-300">
-                    <span
-                      className="material-symbols-outlined text-[40px]"
-                      style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}
-                    >
-                      image
-                    </span>
-                    <span className="text-xs font-semibold">No banner image</span>
-                  </div>
-                )}
+              {/* Banner image upload */}
+              <div className="mb-4">
+                <ImageUpload
+                  name="bannerimage_file"
+                  label="Banner / Background Image"
+                  initialImage={bannerUrl || null}
+                  existingName="bannerimage_existing"
+                />
+              </div>
+
+              {/* Logo image upload */}
+              <div className="mb-5">
+                <ImageUpload
+                  name="logoimage_file"
+                  label="Logo Image"
+                  initialImage={college.logoimage ? buildImageUrl(college.logoimage) : null}
+                  existingName="logoimage_existing"
+                />
               </div>
 
               {/* Read-only identity */}
