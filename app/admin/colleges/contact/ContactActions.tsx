@@ -44,7 +44,7 @@ export default function ContactActions({ email, collegeName, contactName }: Cont
       <button
         onClick={handleSendEmail}
         disabled={loading || sent}
-        className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all border ${
+        className={`px-8 py-2.5 rounded-[5px] text-[15px] font-semibold transition-all border ${
           sent 
             ? "bg-green-50 text-green-600 border-green-200 cursor-default" 
             : "bg-white text-slate-500 hover:text-blue-600 border-slate-200 hover:border-blue-400 hover:bg-blue-50/30"

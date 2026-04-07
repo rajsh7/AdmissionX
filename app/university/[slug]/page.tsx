@@ -1,10 +1,9 @@
-import { redirect } from "next/navigation";
+import CollegeOverviewPage from "@/app/college/[slug]/page";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
 export default async function UniversitySlugPage({ params }: PageProps) {
-  const { slug } = await params;
-  redirect(`/college/${slug}`);
+  return <CollegeOverviewPage params={params} />;
 }

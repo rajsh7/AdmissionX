@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import BookmarkFormModal from "./BookmarkFormModal";
+import DeleteButton from "@/app/admin/_components/DeleteButton";
 
 interface BookmarkClientProps {
   bookmarks: any[];
@@ -14,7 +15,6 @@ interface BookmarkClientProps {
   totalPages: number;
   q: string;
   createBookmark: (data: FormData) => Promise<void>;
-  updateBookmark: (data: FormData) => Promise<void>;
   deleteBookmark: (id: number) => Promise<void>;
 }
 
@@ -28,166 +28,226 @@ export default function BookmarkClient({
   totalPages,
   q,
   createBookmark,
-  updateBookmark,
   deleteBookmark,
 }: BookmarkClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingBookmark, setEditingBookmark] = useState<any | null>(null);
-
   function openAddModal() {
-    setEditingBookmark(null);
     setIsModalOpen(true);
   }
 
-  function openEditModal(b: any) {
-    setEditingBookmark(b);
-    setIsModalOpen(true);
-  }
-
-  async function handleDelete(id: number) {
-    if (confirm("Are you sure you want to delete this bookmark?")) {
-      await deleteBookmark(id);
-    }
-  }
-
-  const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
-  const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
+  const start = total > 0 ? offset + 1 : 0;
+  const end = Math.min(offset + PAGE_SIZE, total);
 
   return (
     <div className="w-full">
-      {/* ── Top Tabs ──────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-1 mb-4">
-        <div 
-          className="text-white px-5 py-2 text-[13px] font-semibold flex items-center gap-2 rounded-md"
-          style={{ backgroundColor: '#3b3b3b', width: 'max-content' }}
+      {/* Add button */}
+      <div className="flex items-center justify-end gap-2 mb-2 mt-2 px-2">
+        <button
+          onClick={openAddModal}
+          className="flex items-center gap-2 bg-admin-blue text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-600 transition-colors shadow-sm whitespace-nowrap"
         >
-          Bookmarks
-          <span className="material-symbols-rounded text-[16px]">expand_more</span>
-        </div>
+          <span className="material-symbols-outlined text-[18px]">add_circle</span>
+          Add Bookmark
+        </button>
       </div>
 
-      {/* ── Main Table ────────────────────────────────────────────────────── */}
-      <div className="bg-white border border-slate-200 shadow-sm overflow-hidden min-h-[600px] rounded-md">
-        <div className="overflow-x-auto">
-          <table className="w-full text-[13px] text-center border-collapse">
+      {/* Table (matches profile information table style) */}
+      <div className="bg-white">
+        {/* Table header info */}
+        <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
+          <p className="text-sm text-slate-500 font-medium">
+            {total > 0 ? (
+              <>
+                Showing{" "}
+                <span className="font-bold text-slate-800">
+                  {start}-{end}
+                </span>{" "}
+                of{" "}
+                <span className="font-bold text-slate-800">
+                  {total.toLocaleString()}
+                </span>{" "}
+                bookmarks
+              </>
+            ) : (
+              "No bookmarks found"
+            )}
+          </p>
+        </div>
+
+        {bookmarks.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-[32px] text-slate-300">
+                bookmark
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-slate-700">
+              No bookmarks found
+            </h3>
+            <p className="text-sm text-slate-400 mt-1">
+              Try adjusting your search or filters
+            </p>
+          </div>
+        ) : (
+          <table className="w-full text-left border-collapse table-fixed">
+            <colgroup>
+              <col style={{ width: "4%" }} />
+              <col style={{ width: "24%" }} />
+              <col style={{ width: "14%" }} />
+              <col style={{ width: "24%" }} />
+              <col style={{ width: "18%" }} />
+              <col style={{ width: "16%" }} />
+            </colgroup>
             <thead>
-              <tr className="text-white border-b border-slate-200" style={{ backgroundColor: '#4a4a4a' }}>
-                <th className="font-semibold py-3 px-4 border-r border-slate-500">ID</th>
-                <th className="font-semibold py-3 px-4 border-r border-slate-500">Student name</th>
-                <th className="font-semibold py-3 px-4 border-r border-slate-500">College Name</th>
-                <th className="font-semibold py-3 px-4 border-r border-slate-500">Course Name</th>
-                <th className="font-semibold py-3 px-4 border-r border-slate-500">Blogs</th>
-                <th className="font-semibold py-3 px-4 border-r border-slate-500">Last Update by</th>
-                <th className="font-semibold py-3 px-4">Action</th>
+              <tr className="bg-slate-50 border-b border-slate-100">
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-center">
+                  S.No
+                </th>
+                <th className="px-4 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Student
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Type
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Title
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Link / Meta
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100">
               {bookmarks.map((bookmark, idx) => {
-                // Alternating rows
-                const rowClass = idx % 2 === 0 ? "bg-blue-50" : "bg-white";
-                
-                // Map the bookmark object
-                const isCollege = bookmark.type_name === 'College';
-                const isCourse = bookmark.type_name === 'Courses';
-                const isBlog = bookmark.type_name === 'Blog';
+                const label = bookmark.type_name || "Bookmark";
+                const created = bookmark.created_at
+                  ? new Date(bookmark.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
+                  : "-";
 
                 return (
-                  <tr key={bookmark.id} className={`${rowClass} border-b border-slate-200 text-slate-600`}>
-                    <td className="py-4 px-4 font-medium border-r border-slate-200">
-                      {String(bookmark.id).padStart(4, '0')}
+                  <tr key={bookmark.id} className="hover:bg-slate-50/60 transition-colors group">
+                    <td className="px-3 py-2.5 text-center">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
+                        {offset + idx + 1}
+                      </span>
                     </td>
-                    <td className="py-4 px-4 font-medium border-r border-slate-200">
-                      {bookmark.student_name || "Unknown"}
+                    <td className="px-4 py-2.5">
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-slate-800 truncate leading-tight">
+                          {bookmark.student_name || "Unknown"}
+                        </p>
+                        <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                          {bookmark.student_email || "-"}
+                        </p>
+                      </div>
                     </td>
-                    <td className="py-4 px-4 border-r border-slate-200">
-                      {isCollege ? bookmark.title : "- - - - -"}
+                    <td className="px-3 py-2.5">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold">
+                        {label}
+                      </span>
                     </td>
-                    <td className="py-4 px-4 border-r border-slate-200">
-                      {isCourse ? bookmark.title : "- - - - -"}
+                    <td className="px-3 py-2.5">
+                      <p className="text-sm font-semibold text-slate-700 truncate" title={bookmark.title}>
+                        {bookmark.title || "-"}
+                      </p>
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                        ID: {bookmark.id}
+                      </p>
                     </td>
-                    <td className="py-4 px-4 border-r border-slate-200">
-                      {isBlog ? bookmark.title : (bookmark.created_at ? new Date(bookmark.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "- - - - -")}
+                    <td className="px-3 py-2.5">
+                      <div className="flex flex-col gap-1">
+                        {bookmark.url ? (
+                          <a
+                            className="text-[12px] text-blue-600 hover:underline truncate"
+                            href={bookmark.url}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {bookmark.url}
+                          </a>
+                        ) : (
+                          <span className="text-slate-300 text-sm">-</span>
+                        )}
+                        <span className="text-[11px] text-slate-400">
+                          Created: {created}
+                        </span>
+                      </div>
                     </td>
-                    <td className="py-4 px-4 border-r border-slate-200">
-                      {bookmark.student_name || "Admin"}
-                    </td>
-                    <td className="py-4 px-4 flex items-center justify-center gap-2">
-                       {/* Edit Box */}
-                      <button 
-                        onClick={() => openEditModal(bookmark)} 
-                        className="text-white p-1.5 rounded transition-opacity hover:opacity-90"
-                        title="Edit"
-                        style={{ backgroundColor: '#464646' }}
-                      >
-                        <span className="material-symbols-rounded text-[18px] block">edit_square</span>
-                      </button>
-
-                      {/* Delete Box (matches the blue document icon from mockup, but performs delete) */}
-                      <button 
-                        onClick={() => handleDelete(bookmark.id)} 
-                        className="text-white p-1.5 rounded transition-opacity hover:opacity-90"
-                        title="Delete"
-                        style={{ backgroundColor: '#1890ff' }}
-                      >
-                        <span className="material-symbols-rounded text-[18px] block">delete</span>
-                      </button>
+                    <td className="px-3 py-2.5">
+                      <div className="flex flex-row items-center justify-end gap-1.5">
+                        <Link
+                          href={`/admin/students/bookmarks/${bookmark.id}`}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors shadow-sm"
+                          title="Edit bookmark"
+                        >
+                          <span className="material-symbols-outlined text-[13px]">
+                            edit
+                          </span>
+                          Edit
+                        </Link>
+                        <DeleteButton
+                          action={async () => {
+                            await deleteBookmark(bookmark.id);
+                          }}
+                          label="Delete"
+                          size="xs"
+                          icon={
+                            <span className="material-symbols-outlined text-[13px]">
+                              delete
+                            </span>
+                          }
+                        />
+                      </div>
                     </td>
                   </tr>
                 );
               })}
-
-              {/* Pad with empty rows to match the tall mockup table if < 5 items */}
-              {bookmarks.length === 0 && (
-                <tr className="bg-white">
-                  <td colSpan={7} className="py-10 text-center text-slate-500">
-                    No bookmarks found.
-                    <button
-                      onClick={openAddModal}
-                      className="mt-3 block mx-auto text-blue-600 hover:underline font-semibold"
-                    >
-                      + Add first record
-                    </button>
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
-        </div>
-
-        {/* ── Pagination ───────────────────────────────────────────────────── */}
-        {totalPages > 1 && (
-          <div className="px-5 py-4 border-t border-[#dddddd] bg-white flex items-center justify-between">
-            <p className="text-[13px] text-slate-500">
-              Showing <strong>{offset + 1}</strong> to <strong>{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total}</strong> bookmarks
-            </p>
-            <div className="flex gap-1 text-[13px]">
-              {offset / PAGE_SIZE + 1 > 1 && (
-                <Link href={`?page=${offset / PAGE_SIZE}&q=${q}`} className="px-3 py-1.5 font-semibold bg-white border border-[#dddddd] rounded hover:bg-slate-50">
-                  Prev
-                </Link>
-              )}
-              {offset / PAGE_SIZE + 1 < totalPages && (
-                <Link href={`?page=${offset / PAGE_SIZE + 2}&q=${q}`} className="px-3 py-1.5 font-semibold bg-white border border-[#dddddd] rounded hover:bg-slate-50">
-                  Next
-                </Link>
-              )}
-            </div>
-          </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="px-6 py-3 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <p className="text-sm text-slate-400 font-medium">
+            Page {offset / PAGE_SIZE + 1} of {totalPages}
+          </p>
+          <div className="flex items-center gap-1.5">
+            {offset / PAGE_SIZE + 1 > 1 && (
+              <a
+                href={`?page=${offset / PAGE_SIZE}&q=${encodeURIComponent(q)}`}
+                className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:border-[#008080] hover:text-[#008080] transition-colors bg-white"
+              >
+                <span className="material-symbols-outlined text-[18px]">
+                  chevron_left
+                </span>
+              </a>
+            )}
+            {offset / PAGE_SIZE + 1 < totalPages && (
+              <a
+                href={`?page=${offset / PAGE_SIZE + 2}&q=${encodeURIComponent(q)}`}
+                className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:border-[#008080] hover:text-[#008080] transition-colors bg-white"
+              >
+                <span className="material-symbols-outlined text-[18px]">
+                  chevron_right
+                </span>
+              </a>
+            )}
+          </div>
+        </div>
+      )}
 
       <BookmarkFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={editingBookmark ? updateBookmark : createBookmark}
-        bookmark={editingBookmark}
+        onSubmit={createBookmark}
         users={users}
         types={types}
       />
     </div>
   );
 }
-
-
-
-

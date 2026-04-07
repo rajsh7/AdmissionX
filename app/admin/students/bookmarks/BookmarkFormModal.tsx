@@ -54,10 +54,10 @@ export default function BookmarkFormModal({
     >
       <form action={handleAction} className="space-y-4 px-1">
         {bookmark && <input type="hidden" name="id" value={bookmark.id} />}
-        
-        {/* User Selection */}
+
+        {/* Student Binding */}
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-500 uppercase">Student</label>
+          <label className="text-xs font-bold text-slate-500 uppercase">Linked Student Account</label>
           <select
             name="student_id"
             defaultValue={bookmark?.student_id || ""}
@@ -65,44 +65,46 @@ export default function BookmarkFormModal({
             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 shadow-sm appearance-none"
           >
             <option value="">Select a Student</option>
-            {users?.map((u) => (
-              <option key={u.id} value={u.id}>
+            {users?.map((u, idx) => (
+              <option key={`${u.id}-${u.email ?? "email"}-${idx}`} value={u.id}>
                 {u.name} ({u.email})
               </option>
             ))}
-            {bookmark && users && !users.find(u => u.id === bookmark.student_id) && (
-              <option value={bookmark.student_id}>{bookmark.student_name} ({bookmark.student_email})</option>
+            {bookmark && users && !users.find((u) => u.id === bookmark.student_id) && (
+              <option key={`current-${bookmark.student_id}`} value={bookmark.student_id}>
+                {bookmark.student_name} ({bookmark.student_email})
+              </option>
             )}
           </select>
         </div>
 
-        {/* Bookmark Type Selection */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-500 uppercase">Bookmark Type</label>
-          <select
-            name="bookmarktypeinfo_id"
-            defaultValue={bookmark?.bookmarktypeinfo_id || ""}
-            required
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 shadow-sm appearance-none"
-          >
-            <option value="">Select Type</option>
-            {types?.map((t) => (
-              <option key={t.id} value={t.id}>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase">Bookmark Type</label>
+            <select
+              name="bookmarktypeinfo_id"
+              defaultValue={bookmark?.bookmarktypeinfo_id || ""}
+              required
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 shadow-sm appearance-none"
+            >
+              <option value="">Select Type</option>
+            {types?.map((t, idx) => (
+              <option key={`${t.id}-${t.name ?? "type"}-${idx}`} value={t.id}>
                 {t.name}
               </option>
             ))}
-          </select>
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-500 uppercase">Title</label>
-          <input
-            name="title"
-            defaultValue={bookmark?.title || ""}
-            required
-            placeholder="e.g. Indian Institute of Technology Bombay"
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-          />
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase">Title</label>
+            <input
+              name="title"
+              defaultValue={bookmark?.title || ""}
+              required
+              placeholder="e.g. Indian Institute of Technology Bombay"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            />
+          </div>
         </div>
 
         <div className="space-y-1.5">
@@ -168,7 +170,3 @@ export default function BookmarkFormModal({
     </AdminModal>
   );
 }
-
-
-
-

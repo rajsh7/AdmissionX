@@ -1,7 +1,6 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
-import AdminImg from "@/app/admin/_components/AdminImg";
 import FacilitiesClient from "./FacilitiesClient";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
@@ -168,15 +167,17 @@ export default async function CollegeFacilitiesPage({
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="p-8 space-y-0 w-full overflow-x-hidden min-h-screen bg-slate-50">
+    <div className="p-6 space-y-6 w-full">
       
-      {/* Page Title & Add Button */}
-      <div className="flex items-center justify-between mb-10">
-        <h1 className="text-[28px] font-light text-slate-500 tracking-tight">
-          College Facilities Details
-        </h1>
-        {/* We'll handle the Add button inside FacilitiesClient for easier state access, 
-            but we'll pass a prop to tell it to render in this 'Legacy' style. */}
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>location_city</span>
+            College facilities
+          </h1>
+          <p className="text-sm text-slate-500 mt-0.5">Manage campus facilities and amenities.</p>
+        </div>
       </div>
 
       <FacilitiesClient 
@@ -184,8 +185,9 @@ export default async function CollegeFacilitiesPage({
          colleges={colleges}
          facilityTypes={facilityTypes}
          offset={offset}
+         total={total}
+         pageSize={PAGE_SIZE}
          onAdd={createFacility}
-         onEdit={updateFacility}
          onDelete={deleteFacilityRow}
          q={q}
          collegeId={collegeId}

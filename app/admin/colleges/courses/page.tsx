@@ -1,19 +1,17 @@
-import pool from "@/lib/db";
+import pool, { getDb } from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import CourseListClient from "./CourseListClient";
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
-
 async function createCourse(formData: FormData) {
   "use server";
-  const collegeprofile_id  = formData.get("collegeprofile_id");
-  const course_id          = formData.get("course_id")          || null;
-  const degree_id          = formData.get("degree_id")          || null;
-  const functionalarea_id  = formData.get("functionalarea_id")  || null;
-  const fees               = formData.get("fees")               || null;
-  const seats              = formData.get("seats")              || null;
-  const courseduration     = formData.get("courseduration")     || null;
+  const collegeprofile_id = formData.get("collegeprofile_id");
+  const course_id = formData.get("course_id") || null;
+  const degree_id = formData.get("degree_id") || null;
+  const functionalarea_id = formData.get("functionalarea_id") || null;
+  const fees = formData.get("fees") || null;
+  const seats = formData.get("seats") || null;
+  const courseduration = formData.get("courseduration") || null;
 
   try {
     await pool.query(
@@ -24,32 +22,6 @@ async function createCourse(formData: FormData) {
     );
   } catch (e) {
     console.error("[admin/colleges/courses createAction]", e);
-  }
-  revalidatePath("/admin/colleges/courses");
-  revalidatePath("/", "layout");
-}
-
-async function updateCourse(formData: FormData) {
-  "use server";
-  const id                 = formData.get("id");
-  const collegeprofile_id  = formData.get("collegeprofile_id");
-  const course_id          = formData.get("course_id")          || null;
-  const degree_id          = formData.get("degree_id")          || null;
-  const functionalarea_id  = formData.get("functionalarea_id")  || null;
-  const fees               = formData.get("fees")               || null;
-  const seats              = formData.get("seats")              || null;
-  const courseduration     = formData.get("courseduration")     || null;
-
-  try {
-    await pool.query(
-      `UPDATE collegemaster
-          SET collegeprofile_id = ?, course_id = ?, degree_id = ?,
-              functionalarea_id = ?, fees = ?, seats = ?, courseduration = ?, updated_at = NOW()
-        WHERE id = ?`,
-      [collegeprofile_id, course_id, degree_id, functionalarea_id, fees, seats, courseduration, id],
-    );
-  } catch (e) {
-    console.error("[admin/colleges/courses updateAction]", e);
   }
   revalidatePath("/admin/colleges/courses");
   revalidatePath("/", "layout");
@@ -66,26 +38,9 @@ async function deleteCourse(id: number) {
   revalidatePath("/", "layout");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const PAGE_SIZE = 25;
 
-async function safeQuery<T >(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/colleges/courses safeQuery]", err);
-    return [];
-  }
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface CourseRow  {
+interface CourseRow {
   id: number;
   collegeprofile_id: number;
   course_id: number | null;
@@ -100,151 +55,192 @@ interface CourseRow  {
   courseduration: string | null;
 }
 
-interface CountRow  {
-  total: number;
+function escapeRegex(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-interface OptionRow  {
-  id: number;
-  name: string;
+function toNumberOrNull(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
-const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
-const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
+function toStringOrNull(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  const parsed = String(value).trim();
+  return parsed ? parsed : null;
+}
 
 export default async function CollegeCoursesPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
-  const sp     = await searchParams;
-  const q      = (sp.q ?? "").trim();
-  const page   = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
+  const sp = await searchParams;
+  const q = (sp.q ?? "").trim();
+  const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── WHERE clause ───────────────────────────────────────────────────────────
-  const conditions: string[] = [];
-  const filterParams: (string | number)[] = [];
+  const db = await getDb();
+  const courseCollection = db.collection("collegemaster");
+
+  const enrichmentPipeline = [
+    {
+      $lookup: {
+        from: "course",
+        localField: "course_id",
+        foreignField: "id",
+        as: "courseDoc",
+      },
+    },
+    { $unwind: { path: "$courseDoc", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "degree",
+        localField: "degree_id",
+        foreignField: "id",
+        as: "degreeDoc",
+      },
+    },
+    { $unwind: { path: "$degreeDoc", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "functionalarea",
+        localField: "functionalarea_id",
+        foreignField: "id",
+        as: "streamDoc",
+      },
+    },
+    { $unwind: { path: "$streamDoc", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "collegeprofile",
+        localField: "collegeprofile_id",
+        foreignField: "id",
+        as: "collegeDoc",
+      },
+    },
+    { $unwind: { path: "$collegeDoc", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "collegeDoc.users_id",
+        foreignField: "id",
+        as: "userDoc",
+      },
+    },
+    { $unwind: { path: "$userDoc", preserveNullAndEmptyArrays: true } },
+    {
+      $addFields: {
+        college_name: { $ifNull: ["$userDoc.firstname", "Unnamed College"] },
+        course_name: "$courseDoc.name",
+        degree_name: "$degreeDoc.name",
+        stream_name: "$streamDoc.name",
+      },
+    },
+  ];
+
+  const projectStage = {
+    $project: {
+      _id: 0,
+      id: 1,
+      collegeprofile_id: 1,
+      course_id: 1,
+      degree_id: 1,
+      functionalarea_id: 1,
+      college_name: 1,
+      course_name: 1,
+      degree_name: 1,
+      stream_name: 1,
+      fees: 1,
+      seats: 1,
+      courseduration: 1,
+    },
+  };
+
+  let total = 0;
+  let rawCourses: Array<Record<string, unknown>> = [];
 
   if (q) {
-    conditions.push(
-      "(u.firstname LIKE ? OR c.name LIKE ? OR d.name LIKE ? OR fa.name LIKE ?)",
-    );
-    filterParams.push(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
-  }
+    const regex = new RegExp(escapeRegex(q), "i");
+    const searchablePipeline = [
+      ...enrichmentPipeline,
+      {
+        $match: {
+          $or: [
+            { college_name: regex },
+            { course_name: regex },
+            { degree_name: regex },
+            { stream_name: regex },
+          ],
+        },
+      },
+    ];
 
-  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-
-  const BASE_JOIN = `
-     FROM collegemaster cm
-     JOIN collegeprofile cp ON cp.id = cm.collegeprofile_id
-     JOIN users u ON u.id = cp.users_id
-     LEFT JOIN course c ON c.id = cm.course_id
-     LEFT JOIN degree d ON d.id = cm.degree_id
-     LEFT JOIN functionalarea fa ON fa.id = cm.functionalarea_id
-  `;
-
-  // ── Fetch everything in parallel ──────────────────────────────────────────
-  const [courses, countRows, colleges, courseOptions, degrees, streams] =
-    await Promise.all([
-      safeQuery<CourseRow>(
-        `SELECT
-          cm.id,
-          cm.collegeprofile_id,
-          cm.course_id,
-          cm.degree_id,
-          cm.functionalarea_id,
-          COALESCE(u.firstname, 'Unnamed College') AS college_name,
-          c.name  AS course_name,
-          d.name  AS degree_name,
-          fa.name AS stream_name,
-          cm.fees,
-          cm.seats,
-          cm.courseduration
-         ${BASE_JOIN}
-         ${where}
-         ORDER BY cm.created_at DESC
-         LIMIT ? OFFSET ?`,
-        [...filterParams, PAGE_SIZE, offset],
-      ),
-      safeQuery<CountRow>(
-        `SELECT COUNT(*) AS total ${BASE_JOIN} ${where}`,
-        filterParams,
-      ),
-      // colleges for the dropdown
-      safeQuery<OptionRow>(
-        "SELECT cp.id, u.firstname AS name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC",
-      ),
-      // course names
-      safeQuery<OptionRow>("SELECT id, name FROM course ORDER BY name ASC"),
-      // degrees
-      safeQuery<OptionRow>("SELECT id, name FROM degree ORDER BY name ASC"),
-      // streams / functional areas
-      safeQuery<OptionRow>("SELECT id, name FROM functionalarea ORDER BY name ASC"),
+    const [countRows, rows] = await Promise.all([
+      courseCollection.aggregate([...searchablePipeline, { $count: "total" }]).toArray(),
+      courseCollection
+        .aggregate([
+          ...searchablePipeline,
+          { $sort: { created_at: -1, id: -1 } },
+          { $skip: offset },
+          { $limit: PAGE_SIZE },
+          projectStage,
+        ])
+        .toArray(),
     ]);
 
-  const total      = Number(countRows[0]?.total ?? 0);
+    total = Number(countRows[0]?.total ?? 0);
+    rawCourses = rows as Array<Record<string, unknown>>;
+  } else {
+    const [count, rows] = await Promise.all([
+      courseCollection.countDocuments(),
+      courseCollection
+        .aggregate([
+          { $sort: { created_at: -1, id: -1 } },
+          { $skip: offset },
+          { $limit: PAGE_SIZE },
+          ...enrichmentPipeline,
+          projectStage,
+        ])
+        .toArray(),
+    ]);
+
+    total = count;
+    rawCourses = rows as Array<Record<string, unknown>>;
+  }
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
-
-  // Deeply map to plain objects to strip hidden Buffer/Date fields from the DB shim
-  const cleanCourses = (courses as any[]).map((c, idx) => ({
-    id: Number(c.id) || (idx + 1),
-    collegeprofile_id: Number(c.collegeprofile_id) || 0,
-    course_id: c.course_id ? Number(c.course_id) : null,
-    degree_id: c.degree_id ? Number(c.degree_id) : null,
-    functionalarea_id: c.functionalarea_id ? Number(c.functionalarea_id) : null,
-    college_name: String(c.college_name || "Unnamed College"),
-    course_name: c.course_name ? String(c.course_name) : null,
-    degree_name: c.degree_name ? String(c.degree_name) : null,
-    stream_name: c.stream_name ? String(c.stream_name) : null,
-    fees: c.fees ? String(c.fees) : null,
-    seats: c.seats ? String(c.seats) : null,
-    courseduration: c.courseduration ? String(c.courseduration) : null,
-  }));
-
-  const cleanColleges = (colleges as any[]).map((c, idx) => ({
-    id: Number(c.id) || (idx + 1),
-    name: String(c.name || ""),
-  }));
-
-  const cleanCourseOptions = (courseOptions as any[]).map((c, idx) => ({
-    id: Number(c.id) || (idx + 1),
-    name: String(c.name || ""),
-  }));
-
-  const cleanDegrees = (degrees as any[]).map((d, idx) => ({
-    id: Number(d.id) || (idx + 1),
-    name: String(d.name || ""),
-  }));
-
-  const cleanStreams = (streams as any[]).map((s, idx) => ({
-    id: Number(s.id) || (idx + 1),
-    name: String(s.name || ""),
+  const cleanCourses: CourseRow[] = rawCourses.map((course, idx) => ({
+    id: Number(course.id) || idx + 1,
+    collegeprofile_id: Number(course.collegeprofile_id) || 0,
+    course_id: toNumberOrNull(course.course_id),
+    degree_id: toNumberOrNull(course.degree_id),
+    functionalarea_id: toNumberOrNull(course.functionalarea_id),
+    college_name: toStringOrNull(course.college_name) ?? "Unnamed College",
+    course_name: toStringOrNull(course.course_name),
+    degree_name: toStringOrNull(course.degree_name),
+    stream_name: toStringOrNull(course.stream_name),
+    fees: toStringOrNull(course.fees),
+    seats: toStringOrNull(course.seats),
+    courseduration: toStringOrNull(course.courseduration),
   }));
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
-
-      {/* ── Client list (table + modal) ───────────────────────────────────── */}
+    <div className="p-6 space-y-6 w-full">
       <CourseListClient
         courses={cleanCourses}
-        colleges={cleanColleges}
-        courseOptions={cleanCourseOptions}
-        degrees={cleanDegrees}
-        streams={cleanStreams}
+        total={total}
+        pageSize={PAGE_SIZE}
         offset={offset}
         onAdd={createCourse}
-        onEdit={updateCourse}
         onDelete={deleteCourse}
       />
 
-      {/* ── Pagination ───────────────────────────────────────────────────── */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
           <p className="text-xs text-slate-500">
-            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of{" "}
+            Showing <strong>{offset + 1}-{Math.min(offset + PAGE_SIZE, total)}</strong> of{" "}
             <strong>{total.toLocaleString()}</strong> courses
           </p>
           <div className="flex items-center gap-1">
@@ -253,10 +249,12 @@ export default async function CollegeCoursesPage({
                 href={`/admin/colleges/courses?page=${page - 1}${q ? `&q=${q}` : ""}`}
                 className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
               >
-                ← Prev
+                Prev
               </Link>
             ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">
+                Prev
+              </span>
             )}
             <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">
               {page} / {totalPages}
@@ -266,10 +264,12 @@ export default async function CollegeCoursesPage({
                 href={`/admin/colleges/courses?page=${page + 1}${q ? `&q=${q}` : ""}`}
                 className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
               >
-                Next →
+                Next
               </Link>
             ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">
+                Next
+              </span>
             )}
           </div>
         </div>
@@ -277,7 +277,3 @@ export default async function CollegeCoursesPage({
     </div>
   );
 }
-
-
-
-

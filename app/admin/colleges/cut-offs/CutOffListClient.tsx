@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import AdminModal from "@/app/admin/_components/AdminModal";
+import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import CutOffFormModal from "./CutOffFormModal";
 
@@ -25,12 +25,11 @@ interface CutOffListClientProps {
   courses: Option[];
   degrees: Option[];
   offset: number;
+  total: number;
+  pageSize: number;
   onAdd: (formData: FormData) => Promise<void>;
-  onEdit: (formData: FormData) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
 }
-
-const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
 export default function CutOffListClient({
   cutoffs,
@@ -38,113 +37,169 @@ export default function CutOffListClient({
   courses,
   degrees,
   offset,
+  total,
+  pageSize,
   onAdd,
-  onEdit,
   onDelete,
 }: CutOffListClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCutoff, setEditingCutoff] = useState<CutOffRow | null>(null);
 
   function openAdd() {
-    setEditingCutoff(null);
-    setIsModalOpen(true);
-  }
-
-  function openEdit(cutoff: CutOffRow) {
-    setEditingCutoff(cutoff);
     setIsModalOpen(true);
   }
 
   function closeModal() {
     setIsModalOpen(false);
-    setEditingCutoff(null);
   }
+
+  const start = total > 0 ? offset + 1 : 0;
+  const end = Math.min(offset + pageSize, total);
 
   return (
     <>
-      {/* Add button */}
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-start mb-4">
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/25 transition-all"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
         >
-          <span className="material-symbols-rounded text-[20px]" style={ICO_FILL}>add_circle</span>
-          Add Cut-off
+          Add cut-off record +
         </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white">
+        <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
+          <p className="text-sm text-slate-500 font-medium">
+            {total > 0 ? (
+              <>
+                Showing{" "}
+                <span className="font-bold text-slate-800">
+                  {start}-{end}
+                </span>{" "}
+                of{" "}
+                <span className="font-bold text-slate-800">
+                  {total.toLocaleString()}
+                </span>{" "}
+                records
+              </>
+            ) : (
+              "No cut-off records found"
+            )}
+          </p>
+        </div>
+
         {cutoffs.length === 0 ? (
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>data_exploration</span>
-            <p className="text-slate-500 font-semibold text-sm">No cut-off records found.</p>
-            <button
-              onClick={openAdd}
-              className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
-            >
-              <span className="material-symbols-rounded text-[18px]" style={ICO_FILL}>add_circle</span>
-              Add first record
-            </button>
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-[32px] text-slate-300">
+                data_exploration
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-slate-700">
+              No cut-off records found
+            </h3>
+            <p className="text-sm text-slate-400 mt-1">
+              Try adjusting your search or filters
+            </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-left">
-                  <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Trend Title</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College & Program</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Description</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {cutoffs.map((co, idx) => (
-                  <tr key={co.id} className="hover:bg-blue-50/20 transition-colors group">
-                    <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-slate-800 leading-snug">{co.title}</span>
-                        <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider mt-0.5">Admission Trend</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-slate-600 font-medium truncate max-w-[200px] block">{co.college_name}</span>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">
-                          {co.course_name || "General"} ({co.degree_name || "Any"})
+          <table className="w-full text-left border-collapse table-fixed">
+            <colgroup>
+              <col style={{ width: "4%" }} />
+              <col style={{ width: "28%" }} />
+              <col style={{ width: "26%" }} />
+              <col style={{ width: "26%" }} />
+              <col style={{ width: "16%" }} />
+            </colgroup>
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100">
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-center">
+                  S.No
+                </th>
+                <th className="px-4 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Trend
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  College & Program
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Description
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-right">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {cutoffs.map((co, idx) => (
+                <tr key={co.id} className="hover:bg-slate-50/60 transition-colors group">
+                  <td className="px-3 py-2.5 text-center">
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
+                      {offset + idx + 1}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-slate-800 truncate leading-tight">
+                        {co.title}
+                      </p>
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                        Admission trend
+                      </p>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-700 truncate">
+                        {co.college_name}
+                      </p>
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                        {co.course_name || "General"} ({co.degree_name || "Any"})
+                      </p>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <span className="text-[11px] text-slate-500 line-clamp-2">
+                      {co.description || "No description provided"}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <div className="flex flex-row items-center justify-end gap-1.5">
+                      <Link
+                        href={`/admin/colleges/cut-offs/${co.id}`}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors shadow-sm"
+                        title="Edit cut-off"
+                      >
+                        <span className="material-symbols-outlined text-[13px]">
+                          edit
                         </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-xs text-slate-500 line-clamp-1 max-w-[300px]">{co.description || "No description provided"}</span>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => openEdit(co)}
-                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                          title="Edit"
-                        >
-                          <span className="material-symbols-rounded text-[18px]">edit</span>
-                        </button>
-                        <DeleteButton action={onDelete.bind(null, co.id)} size="sm" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        Edit
+                      </Link>
+                      <DeleteButton
+                        action={async () => {
+                          await onDelete(co.id);
+                        }}
+                        label="Delete"
+                        size="xs"
+                        icon={
+                          <span className="material-symbols-outlined text-[13px]">
+                            delete
+                          </span>
+                        }
+                      />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
 
       <CutOffFormModal
         isOpen={isModalOpen}
         onClose={closeModal}
-        onSubmit={editingCutoff ? onEdit : onAdd}
-        cutoff={editingCutoff}
+        onSubmit={onAdd}
+        cutoff={undefined}
         colleges={colleges}
         courses={courses}
         degrees={degrees}
@@ -152,7 +207,3 @@ export default function CutOffListClient({
     </>
   );
 }
-
-
-
-

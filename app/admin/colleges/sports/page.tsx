@@ -153,7 +153,7 @@ export default async function CollegeSportsPage({
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 w-full">
       
       {/* ── Header ───────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -184,8 +184,9 @@ export default async function CollegeSportsPage({
         activities={activities}
         colleges={colleges}
         offset={offset}
+        total={total}
+        pageSize={PAGE_SIZE}
         onAdd={createActivity}
-        onEdit={updateActivity}
         onDelete={deleteActivityRow}
       />
 

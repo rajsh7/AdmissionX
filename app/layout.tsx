@@ -1,26 +1,9 @@
 import type { Metadata } from "next";
-import { Lexend, Poppins } from "next/font/google";
 import "./globals.css";
 import ChatbotWidget from "./components/ChatbotWidget";
 import SmoothScrollProvider from "./components/SmoothScrollProvider";
 import GSAPAnimations from "./components/GSAPAnimations";
 import PageTransition from "./components/PageTransition";
-
-const lexend = Lexend({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "900"],
-  variable: "--font-lexend",
-  display: "swap",
-  preload: true,
-});
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-poppins",
-  display: "swap",
-  preload: true,
-});
 
 export const metadata: Metadata = {
   title: "Admissionx - Find Your Dream College",
@@ -63,7 +46,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${lexend.variable} ${poppins.variable} font-display antialiased overflow-x-hidden`}>
+      <body className="font-display antialiased overflow-x-hidden">
         {/* Custom cursor disabled — using default browser cursor */}
 
         {/* Smooth scroll */}

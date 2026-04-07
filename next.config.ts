@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 import path from "path";
 
-if (process.env.NODE_ENV !== "production") {
+// Only opt into insecure TLS locally when explicitly requested.
+if (
+  process.env.NODE_ENV !== "production" &&
+  process.env.NEXT_ALLOW_INSECURE_TLS === "1"
+) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 // Force dev server restart to register new API routes

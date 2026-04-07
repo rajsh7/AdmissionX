@@ -2,9 +2,7 @@ import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import StudentProfileClient from "./StudentProfileClient";
 
-const PAGE_SIZE = 25;
-
-async function safeQuery<T >(
+async function safeQuery<T>(
   sql: string,
   params: (string | number)[] = []
 ): Promise<T[]> {
@@ -117,61 +115,32 @@ interface UserRow  {
   email: string;
 }
 
-export default async function StudentProfilePage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string>>;
-}) {
-  const sp = await searchParams;
-  const q = (sp.q ?? "").trim();
-  const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
-  const offset = (page - 1) * PAGE_SIZE;
-
-  const conditions: string[] = [];
-  const params: (string | number)[] = [];
-
-  if (q) {
-    conditions.push("(s.name LIKE ? OR s.email LIKE ? OR sp.parentsname LIKE ?)");
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`);
-  }
-
-  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-
+export default async function StudentProfilePage() {
   const [profiles, countRows, users] = await Promise.all([
     safeQuery<StudentProfileRow>(
       `SELECT sp.*, s.name as student_name, s.email as student_email
        FROM studentprofile sp
        LEFT JOIN next_student_signups s ON sp.users_id = s.id
-       ${where}
-       ORDER BY sp.created_at DESC
-       LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset]
+       ORDER BY sp.created_at DESC`
     ),
     safeQuery<CountRow>(
       `SELECT COUNT(*) AS total 
        FROM studentprofile sp
-       LEFT JOIN next_student_signups s ON sp.users_id = s.id
-       ${where}`,
-      params
+       LEFT JOIN next_student_signups s ON sp.users_id = s.id`
     ),
     safeQuery<UserRow>(`SELECT id, name, email FROM next_student_signups ORDER BY name ASC LIMIT 1000`)
   ]);
 
-  const total = Number(countRows[0]?.total ?? 0);
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const total = Number(countRows[0]?.total ?? profiles.length);
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 w-full">
       <StudentProfileClient 
         profiles={JSON.parse(JSON.stringify(profiles))}
         users={JSON.parse(JSON.stringify(users))}
-        offset={offset}
-        PAGE_SIZE={PAGE_SIZE}
         total={total}
-        totalPages={totalPages}
-        q={q}
+        totalPages={1}
         createProfile={createProfile}
-        updateProfile={updateProfile}
         deleteProfile={deleteProfile}
       />
     </div>

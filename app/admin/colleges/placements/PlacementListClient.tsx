@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import AdminModal from "@/app/admin/_components/AdminModal";
+import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import PlacementFormModal from "./PlacementFormModal";
 
@@ -22,138 +22,190 @@ interface PlacementListClientProps {
   placements: PlacementRow[];
   colleges: Option[];
   offset: number;
+  total: number;
+  pageSize: number;
   onAdd: (formData: FormData) => Promise<void>;
-  onEdit: (formData: FormData) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
 }
-
-const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
 export default function PlacementListClient({
   placements,
   colleges,
   offset,
+  total,
+  pageSize,
   onAdd,
-  onEdit,
   onDelete,
 }: PlacementListClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingPlacement, setEditingPlacement] = useState<PlacementRow | null>(null);
 
   function openAdd() {
-    setEditingPlacement(null);
-    setIsModalOpen(true);
-  }
-
-  function openEdit(placement: PlacementRow) {
-    setEditingPlacement(placement);
     setIsModalOpen(true);
   }
 
   function closeModal() {
     setIsModalOpen(false);
-    setEditingPlacement(null);
   }
+
+  const start = total > 0 ? offset + 1 : 0;
+  const end = Math.min(offset + pageSize, total);
 
   return (
     <>
-      {/* Add button */}
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-start mb-4">
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/25 transition-all"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
         >
-          <span className="material-symbols-rounded text-[20px]" style={ICO_FILL}>add_circle</span>
-          Add Placement Stats
+          Add placement stats +
         </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white">
+        <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
+          <p className="text-sm text-slate-500 font-medium">
+            {total > 0 ? (
+              <>
+                Showing{" "}
+                <span className="font-bold text-slate-800">
+                  {start}-{end}
+                </span>{" "}
+                of{" "}
+                <span className="font-bold text-slate-800">
+                  {total.toLocaleString()}
+                </span>{" "}
+                placements
+              </>
+            ) : (
+              "No placements found"
+            )}
+          </p>
+        </div>
+
         {placements.length === 0 ? (
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>monitoring</span>
-            <p className="text-slate-500 font-semibold text-sm">No placement records found.</p>
-            <button
-              onClick={openAdd}
-              className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
-            >
-              <span className="material-symbols-rounded text-[18px]" style={ICO_FILL}>add_circle</span>
-              Add first record
-            </button>
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-[32px] text-slate-300">
+                monitoring
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-slate-700">
+              No placement records found
+            </h3>
+            <p className="text-sm text-slate-400 mt-1">
+              Try adjusting your search or filters
+            </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-left">
-                  <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College Name</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Placement Data</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Additional Info</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {placements.map((p, idx) => (
-                  <tr key={p.id} className="hover:bg-blue-50/20 transition-colors group">
-                    <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
-                    <td className="px-4 py-4">
-                      <span className="font-semibold text-slate-800 leading-snug">{p.college_name}</span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col text-xs space-y-0.5">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-slate-400 font-medium">Avg:</span>
-                          <span className="text-blue-600 font-bold">₹ {p.average_ctc || "N/A"}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-slate-400 font-medium">Max:</span>
-                          <span className="text-green-600 font-bold">₹ {p.highest_ctc || "N/A"}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-[11px] text-slate-600 font-medium">
-                          {p.recruiting_companies ? `${p.recruiting_companies}+ Companies` : "No company data"}
+          <table className="w-full text-left border-collapse table-fixed">
+            <colgroup>
+              <col style={{ width: "4%" }} />
+              <col style={{ width: "24%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "22%" }} />
+              <col style={{ width: "18%" }} />
+              <col style={{ width: "12%" }} />
+            </colgroup>
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100">
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-center">
+                  S.No
+                </th>
+                <th className="px-4 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  College
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  CTC Range
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Companies
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Notes
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-right">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {placements.map((p, idx) => (
+                <tr key={p.id} className="hover:bg-slate-50/60 transition-colors group">
+                  <td className="px-3 py-2.5 text-center">
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
+                      {offset + idx + 1}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-slate-800 truncate leading-tight">
+                        {p.college_name || "Unnamed College"}
+                      </p>
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                        Profile #{p.collegeprofile_id}
+                      </p>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <div className="flex flex-col gap-1">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-[11px] font-bold">
+                        Avg: {p.average_ctc || "-"}
+                      </span>
+                      <span className="text-[11px] text-slate-400">
+                        Low: {p.lowest_ctc || "-"} | High: {p.highest_ctc || "-"}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold">
+                      {p.recruiting_companies ? `${p.recruiting_companies}+` : "-"}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <span className="text-[11px] text-slate-500 line-clamp-2">
+                      {p.placement_info || "No additional info"}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <div className="flex flex-row items-center justify-end gap-1.5">
+                      <Link
+                        href={`/admin/colleges/placements/${p.id}`}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors shadow-sm"
+                        title="Edit placement"
+                      >
+                        <span className="material-symbols-outlined text-[13px]">
+                          edit
                         </span>
-                        <span className="text-[10px] text-slate-400 line-clamp-1 max-w-[250px]">
-                          {p.placement_info || "No extra info"}
+                        Edit
+                      </Link>
+                      <DeleteButton
+                        action={async () => {
+                          await onDelete(p.id);
+                        }}
+                        label="Delete"
+                        size="xs"
+                        icon={
+                          <span className="material-symbols-outlined text-[13px]">
+                            delete
                           </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => openEdit(p)}
-                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                          title="Edit"
-                        >
-                          <span className="material-symbols-rounded text-[18px]">edit</span>
-                        </button>
-                        <DeleteButton action={onDelete.bind(null, p.id)} size="sm" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        }
+                      />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
 
       <PlacementFormModal
         isOpen={isModalOpen}
         onClose={closeModal}
-        onSubmit={editingPlacement ? onEdit : onAdd}
-        placement={editingPlacement}
+        onSubmit={onAdd}
+        placement={undefined}
         colleges={colleges}
       />
     </>
   );
 }
-
-
-
-

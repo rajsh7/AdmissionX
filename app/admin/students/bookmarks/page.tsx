@@ -162,7 +162,7 @@ export default async function StudentBookmarksPage({
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 w-full">
       <BookmarkClient 
         bookmarks={JSON.parse(JSON.stringify(bookmarks))}
         users={JSON.parse(JSON.stringify(users))}
@@ -173,7 +173,6 @@ export default async function StudentBookmarksPage({
         totalPages={totalPages}
         q={q}
         createBookmark={createBookmark}
-        updateBookmark={updateBookmark}
         deleteBookmark={deleteBookmark}
       />
     </div>

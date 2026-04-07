@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import AdminModal from "@/app/admin/_components/AdminModal";
+import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import CourseFormModal from "./CourseFormModal";
 
-interface Option { id: number; name: string; }
+interface Option {
+  id: number;
+  name: string;
+}
 
 interface CourseRow {
   id: number;
@@ -24,50 +27,100 @@ interface CourseRow {
 
 interface CourseListClientProps {
   courses: CourseRow[];
-  colleges: Option[];
-  courseOptions: Option[];
-  degrees: Option[];
-  streams: Option[];
+  total: number;
+  pageSize: number;
   offset: number;
   onAdd: (formData: FormData) => Promise<void>;
-  onEdit: (formData: FormData) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
 }
 
-const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
-
 export default function CourseListClient({
   courses,
-  colleges,
-  courseOptions,
-  degrees,
-  streams,
+  total,
+  pageSize,
   offset,
   onAdd,
-  onEdit,
   onDelete,
 }: CourseListClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCourse, setEditingCourse] = useState<CourseRow | null>(null);
+  const [options, setOptions] = useState<{
+    colleges: Option[];
+    courseOptions: Option[];
+    degrees: Option[];
+    streams: Option[];
+  }>({
+    colleges: [],
+    courseOptions: [],
+    degrees: [],
+    streams: [],
+  });
+  const [optionsState, setOptionsState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [optionsError, setOptionsError] = useState<string | null>(null);
 
-  function openAdd() {
-    setEditingCourse(null);
-    setIsModalOpen(true);
+  async function loadOptions(force = false) {
+    if (optionsState === "loading") return;
+    if (!force && optionsState === "ready") return;
+
+    setOptionsState("loading");
+    setOptionsError(null);
+
+    try {
+      const res = await fetch("/api/admin/colleges/courses/options", {
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error("Failed to load course form options.");
+
+      const data = (await res.json()) as {
+        success?: boolean;
+        colleges?: Option[];
+        courseOptions?: Option[];
+        degrees?: Option[];
+        streams?: Option[];
+        error?: string;
+      };
+
+      if (!data.success) {
+        throw new Error(data.error || "Failed to load course form options.");
+      }
+
+      setOptions({
+        colleges: data.colleges ?? [],
+        courseOptions: data.courseOptions ?? [],
+        degrees: data.degrees ?? [],
+        streams: data.streams ?? [],
+      });
+      setOptionsState("ready");
+    } catch (error) {
+      setOptionsState("error");
+      setOptionsError(
+        error instanceof Error ? error.message : "Failed to load course form options.",
+      );
+    }
   }
 
-  function openEdit(course: CourseRow) {
-    setEditingCourse(course);
+  function openAdd() {
     setIsModalOpen(true);
+    void loadOptions();
   }
 
   function closeModal() {
     setIsModalOpen(false);
-    setEditingCourse(null);
   }
+
+  const start = total > 0 ? offset + 1 : 0;
+  const end = Math.min(offset + pageSize, total);
+
+  const formatFee = (val: string | null) => {
+    if (!val) return "-";
+    const n = Number(val);
+    if (Number.isFinite(n)) {
+      return `INR ${n.toLocaleString("en-IN")}`;
+    }
+    return val;
+  };
 
   return (
     <>
-      {/* Add button */}
       <div className="flex justify-start mb-4">
         <button
           onClick={openAdd}
@@ -77,94 +130,172 @@ export default function CourseListClient({
         </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-white border-[3px] border-[#3498db] shadow-sm overflow-hidden">
+      <div className="bg-white">
+        <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
+          <p className="text-sm text-slate-500 font-medium">
+            {total > 0 ? (
+              <>
+                Showing <span className="font-bold text-slate-800">{start}-{end}</span> of{" "}
+                <span className="font-bold text-slate-800">{total.toLocaleString()}</span> courses
+              </>
+            ) : (
+              "No courses found"
+            )}
+          </p>
+        </div>
+
         {courses.length === 0 ? (
-          /* Empty state */
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>menu_book</span>
-            <p className="text-slate-500 font-semibold text-sm">No course records found.</p>
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-[32px] text-slate-300">
+                menu_book
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-slate-700">No course records found</h3>
+            <p className="text-sm text-slate-400 mt-1">Try adjusting your search or filters</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-center border-collapse">
-              <thead>
-                <tr className="bg-[#444444] text-white uppercase text-[11px] font-black tracking-widest">
-                  <th className="px-4 py-4 border-r border-white/10 w-16">ID</th>
-                  <th className="px-4 py-4 border-r border-white/10">Course Name</th>
-                  <th className="px-4 py-4 border-r border-white/10">Details</th>
-                  <th className="px-4 py-4 border-r border-white/10">College</th>
-                  <th className="px-4 py-4 border-r border-white/10">Fees</th>
-                  <th className="px-4 py-4 border-r border-white/10">Seats</th>
-                  <th className="px-4 py-4 border-r border-white/10">Last Update by</th>
-                  <th className="px-4 py-5">Action</th>
+          <table className="w-full text-left border-collapse table-fixed">
+            <colgroup>
+              <col style={{ width: "4%" }} />
+              <col style={{ width: "26%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "16%" }} />
+              <col style={{ width: "14%" }} />
+              <col style={{ width: "10%" }} />
+              <col style={{ width: "10%" }} />
+            </colgroup>
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100">
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-center">
+                  S.No
+                </th>
+                <th className="px-4 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Course
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  College
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Degree & Stream
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Fees & Seats
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Duration
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-right">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {courses.map((course, idx) => (
+                <tr key={course.id} className="hover:bg-slate-50/60 transition-colors group">
+                  <td className="px-3 py-2.5 text-center">
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
+                      {offset + idx + 1}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-slate-800 truncate leading-tight">
+                        {course.course_name || "General Program"}
+                      </p>
+                      <p className="text-[11px] text-slate-400 font-mono truncate mt-0.5">
+                        Course ID: {course.course_id ?? "-"}
+                      </p>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-700 truncate">
+                        {course.college_name || "Unnamed College"}
+                      </p>
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                        Profile #{course.collegeprofile_id || "-"}
+                      </p>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <div className="flex flex-wrap gap-1.5">
+                      {course.degree_name && (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold truncate max-w-full">
+                          {course.degree_name}
+                        </span>
+                      )}
+                      {course.stream_name && (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 text-[11px] font-bold truncate max-w-full">
+                          {course.stream_name}
+                        </span>
+                      )}
+                      {!course.degree_name && !course.stream_name && (
+                        <span className="text-slate-300 text-sm">-</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <div className="flex flex-col gap-1">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-[11px] font-bold">
+                        {formatFee(course.fees)}
+                      </span>
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold">
+                        Seats: {course.seats || "-"}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    {course.courseduration ? (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-[11px] font-bold">
+                        {course.courseduration}
+                      </span>
+                    ) : (
+                      <span className="text-slate-300 text-sm">-</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <div className="flex flex-row items-center justify-end gap-1.5">
+                      <Link
+                        href={`/admin/colleges/courses/${course.id}`}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors shadow-sm"
+                        title="Edit course"
+                      >
+                        <span className="material-symbols-outlined text-[13px]">edit</span>
+                        Edit
+                      </Link>
+                      <DeleteButton
+                        action={async () => {
+                          await onDelete(course.id);
+                        }}
+                        label="Delete"
+                        size="xs"
+                        icon={<span className="material-symbols-outlined text-[13px]">delete</span>}
+                      />
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {courses.map((c, idx) => (
-                  <tr 
-                    key={c.id} 
-                    className={`transition-colors text-[13px] font-medium ${idx % 2 === 0 ? "bg-[#e8f4fd]" : "bg-white"} hover:bg-blue-100/30`}
-                  >
-                    <td className="px-4 py-3.5 border-r border-slate-200/60 font-bold text-slate-400">
-                      {String(idx + 1).padStart(4, '0')}
-                    </td>
-                    <td className="px-4 py-3.5 border-r border-slate-200/60 font-bold text-slate-700">
-                      {c.course_name || "General Program"}
-                    </td>
-                    <td className="px-4 py-3.5 border-r border-slate-200/60 font-semibold text-slate-500 text-xs">
-                      {[c.degree_name, c.stream_name].filter(Boolean).join(" • ")}
-                    </td>
-                    <td className="px-4 py-3.5 border-r border-slate-200/60 text-slate-600">
-                      {c.college_name}
-                    </td>
-                    <td className="px-4 py-3.5 border-r border-slate-200/60 font-black text-slate-700">
-                      {c.fees ? `₹${c.fees}` : "—"}
-                    </td>
-                    <td className="px-4 py-3.5 border-r border-slate-200/60 font-black text-slate-700">
-                      {c.seats || "—"}
-                    </td>
-                    <td className="px-4 py-3.5 border-r border-slate-200/60 text-blue-400 font-bold">
-                      Amit Tyagi
-                    </td>
-                    <td className="px-4 py-3.5 flex items-center justify-center gap-1.5 min-w-[100px]">
-                      <button
-                        onClick={() => openEdit(c)}
-                        className="w-10 h-10 flex items-center justify-center bg-[#444444] text-white rounded hover:bg-black transition-all"
-                        title="Edit"
-                      >
-                        <span className="material-symbols-rounded text-[20px]" style={ICO_FILL}>edit_square</span>
-                      </button>
-                      <button
-                        className="w-10 h-10 flex items-center justify-center bg-[#0799fb] text-white rounded hover:bg-blue-600 transition-all"
-                        title="Details"
-                      >
-                        <span className="material-symbols-rounded text-[20px]" style={ICO_FILL}>description</span>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
 
-      {/* CRUD Modal */}
       <CourseFormModal
         isOpen={isModalOpen}
         onClose={closeModal}
-        onSubmit={editingCourse ? onEdit : onAdd}
-        course={editingCourse}
-        colleges={colleges}
-        courseOptions={courseOptions}
-        degrees={degrees}
-        streams={streams}
+        onSubmit={onAdd}
+        course={undefined}
+        colleges={options.colleges}
+        courseOptions={options.courseOptions}
+        degrees={options.degrees}
+        streams={options.streams}
+        optionsLoading={optionsState === "loading"}
+        optionsError={optionsError}
+        onRetryOptions={() => {
+          void loadOptions(true);
+        }}
       />
     </>
   );
 }
-
-
-
-
