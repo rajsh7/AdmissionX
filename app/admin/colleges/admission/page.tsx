@@ -101,6 +101,9 @@ export default async function CollegeAdmissionPage({
 }) {
   const sp   = await searchParams;
   const q    = (sp.q ?? "").trim();
+  const collegeId = (sp.collegeId ?? "").trim();
+  const title = (sp.title ?? "").trim();
+  const description = (sp.description ?? "").trim();
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
@@ -113,6 +116,21 @@ export default async function CollegeAdmissionPage({
       "(u.firstname LIKE ? OR ap.title LIKE ? OR ap.description LIKE ?)",
     );
     filterParams.push(`%${q}%`, `%${q}%`, `%${q}%`);
+  }
+
+  if (collegeId) {
+    conditions.push("ap.collegeprofile_id = ?");
+    filterParams.push(collegeId);
+  }
+
+  if (title) {
+    conditions.push("ap.title LIKE ?");
+    filterParams.push(`%${title}%`);
+  }
+
+  if (description) {
+    conditions.push("ap.description LIKE ?");
+    filterParams.push(`%${description}%`);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -149,6 +167,14 @@ export default async function CollegeAdmissionPage({
 
   const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
+  const buildPageHref = (targetPage: number) => {
+    const query = new URLSearchParams({ page: String(targetPage) });
+    if (q) query.set("q", q);
+    if (collegeId) query.set("collegeId", collegeId);
+    if (title) query.set("title", title);
+    if (description) query.set("description", description);
+    return `/admin/colleges/admission?${query.toString()}`;
+  };
 
   return (
     <div className="p-6 space-y-6 w-full">
@@ -164,6 +190,9 @@ export default async function CollegeAdmissionPage({
         </div>
         <div className="flex items-center gap-3">
           <form method="GET" action="/admin/colleges/admission" className="w-full sm:w-80">
+            {collegeId ? <input type="hidden" name="collegeId" value={collegeId} /> : null}
+            {title ? <input type="hidden" name="title" value={title} /> : null}
+            {description ? <input type="hidden" name="description" value={description} /> : null}
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
               <input 
@@ -184,6 +213,10 @@ export default async function CollegeAdmissionPage({
         offset={offset}
         total={total}
         pageSize={PAGE_SIZE}
+        searchQuery={q}
+        selectedCollegeId={collegeId}
+        selectedTitle={title}
+        selectedDescription={description}
         onAdd={createAdmission}
         onDelete={deleteAdmissionRow}
       />
@@ -196,7 +229,7 @@ export default async function CollegeAdmissionPage({
           </p>
           <div className="flex items-center gap-1">
             {page > 1 ? (
-              <Link href={`/admin/colleges/admission?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
+              <Link href={buildPageHref(page - 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
             ) : (
               <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
             )}
@@ -204,7 +237,7 @@ export default async function CollegeAdmissionPage({
               {page} / {totalPages}
             </span>
             {page < totalPages ? (
-              <Link href={`/admin/colleges/admission?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
+              <Link href={buildPageHref(page + 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
             ) : (
               <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
             )}

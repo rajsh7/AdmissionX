@@ -30,6 +30,18 @@ interface CourseListClientProps {
   total: number;
   pageSize: number;
   offset: number;
+  searchQuery?: string;
+  selectedCollegeId?: string;
+  selectedCourseId?: string;
+  selectedDegreeId?: string;
+  selectedStreamId?: string;
+  selectedFees?: string;
+  selectedSeats?: string;
+  selectedDuration?: string;
+  collegeOptions?: Option[];
+  courseOptions?: Option[];
+  degreeOptions?: Option[];
+  streamOptions?: Option[];
   onAdd: (formData: FormData) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
 }
@@ -39,10 +51,23 @@ export default function CourseListClient({
   total,
   pageSize,
   offset,
+  searchQuery = "",
+  selectedCollegeId = "",
+  selectedCourseId = "",
+  selectedDegreeId = "",
+  selectedStreamId = "",
+  selectedFees = "",
+  selectedSeats = "",
+  selectedDuration = "",
+  collegeOptions = [],
+  courseOptions = [],
+  degreeOptions = [],
+  streamOptions = [],
   onAdd,
   onDelete,
 }: CourseListClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [options, setOptions] = useState<{
     colleges: Option[];
     courseOptions: Option[];
@@ -121,14 +146,147 @@ export default function CourseListClient({
 
   return (
     <>
-      <div className="flex justify-start mb-4">
-        <button
-          onClick={openAdd}
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
-        >
-          Add new college course +
-        </button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-end mb-4">
+        <div className="flex flex-col gap-2 sm:items-end">
+          <button
+            type="button"
+            onClick={() => setShowFilters((value) => !value)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-all"
+          >
+            <span className="material-symbols-outlined text-[18px]">filter_alt</span>
+            Filters
+          </button>
+          <button
+            onClick={openAdd}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
+          >
+            Add new college course +
+          </button>
+        </div>
       </div>
+
+      {showFilters && (
+        <form id="course-filter-form" method="GET" action="/admin/colleges/courses" className="bg-white border border-slate-200 rounded-2xl shadow-sm mb-4 p-4">
+          <div className="grid gap-4 lg:grid-cols-3">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Search</label>
+              <input
+                type="text"
+                name="q"
+                defaultValue={searchQuery}
+                placeholder="Search course, college, degree, stream"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">College</label>
+              <select
+                name="collegeId"
+                defaultValue={selectedCollegeId}
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="">All colleges</option>
+                {collegeOptions.map((college, idx) => (
+                  <option key={`college-${college.id}-${idx}`} value={college.id}>
+                    {college.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Course</label>
+              <select
+                name="courseId"
+                defaultValue={selectedCourseId}
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="">All courses</option>
+                {courseOptions.map((course, idx) => (
+                  <option key={`course-${course.id}-${idx}`} value={course.id}>
+                    {course.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Degree</label>
+              <select
+                name="degreeId"
+                defaultValue={selectedDegreeId}
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="">All degrees</option>
+                {degreeOptions.map((degree, idx) => (
+                  <option key={`degree-${degree.id}-${idx}`} value={degree.id}>
+                    {degree.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Stream</label>
+              <select
+                name="streamId"
+                defaultValue={selectedStreamId}
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="">All streams</option>
+                {streamOptions.map((stream, idx) => (
+                  <option key={`stream-${stream.id}-${idx}`} value={stream.id}>
+                    {stream.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Fees</label>
+              <input
+                type="text"
+                name="fees"
+                defaultValue={selectedFees}
+                placeholder="e.g. 50000"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Seats</label>
+              <input
+                type="text"
+                name="seats"
+                defaultValue={selectedSeats}
+                placeholder="e.g. 60"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Duration</label>
+              <input
+                type="text"
+                name="duration"
+                defaultValue={selectedDuration}
+                placeholder="e.g. 2 Years"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-all"
+            >
+              Apply
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowFilters(false)}
+              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all"
+            >
+              Close
+            </button>
+          </div>
+        </form>
+      )}
 
       <div className="bg-white">
         <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
@@ -258,7 +416,7 @@ export default function CourseListClient({
                     <div className="flex flex-row items-center justify-end gap-1.5">
                       <Link
                         href={`/admin/colleges/courses/${course.id}`}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors shadow-sm"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition-colors shadow-sm"
                         title="Edit course"
                       >
                         <span className="material-symbols-outlined text-[13px]">edit</span>

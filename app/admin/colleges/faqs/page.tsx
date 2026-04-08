@@ -46,6 +46,7 @@ export default async function CollegeFAQsPage({ searchParams }: { searchParams: 
   const params: (string | number)[] = [];
   if (q) { conditions.push("(u.firstname LIKE ? OR f.question LIKE ? OR f.answer LIKE ?)"); params.push(`%${q}%`, `%${q}%`, `%${q}%`); }
   if (collegeId) { conditions.push("f.collegeprofile_id = ?"); params.push(collegeId); }
+
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
   const [faqs, countRows, collegeOptions] = await Promise.all([
@@ -70,7 +71,7 @@ export default async function CollegeFAQsPage({ searchParams }: { searchParams: 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
       <CollegeFilterBar colleges={collegeOptions} selectedId={collegeId} total={total} label="College FAQs" icon="quiz" description="Manage frequently asked questions — filter by college to see classified data." />
-      <FAQListClient faqs={faqs} colleges={collegeOptions as any} offset={offset} onAdd={createFAQ} onEdit={updateFAQ} onDelete={deleteFAQRow} />
+      <FAQListClient faqs={faqs} colleges={collegeOptions as any} offset={offset} total={total} pageSize={PAGE_SIZE} onAdd={createFAQ} onEdit={updateFAQ} onDelete={deleteFAQRow} />
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
           <p className="text-xs text-slate-500">Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> FAQs</p>

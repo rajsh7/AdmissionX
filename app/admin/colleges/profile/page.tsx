@@ -198,7 +198,26 @@ export default async function CollegeProfilePage({
   const [total, rawProfiles] = await Promise.all([
     col.countDocuments(mongoFilter),
     col
-      .find(mongoFilter)
+      .find(mongoFilter, {
+        projection: {
+          id: 1,
+          slug: 1,
+          bannerimage: 1,
+          rating: 1,
+          ranking: 1,
+          verified: 1,
+          isTopUniversity: 1,
+          topUniversityRank: 1,
+          universityType: 1,
+          isShowOnHome: 1,
+          isShowOnTop: 1,
+          registeredAddressCityId: 1,
+          contactpersonname: 1,
+          email: 1,
+          users_id: 1,
+          created_at: 1,
+        },
+      })
       .sort({ created_at: -1 })
       .skip(offset)
       .limit(PAGE_SIZE)

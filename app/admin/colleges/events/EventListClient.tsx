@@ -5,11 +5,11 @@ import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import EventFormModal from "./EventFormModal";
 
-interface Option { id: number; name: string; }
+interface Option { id: string; name: string; }
 
 interface EventRow {
-  id: number;
-  collegeprofile_id: number;
+  id: string;
+  collegeprofile_id: string;
   name: string;
   datetime: string;
   venue: string;
@@ -21,16 +21,26 @@ interface EventRow {
 interface EventListClientProps {
   events: EventRow[];
   colleges: Option[];
+  q: string;
+  collegeId: string;
+  eventName: string;
+  from: string;
+  to: string;
   offset: number;
   total: number;
   pageSize: number;
   onAdd: (formData: FormData) => Promise<void>;
-  onDelete: (id: number) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
 }
 
 export default function EventListClient({
   events,
   colleges,
+  q,
+  collegeId,
+  eventName,
+  from,
+  to,
   offset,
   total,
   pageSize,
@@ -38,6 +48,7 @@ export default function EventListClient({
   onDelete,
 }: EventListClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   function openAdd() {
     setIsModalOpen(true);
@@ -63,15 +74,103 @@ export default function EventListClient({
 
   return (
     <>
-      {/* Add button */}
-      <div className="flex justify-start mb-4">
-        <button
-          onClick={openAdd}
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
-        >
-          Add new college event +
-        </button>
+      {/* Add button and filter toggle */}
+      <div className="flex flex-col gap-3 sm:flex-row items-start justify-end gap-3 mb-4">
+        <div className="flex flex-col gap-2 sm:items-end">
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((prev) => !prev)}
+            className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 rounded text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-all"
+          >
+            <span className="material-symbols-rounded text-[18px]">filter_alt</span>
+            Filters
+          </button>
+          <button
+            onClick={openAdd}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
+          >
+            Add new college event +
+          </button>
+        </div>
       </div>
+
+      {filtersOpen && (
+        <div className="mb-5 border border-slate-200 rounded-[10px] bg-white shadow-sm p-5">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h3 className="text-sm font-bold text-slate-800">Filter events</h3>
+            <button
+              type="button"
+              onClick={() => setFiltersOpen(false)}
+              className="text-[13px] font-semibold text-slate-500 hover:text-slate-700"
+            >
+              Close
+            </button>
+          </div>
+          <form method="GET" action="/admin/colleges/events" className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400 mb-2">College Name</label>
+              <select
+                name="collegeId"
+                defaultValue={collegeId}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 focus:border-blue-500 focus:ring-blue-500/20 outline-none"
+              >
+                <option value="">Select College</option>
+                {colleges.map((college) => (
+                  <option key={college.id} value={college.id}>{college.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400 mb-2">Event Name</label>
+              <input
+                name="eventName"
+                defaultValue={eventName}
+                placeholder="Enter event name"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 focus:border-blue-500 focus:ring-blue-500/20 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400 mb-2">Event From</label>
+              <input
+                type="date"
+                name="from"
+                defaultValue={from}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 focus:border-blue-500 focus:ring-blue-500/20 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400 mb-2">Event To</label>
+              <input
+                type="date"
+                name="to"
+                defaultValue={to}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 focus:border-blue-500 focus:ring-blue-500/20 outline-none"
+              />
+            </div>
+
+            <input type="hidden" name="q" value={q} />
+
+            <div className="md:col-span-2 flex flex-wrap items-center gap-3">
+              <button
+                type="submit"
+                className="inline-flex items-center justify-center rounded-xl bg-[#FF3C3C] px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-[#e23333]"
+              >
+                Search
+              </button>
+              <button
+                type="button"
+                onClick={() => setFiltersOpen(false)}
+                className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-200"
+              >
+                Close
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* Table (matches profile information table style) */}
       <div className="bg-white">
@@ -193,7 +292,7 @@ export default function EventListClient({
                     <div className="flex flex-row items-center justify-end gap-1.5">
                       <Link
                         href={`/admin/colleges/events/${e.id}`}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors shadow-sm"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition-colors shadow-sm"
                         title="Edit event"
                       >
                         <span className="material-symbols-outlined text-[13px]">

@@ -1,4 +1,5 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
+import { ObjectId } from "mongodb";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import EventListClient from "./EventListClient";
@@ -7,20 +8,25 @@ import EventListClient from "./EventListClient";
 
 async function createEvent(formData: FormData) {
   "use server";
-  const collegeprofile_id = formData.get("collegeprofile_id");
-  const name              = formData.get("name");
-  const datetime          = formData.get("datetime") || null;
-  const venue             = formData.get("venue")    || null;
-  const description       = formData.get("description") || null;
-  const link              = formData.get("link")    || null;
+  const db = await getDb();
+  const collegeprofile_id = formData.get("collegeprofile_id") as string;
+  const name              = formData.get("name") as string;
+  const datetime          = formData.get("datetime") as string || null;
+  const venue             = formData.get("venue") as string || null;
+  const description       = formData.get("description") as string || null;
+  const link              = formData.get("link") as string || null;
 
   try {
-    await pool.query(
-      `INSERT INTO event 
-        (collegeprofile_id, name, datetime, venue, description, link, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      [collegeprofile_id, name, datetime, venue, description, link],
-    );
+    await db.collection("event").insertOne({
+      collegeprofile_id: new ObjectId(collegeprofile_id),
+      name,
+      datetime,
+      venue,
+      description,
+      link,
+      created_at: new Date(),
+      updated_at: new Date()
+    });
   } catch (e) {
     console.error("[admin/colleges/events createAction]", e);
   }
@@ -29,21 +35,29 @@ async function createEvent(formData: FormData) {
 
 async function updateEvent(formData: FormData) {
   "use server";
-  const id                = formData.get("id");
-  const collegeprofile_id = formData.get("collegeprofile_id");
-  const name              = formData.get("name");
-  const datetime          = formData.get("datetime") || null;
-  const venue             = formData.get("venue")    || null;
-  const description       = formData.get("description") || null;
-  const link              = formData.get("link")    || null;
+  const db = await getDb();
+  const id                = formData.get("id") as string;
+  const collegeprofile_id = formData.get("collegeprofile_id") as string;
+  const name              = formData.get("name") as string;
+  const datetime          = formData.get("datetime") as string || null;
+  const venue             = formData.get("venue") as string || null;
+  const description       = formData.get("description") as string || null;
+  const link              = formData.get("link") as string || null;
 
   try {
-    await pool.query(
-      `UPDATE event 
-          SET collegeprofile_id = ?, name = ?, datetime = ?, venue = ?, 
-              description = ?, link = ?, updated_at = NOW()
-        WHERE id = ?`,
-      [collegeprofile_id, name, datetime, venue, description, link, id],
+    await db.collection("event").updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          collegeprofile_id: new ObjectId(collegeprofile_id),
+          name,
+          datetime,
+          venue,
+          description,
+          link,
+          updated_at: new Date()
+        }
+      }
     );
   } catch (e) {
     console.error("[admin/colleges/events updateAction]", e);
@@ -51,10 +65,11 @@ async function updateEvent(formData: FormData) {
   revalidatePath("/admin/colleges/events");
 }
 
-async function deleteEventRow(id: number) {
+async function deleteEventRow(id: string) {
   "use server";
+  const db = await getDb();
   try {
-    await pool.query("DELETE FROM event WHERE id = ?", [id]);
+    await db.collection("event").deleteOne({ _id: new ObjectId(id) });
   } catch (e) {
     console.error("[admin/colleges/events deleteAction]", e);
   }
@@ -65,24 +80,11 @@ async function deleteEventRow(id: number) {
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T >(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/colleges/events safeQuery]", err);
-    return [];
-  }
-}
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface EventRow  {
-  id: number;
-  collegeprofile_id: number;
+  id: string;
+  collegeprofile_id: string;
   name: string;
   datetime: string;
   venue: string;
@@ -96,7 +98,7 @@ interface CountRow  {
 }
 
 interface OptionRow  {
-  id: number;
+  id: string;
   name: string;
 }
 
@@ -112,57 +114,111 @@ export default async function CollegeEventsPage({
 }) {
   const sp   = await searchParams;
   const q    = (sp.q ?? "").trim();
+  const collegeId = sp.collegeId ?? "";
+  const eventName = (sp.eventName ?? "").trim();
+  const from = sp.from ?? "";
+  const to = sp.to ?? "";
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Build WHERE clause ─────────────────────────────────────────────────────
-  const conditions: string[] = [];
-  const filterParams: (string | number)[] = [];
+  const db = await getDb();
 
+  // Build match for aggregation
+  const match: any = {};
   if (q) {
-    conditions.push(
-      "(e.name LIKE ? OR e.venue LIKE ? OR u.firstname LIKE ?)",
-    );
-    filterParams.push(`%${q}%`, `%${q}%`, `%${q}%`);
+    match.$or = [
+      { name: { $regex: q, $options: "i" } },
+      { venue: { $regex: q, $options: "i" } },
+      { "user.firstname": { $regex: q, $options: "i" } }
+    ];
+  }
+  if (eventName) {
+    match.name = { $regex: eventName, $options: "i" };
+  }
+  if (collegeId && ObjectId.isValid(collegeId)) {
+    match.collegeprofile_id = new ObjectId(collegeId);
+  }
+  if (from || to) {
+    match.datetime = {};
+    if (from) {
+      match.datetime.$gte = `${from}T00:00:00`;
+    }
+    if (to) {
+      match.datetime.$lte = `${to}T23:59:59`;
+    }
   }
 
-  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  // Aggregation for events
+  const eventsAggregation = [
+    {
+      $lookup: {
+        from: "collegeprofile",
+        localField: "collegeprofile_id",
+        foreignField: "_id",
+        as: "college"
+      }
+    },
+    { $unwind: "$college" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "college.users_id",
+        foreignField: "_id",
+        as: "user"
+      }
+    },
+    { $unwind: "$user" },
+    { $match: match },
+    {
+      $project: {
+        id: { $toString: "$_id" },
+        collegeprofile_id: { $toString: "$collegeprofile_id" },
+        name: 1,
+        datetime: 1,
+        venue: 1,
+        description: 1,
+        link: 1,
+        college_name: { $ifNull: ["$user.firstname", "Unnamed College"] }
+      }
+    },
+    { $sort: { datetime: -1 } },
+    {
+      $facet: {
+        data: [{ $skip: offset }, { $limit: PAGE_SIZE }],
+        total: [{ $count: "count" }]
+      }
+    }
+  ];
 
-  // ── Fetch metadata + data ──────────────────────────────────────────────────
-  const [events, countRows, colleges] = await Promise.all([
-    safeQuery<EventRow>(
-      `SELECT 
-        e.id,
-        e.collegeprofile_id,
-        e.name,
-        e.datetime,
-        e.venue,
-        e.description,
-        e.link,
-        COALESCE(u.firstname, 'Unnamed College') as college_name
-       FROM event e
-       JOIN collegeprofile cp ON cp.id = e.collegeprofile_id
-       JOIN users u ON u.id = cp.users_id
-       ${where}
-       ORDER BY e.datetime DESC
-       LIMIT ? OFFSET ?`,
-      [...filterParams, PAGE_SIZE, offset],
-    ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total 
-       FROM event e 
-       JOIN collegeprofile cp ON cp.id = e.collegeprofile_id
-       JOIN users u ON u.id = cp.users_id
-       ${where}`,
-      filterParams,
-    ),
-    safeQuery<OptionRow>(
-      "SELECT cp.id, u.firstname AS name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
-    )
+  // Aggregation for colleges
+  const collegesAggregation = [
+    {
+      $lookup: {
+        from: "users",
+        localField: "users_id",
+        foreignField: "_id",
+        as: "user"
+      }
+    },
+    { $unwind: "$user" },
+    {
+      $project: {
+        id: { $toString: "$_id" },
+        name: "$user.firstname"
+      }
+    },
+    { $sort: { name: 1 } }
+  ];
+
+  const [eventsResult, collegesResult] = await Promise.all([
+    db.collection("event").aggregate(eventsAggregation).toArray(),
+    db.collection("collegeprofile").aggregate(collegesAggregation).toArray()
   ]);
 
-  const total = Number(countRows[0]?.total ?? 0);
+  const events = eventsResult[0]?.data || [];
+  const total = eventsResult[0]?.total[0]?.count || 0;
   const totalPages = Math.ceil(total / PAGE_SIZE);
+  const colleges = collegesResult as OptionRow[];
 
   return (
     <div className="p-6 space-y-6 w-full">
@@ -195,6 +251,11 @@ export default async function CollegeEventsPage({
       <EventListClient
         events={events}
         colleges={colleges}
+        q={q}
+        collegeId={collegeId}
+        eventName={eventName}
+        from={from}
+        to={to}
         offset={offset}
         total={total}
         pageSize={PAGE_SIZE}

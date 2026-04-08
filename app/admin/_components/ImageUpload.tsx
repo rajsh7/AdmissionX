@@ -88,9 +88,9 @@ export default function ImageUpload({
           required={required && !preview}
         />
         
-        {/* Only submit the existing image if no new file is chosen AND it wasn't cleared */}
-        {existingName && initialImage && preview === initialImage && (
-          <input type="hidden" name={existingName} value={initialImage} />
+        {/* Always send existing image path unless a new file was picked */}
+        {existingName && (
+          <input type="hidden" name={existingName} value={preview && !preview.startsWith("data:") ? preview : (initialImage ?? "")} />
         )}
         
         {preview && (

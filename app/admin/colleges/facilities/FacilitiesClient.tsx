@@ -7,9 +7,9 @@ import FacilityForm from "./FacilityForm";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 
 interface FacilityRow {
-  id: number;
-  collegeprofile_id: number;
-  facilities_id: number | null;
+  id: string;
+  collegeprofile_id: string;
+  facilities_id: string | null;
   facility_name_raw: string | null;
   facility_name: string;
   description: string | null;
@@ -18,15 +18,18 @@ interface FacilityRow {
 
 interface FacilitiesClientProps {
   facilitiesList: FacilityRow[];
-  colleges: { id: number; name: string }[];
-  facilityTypes: { id: number; name: string }[];
+  colleges: { id: string; name: string }[];
+  facilityTypes: { id: string; name: string }[];
   offset: number;
   total: number;
   pageSize: number;
-  onDelete: (id: number) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
   onAdd: (formData: FormData) => Promise<void>;
   q: string;
   collegeId: string;
+  facilityTypeId: string;
+  displayName: string;
+  description: string;
 }
 
 export default function FacilitiesClient({
@@ -40,9 +43,14 @@ export default function FacilitiesClient({
   onAdd,
   q,
   collegeId,
+  facilityTypeId,
+  displayName,
+  description,
 }: FacilitiesClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showFilter, setShowFilter] = useState(false);
+  const [showFilter, setShowFilter] = useState(
+    Boolean(q || collegeId || facilityTypeId || displayName || description),
+  );
 
   function openAdd() {
     setIsModalOpen(true);
@@ -68,24 +76,28 @@ export default function FacilitiesClient({
 
   return (
     <>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-        <button
-          onClick={openAdd}
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
-        >
-          Add college facility +
-        </button>
-        <button
-          onClick={() => setShowFilter(!showFilter)}
-          className="px-4 py-2.5 bg-slate-900 text-white text-[11px] font-bold rounded shadow hover:bg-black transition-all uppercase tracking-widest"
-        >
-          {showFilter ? "Hide Filters" : "Filter Options"}
-        </button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-end mb-4">
+        <div className="flex flex-col gap-2 sm:items-end">
+          <button
+            type="button"
+            onClick={() => setShowFilter((value) => !value)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-all"
+          >
+            <span className="material-symbols-outlined text-[18px]">filter_alt</span>
+            Filters
+          </button>
+          <button
+            onClick={openAdd}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
+          >
+            Add college facility +
+          </button>
+        </div>
       </div>
 
       {showFilter && (
         <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-6 mb-4">
-          <form method="GET" action="/admin/colleges/facilities" className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-4 items-end">
+          <form method="GET" action="/admin/colleges/facilities" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-end">
             <div>
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">College</label>
               <div className="relative">
@@ -107,12 +119,53 @@ export default function FacilitiesClient({
               </div>
             </div>
             <div>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Facility Type</label>
+              <div className="relative">
+                <select
+                  name="facilityTypeId"
+                  defaultValue={facilityTypeId}
+                  className="w-full h-10 px-4 border border-slate-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:border-[#008080] focus:ring-2 focus:ring-[#008080]/10 transition-all text-slate-700 appearance-none"
+                >
+                  <option value="">All types</option>
+                  <option value="custom">Custom / None</option>
+                  {facilityTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+                </select>
+                <span className="material-symbols-outlined text-[18px] text-slate-400 absolute right-3 top-2.5 pointer-events-none">
+                  expand_more
+                </span>
+              </div>
+            </div>
+            <div>
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Search</label>
               <input
                 type="text"
                 name="q"
                 defaultValue={q}
                 placeholder="Search facilities..."
+                className="w-full h-10 px-4 border border-slate-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:border-[#008080] focus:ring-2 focus:ring-[#008080]/10 transition-all placeholder:text-slate-300 text-slate-700"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Display Name</label>
+              <input
+                type="text"
+                name="displayName"
+                defaultValue={displayName}
+                placeholder="Search display name"
+                className="w-full h-10 px-4 border border-slate-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:border-[#008080] focus:ring-2 focus:ring-[#008080]/10 transition-all placeholder:text-slate-300 text-slate-700"
+              />
+            </div>
+            <div className="md:col-span-2 xl:col-span-3">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Description</label>
+              <input
+                type="text"
+                name="description"
+                defaultValue={description}
+                placeholder="Search description"
                 className="w-full h-10 px-4 border border-slate-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:border-[#008080] focus:ring-2 focus:ring-[#008080]/10 transition-all placeholder:text-slate-300 text-slate-700"
               />
             </div>
@@ -125,7 +178,7 @@ export default function FacilitiesClient({
               </Link>
               <button
                 type="submit"
-                className="px-5 h-10 rounded-xl bg-[#008080] text-white text-xs font-bold hover:bg-[#006666] transition-colors"
+                className="px-5 h-10 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-bold hover:bg-slate-100 transition-colors"
               >
                 Apply
               </button>
@@ -244,7 +297,7 @@ export default function FacilitiesClient({
                       <div className="flex flex-row items-center justify-end gap-1.5">
                         <Link
                           href={`/admin/colleges/facilities/${f.id}`}
-                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors shadow-sm"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition-colors shadow-sm"
                           title="Edit facility"
                         >
                           <span className="material-symbols-outlined text-[13px]">edit</span>

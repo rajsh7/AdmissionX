@@ -11,9 +11,12 @@ interface BookmarkClientProps {
   types: any[];
   offset: number;
   PAGE_SIZE: number;
+  page: number;
   total: number;
   totalPages: number;
   q: string;
+  selectedStudentId?: string;
+  selectedTypeId?: string;
   createBookmark: (data: FormData) => Promise<void>;
   deleteBookmark: (id: number) => Promise<void>;
 }
@@ -24,32 +27,116 @@ export default function BookmarkClient({
   types,
   offset,
   PAGE_SIZE,
+  page,
   total,
   totalPages,
   q,
+  selectedStudentId = "",
+  selectedTypeId = "",
   createBookmark,
   deleteBookmark,
 }: BookmarkClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  function openAddModal() {
-    setIsModalOpen(true);
-  }
+  const [showFilters, setShowFilters] = useState(Boolean(q || selectedStudentId || selectedTypeId));
 
   const start = total > 0 ? offset + 1 : 0;
   const end = Math.min(offset + PAGE_SIZE, total);
 
+  const buildPageHref = (targetPage: number) => {
+    const params = new URLSearchParams({ page: String(targetPage) });
+    if (q) params.set("q", q);
+    if (selectedStudentId) params.set("studentId", selectedStudentId);
+    if (selectedTypeId) params.set("typeId", selectedTypeId);
+    return `/admin/students/bookmarks?${params.toString()}`;
+  };
+
   return (
     <div className="w-full">
-      {/* Add button */}
-      <div className="flex items-center justify-end gap-2 mb-2 mt-2 px-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
         <button
-          onClick={openAddModal}
-          className="flex items-center gap-2 bg-admin-blue text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-600 transition-colors shadow-sm whitespace-nowrap"
+          type="button"
+          onClick={() => setShowFilters((value) => !value)}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-all"
         >
-          <span className="material-symbols-outlined text-[18px]">add_circle</span>
+          <span className="material-symbols-outlined text-[18px]">filter_alt</span>
+          Filters
+        </button>
+        <button
+          type="button"
+          onClick={() => setIsModalOpen(true)}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#313131] text-white text-xs font-semibold hover:bg-black transition-all"
+        >
           Add Bookmark
         </button>
       </div>
+
+      {showFilters && (
+        <form method="GET" action="/admin/students/bookmarks" className="bg-white border border-slate-200 rounded-2xl shadow-sm mb-4 p-4">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Search</label>
+              <input
+                type="text"
+                name="q"
+                defaultValue={q}
+                placeholder="Search student, email or title"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Student</label>
+              <select
+                name="studentId"
+                defaultValue={selectedStudentId}
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="">All students</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Bookmark Type</label>
+              <select
+                name="typeId"
+                defaultValue={selectedTypeId}
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="">All types</option>
+                {types.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="mt-4 flex gap-2 sm:justify-end">
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-all"
+            >
+              Apply
+            </button>
+            <a
+              href="/admin/students/bookmarks"
+              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all"
+            >
+              Clear
+            </a>
+            <button
+              type="button"
+              onClick={() => setShowFilters(false)}
+              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all"
+            >
+              Close
+            </button>
+          </div>
+        </form>
+      )}
 
       {/* Table (matches profile information table style) */}
       <div className="bg-white">
@@ -180,7 +267,7 @@ export default function BookmarkClient({
                       <div className="flex flex-row items-center justify-end gap-1.5">
                         <Link
                           href={`/admin/students/bookmarks/${bookmark.id}`}
-                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors shadow-sm"
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-[11px] font-bold hover:bg-slate-100 transition-colors shadow-sm"
                           title="Edit bookmark"
                         >
                           <span className="material-symbols-outlined text-[13px]">
@@ -214,28 +301,28 @@ export default function BookmarkClient({
       {totalPages > 1 && (
         <div className="px-6 py-3 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
           <p className="text-sm text-slate-400 font-medium">
-            Page {offset / PAGE_SIZE + 1} of {totalPages}
+            Page {page} of {totalPages}
           </p>
           <div className="flex items-center gap-1.5">
-            {offset / PAGE_SIZE + 1 > 1 && (
-              <a
-                href={`?page=${offset / PAGE_SIZE}&q=${encodeURIComponent(q)}`}
+            {page > 1 && (
+              <Link
+                href={buildPageHref(page - 1)}
                 className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:border-[#008080] hover:text-[#008080] transition-colors bg-white"
               >
                 <span className="material-symbols-outlined text-[18px]">
                   chevron_left
                 </span>
-              </a>
+              </Link>
             )}
-            {offset / PAGE_SIZE + 1 < totalPages && (
-              <a
-                href={`?page=${offset / PAGE_SIZE + 2}&q=${encodeURIComponent(q)}`}
+            {page < totalPages && (
+              <Link
+                href={buildPageHref(page + 1)}
                 className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:border-[#008080] hover:text-[#008080] transition-colors bg-white"
               >
                 <span className="material-symbols-outlined text-[18px]">
                   chevron_right
                 </span>
-              </a>
+              </Link>
             )}
           </div>
         </div>

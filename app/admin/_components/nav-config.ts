@@ -19,6 +19,10 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "MAIN MENU",
     items: [
       { href: "/admin/dashboard", icon: "home", label: "Home" },
+      { href: "/admin/members/registrations", icon: "how_to_reg", label: "Registrations" },
+      { href: "/admin/members/users", icon: "group", label: "Platform Users" },
+      { href: "/admin/members/roles", icon: "manage_accounts", label: "Roles" },
+      { href: "/admin/members/status", icon: "toggle_on", label: "Status" },
       {
         href: "/admin/students",
         icon: "person",

@@ -3,8 +3,8 @@
 import { useTransition } from "react";
 
 interface FacilityFormProps {
-  colleges: { id: number; name: string }[];
-  facilityTypes: { id: number; name: string }[];
+  colleges: { id: string; name: string }[];
+  facilityTypes: { id: string; name: string }[];
   initialData?: any;
   onSubmitAction: (formData: FormData) => Promise<void>;
   onSuccess: () => void;

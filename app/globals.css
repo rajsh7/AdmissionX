@@ -251,6 +251,23 @@ html.dark {
     border-color: var(--color-primary);
 }
 
+/* Remove green background from edit action buttons across admin pages */
+button[title*="Edit"],
+a[title*="Edit"],
+button[aria-label*="Edit"],
+a[aria-label*="Edit"] {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    color: inherit !important;
+}
+
+button[title*="Edit"]:hover,
+a[title*="Edit"]:hover,
+button[aria-label*="Edit"]:hover,
+a[aria-label*="Edit"]:hover {
+    background-color: transparent !important;
+}
+
 .dark\:bg-primary:is(.dark *) {
     background-color: var(--color-primary);
 }

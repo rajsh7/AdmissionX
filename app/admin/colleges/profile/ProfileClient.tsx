@@ -624,7 +624,7 @@ export default function ProfileClient({
                       {/* Edit → full edit page */}
                       <Link
                         href={`/admin/colleges/profile/${p.slug}`}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors shadow-sm"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-[11px] font-bold hover:bg-slate-100 transition-colors shadow-sm"
                         title="Edit all college details"
                       >
                         <span className="material-symbols-outlined text-[13px]">

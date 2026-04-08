@@ -308,17 +308,13 @@ export default function Header({ theme }: HeaderProps) {
       )}
 
       <motion.header 
-        className={`site-header fixed top-0 left-0 right-0 z-50 w-full flex items-center transition-all duration-300 ${
-          showActiveState 
-            ? "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.08)] py-4 min-h-[80px]" 
-            : "bg-transparent py-5 min-h-[90px]"
-        }`}
+        className="site-header fixed top-0 left-0 right-0 z-50 w-full flex items-center transition-all duration-300 bg-white shadow-[0_4px_30px_rgba(0,0,0,0.08)] py-3 min-h-[58px]"
       >
         <div className="flex items-center justify-between px-6 sm:px-12 w-full max-w-[1920px] mx-auto">
           {/* Logo Area */}
           <div className="shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
-              <img src="/logo.jpg" alt="AdmissionX" className="h-10 w-auto object-contain" />
+              <img src="/logo.jpg" alt="AdmissionX" className="h-10 sm:h-12 w-auto object-contain" />
             </Link>
           </div>
 
@@ -330,15 +326,11 @@ export default function Header({ theme }: HeaderProps) {
                 <div key={link.label} className="relative group/nav">
                   <Link
                     href={link.href}
-                    className={`flex items-center gap-1.5 px-4 py-2 text-[16px] font-medium transition-colors relative ${
-                      showActiveState ? "text-slate-700 hover:text-primary" : "text-white hover:text-white/80"
-                    }`}
+                    className="flex items-center gap-1.5 px-4 py-2 text-[16px] font-medium transition-colors relative text-slate-700 hover:text-primary"
                   >
                     {link.label}
                     {link.subItems && mounted && (
-                      <span className={`material-symbols-outlined text-[18px] transition-colors ${
-                        showActiveState ? "text-slate-300 group-hover/nav:text-primary" : "text-white/70 group-hover/nav:text-white"
-                      }`}>
+                      <span className="material-symbols-outlined text-[18px] transition-colors text-slate-300 group-hover/nav:text-primary">
                         expand_more
                       </span>
                     )}
@@ -391,9 +383,7 @@ export default function Header({ theme }: HeaderProps) {
                   {/* Login Dropdown */}
                   <div ref={loginRef} className="relative" onMouseEnter={openLogin} onMouseLeave={closeLogin}>
                     <button
-                      className={`flex items-center gap-1.5 px-4 py-2.5 rounded-[10px] transition-all font-medium text-[16px] ${
-                        isScrolled ? "text-slate-700 hover:bg-slate-50" : "text-white hover:bg-white/10"
-                      }`}
+                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-[10px] transition-all font-medium text-[16px] text-slate-700 hover:bg-slate-50"
                     >
                       Login
                       <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${loginOpen ? "rotate-180" : ""}`}>expand_more</span>
@@ -416,9 +406,7 @@ export default function Header({ theme }: HeaderProps) {
             </div>
           </div>
 
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className={`lg:hidden h-10 w-10 flex items-center justify-center rounded-full transition-all ${
-            isScrolled ? "text-slate-700 hover:bg-slate-50" : "text-white hover:bg-white/10"
-          }`}>
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden h-10 w-10 flex items-center justify-center rounded-full transition-all text-slate-700 hover:bg-slate-50">
             <span className="material-symbols-outlined">{mobileMenuOpen ? "close" : "menu"}</span>
           </button>
         </div>

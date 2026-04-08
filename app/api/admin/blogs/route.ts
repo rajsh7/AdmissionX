@@ -48,12 +48,18 @@ export async function PUT(req: NextRequest) {
     }
 
     const db = await getDb();
+    const numericId = Number(id);
+    const filter = !isNaN(numericId) && numericId > 0
+      ? { id: numericId }
+      : { _id: new ObjectId(id) };
+
     await db.collection("blogs").updateOne(
-      { _id: new ObjectId(id) },
+      filter,
       { $set: { topic, slug, description, isactive, featimage, updated_at: new Date() } }
     );
 
     revalidatePath("/admin/blogs");
+    revalidatePath("/");
     return NextResponse.json({ success: true });
   } catch (e) {
     console.error("[api/admin/blogs PUT]", e);

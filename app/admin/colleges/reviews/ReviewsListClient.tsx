@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import ReviewFormModal from "./ReviewFormModal";
 
-interface CollegeOption { id: number; name: string; }
+interface CollegeOption { id: string; name: string; }
 
 interface ReviewsListClientProps {
   reviews: any[];
@@ -21,7 +21,7 @@ interface ReviewsListClientProps {
   studentName?: string;
   createReview: (data: FormData) => Promise<void>;
   updateReview: (data: FormData) => Promise<void>;
-  deleteReview: (id: number) => Promise<void>;
+  deleteReview: (id: string) => Promise<void>;
 }
 
 function StarRating({ label, value }: { label: string; value: number }) {
@@ -176,7 +176,7 @@ export default function ReviewsListClient({
                         <div style={{ width: "100%", height: "1px", backgroundColor: "#e2e8f0", marginBottom: "8px" }}></div>
                         <div className="flex flex-col gap-1.5">
                           <Link 
-                            href={`/colleges/${r.collegeprofile_id}`} 
+                            href={`/colleges/${r.college_slug || r.collegeprofile_id}`} 
                             target="_blank"
                             className="text-white text-[10.5px] font-bold py-[6px] px-3 rounded-[2px] flex items-center gap-1.5 w-full justify-center uppercase tracking-wider hover:brightness-95 transition-all shadow-sm" 
                             style={{ backgroundColor: "#24b29b" }}

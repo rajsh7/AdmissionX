@@ -1,105 +1,316 @@
-import pool from "@/lib/db";
-import Link from "next/link";
+import { getDb } from "@/lib/db";
+import { ObjectId } from "mongodb";
 import { revalidatePath } from "next/cache";
 import { fetchCollegeOptions } from "../_components/college-options";
 import CollegeFilterBar from "../_components/CollegeFilterBar";
 import ReviewsListClient from "./ReviewsListClient";
 
+// ─── Server Actions ───────────────────────────────────────────────────────────
+
+function parseNumber(formData: FormData, key: string) {
+  const v = formData.get(key) as string;
+  const num = Number(v);
+  return Number.isFinite(num) ? num : 0;
+}
+
 async function createReview(formData: FormData) {
   "use server";
   const collegeprofile_id = formData.get("collegeprofile_id") as string;
-  const title = formData.get("title") as string;
+  const title = String(formData.get("title") || "").trim();
   if (!collegeprofile_id || !title) return;
-  const parse = (key: string) => { const v = formData.get(key) as string; return v ? parseFloat(v) : 0; };
+
+  if (!ObjectId.isValid(collegeprofile_id)) return;
+
   try {
-    await pool.query(
-      `INSERT INTO college_reviews (collegeprofile_id, title, description, academic, infrastructure, faculty, accommodation, placement, social, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      [collegeprofile_id, title, formData.get("description") || "", parse("academic"), parse("infrastructure"), parse("faculty"), parse("accommodation"), parse("placement"), parse("social")],
-    );
-  } catch (e) { console.error("[admin/colleges/reviews createReview]", e); }
+    const db = await getDb();
+    await db.collection("college_reviews").insertOne({
+      collegeprofile_id: new ObjectId(collegeprofile_id),
+      title,
+      description: String(formData.get("description") || "").trim(),
+      academic: parseNumber(formData, "academic"),
+      infrastructure: parseNumber(formData, "infrastructure"),
+      faculty: parseNumber(formData, "faculty"),
+      accommodation: parseNumber(formData, "accommodation"),
+      placement: parseNumber(formData, "placement"),
+      social: parseNumber(formData, "social"),
+      users_id: null,
+      votes: 0,
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+  } catch (e) {
+    console.error("[admin/colleges/reviews createReview]", e);
+  }
   revalidatePath("/admin/colleges/reviews");
 }
 
 async function updateReview(formData: FormData) {
   "use server";
-  const id = parseInt(formData.get("id") as string, 10);
+  const id = String(formData.get("id") || "");
   const collegeprofile_id = formData.get("collegeprofile_id") as string;
-  const title = formData.get("title") as string;
-  if (isNaN(id) || !collegeprofile_id || !title) return;
-  const parse = (key: string) => { const v = formData.get(key) as string; return v ? parseFloat(v) : 0; };
+  const title = String(formData.get("title") || "").trim();
+  if (!id || !collegeprofile_id || !title) return;
+
+  if (!ObjectId.isValid(id) || !ObjectId.isValid(collegeprofile_id)) return;
+  const reviewId = new ObjectId(id);
+
   try {
-    await pool.query(
-      `UPDATE college_reviews SET collegeprofile_id=?, title=?, description=?, academic=?, infrastructure=?, faculty=?, accommodation=?, placement=?, social=?, updated_at=NOW() WHERE id=?`,
-      [collegeprofile_id, title, formData.get("description") || "", parse("academic"), parse("infrastructure"), parse("faculty"), parse("accommodation"), parse("placement"), parse("social"), id],
-    );
-  } catch (e) { console.error("[admin/colleges/reviews updateReview]", e); }
+    const db = await getDb();
+    await db.collection("college_reviews").updateOne({ _id: reviewId }, {
+      $set: {
+        collegeprofile_id: new ObjectId(collegeprofile_id),
+        title,
+        description: String(formData.get("description") || "").trim(),
+        academic: parseNumber(formData, "academic"),
+        infrastructure: parseNumber(formData, "infrastructure"),
+        faculty: parseNumber(formData, "faculty"),
+        accommodation: parseNumber(formData, "accommodation"),
+        placement: parseNumber(formData, "placement"),
+        social: parseNumber(formData, "social"),
+        updated_at: new Date(),
+      },
+    });
+  } catch (e) {
+    console.error("[admin/colleges/reviews updateReview]", e);
+  }
   revalidatePath("/admin/colleges/reviews");
 }
 
-async function deleteReview(id: number) {
+async function deleteReview(id: string) {
   "use server";
-  if (isNaN(id)) return;
-  try { await pool.query("DELETE FROM college_reviews WHERE id = ?", [id]); }
-  catch (e) { console.error("[admin/colleges/reviews deleteReview]", e); }
+  if (!ObjectId.isValid(id)) return;
+  try {
+    const db = await getDb();
+    await db.collection("college_reviews").deleteOne({ _id: new ObjectId(id) });
+  } catch (e) {
+    console.error("[admin/colleges/reviews deleteReview]", e);
+  }
   revalidatePath("/admin/colleges/reviews");
 }
 
 const PAGE_SIZE = 25;
-async function safeQuery<T>(sql: string, params: (string | number)[] = []): Promise<T[]> {
-  try { const [rows] = (await pool.query(sql, params)) as [T[], unknown]; return rows; }
-  catch (err) { console.error("[admin/colleges/reviews safeQuery]", err); return []; }
+
+function escapeRegex(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-interface ReviewRow { id: number; college_name: string; collegeprofile_id: number; title: string; description: string; academic: number; accommodation: number; faculty: number; infrastructure: number; placement: number; social: number; student_name: string | null; student_email: string | null; created_at: string | null; updated_at: string | null; vote: number | null; }
-interface CountRow { total: number; }
+interface ReviewRow {
+  id: string;
+  collegeprofile_id: string;
+  college_slug: string | null;
+  college_name: string;
+  title: string;
+  description: string;
+  academic: number;
+  accommodation: number;
+  faculty: number;
+  infrastructure: number;
+  placement: number;
+  social: number;
+  student_name: string;
+  student_email: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  vote: number;
+}
 
-export default async function CollegeReviewsPage({ searchParams }: { searchParams: Promise<Record<string, string>> }) {
-  const sp          = await searchParams;
-  const q           = (sp.q ?? "").trim();
-  const collegeId   = sp.collegeId ?? "";
+interface CollegeOption {
+  id: string;
+  name: string;
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default async function CollegeReviewsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string>>;
+}) {
+  const sp = await searchParams;
+  const q = (sp.q ?? "").trim();
   const collegeName = (sp.collegeName ?? "").trim();
   const studentName = (sp.studentName ?? "").trim();
   const page        = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset      = (page - 1) * PAGE_SIZE;
 
-  const conditions: string[] = [];
-  const params: (string | number)[] = [];
-  if (q) { conditions.push("(u.firstname LIKE ? OR r.title LIKE ? OR r.description LIKE ?)"); params.push(`%${q}%`, `%${q}%`, `%${q}%`); }
-  if (collegeId) { conditions.push("r.collegeprofile_id = ?"); params.push(collegeId); }
-  if (collegeName) { conditions.push("u.firstname LIKE ?"); params.push(`%${collegeName}%`); }
-  if (studentName) { conditions.push("r.title LIKE ?"); params.push(`%${studentName}%`); }
-  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const db = await getDb();
 
-  const [reviews, countRows, collegeOptions] = await Promise.all([
-    safeQuery<ReviewRow>(
-      `SELECT r.id, r.collegeprofile_id, COALESCE(u.firstname,'Unnamed College') as college_name, r.title, r.description, r.academic, r.accommodation, r.faculty, r.infrastructure, r.placement, r.social, COALESCE(u2.firstname,'Anonymous') as student_name, u2.email as student_email, DATE_FORMAT(r.created_at,'%Y-%m-%d %H:%i:%s') as created_at, DATE_FORMAT(r.updated_at,'%Y-%m-%d %H:%i:%s') as updated_at, r.votes as vote
-       FROM college_reviews r JOIN collegeprofile cp ON cp.id=r.collegeprofile_id JOIN users u ON u.id=cp.users_id LEFT JOIN users u2 ON u2.id=r.users_id ${where} ORDER BY r.created_at DESC LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
-    ),
-    safeQuery<CountRow>(`SELECT COUNT(*) AS total FROM college_reviews r JOIN collegeprofile cp ON cp.id=r.collegeprofile_id JOIN users u ON u.id=cp.users_id ${where}`, params),
-    fetchCollegeOptions(),
-  ]);
+  const pipeline: Record<string, unknown>[] = [];
+  if (q) {
+    pipeline.push({
+      $match: {
+        $or: [
+          { title: { $regex: escapeRegex(q), $options: "i" } },
+          { description: { $regex: escapeRegex(q), $options: "i" } },
+        ],
+      },
+    });
+  }
 
-  const total = Number(countRows[0]?.total ?? 0);
+  pipeline.push(
+    {
+      $lookup: {
+        from: "collegeprofile",
+        localField: "collegeprofile_id",
+        foreignField: "_id",
+        as: "cp",
+      },
+    },
+    { $unwind: { path: "$cp", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "cp.users_id",
+        foreignField: "_id",
+        as: "cpUser",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "users_id",
+        foreignField: "_id",
+        as: "studentUser",
+      },
+    },
+    {
+      $addFields: {
+        college_name: {
+          $ifNull: [
+            { $arrayElemAt: ["$cpUser.firstname", 0] },
+            { $ifNull: ["$cp.contactpersonname", "$cp.slug"] },
+            "Unnamed College",
+          ],
+        },
+        college_slug: { $ifNull: ["$cp.slug", null] },
+        student_name: {
+          $ifNull: [{ $arrayElemAt: ["$studentUser.firstname", 0] }, "Anonymous Student"],
+        },
+        student_email: { $arrayElemAt: ["$studentUser.email", 0] },
+      },
+    },
+  );
+
+  if (collegeName) {
+    pipeline.push({
+      $match: {
+        college_name: { $regex: escapeRegex(collegeName), $options: "i" },
+      },
+    });
+  }
+
+  if (studentName) {
+    pipeline.push({
+      $match: {
+        student_name: { $regex: escapeRegex(studentName), $options: "i" },
+      },
+    });
+  }
+
+  pipeline.push({ $sort: { created_at: -1 } });
+
+  const facetStage = {
+    $facet: {
+      data: [
+        { $skip: offset },
+        { $limit: PAGE_SIZE },
+        {
+          $project: {
+            _id: 0,
+            id: { $toString: "$_id" },
+            collegeprofile_id: { $toString: "$collegeprofile_id" },
+            college_slug: 1,
+            college_name: 1,
+            title: 1,
+            description: 1,
+            academic: 1,
+            accommodation: 1,
+            faculty: 1,
+            infrastructure: 1,
+            placement: 1,
+            social: 1,
+            student_name: 1,
+            student_email: 1,
+            votes: 1,
+            created_at: 1,
+            updated_at: 1,
+          },
+        },
+      ],
+      total: [{ $count: "count" }],
+    },
+  };
+
+  const aggResult = await db.collection("college_reviews").aggregate([...pipeline, facetStage]).toArray();
+  const view = aggResult[0] ?? { data: [], total: [] };
+  const reviewDocs = (view.data ?? []) as ReviewRow[];
+  const total = Number(view.total?.[0]?.count ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  const cleanReviews = (reviews as any[]).map((r, idx) => ({
-    id: Number(r.id) || (idx + 1), collegeprofile_id: Number(r.collegeprofile_id), college_name: String(r.college_name || ""), title: String(r.title || ""), description: String(r.description || ""),
-    academic: Number(r.academic || 0), accommodation: Number(r.accommodation || 0), faculty: Number(r.faculty || 0), infrastructure: Number(r.infrastructure || 0), placement: Number(r.placement || 0), social: Number(r.social || 0),
-    student_name: r.student_name ? String(r.student_name) : "Anonymous", student_email: r.student_email ? String(r.student_email) : null,
-    created_at: r.created_at ? String(r.created_at) : null, updated_at: r.updated_at ? String(r.updated_at) : null, vote: r.vote ? Number(r.vote) : 0,
+  const collegeDocs = await db
+    .collection("collegeprofile")
+    .find({}, { projection: { _id: 1, slug: 1, contactpersonname: 1, users_id: 1 } })
+    .sort({ slug: 1 })
+    .toArray();
+
+  const userIds = [
+    ...new Set(
+      collegeDocs
+        .map((doc) => doc.users_id)
+        .filter((id) => id !== null && id !== undefined),
+    ),
+  ];
+
+  const userDocs = userIds.length
+    ? await db.collection("users").find({ _id: { $in: userIds } }, { projection: { _id: 1, firstname: 1 } }).toArray()
+    : [];
+
+  const userMap: Record<string, string> = Object.fromEntries(
+    userDocs.map((u) => [String(u._id), String(u.firstname ?? "")]),
+  );
+
+  const colleges = collegeDocs.map((cp) => ({
+    id: String(cp._id),
+    name: userMap[String(cp.users_id)] || String(cp.contactpersonname ?? cp.slug ?? "Unnamed College"),
   }));
 
-  function pageUrl(p: number) {
-    const qs = new URLSearchParams();
-    if (q) qs.set("q", q); if (collegeId) qs.set("collegeId", collegeId); qs.set("page", String(p));
-    return `/admin/colleges/reviews?${qs.toString()}`;
-  }
+  const cleanReviews = reviewDocs.map((r) => ({
+    id: String(r.id),
+    collegeprofile_id: String(r.collegeprofile_id),
+    college_slug: String(r.college_slug ?? ""),
+    college_name: String(r.college_name || "Unnamed College"),
+    title: String(r.title || ""),
+    description: String(r.description || ""),
+    academic: Number(r.academic || 0),
+    accommodation: Number(r.accommodation || 0),
+    faculty: Number(r.faculty || 0),
+    infrastructure: Number(r.infrastructure || 0),
+    placement: Number(r.placement || 0),
+    social: Number(r.social || 0),
+    student_name: String(r.student_name || "Anonymous Student"),
+    student_email: r.student_email ? String(r.student_email) : null,
+    created_at: r.created_at ? String(r.created_at) : null,
+    updated_at: r.updated_at ? String(r.updated_at) : null,
+    vote: Number(r.vote || 0),
+  }));
 
   return (
     <div className="p-6 space-y-6 w-full overflow-x-hidden">
-      <CollegeFilterBar colleges={collegeOptions} selectedId={collegeId} total={total} label="College Reviews" icon="reviews" description="Manage student reviews and ratings — filter by college to see classified data." />
-      <ReviewsListClient reviews={cleanReviews} colleges={collegeOptions as any} total={total} page={page} totalPages={totalPages} offset={offset} pageSize={PAGE_SIZE} q={q} collegeName={collegeName} studentName={studentName} createReview={createReview} updateReview={updateReview} deleteReview={deleteReview} />
+      <ReviewsListClient
+        reviews={cleanReviews}
+        colleges={colleges}
+        total={total}
+        page={page}
+        totalPages={totalPages}
+        offset={offset}
+        pageSize={PAGE_SIZE}
+        q={q}
+        collegeName={collegeName}
+        studentName={studentName}
+        createReview={createReview}
+        updateReview={updateReview}
+        deleteReview={deleteReview}
+      />
     </div>
   );
 }

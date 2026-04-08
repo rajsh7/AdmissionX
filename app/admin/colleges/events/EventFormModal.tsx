@@ -3,7 +3,7 @@
 import AdminModal from "@/app/admin/_components/AdminModal";
 import { useState } from "react";
 
-interface Option { id: number; name: string; }
+interface Option { id: string; name: string; }
 
 interface EventFormModalProps {
   isOpen: boolean;

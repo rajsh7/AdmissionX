@@ -1,5 +1,7 @@
 import { getDb } from "@/lib/db";
 import DashboardClient from "../_components/DashboardClient";
+import ChartsWrapper from "../_components/ChartsWrapper";
+import { Users, Building2, UserCog, MessageSquare, ArrowUpRight } from "lucide-react";
 
 // Cache dashboard data briefly to avoid expensive DB work on every request
 export const revalidate = 60;
@@ -7,152 +9,182 @@ export const revalidate = 60;
 export default async function AdminDashboardPage() {
   const db = await getDb();
 
-  // 1. Fetch KPI counts
-  const [
-    totalStudents,
-    totalColleges,
-    totalAdmins,
-    activeQueries
-  ] = await Promise.all([
-    db.collection("users").estimatedDocumentCount(),
-    db.collection("collegeprofile").estimatedDocumentCount(),
-    db.collection("next_admin_users").estimatedDocumentCount(),
-    db.collection("chatbot_sessions").countDocuments({ status: "open" }),
-  ]);
-
-  // 2. Fetch Recent Students for the Table
-  const recentStudents = await db.collection("users")
-    .find({}, { projection: { id: 1, firstname: 1, lastname: 1, email: 1, course: 1, college: 1, status: 1, created_at: 1 } })
-    .sort({ created_at: -1 })
-    .limit(5)
-    .toArray();
-
-  // 3. Fetch Recent Activity logs (mocked or retrieved if a system_logs collection exists, falling back to recent colleges/users as activity)
-  const recentColleges = await db.collection("collegeprofile")
-    .find({}, { projection: { id: 1, slug: 1, created_at: 1 } })
-    .sort({ created_at: -1 })
-    .limit(3)
-    .toArray();
-
-  const [paymentStatuses, transactionAgg] = await Promise.all([
-    db.collection("paymentstatus").find({}, { projection: { id: 1, name: 1 } }).toArray(),
-    db.collection("transaction").aggregate([
-      {
-        $lookup: {
-          from: "application",
-          localField: "application_id",
-          foreignField: "id",
-          as: "app",
-        },
-      },
-      {
-        $addFields: {
-          amount: {
-            $convert: {
-              input: {
-                $ifNull: [
-                  { $arrayElemAt: ["$app.amount_paid", 0] },
-                  {
-                    $ifNull: [
-                      { $arrayElemAt: ["$app.byafees", 0] },
-                      { $ifNull: ["$amount", 0] },
-                    ],
-                  },
-                ],
-              },
-              to: "double",
-              onError: 0,
-              onNull: 0,
-            },
-          },
-        },
-      },
-      { $group: { _id: "$paymentstatus_id", count: { $sum: 1 }, amount: { $sum: "$amount" } } },
-    ]).toArray(),
-  ]);
-
-  const statusNameMap = new Map(
-    paymentStatuses.map((s) => [String(s.id), s.name || String(s.id)])
-  );
-
-  const transactionPieRaw = transactionAgg.map((t: any) => ({
-    name: statusNameMap.get(String(t._id)) ?? "Unknown",
-    amount: Number(t.amount ?? 0),
-    count: Number(t.count ?? 0),
-  })).filter(p => p.count > 0);
-
-  const totalAmount = transactionPieRaw.reduce((sum, p) => sum + p.amount, 0);
-  const transactionPie = transactionPieRaw.map((p) => ({
-    ...p,
-    value: totalAmount > 0 ? p.amount : p.count,
-  }));
-
-  // Map to a common activity format
-  const recentActivity = [
-    ...recentStudents.map(s => ({
-      type: 'student',
-      message: `New student registered: ${s.firstname || 'User'}`,
-      time: s.created_at
-    })),
-    ...recentColleges.map(c => ({
-      type: 'college',
-      message: `New college profile created: ${c.slug}`,
-      time: c.created_at
-    }))
-  ].sort((a, b) => new Date(b.time || 0).getTime() - new Date(a.time || 0).getTime()).slice(0, 5);
-
-  // 4. Graph Data - real student registrations by month
   const monthsBack = 24;
   const now = new Date();
   const startMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (monthsBack - 1), 1));
 
-  const studentMonthlyAgg = await db.collection("users").aggregate([
-    {
-      $addFields: {
-        createdAt: {
-          $convert: {
-            input: "$created_at",
-            to: "date",
-            onError: null,
-            onNull: null,
+  const [
+    [totalStudents, totalColleges, totalAdmins, activeQueries],
+    recentStudents,
+    recentColleges,
+    [paymentStatuses, transactionAgg],
+    studentMonthlyAgg,
+    collegeMonthlyAgg,
+  ] = await Promise.all([
+    Promise.all([
+      db.collection("users").estimatedDocumentCount(),
+      db.collection("collegeprofile").estimatedDocumentCount(),
+      db.collection("next_admin_users").estimatedDocumentCount(),
+      db.collection("chatbot_sessions").countDocuments({ status: "open" }),
+    ]),
+    db.collection("users")
+      .find({}, {
+        projection: {
+          id: 1,
+          firstname: 1,
+          lastname: 1,
+          email: 1,
+          course: 1,
+          college: 1,
+          status: 1,
+          created_at: 1,
+        },
+      })
+      .sort({ created_at: -1 })
+      .limit(5)
+      .toArray(),
+    db.collection("collegeprofile")
+      .find({}, { projection: { id: 1, slug: 1, created_at: 1 } })
+      .sort({ created_at: -1 })
+      .limit(3)
+      .toArray(),
+    Promise.all([
+      db.collection("paymentstatus").find({}, { projection: { id: 1, name: 1 } }).toArray(),
+      db.collection("transaction").aggregate([
+        {
+          $lookup: {
+            from: "application",
+            localField: "application_id",
+            foreignField: "id",
+            as: "app",
+          },
+        },
+        {
+          $addFields: {
+            amount: {
+              $convert: {
+                input: {
+                  $ifNull: [
+                    { $arrayElemAt: ["$app.amount_paid", 0] },
+                    {
+                      $ifNull: [
+                        { $arrayElemAt: ["$app.byafees", 0] },
+                        { $ifNull: ["$amount", 0] },
+                      ],
+                    },
+                  ],
+                },
+                to: "double",
+                onError: 0,
+                onNull: 0,
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$paymentstatus_id",
+            count: { $sum: 1 },
+            amount: { $sum: "$amount" },
+          },
+        },
+      ]).toArray(),
+    ]),
+    db.collection("users").aggregate([
+      {
+        $addFields: {
+          createdAt: {
+            $convert: {
+              input: "$created_at",
+              to: "date",
+              onError: null,
+              onNull: null,
+            },
           },
         },
       },
-    },
-    { $match: { createdAt: { $ne: null, $gte: startMonth } } },
-    {
-      $group: {
-        _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
-        count: { $sum: 1 },
+      { $match: { createdAt: { $ne: null, $gte: startMonth } } },
+      {
+        $group: {
+          _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+          count: { $sum: 1 },
+        },
       },
-    },
-    { $sort: { "_id.year": 1, "_id.month": 1 } },
-  ]).toArray();
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
+    ]).toArray(),
+    db.collection("collegeprofile").aggregate([
+      {
+        $addFields: {
+          createdAt: {
+            $convert: {
+              input: "$created_at",
+              to: "date",
+              onError: null,
+              onNull: null,
+            },
+          },
+        },
+      },
+      { $match: { createdAt: { $ne: null, $gte: startMonth } } },
+      {
+        $group: {
+          _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
+    ]).toArray(),
+  ]);
 
-  const collegeMonthlyAgg = await db.collection("collegeprofile").aggregate([
-    {
-      $addFields: {
-        createdAt: {
-          $convert: {
-            input: "$created_at",
-            to: "date",
-            onError: null,
-            onNull: null,
-          },
-        },
-      },
-    },
-    { $match: { createdAt: { $ne: null, $gte: startMonth } } },
-    {
-      $group: {
-        _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
-        count: { $sum: 1 },
-      },
-    },
-    { $sort: { "_id.year": 1, "_id.month": 1 } },
-  ]).toArray();
+  const statusNameMap = new Map(
+    paymentStatuses.map((s: any) => [String(s.id), s.name || String(s.id)])
+  );
+
+  const processTransactionData = (data: any[]) => {
+    const raw = data
+      .map((t: any) => {
+        const id = t._id ? String(t._id) : "Unknown";
+        return {
+          name: statusNameMap.get(id) ?? "Unknown",
+          amount: Number(t.amount ?? 0),
+          count: Number(t.count ?? 0),
+        };
+      })
+      .filter((p: any) => p.count > 0);
+
+    const totalAmount = raw.reduce((sum: number, p: any) => sum + p.amount, 0);
+    return raw.map((p: any) => ({
+      name: p.name,
+      amount: p.amount,
+      count: p.count,
+      value: totalAmount > 0 ? p.amount : p.count,
+    }));
+  };
+
+  const studentTransactionPie = processTransactionData(transactionAgg);
+  const collegeTransactionPie = processTransactionData(transactionAgg);
+
+  // Map to a common activity format
+  const recentActivity = [
+    ...recentStudents.map((s) => ({
+      type: "student",
+      message: `New student registered: ${s.firstname || "User"}`,
+      time: s.created_at,
+    })),
+    ...recentColleges.map((c) => ({
+      type: "college",
+      message: `New college profile created: ${c.slug}`,
+      time: c.created_at,
+    })),
+  ]
+    .sort((a, b) => new Date(b.time || 0).getTime() - new Date(a.time || 0).getTime())
+    .slice(0, 5);
 
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  const studentGraphData = buildMonthlySeries(studentMonthlyAgg, startMonth, monthsBack);
+  const collegeGraphData = buildMonthlySeries(collegeMonthlyAgg, startMonth, monthsBack);
+
   function buildMonthlySeries(source: any[], start: Date, months: number) {
     const monthlyMap = new Map<string, number>();
     for (const agg of source) {
@@ -179,9 +211,6 @@ export default async function AdminDashboardPage() {
     return series;
   }
 
-  const studentGraphData = buildMonthlySeries(studentMonthlyAgg, startMonth, monthsBack);
-  const collegeGraphData = buildMonthlySeries(collegeMonthlyAgg, startMonth, monthsBack);
-
   return (
     <div className="p-8 w-full space-y-6">
       
@@ -190,6 +219,79 @@ export default async function AdminDashboardPage() {
         <h1 className="text-[25px] font-semibold text-[#3E3E3E]">Analytics Dashboard</h1>
         <p className="text-[18px] font-normal text-slate-500">Welcome back!</p>
       </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[12px] uppercase tracking-[0.24em] text-slate-400 font-semibold">Total Students</p>
+              <p className="mt-4 text-[28px] font-semibold text-slate-900">{totalStudents?.toLocaleString() || "0"}</p>
+            </div>
+            <div className="w-11 h-11 rounded-[5px] flex items-center justify-center" style={{ backgroundColor: '#FF3C3C' }}>
+              <Users className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+            </div>
+          </div>
+          <div className="mt-5 flex items-center gap-2 text-[13px] text-emerald-500 font-semibold">
+            <ArrowUpRight className="w-4 h-4" />
+            <span>+12.5% vs last month</span>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[12px] uppercase tracking-[0.24em] text-slate-400 font-semibold">Total Colleges</p>
+              <p className="mt-4 text-[28px] font-semibold text-slate-900">{totalColleges?.toLocaleString() || "0"}</p>
+            </div>
+            <div className="w-11 h-11 rounded-[5px] flex items-center justify-center" style={{ backgroundColor: '#FF3C3C' }}>
+              <Building2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+            </div>
+          </div>
+          <div className="mt-5 flex items-center gap-2 text-[13px] text-emerald-500 font-semibold">
+            <ArrowUpRight className="w-4 h-4" />
+            <span>+3 new this month</span>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[12px] uppercase tracking-[0.24em] text-slate-400 font-semibold">Total Admins</p>
+              <p className="mt-4 text-[28px] font-semibold text-slate-900">{totalAdmins?.toLocaleString() || "0"}</p>
+            </div>
+            <div className="w-11 h-11 rounded-[5px] flex items-center justify-center" style={{ backgroundColor: '#FF3C3C' }}>
+              <UserCog className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+            </div>
+          </div>
+          <div className="mt-5 flex items-center gap-2 text-[13px] text-emerald-500 font-semibold">
+            <ArrowUpRight className="w-4 h-4" />
+            <span>+12.5% new this month</span>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[12px] uppercase tracking-[0.24em] text-slate-400 font-semibold">Active Queries</p>
+              <p className="mt-4 text-[28px] font-semibold text-slate-900">{activeQueries?.toLocaleString() || "0"}</p>
+            </div>
+            <div className="w-11 h-11 rounded-[5px] flex items-center justify-center" style={{ backgroundColor: '#FF3C3C' }}>
+              <MessageSquare className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+            </div>
+          </div>
+          <div className="mt-5 flex items-center gap-2 text-[13px] text-emerald-500 font-semibold">
+            <ArrowUpRight className="w-4 h-4" />
+            <span>+12.5% new this month</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Transaction Charts */}
+      <ChartsWrapper 
+        studentTransactionPie={studentTransactionPie}
+        collegeTransactionPie={collegeTransactionPie}
+      />
 
       <DashboardClient 
         stats={{
@@ -200,7 +302,7 @@ export default async function AdminDashboardPage() {
         }}
         graphData={studentGraphData}
         collegeGraphData={collegeGraphData}
-        transactionPie={transactionPie}
+        transactionPie={[]} // Empty array since we're using separate charts above
         recentStudents={recentStudents.map(s => ({
           id: s._id.toString(),
           name: [s.firstname, s.lastname].filter(Boolean).join(" ") || s.email || "Unknown",

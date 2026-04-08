@@ -50,44 +50,66 @@ export default async function CollegeContactPage({
   const offset = (page - 1) * PAGE_SIZE;
 
   const db = await getDb();
+  const oldCollection = "request_for_create_college_accounts";
+  const newCollection = "next_college_signups";
 
-  const [oldDocs, newDocs] = await Promise.all([
-    db.collection("request_for_create_college_accounts").find({}).toArray(),
-    db.collection("next_college_signups").find({}).toArray(),
-  ]);
+  const escapeRegExp = (value: string) =>
+    value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-  let contacts: ContactRow[] = [
-    ...newDocs.map(d => ({
-      _id:          String(d._id),
-      college_name: String(d.college_name ?? "").trim(),
-      contact_name: String(d.contact_name ?? "").trim(),
-      email:        String(d.email ?? "").trim(),
-      phone:        String(d.phone ?? "").trim(),
-      _source:      "new" as const,
-    })),
-    ...oldDocs.map(d => ({
-      _id:          String(d._id),
-      college_name: String(d.collegeName ?? d.college_name ?? "").trim(),
-      contact_name: String(d.contactPersonName ?? d.contact_name ?? "").trim(),
-      email:        String(d.email ?? "").trim(),
-      phone:        String(d.phone ?? "").trim(),
-      _source:      "old" as const,
-    })),
-  ].sort((a, b) => a.college_name.localeCompare(b.college_name));
+  const buildSearchMatch = (query: string) => {
+    const regex = { $regex: escapeRegExp(query), $options: "i" };
+    return {
+      $or: [
+        { college_name: regex },
+        { contact_name: regex },
+        { email: regex },
+        { phone: regex },
+      ],
+    };
+  };
 
-  if (q) {
-    const lq = q.toLowerCase();
-    contacts = contacts.filter(c =>
-      c.college_name.toLowerCase().includes(lq) ||
-      c.contact_name.toLowerCase().includes(lq) ||
-      c.email.toLowerCase().includes(lq) ||
-      c.phone.includes(lq)
-    );
-  }
+  const normalizeNewPipeline = [
+    {
+      $project: {
+        college_name: { $ifNull: ["$college_name", ""] },
+        contact_name: { $ifNull: ["$contact_name", ""] },
+        email: { $ifNull: ["$email", ""] },
+        phone: { $ifNull: ["$phone", ""] },
+        _source: { $literal: "new" },
+      },
+    },
+  ];
 
-  const total      = contacts.length;
+  const normalizeOldPipeline = [
+    {
+      $project: {
+        college_name: { $ifNull: ["$collegeName", "$college_name", ""] },
+        contact_name: { $ifNull: ["$contactPersonName", "$contact_name", ""] },
+        email: { $ifNull: ["$email", ""] },
+        phone: { $ifNull: ["$phone", ""] },
+        _source: { $literal: "old" },
+      },
+    },
+  ];
+
+  const pipeline: Record<string, unknown>[] = [
+    ...normalizeNewPipeline,
+    { $unionWith: { coll: oldCollection, pipeline: normalizeOldPipeline } },
+    ...(q ? [{ $match: buildSearchMatch(q) }] : []),
+    { $sort: { college_name: 1 } },
+    {
+      $facet: {
+        data: [{ $skip: offset }, { $limit: PAGE_SIZE }],
+        total: [{ $count: "count" }],
+      },
+    },
+  ];
+
+  const aggResult = await db.collection(newCollection).aggregate(pipeline).toArray();
+  const view = aggResult[0] ?? { data: [], total: [] };
+  const rows: ContactRow[] = (view.data ?? []) as ContactRow[];
+  const total = Number(view.total?.[0]?.count ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const rows       = contacts.slice(offset, offset + PAGE_SIZE);
 
   return (
     <div className="p-6 space-y-6 w-full max-w-none">

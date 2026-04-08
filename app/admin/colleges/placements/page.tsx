@@ -112,6 +112,12 @@ export default async function CollegePlacementsPage({
 }) {
   const sp   = await searchParams;
   const q    = (sp.q ?? "").trim();
+  const collegeId = (sp.collegeId ?? "").trim();
+  const highestCtc = (sp.highestCtc ?? "").trim();
+  const lowestCtc = (sp.lowestCtc ?? "").trim();
+  const averageCtc = (sp.averageCtc ?? "").trim();
+  const recruitingCompanies = (sp.recruitingCompanies ?? "").trim();
+  const placementInfo = (sp.placementInfo ?? "").trim();
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
@@ -124,6 +130,36 @@ export default async function CollegePlacementsPage({
       "(u.firstname LIKE ? OR pl.placementinfo LIKE ?)",
     );
     params.push(`%${q}%`, `%${q}%`);
+  }
+
+  if (collegeId) {
+    conditions.push("pl.collegeprofile_id = ?");
+    params.push(collegeId);
+  }
+
+  if (highestCtc) {
+    conditions.push("pl.ctchighest LIKE ?");
+    params.push(`%${highestCtc}%`);
+  }
+
+  if (lowestCtc) {
+    conditions.push("pl.ctclowest LIKE ?");
+    params.push(`%${lowestCtc}%`);
+  }
+
+  if (averageCtc) {
+    conditions.push("pl.ctcaverage LIKE ?");
+    params.push(`%${averageCtc}%`);
+  }
+
+  if (recruitingCompanies) {
+    conditions.push("pl.numberofrecruitingcompany LIKE ?");
+    params.push(`%${recruitingCompanies}%`);
+  }
+
+  if (placementInfo) {
+    conditions.push("pl.placementinfo LIKE ?");
+    params.push(`%${placementInfo}%`);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -163,6 +199,17 @@ export default async function CollegePlacementsPage({
 
   const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
+  const buildPageHref = (targetPage: number) => {
+    const query = new URLSearchParams({ page: String(targetPage) });
+    if (q) query.set("q", q);
+    if (collegeId) query.set("collegeId", collegeId);
+    if (highestCtc) query.set("highestCtc", highestCtc);
+    if (lowestCtc) query.set("lowestCtc", lowestCtc);
+    if (averageCtc) query.set("averageCtc", averageCtc);
+    if (recruitingCompanies) query.set("recruitingCompanies", recruitingCompanies);
+    if (placementInfo) query.set("placementInfo", placementInfo);
+    return `/admin/colleges/placements?${query.toString()}`;
+  };
 
   return (
     <div className="p-6 space-y-6 w-full">
@@ -178,6 +225,12 @@ export default async function CollegePlacementsPage({
         </div>
         <div className="flex items-center gap-3">
           <form method="GET" action="/admin/colleges/placements" className="w-full sm:w-80">
+            {collegeId ? <input type="hidden" name="collegeId" value={collegeId} /> : null}
+            {highestCtc ? <input type="hidden" name="highestCtc" value={highestCtc} /> : null}
+            {lowestCtc ? <input type="hidden" name="lowestCtc" value={lowestCtc} /> : null}
+            {averageCtc ? <input type="hidden" name="averageCtc" value={averageCtc} /> : null}
+            {recruitingCompanies ? <input type="hidden" name="recruitingCompanies" value={recruitingCompanies} /> : null}
+            {placementInfo ? <input type="hidden" name="placementInfo" value={placementInfo} /> : null}
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
               <input 
@@ -198,6 +251,13 @@ export default async function CollegePlacementsPage({
         offset={offset}
         total={total}
         pageSize={PAGE_SIZE}
+        searchQuery={q}
+        selectedCollegeId={collegeId}
+        selectedHighestCtc={highestCtc}
+        selectedLowestCtc={lowestCtc}
+        selectedAverageCtc={averageCtc}
+        selectedRecruitingCompanies={recruitingCompanies}
+        selectedPlacementInfo={placementInfo}
         onAdd={createPlacement}
         onDelete={deletePlacementRow}
       />
@@ -210,7 +270,7 @@ export default async function CollegePlacementsPage({
           </p>
           <div className="flex items-center gap-1">
             {page > 1 ? (
-              <Link href={`/admin/colleges/placements?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
+              <Link href={buildPageHref(page - 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
             ) : (
               <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
             )}
@@ -218,7 +278,7 @@ export default async function CollegePlacementsPage({
               {page} / {totalPages}
             </span>
             {page < totalPages ? (
-              <Link href={`/admin/colleges/placements?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
+              <Link href={buildPageHref(page + 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
             ) : (
               <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
             )}

@@ -62,8 +62,8 @@ export default function SportsFormModal({
               className={SELECT}
             >
               <option value="">Select a college…</option>
-              {colleges.map((c) => (
-                <option key={c.id} value={c.id}>
+              {colleges.map((c, idx) => (
+                <option key={`college-${c.id}-${idx}`} value={c.id}>
                   {c.name}
                 </option>
               ))}

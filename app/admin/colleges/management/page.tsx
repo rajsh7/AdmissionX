@@ -1,90 +1,11 @@
-import pool from "@/lib/db";
+import pool, { getDb } from "@/lib/db";
 import Link from "next/link";
-import { revalidatePath } from "next/cache";
-import { fetchCollegeOptions } from "../_components/college-options";
-import CollegeFilterBar from "../_components/CollegeFilterBar";
+import { revalidatePath, unstable_cache } from "next/cache";
 import ManagementListClient from "./ManagementListClient";
-
-// ─── Server Actions ───────────────────────────────────────────────────────────
-
-async function createManagementMember(formData: FormData) {
-  "use server";
-  const collegeprofile_id = formData.get("collegeprofile_id");
-  const name              = formData.get("name");
-  const suffix            = formData.get("suffix")      || null;
-  const designation       = formData.get("designation") || null;
-  const email             = formData.get("emailaddress") || null;
-  const phone             = formData.get("phoneno")      || null;
-  const picture           = formData.get("picture")     || null;
-
-  try {
-    await pool.query(
-      `INSERT INTO college_management_details 
-        (collegeprofile_id, name, suffix, designation, emailaddress, phoneno, picture, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      [collegeprofile_id, name, suffix, designation, email, phone, picture],
-    );
-  } catch (e) {
-    console.error("[admin/colleges/management createAction]", e);
-  }
-  revalidatePath("/admin/colleges/management");
-}
-
-async function updateManagementMember(formData: FormData) {
-  "use server";
-  const id                = formData.get("id");
-  const collegeprofile_id = formData.get("collegeprofile_id");
-  const name              = formData.get("name");
-  const suffix            = formData.get("suffix")      || null;
-  const designation       = formData.get("designation") || null;
-  const email             = formData.get("emailaddress") || null;
-  const phone             = formData.get("phoneno")      || null;
-  const picture           = formData.get("picture")     || null;
-
-  try {
-    await pool.query(
-      `UPDATE college_management_details 
-          SET collegeprofile_id = ?, name = ?, suffix = ?, designation = ?, 
-              emailaddress = ?, phoneno = ?, picture = ?, updated_at = NOW()
-        WHERE id = ?`,
-      [collegeprofile_id, name, suffix, designation, email, phone, picture, id],
-    );
-  } catch (e) {
-    console.error("[admin/colleges/management updateAction]", e);
-  }
-  revalidatePath("/admin/colleges/management");
-}
-
-async function deleteManagementRow(id: number) {
-  "use server";
-  try {
-    await pool.query("DELETE FROM college_management_details WHERE id = ?", [id]);
-  } catch (e) {
-    console.error("[admin/colleges/management deleteAction]", e);
-  }
-  revalidatePath("/admin/colleges/management");
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T >(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/colleges/management safeQuery]", err);
-    return [];
-  }
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface ManagementRow  {
+interface ManagementRow {
   id: number;
   collegeprofile_id: number;
   name: string;
@@ -96,117 +17,250 @@ interface ManagementRow  {
   college_name: string;
 }
 
-interface CountRow  {
-  total: number;
-}
-
-interface OptionRow  {
+interface OptionRow {
   id: number;
   name: string;
 }
 
-const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
-const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
+interface AggregatedManagementResult {
+  data?: Partial<ManagementRow>[];
+  total?: { total?: number }[];
+}
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+function escapeRegex(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function toStringOrNull(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  const parsed = String(value).trim();
+  return parsed ? parsed : null;
+}
+
+const getCachedCollegeOptions = unstable_cache(
+  async (): Promise<OptionRow[]> => {
+    try {
+      const db = await getDb();
+      const rows = await db
+        .collection("collegeprofile")
+        .aggregate([
+          {
+            $lookup: {
+              from: "users",
+              localField: "users_id",
+              foreignField: "id",
+              as: "user",
+            },
+          },
+          { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+          {
+            $project: {
+              _id: 0,
+              id: { $toInt: "$id" },
+              name: {
+                $trim: {
+                  input: { $ifNull: ["$user.firstname", "Unnamed College"] },
+                },
+              },
+            },
+          },
+          { $sort: { name: 1, id: 1 } },
+        ])
+        .toArray();
+
+      return rows.map((row, idx) => ({
+        id: Number(row.id) || idx + 1,
+        name: String(row.name || "Unnamed College"),
+      }));
+    } catch (error) {
+      console.error("[admin/colleges/management colleges]", error);
+      return [];
+    }
+  },
+  ["admin-colleges-management-college-options-v1"],
+  { revalidate: 300 },
+);
 
 export default async function CollegeManagementPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
-  const sp   = await searchParams;
-  const q    = (sp.q ?? "").trim();
+  const sp = await searchParams;
+  const q = (sp.q ?? "").trim();
+  const collegeId = (sp.collegeId ?? "").trim();
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Build WHERE clause ─────────────────────────────────────────────────────
-  const conditions: string[] = [];
-  const filterParams: (string | number)[] = [];
+  const db = await getDb();
+  const mgmtCollection = db.collection("college_management_details");
 
-  const collegeId = sp.collegeId ?? "";
-
-  if (q) {
-    conditions.push(
-      "(m.name LIKE ? OR m.designation LIKE ? OR u.firstname LIKE ? OR m.emailaddress LIKE ? OR m.phoneno LIKE ?)",
-    );
-    filterParams.push(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
-  }
-
+  // Build base match conditions
+  const match: any = {};
   if (collegeId) {
-    conditions.push("m.collegeprofile_id = ?");
-    filterParams.push(collegeId);
+    const collegeIdNumber = Number(collegeId);
+    if (Number.isFinite(collegeIdNumber)) {
+      match.collegeprofile_id = collegeIdNumber;
+    }
   }
 
-  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  // Get total count first
+  const total = await mgmtCollection.countDocuments(match);
 
-  // ── Fetch metadata + data ──────────────────────────────────────────────────
-  const [members, countRows, colleges, collegeOptions] = await Promise.all([
-    safeQuery<ManagementRow>(
-      `SELECT 
-        m.id,
-        m.collegeprofile_id,
-        m.name,
-        m.suffix,
-        m.designation,
-        m.emailaddress,
-        m.phoneno,
-        m.picture,
-        COALESCE(u.firstname, 'Unnamed College') as college_name
-       FROM college_management_details m
-       JOIN collegeprofile cp ON cp.id = m.collegeprofile_id
-       JOIN users u ON u.id = cp.users_id
-       ${where}
-       ORDER BY m.created_at DESC
-       LIMIT ? OFFSET ?`,
-      [...filterParams, PAGE_SIZE, offset],
-    ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total 
-       FROM college_management_details m 
-       JOIN collegeprofile cp ON cp.id = m.collegeprofile_id
-       JOIN users u ON u.id = cp.users_id
-       ${where}`,
-      filterParams,
-    ),
-    safeQuery<OptionRow>(
-      "SELECT cp.id, u.firstname AS name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
-    ),
-    fetchCollegeOptions(),
+  // Get paginated management records with minimal projection
+  const managementRecords = await mgmtCollection
+    .find(match, {
+      projection: {
+        id: 1,
+        collegeprofile_id: 1,
+        name: 1,
+        suffix: 1,
+        designation: 1,
+        emailaddress: 1,
+        phoneno: 1,
+        picture: 1,
+      }
+    })
+    .sort({ created_at: -1, id: -1 })
+    .skip(offset)
+    .limit(PAGE_SIZE)
+    .toArray();
+
+  // Get unique college IDs for batch lookup
+  const collegeIds = [...new Set(managementRecords.map(m => m.collegeprofile_id).filter(Boolean))];
+
+  // Batch lookup colleges with user data
+  const [colleges] = await Promise.all([
+    collegeIds.length > 0 ? db.collection("collegeprofile").aggregate([
+      { $match: { id: { $in: collegeIds } } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "users_id",
+          foreignField: "id",
+          as: "user",
+        },
+      },
+      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 0,
+          id: 1,
+          name: { $ifNull: ["$user.firstname", "Unnamed College"] },
+        },
+      },
+    ]).toArray() : Promise.resolve([]),
   ]);
 
-  const total = Number(countRows[0]?.total ?? 0);
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  // Create lookup map for fast access
+  const collegeMap = new Map(colleges.map(c => [c.id, c.name]));
 
-  // Deeply map to plain objects to strip hidden Buffer/Date fields from the DB shim
-  const cleanMembers = members.map((m: any, idx: number) => ({
-    id: Number(m.id) || (idx + 1),
-    collegeprofile_id: Number(m.collegeprofile_id),
-    name: String(m.name || ""),
-    suffix: String(m.suffix || ""),
-    designation: String(m.designation || ""),
-    emailaddress: String(m.emailaddress || ""),
-    phoneno: String(m.phoneno || ""),
-    picture: String(m.picture || ""),
-    college_name: String(m.college_name || "")
+  // Enrich management records with college names
+  const cleanMembers = managementRecords.map((member, idx) => ({
+    id: Number(member.id) || idx + 1,
+    collegeprofile_id: Number(member.collegeprofile_id) || 0,
+    name: toStringOrNull(member.name) || "",
+    suffix: toStringOrNull(member.suffix) || "",
+    designation: toStringOrNull(member.designation) || "",
+    emailaddress: toStringOrNull(member.emailaddress) || "",
+    phoneno: toStringOrNull(member.phoneno) || "",
+    picture: toStringOrNull(member.picture) || "",
+    college_name: collegeMap.get(member.collegeprofile_id) ?? "Unnamed College",
   }));
 
-  const cleanColleges = colleges.map((c: any, idx: number) => ({
-    id: Number(c.id) || (idx + 1),
-    name: String(c.name || "")
-  }));
+  // Handle search query
+  let finalMembers = cleanMembers;
+  let finalTotal = total;
+
+  if (q) {
+    const searchRegex = new RegExp(escapeRegex(q), "i");
+
+    // Filter already fetched records
+    const filteredMembers = cleanMembers.filter(member =>
+      searchRegex.test(member.name) ||
+      searchRegex.test(member.designation) ||
+      searchRegex.test(member.emailaddress) ||
+      searchRegex.test(member.phoneno) ||
+      searchRegex.test(member.college_name)
+    );
+
+    // If we have enough filtered results, use them
+    if (filteredMembers.length >= PAGE_SIZE) {
+      finalMembers = filteredMembers.slice(0, PAGE_SIZE);
+      finalTotal = filteredMembers.length;
+    } else {
+      // Need to search all data for accurate results
+      const allRecords = await mgmtCollection.find(match).toArray();
+
+      // Get all unique college IDs
+      const allCollegeIds = [...new Set(allRecords.map(m => m.collegeprofile_id).filter(Boolean))];
+
+      const [allColleges] = await Promise.all([
+        allCollegeIds.length > 0 ? db.collection("collegeprofile").aggregate([
+          { $match: { id: { $in: allCollegeIds } } },
+          {
+            $lookup: {
+              from: "users",
+              localField: "users_id",
+              foreignField: "id",
+              as: "user",
+            },
+          },
+          { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+          {
+            $project: {
+              _id: 0,
+              id: 1,
+              name: { $ifNull: ["$user.firstname", "Unnamed College"] },
+            },
+          },
+        ]).toArray() : Promise.resolve([]),
+      ]);
+
+      const allCollegeMap = new Map(allColleges.map(c => [c.id, c.name]));
+
+      const enrichedAllMembers = allRecords.map((member, idx) => ({
+        id: Number(member.id) || idx + 1,
+        collegeprofile_id: Number(member.collegeprofile_id) || 0,
+        name: toStringOrNull(member.name) || "",
+        suffix: toStringOrNull(member.suffix) || "",
+        designation: toStringOrNull(member.designation) || "",
+        emailaddress: toStringOrNull(member.emailaddress) || "",
+        phoneno: toStringOrNull(member.phoneno) || "",
+        picture: toStringOrNull(member.picture) || "",
+        college_name: allCollegeMap.get(member.collegeprofile_id) ?? "Unnamed College",
+      }));
+
+      const searchedMembers = enrichedAllMembers.filter(member =>
+        searchRegex.test(member.name) ||
+        searchRegex.test(member.designation) ||
+        searchRegex.test(member.emailaddress) ||
+        searchRegex.test(member.phoneno) ||
+        searchRegex.test(member.college_name)
+      );
+
+      finalMembers = searchedMembers.slice(offset, offset + PAGE_SIZE);
+      finalTotal = searchedMembers.length;
+    }
+  }
+
+  const cleanColleges = await getCachedCollegeOptions();
+  const totalPages = Math.ceil(finalTotal / PAGE_SIZE);
+  const buildPageHref = (targetPage: number) => {
+    const query = new URLSearchParams({ page: String(targetPage) });
+    if (q) query.set("q", q);
+    if (collegeId) query.set("collegeId", collegeId);
+    return `/admin/colleges/management?${query.toString()}`;
+  };
 
   return (
     <div className="p-6 space-y-6 w-full overflow-x-hidden">
-      
-      {/* ── Header Area (Search Box Match Design) ───────────────────── */}
       <div className="bg-white rounded-md border border-slate-200 shadow-sm p-6 mb-6">
         <h1 className="text-[22px] font-semibold text-slate-500 mb-8 border-b border-slate-100 pb-3">
           Search College  Management Details
         </h1>
-        
+
         <form method="GET" action="/admin/colleges/management" className="flex flex-col sm:flex-row items-start sm:items-end gap-6 sm:gap-8">
-          {/* College Name Select */}
           <div className="relative flex-1 w-full relative">
             <label className="absolute -top-2.5 left-3 bg-white px-1 text-sm font-semibold text-slate-500">
               College Name
@@ -217,9 +271,9 @@ export default async function CollegeManagementPage({
               className="w-full border border-slate-200 rounded-md px-3 py-3 text-sm text-slate-600 bg-transparent focus:outline-none focus:border-red-500 appearance-none cursor-pointer"
             >
               <option value="">Select college</option>
-              {cleanColleges.map((c, idx) => (
-                <option key={`college-opt-${c.id}-${idx}`} value={c.id}>
-                  {c.name}
+              {cleanColleges.map((college, idx) => (
+                <option key={`college-${college.id}-${idx}`} value={college.id}>
+                  {college.name}
                 </option>
               ))}
             </select>
@@ -228,7 +282,6 @@ export default async function CollegeManagementPage({
             </span>
           </div>
 
-          {/* Search Input */}
           <div className="relative flex-1 w-full">
             <label className="absolute -top-2.5 left-3 bg-white px-1 text-sm font-semibold text-slate-500">
               Search
@@ -242,7 +295,6 @@ export default async function CollegeManagementPage({
             />
           </div>
 
-          {/* Buttons */}
           <div className="flex items-center gap-4 w-full sm:w-auto h-[46px]">
             <Link
               href="/admin/colleges/management"
@@ -261,23 +313,24 @@ export default async function CollegeManagementPage({
       </div>
 
       <ManagementListClient
-        members={cleanMembers}
+        members={finalMembers}
         colleges={cleanColleges}
         offset={offset}
-        onAdd={createManagementMember}
-        onEdit={updateManagementMember}
-        onDelete={deleteManagementRow}
+        total={finalTotal}
+        page={page}
+        totalPages={totalPages}
+        search={q}
+        selectedCollegeId={collegeId}
       />
 
-      {/* ── Pagination ───────────────────────────────────────────────────── */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
           <p className="text-xs text-slate-500">
-            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> records
+            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, finalTotal)}</strong> of <strong>{finalTotal.toLocaleString()}</strong> records
           </p>
           <div className="flex items-center gap-1">
             {page > 1 ? (
-              <Link href={`/admin/colleges/management?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
+              <Link href={buildPageHref(page - 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
             ) : (
               <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
             )}
@@ -285,7 +338,7 @@ export default async function CollegeManagementPage({
               {page} / {totalPages}
             </span>
             {page < totalPages ? (
-              <Link href={`/admin/colleges/management?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
+              <Link href={buildPageHref(page + 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
             ) : (
               <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
             )}
@@ -295,7 +348,3 @@ export default async function CollegeManagementPage({
     </div>
   );
 }
-
-
-
-

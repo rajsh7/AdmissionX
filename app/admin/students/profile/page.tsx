@@ -4,7 +4,7 @@ import StudentProfileClient from "./StudentProfileClient";
 
 async function safeQuery<T>(
   sql: string,
-  params: (string | number)[] = []
+  params: (string | number)[] = [],
 ): Promise<T[]> {
   try {
     const [rows] = (await pool.query(sql, params)) as [T[], unknown];
@@ -15,29 +15,27 @@ async function safeQuery<T>(
   }
 }
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
-
 async function createProfile(formData: FormData) {
   "use server";
   const users_id = parseInt(formData.get("users_id") as string, 10);
-  const gender = formData.get("gender") as string || "Default";
-  const dateofbirth = formData.get("dateofbirth") as string || "2000-01-01";
-  const parentsname = formData.get("parentsname") as string || "";
-  const parentsnumber = formData.get("parentsnumber") as string || "";
-  const hobbies = formData.get("hobbies") as string || "";
-  const interests = formData.get("interests") as string || "";
-  const projects = formData.get("projects") as string || "";
-  const entranceexamname = formData.get("entranceexamname") as string || "";
-  const entranceexamnumber = formData.get("entranceexamnumber") as string || "";
+  const gender = (formData.get("gender") as string) || "Default";
+  const dateofbirth = (formData.get("dateofbirth") as string) || "2000-01-01";
+  const parentsname = (formData.get("parentsname") as string) || "";
+  const parentsnumber = (formData.get("parentsnumber") as string) || "";
+  const hobbies = (formData.get("hobbies") as string) || "";
+  const interests = (formData.get("interests") as string) || "";
+  const projects = (formData.get("projects") as string) || "";
+  const entranceexamname = (formData.get("entranceexamname") as string) || "";
+  const entranceexamnumber = (formData.get("entranceexamnumber") as string) || "";
 
   if (isNaN(users_id)) return;
 
   try {
     await pool.query(
-      `INSERT INTO studentprofile 
-        (users_id, gender, dateofbirth, parentsname, parentsnumber, entranceexamname, entranceexamnumber, hobbies, interests, projects, created_at, updated_at, slug) 
+      `INSERT INTO studentprofile
+        (users_id, gender, dateofbirth, parentsname, parentsnumber, entranceexamname, entranceexamnumber, hobbies, interests, projects, created_at, updated_at, slug)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)`,
-      [users_id, gender, dateofbirth, parentsname, parentsnumber, entranceexamname, entranceexamnumber, hobbies, interests, projects, `user-${users_id}-${Date.now()}`]
+      [users_id, gender, dateofbirth, parentsname, parentsnumber, entranceexamname, entranceexamnumber, hobbies, interests, projects, `user-${users_id}-${Date.now()}`],
     );
   } catch (e) {
     console.error("[admin/students/profile createProfile]", e);
@@ -63,10 +61,10 @@ async function updateProfile(formData: FormData) {
 
   try {
     await pool.query(
-      `UPDATE studentprofile SET 
+      `UPDATE studentprofile SET
         users_id = ?, gender = ?, dateofbirth = ?, parentsname = ?, parentsnumber = ?, entranceexamname = ?, entranceexamnumber = ?, hobbies = ?, interests = ?, projects = ?, updated_at = NOW()
        WHERE id = ?`,
-      [users_id, gender, dateofbirth, parentsname, parentsnumber, entranceexamname, entranceexamnumber, hobbies, interests, projects, id]
+      [users_id, gender, dateofbirth, parentsname, parentsnumber, entranceexamname, entranceexamnumber, hobbies, interests, projects, id],
     );
   } catch (e) {
     console.error("[admin/students/profile updateProfile]", e);
@@ -85,9 +83,7 @@ async function deleteProfile(id: number) {
   revalidatePath("/admin/students/profile");
 }
 
-// ─── Interfaces ───────────────────────────────────────────────────────────────
-
-interface StudentProfileRow  {
+interface StudentProfileRow {
   id: number;
   users_id: number;
   student_name: string;
@@ -105,48 +101,102 @@ interface StudentProfileRow  {
   updated_at: string;
 }
 
-interface CountRow  {
+interface CountRow {
   total: number;
 }
 
-interface UserRow  {
+interface UserRow {
   id: number;
   name: string;
   email: string;
 }
 
-export default async function StudentProfilePage() {
+const PAGE_SIZE = 25;
+
+export default async function StudentProfilePage({
+  searchParams,
+}: {
+  searchParams: Record<string, string>;
+}) {
+  const studentName = (searchParams.studentName ?? "").trim();
+  const email = (searchParams.email ?? "").trim();
+  const phoneNumber = (searchParams.phoneNumber ?? "").trim();
+  const gender = (searchParams.gender ?? "").trim();
+  const parentsname = (searchParams.parentsname ?? "").trim();
+  const page = Math.max(1, parseInt(searchParams.page ?? "1", 10) || 1);
+  const offset = (page - 1) * PAGE_SIZE;
+
+  const conditions: string[] = [];
+  const params: (string | number)[] = [];
+
+  if (studentName) {
+    conditions.push("(s.name LIKE ? OR s.email LIKE ?)");
+    params.push(`%${studentName}%`, `%${studentName}%`);
+  }
+
+  if (email) {
+    conditions.push("s.email LIKE ?");
+    params.push(`%${email}%`);
+  }
+
+  if (phoneNumber) {
+    conditions.push("sp.parentsnumber LIKE ?");
+    params.push(`%${phoneNumber}%`);
+  }
+
+  if (gender) {
+    conditions.push("sp.gender = ?");
+    params.push(gender);
+  }
+
+  if (parentsname) {
+    conditions.push("sp.parentsname LIKE ?");
+    params.push(`%${parentsname}%`);
+  }
+
+  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+
   const [profiles, countRows, users] = await Promise.all([
     safeQuery<StudentProfileRow>(
       `SELECT sp.*, s.name as student_name, s.email as student_email
        FROM studentprofile sp
        LEFT JOIN next_student_signups s ON sp.users_id = s.id
-       ORDER BY sp.created_at DESC`
+       ${where}
+       ORDER BY sp.created_at DESC
+       LIMIT ? OFFSET ?`,
+      [...params, PAGE_SIZE, offset],
     ),
     safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total 
+      `SELECT COUNT(*) AS total
        FROM studentprofile sp
-       LEFT JOIN next_student_signups s ON sp.users_id = s.id`
+       LEFT JOIN next_student_signups s ON sp.users_id = s.id
+       ${where}`,
+      params,
     ),
-    safeQuery<UserRow>(`SELECT id, name, email FROM next_student_signups ORDER BY name ASC LIMIT 1000`)
+    safeQuery<UserRow>(
+      `SELECT id, name, email FROM next_student_signups ORDER BY name ASC LIMIT 1000`,
+    ),
   ]);
 
-  const total = Number(countRows[0]?.total ?? profiles.length);
+  const total = Number(countRows[0]?.total ?? 0);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className="p-6 space-y-6 w-full">
-      <StudentProfileClient 
+      <StudentProfileClient
         profiles={JSON.parse(JSON.stringify(profiles))}
         users={JSON.parse(JSON.stringify(users))}
         total={total}
-        totalPages={1}
+        page={page}
+        totalPages={totalPages}
+        selectedStudentName={studentName}
+        selectedEmail={email}
+        selectedPhoneNumber={phoneNumber}
+        selectedGender={gender}
+        selectedParentsName={parentsname}
         createProfile={createProfile}
         deleteProfile={deleteProfile}
       />
     </div>
   );
 }
-
-
-
-

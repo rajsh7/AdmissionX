@@ -215,61 +215,115 @@ export default async function AdminCollegesPage({
     } as CollegeRow;
   }
 
-  const [oldDocs, newDocs] = await Promise.all([
-    db.collection("request_for_create_college_accounts").find({}).toArray(),
-    db.collection("next_college_signups").find({}).toArray(),
-  ]);
+  const oldCollection = "request_for_create_college_accounts";
+  const newCollection = "next_college_signups";
 
-  let allDocs: CollegeRow[] = [
-    ...newDocs.map(d => normalizeNew(d as Record<string, unknown>)),
-    ...oldDocs.map(d => normalizeOld(d as Record<string, unknown>)),
+  const escapeRegExp = (value: string) =>
+    value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  const buildSearchMatch = (query: string) => {
+    const regex = { $regex: escapeRegExp(query), $options: "i" };
+    return {
+      $or: [
+        { college_name: regex },
+        { email: regex },
+        { contact_name: regex },
+        { phone: regex },
+      ],
+    };
+  };
+
+  const normalizeNewPipeline = [
+    {
+      $project: {
+        college_name: { $ifNull: ["$college_name", ""] },
+        email: { $ifNull: ["$email", ""] },
+        contact_name: { $ifNull: ["$contact_name", ""] },
+        phone: { $ifNull: ["$phone", ""] },
+        status: { $ifNull: ["$status", "pending"] },
+        created_at: "$created_at",
+        updated_at: "$updated_at",
+        _source: { $literal: "new" },
+      },
+    },
   ];
 
-  // Apply search filter
-  if (q) {
-    try {
-      const re = new RegExp(q, "i");
-      allDocs = allDocs.filter(c =>
-        re.test(c.college_name) || re.test(c.email) || re.test(c.contact_name) || re.test(c.phone)
-      );
-    } catch {
-      // invalid regex — fall back to plain string match
-      const lq = q.toLowerCase();
-      allDocs = allDocs.filter(c =>
-        c.college_name.toLowerCase().includes(lq) ||
-        c.email.toLowerCase().includes(lq) ||
-        c.contact_name.toLowerCase().includes(lq) ||
-        c.phone.toLowerCase().includes(lq)
-      );
-    }
-  }
-  if (status !== "all") {
-    allDocs = allDocs.filter(c => c.status === status);
-  }
-
-  // Status counts (from full unfiltered set)
-  const allNormalized: CollegeRow[] = [
-    ...newDocs.map(d => normalizeNew(d as Record<string, unknown>)),
-    ...oldDocs.map(d => normalizeOld(d as Record<string, unknown>)),
+  const normalizeOldPipeline = [
+    {
+      $project: {
+        college_name: { $ifNull: ["$collegeName", "$college_name", ""] },
+        email: { $ifNull: ["$email", ""] },
+        contact_name: { $ifNull: ["$contactPersonName", "$contact_name", ""] },
+        phone: { $ifNull: ["$phone", ""] },
+        status: {
+          $switch: {
+            branches: [
+              { case: { $eq: ["$status", "1"] }, then: "approved" },
+              { case: { $eq: ["$status", "0"] }, then: "rejected" },
+            ],
+            default: "pending",
+          },
+        },
+        created_at: "$created_at",
+        updated_at: "$updated_at",
+        _source: { $literal: "old" },
+      },
+    },
   ];
-  const statusCounts = { pending: 0, approved: 0, rejected: 0 };
-  for (const c of allNormalized) {
-    if (c.status in statusCounts) statusCounts[c.status as keyof typeof statusCounts]++;
-  }
-  const grandTotal = allNormalized.length;
 
-  // Sort: pending first, then approved, then rejected; newest first within each
-  const STATUS_ORDER: Record<string, number> = { pending: 0, approved: 1, rejected: 2 };
-  allDocs.sort((a, b) => {
-    const sa = STATUS_ORDER[a.status] ?? 3;
-    const sb = STATUS_ORDER[b.status] ?? 3;
-    if (sa !== sb) return sa - sb;
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-  });
+  const filters: Record<string, unknown>[] = [];
+  if (q) filters.push({ $match: buildSearchMatch(q) });
+  if (status !== "all") filters.push({ $match: { status } });
 
-  const total      = allDocs.length;
+  const aggregationPipeline = [
+    ...normalizeNewPipeline,
+    { $unionWith: { coll: oldCollection, pipeline: normalizeOldPipeline } },
+    ...filters,
+    {
+      $addFields: {
+        statusOrder: {
+          $switch: {
+            branches: [
+              { case: { $eq: ["$status", "pending"] }, then: 0 },
+              { case: { $eq: ["$status", "approved"] }, then: 1 },
+              { case: { $eq: ["$status", "rejected"] }, then: 2 },
+            ],
+            default: 3,
+          },
+        },
+      },
+    },
+    { $sort: { statusOrder: 1, created_at: -1 } },
+    {
+      $facet: {
+        data: [{ $skip: offset }, { $limit: PAGE_SIZE }],
+        total: [{ $count: "count" }],
+      },
+    },
+  ];
+
+  const aggResult = await db.collection(newCollection).aggregate(aggregationPipeline).toArray();
+  const view = aggResult[0] ?? { data: [], total: [] };
+  const colleges: CollegeRow[] = (view.data ?? []) as CollegeRow[];
+  const total = Number(view.total?.[0]?.count ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const colleges   = allDocs.slice(offset, offset + PAGE_SIZE);
+
+  const [pendingOldCount, approvedOldCount, rejectedOldCount, pendingNewCount, approvedNewCount, rejectedNewCount] =
+    await Promise.all([
+      db.collection(oldCollection).countDocuments({ $nor: [{ status: "1" }, { status: "0" }] }),
+      db.collection(oldCollection).countDocuments({ status: { $in: ["1", "1 "] } }),
+      db.collection(oldCollection).countDocuments({ status: { $in: ["0", "0 "] } }),
+      db.collection(newCollection).countDocuments({ status: "pending" }),
+      db.collection(newCollection).countDocuments({ status: "approved" }),
+      db.collection(newCollection).countDocuments({ status: "rejected" }),
+    ]);
+
+  const statusCounts = {
+    pending: pendingOldCount + pendingNewCount,
+    approved: approvedOldCount + approvedNewCount,
+    rejected: rejectedOldCount + rejectedNewCount,
+  };
+  const grandTotal = pendingOldCount + approvedOldCount + rejectedOldCount + pendingNewCount + approvedNewCount + rejectedNewCount;
 
   // ── URL builder ────────────────────────────────────────────────────────────
   function buildUrl(overrides: Record<string, string | number>) {

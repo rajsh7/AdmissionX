@@ -6,11 +6,39 @@ import StudentProfileFormModal from "./StudentProfileFormModal";
 import { formatDate } from "@/lib/utils";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 
+interface StudentProfileRow {
+  id: number;
+  users_id: number;
+  student_name: string;
+  student_email: string;
+  gender: string;
+  dateofbirth: string;
+  parentsname: string;
+  parentsnumber: string;
+  entranceexamname?: string;
+  entranceexamnumber?: string;
+  hobbies?: string;
+  interests?: string;
+  projects?: string;
+}
+
+interface UserOption {
+  id: number;
+  name: string;
+  email: string;
+}
+
 interface StudentProfileClientProps {
-  profiles: any[];
-  users: any[];
+  profiles: StudentProfileRow[];
+  users: UserOption[];
   total: number;
+  page: number;
   totalPages: number;
+  selectedStudentName?: string;
+  selectedEmail?: string;
+  selectedPhoneNumber?: string;
+  selectedGender?: string;
+  selectedParentsName?: string;
   createProfile: (data: FormData) => Promise<void>;
   deleteProfile: (id: number) => Promise<void>;
 }
@@ -19,40 +47,136 @@ export default function StudentProfileClient({
   profiles,
   users,
   total,
+  page,
   totalPages,
+  selectedStudentName = "",
+  selectedEmail = "",
+  selectedPhoneNumber = "",
+  selectedGender = "",
+  selectedParentsName = "",
   createProfile,
   deleteProfile,
 }: StudentProfileClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(
+    Boolean(
+      selectedStudentName ||
+        selectedEmail ||
+        selectedPhoneNumber ||
+        selectedGender ||
+        selectedParentsName,
+    ),
+  );
 
-  function openAddModal() {
-    setIsModalOpen(true);
-  }
-
-  const start = total > 0 ? 1 : 0;
-  const end = Math.min(profiles.length, total || profiles.length);
+  const start = total > 0 ? (page - 1) * 25 + 1 : 0;
+  const end = Math.min(page * 25, total);
 
   const formatPhone = (val: string | null | undefined) => {
     if (!val) return "-";
     return val.startsWith("+") ? val : `+91 ${val}`;
   };
 
+  const buildPageHref = (targetPage: number) => {
+    const query = new URLSearchParams({ page: String(targetPage) });
+    if (selectedStudentName) query.set("studentName", selectedStudentName);
+    if (selectedEmail) query.set("email", selectedEmail);
+    if (selectedPhoneNumber) query.set("phoneNumber", selectedPhoneNumber);
+    if (selectedGender) query.set("gender", selectedGender);
+    if (selectedParentsName) query.set("parentsname", selectedParentsName);
+    return `/admin/students/profile?${query.toString()}`;
+  };
+
   return (
     <>
-      {/* Tabs */}
-      <div className="flex items-center justify-end gap-2 mb-0 mt-2 px-2">
+      <div className="flex justify-end mb-4">
         <button
-          onClick={openAddModal}
-          className="flex items-center gap-2 bg-admin-blue text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-600 transition-colors shadow-sm whitespace-nowrap"
+          type="button"
+          onClick={() => setShowFilters((value) => !value)}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-all"
         >
-          <span className="material-symbols-outlined text-[18px]">add_circle</span>
-          Add Profile
+          <span className="material-symbols-outlined text-[18px]">filter_alt</span>
+          Filters
         </button>
       </div>
 
-      {/* Table (matches profile information table style) */}
+      {showFilters && (
+        <form method="GET" action="/admin/students/profile" className="bg-white border border-slate-200 rounded-2xl shadow-sm mb-4 p-4">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Student Name</label>
+              <input
+                type="text"
+                name="studentName"
+                defaultValue={selectedStudentName}
+                placeholder="Enter student name here"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Email Address</label>
+              <input
+                type="email"
+                name="email"
+                defaultValue={selectedEmail}
+                placeholder="Enter user email address here"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Phone Number</label>
+              <input
+                type="text"
+                name="phoneNumber"
+                defaultValue={selectedPhoneNumber}
+                placeholder="Enter user phone number here"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Parents Name</label>
+              <input
+                type="text"
+                name="parentsname"
+                defaultValue={selectedParentsName}
+                placeholder="Enter parents name here"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Gender</label>
+              <select
+                name="gender"
+                defaultValue={selectedGender}
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+                <option value="Default">Default</option>
+              </select>
+            </div>
+          </div>
+          <div className="mt-4 flex gap-2 sm:justify-end">
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-all"
+            >
+              Apply
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowFilters(false)}
+              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all"
+            >
+              Close
+            </button>
+          </div>
+        </form>
+      )}
+
       <div className="bg-white">
-        {/* Table header info */}
         <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
           <p className="text-sm text-slate-500 font-medium">
             {total > 0 ? (
@@ -173,7 +297,7 @@ export default function StudentProfileClient({
                     <div className="flex flex-row items-center justify-end gap-1.5">
                       <Link
                         href={`/admin/students/profile/${profile.id}`}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors shadow-sm"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-[11px] font-bold hover:bg-slate-100 transition-colors shadow-sm"
                         title="Edit profile"
                       >
                         <span className="material-symbols-outlined text-[13px]">
@@ -201,6 +325,41 @@ export default function StudentProfileClient({
           </table>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
+          <p className="text-xs text-slate-500">
+            Showing <strong>{start}</strong>-<strong>{end}</strong> of <strong>{total.toLocaleString()}</strong> profiles
+          </p>
+          <div className="flex items-center gap-2">
+            {page > 1 ? (
+              <Link
+                href={buildPageHref(page - 1)}
+                className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Prev
+              </Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg">
+                Prev
+              </span>
+            )}
+            <span className="text-xs text-slate-500">Page {page} of {totalPages}</span>
+            {page < totalPages ? (
+              <Link
+                href={buildPageHref(page + 1)}
+                className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Next
+              </Link>
+            ) : (
+              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg">
+                Next
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       <StudentProfileFormModal
         isOpen={isModalOpen}

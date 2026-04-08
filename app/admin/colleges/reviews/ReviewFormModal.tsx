@@ -3,7 +3,7 @@
 import AdminModal from "@/app/admin/_components/AdminModal";
 import { useState } from "react";
 
-interface CollegeOption { id: number; name: string; }
+interface CollegeOption { id: string; name: string; }
 
 interface ReviewFormModalProps {
   isOpen: boolean;
@@ -71,7 +71,7 @@ export default function ReviewFormModal({ isOpen, onClose, onSubmit, review, col
                 ) : (
                   <option value="" disabled style={{ color: "black" }}>No colleges found in database</option>
                 )}
-                {review && colleges && !colleges.find(c => c.id === parseInt(review.collegeprofile_id)) && (
+                {review && colleges && !colleges.find(c => c.id === review.collegeprofile_id) && (
                   <option value={review.collegeprofile_id} style={{ color: "black" }}>{review.college_name}</option>
                 )}
               </select>

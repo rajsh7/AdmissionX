@@ -65,8 +65,8 @@ export default function FacultyFormModal({ isOpen, onClose, onSubmit, faculty, c
             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm appearance-none"
           >
             <option value="">Select a College</option>
-            {colleges?.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+            {colleges?.map((c, idx) => (
+              <option key={`college-${c.id}-${idx}`} value={c.id}>{c.name}</option>
             ))}
             {faculty && colleges && !colleges.find(c => c.id === parseInt(faculty.collegeprofile_id)) && (
               <option value={faculty.collegeprofile_id}>{faculty.college_name}</option>

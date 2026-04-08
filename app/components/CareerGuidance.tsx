@@ -7,7 +7,7 @@ export default function CareerGuidance() {
     <section className="w-full py-16 lg:py-24 bg-white overflow-hidden">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
         <div
-          className="relative rounded-[20px] pt-8 px-8 lg:pt-16 lg:px-16 pb-0 flex flex-col lg:flex-row items-center lg:items-stretch gap-12 border border-slate-300 overflow-hidden bg-white"
+          className="relative rounded-[5px] pt-8 px-8 lg:pt-16 lg:px-16 pb-0 flex flex-col lg:flex-row items-center lg:items-stretch gap-12 border border-slate-300 overflow-hidden bg-white"
           style={{ boxShadow: '0px 20px 50px rgba(0, 0, 0, 0.15)' }}
         >
 

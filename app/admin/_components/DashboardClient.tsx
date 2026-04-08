@@ -53,7 +53,6 @@ export default function DashboardClient({
   const [openMenu, setOpenMenu] = useState<"student" | "college" | null>(null);
   const studentMonthRef = useRef<HTMLDivElement | null>(null);
   const collegeMonthRef = useRef<HTMLDivElement | null>(null);
-  const [selectedPie, setSelectedPie] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -185,87 +184,10 @@ export default function DashboardClient({
         ))}
       </div>
 
-      {/* Transactions Pie */}
-      <div className="bg-white rounded-[5px] border border-slate-100 shadow-sm p-6 w-full lg:w-1/2">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-[20px] font-bold text-slate-800">Transactions Overview</h2>
-        </div>
-        <div className="h-[260px] w-full">
-          {isMounted ? (
-            transactionPie?.length ? (
-              <div className="flex items-center gap-6 h-full w-full">
-                <div className="flex flex-col gap-3 w-1/2">
-                  {transactionPie.map((p, i) => {
-                    const isSelected = selectedPie === p.name;
-                    return (
-                      <button
-                        key={p.name}
-                        type="button"
-                        onClick={() => setSelectedPie(isSelected ? null : p.name)}
-                        className={`flex items-center gap-2 text-xs font-semibold rounded-full px-3 py-1.5 transition-colors w-fit ${
-                          isSelected ? "bg-black text-white" : "text-slate-600 hover:bg-slate-100"
-                        }`}
-                      >
-                        <span
-                          className="w-2.5 h-2.5 rounded-full"
-                          style={{ background: pieColors[i % pieColors.length] }}
-                        />
-                        {p.name}{" "}
-                        <span className={isSelected ? "text-white/80" : "text-slate-400"}>
-                          {fmtCurrency(Number(p.amount ?? p.value ?? 0))} · {p.count?.toLocaleString?.() ?? p.count}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="w-1/2 flex justify-end items-center h-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={transactionPie}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={60}
-                        outerRadius={95}
-                        paddingAngle={2}
-                      >
-                        {transactionPie.map((entry, idx) => (
-                          <Cell key={`cell-${entry.name}-${idx}`} fill={pieColors[idx % pieColors.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        content={({ active, payload }) => {
-                          if (active && payload && payload.length) {
-                            const item = payload[0]?.payload as (PiePoint & { amount?: number }) | undefined;
-                            return (
-                              <div className="bg-[#1F2937] text-white px-3 py-1.5 rounded shadow-xl text-[11px] font-bold">
-                                {item?.name}: {fmtCurrency(Number(item?.amount ?? item?.value ?? 0))} · {item?.count ?? 0}
-                              </div>
-                            );
-                          }
-                          return null;
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            ) : (
-              <div className="h-full w-full flex items-center justify-center text-slate-400 text-sm">
-                No transactions yet.
-              </div>
-            )
-          ) : (
-            <div className="h-full w-full bg-slate-50 animate-pulse rounded-[5px]" />
-          )}
-        </div>
-        {null}
-      </div>
-
       {/* Main Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Student Registration */}
-        <div className="bg-white rounded-[5px] border border-slate-100 shadow-sm p-6 relative min-h-[520px]">
+        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6 relative min-h-[520px]">
           <div className="flex justify-between items-center mb-10 overflow-visible">
             <h2 className="text-[25px] font-semibold text-slate-800">Student Registration</h2>
             <div className="relative" ref={studentMonthRef}>
@@ -375,7 +297,7 @@ export default function DashboardClient({
         </div>
 
         {/* College Registration */}
-        <div className="bg-white rounded-[5px] border border-slate-100 shadow-sm p-6 relative min-h-[520px]">
+        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6 relative min-h-[520px]">
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-[20px] font-bold text-slate-800">College Registration</h2>
             <div className="relative" ref={collegeMonthRef}>
@@ -477,7 +399,7 @@ export default function DashboardClient({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Student Registration Table */}
-        <div className="bg-white rounded-[5px] border border-slate-100 shadow-sm lg:col-span-2 overflow-hidden flex flex-col pt-6 px-6 pb-2">
+        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md lg:col-span-2 overflow-hidden flex flex-col pt-6 px-6 pb-2">
           <div className="flex justify-between items-center mb-6">
           <h2 className="text-[25px] font-semibold text-slate-800">Student Registration</h2>
             <Link href="/admin/students/profile" className="text-[13px] font-bold text-slate-400 hover:text-slate-600">
@@ -516,7 +438,7 @@ export default function DashboardClient({
         </div>
 
         {/* Recent Activity List */}
-        <div className="bg-white rounded-[5px] border border-slate-100 shadow-sm flex flex-col p-6 min-h-[520px]">
+        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md flex flex-col p-6 min-h-[520px]">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-[25px] font-semibold text-slate-800">Recent Activity</h2>
           </div>

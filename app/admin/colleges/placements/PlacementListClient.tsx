@@ -24,6 +24,13 @@ interface PlacementListClientProps {
   offset: number;
   total: number;
   pageSize: number;
+  searchQuery?: string;
+  selectedCollegeId?: string;
+  selectedHighestCtc?: string;
+  selectedLowestCtc?: string;
+  selectedAverageCtc?: string;
+  selectedRecruitingCompanies?: string;
+  selectedPlacementInfo?: string;
   onAdd: (formData: FormData) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
 }
@@ -34,10 +41,28 @@ export default function PlacementListClient({
   offset,
   total,
   pageSize,
+  searchQuery = "",
+  selectedCollegeId = "",
+  selectedHighestCtc = "",
+  selectedLowestCtc = "",
+  selectedAverageCtc = "",
+  selectedRecruitingCompanies = "",
+  selectedPlacementInfo = "",
   onAdd,
   onDelete,
 }: PlacementListClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(
+    Boolean(
+      searchQuery ||
+        selectedCollegeId ||
+        selectedHighestCtc ||
+        selectedLowestCtc ||
+        selectedAverageCtc ||
+        selectedRecruitingCompanies ||
+        selectedPlacementInfo,
+    ),
+  );
 
   function openAdd() {
     setIsModalOpen(true);
@@ -52,14 +77,121 @@ export default function PlacementListClient({
 
   return (
     <>
-      <div className="flex justify-start mb-4">
-        <button
-          onClick={openAdd}
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
-        >
-          Add placement stats +
-        </button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-end mb-4">
+        <div className="flex flex-col gap-2 sm:items-end">
+          <button
+            type="button"
+            onClick={() => setShowFilters((value) => !value)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-all"
+          >
+            <span className="material-symbols-outlined text-[18px]">filter_alt</span>
+            Filters
+          </button>
+          <button
+            onClick={openAdd}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
+          >
+            Add new placement +
+          </button>
+        </div>
       </div>
+
+      {showFilters && (
+        <form method="GET" action="/admin/colleges/placements" className="bg-white border border-slate-200 rounded-2xl shadow-sm mb-4 p-4">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Search</label>
+              <input
+                type="text"
+                name="q"
+                defaultValue={searchQuery}
+                placeholder="Search college or placement info"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">College</label>
+              <select
+                name="collegeId"
+                defaultValue={selectedCollegeId}
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              >
+                <option value="">All colleges</option>
+                {colleges.map((college) => (
+                  <option key={college.id} value={college.id}>
+                    {college.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Highest CTC</label>
+              <input
+                type="text"
+                name="highestCtc"
+                defaultValue={selectedHighestCtc}
+                placeholder="e.g. 4500000"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Lowest CTC</label>
+              <input
+                type="text"
+                name="lowestCtc"
+                defaultValue={selectedLowestCtc}
+                placeholder="e.g. 400000"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Average CTC</label>
+              <input
+                type="text"
+                name="averageCtc"
+                defaultValue={selectedAverageCtc}
+                placeholder="e.g. 1200000"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Recruiting Companies</label>
+              <input
+                type="text"
+                name="recruitingCompanies"
+                defaultValue={selectedRecruitingCompanies}
+                placeholder="e.g. 150"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+            <div className="md:col-span-2 xl:col-span-3">
+              <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Placement Info</label>
+              <input
+                type="text"
+                name="placementInfo"
+                defaultValue={selectedPlacementInfo}
+                placeholder="Search placement notes"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
+          </div>
+          <div className="mt-4 flex gap-2 sm:justify-end">
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-all"
+            >
+              Apply
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowFilters(false)}
+              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all"
+            >
+              Close
+            </button>
+          </div>
+        </form>
+      )}
 
       <div className="bg-white">
         <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
@@ -170,7 +302,7 @@ export default function PlacementListClient({
                     <div className="flex flex-row items-center justify-end gap-1.5">
                       <Link
                         href={`/admin/colleges/placements/${p.id}`}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors shadow-sm"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition-colors shadow-sm"
                         title="Edit placement"
                       >
                         <span className="material-symbols-outlined text-[13px]">

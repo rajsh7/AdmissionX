@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import AdminModal from "@/app/admin/_components/AdminModal";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import ManagementFormModal from "./ManagementFormModal";
 import Image from "next/image";
+import { createManagementMember, updateManagementMember, deleteManagementRow } from "./actions";
 
 interface Option { id: number; name: string; }
 
@@ -24,9 +24,11 @@ interface ManagementListClientProps {
   members: ManagementRow[];
   colleges: Option[];
   offset: number;
-  onAdd: (formData: FormData) => Promise<void>;
-  onEdit: (formData: FormData) => Promise<void>;
-  onDelete: (id: number) => Promise<void>;
+  total: number;
+  page: number;
+  totalPages: number;
+  search?: string;
+  selectedCollegeId?: string;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -35,9 +37,11 @@ export default function ManagementListClient({
   members,
   colleges,
   offset,
-  onAdd,
-  onEdit,
-  onDelete,
+  total,
+  page,
+  totalPages,
+  search = "",
+  selectedCollegeId = "",
 }: ManagementListClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<ManagementRow | null>(null);
@@ -59,14 +63,12 @@ export default function ManagementListClient({
 
   return (
     <>
-      {/* Add button */}
-      <div className="flex justify-end mb-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end mb-4">
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/25 transition-all"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#3E3E3E] hover:bg-[#2a2a2a] text-white font-semibold rounded-[5px] shadow-lg transition-all text-base"
         >
-          <span className="material-symbols-rounded text-[20px]" style={ICO_FILL}>add_circle</span>
-          Add Management Member
+          Add management member +
         </button>
       </div>
 
@@ -107,7 +109,10 @@ export default function ManagementListClient({
                             src={m.picture ? (m.picture.startsWith('http') ? m.picture : `https://admin.admissionx.in/uploads/${m.picture}`) : '/placeholder.png'}
                             alt={m.name}
                             fill
+                            sizes="40px"
                             className="object-cover"
+                            loading="lazy"
+                            unoptimized={Boolean(m.picture)}
                           />
                         </div>
                         <div className="flex flex-col min-w-0">
@@ -137,7 +142,7 @@ export default function ManagementListClient({
                         >
                           <span className="material-symbols-rounded text-[18px]">edit</span>
                         </button>
-                        <DeleteButton action={onDelete.bind(null, m.id)} size="sm" />
+                        <DeleteButton action={deleteManagementRow.bind(null, m.id)} size="sm" />
                       </div>
                     </td>
                   </tr>
@@ -151,7 +156,7 @@ export default function ManagementListClient({
       <ManagementFormModal
         isOpen={isModalOpen}
         onClose={closeModal}
-        onSubmit={editingMember ? onEdit : onAdd}
+        onSubmit={editingMember ? updateManagementMember : createManagementMember}
         member={editingMember}
         colleges={colleges}
       />

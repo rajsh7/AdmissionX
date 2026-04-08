@@ -220,7 +220,7 @@ export default function Footer() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {STATS.map((stat) => (
                     <div key={stat.label}
-                      className="rounded-xl border border-white/8 p-4 text-center"
+                      className="rounded-xl p-4 text-center"
                       style={{ background: "rgba(255,255,255,0.03)" }}>
                       <span className="material-symbols-outlined text-primary text-[22px] block mb-2"
                         style={{ fontVariationSettings: "'FILL' 1" }}>{stat.icon}</span>
@@ -234,7 +234,7 @@ export default function Footer() {
               {/* Mission + Vision */}
               <FadeIn>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="rounded-xl border border-white/8 p-5" style={{ background: "rgba(255,60,60,0.04)" }}>
+                  <div className="rounded-xl p-5" style={{ background: "rgba(255,60,60,0.04)" }}>
                     <div className="flex items-center gap-2 mb-3">
                       <span className="material-symbols-outlined text-primary text-[18px]"
                         style={{ fontVariationSettings: "'FILL' 1" }}>target</span>
@@ -244,7 +244,7 @@ export default function Footer() {
                       To democratise access to quality education information for every student in India — making the admission process transparent, simple, and student-first.
                     </p>
                   </div>
-                  <div className="rounded-xl border border-white/8 p-5" style={{ background: "rgba(255,255,255,0.02)" }}>
+                  <div className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.02)" }}>
                     <div className="flex items-center gap-2 mb-3">
                       <span className="material-symbols-outlined text-amber-400 text-[18px]"
                         style={{ fontVariationSettings: "'FILL' 1" }}>visibility</span>

@@ -87,7 +87,7 @@ export default function TopCourse() {
           <div className="mb-16">
             <div className="flex items-center justify-between gap-12 mb-6">
               <h2 className="text-[40px] lg:text-[68px] font-semibold text-slate-900 tracking-tight leading-[1.1]">
-                Discover the Top <span style={{ color: '#DD8D8F' }}>Course</span>
+                Discover the Top <span style={{ color: '#FF3C3C' }}>Course</span>
               </h2>
               <Link href="/careers-courses" className="px-8 py-3.5 rounded-[10px] bg-white border border-slate-100 shadow-sm text-slate-600 font-normal text-sm hover:bg-slate-50 transition-all active:scale-95 whitespace-nowrap">
                 View All Course

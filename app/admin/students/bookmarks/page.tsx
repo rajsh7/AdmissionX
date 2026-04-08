@@ -123,6 +123,8 @@ export default async function StudentBookmarksPage({
 }) {
   const sp = await searchParams;
   const q = (sp.q ?? "").trim();
+  const studentId = (sp.studentId ?? "").trim();
+  const typeId = (sp.typeId ?? "").trim();
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
@@ -130,8 +132,18 @@ export default async function StudentBookmarksPage({
   const params: (string | number)[] = [];
 
   if (q) {
-    conditions.push("(s.name LIKE ? OR s.email LIKE ? OR b.title LIKE ?)");
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`);
+    conditions.push("(s.name LIKE ? OR s.email LIKE ? OR b.title LIKE ? OR b.url LIKE ?)");
+    params.push(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
+  }
+
+  if (studentId) {
+    conditions.push("b.student_id = ?");
+    params.push(studentId);
+  }
+
+  if (typeId) {
+    conditions.push("b.bookmarktypeinfo_id = ?");
+    params.push(typeId);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -171,7 +183,10 @@ export default async function StudentBookmarksPage({
         PAGE_SIZE={PAGE_SIZE}
         total={total}
         totalPages={totalPages}
+        page={page}
         q={q}
+        selectedStudentId={studentId}
+        selectedTypeId={typeId}
         createBookmark={createBookmark}
         deleteBookmark={deleteBookmark}
       />

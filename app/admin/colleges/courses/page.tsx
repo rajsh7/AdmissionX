@@ -1,6 +1,6 @@
 import pool, { getDb } from "@/lib/db";
 import Link from "next/link";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 import CourseListClient from "./CourseListClient";
 
 async function createCourse(formData: FormData) {
@@ -71,6 +71,73 @@ function toStringOrNull(value: unknown): string | null {
   return parsed ? parsed : null;
 }
 
+// Cached option loaders
+const getCachedCourseOptions = unstable_cache(
+  async (): Promise<Array<{ id: number; name: string }>> => {
+    const db = await getDb();
+    return db.collection<{ id: number; name: string }>("course")
+      .find({}, { projection: { id: 1, name: 1, _id: 0 } })
+      .sort({ name: 1 })
+      .toArray();
+  },
+  ["admin-colleges-courses-options"],
+  { revalidate: 300 } // Cache for 5 minutes
+);
+
+const getCachedDegreeOptions = unstable_cache(
+  async (): Promise<Array<{ id: number; name: string }>> => {
+    const db = await getDb();
+    return db.collection<{ id: number; name: string }>("degree")
+      .find({}, { projection: { id: 1, name: 1, _id: 0 } })
+      .sort({ name: 1 })
+      .toArray();
+  },
+  ["admin-colleges-degrees-options"],
+  { revalidate: 300 }
+);
+
+const getCachedStreamOptions = unstable_cache(
+  async (): Promise<Array<{ id: number; name: string }>> => {
+    const db = await getDb();
+    return db.collection<{ id: number; name: string }>("functionalarea")
+      .find({}, { projection: { id: 1, name: 1, _id: 0 } })
+      .sort({ name: 1 })
+      .toArray();
+  },
+  ["admin-colleges-streams-options"],
+  { revalidate: 300 }
+);
+
+const getCachedCollegeOptions = unstable_cache(
+  async (): Promise<Array<{ id: number; name: string }>> => {
+    const db = await getDb();
+    return db.collection("collegeprofile").aggregate<{
+      id: number;
+      name: string;
+    }>([
+      {
+        $lookup: {
+          from: "users",
+          localField: "users_id",
+          foreignField: "id",
+          as: "userDoc",
+        },
+      },
+      { $unwind: { path: "$userDoc", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 0,
+          id: 1,
+          name: { $ifNull: ["$userDoc.firstname", "Unnamed College"] },
+        },
+      },
+      { $sort: { name: 1 } },
+    ]).toArray();
+  },
+  ["admin-colleges-college-options"],
+  { revalidate: 300 }
+);
+
 export default async function CollegeCoursesPage({
   searchParams,
 }: {
@@ -78,161 +145,256 @@ export default async function CollegeCoursesPage({
 }) {
   const sp = await searchParams;
   const q = (sp.q ?? "").trim();
+  const collegeId = sp.collegeId ?? "";
+  const courseId = sp.courseId ?? "";
+  const degreeId = sp.degreeId ?? "";
+  const streamId = sp.streamId ?? "";
+  const fees = (sp.fees ?? "").trim();
+  const seats = (sp.seats ?? "").trim();
+  const duration = (sp.duration ?? "").trim();
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
   const db = await getDb();
   const courseCollection = db.collection("collegemaster");
 
-  const enrichmentPipeline = [
-    {
-      $lookup: {
-        from: "course",
-        localField: "course_id",
-        foreignField: "id",
-        as: "courseDoc",
-      },
-    },
-    { $unwind: { path: "$courseDoc", preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        from: "degree",
-        localField: "degree_id",
-        foreignField: "id",
-        as: "degreeDoc",
-      },
-    },
-    { $unwind: { path: "$degreeDoc", preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        from: "functionalarea",
-        localField: "functionalarea_id",
-        foreignField: "id",
-        as: "streamDoc",
-      },
-    },
-    { $unwind: { path: "$streamDoc", preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        from: "collegeprofile",
-        localField: "collegeprofile_id",
-        foreignField: "id",
-        as: "collegeDoc",
-      },
-    },
-    { $unwind: { path: "$collegeDoc", preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        from: "users",
-        localField: "collegeDoc.users_id",
-        foreignField: "id",
-        as: "userDoc",
-      },
-    },
-    { $unwind: { path: "$userDoc", preserveNullAndEmptyArrays: true } },
-    {
-      $addFields: {
-        college_name: { $ifNull: ["$userDoc.firstname", "Unnamed College"] },
-        course_name: "$courseDoc.name",
-        degree_name: "$degreeDoc.name",
-        stream_name: "$streamDoc.name",
-      },
-    },
-  ];
+  // Build match conditions
+  const match: any = {};
+  if (collegeId) match.collegeprofile_id = Number(collegeId);
+  if (courseId) match.course_id = Number(courseId);
+  if (degreeId) match.degree_id = Number(degreeId);
+  if (streamId) match.functionalarea_id = Number(streamId);
+  if (fees) match.fees = { $regex: new RegExp(escapeRegex(fees), "i") };
+  if (seats) match.seats = { $regex: new RegExp(escapeRegex(seats), "i") };
+  if (duration) match.courseduration = { $regex: new RegExp(escapeRegex(duration), "i") };
 
-  const projectStage = {
-    $project: {
-      _id: 0,
-      id: 1,
-      collegeprofile_id: 1,
-      course_id: 1,
-      degree_id: 1,
-      functionalarea_id: 1,
-      college_name: 1,
-      course_name: 1,
-      degree_name: 1,
-      stream_name: 1,
-      fees: 1,
-      seats: 1,
-      courseduration: 1,
-    },
-  };
+  // Get total count first (fast operation)
+  const total = await courseCollection.countDocuments(match);
 
-  let total = 0;
-  let rawCourses: Array<Record<string, unknown>> = [];
+  // Get paginated courses with minimal data first
+  const courses = await courseCollection
+    .find(match, {
+      projection: {
+        id: 1,
+        collegeprofile_id: 1,
+        course_id: 1,
+        degree_id: 1,
+        functionalarea_id: 1,
+        fees: 1,
+        seats: 1,
+        courseduration: 1,
+      }
+    })
+    .sort({ created_at: -1, id: -1 })
+    .skip(offset)
+    .limit(PAGE_SIZE)
+    .toArray();
 
-  if (q) {
-    const regex = new RegExp(escapeRegex(q), "i");
-    const searchablePipeline = [
-      ...enrichmentPipeline,
+  // Get all required IDs for batch lookups
+  const collegeIds = [...new Set(courses.map(c => c.collegeprofile_id).filter(Boolean))];
+  const courseIds = [...new Set(courses.map(c => c.course_id).filter(Boolean))];
+  const degreeIds = [...new Set(courses.map(c => c.degree_id).filter(Boolean))];
+  const streamIds = [...new Set(courses.map(c => c.functionalarea_id).filter(Boolean))];
+
+  // Batch lookup all related data
+  const [colleges, courseData, degrees, streams] = await Promise.all([
+    collegeIds.length > 0 ? db.collection("collegeprofile").aggregate([
+      { $match: { id: { $in: collegeIds } } },
       {
-        $match: {
-          $or: [
-            { college_name: regex },
-            { course_name: regex },
-            { degree_name: regex },
-            { stream_name: regex },
-          ],
+        $lookup: {
+          from: "users",
+          localField: "users_id",
+          foreignField: "id",
+          as: "userDoc",
         },
       },
-    ];
+      { $unwind: { path: "$userDoc", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 0,
+          id: 1,
+          name: { $ifNull: ["$userDoc.firstname", "Unnamed College"] },
+        },
+      },
+    ]).toArray() : Promise.resolve([]),
+    courseIds.length > 0 ? db.collection("course").find(
+      { id: { $in: courseIds } },
+      { projection: { id: 1, name: 1, _id: 0 } }
+    ).toArray() : Promise.resolve([]),
+    degreeIds.length > 0 ? db.collection("degree").find(
+      { id: { $in: degreeIds } },
+      { projection: { id: 1, name: 1, _id: 0 } }
+    ).toArray() : Promise.resolve([]),
+    streamIds.length > 0 ? db.collection("functionalarea").find(
+      { id: { $in: streamIds } },
+      { projection: { id: 1, name: 1, _id: 0 } }
+    ).toArray() : Promise.resolve([]),
+  ]);
 
-    const [countRows, rows] = await Promise.all([
-      courseCollection.aggregate([...searchablePipeline, { $count: "total" }]).toArray(),
-      courseCollection
-        .aggregate([
-          ...searchablePipeline,
-          { $sort: { created_at: -1, id: -1 } },
-          { $skip: offset },
-          { $limit: PAGE_SIZE },
-          projectStage,
-        ])
-        .toArray(),
-    ]);
+  // Create lookup maps for fast access
+  const collegeMap = new Map(colleges.map(c => [c.id, c.name]));
+  const courseMap = new Map(courseData.map(c => [c.id, c.name]));
+  const degreeMap = new Map(degrees.map(d => [d.id, d.name]));
+  const streamMap = new Map(streams.map(s => [s.id, s.name]));
 
-    total = Number(countRows[0]?.total ?? 0);
-    rawCourses = rows as Array<Record<string, unknown>>;
-  } else {
-    const [count, rows] = await Promise.all([
-      courseCollection.countDocuments(),
-      courseCollection
-        .aggregate([
-          { $sort: { created_at: -1, id: -1 } },
-          { $skip: offset },
-          { $limit: PAGE_SIZE },
-          ...enrichmentPipeline,
-          projectStage,
-        ])
-        .toArray(),
-    ]);
-
-    total = count;
-    rawCourses = rows as Array<Record<string, unknown>>;
-  }
-
-  const totalPages = Math.ceil(total / PAGE_SIZE);
-  const cleanCourses: CourseRow[] = rawCourses.map((course, idx) => ({
+  // Enrich courses with lookup data
+  const cleanCourses: CourseRow[] = courses.map((course, idx) => ({
     id: Number(course.id) || idx + 1,
     collegeprofile_id: Number(course.collegeprofile_id) || 0,
     course_id: toNumberOrNull(course.course_id),
     degree_id: toNumberOrNull(course.degree_id),
     functionalarea_id: toNumberOrNull(course.functionalarea_id),
-    college_name: toStringOrNull(course.college_name) ?? "Unnamed College",
-    course_name: toStringOrNull(course.course_name),
-    degree_name: toStringOrNull(course.degree_name),
-    stream_name: toStringOrNull(course.stream_name),
+    college_name: collegeMap.get(course.collegeprofile_id) ?? "Unnamed College",
+    course_name: course.course_id ? courseMap.get(course.course_id) ?? null : null,
+    degree_name: course.degree_id ? degreeMap.get(course.degree_id) ?? null : null,
+    stream_name: course.functionalarea_id ? streamMap.get(course.functionalarea_id) ?? null : null,
     fees: toStringOrNull(course.fees),
     seats: toStringOrNull(course.seats),
     courseduration: toStringOrNull(course.courseduration),
   }));
 
+  // Handle search query separately (more complex but less frequent)
+  let finalCourses = cleanCourses;
+  let finalTotal = total;
+
+  if (q) {
+    const regex = new RegExp(escapeRegex(q), "i");
+
+    // Filter already fetched courses
+    const filteredCourses = cleanCourses.filter(course =>
+      regex.test(course.college_name) ||
+      regex.test(course.course_name || "") ||
+      regex.test(course.degree_name || "") ||
+      regex.test(course.stream_name || "") ||
+      regex.test(course.fees || "") ||
+      regex.test(course.seats || "") ||
+      regex.test(course.courseduration || "")
+    );
+
+    // If we have enough filtered results, use them
+    if (filteredCourses.length >= PAGE_SIZE) {
+      finalCourses = filteredCourses.slice(0, PAGE_SIZE);
+      finalTotal = filteredCourses.length; // Approximate total
+    } else {
+      // Need to search all data for accurate results
+      const allCourses = await courseCollection
+        .find(match, {
+          projection: {
+            id: 1,
+            collegeprofile_id: 1,
+            course_id: 1,
+            degree_id: 1,
+            functionalarea_id: 1,
+            fees: 1,
+            seats: 1,
+            courseduration: 1,
+          }
+        })
+        .toArray();
+
+      // Get all IDs for comprehensive lookup
+      const allCollegeIds = [...new Set(allCourses.map(c => c.collegeprofile_id).filter(Boolean))];
+      const allCourseIds = [...new Set(allCourses.map(c => c.course_id).filter(Boolean))];
+      const allDegreeIds = [...new Set(allCourses.map(c => c.degree_id).filter(Boolean))];
+      const allStreamIds = [...new Set(allCourses.map(c => c.functionalarea_id).filter(Boolean))];
+
+      const [allColleges, allCourseData, allDegrees, allStreams] = await Promise.all([
+        allCollegeIds.length > 0 ? db.collection("collegeprofile").aggregate([
+          { $match: { id: { $in: allCollegeIds } } },
+          {
+            $lookup: {
+              from: "users",
+              localField: "users_id",
+              foreignField: "id",
+              as: "userDoc",
+            },
+          },
+          { $unwind: { path: "$userDoc", preserveNullAndEmptyArrays: true } },
+          {
+            $project: {
+              _id: 0,
+              id: 1,
+              name: { $ifNull: ["$userDoc.firstname", "Unnamed College"] },
+            },
+          },
+        ]).toArray() : Promise.resolve([]),
+        allCourseIds.length > 0 ? db.collection("course").find(
+          { id: { $in: allCourseIds } },
+          { projection: { id: 1, name: 1, _id: 0 } }
+        ).toArray() : Promise.resolve([]),
+        allDegreeIds.length > 0 ? db.collection("degree").find(
+          { id: { $in: allDegreeIds } },
+          { projection: { id: 1, name: 1, _id: 0 } }
+        ).toArray() : Promise.resolve([]),
+        allStreamIds.length > 0 ? db.collection("functionalarea").find(
+          { id: { $in: allStreamIds } },
+          { projection: { id: 1, name: 1, _id: 0 } }
+        ).toArray() : Promise.resolve([]),
+      ]);
+
+      const allCollegeMap = new Map(allColleges.map(c => [c.id, c.name]));
+      const allCourseMap = new Map(allCourseData.map(c => [c.id, c.name]));
+      const allDegreeMap = new Map(allDegrees.map(d => [d.id, d.name]));
+      const allStreamMap = new Map(allStreams.map(s => [s.id, s.name]));
+
+      const enrichedAllCourses = allCourses.map((course, idx) => ({
+        id: Number(course.id) || idx + 1,
+        collegeprofile_id: Number(course.collegeprofile_id) || 0,
+        course_id: toNumberOrNull(course.course_id),
+        degree_id: toNumberOrNull(course.degree_id),
+        functionalarea_id: toNumberOrNull(course.functionalarea_id),
+        college_name: allCollegeMap.get(course.collegeprofile_id) ?? "Unnamed College",
+        course_name: course.course_id ? allCourseMap.get(course.course_id) ?? null : null,
+        degree_name: course.degree_id ? allDegreeMap.get(course.degree_id) ?? null : null,
+        stream_name: course.functionalarea_id ? allStreamMap.get(course.functionalarea_id) ?? null : null,
+        fees: toStringOrNull(course.fees),
+        seats: toStringOrNull(course.seats),
+        courseduration: toStringOrNull(course.courseduration),
+      }));
+
+      const searchedCourses = enrichedAllCourses.filter(course =>
+        regex.test(course.college_name) ||
+        regex.test(course.course_name || "") ||
+        regex.test(course.degree_name || "") ||
+        regex.test(course.stream_name || "") ||
+        regex.test(course.fees || "") ||
+        regex.test(course.seats || "") ||
+        regex.test(course.courseduration || "")
+      );
+
+      finalCourses = searchedCourses.slice(offset, offset + PAGE_SIZE);
+      finalTotal = searchedCourses.length;
+    }
+  }
+
+  const [courseOptions, degreeOptions, streamOptions, collegeOptions] = await Promise.all([
+    getCachedCourseOptions(),
+    getCachedDegreeOptions(),
+    getCachedStreamOptions(),
+    getCachedCollegeOptions(),
+  ]);
+
+  const totalPages = Math.ceil(finalTotal / PAGE_SIZE);
+
   return (
     <div className="p-6 space-y-6 w-full">
       <CourseListClient
-        courses={cleanCourses}
-        total={total}
+        courses={finalCourses}
+        total={finalTotal}
         pageSize={PAGE_SIZE}
         offset={offset}
+        searchQuery={q}
+        selectedCollegeId={collegeId}
+        selectedCourseId={courseId}
+        selectedDegreeId={degreeId}
+        selectedStreamId={streamId}
+        selectedFees={fees}
+        selectedSeats={seats}
+        selectedDuration={duration}
+        courseOptions={courseOptions}
+        degreeOptions={degreeOptions}
+        streamOptions={streamOptions}
+        collegeOptions={collegeOptions}
         onAdd={createCourse}
         onDelete={deleteCourse}
       />
@@ -240,8 +402,8 @@ export default async function CollegeCoursesPage({
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
           <p className="text-xs text-slate-500">
-            Showing <strong>{offset + 1}-{Math.min(offset + PAGE_SIZE, total)}</strong> of{" "}
-            <strong>{total.toLocaleString()}</strong> courses
+            Showing <strong>{offset + 1}-{Math.min(offset + PAGE_SIZE, finalTotal)}</strong> of{" "}
+            <strong>{finalTotal.toLocaleString()}</strong> courses
           </p>
           <div className="flex items-center gap-1">
             {page > 1 ? (

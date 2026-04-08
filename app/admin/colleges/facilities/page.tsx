@@ -1,14 +1,16 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
+import { ObjectId } from "mongodb";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import FacilitiesClient from "./FacilitiesClient";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
-async function deleteFacilityRow(id: number) {
+async function deleteFacilityRow(id: string) {
   "use server";
+  const db = await getDb();
   try {
-    await pool.query("DELETE FROM collegefacilities WHERE id = ?", [id]);
+    await db.collection("collegefacilities").deleteOne({ _id: new ObjectId(id) });
   } catch (e) {
     console.error("[admin/colleges/facilities deleteAction]", e);
   }
@@ -18,16 +20,20 @@ async function deleteFacilityRow(id: number) {
 
 async function createFacility(formData: FormData) {
   "use server";
-  const collegeprofile_id = formData.get("collegeprofile_id");
-  const facilities_id = formData.get("facilities_id") || null;
-  const name = formData.get("name") || null;
-  const description = formData.get("description") || null;
+  const db = await getDb();
+  const collegeprofile_id = formData.get("collegeprofile_id") as string;
+  const facilities_id = formData.get("facilities_id") as string || null;
+  const name = formData.get("name") as string || null;
+  const description = formData.get("description") as string || null;
 
   try {
-    await pool.query(
-      "INSERT INTO collegefacilities (collegeprofile_id, facilities_id, name, description) VALUES (?, ?, ?, ?)",
-      [collegeprofile_id, facilities_id, name, description]
-    );
+    await db.collection("collegefacilities").insertOne({
+      collegeprofile_id: new ObjectId(collegeprofile_id),
+      facilities_id: facilities_id ? new ObjectId(facilities_id) : null,
+      name,
+      description,
+      created_at: new Date()
+    });
   } catch (e) {
     console.error("[admin/colleges/facilities createAction]", e);
   }
@@ -37,16 +43,24 @@ async function createFacility(formData: FormData) {
 
 async function updateFacility(formData: FormData) {
   "use server";
-  const id = formData.get("id"); // Make sure to add this hidden field in form or handle differently
-  const collegeprofile_id = formData.get("collegeprofile_id");
-  const facilities_id = formData.get("facilities_id") || null;
-  const name = formData.get("name") || null;
-  const description = formData.get("description") || null;
+  const db = await getDb();
+  const id = formData.get("id") as string;
+  const collegeprofile_id = formData.get("collegeprofile_id") as string;
+  const facilities_id = formData.get("facilities_id") as string || null;
+  const name = formData.get("name") as string || null;
+  const description = formData.get("description") as string || null;
 
   try {
-    await pool.query(
-      "UPDATE collegefacilities SET collegeprofile_id = ?, facilities_id = ?, name = ?, description = ? WHERE id = ?",
-      [collegeprofile_id, facilities_id, name, description, id]
+    await db.collection("collegefacilities").updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          collegeprofile_id: new ObjectId(collegeprofile_id),
+          facilities_id: facilities_id ? new ObjectId(facilities_id) : null,
+          name,
+          description
+        }
+      }
     );
   } catch (e) {
     console.error("[admin/colleges/facilities updateAction]", e);
@@ -59,30 +73,17 @@ async function updateFacility(formData: FormData) {
 
 const PAGE_SIZE = 25;
 
-async function safeQuery<T >(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/colleges/facilities safeQuery]", err);
-    return [];
-  }
-}
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface FacilityRow  {
-  id: number;
+  id: string;
   college_name: string;
   facility_name: string;
   facility_name_raw: string | null;
   description: string;
   icon: string | null;
-  collegeprofile_id: number;
-  facilities_id: number | null;
+  collegeprofile_id: string;
+  facilities_id: string | null;
   created_at?: string;
 }
 
@@ -103,68 +104,150 @@ export default async function CollegeFacilitiesPage({
   const sp = await searchParams;
   const q = (sp.q ?? "").trim();
   const collegeId = sp.collegeId ?? "";
+  const facilityTypeId = (sp.facilityTypeId ?? "").trim();
+  const displayName = (sp.displayName ?? "").trim();
+  const description = (sp.description ?? "").trim();
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Build WHERE clause ─────────────────────────────────────────────────────
-  const conditions: string[] = [];
-  const params: (string | number)[] = [];
+  const db = await getDb();
 
+  // Build match for aggregation
+  const matchClauses: Record<string, unknown>[] = [];
   if (q) {
-    conditions.push(
-      "(u.firstname LIKE ? OR cf.name LIKE ? OR f.name LIKE ?)",
-    );
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`);
+    matchClauses.push({
+      $or: [
+      { "user.firstname": { $regex: q, $options: "i" } },
+      { name: { $regex: q, $options: "i" } },
+      { "facility.name": { $regex: q, $options: "i" } }
+      ],
+    });
   }
-
   if (collegeId) {
-    conditions.push("cf.collegeprofile_id = ?");
-    params.push(collegeId);
+    matchClauses.push({ collegeprofile_id: new ObjectId(collegeId) });
   }
+  if (facilityTypeId === "custom") {
+    matchClauses.push({ facilities_id: null });
+  } else if (facilityTypeId) {
+    matchClauses.push({ facilities_id: new ObjectId(facilityTypeId) });
+  }
+  if (displayName) {
+    matchClauses.push({ name: { $regex: displayName, $options: "i" } });
+  }
+  if (description) {
+    matchClauses.push({ description: { $regex: description, $options: "i" } });
+  }
+  const match = matchClauses.length > 0 ? { $and: matchClauses } : {};
 
-  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  // Aggregation for facilities
+  const facilitiesAggregation = [
+    {
+      $lookup: {
+        from: "collegeprofile",
+        localField: "collegeprofile_id",
+        foreignField: "_id",
+        as: "college"
+      }
+    },
+    { $unwind: "$college" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "college.users_id",
+        foreignField: "_id",
+        as: "user"
+      }
+    },
+    { $unwind: "$user" },
+    {
+      $lookup: {
+        from: "facilities",
+        localField: "facilities_id",
+        foreignField: "_id",
+        as: "facility"
+      }
+    },
+    {
+      $unwind: {
+        path: "$facility",
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    { $match: match },
+    {
+      $project: {
+        id: { $toString: "$_id" },
+        collegeprofile_id: { $toString: "$collegeprofile_id" },
+        facilities_id: { $toString: "$facilities_id" },
+        name: 1,
+        facility_name_raw: "$name",
+        college_name: { $ifNull: ["$user.firstname", "Unnamed College"] },
+        facility_name: { $ifNull: ["$name", "$facility.name"] },
+        description: 1,
+        created_at: 1,
+        icon: "$facility.iconname"
+      }
+    },
+    { $sort: { created_at: -1 } },
+    {
+      $facet: {
+        data: [{ $skip: offset }, { $limit: PAGE_SIZE }],
+        total: [{ $count: "count" }]
+      }
+    }
+  ];
 
-  // ── Query facilities ───────────────────────────────────────────────────────
-  const [facilitiesList, countRows, colleges, facilityTypes] = await Promise.all([
-    safeQuery<FacilityRow>(
-      `SELECT 
-        cf.id,
-        cf.collegeprofile_id,
-        cf.facilities_id,
-        cf.name as facility_name_raw,
-        COALESCE(u.firstname, 'Unnamed College') as college_name,
-        COALESCE(cf.name, f.name) as facility_name,
-        cf.description,
-        cf.created_at,
-        f.iconname as icon
-       FROM collegefacilities cf
-       JOIN collegeprofile cp ON cp.id = cf.collegeprofile_id
-       JOIN users u ON u.id = cp.users_id
-       LEFT JOIN facilities f ON f.id = cf.facilities_id
-       ${where}
-       ORDER BY cf.created_at DESC
-       LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
-    ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total 
-       FROM collegefacilities cf 
-       JOIN collegeprofile cp ON cp.id = cf.collegeprofile_id
-       JOIN users u ON u.id = cp.users_id
-       LEFT JOIN facilities f ON f.id = cf.facilities_id
-       ${where}`,
-      params,
-    ),
-    safeQuery<{ id: number; name: string }>(
-      "SELECT cp.id, u.firstname as name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
-    ),
-    safeQuery<{ id: number; name: string }>(
-      "SELECT id, name FROM facilities ORDER BY name ASC"
-    ),
+  // Aggregation for colleges
+  const collegesAggregation = [
+    {
+      $lookup: {
+        from: "users",
+        localField: "users_id",
+        foreignField: "_id",
+        as: "user"
+      }
+    },
+    { $unwind: "$user" },
+    {
+      $project: {
+        id: { $toString: "$_id" },
+        name: "$user.firstname"
+      }
+    },
+    { $sort: { name: 1 } }
+  ];
+
+  // Aggregation for facility types
+  const facilityTypesAggregation = [
+    {
+      $project: {
+        id: { $toString: "$_id" },
+        name: 1
+      }
+    },
+    { $sort: { name: 1 } }
+  ];
+
+  const [facilitiesResult, collegesResult, facilityTypesResult] = await Promise.all([
+    db.collection("collegefacilities").aggregate(facilitiesAggregation).toArray(),
+    db.collection("collegeprofile").aggregate(collegesAggregation).toArray(),
+    db.collection("facilities").aggregate(facilityTypesAggregation).toArray()
   ]);
 
-  const total = Number(countRows[0]?.total ?? 0);
+  const facilitiesList = facilitiesResult[0]?.data || [];
+  const total = facilitiesResult[0]?.total[0]?.count || 0;
   const totalPages = Math.ceil(total / PAGE_SIZE);
+  const colleges = collegesResult as { id: string; name: string }[];
+  const facilityTypes = facilityTypesResult as { id: string; name: string }[];
+  const buildPageHref = (targetPage: number) => {
+    const query = new URLSearchParams({ page: String(targetPage) });
+    if (q) query.set("q", q);
+    if (collegeId) query.set("collegeId", collegeId);
+    if (facilityTypeId) query.set("facilityTypeId", facilityTypeId);
+    if (displayName) query.set("displayName", displayName);
+    if (description) query.set("description", description);
+    return `/admin/colleges/facilities?${query.toString()}`;
+  };
 
   return (
     <div className="p-6 space-y-6 w-full">
@@ -191,6 +274,9 @@ export default async function CollegeFacilitiesPage({
          onDelete={deleteFacilityRow}
          q={q}
          collegeId={collegeId}
+         facilityTypeId={facilityTypeId}
+         displayName={displayName}
+         description={description}
       />
 
       {/* ── Pagination ───────────────────────────────────────────────────── */}
@@ -203,7 +289,7 @@ export default async function CollegeFacilitiesPage({
           <div className="flex items-center gap-1">
             {page > 1 ? (
               <Link
-                href={`/admin/colleges/facilities?page=${page - 1}${q ? `&q=${q}` : ''}${collegeId ? `&collegeId=${collegeId}` : ''}`}
+                href={buildPageHref(page - 1)}
                 className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
               >
                 ← Prev
@@ -216,7 +302,7 @@ export default async function CollegeFacilitiesPage({
             </span>
             {page < totalPages ? (
               <Link
-                href={`/admin/colleges/facilities?page=${page + 1}${q ? `&q=${q}` : ''}${collegeId ? `&collegeId=${collegeId}` : ''}`}
+                href={buildPageHref(page + 1)}
                 className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
               >
                 Next →

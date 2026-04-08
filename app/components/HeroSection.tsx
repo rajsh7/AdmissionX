@@ -29,7 +29,7 @@ export default function HeroSection() {
   if (!isMounted) return <div className="min-h-[850px] bg-[#181C35]" />;
 
   return (
-    <section className="relative w-full h-screen min-h-[850px] flex items-center overflow-hidden">
+    <section className="relative w-full h-screen min-h-[850px] overflow-hidden">
       {/* Animated Background Slider */}
       <div className="absolute inset-0 z-0 bg-[#181C35]">
         <AnimatePresence>
@@ -47,30 +47,29 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/10 to-transparent" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-[1920px] w-full">
-        <div className="px-6 sm:px-12 lg:px-24 py-24 lg:py-32">
-          <div className="grid grid-cols-1 lg:grid-cols-12 lg:items-center">
+      <div className="relative z-10 w-full h-screen min-h-[850px] flex items-center">
+        <div className="w-full h-full flex items-center justify-center lg:justify-end">
+          <div className="w-full lg:w-[60%] xl:w-[64%] 2xl:w-[68%] px-6 sm:px-10 lg:px-0 lg:pr-20 xl:pr-28 py-24 lg:py-32">
             
-            {/* Moved slightly left (col-start-6) to match the user's request for "little left" */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="lg:col-start-6 lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left pt-20"
+              className="flex flex-col items-center lg:items-start text-center lg:text-left pt-20 w-full lg:max-w-[920px] lg:ml-auto"
             >
               <div className="mb-4">
                 <img 
                   src="/images/Architect Your  Academic Future.png" 
                   alt="Architect Your Academic Future" 
-                  className="h-auto w-full max-w-[320px] sm:max-w-[450px] lg:max-w-[650px] object-contain"
+                  className="h-auto w-full max-w-[320px] sm:max-w-[450px] lg:max-w-[760px] xl:max-w-[860px] object-contain"
                 />
               </div>
 
-              <p className="mt-8 text-[22px] text-white/90 w-full max-w-xl lg:w-[763px] lg:h-[132px] leading-relaxed font-normal drop-shadow-sm">
+              <p className="mt-8 text-[22px] text-white/90 w-full max-w-3xl leading-relaxed font-normal drop-shadow-sm">
                 The world's most comprehensive academic discovery platform. Search 50,000+ universities, get exam guidance, and read unfiltered student reviews.
               </p>
 
-              <div className="mt-12 w-full max-w-2xl">
+              <div className="mt-12 w-full max-w-4xl">
                 <SearchBar />
               </div>
 
