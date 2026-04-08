@@ -43,16 +43,12 @@ export function UnifiedSidebarV3({
     <nav className="flex flex-col h-full select-none" style={{ backgroundColor: '#313131' }}>
       {/* Logo Area */}
       <div className="p-4 flex-shrink-0">
-        <div className="bg-white rounded p-3 flex items-center justify-center" style={{ border: '2px solid #00b5ad' }}>
-          <Link href="/admin/dashboard" className="flex items-center">
-            <span className="text-black font-extrabold text-2xl tracking-tighter" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              admissi<span style={{ color: '#FF3C3C' }}>o</span>n<span style={{ color: '#00b5ad' }}>X</span>
-            </span>
-          </Link>
-        </div>
+        <Link href="/admin/dashboard" className="flex items-center justify-center px-3 py-2">
+          <img src="/logo.jpg" alt="AdmissionX" className="h-9 w-auto object-contain" />
+        </Link>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-2 space-y-6">
+      <div data-lenis-prevent className="flex-1 overflow-y-auto py-2 space-y-6">
         {NAV_GROUPS.map((group, gIdx) => (
           <div key={`v3-group-${group.label || gIdx}`}>
             {group.label && (

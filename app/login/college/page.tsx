@@ -121,6 +121,7 @@ function CollegeLoginForm() {
     <div className="min-h-screen flex flex-col font-display relative">
       <AuthBackgroundSlider />
       <Header />
+
       {forceChangePw && (
         <ForceChangePasswordModal slug={forceChangePw.slug} onDone={() => {
           setForceChangePw(null);
@@ -129,109 +130,75 @@ function CollegeLoginForm() {
         }} />
       )}
 
-      <main className="relative flex-1 flex items-center justify-center px-4 py-24 overflow-hidden">
-        <div className="w-full max-w-[1100px] grid grid-cols-1 lg:grid-cols-2 gap-0 rounded-2xl overflow-hidden shadow-2xl shadow-black/10 z-10">
+      {/* Full-height main — pushes footer to bottom */}
+      <main className="relative flex-1 flex items-center justify-center px-4 py-8 z-10">
+        <div className="w-full max-w-md">
+          {/* Login Card */}
+          <div className="bg-white rounded-2xl shadow-2xl shadow-black/10 overflow-hidden">
+            {/* Card header strip */}
+            <div className="h-1.5 w-full" style={{ background: "linear-gradient(90deg, #FF3C3C, #c0392b)" }} />
 
-          {/* ── Left: Login Card ── */}
-          <div className="bg-white p-8 lg:p-10 flex flex-col justify-center">
-            <div className="mb-6">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-2xl mb-4">
-                <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>apartment</span>
-              </div>
-              <h2 className="text-2xl font-black text-slate-900 mb-1">College Login</h2>
-              <p className="text-slate-500 text-sm">Sign in to manage your college profile, courses, and student applications.</p>
-            </div>
-
-            {error && (
-              <div className="mb-5 flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                <span className="material-symbols-outlined text-red-500 text-[18px] mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>error</span>
-                <p className="text-sm text-red-700 font-medium">{error}</p>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 block">Official Email</label>
-                <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">mail</span>
-                  <input name="email" type="email" placeholder="admissions@yourcollege.com" required autoComplete="email"
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all" />
+            <div className="p-8 sm:p-10">
+              {/* Icon + title */}
+              <div className="flex flex-col items-center text-center mb-8">
+                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
+                  <span className="material-symbols-outlined text-primary text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>apartment</span>
                 </div>
+                <h2 className="text-2xl font-black text-slate-900">College Login</h2>
+                <p className="text-slate-500 text-sm mt-1.5">Sign in to manage your college profile and applications.</p>
               </div>
 
-              <div>
-                <div className="flex justify-between items-center mb-1.5">
-                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Password</label>
-                  <Link href="/forgot-password" className="text-xs font-medium text-primary hover:underline">Forgot password?</Link>
+              {error && (
+                <div className="mb-6 flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                  <span className="material-symbols-outlined text-red-500 text-[18px] mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>error</span>
+                  <p className="text-sm text-red-700 font-medium">{error}</p>
                 </div>
-                <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">lock</span>
-                  <input name="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" required autoComplete="current-password"
-                    className="w-full pl-10 pr-12 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all" />
-                  <button type="button" onClick={() => setShowPassword(p => !p)} tabIndex={-1}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
-                    <span className="material-symbols-outlined text-[18px]">{showPassword ? "visibility" : "visibility_off"}</span>
-                  </button>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 block">Official Email</label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">mail</span>
+                    <input name="email" type="email" placeholder="admissions@yourcollege.com" required autoComplete="email"
+                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all" />
+                  </div>
                 </div>
-              </div>
 
-              <button type="submit" disabled={loading}
-                className="w-full bg-primary hover:bg-red-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
-                {loading ? <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
-                  : <><span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>login</span>Sign in as College</>}
-              </button>
-            </form>
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Password</label>
+                    <Link href="/forgot-password" className="text-xs font-medium text-primary hover:underline">Forgot password?</Link>
+                  </div>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">lock</span>
+                    <input name="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" required autoComplete="current-password"
+                      className="w-full pl-10 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all" />
+                    <button type="button" onClick={() => setShowPassword(p => !p)} tabIndex={-1}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                      <span className="material-symbols-outlined text-[18px]">{showPassword ? "visibility" : "visibility_off"}</span>
+                    </button>
+                  </div>
+                </div>
 
-            <p className="mt-6 text-center text-slate-500 text-sm">
-              Not registered yet?{" "}
-              <Link href="/signup/college" className="text-primary font-bold hover:underline">Register your college</Link>
-            </p>
-          </div>
+                <button type="submit" disabled={loading}
+                  className="w-full bg-primary hover:bg-red-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 mt-2">
+                  {loading
+                    ? <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                    : <><span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>login</span>Sign in as College</>
+                  }
+                </button>
+              </form>
 
-          {/* ── Right: Promo Panel ── */}
-          <div className="hidden lg:flex flex-col justify-between p-10 relative overflow-hidden"
-            style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}>
-            <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full opacity-10" style={{ background: "radial-gradient(circle, #FF3C3C, transparent)" }} />
-            <div className="absolute -bottom-16 -right-16 w-48 h-48 rounded-full opacity-10" style={{ background: "radial-gradient(circle, #FF3C3C, transparent)" }} />
-
-            <div>
-              <Link href="/" className="inline-block mb-10 bg-white px-4 py-2 rounded-xl">
-                <img src="/admissionx-logo.png" className="h-7 w-auto object-contain" alt="AdmissionX" />
-              </Link>
-              <h2 className="text-3xl font-black text-white leading-tight mb-4">
-                Your College Dashboard Awaits
-              </h2>
-              <p className="text-slate-400 text-sm leading-relaxed mb-8">
-                Manage your college profile, review student applications, update courses, and track your performance — all from one powerful dashboard.
+              <p className="mt-6 text-center text-slate-500 text-sm">
+                Not registered yet?{" "}
+                <Link href="/signup/college" className="text-primary font-bold hover:underline">Register your college</Link>
               </p>
             </div>
-
-            <div className="space-y-4">
-              {[
-                { icon: "description", title: "Manage Applications", desc: "Review, accept or reject student applications in real-time" },
-                { icon: "menu_book", title: "Update Courses & Fees", desc: "Keep your course listings and fee structure up to date" },
-                { icon: "photo_library", title: "Gallery & Media", desc: "Showcase your campus with photos and videos" },
-                { icon: "star", title: "Student Reviews", desc: "Monitor and respond to student feedback" },
-              ].map((b) => (
-                <div key={b.title} className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <span className="material-symbols-outlined text-primary text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>{b.icon}</span>
-                  </div>
-                  <div>
-                    <p className="text-white text-sm font-bold">{b.title}</p>
-                    <p className="text-slate-500 text-xs">{b.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <p className="text-slate-600 text-xs mt-8">
-              New to AdmissionX?{" "}
-              <Link href="/signup/college" className="text-primary font-semibold hover:underline">Register your college →</Link>
-            </p>
           </div>
         </div>
       </main>
+
       <Footer />
     </div>
   );

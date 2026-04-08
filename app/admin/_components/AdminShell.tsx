@@ -143,7 +143,7 @@ export default function AdminShell({
   })();
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden font-display">
+    <div className="flex h-screen overflow-hidden bg-slate-50 font-display">
 
       {/* ── Desktop sidebar (always visible ≥ lg) ──────────────────────────── */}
       <aside className="hidden lg:flex w-56 xl:w-60 flex-col flex-shrink-0 overflow-hidden" style={{ backgroundColor: "#313131" }}>
@@ -166,7 +166,7 @@ export default function AdminShell({
       )}
 
       {/* ── Main area ──────────────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
 
         {/* Top bar */}
         <header className="bg-white border-b border-slate-100 h-14 flex items-center px-4 gap-3 flex-shrink-0 shadow-sm z-10">
@@ -182,16 +182,24 @@ export default function AdminShell({
             </span>
           </button>
 
-          {/* Search bar (Mockup) */}
+          {/* Search bar */}
           <div className="flex-1 flex items-center px-4">
-            <div className="flex items-center gap-2 bg-slate-100 text-slate-500 px-4 py-2 rounded-lg w-full max-w-md">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const q = (e.currentTarget.elements.namedItem("q") as HTMLInputElement)?.value.trim();
+                if (q) router.push(`/admin/colleges/profile?q=${encodeURIComponent(q)}`);
+              }}
+              className="flex items-center gap-2 bg-slate-100 text-slate-500 px-4 py-2 rounded-lg w-full max-w-md"
+            >
               <span className="material-symbols-rounded text-[20px]" style={ICO}>search</span>
-              <input 
-                type="text" 
-                placeholder="Location, universities, courses..." 
+              <input
+                name="q"
+                type="text"
+                placeholder="Search by college name..."
                 className="bg-transparent border-none outline-none text-sm w-full text-slate-700 placeholder-slate-400 font-medium"
               />
-            </div>
+            </form>
           </div>
 
           {/* Right side actions */}
@@ -202,11 +210,8 @@ export default function AdminShell({
               <button className="hover:text-slate-900 transition-colors p-1">
                 <span className="material-symbols-rounded text-[24px]" style={ICO}>chat_bubble_outline</span>
               </button>
-              <button className="hover:text-slate-900 transition-colors p-1 relative">
+              <button className="hover:text-slate-900 transition-colors p-1">
                 <span className="material-symbols-rounded text-[24px]" style={ICO}>notifications</span>
-                <span className="absolute top-0 right-0 -mt-1 -mr-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
-                  3
-                </span>
               </button>
             </div>
 
@@ -219,7 +224,7 @@ export default function AdminShell({
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-slate-100 scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400">
+        <main className="flex-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-track-slate-100 scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400">
           {children}
         </main>
       </div>

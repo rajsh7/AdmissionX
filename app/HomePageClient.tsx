@@ -9,6 +9,8 @@ import TopUniversities from "./components/TopUniversities";
 import TopCourse from "./components/TopCourse";
 import type { FilterCollegeResult } from "@/lib/college-filter";
 import type { AdItem } from "./components/AdsSection";
+import HomeTicker from "./components/HomeTicker";
+import type { TickerAdItem } from "./components/HomeTicker";
 
 // Below-the-fold components loaded lazily – they won't block the first paint
 const EntranceExams = dynamic(() => import("./components/EntranceExams"), {
@@ -41,6 +43,7 @@ interface HomePageClientProps {
   streamCounts: Record<string, number>;
   initialStreamColleges: FilterCollegeResult[];
   ads: AdItem[];
+  tickerAds: TickerAdItem[];
 }
 
 export default function HomePageClient({
@@ -51,6 +54,7 @@ export default function HomePageClient({
   streamCounts,
   initialStreamColleges,
   ads,
+  tickerAds,
 }: HomePageClientProps) {
   const [authModal, setAuthModal] = useState<"login" | "register" | null>(null);
 
@@ -87,6 +91,9 @@ export default function HomePageClient({
             initialStreamColleges={initialStreamColleges}
           />
         </div>
+
+        {/* 3b. Ticker Ad Strip — controlled from Admin > Ads Management (position: home_ticker) */}
+        <HomeTicker ads={tickerAds} />
 
         {/* 4. Discover the Top Course */}
         <div data-gsap="fade-up">

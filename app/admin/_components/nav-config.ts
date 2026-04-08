@@ -54,11 +54,11 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: "quiz",
         label: "Examination Section",
         subItems: [
-          { href: "/admin/exams/department", label: "Exam Department", icon: "chat" },
-          { href: "/admin/exams/list", label: "List of Examination", icon: "chat" },
-          { href: "/admin/exams/questions", label: "All Exams Questions", icon: "chat" },
-          { href: "/admin/exams/answers", label: "All Exams Answer", icon: "chat" },
-          { href: "/admin/exams/comments", label: "All Exam Comments", icon: "chat" },
+          { href: "/admin/exams/department", label: "Exam Department", icon: "category" },
+          { href: "/admin/exams/list", label: "List of Examination", icon: "format_list_bulleted" },
+          { href: "/admin/exams/questions", label: "All Exams Questions", icon: "help_outline" },
+          { href: "/admin/exams/answers", label: "All Exams Answer", icon: "check_circle" },
+          { href: "/admin/exams/comments", label: "All Exam Comments", icon: "comment" },
         ]
       },
       { href: "/admin/applications", icon: "description", label: "Applications" },
@@ -106,7 +106,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/admin/exams/aiea", icon: "quiz", label: "AIEA Exam" },
       { href: "/admin/exams/info", icon: "info", label: "Examination Information" },
-      { href: "/admin/exams", icon: "grading", label: "Examination Section" },
+      { href: "/admin/exams/type", icon: "grading", label: "Exam Types" },
       { href: "/admin/exams/counselling", icon: "description", label: "Exam Counselling Form" },
     ],
   },

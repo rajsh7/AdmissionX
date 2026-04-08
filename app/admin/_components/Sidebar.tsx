@@ -87,13 +87,9 @@ export function AdminSidebarContentV2({
     <nav className="flex flex-col h-full select-none bg-[#3b3b3b]">
       {/* Logo Area */}
       <div className="p-4 flex-shrink-0">
-        <div className="bg-white rounded p-3 flex items-center justify-center border-2 border-cyan-400">
-          <Link href="/admin/dashboard" className="flex items-center">
-            <span className="text-black font-extrabold text-2xl tracking-tighter">
-              admissi<span className="text-red-500">o</span>n<span className="text-cyan-400">X</span>
-            </span>
-          </Link>
-        </div>
+        <Link href="/admin/dashboard" className="flex items-center justify-center px-3 py-2">
+          <img src="/logo.jpg" alt="AdmissionX" className="h-9 w-auto object-contain" />
+        </Link>
       </div>
 
       <div className="flex-1 overflow-y-auto py-2 space-y-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">

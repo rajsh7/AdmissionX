@@ -219,7 +219,7 @@ export default function ProfileClient({
                 type="text"
                 value={f.collegeName}
                 onChange={(e) => set("collegeName", e.target.value)}
-                placeholder="Enter college name"
+                placeholder="Search by college name"
                 className={inputCls}
               />
             </div>

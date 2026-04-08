@@ -178,7 +178,7 @@ export default function Footer() {
             {/* Left — Brand + description */}
             <FadeIn className="lg:col-span-5">
               <Link href="/" className="inline-block mb-6 bg-white px-5 py-2.5 rounded-xl">
-                <img src="/admissionx-logo.png" className="h-8 w-auto object-contain" alt="AdmissionX" />
+                <img src="/logo.jpg" className="h-8 w-auto object-contain" alt="AdmissionX" />
               </Link>
 
               <p className="text-slate-400 text-[14px] leading-relaxed mb-4 max-w-md">

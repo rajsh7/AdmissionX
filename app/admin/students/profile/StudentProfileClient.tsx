@@ -1,205 +1,249 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import StudentProfileFormModal from "./StudentProfileFormModal";
-import { formatDate } from "@/lib/utils";
 
-interface StudentProfileClientProps {
-  profiles: any[];
-  users: any[];
-  offset: number;
-  PAGE_SIZE: number;
+interface Student {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  dob: string | null;
+  marks12: number | null;
+  is_active: number;
+  created_at: string | null;
+}
+
+interface Props {
+  students: Student[];
   total: number;
+  page: number;
   totalPages: number;
+  pageSize: number;
   q: string;
-  createProfile: (data: FormData) => Promise<void>;
-  updateProfile: (data: FormData) => Promise<void>;
-  deleteProfile: (id: number) => Promise<void>;
+  statusFilter: string;
+  deleteStudent: (id: string) => Promise<void>;
+  toggleActive: (id: string, current: number) => Promise<void>;
+  updateStudent: (id: string, data: { name: string; email: string; phone: string; dob: string; marks12: number | null }) => Promise<void>;
+}
+
+function formatDate(val: string | null) {
+  if (!val) return "—";
+  try { return new Date(val).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }); }
+  catch { return "—"; }
 }
 
 export default function StudentProfileClient({
-  profiles,
-  users,
-  offset,
-  PAGE_SIZE,
-  total,
-  totalPages,
-  q,
-  createProfile,
-  updateProfile,
-  deleteProfile,
-}: StudentProfileClientProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProfile, setEditingProfile] = useState<any | null>(null);
+  students, total, page, totalPages, pageSize,
+  q, statusFilter, deleteStudent, toggleActive,
+}: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
-  function openAddModal() {
-    setEditingProfile(null);
-    setIsModalOpen(true);
+  function buildUrl(overrides: Record<string, string>) {
+    const params = new URLSearchParams({
+      ...(q ? { q } : {}),
+      ...(statusFilter ? { status: statusFilter } : {}),
+      page: String(page),
+      ...overrides,
+    });
+    return `${pathname}?${params.toString()}`;
   }
 
-  function openEditModal(p: any) {
-    setEditingProfile(p);
-    setIsModalOpen(true);
+  async function handleDelete(id: string) {
+    if (!confirm("Delete this student permanently?")) return;
+    setDeletingId(id);
+    await deleteStudent(id);
+    setDeletingId(null);
   }
 
-  async function handleDelete(id: number) {
-    if (confirm("Are you sure you want to delete this profile?")) {
-      await deleteProfile(id);
-    }
+  async function handleToggle(id: string, current: number) {
+    setTogglingId(id);
+    await toggleActive(id, current);
+    setTogglingId(null);
   }
+
+  const start = (page - 1) * pageSize + 1;
+  const end = Math.min(page * pageSize, total);
 
   return (
-    <>
-      {/* Top Header & Actions */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 px-2">
-        <div className="flex items-center gap-4 flex-1 max-w-xl">
-          <form method="GET" className="relative flex-1 group">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[20px] group-focus-within:text-admin-blue transition-colors">search</span>
-            <input 
-              name="q"
-              defaultValue={q}
-              placeholder="Search students..."
-              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-admin-blue/20 focus:border-admin-blue transition-all"
-            />
-          </form>
-          <button 
-            onClick={openAddModal}
-            className="flex items-center gap-2 bg-admin-blue text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-600 transition-colors shadow-sm whitespace-nowrap"
-          >
-            <span className="material-symbols-outlined text-[18px]">add_circle</span>
-            Add Profile
-          </button>
+    <div className="flex flex-col">
+
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
+        <div>
+          <h1 className="text-lg font-black text-slate-800">Student Profiles</h1>
+          <p className="text-xs text-slate-400 mt-0.5">Manage all registered students</p>
+        </div>
+        <div className="flex items-center gap-2 bg-[#008080]/10 px-4 py-2 rounded-xl">
+          <span className="material-symbols-outlined text-[18px] text-[#008080]">school</span>
+          <span className="text-sm font-black text-[#008080]">{total.toLocaleString()} Total</span>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-1 mb-0 mt-2 px-2">
-        <button className="flex items-center justify-between !bg-admin-dark !text-white px-8 py-3 rounded-t-lg font-bold text-[13px] min-w-[200px]">
-          Profile Information
-          <span className="material-symbols-outlined text-[18px] ml-4">expand_more</span>
-        </button>
+      {/* Filters */}
+      <div className="bg-white border-b border-slate-100 px-6 py-4">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const val = (e.currentTarget.elements.namedItem("q") as HTMLInputElement).value.trim();
+            router.push(buildUrl({ q: val, page: "1" }));
+          }}
+          className="flex flex-wrap items-center gap-3"
+        >
+          <div className="relative flex-1 min-w-[220px] max-w-sm">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+            <input name="q" defaultValue={q} placeholder="Search name, email, phone..."
+              className="w-full pl-9 pr-4 h-10 border border-slate-200 rounded-xl bg-white text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none focus:border-[#008080] focus:ring-2 focus:ring-[#008080]/10 transition-all" />
+          </div>
+          <div className="relative">
+            <select value={statusFilter} onChange={(e) => router.push(buildUrl({ status: e.target.value, page: "1" }))}
+              className="h-10 pl-3 pr-8 border border-slate-200 rounded-xl bg-white text-sm text-slate-700 focus:outline-none focus:border-[#008080] appearance-none cursor-pointer">
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+            </select>
+            <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[16px] pointer-events-none">expand_more</span>
+          </div>
+          <button type="submit" className="h-10 px-5 rounded-xl bg-[#008080] text-white text-sm font-bold hover:bg-[#006666] transition-colors">Search</button>
+          {(q || statusFilter) && (
+            <Link href={pathname} className="h-10 px-4 rounded-xl border border-slate-200 text-slate-500 text-sm font-medium hover:bg-slate-50 flex items-center transition-colors">Clear</Link>
+          )}
+        </form>
       </div>
 
-      {/* Main Table Interface */}
-      <div className="bg-white border-[2.5px] border-admin-blue overflow-hidden shadow-sm mx-2">
-        <div className="overflow-x-auto">
-          <table className="w-full text-[13px] border-collapse">
+      {/* Table */}
+      <div className="bg-white">
+        <div className="px-6 py-3 border-b border-slate-100">
+          <p className="text-sm text-slate-500">
+            {total > 0
+              ? <>Showing <span className="font-bold text-slate-800">{start}–{end}</span> of <span className="font-bold text-slate-800">{total.toLocaleString()}</span> students</>
+              : "No students found"}
+          </p>
+        </div>
+
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
-              <tr className="bg-admin-header text-white">
-                <th className="px-2 py-3.5 font-bold border-r border-[#666666] w-16 text-center text-[12px] uppercase">ID</th>
-                <th className="px-4 py-3.5 font-bold border-r border-[#666666] text-center text-[12px] uppercase">Student name</th>
-                <th className="px-4 py-3.5 font-bold border-r border-[#666666] text-center text-[12px] uppercase">Phone No.</th>
-                <th className="px-4 py-3.5 font-bold border-r border-[#666666] text-center text-[12px] uppercase">Email Address</th>
-                <th className="px-3 py-3.5 font-bold border-r border-[#666666] text-center text-[12px] uppercase">Gender</th>
-                <th className="px-3 py-3.5 font-bold border-r border-[#666666] text-center text-[12px] uppercase">DOB</th>
-                <th className="px-4 py-3.5 font-bold border-r border-[#666666] text-center text-[12px] uppercase">Last Update by</th>
-                <th className="px-4 py-3.5 font-bold text-center text-[12px] uppercase">Action</th>
+              <tr className="bg-slate-50 border-b border-slate-100">
+                <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider w-10 text-center">#</th>
+                <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Student</th>
+                <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Phone</th>
+                <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Date of Birth</th>
+                <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">12th Marks</th>
+                <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Registered</th>
+                <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Status</th>
+                <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="border-t border-admin-blue">
-              {profiles.length > 0 ? (
-                profiles.map((profile, i) => (
-                  <tr key={profile.id} className={`${i % 2 === 1 ? "bg-admin-stripe" : "bg-white"} border-b border-[#D1E1F5] last:border-0`}>
-                    <td className="px-2 py-3.5 text-center border-r border-[#D1E1F5] text-slate-500 font-medium">
-                      {String(profile.id).padStart(4, '0')}
-                    </td>
-                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] font-normal text-slate-700">
-                      {profile.student_name}
-                    </td>
-                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] text-slate-600">
-                      {profile.parentsnumber ? (profile.parentsnumber.startsWith('+') ? profile.parentsnumber : `+91 ${profile.parentsnumber}`) : "—"}
-                    </td>
-                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] text-slate-500">
-                      {profile.student_email}
-                    </td>
-                    <td className="px-3 py-3.5 text-center border-r border-[#D1E1F5] text-slate-600">
-                      {profile.gender}
-                    </td>
-                    <td className="px-3 py-3.5 text-center border-r border-[#D1E1F5] text-slate-500">
-                      {formatDate(profile.dateofbirth)}
-                    </td>
-                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] text-slate-600">
-                      Amit Tyagi
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <div className="flex items-center justify-center gap-2.5">
-                        <button 
-                          onClick={() => openEditModal(profile)} 
-                          className="w-[32px] h-[32px] flex items-center justify-center bg-admin-dark text-white rounded-[4px] hover:bg-black transition-colors"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">edit_square</span>
-                        </button>
-                        <div className="w-[1px] h-5 bg-slate-300 mx-1" />
-                        <button 
-                          onClick={() => handleDelete(profile.id)} 
-                          className="w-[32px] h-[32px] flex items-center justify-center bg-admin-blue text-white rounded-[4px] hover:bg-blue-600 transition-colors"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">description</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+            <tbody className="divide-y divide-slate-100">
+              {students.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="py-20 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <span className="material-symbols-outlined text-[40px] text-slate-200">person_search</span>
+                      <p className="text-slate-400 font-medium text-sm">No students found</p>
+                    </div>
+                  </td>
+                </tr>
               ) : (
-                offset === 0 && Array(15).fill(null).map((_, i) => (
-                  <tr key={`placeholder-${i}`} className={`${i % 2 === 1 ? "bg-admin-stripe" : "bg-white"} border-b border-[#D1E1F5] last:border-0 opacity-40 grayscale`}>
-                    <td className="px-2 py-3.5 text-center border-r border-[#D1E1F5] text-slate-400 font-medium">0101</td>
-                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] font-normal text-slate-400">Ankarya</td>
-                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] text-slate-400">+91 823-281-8292</td>
-                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] text-slate-400">ankarya@gmail...</td>
-                    <td className="px-3 py-3.5 text-center border-r border-[#D1E1F5] text-slate-400">Female</td>
-                    <td className="px-3 py-3.5 text-center border-r border-[#D1E1F5] text-slate-400">11 Jan 2002</td>
-                    <td className="px-4 py-3.5 text-center border-r border-[#D1E1F5] text-slate-400">Amit Tyagi</td>
-                    <td className="px-4 py-3.5">
-                      <div className="flex items-center justify-center gap-2.5">
-                        <div className="w-[30px] h-[30px] bg-slate-200 rounded-[4px]" />
-                        <div className="w-[1px] h-5 bg-slate-200 mx-1" />
-                        <div className="w-[30px] h-[30px] bg-slate-200 rounded-[4px]" />
+                students.map((s, i) => (
+                  <tr key={s.id} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="px-4 py-3 text-center">
+                      <span className="text-[11px] font-bold text-slate-400">{(page - 1) * pageSize + i + 1}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-[#008080]/10 flex items-center justify-center flex-shrink-0 text-[#008080] font-black text-sm">
+                          {s.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-bold text-slate-800 truncate">{s.name}</p>
+                          <p className="text-[11px] text-slate-400 truncate">{s.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-slate-600">
+                      {s.phone !== "—" ? s.phone : <span className="text-slate-300">—</span>}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-slate-600">
+                      {s.dob ? formatDate(s.dob) : <span className="text-slate-300">—</span>}
+                    </td>
+                    <td className="px-4 py-3">
+                      {s.marks12 != null
+                        ? <span className="inline-flex items-center px-2 py-0.5 rounded-lg bg-blue-50 text-blue-700 text-[12px] font-bold">{s.marks12}%</span>
+                        : <span className="text-slate-300 text-sm">—</span>}
+                    </td>
+                    <td className="px-4 py-3 text-[12px] text-slate-500">{formatDate(s.created_at)}</td>
+                    <td className="px-4 py-3">
+                      <button onClick={() => handleToggle(s.id, s.is_active)} disabled={togglingId === s.id}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all ${
+                          s.is_active ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" : "bg-amber-100 text-amber-700 hover:bg-amber-200"
+                        } disabled:opacity-50`}>
+                        <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                          {s.is_active ? "check_circle" : "pending"}
+                        </span>
+                        {togglingId === s.id ? "..." : s.is_active ? "Active" : "Pending"}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-2">
+                        <Link href={`/admin/students/${s.id}`}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors">
+                          <span className="material-symbols-outlined text-[13px]">edit</span>
+                          Edit
+                        </Link>
+                        <button onClick={() => handleDelete(s.id)} disabled={deletingId === s.id}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-red-200 text-red-500 text-[11px] font-bold hover:bg-red-50 transition-colors disabled:opacity-50">
+                          <span className="material-symbols-outlined text-[13px]">delete</span>
+                          {deletingId === s.id ? "..." : "Delete"}
+                        </button>
                       </div>
                     </td>
                   </tr>
                 ))
-              )}
-              {profiles.length === 0 && offset > 0 && (
-                 <tr>
-                    <td colSpan={8} className="text-center py-20 text-slate-400 font-medium">
-                      No more records found on this page.
-                    </td>
-                 </tr>
               )}
             </tbody>
           </table>
         </div>
 
+        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-5 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-            <p className="text-xs text-slate-500">
-              Showing <strong>{offset + 1}</strong> to <strong>{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total}</strong> profiles
-            </p>
-            <div className="flex gap-1">
-              {offset / PAGE_SIZE + 1 > 1 && (
-                <Link href={`?page=${offset / PAGE_SIZE}&q=${q}`} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded hover:bg-slate-50">
-                  Prev
+          <div className="px-6 py-3 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+            <p className="text-sm text-slate-400">Page {page} of {totalPages}</p>
+            <div className="flex items-center gap-1.5">
+              {page > 1 && (
+                <Link href={buildUrl({ page: String(page - 1) })} className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:border-[#008080] hover:text-[#008080] transition-colors bg-white">
+                  <span className="material-symbols-outlined text-[18px]">chevron_left</span>
                 </Link>
               )}
-              {offset / PAGE_SIZE + 1 < totalPages && (
-                <Link href={`?page=${offset / PAGE_SIZE + 2}&q=${q}`} className="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded hover:bg-slate-50 transition-colors">
-                  Next
+              {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                let p: number;
+                if (totalPages <= 7) p = i + 1;
+                else if (page <= 4) p = i + 1;
+                else if (page >= totalPages - 3) p = totalPages - 6 + i;
+                else p = page - 3 + i;
+                return (
+                  <Link key={p} href={buildUrl({ page: String(p) })}
+                    className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm font-bold transition-colors ${
+                      p === page ? "bg-[#008080] text-white" : "border border-slate-200 text-slate-500 hover:border-[#008080] hover:text-[#008080] bg-white"
+                    }`}>
+                    {p}
+                  </Link>
+                );
+              })}
+              {page < totalPages && (
+                <Link href={buildUrl({ page: String(page + 1) })} className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:border-[#008080] hover:text-[#008080] transition-colors bg-white">
+                  <span className="material-symbols-outlined text-[18px]">chevron_right</span>
                 </Link>
               )}
             </div>
           </div>
         )}
       </div>
-
-      <StudentProfileFormModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={editingProfile ? updateProfile : createProfile}
-        profile={editingProfile}
-        users={users}
-      />
-    </>
+    </div>
   );
 }

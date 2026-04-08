@@ -810,22 +810,24 @@ a, button, [role="button"] {
 }
 
 /* ─── Hide scrollbar globally ───────────────────────────────── */
-body:not(.admin-layout),
-body:not(.admin-layout) * {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-body:not(.admin-layout)::-webkit-scrollbar,
-body:not(.admin-layout) *::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
-}
+body:not(.admin-layout) { scrollbar-width: none; -ms-overflow-style: none; }
 
 /* ─── Chatbot scroll containment ────────────────────────────── */
 .chatbot-scroll {
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Admin layout scroll fix ──────────────────────────────── */
+/* When body has overflow-x:hidden, browsers make <html> the scroll container
+   which breaks overflow-y-auto on inner admin containers. Fix by letting
+   the admin main element scroll naturally. */
+.admin-layout {
+  overflow: hidden;
+}
+.admin-layout main {
+  overflow-y: auto !important;
+  height: 100%;
 }
 
 /* ─── Admin scrollbar styles ────────────────────────────────── */

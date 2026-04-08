@@ -1,7 +1,8 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
-import AdminImg from "@/app/admin/_components/AdminImg";
+import { fetchCollegeOptions } from "../_components/college-options";
+import CollegeFilterBar from "../_components/CollegeFilterBar";
 import FacilitiesClient from "./FacilitiesClient";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
@@ -126,7 +127,7 @@ export default async function CollegeFacilitiesPage({
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
   // ── Query facilities ───────────────────────────────────────────────────────
-  const [facilitiesList, countRows, colleges, facilityTypes] = await Promise.all([
+  const [facilitiesList, countRows, colleges, facilityTypes, collegeOptions] = await Promise.all([
     safeQuery<FacilityRow>(
       `SELECT 
         cf.id,
@@ -162,22 +163,22 @@ export default async function CollegeFacilitiesPage({
     safeQuery<{ id: number; name: string }>(
       "SELECT id, name FROM facilities ORDER BY name ASC"
     ),
+    fetchCollegeOptions(),
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="p-8 space-y-0 w-full overflow-x-hidden min-h-screen bg-slate-50">
-      
-      {/* Page Title & Add Button */}
-      <div className="flex items-center justify-between mb-10">
-        <h1 className="text-[28px] font-light text-slate-500 tracking-tight">
-          College Facilities Details
-        </h1>
-        {/* We'll handle the Add button inside FacilitiesClient for easier state access, 
-            but we'll pass a prop to tell it to render in this 'Legacy' style. */}
-      </div>
+    <div className="p-6 space-y-6 w-full overflow-x-hidden">
+      <CollegeFilterBar
+        colleges={collegeOptions}
+        selectedId={collegeId}
+        total={total}
+        label="College Facilities"
+        icon="apartment"
+        description="Manage campus facilities — filter by college to see classified data."
+      />
 
       <FacilitiesClient 
          facilitiesList={facilitiesList}

@@ -20,7 +20,8 @@ function slugToName(slug: string): string {
 function buildImageUrl(raw: string | null | undefined): string | null {
   if (!raw) return null;
   if (raw.startsWith("http") || raw.startsWith("/")) return raw;
-  return `/uploads/${raw}`;
+  // Legacy bare filenames from old PHP admin server
+  return `https://admin.admissionx.in/uploads/${raw}`;
 }
 
 // ── Filter data ───────────────────────────────────────────────────────────────

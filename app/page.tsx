@@ -12,6 +12,14 @@ import {
 } from "@/lib/college-filter";
 import type { AdItem } from "./components/AdsSection";
 
+export interface TickerAdItem {
+  id: number;
+  title: string | null;
+  description: string | null;
+  img: string | null;
+  redirectto: string | null;
+}
+
 // ── Route-level cache ─────────────────────────────────────────────────────────
 // Tells Next.js to cache the fully-rendered page for 5 minutes.
 // Works in both development and production, unlike unstable_cache alone.
@@ -128,10 +136,13 @@ const getHomePageData = unstable_cache(
         // 4. Active home-page ads
         db.collection("ads_managements")
           .find({
-            isactive: 1,
-            ads_position: "home",
-            $or: [{ start: null }, { start: { $lte: now } }],
-            $and: [{ $or: [{ end: null }, { end: { $gte: now } }] }],
+            $or: [
+              { ads_position: "home" },
+              { ads_position: " home" },
+            ],
+            $and: [{
+              $or: [{ isactive: 1 }, { isactive: "1" }, { isactive: " 1" }]
+            }],
           })
           .sort({ created_at: -1 })
           .limit(8)
@@ -147,7 +158,23 @@ const getHomePageData = unstable_cache(
         ]),
       ]);
 
-      return { collegeRows, blogRows, examRows, adRows, statCounts };
+      // 6. Ticker ads (home_ticker position)
+      const tickerAdRows = await db.collection("ads_managements")
+        .find({
+          $or: [
+            { ads_position: "home_ticker" },
+            { ads_position: " home_ticker" },
+          ],
+          $and: [{
+            $or: [{ isactive: 1 }, { isactive: "1" }, { isactive: " 1" }]
+          }],
+        })
+        .sort({ created_at: -1 })
+        .limit(20)
+        .project({ _id: 0, id: 1, title: 1, description: 1, img: 1, redirectto: 1 })
+        .toArray() as TickerAdItem[];
+
+      return { collegeRows, blogRows, examRows, adRows, statCounts, tickerAdRows };
     } catch (error) {
       console.error("[getHomePageData] Database error:", error);
       // Return empty data instead of crashing
@@ -157,10 +184,11 @@ const getHomePageData = unstable_cache(
         examRows: [],
         adRows: [],
         statCounts: [0, 0, 0, 0],
+        tickerAdRows: [],
       };
     }
   },
-  ["homepage-data-v8"],
+  ["homepage-data-v10"],
   { revalidate: 300 },
 );
 
@@ -172,17 +200,18 @@ export default async function Page() {
   let examRows: DbExam[] = [];
   let adRows: AdItem[] = [];
   let statCounts = [0, 0, 0, 0];
+  let tickerAdRows: TickerAdItem[] = [];
 
   try {
     const data = await getHomePageData();
-    collegeRows = data.collegeRows;
-    blogRows = data.blogRows;
-    examRows = data.examRows;
-    adRows = data.adRows;
-    statCounts = data.statCounts;
+    collegeRows   = data.collegeRows;
+    blogRows      = data.blogRows;
+    examRows      = data.examRows;
+    adRows        = data.adRows;
+    statCounts    = data.statCounts;
+    tickerAdRows  = data.tickerAdRows;
   } catch (error) {
     console.error("[homepage] Failed to fetch data:", error);
-    // Return page with empty/fallback data instead of crashing
   }
 
   // ── Transform colleges ──────────────────────────────────────────────────
@@ -273,6 +302,7 @@ export default async function Page() {
       streamCounts={streamCounts}
       initialStreamColleges={initialStreamColleges}
       ads={adRows}
+      tickerAds={tickerAdRows}
     />
   );
 }

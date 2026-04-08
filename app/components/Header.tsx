@@ -319,7 +319,7 @@ export default function Header({ theme }: HeaderProps) {
           {/* Logo Area */}
           <div className="shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="bg-white rounded-xl px-3 py-1.5 shadow-sm"><img src="/admissionx-logo.png" alt="AdmissionX logo" className="h-9 w-auto object-contain" /></div>
+              <img src="/logo.jpg" alt="AdmissionX" className="h-10 w-auto object-contain" />
             </Link>
           </div>
 

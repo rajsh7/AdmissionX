@@ -1,6 +1,8 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import { fetchCollegeOptions } from "../_components/college-options";
+import CollegeFilterBar from "../_components/CollegeFilterBar";
 import ManagementListClient from "./ManagementListClient";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
@@ -139,7 +141,7 @@ export default async function CollegeManagementPage({
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
   // ── Fetch metadata + data ──────────────────────────────────────────────────
-  const [members, countRows, colleges] = await Promise.all([
+  const [members, countRows, colleges, collegeOptions] = await Promise.all([
     safeQuery<ManagementRow>(
       `SELECT 
         m.id,
@@ -169,7 +171,8 @@ export default async function CollegeManagementPage({
     ),
     safeQuery<OptionRow>(
       "SELECT cp.id, u.firstname AS name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
-    )
+    ),
+    fetchCollegeOptions(),
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);

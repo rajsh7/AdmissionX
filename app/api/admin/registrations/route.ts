@@ -101,15 +101,14 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ success: true });
     }
 
-    // ── College approval — full account creation flow ────────────────────────
+    // ── College approval ──────────────────────────────────────────────────────
     if (type === "college") {
       const college = await db.collection("next_college_signups").findOne(
-        { _id: new ObjectId(_id) },
-        { projection: { college_name: 1, email: 1, contact_name: 1, phone: 1, status: 1 } }
+        { _id: new ObjectId(_id) }
       );
       if (!college) return NextResponse.json({ error: "College not found" }, { status: 404 });
 
-      // Basic field updates (name/email/phone/reject) — no full flow needed
+      // Non-approval updates (reject / edit fields)
       if (status !== "approved") {
         const update: Record<string, unknown> = { updated_at: new Date() };
         if (status) update.status = status;
@@ -128,23 +127,10 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json({ success: true, message: "Already approved" });
       }
 
-      // ── Full approval flow (mirrors old RequestForCreateCollegeAccountController) ──
       const collegeName = (name || college.college_name || "").trim();
       const collegeEmail = (email || college.email || "").trim().toLowerCase();
       const collegePhone = (phone || college.phone || "").trim();
       const contactName = (college.contact_name || collegeName).trim();
-
-      // Check email not already used in collegeprofile
-      const existingProfile = await db.collection("collegeprofile").findOne(
-        { email: collegeEmail },
-        { projection: { _id: 1 } }
-      );
-      if (existingProfile) {
-        return NextResponse.json(
-          { error: "A college profile with this email already exists." },
-          { status: 409 }
-        );
-      }
 
       // Generate slug: college-name-{shortId}
       const shortId = _id.slice(-5);
@@ -153,43 +139,49 @@ export async function PATCH(req: NextRequest) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "") + "-" + shortId;
 
-      // Generate temporary password: same pattern as old project
-      const last4 = collegePhone.slice(-4) || "0000";
+      // Generate temp password: Adx@{year}#{last4phone}
+      const last4 = collegePhone.replace(/\D/g, "").slice(-4) || "0000";
       const year = new Date().getFullYear();
       const tempPassword = `Adx@${year}#${last4}`;
       const passwordHash = await bcrypt.hash(tempPassword, 12);
 
-      // Create collegeprofile record
-      const profileResult = await db.collection("collegeprofile").insertOne({
-        college_name: collegeName,
-        email: collegeEmail,
-        contact_name: contactName,
-        phone: collegePhone,
-        slug,
-        signup_id: new ObjectId(_id),
-        review: 0,
-        password_hash: passwordHash,
-        is_active: 1,
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      // Upsert collegeprofile (skip if already exists for this email)
+      const existingProfile = await db.collection("collegeprofile").findOne(
+        { email: collegeEmail }, { projection: { _id: 1 } }
+      );
+      let profileId = existingProfile?._id;
+      if (!existingProfile) {
+        const profileResult = await db.collection("collegeprofile").insertOne({
+          college_name: collegeName,
+          email: collegeEmail,
+          contact_name: contactName,
+          phone: collegePhone,
+          slug,
+          signup_id: new ObjectId(_id),
+          review: 0,
+          is_active: 1,
+          created_at: new Date(),
+          updated_at: new Date(),
+        });
+        profileId = profileResult.insertedId;
+      }
 
-      // Update the signup record: mark approved, store slug + hashed password
+      // *** KEY FIX: update password_hash on next_college_signups so login works ***
       await db.collection("next_college_signups").updateOne(
         { _id: new ObjectId(_id) },
         {
           $set: {
             status: "approved",
             slug,
-            password_hash: passwordHash,
-            collegeprofile_id: profileResult.insertedId,
+            password_hash: passwordHash,   // login reads this field
+            collegeprofile_id: profileId,
             approved_at: new Date(),
             updated_at: new Date(),
           },
         }
       );
 
-      // Send approval email with credentials
+      // Send approval email with login credentials
       try {
         await sendCollegeApprovalEmail(collegeEmail, collegeName, contactName, tempPassword);
       } catch (emailErr) {

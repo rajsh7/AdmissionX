@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { Lexend, Poppins } from "next/font/google";
 import "./globals.css";
-import ChatbotWidget from "./components/ChatbotWidget";
-import SmoothScrollProvider from "./components/SmoothScrollProvider";
-import GSAPAnimations from "./components/GSAPAnimations";
-import PageTransition from "./components/PageTransition";
+import ChatbotWrapper from "./components/ChatbotWrapper";
+import PublicProviders from "./components/PublicProviders";
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -36,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -66,18 +64,11 @@ export default function RootLayout({
       <body className={`${lexend.variable} ${poppins.variable} font-display antialiased overflow-x-hidden`}>
         {/* Custom cursor disabled — using default browser cursor */}
 
-        {/* Smooth scroll */}
-        <SmoothScrollProvider>
-          {/* GSAP scroll-triggered animations */}
-          <GSAPAnimations />
+        <PublicProviders>
+          {children}
+        </PublicProviders>
 
-          {/* Page transition wrapper */}
-          <PageTransition>
-            {children}
-          </PageTransition>
-        </SmoothScrollProvider>
-
-        <ChatbotWidget />
+        <ChatbotWrapper />
       </body>
     </html>
   );

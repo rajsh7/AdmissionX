@@ -3,50 +3,34 @@ import fs from "fs";
 import path from "path";
 
 // ── Transporter ───────────────────────────────────────────────────────────────
-// Reads from environment variables. In development, if no SMTP is configured
-// it falls back to Ethereal (a fake SMTP service for testing).
-let transporter: nodemailer.Transporter | null = null;
 
-async function getTransporter(): Promise<nodemailer.Transporter> {
-  if (transporter) return transporter;
-
-  // Support both SMTP_* (Next.js style) and MAIL_* (Laravel style) env vars
+function createTransporter(): nodemailer.Transporter {
   const smtpHost = process.env.SMTP_HOST ?? process.env.MAIL_HOST;
   const smtpPort = Number(process.env.SMTP_PORT ?? process.env.MAIL_PORT ?? 587);
   const smtpUser = process.env.SMTP_USER ?? process.env.MAIL_USERNAME;
   const smtpPass = process.env.SMTP_PASS ?? process.env.MAIL_PASSWORD;
   const smtpSecure = process.env.SMTP_SECURE === "true" || smtpPort === 465;
 
-  if (smtpHost) {
-    // Production / real SMTP (e.g. Gmail, SendGrid, Mailgun, etc.)
-    transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: smtpSecure,
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
-    });
-  } else {
-    // Development fallback — Ethereal fake SMTP
-    const testAccount = await nodemailer.createTestAccount();
-    transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      secure: false,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    });
-    console.log(
-      "[email] No SMTP_HOST set — using Ethereal test account:",
-      testAccount.user,
-    );
+  if (!smtpHost) {
+    throw new Error("[email] No SMTP host configured. Set MAIL_HOST or SMTP_HOST in .env.local");
   }
 
-  return transporter;
+  return nodemailer.createTransport({
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpSecure,       // true for 465, false for 587
+    requireTLS: !smtpSecure,  // force STARTTLS on port 587
+    auth: {
+      user: smtpUser,
+      pass: smtpPass,
+    },
+    tls: {
+      rejectUnauthorized: false, // allow self-signed certs in dev
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+  });
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -59,27 +43,26 @@ interface SendMailOptions {
 
 // ── Core send function ────────────────────────────────────────────────────────
 export async function sendMail(opts: SendMailOptions): Promise<void> {
-  const t = await getTransporter();
+  const t = createTransporter();
 
   const from =
     process.env.SMTP_FROM ??
-    (process.env.MAIL_USERNAME ? `"AdmissionX" <${process.env.MAIL_USERNAME}>` : '"AdmissionX" <no-reply@admissionx.com>');
+    (process.env.MAIL_USERNAME
+      ? `"AdmissionX" <${process.env.MAIL_USERNAME}>`
+      : '"AdmissionX" <no-reply@admissionx.com>');
 
-  const info = await t.sendMail({
-    from,
-    to: opts.to,
-    subject: opts.subject,
-    html: opts.html,
-    text: opts.text ?? opts.html.replace(/<[^>]+>/g, ""),
-  });
-
-  // In dev, log the Ethereal preview URL so you can see the email in a browser
-  const smtpConfigured = !!(process.env.SMTP_HOST ?? process.env.MAIL_HOST);
-  if (!smtpConfigured) {
-    console.log(
-      "[email] Preview URL:",
-      nodemailer.getTestMessageUrl(info),
-    );
+  try {
+    await t.sendMail({
+      from,
+      to: opts.to,
+      subject: opts.subject,
+      html: opts.html,
+      text: opts.text ?? opts.html.replace(/<[^>]+>/g, ""),
+    });
+    console.log(`[email] Sent "${opts.subject}" to ${opts.to}`);
+  } catch (err: any) {
+    console.error(`[email] FAILED to send "${opts.subject}" to ${opts.to}:`, err.message ?? err);
+    throw err;
   }
 }
 

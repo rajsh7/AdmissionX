@@ -91,9 +91,22 @@ export default async function CollegeProfilePage({
   const mongoFilter: Record<string, any> = {};
 
   if (q) {
+    const db0 = await getDb();
+    // Find users whose firstname matches the query — these are the college names
+    const matchedUsers = await db0
+      .collection("users")
+      .find(
+        { firstname: { $regex: q, $options: "i" } },
+        { projection: { id: 1, _id: 1 } },
+      )
+      .limit(200)
+      .toArray();
+    const matchedUserIds = matchedUsers.map((u) => u.id ?? u._id);
+
     mongoFilter.$or = [
       { slug:              { $regex: q, $options: "i" } },
       { contactpersonname: { $regex: q, $options: "i" } },
+      ...(matchedUserIds.length > 0 ? [{ users_id: { $in: matchedUserIds } }] : []),
     ];
   }
 

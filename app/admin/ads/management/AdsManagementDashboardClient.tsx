@@ -284,6 +284,7 @@ export default function AdsManagementDashboardClient({
               <select name="ads_position" defaultValue={editingAd?.ads_position || "default"} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-rose-500/30 outline-none">
                 <option value="default">Default</option>
                 <option value="home">Home Page</option>
+                <option value="home_ticker">Home Ticker Strip</option>
                 <option value="top">Top</option>
                 <option value="sidebar">Sidebar</option>
                 <option value="banner">Banner</option>

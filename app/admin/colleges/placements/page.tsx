@@ -1,233 +1,98 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import { fetchCollegeOptions } from "../_components/college-options";
+import CollegeFilterBar from "../_components/CollegeFilterBar";
 import PlacementListClient from "./PlacementListClient";
-
-// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function createPlacement(formData: FormData) {
   "use server";
-  const collegeprofile_id          = formData.get("collegeprofile_id");
-  const numberofrecruitingcompany  = formData.get("numberofrecruitingcompany") || null;
-  const ctchighest                 = formData.get("ctchighest")                || null;
-  const ctclowest                  = formData.get("ctclowest")                 || null;
-  const ctcaverage                 = formData.get("ctcaverage")                || null;
-  const placementinfo              = formData.get("placementinfo")             || null;
-
   try {
     await pool.query(
-      `INSERT INTO placement 
-        (collegeprofile_id, numberofrecruitingcompany, ctchighest, ctclowest, ctcaverage, placementinfo, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      [collegeprofile_id, numberofrecruitingcompany, ctchighest, ctclowest, ctcaverage, placementinfo],
+      `INSERT INTO placement (collegeprofile_id, numberofrecruitingcompany, ctchighest, ctclowest, ctcaverage, placementinfo, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      [formData.get("collegeprofile_id"), formData.get("numberofrecruitingcompany") || null, formData.get("ctchighest") || null, formData.get("ctclowest") || null, formData.get("ctcaverage") || null, formData.get("placementinfo") || null],
     );
-  } catch (e) {
-    console.error("[admin/colleges/placements createAction]", e);
-  }
+  } catch (e) { console.error("[admin/colleges/placements createAction]", e); }
   revalidatePath("/admin/colleges/placements");
 }
 
 async function updatePlacement(formData: FormData) {
   "use server";
-  const id                         = formData.get("id");
-  const collegeprofile_id          = formData.get("collegeprofile_id");
-  const numberofrecruitingcompany  = formData.get("numberofrecruitingcompany") || null;
-  const ctchighest                 = formData.get("ctchighest")                || null;
-  const ctclowest                  = formData.get("ctclowest")                 || null;
-  const ctcaverage                 = formData.get("ctcaverage")                || null;
-  const placementinfo              = formData.get("placementinfo")             || null;
-
   try {
     await pool.query(
-      `UPDATE placement 
-          SET collegeprofile_id = ?, numberofrecruitingcompany = ?, ctchighest = ?, 
-              ctclowest = ?, ctcaverage = ?, placementinfo = ?, updated_at = NOW()
-        WHERE id = ?`,
-      [collegeprofile_id, numberofrecruitingcompany, ctchighest, ctclowest, ctcaverage, placementinfo, id],
+      `UPDATE placement SET collegeprofile_id=?, numberofrecruitingcompany=?, ctchighest=?, ctclowest=?, ctcaverage=?, placementinfo=?, updated_at=NOW() WHERE id=?`,
+      [formData.get("collegeprofile_id"), formData.get("numberofrecruitingcompany") || null, formData.get("ctchighest") || null, formData.get("ctclowest") || null, formData.get("ctcaverage") || null, formData.get("placementinfo") || null, formData.get("id")],
     );
-  } catch (e) {
-    console.error("[admin/colleges/placements updateAction]", e);
-  }
+  } catch (e) { console.error("[admin/colleges/placements updateAction]", e); }
   revalidatePath("/admin/colleges/placements");
 }
 
 async function deletePlacementRow(id: number) {
   "use server";
-  try {
-    await pool.query("DELETE FROM placement WHERE id = ?", [id]);
-  } catch (e) {
-    console.error("[admin/colleges/placements deleteAction]", e);
-  }
+  try { await pool.query("DELETE FROM placement WHERE id = ?", [id]); }
+  catch (e) { console.error("[admin/colleges/placements deleteAction]", e); }
   revalidatePath("/admin/colleges/placements");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const PAGE_SIZE = 25;
-
-async function safeQuery<T >(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/colleges/placements safeQuery]", err);
-    return [];
-  }
+async function safeQuery<T>(sql: string, params: (string | number)[] = []): Promise<T[]> {
+  try { const [rows] = (await pool.query(sql, params)) as [T[], unknown]; return rows; }
+  catch (err) { console.error("[admin/colleges/placements safeQuery]", err); return []; }
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+interface PlacementRow { id: number; collegeprofile_id: number; college_name: string; recruiting_companies: string; highest_ctc: string; lowest_ctc: string; average_ctc: string; placement_info: string; }
+interface CountRow { total: number; }
 
-interface PlacementRow  {
-  id: number;
-  collegeprofile_id: number;
-  college_name: string;
-  recruiting_companies: string;
-  highest_ctc: string;
-  lowest_ctc: string;
-  average_ctc: string;
-  placement_info: string;
-}
+export default async function CollegePlacementsPage({ searchParams }: { searchParams: Promise<Record<string, string>> }) {
+  const sp        = await searchParams;
+  const q         = (sp.q ?? "").trim();
+  const collegeId = sp.collegeId ?? "";
+  const page      = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
+  const offset    = (page - 1) * PAGE_SIZE;
 
-interface CountRow  {
-  total: number;
-}
-
-interface OptionRow  {
-  id: number;
-  name: string;
-}
-
-const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
-const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
-export default async function CollegePlacementsPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string>>;
-}) {
-  const sp   = await searchParams;
-  const q    = (sp.q ?? "").trim();
-  const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
-  const offset = (page - 1) * PAGE_SIZE;
-
-  // ── Build WHERE clause ─────────────────────────────────────────────────────
   const conditions: string[] = [];
   const params: (string | number)[] = [];
-
-  if (q) {
-    conditions.push(
-      "(u.firstname LIKE ? OR pl.placementinfo LIKE ?)",
-    );
-    params.push(`%${q}%`, `%${q}%`);
-  }
-
+  if (q) { conditions.push("(u.firstname LIKE ? OR pl.placementinfo LIKE ?)"); params.push(`%${q}%`, `%${q}%`); }
+  if (collegeId) { conditions.push("pl.collegeprofile_id = ?"); params.push(collegeId); }
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Fetch metadata + data ──────────────────────────────────────────────────
-  const [placements, countRows, colleges] = await Promise.all([
+  const [placements, countRows, collegeOptions] = await Promise.all([
     safeQuery<PlacementRow>(
-      `SELECT 
-        pl.id,
-        pl.collegeprofile_id,
-        COALESCE(u.firstname, 'Unnamed College') as college_name,
-        pl.numberofrecruitingcompany as recruiting_companies,
-        pl.ctchighest as highest_ctc,
-        pl.ctclowest as lowest_ctc,
-        pl.ctcaverage as average_ctc,
-        pl.placementinfo as placement_info
-       FROM placement pl
-       JOIN collegeprofile cp ON cp.id = pl.collegeprofile_id
-       JOIN users u ON u.id = cp.users_id
-       ${where}
-       ORDER BY pl.created_at DESC
-       LIMIT ? OFFSET ?`,
+      `SELECT pl.id, pl.collegeprofile_id, COALESCE(u.firstname,'Unnamed College') as college_name, pl.numberofrecruitingcompany as recruiting_companies, pl.ctchighest as highest_ctc, pl.ctclowest as lowest_ctc, pl.ctcaverage as average_ctc, pl.placementinfo as placement_info
+       FROM placement pl JOIN collegeprofile cp ON cp.id=pl.collegeprofile_id JOIN users u ON u.id=cp.users_id ${where} ORDER BY pl.created_at DESC LIMIT ? OFFSET ?`,
       [...params, PAGE_SIZE, offset],
     ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total 
-       FROM placement pl 
-       JOIN collegeprofile cp ON cp.id = pl.collegeprofile_id
-       JOIN users u ON u.id = cp.users_id
-       ${where}`,
-      params,
-    ),
-    safeQuery<OptionRow>(
-      "SELECT cp.id, u.firstname AS name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
-    )
+    safeQuery<CountRow>(`SELECT COUNT(*) AS total FROM placement pl JOIN collegeprofile cp ON cp.id=pl.collegeprofile_id JOIN users u ON u.id=cp.users_id ${where}`, params),
+    fetchCollegeOptions(),
   ]);
 
-  const total = Number(countRows[0]?.total ?? 0);
+  const total      = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
+
+  function pageUrl(p: number) {
+    const qs = new URLSearchParams();
+    if (q) qs.set("q", q);
+    if (collegeId) qs.set("collegeId", collegeId);
+    qs.set("page", String(p));
+    return `/admin/colleges/placements?${qs.toString()}`;
+  }
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
-      
-      {/* ── Header ───────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>monitoring</span>
-            Placement stats
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">Track and manage college placement records and CTC data.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <form method="GET" action="/admin/colleges/placements" className="w-full sm:w-80">
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
-              <input 
-                type="text" 
-                name="q" 
-                defaultValue={q}
-                placeholder="Search colleges, placement info..." 
-                className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
-              />
-            </div>
-          </form>
-        </div>
-      </div>
+      <CollegeFilterBar colleges={collegeOptions} selectedId={collegeId} total={total} label="College Placements" icon="monitoring" description="Track placement records and CTC data — filter by college to see classified data." />
 
-      <PlacementListClient 
-        placements={placements}
-        colleges={colleges}
-        offset={offset}
-        onAdd={createPlacement}
-        onEdit={updatePlacement}
-        onDelete={deletePlacementRow}
-      />
+      <PlacementListClient placements={placements} colleges={collegeOptions as any} offset={offset} onAdd={createPlacement} onEdit={updatePlacement} onDelete={deletePlacementRow} />
 
-      {/* ── Pagination ───────────────────────────────────────────────────── */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-          <p className="text-xs text-slate-500">
-            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> placement records
-          </p>
+          <p className="text-xs text-slate-500">Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> records</p>
           <div className="flex items-center gap-1">
-            {page > 1 ? (
-              <Link href={`/admin/colleges/placements?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-            )}
-            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">
-              {page} / {totalPages}
-            </span>
-            {page < totalPages ? (
-              <Link href={`/admin/colleges/placements?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-            )}
+            {page > 1 ? <Link href={pageUrl(page - 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">← Prev</Link> : <span className="px-3 py-1.5 text-xs text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>}
+            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">{page} / {totalPages}</span>
+            {page < totalPages ? <Link href={pageUrl(page + 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Next →</Link> : <span className="px-3 py-1.5 text-xs text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>}
           </div>
         </div>
       )}
     </div>
   );
 }
-
-
-
-

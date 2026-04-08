@@ -84,6 +84,8 @@ async function updateCollegeProfile(formData: FormData) {
 
   revalidatePath("/admin/colleges/profile");
   revalidatePath(`/college/${slug}`, "page");
+  revalidatePath("/top-colleges", "page");
+  revalidatePath("/top-university", "page");
   redirect("/admin/colleges/profile");
 }
 

@@ -21,7 +21,7 @@ interface SearchBarProps {
 
 export default function SearchBar({
   defaultValue = "",
-  placeholder = "Location, universities, courses...",
+  placeholder = "Search colleges, courses, cities...",
   onSearch,
   className = "",
 }: SearchBarProps) {
@@ -81,7 +81,9 @@ export default function SearchBar({
     } else if (item.type === "course") {
       router.push(`/careers-courses?q=${encodeURIComponent(item.name)}`);
     } else if (item.type === "stream") {
-      router.push(`/top-colleges?stream=${item.slug}`);
+      const params = new URLSearchParams({ stream: item.slug ?? "" });
+      if ((item as any).cityId) params.set("city_id", String((item as any).cityId));
+      router.push(`/top-colleges?${params.toString()}`);
     } else if (item.type === "city") {
       router.push(`/top-colleges?city_id=${item.id}`);
     } else {
@@ -139,10 +141,15 @@ export default function SearchBar({
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-[15px] font-medium text-slate-800 truncate">{item.name}</div>
-                    <div className="text-[12px] font-normal text-slate-500 flex items-center gap-1">
+                    <div className="text-[12px] font-normal text-slate-500 flex items-center gap-1 flex-wrap">
                       <span className="capitalize px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-bold text-slate-400">
                         {item.type}
                       </span>
+                      {(item as any).tag && (
+                        <span className="px-1.5 py-0.5 bg-red-50 rounded text-[10px] font-bold text-red-400">
+                          {(item as any).tag}
+                        </span>
+                      )}
                       <span className="truncate">{item.location}</span>
                     </div>
                   </div>
