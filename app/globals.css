@@ -880,3 +880,20 @@ body:not(.admin-layout) { scrollbar-width: none; -ms-overflow-style: none; }
   background: rgba(255,255,255,0.15);
   border-radius: 2px;
 }
+
+/* ─── Native CSS scroll progress bar ───────────────────────────────── */
+.scroll-progress-bar {
+  background: linear-gradient(90deg, #FF3C3C, #E63535);
+  animation: none;
+  transform-origin: left;
+  transform: scaleX(0);
+  /* Use CSS scroll-driven animation where supported */
+  animation: scroll-progress linear;
+  animation-timeline: scroll();
+  animation-range: 0% 100%;
+}
+
+@keyframes scroll-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}

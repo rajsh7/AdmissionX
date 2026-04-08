@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import ChatbotWrapper from "./components/ChatbotWrapper";
 import PublicProviders from "./components/PublicProviders";
@@ -27,31 +28,26 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                function markLoaded() {
-                  document.documentElement.classList.add('fonts-loaded');
-                }
-                if (document.fonts && document.fonts.ready) {
-                  document.fonts.ready.then(markLoaded);
-                } else {
-                  setTimeout(markLoaded, 500);
-                }
-              })();
-            `,
-          }}
-        />
       </head>
       <body className="font-display antialiased overflow-x-hidden">
-        {/* Custom cursor disabled — using default browser cursor */}
-
         <PublicProviders>
           {children}
         </PublicProviders>
 
         <ChatbotWrapper />
+
+        <Script id="fonts-loaded" strategy="afterInteractive">{`
+          (function() {
+            function markLoaded() {
+              document.documentElement.classList.add('fonts-loaded');
+            }
+            if (document.fonts && document.fonts.ready) {
+              document.fonts.ready.then(markLoaded);
+            } else {
+              setTimeout(markLoaded, 500);
+            }
+          })();
+        `}</Script>
       </body>
     </html>
   );

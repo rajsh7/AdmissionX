@@ -1,4 +1,5 @@
 "use client";
+// v2 - lucide removed
 
 import Link from "next/link";
 import { useMemo, useState, useEffect, useRef } from "react";
@@ -16,14 +17,7 @@ import {
   Tooltip, 
   ResponsiveContainer
 } from "recharts";
-import { 
-  Users, 
-  Building2, 
-  UserCog, 
-  MessageSquare, 
-  MoreHorizontal, 
-  ChevronDown 
-} from "lucide-react";
+
 
 type GraphPoint = {
   key: string;
@@ -145,35 +139,27 @@ export default function DashboardClient({
     {
       title: "Total Students",
       value: stats.totalStudents?.toLocaleString() || "0",
-      change: "+12.5%",
-      subtext: "new this month",
-      icon: Users,
-      trend: "up"
+      subtext: `${stats.pendingColleges ?? 0} pending approval`,
+      icon: "group",
     },
     {
       title: "Total Colleges",
       value: stats.totalColleges?.toLocaleString() || "0",
-      change: "+12.5%",
-      subtext: "new this month",
-      icon: Building2,
-      trend: "up"
+      subtext: `${stats.pendingColleges ?? 0} pending approval`,
+      icon: "account_balance",
     },
     {
-      title: "Total Admins",
+      title: "Admin Users",
       value: stats.totalAdmins?.toLocaleString() || "0",
-      change: "+12.5%",
-      subtext: "new this month",
-      icon: UserCog,
-      trend: "up"
+      subtext: "active admins",
+      icon: "manage_accounts",
     },
     {
-      title: "Active Queries",
+      title: "Applications",
       value: stats.activeQueries?.toLocaleString() || "0",
-      change: "+12.5%",
-      subtext: "new this month",
-      icon: MessageSquare,
-      trend: "up"
-    }
+      subtext: `${stats.activeBlogs ?? 0} active blogs`,
+      icon: "description",
+    },
   ];
 
   return (
@@ -188,15 +174,11 @@ export default function DashboardClient({
                 <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
               </div>
               <div className="bg-[#FF3C3C] p-2 rounded-lg text-white">
-                <stat.icon className="w-5 h-5" strokeWidth={2.5} />
+                <span className="material-symbols-rounded text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>{stat.icon}</span>
               </div>
             </div>
             
-            <div className="mt-6 flex items-center gap-2">
-              <div className="flex items-center text-emerald-500">
-                <span className="material-symbols-rounded text-[18px]">trending_up</span>
-                <span className="text-[13px] font-bold ml-1">{stat.change}</span>
-              </div>
+            <div className="mt-4">
               <span className="text-[13px] text-slate-400 font-medium">{stat.subtext}</span>
             </div>
           </div>
@@ -295,7 +277,7 @@ export default function DashboardClient({
                 aria-expanded={openMenu === "student"}
               >
                 {monthFilter}
-                <ChevronDown className="w-4 h-4 text-slate-400" />
+                <span className="material-symbols-rounded text-[16px] text-slate-400">expand_more</span>
               </button>
               {openMenu === "student" && (
                 <div className="absolute right-0 mt-2 w-40 bg-white border border-slate-100 rounded-md shadow-lg z-20">
@@ -405,7 +387,7 @@ export default function DashboardClient({
                 aria-expanded={openMenu === "college"}
               >
                 {monthFilter}
-                <ChevronDown className="w-4 h-4 text-slate-400" />
+                <span className="material-symbols-rounded text-[16px] text-slate-400">expand_more</span>
               </button>
               {openMenu === "college" && (
                 <div className="absolute right-0 mt-2 w-40 bg-white border border-slate-100 rounded-md shadow-lg z-20">

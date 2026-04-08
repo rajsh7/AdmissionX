@@ -5,7 +5,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { motion, useScroll, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface HeaderProps {
   theme?: "light" | "dark";
@@ -23,6 +23,7 @@ const navLinks = [
   { label: "Colleges", href: "/top-colleges" },
   { label: "Top University", href: "/top-university" },
   { label: "Top Courses", href: "/careers-courses" },
+  { label: "Compare", href: "/compare" },
   { label: "Study Abroad", href: "/study-abroad" },
   {
     label: "More",
@@ -205,12 +206,13 @@ export default function Header({ theme }: HeaderProps) {
   const loginTimer = useRef<ReturnType<typeof setTimeout>>(null);
   const signupTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
-  const { scrollYProgress } = useScroll();
-
   // ── Auth check ────────────────────────────────────────────────────────────
   const checkAuth = useCallback(async () => {
     try {
-      const res = await fetch("/api/auth/me", { cache: "no-store" });
+      const res = await fetch("/api/auth/me", {
+        cache: "default",
+        headers: { "Cache-Control": "max-age=30" },
+      });
       if (res.ok) {
         const data = await res.json();
         setAuthUser(data.user ?? null);
@@ -300,12 +302,9 @@ export default function Header({ theme }: HeaderProps) {
 
   return (
     <>
-      {/* Scroll Progress Bar */}
+      {/* Scroll Progress Bar — CSS only, no framer-motion overhead */}
       {mounted && (
-        <motion.div
-          className="scroll-progress-bar h-1 fixed top-0 left-0 right-0 z-[60] origin-left"
-          style={{ scaleX: scrollYProgress, backgroundColor: '#FF3C3C' }}
-        />
+        <div className="scroll-progress-bar fixed top-0 left-0 right-0 z-[60] h-[3px]" />
       )}
 
       <motion.header 
