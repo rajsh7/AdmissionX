@@ -23,7 +23,7 @@ async function deleteContactRow(id: string, src: string) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 15;
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
@@ -90,32 +90,7 @@ export default async function CollegeContactPage({
   const rows       = contacts.slice(offset, offset + PAGE_SIZE);
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
-
-      {/* ── Header ───────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>contact_mail</span>
-            College Contacts
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            {total.toLocaleString()} contact{total !== 1 ? "s" : ""} — manage inquiries and send welcome communications.
-          </p>
-        </div>
-        <form method="GET" action="/admin/colleges/contact" className="w-full sm:w-80">
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
-            <input
-              type="text"
-              name="q"
-              defaultValue={q}
-              placeholder="Search name, email, college..."
-              className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
-            />
-          </div>
-        </form>
-      </div>
+    <div className="p-6 space-y-6 w-full max-w-none">
 
       {/* ── Grid of Contact Cards ────────────────────────────────────── */}
       <div className="bg-transparent rounded-2xl overflow-hidden">
@@ -132,11 +107,11 @@ export default async function CollegeContactPage({
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-6">
             {rows.map((c, idx) => (
               <div 
                 key={c._id} 
-                className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"
+                className="bg-white rounded-[5px] border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"
               >
                 {/* Delete button (positioned absolute for clean card UI) */}
                 <div className="absolute top-4 right-4 z-10">
@@ -147,16 +122,16 @@ export default async function CollegeContactPage({
                   {/* Card Header: Logo + Title Section */}
                   <div className="flex gap-4 items-start mb-4">
                     {/* Placeholder Logo / AKT Styled */}
-                    <div className="w-24 h-24 bg-[#D16B0D] rounded-lg shrink-0 flex items-center justify-center p-2">
+                    <div className="w-[137px] h-[127px] bg-[#D16B0D] rounded-[5px] shrink-0 flex items-center justify-center p-2">
                        <span className="text-white text-3xl font-black tracking-tighter">AKT</span>
                     </div>
 
                     <div className="flex-1 min-w-0 pr-8">
-                       <h3 className="font-bold text-slate-600 text-lg leading-tight uppercase truncate">
+                       <h3 className="font-semibold text-[#6C6C6C] text-[20px] leading-tight uppercase truncate">
                          {c.college_name || "Unknown College"}
-                         {idx % 2 === 0 && <span className="block text-slate-600">Polytechnic College</span>}
+                         {idx % 2 === 0 && <span className="block text-[#6C6C6C]">Polytechnic College</span>}
                        </h3>
-                       <p className="text-[11px] font-bold text-slate-500 leading-tight mt-2 italic">
+                       <p className="text-[14px] font-medium text-[#6C6C6C] leading-tight mt-2">
                          Directorate of Technical Education, Chennai ( DoTE Chennai )
                        </p>
                     </div>
@@ -164,30 +139,30 @@ export default async function CollegeContactPage({
 
                   {/* Address Line Separator */}
                   <div className="border-t border-slate-100 pt-4 mb-4">
-                    <p className="text-sm font-bold text-slate-500 truncate">
+                    <p className="text-[15px] font-semibold text-[#6C6C6C] truncate">
                        AKT Nagar, Neelamangalam, Kallakurichi
                     </p>
                   </div>
 
                   {/* Contact Info Rows */}
-                  <div className="space-y-2 text-slate-500">
+                  <div className="space-y-2">
                     <div className="flex items-center gap-3">
                       <span className="material-symbols-rounded text-[18px] shrink-0" style={ICO_FILL}>location_on</span>
-                      <span className="text-xs font-bold leading-tight">
+                      <span className="text-[13px] font-normal leading-tight text-[#6C6C6C]">
                          Villupuram, Tamil Nadu 606202
                       </span>
                     </div>
 
                     <div className="flex items-center gap-3">
                       <span className="material-symbols-rounded text-[18px] shrink-0" style={ICO_FILL}>mail</span>
-                      <span className="text-xs font-bold leading-tight truncate">
+                      <span className="text-[13px] font-normal leading-tight truncate text-[#6C6C6C]">
                          {c.email || "no-email@yahoo.co.in"}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-3">
                       <span className="material-symbols-rounded text-[18px] shrink-0" style={ICO_FILL}>call</span>
-                      <span className="text-xs font-bold leading-tight tracking-wide">
+                      <span className="text-[13px] font-normal leading-tight tracking-wide text-[#6C6C6C]">
                          {c.phone || "04364222202"}
                       </span>
                     </div>

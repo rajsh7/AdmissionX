@@ -290,7 +290,7 @@ export default async function AdminCollegesPage({
   ];
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 w-full">
 
       {/* ── Page header ──────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -409,7 +409,7 @@ export default async function AdminCollegesPage({
         </div>
 
         {/* Search box */}
-        <form method="GET" action="/admin/colleges" className="flex-1 max-w-sm">
+        <form method="GET" action="/admin/colleges" className="flex-1">
           {status !== "all" && (
             <input type="hidden" name="status" value={status} />
           )}

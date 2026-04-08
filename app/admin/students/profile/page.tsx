@@ -1,114 +1,152 @@
-import { getDb } from "@/lib/db";
+import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { ObjectId } from "mongodb";
 import StudentProfileClient from "./StudentProfileClient";
 
-export const dynamic = "force-dynamic";
-
-const PAGE_SIZE = 25;
-
-async function deleteStudent(id: string) {
-  "use server";
+async function safeQuery<T>(
+  sql: string,
+  params: (string | number)[] = []
+): Promise<T[]> {
   try {
-    const db = await getDb();
-    await db.collection("next_student_signups").deleteOne({ _id: new ObjectId(id) });
-  } catch (e) {
-    console.error("[admin/students/profile delete]", e);
+    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
+    return rows;
+  } catch (err) {
+    console.error("[admin/students/profile safeQuery]", err);
+    return [];
   }
-  revalidatePath("/admin/students/profile");
 }
 
-async function toggleActive(id: string, current: number) {
+// ─── Server Actions ───────────────────────────────────────────────────────────
+
+async function createProfile(formData: FormData) {
   "use server";
+  const users_id = parseInt(formData.get("users_id") as string, 10);
+  const gender = formData.get("gender") as string || "Default";
+  const dateofbirth = formData.get("dateofbirth") as string || "2000-01-01";
+  const parentsname = formData.get("parentsname") as string || "";
+  const parentsnumber = formData.get("parentsnumber") as string || "";
+  const hobbies = formData.get("hobbies") as string || "";
+  const interests = formData.get("interests") as string || "";
+  const projects = formData.get("projects") as string || "";
+  const entranceexamname = formData.get("entranceexamname") as string || "";
+  const entranceexamnumber = formData.get("entranceexamnumber") as string || "";
+
+  if (isNaN(users_id)) return;
+
   try {
-    const db = await getDb();
-    await db.collection("next_student_signups").updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { is_active: current ? 0 : 1, updated_at: new Date() } }
+    await pool.query(
+      `INSERT INTO studentprofile 
+        (users_id, gender, dateofbirth, parentsname, parentsnumber, entranceexamname, entranceexamnumber, hobbies, interests, projects, created_at, updated_at, slug) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)`,
+      [users_id, gender, dateofbirth, parentsname, parentsnumber, entranceexamname, entranceexamnumber, hobbies, interests, projects, `user-${users_id}-${Date.now()}`]
     );
   } catch (e) {
-    console.error("[admin/students/profile toggleActive]", e);
+    console.error("[admin/students/profile createProfile]", e);
   }
   revalidatePath("/admin/students/profile");
 }
 
-async function updateStudent(id: string, data: {
-  name: string; email: string; phone: string; dob: string; marks12: number | null;
-}) {
+async function updateProfile(formData: FormData) {
   "use server";
+  const id = parseInt(formData.get("id") as string, 10);
+  const users_id = parseInt(formData.get("users_id") as string, 10);
+  const gender = formData.get("gender") as string;
+  const dateofbirth = formData.get("dateofbirth") as string;
+  const parentsname = formData.get("parentsname") as string;
+  const parentsnumber = formData.get("parentsnumber") as string;
+  const hobbies = formData.get("hobbies") as string;
+  const interests = formData.get("interests") as string;
+  const projects = formData.get("projects") as string;
+  const entranceexamname = formData.get("entranceexamname") as string;
+  const entranceexamnumber = formData.get("entranceexamnumber") as string;
+
+  if (isNaN(id) || isNaN(users_id)) return;
+
   try {
-    const db = await getDb();
-    await db.collection("next_student_signups").updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { ...data, updated_at: new Date() } }
+    await pool.query(
+      `UPDATE studentprofile SET 
+        users_id = ?, gender = ?, dateofbirth = ?, parentsname = ?, parentsnumber = ?, entranceexamname = ?, entranceexamnumber = ?, hobbies = ?, interests = ?, projects = ?, updated_at = NOW()
+       WHERE id = ?`,
+      [users_id, gender, dateofbirth, parentsname, parentsnumber, entranceexamname, entranceexamnumber, hobbies, interests, projects, id]
     );
   } catch (e) {
-    console.error("[admin/students/profile update]", e);
+    console.error("[admin/students/profile updateProfile]", e);
   }
   revalidatePath("/admin/students/profile");
 }
 
-export default async function StudentProfilePage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string>>;
-}) {
-  const sp = await searchParams;
-  const q = (sp.q ?? "").trim();
-  const statusFilter = sp.status ?? "";
-  const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
-  const offset = (page - 1) * PAGE_SIZE;
-
-  const db = await getDb();
-
-  const filter: Record<string, unknown> = {};
-  if (q) {
-    filter.$or = [
-      { name: { $regex: q, $options: "i" } },
-      { email: { $regex: q, $options: "i" } },
-      { phone: { $regex: q, $options: "i" } },
-    ];
+async function deleteProfile(id: number) {
+  "use server";
+  if (isNaN(id)) return;
+  try {
+    await pool.query("DELETE FROM studentprofile WHERE id = ?", [id]);
+  } catch (e) {
+    console.error("[admin/students/profile deleteProfile]", e);
   }
-  if (statusFilter === "active") filter.is_active = 1;
-  if (statusFilter === "pending") filter.is_active = 0;
+  revalidatePath("/admin/students/profile");
+}
 
-  const [total, students] = await Promise.all([
-    db.collection("next_student_signups").countDocuments(filter),
-    db.collection("next_student_signups")
-      .find(filter, {
-        projection: { _id: 1, name: 1, email: 1, phone: 1, dob: 1, marks12: 1, is_active: 1, created_at: 1 },
-      })
-      .sort({ created_at: -1 })
-      .skip(offset)
-      .limit(PAGE_SIZE)
-      .toArray(),
+// ─── Interfaces ───────────────────────────────────────────────────────────────
+
+interface StudentProfileRow  {
+  id: number;
+  users_id: number;
+  student_name: string;
+  student_email: string;
+  gender: string;
+  dateofbirth: string;
+  parentsname: string;
+  parentsnumber: string;
+  entranceexamname: string;
+  entranceexamnumber: string;
+  hobbies: string;
+  interests: string;
+  projects: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface CountRow  {
+  total: number;
+}
+
+interface UserRow  {
+  id: number;
+  name: string;
+  email: string;
+}
+
+export default async function StudentProfilePage() {
+  const [profiles, countRows, users] = await Promise.all([
+    safeQuery<StudentProfileRow>(
+      `SELECT sp.*, s.name as student_name, s.email as student_email
+       FROM studentprofile sp
+       LEFT JOIN next_student_signups s ON sp.users_id = s.id
+       ORDER BY sp.created_at DESC`
+    ),
+    safeQuery<CountRow>(
+      `SELECT COUNT(*) AS total 
+       FROM studentprofile sp
+       LEFT JOIN next_student_signups s ON sp.users_id = s.id`
+    ),
+    safeQuery<UserRow>(`SELECT id, name, email FROM next_student_signups ORDER BY name ASC LIMIT 1000`)
   ]);
 
-  const totalPages = Math.ceil(total / PAGE_SIZE);
-
-  const rows = students.map((s) => ({
-    id: s._id.toString(),
-    name: s.name ?? "—",
-    email: s.email ?? "—",
-    phone: s.phone ?? "—",
-    dob: s.dob ?? null,
-    marks12: s.marks12 ?? null,
-    is_active: s.is_active ?? 0,
-    created_at: s.created_at ? new Date(s.created_at).toISOString() : null,
-  }));
+  const total = Number(countRows[0]?.total ?? profiles.length);
 
   return (
-    <StudentProfileClient
-      students={rows}
-      total={total}
-      page={page}
-      totalPages={totalPages}
-      pageSize={PAGE_SIZE}
-      q={q}
-      statusFilter={statusFilter}
-      deleteStudent={deleteStudent}
-      toggleActive={toggleActive}
-      updateStudent={updateStudent}
-    />
+    <div className="p-6 space-y-6 w-full">
+      <StudentProfileClient 
+        profiles={JSON.parse(JSON.stringify(profiles))}
+        users={JSON.parse(JSON.stringify(users))}
+        total={total}
+        totalPages={1}
+        createProfile={createProfile}
+        deleteProfile={deleteProfile}
+      />
+    </div>
   );
 }
+
+
+
+

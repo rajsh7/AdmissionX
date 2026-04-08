@@ -5,190 +5,286 @@ import Link from "next/link";
 import AdminModal from "@/app/admin/_components/AdminModal";
 import FacilityForm from "./FacilityForm";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
-import AdminImg from "@/app/admin/_components/AdminImg";
+
+interface FacilityRow {
+  id: number;
+  collegeprofile_id: number;
+  facilities_id: number | null;
+  facility_name_raw: string | null;
+  facility_name: string;
+  description: string | null;
+  created_at?: string | null;
+}
 
 interface FacilitiesClientProps {
-  facilitiesList: any[];
+  facilitiesList: FacilityRow[];
   colleges: { id: number; name: string }[];
   facilityTypes: { id: number; name: string }[];
   offset: number;
+  total: number;
+  pageSize: number;
   onDelete: (id: number) => Promise<void>;
   onAdd: (formData: FormData) => Promise<void>;
-  onEdit: (formData: FormData) => Promise<void>;
   q: string;
   collegeId: string;
 }
-
-const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
 export default function FacilitiesClient({
   facilitiesList,
   colleges,
   facilityTypes,
   offset,
+  total,
+  pageSize,
   onDelete,
   onAdd,
-  onEdit,
   q,
-  collegeId
+  collegeId,
 }: FacilitiesClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingFacility, setEditingFacility] = useState<any>(null);
   const [showFilter, setShowFilter] = useState(false);
 
-  const handleEdit = (facility: any) => {
-    setEditingFacility(facility);
+  function openAdd() {
     setIsModalOpen(true);
-  };
+  }
 
-  const handleAdd = () => {
-    setEditingFacility(null);
-    setIsModalOpen(true);
-  };
-
-  const handleFormSuccess = () => {
+  function closeModal() {
     setIsModalOpen(false);
-    setEditingFacility(null);
-  };
+  }
+
+  const start = total > 0 ? offset + 1 : 0;
+  const end = Math.min(offset + pageSize, total);
+
+  function formatDate(value?: string | null) {
+    if (!value) return "-";
+    const dt = new Date(value);
+    if (Number.isNaN(dt.getTime())) return "-";
+    return dt.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
 
   return (
     <>
-      <div className="relative">
-        {/* Add Button */}
-        <div className="flex justify-start mb-4">
-          <button 
-            onClick={handleAdd}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
-          >
-            Add new college facilities +
-          </button>
-        </div>
-
-        {/* Table Container with Courses Border */}
-        <div className="bg-white border-[3px] border-[#3498db] shadow-sm overflow-hidden">
-          
-          <div className="bg-white border-b border-slate-200 p-4 flex justify-end">
-             <button 
-               onClick={() => setShowFilter(!showFilter)}
-               className="px-4 py-1.5 bg-[#444444] text-white text-[11px] font-bold rounded shadow hover:bg-black transition-all uppercase tracking-widest"
-             >
-               Filter Options
-             </button>
-          </div>
-
-          {showFilter && (
-            <div className="bg-white p-6 border-b border-slate-100 animate-in fade-in slide-in-from-top-2 duration-200">
-              <form method="GET" action="/admin/colleges/facilities" className="flex flex-col sm:flex-row items-end gap-6 text-black">
-                <div className="flex-1 w-full">
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2">College Name</label>
-                  <select name="collegeId" defaultValue={collegeId} className="w-full border border-slate-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-black">
-                    <option value="">Select college</option>
-                    {colleges.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
-                </div>
-                <div className="flex-1 w-full">
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Search Query</label>
-                  <input type="text" name="q" defaultValue={q} placeholder="Facility name..." className="w-full border border-slate-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-black" />
-                </div>
-                <div className="flex gap-2">
-                  <Link href="/admin/colleges/facilities" className="px-6 py-2 bg-slate-400 text-white text-xs font-bold rounded-sm hover:bg-slate-500 flex items-center justify-center">CLEAR</Link>
-                  <button type="submit" className="px-6 py-2 bg-[#0799fb] text-white text-xs font-bold rounded-sm hover:bg-blue-600">SUBMIT</button>
-                </div>
-              </form>
-            </div>
-          )}
-
-          {facilitiesList.length === 0 ? (
-            <div className="py-20 text-center text-slate-500 text-sm font-semibold">No facility records found.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-center border-collapse">
-                <thead>
-                  <tr className="bg-[#444444] text-white uppercase text-[11px] font-black tracking-widest">
-                    <th className="px-4 py-4 border-r border-white/10 w-16">ID</th>
-                    <th className="px-4 py-4 border-r border-white/10">College Profile</th>
-                    <th className="px-4 py-4 border-r border-white/10">Facilities</th>
-                    <th className="px-4 py-4 border-r border-white/10">Last Update by</th>
-                    <th className="px-4 py-5 w-32">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {facilitiesList.map((f, idx) => {
-                    const college = colleges.find(c => c.id === f.collegeprofile_id);
-                    const facilityType = facilityTypes.find(ft => ft.id === f.facilities_id);
-                    const displayName = f.facility_name_raw || facilityType?.name || "General Facility";
-                    const collegeName = college?.name || "Unnamed College";
-                    
-                    return (
-                      <tr 
-                        key={f.id} 
-                        className={`transition-colors text-[13px] font-medium ${idx % 2 === 0 ? "bg-[#e8f4fd]" : "bg-white"} hover:bg-blue-100/30`}
-                      >
-                        <td className="px-4 py-4 border-r border-slate-200/60 font-bold text-slate-400">
-                          {String(idx + 1 + offset).padStart(4, '0')}
-                        </td>
-                        <td className="px-4 py-4 border-r border-slate-200/60 font-bold text-slate-700 uppercase">
-                          {collegeName}
-                        </td>
-                        <td className="px-4 py-4 border-r border-slate-200/60 font-semibold text-slate-500">
-                          {displayName}
-                        </td>
-                        <td className="px-4 py-4 border-r border-slate-200/60">
-                          <div className="text-blue-400 font-bold mb-1">Amit Tyagi</div>
-                          <div className="text-[10px] text-slate-400 font-medium">
-                            {f.created_at ? new Date(f.created_at).toISOString().replace('T', ' ').split('.')[0] : 'N/A'}
-                          </div>
-                        </td>
-                        <td className="px-4 py-4 flex items-center justify-center gap-1.5 min-w-[120px]">
-                          <button 
-                            onClick={() => handleEdit(f)}
-                            className="w-9 h-9 flex items-center justify-center bg-[#444444] text-white rounded hover:bg-black transition-all"
-                            title="Update"
-                          >
-                            <span className="material-symbols-rounded text-[18px]">edit_square</span>
-                          </button>
-                          <DeleteButton 
-                             action={onDelete.bind(null, f.id)} 
-                             size="sm" 
-                             variant="classic"
-                             label="Delete"
-                             icon={<span className="material-symbols-rounded text-[20px]">delete</span>}
-                          />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+        <button
+          onClick={openAdd}
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
+        >
+          Add college facility +
+        </button>
+        <button
+          onClick={() => setShowFilter(!showFilter)}
+          className="px-4 py-2.5 bg-slate-900 text-white text-[11px] font-bold rounded shadow hover:bg-black transition-all uppercase tracking-widest"
+        >
+          {showFilter ? "Hide Filters" : "Filter Options"}
+        </button>
       </div>
 
-      {/* CRUD Modal */}
-      <AdminModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        title={editingFacility ? "Update Facility" : "Add New campus Facility"}
+      {showFilter && (
+        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-6 mb-4">
+          <form method="GET" action="/admin/colleges/facilities" className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-4 items-end">
+            <div>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">College</label>
+              <div className="relative">
+                <select
+                  name="collegeId"
+                  defaultValue={collegeId}
+                  className="w-full h-10 px-4 border border-slate-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:border-[#008080] focus:ring-2 focus:ring-[#008080]/10 transition-all text-slate-700 appearance-none"
+                >
+                  <option value="">All colleges</option>
+                  {colleges.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                <span className="material-symbols-outlined text-[18px] text-slate-400 absolute right-3 top-2.5 pointer-events-none">
+                  expand_more
+                </span>
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Search</label>
+              <input
+                type="text"
+                name="q"
+                defaultValue={q}
+                placeholder="Search facilities..."
+                className="w-full h-10 px-4 border border-slate-200 rounded-xl text-sm font-medium bg-white focus:outline-none focus:border-[#008080] focus:ring-2 focus:ring-[#008080]/10 transition-all placeholder:text-slate-300 text-slate-700"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Link
+                href="/admin/colleges/facilities"
+                className="px-5 h-10 inline-flex items-center justify-center rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-colors"
+              >
+                Clear
+              </Link>
+              <button
+                type="submit"
+                className="px-5 h-10 rounded-xl bg-[#008080] text-white text-xs font-bold hover:bg-[#006666] transition-colors"
+              >
+                Apply
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      <div className="bg-white">
+        <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
+          <p className="text-sm text-slate-500 font-medium">
+            {total > 0 ? (
+              <>
+                Showing{" "}
+                <span className="font-bold text-slate-800">
+                  {start}-{end}
+                </span>{" "}
+                of{" "}
+                <span className="font-bold text-slate-800">
+                  {total.toLocaleString()}
+                </span>{" "}
+                facilities
+              </>
+            ) : (
+              "No facilities found"
+            )}
+          </p>
+        </div>
+
+        {facilitiesList.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-[32px] text-slate-300">
+                location_city
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-slate-700">
+              No facility records found
+            </h3>
+            <p className="text-sm text-slate-400 mt-1">
+              Try adjusting your search or filters
+            </p>
+          </div>
+        ) : (
+          <table className="w-full text-left border-collapse table-fixed">
+            <colgroup>
+              <col style={{ width: "4%" }} />
+              <col style={{ width: "28%" }} />
+              <col style={{ width: "22%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "10%" }} />
+              <col style={{ width: "16%" }} />
+            </colgroup>
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100">
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-center">
+                  S.No
+                </th>
+                <th className="px-4 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Facility
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  College
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Type
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Created
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-right">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {facilitiesList.map((f, idx) => {
+                const college = colleges.find((c) => c.id === f.collegeprofile_id);
+                const facilityType = facilityTypes.find((ft) => ft.id === f.facilities_id);
+                const displayName = f.facility_name_raw || facilityType?.name || "General Facility";
+                const collegeName = college?.name || "Unnamed College";
+
+                return (
+                  <tr key={f.id} className="hover:bg-slate-50/60 transition-colors group">
+                    <td className="px-3 py-2.5 text-center">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
+                        {offset + idx + 1}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-slate-800 truncate leading-tight">
+                          {displayName}
+                        </p>
+                        <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                          {f.description || "No description"}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <p className="text-sm font-semibold text-slate-700 truncate">
+                        {collegeName}
+                      </p>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold">
+                        {facilityType?.name || "Custom"}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <span className="text-[11px] text-slate-500">
+                        {formatDate(f.created_at)}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <div className="flex flex-row items-center justify-end gap-1.5">
+                        <Link
+                          href={`/admin/colleges/facilities/${f.id}`}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors shadow-sm"
+                          title="Edit facility"
+                        >
+                          <span className="material-symbols-outlined text-[13px]">edit</span>
+                          Edit
+                        </Link>
+                        <DeleteButton
+                          action={async () => {
+                            await onDelete(f.id);
+                          }}
+                          label="Delete"
+                          size="xs"
+                          icon={
+                            <span className="material-symbols-outlined text-[13px]">
+                              delete
+                            </span>
+                          }
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      <AdminModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title="Add New Campus Facility"
       >
-        <FacilityForm 
+        <FacilityForm
           colleges={colleges}
           facilityTypes={facilityTypes}
-          initialData={editingFacility ? {
-            id: editingFacility.id,
-            collegeprofile_id: editingFacility.collegeprofile_id,
-            facilities_id: editingFacility.facilities_id,
-            name: editingFacility.facility_name_raw,
-            description: editingFacility.description
-          } : null}
-          onSubmitAction={editingFacility ? onEdit : onAdd}
-          onSuccess={handleFormSuccess}
+          initialData={null}
+          onSubmitAction={onAdd}
+          onSuccess={closeModal}
         />
       </AdminModal>
     </>
   );
 }
-
-
-
-

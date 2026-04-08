@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Local fonts to avoid build-time Google Fonts fetch */
+@font-face {
+    font-family: "Lexend";
+    src: url("/fonts/lexend/ca31d6821328a4e9-s.p.8036670a.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 300 900;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Poppins";
+    src: url("/fonts/poppins/41e95f694c5c4549-s.666bad7d.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 400 900;
+    font-display: swap;
+}
+
+.font-poppins {
+    font-family: "Poppins", sans-serif;
+}
+
 @layer base {
   :root {
     --color-primary: #FF3C3C;

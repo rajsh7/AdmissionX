@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import AdminModal from "@/app/admin/_components/AdminModal";
+import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import AdmissionFormModal from "./AdmissionFormModal";
 
@@ -19,125 +19,176 @@ interface AdmissionListClientProps {
   admissions: AdmissionRow[];
   colleges: Option[];
   offset: number;
+  total: number;
+  pageSize: number;
   onAdd: (formData: FormData) => Promise<void>;
-  onEdit: (formData: FormData) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
 }
-
-const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
 export default function AdmissionListClient({
   admissions,
   colleges,
   offset,
+  total,
+  pageSize,
   onAdd,
-  onEdit,
   onDelete,
 }: AdmissionListClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingAdmission, setEditingAdmission] = useState<AdmissionRow | null>(null);
 
   function openAdd() {
-    setEditingAdmission(null);
-    setIsModalOpen(true);
-  }
-
-  function openEdit(admission: AdmissionRow) {
-    setEditingAdmission(admission);
     setIsModalOpen(true);
   }
 
   function closeModal() {
     setIsModalOpen(false);
-    setEditingAdmission(null);
   }
+
+  const start = total > 0 ? offset + 1 : 0;
+  const end = Math.min(offset + pageSize, total);
 
   return (
     <>
-      {/* Add button */}
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-start mb-4">
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/25 transition-all"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
         >
-          <span className="material-symbols-rounded text-[20px]" style={ICO_FILL}>add_circle</span>
-          Add Procedure
+          Add admission procedure +
         </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white">
+        <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
+          <p className="text-sm text-slate-500 font-medium">
+            {total > 0 ? (
+              <>
+                Showing{" "}
+                <span className="font-bold text-slate-800">
+                  {start}-{end}
+                </span>{" "}
+                of{" "}
+                <span className="font-bold text-slate-800">
+                  {total.toLocaleString()}
+                </span>{" "}
+                procedures
+              </>
+            ) : (
+              "No admission procedures found"
+            )}
+          </p>
+        </div>
+
         {admissions.length === 0 ? (
-          <div className="py-20 text-center">
-            <span className="material-symbols-rounded text-6xl text-slate-200 block mb-4" style={ICO_FILL}>assignment_ind</span>
-            <p className="text-slate-500 font-semibold text-sm">No admission records found.</p>
-            <button
-              onClick={openAdd}
-              className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
-            >
-              <span className="material-symbols-rounded text-[18px]" style={ICO_FILL}>add_circle</span>
-              Add first procedure
-            </button>
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-[32px] text-slate-300">
+                assignment_ind
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-slate-700">
+              No admission procedures found
+            </h3>
+            <p className="text-sm text-slate-400 mt-1">
+              Try adjusting your search or filters
+            </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-left">
-                  <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Procedure Title</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College Name</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Description</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+          <table className="w-full text-left border-collapse table-fixed">
+            <colgroup>
+              <col style={{ width: "4%" }} />
+              <col style={{ width: "30%" }} />
+              <col style={{ width: "22%" }} />
+              <col style={{ width: "28%" }} />
+              <col style={{ width: "16%" }} />
+            </colgroup>
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100">
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-center">
+                  S.No
+                </th>
+                <th className="px-4 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Procedure
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  College
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                  Description
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-right">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {admissions.map((a, idx) => (
+                <tr key={a.id} className="hover:bg-slate-50/60 transition-colors group">
+                  <td className="px-3 py-2.5 text-center">
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
+                      {offset + idx + 1}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-slate-800 truncate leading-tight">
+                        {a.title}
+                      </p>
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                        Enrollment workflow
+                      </p>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <p className="text-sm font-semibold text-slate-700 truncate">
+                      {a.college_name}
+                    </p>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <span className="text-[11px] text-slate-500 line-clamp-2">
+                      {a.description || "No description provided"}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <div className="flex flex-row items-center justify-end gap-1.5">
+                      <Link
+                        href={`/admin/colleges/admission/${a.id}`}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#008080] text-white text-[11px] font-bold hover:bg-[#006666] transition-colors shadow-sm"
+                        title="Edit admission"
+                      >
+                        <span className="material-symbols-outlined text-[13px]">
+                          edit
+                        </span>
+                        Edit
+                      </Link>
+                      <DeleteButton
+                        action={async () => {
+                          await onDelete(a.id);
+                        }}
+                        label="Delete"
+                        size="xs"
+                        icon={
+                          <span className="material-symbols-outlined text-[13px]">
+                            delete
+                          </span>
+                        }
+                      />
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {admissions.map((a, idx) => (
-                  <tr key={a.id} className="hover:bg-blue-50/20 transition-colors group">
-                    <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-slate-800 leading-snug">{a.title}</span>
-                        <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider mt-0.5">Enrollment Workflow</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-slate-600 font-medium truncate max-w-[200px] block">{a.college_name}</span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-xs text-slate-500 line-clamp-1 max-w-[350px]">{a.description || "No description provided"}</span>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => openEdit(a)}
-                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                          title="Edit"
-                        >
-                          <span className="material-symbols-rounded text-[18px]">edit</span>
-                        </button>
-                        <DeleteButton action={onDelete.bind(null, a.id)} size="sm" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
 
       <AdmissionFormModal
         isOpen={isModalOpen}
         onClose={closeModal}
-        onSubmit={editingAdmission ? onEdit : onAdd}
-        admission={editingAdmission}
+        onSubmit={onAdd}
+        admission={undefined}
         colleges={colleges}
       />
     </>
   );
 }
-
-
-
-

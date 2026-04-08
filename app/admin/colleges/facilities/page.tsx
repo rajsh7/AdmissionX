@@ -1,8 +1,6 @@
 import pool from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
-import { fetchCollegeOptions } from "../_components/college-options";
-import CollegeFilterBar from "../_components/CollegeFilterBar";
 import FacilitiesClient from "./FacilitiesClient";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
@@ -127,7 +125,7 @@ export default async function CollegeFacilitiesPage({
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
   // ── Query facilities ───────────────────────────────────────────────────────
-  const [facilitiesList, countRows, colleges, facilityTypes, collegeOptions] = await Promise.all([
+  const [facilitiesList, countRows, colleges, facilityTypes] = await Promise.all([
     safeQuery<FacilityRow>(
       `SELECT 
         cf.id,
@@ -163,30 +161,33 @@ export default async function CollegeFacilitiesPage({
     safeQuery<{ id: number; name: string }>(
       "SELECT id, name FROM facilities ORDER BY name ASC"
     ),
-    fetchCollegeOptions(),
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="p-6 space-y-6 w-full overflow-x-hidden">
-      <CollegeFilterBar
-        colleges={collegeOptions}
-        selectedId={collegeId}
-        total={total}
-        label="College Facilities"
-        icon="apartment"
-        description="Manage campus facilities — filter by college to see classified data."
-      />
+    <div className="p-6 space-y-6 w-full">
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>location_city</span>
+            College facilities
+          </h1>
+          <p className="text-sm text-slate-500 mt-0.5">Manage campus facilities and amenities.</p>
+        </div>
+      </div>
 
       <FacilitiesClient 
          facilitiesList={facilitiesList}
          colleges={colleges}
          facilityTypes={facilityTypes}
          offset={offset}
+         total={total}
+         pageSize={PAGE_SIZE}
          onAdd={createFacility}
-         onEdit={updateFacility}
          onDelete={deleteFacilityRow}
          q={q}
          collegeId={collegeId}
