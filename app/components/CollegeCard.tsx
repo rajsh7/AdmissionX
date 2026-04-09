@@ -139,18 +139,37 @@ export default function CollegeCard({
             </span>
           </div>
 
-          <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-50">
-            <div>
-              <div className="text-[10px] font-normal text-slate-400 uppercase tracking-widest leading-none">
-                Best Course
-              </div>
-              <div className="text-sm font-normal text-slate-800 mt-1">
-                {streams.length > 0 ? streams[0] : "Engineering"}
-              </div>
+          {/* Courses offered */}
+          <div className="mb-6 flex flex-wrap gap-2">
+            {(streams.length > 0 ? streams : ["Engineering"]).slice(0, 3).map((course) => (
+              <span
+                key={course}
+                className="inline-flex items-center rounded-full border border-slate-400 px-3 py-1.5 text-[13px] font-semibold text-[#6C6C6C] leading-none"
+              >
+                {course}
+              </span>
+            ))}
+            {streams.length > 3 && (
+              <span className="inline-flex items-center rounded-full border border-slate-400 px-3 py-1.5 text-[13px] font-semibold text-[#6C6C6C] leading-none">
+                +{streams.length - 3} More
+              </span>
+            )}
+          </div>
+
+          <div className="mt-auto flex items-center justify-between pt-5 border-t border-slate-200">
+            <div className="text-[16px] font-medium text-[#6C6C6C]">
+              Avg. Package: <span className="font-bold text-[#FF3C3C]">
+                {min_fees
+                  ? `₹${(min_fees / 100000).toFixed(1)} LPA`
+                  : max_fees
+                  ? `₹${(max_fees / 100000).toFixed(1)} LPA`
+                  : "N/A"}
+              </span>
             </div>
-            <div className="px-4 py-2 rounded-[10px] bg-slate-900 text-white text-xs font-normal group-hover:bg-[#FF3C3C] transition-all active:scale-95">
-              Apply Now
-            </div>
+            <span className="inline-flex items-center gap-1.5 text-[16px] font-bold text-[#FF3C3C] group-hover:translate-x-1 transition-transform">
+              View Details
+              <span className="material-symbols-rounded text-[20px]">arrow_forward</span>
+            </span>
           </div>
         </div>
       </Link>

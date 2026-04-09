@@ -34,11 +34,11 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
   const blogs = dbBlogs && dbBlogs.length > 0 ? dbBlogs.slice(0, 8) : [];
 
   return (
-    <section className="w-full py-16 lg:py-24 bg-white">
+    <section className="w-full py-16 lg:py-24 bg-white border-b border-slate-200">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
            <div className="flex-1">
-              <h2 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">Student Life & Beyond</h2>
+              <h2 className="text-[40px] lg:text-[68px] font-semibold text-slate-900 tracking-tight leading-[1.1]">Student Life & <span className="text-primary">Beyond</span></h2>
               <p className="mt-3 text-slate-500 font-medium max-w-lg">
                 Explore our latest articles, guides, and student stories to stay ahead in your academic journey.
               </p>
@@ -65,7 +65,7 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
                 <Link href={`/blogs/${blog.slug}`} className="group block">
-                  <div className="relative aspect-[16/10] rounded-[32px] overflow-hidden mb-6 shadow-lg shadow-black/5">
+                  <div className="relative aspect-[16/10] rounded-[5px] overflow-hidden mb-6 shadow-lg shadow-black/5">
                     <img
                       src={buildImageUrl(blog.featimage)}
                       alt={blog.topic}

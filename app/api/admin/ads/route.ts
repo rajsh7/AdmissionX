@@ -1,5 +1,5 @@
 import { getDb } from "@/lib/db";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 
@@ -15,6 +15,7 @@ export async function DELETE(req: NextRequest) {
 
     revalidatePath("/admin/ads/management");
     revalidatePath("/", "layout");
+    revalidateTag("home-page-ads", "default");
     return NextResponse.json({ success: true });
   } catch (e) {
     console.error("[api/admin/ads DELETE]", e);

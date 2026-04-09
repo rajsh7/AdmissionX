@@ -19,6 +19,7 @@ import type { University } from "./components/TopUniversities";
 import type { DbBlog } from "./api/home/latest-blogs/route";
 import type { DbExam } from "./api/home/exams/route";
 import type { HomeStat } from "./api/home/stats/route";
+import type { HomepageTestimonial } from "./components/Testimonials";
 
 // Heavy below-the-fold components — lazy loaded after first paint
 const NewsSection  = dynamic(() => import("./components/NewsSection"),  { ssr: true });
@@ -34,7 +35,10 @@ interface HomePageClientProps {
   streamCounts: Record<string, number>;
   initialStreamColleges: FilterCollegeResult[];
   ads: AdItem[];
+  partnerAds: AdItem[];
+  featuredAds: AdItem[];
   tickerAds: TickerAdItem[];
+  testimonials: HomepageTestimonial[];
 }
 
 export default function HomePageClient({
@@ -45,7 +49,10 @@ export default function HomePageClient({
   streamCounts,
   initialStreamColleges,
   ads,
+  partnerAds,
+  featuredAds,
   tickerAds,
+  testimonials,
 }: HomePageClientProps) {
   const [authModal, setAuthModal] = useState<"login" | "register" | null>(null);
   // Only render AuthModal after hydration to avoid SSR mismatch
@@ -68,13 +75,17 @@ export default function HomePageClient({
         <HeroSection />
 
         <div data-gsap="fade-up">
-          <StatsBar />
+          <StatsBar ads={ads} />
         </div>
 
         <div data-gsap="fade-up">
           <TopUniversities
             universities={universities}
             initialStreamColleges={initialStreamColleges}
+            ads={ads}
+            partnerAds={partnerAds}
+            featuredAds={featuredAds}
+            tickerAds={tickerAds}
           />
         </div>
 
@@ -97,7 +108,7 @@ export default function HomePageClient({
         </div>
 
         <div data-gsap="fade-up">
-          <Testimonials />
+          <Testimonials testimonials={testimonials} />
         </div>
 
         <div data-gsap="fade-up">

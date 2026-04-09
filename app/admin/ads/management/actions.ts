@@ -1,7 +1,7 @@
 "use server";
 
 import pool from "@/lib/db";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { saveUpload } from "@/lib/upload-utils";
 
 export async function toggleAdAction(formData: FormData) {
@@ -15,6 +15,7 @@ export async function toggleAdAction(formData: FormData) {
   }
   revalidatePath("/admin/ads/management");
   revalidatePath("/", "layout");
+  revalidateTag("home-page-ads", "default");
 }
 
 export async function createAdManagement(formData: FormData) {
@@ -46,6 +47,7 @@ export async function createAdManagement(formData: FormData) {
   }
   revalidatePath("/admin/ads/management");
   revalidatePath("/", "layout");
+  revalidateTag("home-page-ads", "default");
 }
 
 export async function updateAdManagement(formData: FormData) {
@@ -79,6 +81,7 @@ export async function updateAdManagement(formData: FormData) {
   }
   revalidatePath("/admin/ads/management");
   revalidatePath("/", "layout");
+  revalidateTag("home-page-ads", "default");
 }
 
 export async function deleteAdManagement(formData: FormData) {
@@ -91,4 +94,5 @@ export async function deleteAdManagement(formData: FormData) {
   }
   revalidatePath("/admin/ads/management");
   revalidatePath("/", "layout");
+  revalidateTag("home-page-ads", "default");
 }

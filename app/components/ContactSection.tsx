@@ -52,8 +52,8 @@ export default function ContactSection() {
               </div>
             </div>
 
-            {/* -- Right: Contact Form ------------------------------- */}
-            <div className="bg-white rounded-[20px] p-10 lg:p-12 border border-slate-200/60 relative" style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
+            {/* ── Right: Contact Form ─────────────────────────────── */}
+            <div className="bg-white rounded-[20px] p-10 lg:p-12 border border-slate-200/60 relative" style={{ boxShadow: '0 25px 50px -12px #00000040' }}>
               <h3 className="font-bold mb-10 tracking-tight" style={{ fontSize: '30px', fontWeight: '700', color: '#6C6C6C' }}>Send a message</h3>
               <form className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

@@ -285,6 +285,8 @@ export default function AdsManagementDashboardClient({
                 <option value="default">Default</option>
                 <option value="home">Home Page</option>
                 <option value="home_ticker">Home Ticker Strip</option>
+                <option value="home_partner">Home Partner Store (Top Universities)</option>
+                <option value="home_featured">Home Featured (Top Universities)</option>
                 <option value="top">Top</option>
                 <option value="sidebar">Sidebar</option>
                 <option value="banner">Banner</option>

@@ -196,12 +196,14 @@ export default function SearchClient({
         params.delete("q");
       }
       params.delete("page");
+      // preserve type param
+      if (initType && !params.has("type")) params.set("type", initType);
       setLoading(true);
       startTransition(() => {
         router.push(`${pathname}?${params.toString()}`);
       });
     },
-    [searchParams, router, pathname],
+    [searchParams, router, pathname, initType],
   );
 
   const isFiltered = !!(q || stream || degree || cityId || stateId || feesMax);
@@ -212,6 +214,7 @@ export default function SearchClient({
 
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
+      <Header theme="dark" />
       <div className="relative w-full overflow-hidden" style={{ height: heroHeight }}>
         <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
           <Image
@@ -227,7 +230,6 @@ export default function SearchClient({
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
         </div>
         <div className="relative z-10 w-full h-full flex flex-col">
-          <Header />
           <div className="flex-1 flex items-center justify-start relative">
             <div className="mx-auto max-w-[1920px] w-full px-8 lg:px-12 xl:px-20 h-full relative">
               <div className="flex flex-col justify-center h-full relative z-20">

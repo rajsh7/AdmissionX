@@ -97,7 +97,7 @@ export default function SearchBar({
         onSubmit={handleSearch}
         className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full"
       >
-        <div className="flex-1 flex items-center gap-3 bg-white/40 backdrop-blur-md rounded-[10px] border border-white/30 shadow-2xl focus-within:border-[#FF3C3C] focus-within:ring-4 focus-within:ring-[#FF3C3C]/10 transition-all duration-300 px-6 py-1">
+        <div className="flex-1 h-14 flex items-center gap-3 bg-white/40 backdrop-blur-md rounded-[5px] border border-white/30 shadow-2xl focus-within:border-[#FF3C3C] focus-within:ring-4 focus-within:ring-[#FF3C3C]/10 transition-all duration-300 px-6">
           <span className="material-symbols-outlined text-[20px] text-white flex-shrink-0">search</span>
           <input
             type="text"
@@ -105,12 +105,12 @@ export default function SearchBar({
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => searchQuery.length >= 2 && setShowDropdown(true)}
             placeholder={placeholder}
-            className="flex-1 py-3 text-sm sm:text-base text-white placeholder:text-white/80 bg-transparent outline-none min-w-0 font-medium"
+            className="flex-1 h-full text-sm sm:text-base text-white placeholder:text-white/80 bg-transparent outline-none min-w-0 font-medium"
           />
         </div>
         <button
           type="submit"
-          className="flex-shrink-0 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-base font-bold px-10 py-3 rounded-[10px] transition-all active:scale-[0.98] shadow-xl shadow-[#FF3C3C]/30 min-w-max"
+          className="flex-shrink-0 h-14 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-base font-bold px-10 rounded-[5px] transition-all active:scale-[0.98] shadow-xl shadow-[#FF3C3C]/30 min-w-max"
         >
           {isLoading ? "Searching..." : "Search Now"}
         </button>
@@ -120,7 +120,7 @@ export default function SearchBar({
       {showDropdown && (
         <div
           ref={dropdownRef}
-          className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100 z-[100] animate-in fade-in slide-in-from-top-2 duration-200"
+          className="absolute top-full left-0 right-0 mt-3 bg-white rounded-[5px] shadow-2xl overflow-hidden border border-slate-100 z-[100] animate-in fade-in slide-in-from-top-2 duration-200"
         >
           {suggestions.length > 0 ? (
             <div className="py-2">

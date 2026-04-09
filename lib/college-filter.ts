@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+﻿import { unstable_cache } from "next/cache";
 import { getDb } from "@/lib/db";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -12,7 +12,16 @@ export interface FilterCollegeResult {
   abbrBg: string;
   tags: string[];
   tuition: string;
+  offeredCourses: string[];
+  avgPackage: string;
   href: string;
+}
+
+function estimateAvgPackage(rating: number): string {
+  if (rating >= 4.8) return "₹12 LPA";
+  if (rating >= 4.5) return "₹10 LPA";
+  if (rating >= 4.2) return "₹8 LPA";
+  return "₹6 LPA";
 }
 
 // ─── UI-label → DB pageslug map ───────────────────────────────────────────────
@@ -92,6 +101,33 @@ export async function fetchCollegesForSlug(
             location: "$registeredSortAddress",
             image: "$bannerimage",
             rating: 1,
+            collegeId: "$id",
+          },
+        },
+        {
+          $lookup: {
+            from: "collegemaster",
+            localField: "collegeId",
+            foreignField: "collegeprofile_id",
+            as: "cm",
+          },
+        },
+        {
+          $lookup: {
+            from: "functionalarea",
+            localField: "cm.functionalarea_id",
+            foreignField: "id",
+            as: "fa",
+          },
+        },
+        {
+          $project: {
+            slug: 1,
+            name: 1,
+            location: 1,
+            image: 1,
+            rating: 1,
+            streams: { $slice: [{ $setUnion: ["$fa.name", []] }, 6] },
           },
         },
       ])
@@ -123,6 +159,8 @@ export async function fetchCollegesForSlug(
         abbrBg: "bg-primary",
         tags: ["Featured", "Top Ranked"],
         tuition: "View Fees",
+        offeredCourses: Array.isArray(row.streams) ? row.streams.filter(Boolean) : [],
+        avgPackage: estimateAvgPackage(Number(row.rating) || 4.5),
         href: `/university/${row.slug || ""}`,
       };
     });

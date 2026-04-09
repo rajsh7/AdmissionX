@@ -124,15 +124,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/admin/landing-page-query", icon: "feed", label: "Landing Page Query Form" },
     ],
   },
-  {
-    label: "Members",
-    items: [
-      { href: "/admin/members/registrations", icon: "how_to_reg", label: "Registrations" },
-      { href: "/admin/members/users", icon: "group", label: "Platform Users" },
-      { href: "/admin/members/roles", icon: "manage_accounts", label: "Roles" },
-      { href: "/admin/members/status", icon: "toggle_on", label: "Status" },
-    ],
-  },
+
   {
     label: "Communication & Feedback",
     items: [

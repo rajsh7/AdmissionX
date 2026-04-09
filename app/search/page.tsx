@@ -194,7 +194,7 @@ async function fetchColleges(opts: {
   } else if (type === "university") {
     conditions.push("cp.isTopUniversity = 1");
   } else if (type === "abroad") {
-    conditions.push("cp.registeredAddressCountryId != 1");
+    conditions.push("(cp.registeredAddressCountryId IS NOT NULL AND cp.registeredAddressCountryId != 1)");
   }
 
   const whereClause = conditions.join(" AND ");

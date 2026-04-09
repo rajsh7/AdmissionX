@@ -23,12 +23,12 @@ const navLinks = [
   { label: "Colleges", href: "/top-colleges" },
   { label: "Top University", href: "/top-university" },
   { label: "Top Courses", href: "/careers-courses" },
-  { label: "Compare", href: "/compare" },
   { label: "Study Abroad", href: "/study-abroad" },
   {
     label: "More",
     href: "#",
     subItems: [
+      { label: "Compare", href: "/compare", icon: "compare" },
       { label: "Counselling", href: "/counselling", icon: "support_agent" },
       { label: "Examination", href: "/examination", icon: "engineering" },
       { label: "Streams", href: "/stream", icon: "grid_view" },
@@ -308,7 +308,11 @@ export default function Header({ theme }: HeaderProps) {
       )}
 
       <motion.header 
-        className="site-header fixed top-0 left-0 right-0 z-50 w-full flex items-center transition-all duration-300 bg-white shadow-[0_4px_30px_rgba(0,0,0,0.08)] py-3 min-h-[58px]"
+        className={`site-header fixed top-0 left-0 right-0 z-[60] w-full flex items-center transition-all duration-300 min-h-[58px] ${
+          isScrolled 
+            ? "bg-white/95 backdrop-blur-md shadow-lg py-2 border-b border-neutral-100" 
+            : "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.08)] py-3"
+        }`}
       >
         <div className="flex items-center justify-between px-6 sm:px-12 w-full max-w-[1920px] mx-auto">
           {/* Logo Area */}
