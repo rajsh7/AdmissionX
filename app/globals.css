@@ -1,0 +1,916 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Local fonts to avoid build-time Google Fonts fetch */
+@font-face {
+    font-family: "Lexend";
+    src: url("/fonts/lexend/ca31d6821328a4e9-s.p.8036670a.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 300 900;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Poppins";
+    src: url("/fonts/poppins/41e95f694c5c4549-s.666bad7d.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 400 900;
+    font-display: swap;
+}
+
+.font-poppins {
+    font-family: "Poppins", sans-serif;
+}
+
+@layer base {
+  :root {
+    --color-primary: #FF3C3C;
+    --color-primary-dark: #E63535;
+    --color-accent-violet: #7c3aed;
+    --color-accent-cyan: #06b6d4;
+    --color-accent-teal: #00b5ad;
+    --color-accent-rose: #FF3C3C;
+    --color-bg-light: #f8fafc;
+    --color-bg-white: #ffffff;
+  }
+}
+
+/* ─── Base ──────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+}
+
+body {
+    font-family: "Outfit", "Inter", "Lexend", sans-serif;
+    background-color: var(--color-bg-white);
+    color: #0f172a;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+.dark body {
+    background-color: #0a0a0a;
+    color: #f1f5f9;
+}
+
+html.dark {
+    color-scheme: dark;
+}
+
+/* ─── Scrollbar Hide ────────────────────────────────────────── */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* ─── Line clamp utilities ──────────────────────────────────── */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.line-clamp-6 {
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ─── Material Symbols fix ──────────────────────────────────────── */
+/* FOUT (Flash of Unstyled Text) prevention:
+   Icons are invisible until the font is loaded. Once loaded, `fonts-loaded`
+   class is added to <html> by a script in layout.tsx, revealing the icons. */
+.material-symbols-outlined,
+.material-symbols-rounded {
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    vertical-align: middle;
+    user-select: none;
+    /* Hide icon text until font is ready */
+    visibility: hidden;
+    transition: visibility 0s;
+}
+
+/* Font-loaded state — set by inline script in layout.tsx */
+.fonts-loaded .material-symbols-outlined,
+.fonts-loaded .material-symbols-rounded {
+    visibility: visible;
+}
+
+.material-symbols-outlined {
+    font-family: "Material Symbols Outlined";
+    font-variation-settings:
+        "FILL" 0,
+        "wght" 400,
+        "GRAD" 0,
+        "opsz" 24;
+}
+
+.material-symbols-rounded {
+    font-family: "Material Symbols Rounded";
+    font-variation-settings:
+        "FILL" 0,
+        "wght" 400,
+        "GRAD" 0,
+        "opsz" 24;
+}
+
+/* ─── Glassmorphism ─────────────────────────────────────────── */
+.glass {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.glass-light {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-dark {
+    background: rgba(10, 10, 10, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Gradient Text ─────────────────────────────────────────── */
+.gradient-text {
+    background: linear-gradient(135deg, #FF3C3C 0%, #E63535 50%, #FF6B6B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-text-warm {
+    background: linear-gradient(135deg, #f43f5e 0%, #f97316 50%, #eab308 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ─── Glow Effects ──────────────────────────────────────────── */
+.glow-red {
+    box-shadow: 0 0 30px rgba(255, 60, 60, 0.3), 0 0 60px rgba(255, 60, 60, 0.1);
+}
+
+.glow-blue {
+    box-shadow: 0 0 30px rgba(255, 60, 60, 0.3), 0 0 60px rgba(255, 60, 60, 0.1);
+}
+
+.glow-violet {
+    box-shadow: 0 0 30px rgba(230, 53, 53, 0.3), 0 0 60px rgba(230, 53, 53, 0.1);
+}
+
+.glow-cyan {
+    box-shadow: 0 0 30px rgba(255, 107, 107, 0.3), 0 0 60px rgba(255, 107, 107, 0.1);
+}
+
+/* ─── Hero Gradient Mesh ────────────────────────────────────── */
+.hero-mesh {
+    background:
+        radial-gradient(
+            ellipse at 20% 50%,
+            rgba(220, 38, 38, 0.15) 0%,
+            transparent 50%
+        ),
+        radial-gradient(
+            ellipse at 80% 20%,
+            rgba(159, 18, 57, 0.12) 0%,
+            transparent 50%
+        ),
+        radial-gradient(
+            ellipse at 50% 80%,
+            rgba(251, 113, 133, 0.08) 0%,
+            transparent 50%
+        ),
+        radial-gradient(
+            ellipse at 60% 40%,
+            rgba(225, 29, 72, 0.06) 0%,
+            transparent 40%
+        ),
+        #0a0a0a;
+}
+
+/* ─── Story Section Dividers ────────────────────────────────── */
+.section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 60, 60, 0.3) 50%, transparent 100%);
+}
+
+/* ─── Custom Color Utilities ─────────────────────────────────── */
+.text-primary { color: var(--color-primary); }
+.text-primary-dark { color: var(--color-primary-dark); }
+.bg-primary { background-color: var(--color-primary); }
+.bg-primary-dark { background-color: var(--color-primary-dark); }
+.border-primary { border-color: var(--color-primary); }
+
+.hover\:text-primary:hover {
+    color: var(--color-primary);
+}
+.hover\:text-primary-dark:hover {
+    color: var(--color-primary-dark);
+}
+.hover\:bg-primary-dark:hover {
+    background-color: var(--color-primary-dark);
+}
+.hover\:bg-primary:hover {
+    background-color: var(--color-primary);
+}
+.hover\:border-primary:hover {
+    border-color: var(--color-primary);
+}
+
+/* Remove green background from edit action buttons across admin pages */
+button[title*="Edit"],
+a[title*="Edit"],
+button[aria-label*="Edit"],
+a[aria-label*="Edit"] {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    color: inherit !important;
+}
+
+button[title*="Edit"]:hover,
+a[title*="Edit"]:hover,
+button[aria-label*="Edit"]:hover,
+a[aria-label*="Edit"]:hover {
+    background-color: transparent !important;
+}
+
+.dark\:bg-primary:is(.dark *) {
+    background-color: var(--color-primary);
+}
+.dark\:hover\:bg-primary-dark:is(.dark *):hover {
+    background-color: var(--color-primary-dark);
+}
+.dark\:hover\:border-primary:is(.dark *):hover {
+    border-color: var(--color-primary);
+}
+.dark\:hover\:text-primary:is(.dark *):hover {
+    color: var(--color-primary);
+}
+
+.focus\:border-primary:focus {
+    border-color: #dc2626;
+}
+.focus\:ring-primary\/50:focus {
+    --tw-ring-color: rgba(220, 38, 38, 0.5);
+    box-shadow: 0 0 0 2px var(--tw-ring-color);
+}
+.group:hover .group-hover\:bg-primary {
+    background-color: #dc2626;
+}
+.group:hover .group-hover\:text-white {
+    color: white;
+}
+.group:hover .group-hover\:border-primary {
+    border-color: #dc2626;
+}
+
+.font-display {
+    font-family: "Lexend", sans-serif;
+}
+
+/* ─── Keyframe Animations ───────────────────────────────────── */
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0) translateX(0);
+    }
+    25% {
+        transform: translateY(-20px) translateX(10px);
+    }
+    50% {
+        transform: translateY(-10px) translateX(-5px);
+    }
+    75% {
+        transform: translateY(-25px) translateX(5px);
+    }
+}
+
+@keyframes float-reverse {
+    0%,
+    100% {
+        transform: translateY(0) translateX(0);
+    }
+    25% {
+        transform: translateY(15px) translateX(-8px);
+    }
+    50% {
+        transform: translateY(8px) translateX(12px);
+    }
+    75% {
+        transform: translateY(20px) translateX(-4px);
+    }
+}
+
+@keyframes pulse-glow {
+    0%,
+    100% {
+        box-shadow:
+            0 0 20px rgba(255, 60, 60, 0.4),
+            0 0 40px rgba(255, 60, 60, 0.1);
+    }
+    50% {
+        box-shadow:
+            0 0 30px rgba(255, 60, 60, 0.6),
+            0 0 60px rgba(255, 60, 60, 0.2);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% center;
+    }
+    100% {
+        background-position: 200% center;
+    }
+}
+
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes bounce-gentle {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(8px);
+    }
+}
+
+@keyframes spin-slow {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes scale-pulse {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes heroZoom {
+    0% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1.15);
+    }
+}
+
+/* ─── Animation Utility Classes ─────────────────────────────── */
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+.animate-float-reverse {
+    animation: float-reverse 7s ease-in-out infinite;
+}
+.animate-float-slow {
+    animation: float 10s ease-in-out infinite;
+}
+.animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+}
+.animate-bounce-gentle {
+    animation: bounce-gentle 2s ease-in-out infinite;
+}
+.animate-spin-slow {
+    animation: spin-slow 20s linear infinite;
+}
+.animate-gradient-shift {
+    background-size: 200% 200%;
+    animation: gradient-shift 4s ease infinite;
+}
+.animate-shimmer {
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+}
+
+/* ─── Floating Orbs ─────────────────────────────────────────── */
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    pointer-events: none;
+    will-change: transform;
+}
+
+.orb-blue {
+    background: rgba(220, 38, 38, 0.2);
+    animation: float 8s ease-in-out infinite;
+}
+
+.orb-violet {
+    background: rgba(159, 18, 57, 0.18);
+    animation: float-reverse 10s ease-in-out infinite;
+}
+
+.orb-cyan {
+    background: rgba(251, 113, 133, 0.12);
+    animation: float 12s ease-in-out infinite;
+}
+
+/* ─── Card 3D Tilt ──────────────────────────────────────────── */
+.card-3d {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.card-3d-inner {
+    transition: transform 0.4s ease;
+}
+
+.card-3d:hover .card-3d-inner {
+    transform: translateZ(20px);
+}
+
+/* ─── Chapter Marker ────────────────────────────────────────── */
+.chapter-number {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.2em;
+}
+
+/* ─── Scroll Progress ───────────────────────────────────────── */
+.scroll-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #FF3C3C, #E63535, #FF6B6B);
+    z-index: 9999;
+    transform-origin: left;
+    will-change: transform;
+}
+
+/* ─── Timeline ──────────────────────────────────────────────── */
+.timeline-line {
+    position: absolute;
+    left: 24px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #FF3C3C, #E63535);
+}
+
+.timeline-dot {
+    position: absolute;
+    left: 16px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #FF3C3C;
+    border: 3px solid #0a0a0a;
+    z-index: 1;
+}
+
+/* ─── Step-line (signup success timeline connector) ─────────── */
+.step-line::after {
+    content: "";
+    position: absolute;
+    left: 1.25rem; /* 20px — horizontal centre of the 40px icon circle */
+    top: 2.5rem; /* 40px — clears the bottom of the icon circle      */
+    bottom: -0.5rem;
+    width: 2px;
+    background-color: #fca5a5; /* rose-300 */
+}
+
+.step-line:last-child::after {
+    display: none;
+}
+
+/* ─── Snap scroll ────────────────────────────────────────────── */
+.snap-x {
+    scroll-snap-type: x mandatory;
+}
+.snap-center {
+    scroll-snap-align: center;
+}
+
+/* ─── CTA Gradient BG ───────────────────────────────────────── */
+.cta-gradient {
+    background: linear-gradient(135deg, #E63535 0%, #FF3C3C 30%, #FF6B6B 70%, #B91C1C 100%);
+}
+
+/* ─── Interactive Button Styles ─────────────────────────────── */
+.btn-primary {
+    background: linear-gradient(135deg, #FF3C3C 0%, #E63535 100%);
+    box-shadow: 0 4px 15px rgba(255, 60, 60, 0.35);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 25px rgba(255, 60, 60, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* ─── Rich Text / Blog Content ──────────────────────────────── */
+.rich-text {
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    color: #374151;
+}
+
+.rich-text h1,
+.rich-text h2,
+.rich-text h3,
+.rich-text h4,
+.rich-text h5,
+.rich-text h6 {
+    font-weight: 800;
+    color: #111827;
+    margin-top: 1.75em;
+    margin-bottom: 0.6em;
+    line-height: 1.3;
+}
+
+.rich-text h1 {
+    font-size: 1.6rem;
+}
+.rich-text h2 {
+    font-size: 1.35rem;
+}
+.rich-text h3 {
+    font-size: 1.15rem;
+}
+.rich-text h4 {
+    font-size: 1rem;
+}
+
+.rich-text p {
+    margin-top: 0;
+    margin-bottom: 1.1em;
+}
+
+.rich-text ul,
+.rich-text ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1.1em;
+}
+
+.rich-text ul {
+    list-style-type: disc;
+}
+.rich-text ol {
+    list-style-type: decimal;
+}
+
+.rich-text li {
+    margin-bottom: 0.35em;
+}
+
+.rich-text a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.rich-text a:hover {
+    color: var(--color-primary-dark);
+}
+
+.rich-text strong,
+.rich-text b {
+    font-weight: 700;
+    color: #111827;
+}
+
+.rich-text em,
+.rich-text i {
+    font-style: italic;
+}
+
+.rich-text blockquote {
+    border-left: 3px solid var(--color-primary);
+    margin: 1.5em 0;
+    padding: 0.75em 1.25em;
+    background: #FFF3F3;
+    border-radius: 0 0.5rem 0.5rem 0;
+    color: #374151;
+    font-style: italic;
+}
+
+.rich-text blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+.rich-text pre {
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 1rem 1.25rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    margin-bottom: 1.1em;
+}
+
+.rich-text code {
+    background: #f3f4f6;
+    color: #dc2626;
+    padding: 0.15em 0.4em;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+    font-family: ui-monospace, monospace;
+}
+
+.rich-text pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: inherit;
+}
+
+.rich-text table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.1em;
+    font-size: 0.875rem;
+}
+
+.rich-text th {
+    background: #f9fafb;
+    font-weight: 700;
+    text-align: left;
+    padding: 0.6em 0.9em;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+}
+
+.rich-text td {
+    padding: 0.55em 0.9em;
+    border: 1px solid #e5e7eb;
+    vertical-align: top;
+}
+
+.rich-text tr:nth-child(even) td {
+    background: #f9fafb;
+}
+
+.rich-text img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1em 0;
+}
+
+.rich-text hr {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 2em 0;
+}
+
+.rich-text > *:first-child {
+    margin-top: 0;
+}
+
+.rich-text > *:last-child {
+    margin-bottom: 0;
+}
+
+/* ─── Noise Texture Overlay ─────────────────────────────────── */
+.noise-overlay::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ─── GSAP / Lenis Smooth Scroll ────────────────────────────── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ─── Custom Cursor (hide default on desktop) ───────────────── */
+
+
+/* ─── GSAP Scroll Reveal — initial hidden state ─────────────── */
+[data-gsap="fade-up"],
+[data-gsap="fade-in"],
+[data-gsap="fade-left"],
+[data-gsap="fade-right"],
+[data-gsap="scale-in"] {
+  will-change: transform, opacity;
+}
+
+/* ─── Smooth hover transitions on all interactive elements ──── */
+a, button, [role="button"] {
+  transition: color 0.2s ease, background-color 0.2s ease,
+              border-color 0.2s ease, box-shadow 0.2s ease,
+              transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* ─── Card hover lift ───────────────────────────────────────── */
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* ─── Magnetic button effect ────────────────────────────────── */
+.magnetic {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─── Image zoom on hover ───────────────────────────────────── */
+.img-zoom {
+  overflow: hidden;
+}
+.img-zoom img {
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.img-zoom:hover img {
+  transform: scale(1.06);
+}
+
+/* ─── Underline slide animation ─────────────────────────────── */
+.underline-slide {
+  position: relative;
+}
+.underline-slide::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--color-primary);
+  transition: width 0.3s ease;
+}
+.underline-slide:hover::after {
+  width: 100%;
+}
+
+/* ─── Scroll progress bar ───────────────────────────────────── */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #FF3C3C, #E63535, #FF6B6B);
+  z-index: 9999;
+  transform-origin: left center;
+  transform: scaleX(0);
+  will-change: transform;
+}
+
+/* ─── Page transition ───────────────────────────────────────── */
+.page-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* ─── Hide scrollbar globally ───────────────────────────────── */
+body:not(.admin-layout) { scrollbar-width: none; -ms-overflow-style: none; }
+
+/* ─── Chatbot scroll containment ────────────────────────────── */
+.chatbot-scroll {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Admin layout scroll fix ──────────────────────────────── */
+/* When body has overflow-x:hidden, browsers make <html> the scroll container
+   which breaks overflow-y-auto on inner admin containers. Fix by letting
+   the admin main element scroll naturally. */
+.admin-layout {
+  overflow: hidden;
+}
+.admin-layout main {
+  overflow-y: auto !important;
+  height: 100%;
+}
+
+/* ─── Admin scrollbar styles ────────────────────────────────── */
+.admin-layout .scrollbar-thin::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+  height: 6px;
+}
+.admin-layout .scrollbar-track-slate-100::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+.admin-layout .scrollbar-thumb-slate-300::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+.admin-layout .scrollbar-thumb-slate-300:hover::-webkit-scrollbar-thumb,
+.admin-layout .hover\:scrollbar-thumb-slate-400::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+/* Sidebar scrollbar */
+.admin-layout nav .overflow-y-auto::-webkit-scrollbar {
+  display: block;
+  width: 4px;
+}
+.admin-layout nav .overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+.admin-layout nav .overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+}
+
+/* ─── Native CSS scroll progress bar ───────────────────────────────── */
+.scroll-progress-bar {
+  background: linear-gradient(90deg, #FF3C3C, #E63535);
+  animation: none;
+  transform-origin: left;
+  transform: scaleX(0);
+  /* Use CSS scroll-driven animation where supported */
+  animation: scroll-progress linear;
+  animation-timeline: scroll();
+  animation-range: 0% 100%;
+}
+
+@keyframes scroll-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
