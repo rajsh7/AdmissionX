@@ -1,470 +1,265 @@
 "use client";
-// v2 - lucide removed
+// v3 - dasher design
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useMemo, useState, useEffect, useRef } from "react";
-import { 
-  AreaChart, 
-  Area, 
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer
+import {
+  AreaChart, Area, BarChart, Bar,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 
+interface Stats {
+  totalStudents: number;
+  totalColleges: number;
+  totalAdmins: number;
+  totalApplications: number;
+  pendingColleges: number;
+  activeBlogs: number;
+}
 
-type GraphPoint = {
-  key: string;
-  label: string;
-  year: number;
-  month: number;
-  uv: number;
-};
-
-type PiePoint = {
-  name: string;
-  value: number;
-  count: number;
-};
+interface GraphPoint { label: string; uv: number; }
+interface Student { id: string; name: string; email: string; phone: string; status: string; created_at: string; }
+interface College { id: string; name: string; email: string; status: string; created_at: string; }
 
 export default function DashboardClient({
-  stats,
-  graphData,
-  collegeGraphData,
-  transactionPie,
-  recentStudents,
-  recentActivity
+  stats, graphData, collegeGraphData, recentStudents, recentColleges,
 }: {
-  stats: any,
-  graphData: GraphPoint[],
-  collegeGraphData: GraphPoint[],
-  transactionPie: (PiePoint & { amount?: number })[],
-  recentStudents: any[],
-  recentActivity: any[]
+  stats: Stats;
+  graphData: GraphPoint[];
+  collegeGraphData: GraphPoint[];
+  recentStudents: Student[];
+  recentColleges: College[];
 }) {
-  const [isMounted, setIsMounted] = useState(false);
-  const [monthFilter, setMonthFilter] = useState<string>("All");
-  const [openMenu, setOpenMenu] = useState<"student" | "college" | null>(null);
-  const studentMonthRef = useRef<HTMLDivElement | null>(null);
-  const collegeMonthRef = useRef<HTMLDivElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [activeChart, setActiveChart] = useState<"students" | "colleges">("students");
+  useEffect(() => setMounted(true), []);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!openMenu) return;
-    const handleClick = (e: MouseEvent) => {
-      const t = e.target as Node;
-      if (
-        studentMonthRef.current?.contains(t) ||
-        collegeMonthRef.current?.contains(t)
-      ) return;
-      setOpenMenu(null);
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [openMenu]);
-
-  const monthOptions = ["All", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const monthIndex = useMemo(() => {
-    if (monthFilter === "All") return null;
-    return monthOptions.indexOf(monthFilter);
-  }, [monthFilter]);
-
-  const filteredGraphData = useMemo(() => {
-    if (!graphData?.length) return [];
-    if (monthIndex == null || monthIndex < 1) return graphData;
-    return graphData.filter((d) => d.month === monthIndex);
-  }, [graphData, monthIndex]);
-
-  const filteredCollegeGraphData = useMemo(() => {
-    if (!collegeGraphData?.length) return [];
-    if (monthIndex == null || monthIndex < 1) return collegeGraphData;
-    return collegeGraphData.filter((d) => d.month === monthIndex);
-  }, [collegeGraphData, monthIndex]);
-
-  const keyMap = useMemo(() => {
-    const map = new Map<string, GraphPoint>();
-    filteredGraphData.forEach((d) => map.set(d.key, d));
-    return map;
-  }, [filteredGraphData]);
-
-  const collegeKeyMap = useMemo(() => {
-    const map = new Map<string, GraphPoint>();
-    filteredCollegeGraphData.forEach((d) => map.set(d.key, d));
-    return map;
-  }, [filteredCollegeGraphData]);
-
-  const firstKeyByYear = useMemo(() => {
-    const map = new Map<number, string>();
-    filteredGraphData.forEach((d) => {
-      if (!map.has(d.year)) map.set(d.year, d.key);
-    });
-    return map;
-  }, [filteredGraphData]);
-
-  const collegeFirstKeyByYear = useMemo(() => {
-    const map = new Map<number, string>();
-    filteredCollegeGraphData.forEach((d) => {
-      if (!map.has(d.year)) map.set(d.year, d.key);
-    });
-    return map;
-  }, [filteredCollegeGraphData]);
-
-  const yearTicks = useMemo(() => {
-    return Array.from(firstKeyByYear.entries())
-      .sort(([a], [b]) => a - b)
-      .map(([, key]) => key);
-  }, [firstKeyByYear]);
-
-  const collegeYearTicks = useMemo(() => {
-    return Array.from(collegeFirstKeyByYear.entries())
-      .sort(([a], [b]) => a - b)
-      .map(([, key]) => key);
-  }, [collegeFirstKeyByYear]);
-
-  const pieColors = ["#10B981", "#F59E0B", "#EF4444", "#6366F1", "#0EA5E9", "#14B8A6"];
-  const fmtCurrency = (amount: number) =>
-    new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(amount || 0);
-
-  const statCards = [
-    {
-      title: "Total Students",
-      value: stats.totalStudents?.toLocaleString() || "0",
-      subtext: `${stats.pendingColleges ?? 0} pending approval`,
-      icon: "group",
-    },
-    {
-      title: "Total Colleges",
-      value: stats.totalColleges?.toLocaleString() || "0",
-      subtext: `${stats.pendingColleges ?? 0} pending approval`,
-      icon: "account_balance",
-    },
-    {
-      title: "Admin Users",
-      value: stats.totalAdmins?.toLocaleString() || "0",
-      subtext: "active admins",
-      icon: "manage_accounts",
-    },
-    {
-      title: "Applications",
-      value: stats.activeQueries?.toLocaleString() || "0",
-      subtext: `${stats.activeBlogs ?? 0} active blogs`,
-      icon: "description",
-    },
+  const kpis = [
+    { label: "Total Students", value: stats.totalStudents.toLocaleString(), sub: `${stats.pendingColleges} pending colleges`, icon: "school", color: "bg-amber-100 text-amber-600" },
+    { label: "Total Colleges", value: stats.totalColleges.toLocaleString(), sub: `${stats.pendingColleges} awaiting approval`, icon: "account_balance", color: "bg-emerald-100 text-emerald-600" },
+    { label: "Applications", value: stats.totalApplications.toLocaleString(), sub: "total submitted", icon: "description", color: "bg-blue-100 text-blue-600" },
+    { label: "Active Blogs", value: stats.activeBlogs.toLocaleString(), sub: `${stats.totalAdmins} admin users`, icon: "article", color: "bg-purple-100 text-purple-600" },
   ];
 
+  const statusMeta: Record<string, { cls: string; label: string }> = {
+    pending:  { cls: "bg-amber-100 text-amber-700",   label: "Pending"  },
+    approved: { cls: "bg-emerald-100 text-emerald-700", label: "Approved" },
+    rejected: { cls: "bg-red-100 text-red-700",        label: "Rejected" },
+    active:   { cls: "bg-emerald-100 text-emerald-700", label: "Active"   },
+  };
+
   return (
-    <div className="space-y-6">
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statCards.map((stat, i) => (
-          <div key={i} className="bg-white rounded-[5px] p-6 border border-slate-100 shadow-md relative overflow-hidden">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">{stat.title}</p>
-                <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+    <div className="p-6 space-y-6 bg-slate-50 min-h-full">
+
+      {/* ── Welcome Banner ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 rounded-2xl p-8 flex flex-col justify-between min-h-[140px]"
+          style={{ background: "linear-gradient(135deg, #1e293b 0%, #0f172a 60%, #1e1b4b 100%)" }}>
+          <div>
+            <h1 className="text-2xl font-black text-white">👋 Welcome back, Admin!</h1>
+            <p className="text-slate-400 mt-1 text-sm">Here's what's happening with AdmissionX today.</p>
+          </div>
+          <div className="flex items-center gap-3 mt-6">
+            <Link href="/admin/colleges/profile"
+              className="px-5 py-2 bg-white text-slate-900 text-sm font-bold rounded-xl hover:bg-slate-100 transition-colors">
+              Manage Colleges
+            </Link>
+            <Link href="/admin/students/profile"
+              className="px-5 py-2 bg-white/10 text-white text-sm font-bold rounded-xl hover:bg-white/20 transition-colors border border-white/20">
+              View Students
+            </Link>
+          </div>
+        </div>
+
+        {/* Quick stats */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex flex-col justify-between">
+          <h2 className="text-sm font-black text-slate-500 uppercase tracking-wider mb-4">Quick Overview</h2>
+          <div className="space-y-3">
+            {[
+              { label: "Pending Approvals", value: stats.pendingColleges, href: "/admin/members/registrations", color: "text-amber-600" },
+              { label: "Active Blogs", value: stats.activeBlogs, href: "/admin/blogs", color: "text-blue-600" },
+              { label: "Admin Users", value: stats.totalAdmins, href: "/admin/members/users", color: "text-purple-600" },
+            ].map((item) => (
+              <Link key={item.label} href={item.href}
+                className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0 hover:bg-slate-50 -mx-2 px-2 rounded-lg transition-colors">
+                <span className="text-sm text-slate-600 font-medium">{item.label}</span>
+                <span className={`text-sm font-black ${item.color}`}>{item.value}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── KPI Cards ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+        {kpis.map((k, i) => (
+          <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex flex-col gap-6">
+            <div className="flex items-center gap-3">
+              <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${k.color}`}>
+                <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>{k.icon}</span>
               </div>
-              <div className="bg-[#FF3C3C] p-2 rounded-lg text-white">
-                <span className="material-symbols-rounded text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>{stat.icon}</span>
-              </div>
+              <span className="text-sm font-semibold text-slate-600">{k.label}</span>
             </div>
-            
-            <div className="mt-4">
-              <span className="text-[13px] text-slate-400 font-medium">{stat.subtext}</span>
+            <div className="flex items-end justify-between">
+              <span className="text-3xl font-black text-slate-900">{k.value}</span>
+              <span className="text-xs text-slate-400 text-right leading-tight">{k.sub}</span>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Main Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Student Registration */}
-        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6 relative min-h-[520px]">
-          <div className="flex justify-between items-center mb-10 overflow-visible">
-            <h2 className="text-[25px] font-semibold text-slate-800">Student Registration</h2>
-            <div className="relative" ref={studentMonthRef}>
-              <button
-                type="button"
-                onClick={() => setOpenMenu((v) => (v === "student" ? null : "student"))}
-                className="text-[13px] font-semibold text-slate-500 flex items-center gap-2 border border-slate-100 px-4 py-1.5 rounded-md hover:bg-slate-50 transition-all"
-                aria-haspopup="listbox"
-                aria-expanded={openMenu === "student"}
-              >
-                {monthFilter}
-                <span className="material-symbols-rounded text-[16px] text-slate-400">expand_more</span>
-              </button>
-              {openMenu === "student" && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border border-slate-100 rounded-md shadow-lg z-20">
-                  <ul className="py-1 max-h-80 overflow-auto" role="listbox">
-                    {monthOptions.map((m) => (
-                      <li key={m}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setMonthFilter(m);
-                            setOpenMenu(null);
-                          }}
-                          className={`w-full text-left px-3 py-2 text-xs font-semibold transition-colors ${monthFilter === m ? "bg-slate-100 text-slate-700" : "text-slate-500 hover:bg-slate-50"}`}
-                        >
-                          {m}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+      {/* ── Charts Row ── */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+        {/* Area / Bar chart */}
+        <div className="xl:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          {/* Tab switcher */}
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-black text-slate-800">Registrations</h2>
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+              {(["students", "colleges"] as const).map((tab) => (
+                <button key={tab} onClick={() => setActiveChart(tab)}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all capitalize ${
+                    activeChart === tab ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  }`}>
+                  {tab}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="h-[380px] w-full px-4 overflow-hidden">
-            {isMounted ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={filteredGraphData} margin={{ top: 20, right: 30, bottom: 0, left: 0 }}>
-                  <defs>
-                    <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#FF3C3C" stopOpacity={0.15}/>
-                      <stop offset="95%" stopColor="#FF3C3C" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis 
-                    dataKey="key"
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: '#94A3B8', fontSize: 11, fontWeight: 500 }} 
-                    dy={15}
-                    interval={0}
-                    ticks={monthFilter === "All" ? yearTicks : undefined}
-                    tickFormatter={(value: string) => {
-                      const item = keyMap.get(value);
-                      if (!item) return "";
-                      if (monthFilter === "All") {
-                        return firstKeyByYear.get(item.year) === value ? String(item.year) : "";
-                      }
-                      return String(item.year);
-                    }}
-                  />
-                  <YAxis 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: '#94A3B8', fontSize: 11, fontWeight: 500 }}
-                    dx={-10}
-                    domain={[0, 10000]}
-                    ticks={[2000, 4000, 6000, 8000, 10000]}
-                  />
-                  <Tooltip 
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const item = payload[0]?.payload as GraphPoint | undefined;
-                        return (
-                          <div className="relative">
-                            <div className="bg-[#332222] text-white px-3 py-1 rounded shadow-xl text-[11px] font-bold">
-                              {item?.label ?? ""}: {payload[0].value?.toLocaleString()}
-                            </div>
-                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#332222] rotate-45" />
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                    cursor={{ stroke: '#FF3C3C', strokeWidth: 1, strokeDasharray: '3 3' }}
-                    offset={-40}
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="uv" 
-                    stroke="#FF3C3C" 
-                    strokeWidth={2} 
-                    dot={{ r: 2.5, fill: '#FF3C3C', strokeWidth: 0 }}
-                    fillOpacity={1}
-                    fill="url(#colorUv)"
-                    activeDot={{ r: 5, fill: '#FF3C3C', stroke: '#fff', strokeWidth: 2 }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-full w-full bg-slate-50 animate-pulse rounded-[5px]" />
-            )}
+          {/* Chart total */}
+          <div className="mb-6">
+            <p className="text-3xl font-black text-slate-900">
+              {activeChart === "students"
+                ? stats.totalStudents.toLocaleString()
+                : stats.totalColleges.toLocaleString()}
+            </p>
+            <p className="text-sm text-slate-400 mt-0.5">
+              Total {activeChart} registered
+            </p>
+          </div>
+
+          <div className="h-[260px]">
+            {mounted ? (
+              activeChart === "students" ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={graphData} margin={{ top: 5, right: 10, bottom: 0, left: -20 }}>
+                    <defs>
+                      <linearGradient id="gradStudent" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#FF3C3C" stopOpacity={0.15} />
+                        <stop offset="95%" stopColor="#FF3C3C" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 10 }} interval="preserveStartEnd" />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 10 }} allowDecimals={false} />
+                    <Tooltip content={({ active, payload, label }) => active && payload?.length ? (
+                      <div className="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xl">
+                        {label}: {payload[0].value} students
+                      </div>
+                    ) : null} />
+                    <Area type="monotone" dataKey="uv" stroke="#FF3C3C" strokeWidth={2} fill="url(#gradStudent)"
+                      dot={false} activeDot={{ r: 4, fill: "#FF3C3C", stroke: "#fff", strokeWidth: 2 }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={collegeGraphData} margin={{ top: 5, right: 10, bottom: 0, left: -20 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 10 }} interval="preserveStartEnd" />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 10 }} allowDecimals={false} />
+                    <Tooltip content={({ active, payload, label }) => active && payload?.length ? (
+                      <div className="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xl">
+                        {label}: {payload[0].value} colleges
+                      </div>
+                    ) : null} />
+                    <Bar dataKey="uv" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={24} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )
+            ) : <div className="h-full bg-slate-50 animate-pulse rounded-xl" />}
           </div>
         </div>
 
-        {/* College Registration */}
-        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6 relative min-h-[520px]">
-          <div className="flex justify-between items-center mb-10">
-            <h2 className="text-[20px] font-bold text-slate-800">College Registration</h2>
-            <div className="relative" ref={collegeMonthRef}>
-              <button
-                type="button"
-                onClick={() => setOpenMenu((v) => (v === "college" ? null : "college"))}
-                className="text-[13px] font-semibold text-slate-500 flex items-center gap-2 border border-slate-100 px-4 py-1.5 rounded-md hover:bg-slate-50 transition-all"
-                aria-haspopup="listbox"
-                aria-expanded={openMenu === "college"}
-              >
-                {monthFilter}
-                <span className="material-symbols-rounded text-[16px] text-slate-400">expand_more</span>
-              </button>
-              {openMenu === "college" && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border border-slate-100 rounded-md shadow-lg z-20">
-                  <ul className="py-1 max-h-80 overflow-auto" role="listbox">
-                    {monthOptions.map((m) => (
-                      <li key={m}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setMonthFilter(m);
-                            setOpenMenu(null);
-                          }}
-                          className={`w-full text-left px-3 py-2 text-xs font-semibold transition-colors ${monthFilter === m ? "bg-slate-100 text-slate-700" : "text-slate-500 hover:bg-slate-50"}`}
-                        >
-                          {m}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+        {/* Recent Colleges */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-base font-black text-slate-800">New Colleges</h2>
+            <Link href="/admin/members/registrations" className="text-xs font-bold text-[#FF3C3C] hover:underline">View all</Link>
           </div>
-
-          <div className="h-[380px] w-full px-4 overflow-hidden">
-            {isMounted ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={filteredCollegeGraphData} margin={{ top: 20, right: 30, bottom: 0, left: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis 
-                    dataKey="key"
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: '#94A3B8', fontSize: 11, fontWeight: 500 }} 
-                    dy={15}
-                    interval={0}
-                    ticks={monthFilter === "All" ? collegeYearTicks : undefined}
-                    tickFormatter={(value: string) => {
-                      const item = collegeKeyMap.get(value);
-                      if (!item) return "";
-                      if (monthFilter === "All") {
-                        return collegeFirstKeyByYear.get(item.year) === value ? String(item.year) : "";
-                      }
-                      return String(item.year);
-                    }}
-                  />
-                  <YAxis 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: '#94A3B8', fontSize: 11, fontWeight: 500 }}
-                    dx={-10}
-                  />
-                  <Tooltip 
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const item = payload[0]?.payload as GraphPoint | undefined;
-                        return (
-                          <div className="relative">
-                            <div className="bg-[#332222] text-white px-3 py-1 rounded shadow-xl text-[11px] font-bold">
-                              {item?.label ?? ""}: {payload[0].value?.toLocaleString()}
-                            </div>
-                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#1F2937] rotate-45" />
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                    cursor={{ stroke: '#3B82F6', strokeWidth: 1, strokeDasharray: '3 3' }}
-                    offset={-40}
-                  />
-                  <Bar
-                    dataKey="uv"
-                    fill="#3B82F6"
-                    radius={[6, 6, 2, 2]}
-                    maxBarSize={22}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-full w-full bg-slate-50 animate-pulse rounded-[5px]" />
-            )}
+          <div className="space-y-4">
+            {recentColleges.length === 0 ? (
+              <p className="text-sm text-slate-400 text-center py-6">No colleges yet</p>
+            ) : recentColleges.map((c) => {
+              const sm = statusMeta[c.status] ?? statusMeta["pending"];
+              return (
+                <div key={c.id} className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-black text-sm flex-shrink-0">
+                    {c.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-slate-800 truncate">{c.name}</p>
+                    <p className="text-[11px] text-slate-400 truncate">{c.email}</p>
+                  </div>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${sm.cls}`}>{sm.label}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* Bottom Tables Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Student Registration Table */}
-        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md lg:col-span-2 overflow-hidden flex flex-col pt-6 px-6 pb-2">
-          <div className="flex justify-between items-center mb-6">
-          <h2 className="text-[25px] font-semibold text-slate-800">Student Registration</h2>
-            <Link href="/admin/students/profile" className="text-[13px] font-bold text-slate-400 hover:text-slate-600">
-              View All
-            </Link>
-          </div>
-          <div className="overflow-x-auto flex-1 rounded-[5px] overflow-hidden border border-slate-100 mb-4">
-            <table className="w-full text-center border-collapse">
-              <thead>
-                <tr className="bg-[#D9D9D9] text-[#444444]">
-                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider border-r border-white last:border-0">Student Name</th>
-                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider border-r border-white last:border-0">Course</th>
-                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider border-r border-white last:border-0">College</th>
-                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {recentStudents.map((student: any) => (
-                  <tr key={student.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-4 py-4 text-sm font-medium text-slate-600">{student.name}</td>
-                    <td className="px-4 py-4 text-sm text-slate-500">{student.course}</td>
-                    <td className="px-4 py-4 text-sm text-slate-500 truncate max-w-[150px]">{student.college}</td>
-                    <td className="px-4 py-4 text-sm text-slate-500">{student.status}</td>
-                  </tr>
+      {/* ── Recent Students Table ── */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+          <h2 className="text-base font-black text-slate-800">Recent Students</h2>
+          <Link href="/admin/students/profile" className="text-xs font-bold text-[#FF3C3C] hover:underline">View all</Link>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100">
+                {["Student", "Email", "Phone", "Status", "Registered", "Action"].map((h) => (
+                  <th key={h} className="px-6 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">{h}</th>
                 ))}
-                {recentStudents.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-8 text-center text-slate-400 text-sm italic">
-                      No recent students registered.
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {recentStudents.length === 0 ? (
+                <tr><td colSpan={6} className="px-6 py-10 text-center text-slate-400 text-sm">No students yet</td></tr>
+              ) : recentStudents.map((s) => {
+                const sm = statusMeta[s.status.toLowerCase()] ?? statusMeta["pending"];
+                return (
+                  <tr key={s.id} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="px-6 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#FF3C3C]/10 flex items-center justify-center text-[#FF3C3C] font-black text-xs flex-shrink-0">
+                          {s.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="text-sm font-semibold text-slate-800">{s.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3 text-sm text-slate-500">{s.email}</td>
+                    <td className="px-6 py-3 text-sm text-slate-500">{s.phone || "—"}</td>
+                    <td className="px-6 py-3">
+                      <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${sm.cls}`}>{sm.label}</span>
+                    </td>
+                    <td className="px-6 py-3 text-sm text-slate-400">{s.created_at}</td>
+                    <td className="px-6 py-3">
+                      <Link href={`/admin/students/${s.id}`}
+                        className="text-xs font-bold px-3 py-1.5 border border-slate-200 rounded-lg text-slate-600 hover:border-[#FF3C3C] hover:text-[#FF3C3C] transition-colors">
+                        View
+                      </Link>
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-
-        {/* Recent Activity List */}
-        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md flex flex-col p-6 min-h-[520px]">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-[25px] font-semibold text-slate-800">Recent Activity</h2>
-          </div>
-          <div className="flex-1">
-            <div className="space-y-8 px-2">
-              {recentActivity.map((activity: any) => (
-                <div key={activity.id} className="flex gap-4 items-center">
-                  <div className="bg-[#99DEFF] w-10 h-10 rounded-full flex items-center justify-center text-[#007AFF] flex-shrink-0 shadow-sm">
-                    <span className="material-symbols-rounded text-[24px]">person</span>
-                  </div>
-                  <div>
-                    <p className="text-[14px] font-medium text-slate-700 leading-tight">{activity.message}</p>
-                    <p className="text-[12px] text-slate-400 mt-1 font-medium">{activity.time} ago</p>
-                  </div>
-                </div>
-              ))}
-              {recentActivity.length === 0 && (
-                <div className="text-center text-slate-400 text-sm py-4 italic">
-                  No activities in history.
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        
       </div>
+
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { getDb } from "@/lib/db";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
@@ -63,7 +63,23 @@ export default async function ExaminationStreamPage({ params }: { params: Promis
   const db = await getDb();
 
   const secDoc = await db.collection("exam_sections").findOne({ slug: stream });
-  if (!secDoc) notFound();
+
+  // If not a valid stream, check if it's an exam slug and redirect
+  if (!secDoc) {
+    const exam = await db.collection("examination_details").findOne(
+      { slug: stream },
+      { projection: { slug: 1, functionalarea_id: 1 } }
+    );
+    if (exam) {
+      const fa = await db.collection("functionalarea").findOne(
+        { $or: [{ _id: exam.functionalarea_id }, { id: exam.functionalarea_id }] },
+        { projection: { pageslug: 1 } }
+      );
+      const streamSlug = fa?.pageslug?.trim() || "general";
+      redirect(`/examination/${streamSlug}/${stream}`);
+    }
+    notFound();
+  }
 
   const streamName: string = secDoc.name;
   let exams: ExamRow[] = [];
