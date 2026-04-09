@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { NavItem, NavGroup, NAV_GROUPS } from "./nav-config";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 export interface Admin {
   id: string;
   name: string;
@@ -14,7 +14,7 @@ export interface Admin {
 export type { NavItem, NavGroup };
 export { NAV_GROUPS };
 
-// ─── Icon style helpers ───────────────────────────────────────────────────────
+// --- Icon style helpers -------------------------------------------------------
 export const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 export const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 

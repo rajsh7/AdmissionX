@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "AdmissionX help, FAQs, support, student questions, college questions, account help",
 };
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface FAQ {
   q: string;
@@ -28,7 +28,7 @@ interface Category {
   faqs: FAQ[];
 }
 
-// ─── FAQ Data ─────────────────────────────────────────────────────────────────
+// --- FAQ Data -----------------------------------------------------------------
 
 const CATEGORIES: Category[] = [
   {
@@ -209,7 +209,7 @@ const CATEGORIES: Category[] = [
   },
 ];
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default function HelpCenterPage() {
   const totalFaqs = CATEGORIES.reduce((s, c) => s + c.faqs.length, 0);
@@ -218,7 +218,7 @@ export default function HelpCenterPage() {
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
+      {/* -- Hero ------------------------------------------------------------ */}
       <div className="bg-neutral-900 pt-24 pb-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           {/* Breadcrumb */}
@@ -280,7 +280,7 @@ export default function HelpCenterPage() {
         </div>
       </div>
 
-      {/* ── Category quick-jump strip ──────────────────────────────────────── */}
+      {/* -- Category quick-jump strip ---------------------------------------- */}
       <div className="bg-white border-b border-neutral-100 sticky top-0 z-10 shadow-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex items-center gap-1 overflow-x-auto py-3 scrollbar-none">
@@ -309,7 +309,7 @@ export default function HelpCenterPage() {
         </div>
       </div>
 
-      {/* ── Main content ──────────────────────────────────────────────────── */}
+      {/* -- Main content ---------------------------------------------------- */}
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12 space-y-16">
         {CATEGORIES.map((cat) => (
           <section key={cat.id} id={cat.id} className="scroll-mt-20">
@@ -366,7 +366,7 @@ export default function HelpCenterPage() {
           </section>
         ))}
 
-        {/* ── Still need help? ─────────────────────────────────────────────── */}
+        {/* -- Still need help? ----------------------------------------------- */}
         <div className="bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-3xl p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
           <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0">
             <span className="material-symbols-outlined text-[28px] text-white">
@@ -404,7 +404,7 @@ export default function HelpCenterPage() {
           </div>
         </div>
 
-        {/* ── Quick links ───────────────────────────────────────────────────── */}
+        {/* -- Quick links ----------------------------------------------------- */}
         <div>
           <h3 className="text-sm font-black text-neutral-500 uppercase tracking-wider mb-4">
             Quick Links

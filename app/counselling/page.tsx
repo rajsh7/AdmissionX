@@ -94,7 +94,7 @@ export default function CounsellingPage() {
       <div className="relative z-10">
         <Header />
 
-        {/* ── Hero ── */}
+        {/* -- Hero -- */}
         <div className="pt-24 pb-16">
           <div className="w-full px-4 lg:px-8 xl:px-12 flex flex-col items-center text-center">
             <nav className="flex items-center justify-center gap-2 text-xs text-neutral-500 mb-6 font-medium">
@@ -142,7 +142,7 @@ export default function CounsellingPage() {
 
         <div className="w-full px-4 lg:px-8 xl:px-12 py-10 space-y-14">
 
-          {/* ── How it works ── */}
+          {/* -- How it works -- */}
           <section>
             <div className="mb-8 text-center">
               <h2 className="text-xl font-black text-white">How It Works</h2>
@@ -162,7 +162,7 @@ export default function CounsellingPage() {
             </div>
           </section>
 
-          {/* ── Counselling types ── */}
+          {/* -- Counselling types -- */}
           <section>
             <div className="mb-8">
               <h2 className="text-xl font-black text-white">Counselling by Stream</h2>
@@ -186,7 +186,7 @@ export default function CounsellingPage() {
             </div>
           </section>
 
-          {/* ── CTA ── */}
+          {/* -- CTA -- */}
           <section className="bg-gradient-to-r from-teal-900 to-neutral-900 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-start gap-4 max-w-xl">
               <div className="w-12 h-12 rounded-2xl bg-teal-600/20 flex items-center justify-center flex-shrink-0">

@@ -5,16 +5,16 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Image from "next/image";
 
-// ─── Dynamic page (requires database access at request time)
+// --- Dynamic page (requires database access at request time)
 export const dynamic = 'force-dynamic';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// --- Constants ----------------------------------------------------------------
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_IMAGE =
   "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=600";
 
-// ─── Metadata ─────────────────────────────────────────────────────────────────
+// --- Metadata -----------------------------------------------------------------
 
 export const metadata: Metadata = {
   title: "Career Opportunities — Explore Career Paths | AdmissionX",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     "Discover career opportunities across engineering, medicine, management, law, and more. Explore salary ranges, skill requirements, and the best courses.",
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || !raw.trim()) return DEFAULT_IMAGE;
@@ -90,7 +90,7 @@ interface CareerRelevantRow {
   stream_slug: string | null;
 }
 
-// ─── Colour helpers ───────────────────────────────────────────────────────────
+// --- Colour helpers -----------------------------------------------------------
 
 const DIFFICULTY_META: Record<
   string,
@@ -134,7 +134,7 @@ function getStreamMeta(slug: string | null) {
   return STREAM_COLORS.default;
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function CareerOpportunitiesPage() {
   const db = await getDb();
@@ -176,7 +176,7 @@ export default async function CareerOpportunitiesPage() {
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* ── Hero ──────────────────────────────────────────────────────── */}
+      {/* -- Hero -------------------------------------------------------- */}
       <div className="bg-neutral-900 pt-24 pb-16 relative overflow-hidden">
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-red-600/10 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-purple-600/10 blur-3xl pointer-events-none" />
@@ -241,7 +241,7 @@ export default async function CareerOpportunitiesPage() {
         </div>
       </div>
 
-      {/* ── Stream filter bar ──────────────────────────────────────────── */}
+      {/* -- Stream filter bar -------------------------------------------- */}
       {streamRows.length > 0 && (
         <div className="bg-white border-b border-neutral-100 sticky top-0 z-30 shadow-sm">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -281,7 +281,7 @@ export default async function CareerOpportunitiesPage() {
         </div>
       )}
 
-      {/* ── Main content ───────────────────────────────────────────────── */}
+      {/* -- Main content ------------------------------------------------- */}
       <main className="mx-auto max-w-7xl px-4 sm:px-6 py-10" id="all">
         {totalCareers === 0 ? (
           <EmptyState />
@@ -293,7 +293,7 @@ export default async function CareerOpportunitiesPage() {
           </div>
         )}
 
-        {/* ── CTA banner ── */}
+        {/* -- CTA banner -- */}
         {totalCareers > 0 && (
           <div className="mt-14 bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-3xl p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-start gap-4">
@@ -342,7 +342,7 @@ export default async function CareerOpportunitiesPage() {
   );
 }
 
-// ─── Career Card ──────────────────────────────────────────────────────────────
+// --- Career Card --------------------------------------------------------------
 
 function CareerCard({ career }: { career: CareerRelevantRow }) {
   const imgUrl = buildImageUrl(career.image);
@@ -466,7 +466,7 @@ function CareerCard({ career }: { career: CareerRelevantRow }) {
   );
 }
 
-// ─── Empty State ──────────────────────────────────────────────────────────────
+// --- Empty State --------------------------------------------------------------
 
 function EmptyState() {
   return (

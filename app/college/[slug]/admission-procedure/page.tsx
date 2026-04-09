@@ -4,7 +4,7 @@ export const revalidate = 300;
 import pool from "@/lib/db";
 import { notFound } from "next/navigation";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function slugToName(slug: string): string {
   return slug
@@ -62,7 +62,7 @@ async function safeQuery<T>(
   }
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface CollegeBaseRow {
   id: number;
@@ -90,7 +90,7 @@ interface ImportantDateRow {
   procedure_title: string | null;
 }
 
-// ─── Step number badge ────────────────────────────────────────────────────────
+// --- Step number badge --------------------------------------------------------
 
 function StepBadge({ index, isLast }: { index: number; isLast: boolean }) {
   return (
@@ -105,7 +105,7 @@ function StepBadge({ index, isLast }: { index: number; isLast: boolean }) {
   );
 }
 
-// ─── Important date pill ──────────────────────────────────────────────────────
+// --- Important date pill ------------------------------------------------------
 
 function DatePill({
   event,
@@ -189,7 +189,7 @@ function DatePill({
   );
 }
 
-// ─── Procedure card ───────────────────────────────────────────────────────────
+// --- Procedure card -----------------------------------------------------------
 
 function ProcedureCard({
   procedure,
@@ -285,7 +285,7 @@ function ProcedureCard({
   );
 }
 
-// ─── General admission steps (shown when no DB data) ─────────────────────────
+// --- General admission steps (shown when no DB data) -------------------------
 
 const GENERAL_STEPS = [
   {
@@ -429,7 +429,7 @@ function GeneralStepsGuide({ collegeName }: { collegeName: string }) {
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function AdmissionProcedurePage({
   params,
@@ -438,7 +438,7 @@ export default async function AdmissionProcedurePage({
 }) {
   const { slug } = await params;
 
-  // ── Fetch in parallel ─────────────────────────────────────────────────────
+  // -- Fetch in parallel -----------------------------------------------------
   const [baseRows, procedureRows, importantDateRows] = await Promise.all([
     safeQuery<CollegeBaseRow>(
       `SELECT
@@ -525,7 +525,7 @@ export default async function AdmissionProcedurePage({
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-10 py-8 space-y-6">
-      {/* ── Page header ── */}
+      {/* -- Page header -- */}
       <div className="bg-white rounded-2xl border border-neutral-100 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-lg font-black text-neutral-900 flex items-center gap-2 mb-1">
@@ -551,7 +551,7 @@ export default async function AdmissionProcedurePage({
         )}
       </div>
 
-      {/* ── Admission window banner ── */}
+      {/* -- Admission window banner -- */}
       {hasAdmissionWindow && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {base.admissionStart && (
@@ -597,7 +597,7 @@ export default async function AdmissionProcedurePage({
         </div>
       )}
 
-      {/* ── Upcoming dates highlight strip ── */}
+      {/* -- Upcoming dates highlight strip -- */}
       {allUpcomingDates.length > 0 && (
         <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-100 rounded-2xl p-5">
           <h2 className="text-sm font-black text-neutral-800 mb-3 flex items-center gap-2">
@@ -626,7 +626,7 @@ export default async function AdmissionProcedurePage({
         </div>
       )}
 
-      {/* ── Main content ── */}
+      {/* -- Main content -- */}
       {!hasProcedures ? (
         <GeneralStepsGuide collegeName={collegeName} />
       ) : hasMultipleStreams ? (
@@ -695,7 +695,7 @@ export default async function AdmissionProcedurePage({
         </section>
       )}
 
-      {/* ── All important dates table (if many dates) ── */}
+      {/* -- All important dates table (if many dates) -- */}
       {importantDateRows.length > 3 && (
         <section className="bg-white rounded-2xl border border-neutral-100 overflow-hidden">
           <div className="px-6 pt-6 pb-4 border-b border-neutral-100 flex items-center justify-between gap-3">
@@ -805,7 +805,7 @@ export default async function AdmissionProcedurePage({
         </section>
       )}
 
-      {/* ── CTA strip ── */}
+      {/* -- CTA strip -- */}
       <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
           <p className="text-white font-black text-base mb-1">

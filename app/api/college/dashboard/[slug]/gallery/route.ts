@@ -6,7 +6,7 @@ import { writeFile, mkdir } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
 
-// ── Auth + ownership helper ───────────────────────────────────────────────────
+// -- Auth + ownership helper ---------------------------------------------------
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_college")?.value;
@@ -35,7 +35,7 @@ async function checkAuth(slug: string) {
 const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_SIZE     = 5 * 1024 * 1024; // 5 MB
 
-// ── GET /api/college/dashboard/[slug]/gallery ─────────────────────────────────
+// -- GET /api/college/dashboard/[slug]/gallery ---------------------------------
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
@@ -80,7 +80,7 @@ export async function GET(
   }
 }
 
-// ── POST /api/college/dashboard/[slug]/gallery ────────────────────────────────
+// -- POST /api/college/dashboard/[slug]/gallery --------------------------------
 // Accepts multipart/form-data: file (required), name? (string), caption? (string)
 export async function POST(
   req: NextRequest,
@@ -119,7 +119,7 @@ export async function POST(
   const caption = String(formData.get("caption") ?? "").trim();
   const name    = String(formData.get("name")    ?? "").trim() || file.name;
 
-  // ── Save file to disk ─────────────────────────────────────────────────────
+  // -- Save file to disk -----------------------------------------------------
   const uploadDir = path.join(process.cwd(), "public", "uploads", "college", slug, "gallery");
   if (!existsSync(uploadDir)) {
     await mkdir(uploadDir, { recursive: true });
@@ -132,7 +132,7 @@ export async function POST(
 
   await writeFile(fullPath, Buffer.from(await file.arrayBuffer()));
 
-  // ── Insert gallery record ─────────────────────────────────────────────────
+  // -- Insert gallery record -------------------------------------------------
   const conn = await pool.getConnection();
   try {
     const [result] = await conn.query(
@@ -162,7 +162,7 @@ export async function POST(
   }
 }
 
-// ── DELETE /api/college/dashboard/[slug]/gallery?imageId=X ───────────────────
+// -- DELETE /api/college/dashboard/[slug]/gallery?imageId=X -------------------
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },

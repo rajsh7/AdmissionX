@@ -1,6 +1,6 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 async function safeCount(
   sql: string,
@@ -36,14 +36,14 @@ const ICO = {
   fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20",
 };
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface AppStatusRow  {
   status_name: string | null;
   cnt: number;
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function AdminReportsPage() {
   const now = new Date();
@@ -55,7 +55,7 @@ export default async function AdminReportsPage() {
   const weekStr = startOfWeek.toISOString().slice(0, 10);
   const monthStr = startOfMonth.toISOString().slice(0, 10);
 
-  // ── All counts in parallel ─────────────────────────────────────────────────
+  // -- All counts in parallel -------------------------------------------------
   const [
     totalColleges,
     pendingColleges,
@@ -261,7 +261,7 @@ export default async function AdminReportsPage() {
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
-      {/* ── Header ────────────────────────────────────────────────────────── */}
+      {/* -- Header ---------------------------------------------------------- */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -286,7 +286,7 @@ export default async function AdminReportsPage() {
         </span>
       </div>
 
-      {/* ── Platform Overview ─────────────────────────────────────────────── */}
+      {/* -- Platform Overview ----------------------------------------------- */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
           <span
@@ -325,7 +325,7 @@ export default async function AdminReportsPage() {
         </div>
       </div>
 
-      {/* ── Row: College Funnel + Application Status ───────────────────────── */}
+      {/* -- Row: College Funnel + Application Status ------------------------- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* College Funnel */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
@@ -513,7 +513,7 @@ export default async function AdminReportsPage() {
         </div>
       </div>
 
-      {/* ── Row: Content Health + Growth ──────────────────────────────────── */}
+      {/* -- Row: Content Health + Growth ------------------------------------ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Content Health */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
@@ -907,7 +907,7 @@ export default async function AdminReportsPage() {
       </div>
       {/* end Row: Content Health + Growth */}
 
-      {/* ── SEO quick-stat ────────────────────────────────────────────────── */}
+      {/* -- SEO quick-stat -------------------------------------------------- */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-2">

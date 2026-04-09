@@ -7,12 +7,12 @@ import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// --- Constants ----------------------------------------------------------------
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_IMAGE = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || !raw.trim()) return DEFAULT_IMAGE;
@@ -68,7 +68,7 @@ interface BlogRow {
   updated_at: string;
 }
 
-// ─── generateMetadata ─────────────────────────────────────────────────────────
+// --- generateMetadata ---------------------------------------------------------
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -79,12 +79,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: `${item.topic} | AdmissionX`, description: desc || "Read this article on AdmissionX." };
 }
 
-// ─── Styles & Icons ──────────────────────────────────────────────────────────
+// --- Styles & Icons ----------------------------------------------------------
 
 const ICO_STYLE = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 const ICO_FILL_STYLE = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -108,7 +108,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
     <>
       <Header />
       <main className="min-h-screen relative overflow-hidden bg-neutral-900">
-        {/* ── Background Layer ── */}
+        {/* -- Background Layer -- */}
         <div className="fixed inset-0 z-0">
           <BlogImage
             src={heroImg}
@@ -118,7 +118,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
           <div className="absolute inset-0 bg-black/75 backdrop-blur-[2px]" />
         </div>
 
-        {/* ── Content Layer ── */}
+        {/* -- Content Layer -- */}
         <div className="relative z-10">
           {/* Hero Section */}
           <section className="relative h-[460px] md:h-[540px] flex flex-col items-center justify-center text-center">

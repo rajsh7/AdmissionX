@@ -1,6 +1,6 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 const PAGE_SIZE = 25;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -44,7 +44,7 @@ function getEntityType(row: SeoRow): { label: string; cls: string } {
   return { label: "General", cls: "bg-slate-100 text-slate-600" };
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface SeoRow  {
   id: number;
@@ -66,7 +66,7 @@ interface SeoRow  {
 
 interface CountRow  { total: number; }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function AdminSeoPage({
   searchParams,
@@ -78,7 +78,7 @@ export default async function AdminSeoPage({
   const page   = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── WHERE ──────────────────────────────────────────────────────────────────
+  // -- WHERE ------------------------------------------------------------------
   const conditions: string[] = [];
   const params: (string | number)[] = [];
 
@@ -89,7 +89,7 @@ export default async function AdminSeoPage({
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Parallel queries ───────────────────────────────────────────────────────
+  // -- Parallel queries -------------------------------------------------------
   const [rows, countRows, totalRow, withTitleRow, noTitleRow] = await Promise.all([
     safeQuery<SeoRow>(
       `SELECT id, slugurl, pagetitle, description, keyword, h1title, canonical,
@@ -146,7 +146,7 @@ export default async function AdminSeoPage({
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
 
-      {/* ── Header ───────────────────────────────────────────────────────── */}
+      {/* -- Header --------------------------------------------------------- */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -164,7 +164,7 @@ export default async function AdminSeoPage({
         </span>
       </div>
 
-      {/* ── Stat mini-cards ───────────────────────────────────────────────── */}
+      {/* -- Stat mini-cards ------------------------------------------------- */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {STAT_CARDS.map((card) => (
           <div
@@ -186,7 +186,7 @@ export default async function AdminSeoPage({
         ))}
       </div>
 
-      {/* ── Search ───────────────────────────────────────────────────────── */}
+      {/* -- Search --------------------------------------------------------- */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
         <form method="GET" action="/admin/seo" className="flex-1 max-w-md">
           <div className="relative">
@@ -222,7 +222,7 @@ export default async function AdminSeoPage({
         )}
       </div>
 
-      {/* ── Table card ────────────────────────────────────────────────────── */}
+      {/* -- Table card ------------------------------------------------------ */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         {rows.length === 0 ? (
           <div className="py-20 text-center">
@@ -386,7 +386,7 @@ export default async function AdminSeoPage({
         )}
       </div>
 
-      {/* ── Legacy note ───────────────────────────────────────────────────── */}
+      {/* -- Legacy note ----------------------------------------------------- */}
       <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4">
         <span
           className="material-symbols-rounded text-amber-500 text-[20px] flex-shrink-0 mt-0.5"

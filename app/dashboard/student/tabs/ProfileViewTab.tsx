@@ -163,7 +163,7 @@ export default function ProfileViewTab({ user }: Props) {
       })
     : "";
 
-  // ── Loading ─────────────────────────────────────────────────────────────────
+  // -- Loading -----------------------------------------------------------------
   if (loading) {
     return (
       <div className="space-y-6 max-w-5xl">
@@ -194,7 +194,7 @@ export default function ProfileViewTab({ user }: Props) {
     );
   }
 
-  // ── Error ────────────────────────────────────────────────────────────────────
+  // -- Error --------------------------------------------------------------------
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-32 gap-4 max-w-5xl">
@@ -217,7 +217,7 @@ export default function ProfileViewTab({ user }: Props) {
   return (
     <div className="space-y-6 max-w-5xl">
 
-      {/* ── PROFILE HERO CARD ─────────────────────────────────────────────── */}
+      {/* -- PROFILE HERO CARD ----------------------------------------------- */}
       <div className="bg-white rounded-2xl border border-green-50 shadow-sm overflow-hidden">
         {/* Cover banner */}
         <div
@@ -313,7 +313,7 @@ export default function ProfileViewTab({ user }: Props) {
         </div>
       </div>
 
-      {/* ── STATS ROW ─────────────────────────────────────────────────────── */}
+      {/* -- STATS ROW ------------------------------------------------------- */}
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
@@ -343,10 +343,10 @@ export default function ProfileViewTab({ user }: Props) {
         </div>
       )}
 
-      {/* ── MAIN GRID ─────────────────────────────────────────────────────── */}
+      {/* -- MAIN GRID ------------------------------------------------------- */}
       <div className="grid grid-cols-12 gap-6">
 
-        {/* ── LEFT COLUMN (8 cols) ──────────────────────────────────────── */}
+        {/* -- LEFT COLUMN (8 cols) ---------------------------------------- */}
         <div className="col-span-12 lg:col-span-8 space-y-5">
 
           {/* Personal Information */}
@@ -567,7 +567,7 @@ export default function ProfileViewTab({ user }: Props) {
           )}
         </div>
 
-        {/* ── RIGHT COLUMN (4 cols) ─────────────────────────────────────── */}
+        {/* -- RIGHT COLUMN (4 cols) --------------------------------------- */}
         <div className="col-span-12 lg:col-span-4 space-y-5">
 
           {/* Profile Completion Card */}

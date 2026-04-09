@@ -2,7 +2,7 @@ import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import ExamTypeListClient from "./ExamTypeListClient";
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+// --- Server Actions -----------------------------------------------------------
 
 async function createExamType(formData: FormData) {
   "use server";
@@ -54,7 +54,7 @@ async function deleteType(id: number) {
   revalidatePath("/", "layout");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 async function getExamTypes(q?: string) {
   try {
@@ -73,7 +73,7 @@ async function getExamTypes(q?: string) {
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
-// ─── Page Component ──────────────────────────────────────────────────────────
+// --- Page Component ----------------------------------------------------------
 
 export default async function ExamTypePage({
   searchParams,

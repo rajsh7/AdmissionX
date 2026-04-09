@@ -1,6 +1,6 @@
 import { CourseData } from "@/app/api/college/[slug]/route";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function formatFees(fees: string | null): string {
   if (!fees) return "—";
@@ -22,7 +22,7 @@ function EligibilityBadge({ marks }: { marks: string | null }) {
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// --- Main Component -----------------------------------------------------------
 
 interface CourseListProps {
   courses: CourseData[];

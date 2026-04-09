@@ -85,7 +85,7 @@ export async function PATCH(req: NextRequest) {
 
     const db = await getDb();
 
-    // ── Student approval ────────────────────────────────────────────────────
+    // -- Student approval ----------------------------------------------------
     if (type === "student") {
       const update: Record<string, unknown> = { updated_at: new Date() };
       if (status) update.status = status;
@@ -101,7 +101,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ success: true });
     }
 
-    // ── College approval ──────────────────────────────────────────────────────
+    // -- College approval ------------------------------------------------------
     if (type === "college") {
       const college = await db.collection("next_college_signups").findOne(
         { _id: new ObjectId(_id) }

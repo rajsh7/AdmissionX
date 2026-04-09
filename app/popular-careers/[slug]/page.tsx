@@ -6,13 +6,13 @@ import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// --- Constants ----------------------------------------------------------------
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_CAREER_IMAGE =
   "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=1200";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || raw.trim() === "") return DEFAULT_CAREER_IMAGE;
@@ -52,7 +52,7 @@ function renderParagraphs(text: string): string[] {
 }
 
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface CareerDetailRow {
   id: number;
@@ -107,7 +107,7 @@ interface RelatedCareerRow {
   stream_slug: string | null;
 }
 
-// ─── Skill chip colour palette ────────────────────────────────────────────────
+// --- Skill chip colour palette ------------------------------------------------
 
 const SKILL_COLORS = [
   "text-blue-700 bg-blue-50 border-blue-200",
@@ -120,7 +120,7 @@ const SKILL_COLORS = [
   "text-rose-700 bg-rose-50 border-rose-200",
 ];
 
-// ─── Metadata ─────────────────────────────────────────────────────────────────
+// --- Metadata -----------------------------------------------------------------
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -172,7 +172,7 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ s
   const whereToStudies: WhereToStudyRow[] = whereToStudyDocs.map((r) => ({ id: r.id, instituteName: r.instituteName ?? null, instituteUrl: r.instituteUrl ?? null, city: r.city ?? null, programmeFees: r.programmeFees ?? null }));
   const relatedCareers: RelatedCareerRow[] = relatedDocs.map((r) => ({ id: r.id, title: r.title, slug: r.slug, description: r.description ?? null, image: r.image ?? null, stream_name: fa?.name ?? null, stream_slug: fa?.pageslug ?? null }));
 
-  // ── Derived data ──────────────────────────────────────────────────────────
+  // -- Derived data ----------------------------------------------------------
   const imgUrl = buildImageUrl(career.image);
   const prosList = parseBulletList(career.pros);
   const consList = parseBulletList(career.cons);
@@ -186,7 +186,7 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ s
   const streamName = career.stream_name ?? "General";
   const streamHref = `/careers/opportunities/${career.stream_slug ?? streamName.toLowerCase().replace(/\s+/g, "-")}`;
 
-  // ── Section visibility ────────────────────────────────────────────────────
+  // -- Section visibility ----------------------------------------------------
   const hasAbout = !!aboutRaw;
   const hasJobRoles = jobRoles.length > 0;
   const hasSkills = skills.length > 0;
@@ -210,7 +210,7 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ s
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      {/* -- Hero ----------------------------------------------------------- */}
       <div className="relative bg-neutral-900 pt-24 pb-12 overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0 z-0">
@@ -313,7 +313,7 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ s
         </div>
       </div>
 
-      {/* ── Jump navigation ───────────────────────────────────────────────── */}
+      {/* -- Jump navigation ------------------------------------------------- */}
       {jumpItems.length > 1 && (
         <div className="bg-white border-b border-neutral-100 shadow-sm sticky top-0 z-30">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -336,11 +336,11 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ s
         </div>
       )}
 
-      {/* ── Main layout ───────────────────────────────────────────────────── */}
+      {/* -- Main layout ----------------------------------------------------- */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
 
-          {/* ══ LEFT / MAIN COLUMN ══════════════════════════════════════════ */}
+          {/* -- LEFT / MAIN COLUMN ------------------------------------------ */}
           <div className="flex-1 min-w-0 space-y-6">
 
             {/* About */}
@@ -674,7 +674,7 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ s
             )}
           </div>
 
-          {/* ══ RIGHT / SIDEBAR ═════════════════════════════════════════════ */}
+          {/* -- RIGHT / SIDEBAR --------------------------------------------- */}
           <aside className="w-full lg:w-80 xl:w-96 flex-shrink-0 space-y-5">
 
             {/* Quick Facts */}
@@ -856,7 +856,7 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ s
         </div>
       </div>
 
-      {/* ── Bottom CTA banner ──────────────────────────────────────────────────── */}
+      {/* -- Bottom CTA banner ---------------------------------------------------- */}
       <div className="bg-gradient-to-r from-red-600 to-rose-600 py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -893,7 +893,7 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ s
   );
 }
 
-// ─── SectionTitle ─────────────────────────────────────────────────────────────────────────────
+// --- SectionTitle -----------------------------------------------------------------------------
 
 function SectionTitle({ icon, title }: { icon: string; title: string }) {
   return (

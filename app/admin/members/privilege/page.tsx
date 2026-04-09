@@ -5,7 +5,7 @@ import PrivilegeListClient from "./PrivilegeListClient";
 
 const PAGE_SIZE = 25;
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+// --- Server Actions -----------------------------------------------------------
 
 async function createPrivilege(formData: FormData) {
   "use server";
@@ -70,7 +70,7 @@ async function deletePrivilege(id: number) {
   revalidatePath("/", "layout");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 async function safeQuery<T >(
   sql: string,

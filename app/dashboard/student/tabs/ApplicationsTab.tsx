@@ -33,7 +33,7 @@ interface Application {
   created_at: string;
 }
 
-// ── Application Card ────────────────────────────────────────────────────────
+// -- Application Card --------------------------------------------------------
 function AppCard({ app }: { app: Application }) {
   return (
     <div className="bg-white rounded-[12px] border-2 border-gray-100 p-6 hover:border-[#e31e24]/20 transition-all group relative overflow-hidden">

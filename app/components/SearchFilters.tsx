@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface FilterOption {
   id: string | number;
@@ -39,7 +39,7 @@ export interface ActiveFilters {
   ranking?: string;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// --- Constants ----------------------------------------------------------------
 
 const INDIAN_STATES: FilterOption[] = [
   { id: "9",  name: "Uttar Pradesh" },
@@ -79,7 +79,7 @@ const FEES_OPTIONS = [
   { label: "Up to ₹20 Lakhs", value: "2000000" },
 ];
 
-// ─── Main SearchFilters component ─────────────────────────────────────────────
+// --- Main SearchFilters component ---------------------------------------------
 
 export default function SearchFilters({
   streams = [],

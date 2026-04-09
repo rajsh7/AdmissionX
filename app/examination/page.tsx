@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
-// ─── Dynamic page (requires database access at request time)
+// --- Dynamic page (requires database access at request time)
 export const dynamic = 'force-dynamic';
 
 const DEFAULT_EXAM_IMAGE =

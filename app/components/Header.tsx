@@ -206,7 +206,7 @@ export default function Header({ theme }: HeaderProps) {
   const loginTimer = useRef<ReturnType<typeof setTimeout>>(null);
   const signupTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
-  // ── Auth check ────────────────────────────────────────────────────────────
+  // -- Auth check ------------------------------------------------------------
   const checkAuth = useCallback(async () => {
     try {
       const res = await fetch("/api/auth/me", {
@@ -241,7 +241,7 @@ export default function Header({ theme }: HeaderProps) {
   // Determine if we should show the "active/scrolled" state (white bg, dark text)
   const showActiveState = theme === "dark" || isScrolled;
 
-  // ── Logout ────────────────────────────────────────────────────────────────
+  // -- Logout ----------------------------------------------------------------
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
@@ -253,7 +253,7 @@ export default function Header({ theme }: HeaderProps) {
     router.refresh();
   };
 
-  // ── Dropdown helpers ──────────────────────────────────────────────────────
+  // -- Dropdown helpers ------------------------------------------------------
   const openLogin = () => {
     if (loginTimer.current) clearTimeout(loginTimer.current);
     setSignupOpen(false);
@@ -271,7 +271,7 @@ export default function Header({ theme }: HeaderProps) {
     signupTimer.current = setTimeout(() => setSignupOpen(false), 150);
   };
 
-  // ── Close dropdowns on outside click ─────────────────────────────────────
+  // -- Close dropdowns on outside click -------------------------------------
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (loginRef.current && !loginRef.current.contains(e.target as Node))
@@ -288,7 +288,7 @@ export default function Header({ theme }: HeaderProps) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  // ── User initials avatar ──────────────────────────────────────────────────
+  // -- User initials avatar --------------------------------------------------
   const initials = authUser
     ? authUser.name
       .split(" ")

@@ -6,7 +6,7 @@ import Footer from "@/app/components/Footer";
 import type { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
-// ─── Constants ────────────────────────────────────────────────────────────────
+// --- Constants ----------------------------------------------------------------
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_CAREER_IMAGE =
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     "Discover the most in-demand careers across engineering, medicine, management, law, and more. Get salary insights, skill requirements, and top colleges.",
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || raw.trim() === "") return DEFAULT_CAREER_IMAGE;
@@ -72,7 +72,7 @@ interface CareerRow {
   totalLikes: number;
 }
 
-// ─── Stream colour map ────────────────────────────────────────────────────────
+// --- Stream colour map --------------------------------------------------------
 
 const STREAM_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   engineering:  { bg: "bg-blue-50",    text: "text-blue-700",   border: "border-blue-200"  },
@@ -120,7 +120,7 @@ function getStreamIcon(slug: string | null): string {
   return STREAM_ICONS.default;
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function PopularCareersPage() {
   const db = await getDb();
@@ -163,7 +163,7 @@ export default async function PopularCareersPage() {
 
   const totalCareers = careerRows.length;
 
-  // ─── Group by stream for the "by stream" section ─────────────────────────
+  // --- Group by stream for the "by stream" section -------------------------
   const careersByStream = new Map<string, CareerRow[]>();
   for (const c of careerRows) {
     const key = c.stream_slug ?? "other";
@@ -175,7 +175,7 @@ export default async function PopularCareersPage() {
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* ── Hero ── */}
+      {/* -- Hero -- */}
       <section className="bg-neutral-900 pt-24 pb-16 relative overflow-hidden">
         {/* Background pattern */}
         <div
@@ -251,7 +251,7 @@ export default async function PopularCareersPage() {
         </div>
       </section>
 
-      {/* ── Stream Filter Chips ── */}
+      {/* -- Stream Filter Chips -- */}
       {streamRows.length > 0 && (
         <section className="bg-white border-b border-neutral-100 sticky top-0 z-30 shadow-sm">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -292,7 +292,7 @@ export default async function PopularCareersPage() {
       )}
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 py-10 space-y-14">
-        {/* ── No Data State ── */}
+        {/* -- No Data State -- */}
         {totalCareers === 0 && (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="w-20 h-20 rounded-3xl bg-neutral-100 flex items-center justify-center mb-5">
@@ -309,7 +309,7 @@ export default async function PopularCareersPage() {
           </div>
         )}
 
-        {/* ── All Careers (flat grid) ── */}
+        {/* -- All Careers (flat grid) -- */}
         {totalCareers > 0 && streamRows.length === 0 && (
           <section id="all-careers">
             <SectionHeader
@@ -321,7 +321,7 @@ export default async function PopularCareersPage() {
           </section>
         )}
 
-        {/* ── Grouped by stream ── */}
+        {/* -- Grouped by stream -- */}
         {streamRows.length > 0 && (
           <>
             {/* All careers anchor */}
@@ -394,7 +394,7 @@ export default async function PopularCareersPage() {
           </>
         )}
 
-        {/* ── CTA Banner ── */}
+        {/* -- CTA Banner -- */}
         <section className="bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-3xl p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-2xl bg-red-500/20 flex items-center justify-center shrink-0">
@@ -443,7 +443,7 @@ export default async function PopularCareersPage() {
   );
 }
 
-// ─── Section header ───────────────────────────────────────────────────────────
+// --- Section header -----------------------------------------------------------
 
 function SectionHeader({
   icon,
@@ -471,7 +471,7 @@ function SectionHeader({
   );
 }
 
-// ─── Career Grid ──────────────────────────────────────────────────────────────
+// --- Career Grid --------------------------------------------------------------
 
 function CareerGrid({ careers }: { careers: CareerRow[] }) {
   if (careers.length === 0) return null;
@@ -484,7 +484,7 @@ function CareerGrid({ careers }: { careers: CareerRow[] }) {
   );
 }
 
-// ─── Career Card ──────────────────────────────────────────────────────────────
+// --- Career Card --------------------------------------------------------------
 
 function CareerCard({ career }: { career: CareerRow }) {
   const imgUrl = buildImageUrl(career.image);

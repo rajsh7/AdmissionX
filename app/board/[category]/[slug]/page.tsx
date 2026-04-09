@@ -6,13 +6,13 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Image from "next/image";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// --- Constants ----------------------------------------------------------------
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_BOARD_IMAGE =
   "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&q=80&w=1200";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || !raw.trim()) return DEFAULT_BOARD_IMAGE;
@@ -59,7 +59,7 @@ function isUpcoming(raw: string | null | undefined): boolean {
 }
 
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface BoardRow {
   id: number;
@@ -137,7 +137,7 @@ interface AdmissionDateRow {
   subjects: string | null;
 }
 
-// ─── Metadata ─────────────────────────────────────────────────────────────────
+// --- Metadata -----------------------------------------------------------------
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string; slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -154,7 +154,7 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   };
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function BoardDetailPage({ params }: { params: Promise<{ category: string; slug: string }> }) {
   const { slug } = await params;
@@ -192,7 +192,7 @@ export default async function BoardDetailPage({ params }: { params: Promise<{ ca
   const resultRaw = stripHtml(detail?.resultDesc);
   const entranceExamRaw = stripHtml(detail?.entranceExam);
 
-  // ── Section visibility flags ──────────────────────────────────────────────
+  // -- Section visibility flags ----------------------------------------------
   const hasAbout = !!aboutRaw;
   const hasHighlights = highlights.length > 0;
   const hasImpDates = impDates.length > 0;
@@ -264,7 +264,7 @@ export default async function BoardDetailPage({ params }: { params: Promise<{ ca
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      {/* -- Hero ----------------------------------------------------------- */}
       <div className="relative bg-neutral-900 pt-24 pb-12 overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0 z-0">
@@ -389,7 +389,7 @@ export default async function BoardDetailPage({ params }: { params: Promise<{ ca
         </div>
       </div>
 
-      {/* ── Jump Navigation ───────────────────────────────────────────────── */}
+      {/* -- Jump Navigation ------------------------------------------------- */}
       {jumpItems.length > 1 && (
         <div className="bg-white border-b border-neutral-100 shadow-sm sticky top-0 z-30">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -414,10 +414,10 @@ export default async function BoardDetailPage({ params }: { params: Promise<{ ca
         </div>
       )}
 
-      {/* ── Main Layout ───────────────────────────────────────────────────── */}
+      {/* -- Main Layout ----------------------------------------------------- */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
-          {/* ══ LEFT / MAIN COLUMN ══════════════════════════════════════════ */}
+          {/* -- LEFT / MAIN COLUMN ------------------------------------------ */}
           <div className="flex-1 min-w-0 space-y-6">
             {/* About */}
             {hasAbout && (

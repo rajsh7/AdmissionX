@@ -8,11 +8,11 @@ import ImageUpload from "@/app/admin/_components/ImageUpload";
 
 export const dynamic = "force-dynamic";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// --- Constants ----------------------------------------------------------------
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 
-// ─── Server Action ─────────────────────────────────────────────────────────────
+// --- Server Action -------------------------------------------------------------
 
 async function updateCollegeProfile(formData: FormData) {
   "use server";
@@ -31,7 +31,7 @@ async function updateCollegeProfile(formData: FormData) {
   };
   const bool = (key: string) => (formData.get(key) === "on" ? 1 : 0);
 
-  // ── Handle image uploads ──────────────────────────────────────────────────
+  // -- Handle image uploads --------------------------------------------------
   const bannerFile = formData.get("bannerimage_file") as File | null;
   const logoFile   = formData.get("logoimage_file") as File | null;
   let bannerimage  = (formData.get("bannerimage_existing") as string) || "";
@@ -89,7 +89,7 @@ async function updateCollegeProfile(formData: FormData) {
   redirect("/admin/colleges/profile");
 }
 
-// ─── Style helpers ─────────────────────────────────────────────────────────────
+// --- Style helpers -------------------------------------------------------------
 
 const inputCls =
   "w-full h-10 px-4 border border-slate-200 rounded-xl text-sm font-medium bg-white " +
@@ -104,7 +104,7 @@ const textareaCls =
 const labelCls =
   "text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block";
 
-// ─── Sub-components ────────────────────────────────────────────────────────────
+// --- Sub-components ------------------------------------------------------------
 
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw) return "";
@@ -162,7 +162,7 @@ function ToggleRow({
   );
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────────
+// --- Page ----------------------------------------------------------------------
 
 export default async function EditCollegeProfilePage({
   params,
@@ -171,7 +171,7 @@ export default async function EditCollegeProfilePage({
 }) {
   const { slug } = await params;
 
-  // ── Fetch directly from MongoDB using getDb() ──────────────────────────────
+  // -- Fetch directly from MongoDB using getDb() ------------------------------
   const db = await getDb();
   const cp = await db.collection("collegeprofile").findOne({ slug });
   if (!cp) notFound();
@@ -259,7 +259,7 @@ export default async function EditCollegeProfilePage({
       <form action={updateCollegeProfile}>
         <input type="hidden" name="slug" value={college.slug} />
 
-        {/* ── Header ── */}
+        {/* -- Header -- */}
         <div className="flex items-center gap-3 mb-8">
           <Link
             href="/admin/colleges/profile"
@@ -296,10 +296,10 @@ export default async function EditCollegeProfilePage({
           </button>
         </div>
 
-        {/* ── Two-column layout ── */}
+        {/* -- Two-column layout -- */}
         <div className="flex flex-col xl:flex-row gap-6 items-start">
 
-          {/* ── Left column ── */}
+          {/* -- Left column -- */}
           <div className="flex-1 min-w-0 space-y-6">
 
             {/* Section 1 — Basic Information */}
@@ -568,7 +568,7 @@ export default async function EditCollegeProfilePage({
 
           </div>
 
-          {/* ── Right column (sticky) ── */}
+          {/* -- Right column (sticky) -- */}
           <div className="w-full xl:w-96 flex-shrink-0 space-y-5 xl:sticky xl:top-6">
 
             <Card>

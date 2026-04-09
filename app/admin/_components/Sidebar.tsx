@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 export interface Admin {
   id: string;
@@ -15,12 +15,12 @@ import { NavItem, NavGroup, NAV_GROUPS } from "./nav-config";
 export type { NavItem, NavGroup };
 export { NAV_GROUPS };
 
-// ─── Icon style helpers ───────────────────────────────────────────────────────
+// --- Icon style helpers -------------------------------------------------------
 
 export const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 export const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
-// ─── Sidebar inner content (shared between desktop + mobile overlay) ──────────
+// --- Sidebar inner content (shared between desktop + mobile overlay) ----------
 
 export function SidebarSkeleton() {
   return (

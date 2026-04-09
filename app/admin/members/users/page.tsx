@@ -6,7 +6,7 @@ import UserListClient from "./UserListClient";
 
 const PAGE_SIZE = 25;
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+// --- Server Actions -----------------------------------------------------------
 
 async function createUser(formData: FormData) {
   "use server";
@@ -82,7 +82,7 @@ async function deleteUser(id: number) {
   revalidatePath("/", "layout");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 async function safeQuery<T >(
   sql: string,

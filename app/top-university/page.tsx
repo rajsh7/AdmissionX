@@ -24,7 +24,7 @@ function buildImageUrl(raw: string | null | undefined): string | null {
   return `/uploads/${raw}`;
 }
 
-// ── Filter data ───────────────────────────────────────────────────────────────
+// -- Filter data ---------------------------------------------------------------
 
 const getFilterData = unstable_cache(
   async () => {
@@ -69,7 +69,7 @@ const getFilterData = unstable_cache(
   { revalidate: 3600 },
 );
 
-// ── Core fetch ────────────────────────────────────────────────────────────────
+// -- Core fetch ----------------------------------------------------------------
 
 async function fetchTopUniversities(opts: {
   q: string; stream: string; degree: string; cityId: string;
@@ -201,7 +201,7 @@ const getCachedTopUniversities = unstable_cache(
   { revalidate: 300 },
 );
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// -- Page ----------------------------------------------------------------------
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

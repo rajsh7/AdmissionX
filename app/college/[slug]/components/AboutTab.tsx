@@ -23,7 +23,7 @@ export default function AboutTab({
   return (
     <div className="w-full bg-white">
 
-      {/* ── STATS BANNER — full bleed ─────────────────────────────────────── */}
+      {/* -- STATS BANNER — full bleed --------------------------------------- */}
       <section className="relative w-full overflow-hidden bg-[#1a1a2e]" style={{ minHeight: 300 }}>
         {/* Campus image fades in from right */}
         <div className="absolute inset-y-0 right-0 w-full lg:w-1/2 z-0">
@@ -77,7 +77,7 @@ export default function AboutTab({
         </div>
       </section>
 
-      {/* ── ABOUT US MOSAIC — full bleed ─────────────────────────────────── */}
+      {/* -- ABOUT US MOSAIC — full bleed ----------------------------------- */}
       <section className="bg-white py-14 md:py-20 w-full">
         <div className="w-full px-6 md:px-12 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
@@ -140,7 +140,7 @@ export default function AboutTab({
         </div>
       </section>
 
-      {/* ── ABOUT ARTICLE — full bleed ───────────────────────────────────── */}
+      {/* -- ABOUT ARTICLE — full bleed ------------------------------------- */}
       <section className="bg-white border-t border-neutral-100 py-12 md:py-16 w-full">
         <div className="w-full px-6 md:px-12 lg:px-16">
           <div className="max-w-4xl">

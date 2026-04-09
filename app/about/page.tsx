@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "about admissionx, college admissions platform, education technology india, admissionx team, college discovery",
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 async function safeCount(sql: string): Promise<number> {
   try {
@@ -23,7 +23,7 @@ async function safeCount(sql: string): Promise<number> {
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function AboutPage() {
   const [colleges, students, exams, courses] = await Promise.all([
@@ -106,7 +106,7 @@ export default async function AboutPage() {
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      {/* -- Hero ----------------------------------------------------------- */}
       <div className="bg-neutral-900 pt-24 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           {/* Breadcrumb */}
@@ -138,7 +138,7 @@ export default async function AboutPage() {
         </div>
       </div>
 
-      {/* ── Stats strip ──────────────────────────────────────────────────── */}
+      {/* -- Stats strip ---------------------------------------------------- */}
       <div className="bg-white border-b border-neutral-100">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-neutral-100">
@@ -162,7 +162,7 @@ export default async function AboutPage() {
         </div>
       </div>
 
-      {/* ── Mission & Vision ─────────────────────────────────────────────── */}
+      {/* -- Mission & Vision ----------------------------------------------- */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
 
@@ -214,7 +214,7 @@ export default async function AboutPage() {
         </div>
       </div>
 
-      {/* ── What We Offer ─────────────────────────────────────────────────── */}
+      {/* -- What We Offer --------------------------------------------------- */}
       <div className="bg-white border-y border-neutral-100 py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="text-center mb-12">
@@ -253,7 +253,7 @@ export default async function AboutPage() {
         </div>
       </div>
 
-      {/* ── Our Values ───────────────────────────────────────────────────── */}
+      {/* -- Our Values ----------------------------------------------------- */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-neutral-100 text-neutral-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide mb-4">
@@ -288,7 +288,7 @@ export default async function AboutPage() {
         </div>
       </div>
 
-      {/* ── Our Story ────────────────────────────────────────────────────── */}
+      {/* -- Our Story ------------------------------------------------------ */}
       <div className="bg-white border-y border-neutral-100 py-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
           <div className="inline-flex items-center gap-2 bg-neutral-100 text-neutral-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide mb-5">
@@ -321,7 +321,7 @@ export default async function AboutPage() {
         </div>
       </div>
 
-      {/* ── CTA ──────────────────────────────────────────────────────────── */}
+      {/* -- CTA ------------------------------------------------------------ */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
         <div className="bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-3xl p-10 lg:p-14 text-center border border-neutral-700">
           <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">

@@ -6,7 +6,7 @@ import { writeFile, mkdir, unlink } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
 
-// ── Auth helper ───────────────────────────────────────────────────────────────
+// -- Auth helper ---------------------------------------------------------------
 async function checkAuth(studentId: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_student")?.value;
@@ -16,7 +16,7 @@ async function checkAuth(studentId: string) {
   return payload;
 }
 
-// ── Ensure table exists ───────────────────────────────────────────────────────
+// -- Ensure table exists -------------------------------------------------------
 async function ensureTable(conn: Awaited<ReturnType<typeof pool.getConnection>>) {
   await conn.query(`
     CREATE TABLE IF NOT EXISTS next_student_documents (
@@ -35,7 +35,7 @@ async function ensureTable(conn: Awaited<ReturnType<typeof pool.getConnection>>)
   `);
 }
 
-// ── Category meta ─────────────────────────────────────────────────────────────
+// -- Category meta -------------------------------------------------------------
 const CATEGORY_LABELS: Record<string, string> = {
   marksheet_10:  "10th Marksheet",
   marksheet_12:  "12th Marksheet",
@@ -61,7 +61,7 @@ const ALLOWED_MIME = [
   "application/pdf",
 ];
 
-// ── GET /api/student/[id]/documents ──────────────────────────────────────────
+// -- GET /api/student/[id]/documents ------------------------------------------
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -146,7 +146,7 @@ export async function GET(
   }
 }
 
-// ── POST /api/student/[id]/documents ─────────────────────────────────────────
+// -- POST /api/student/[id]/documents -----------------------------------------
 // Accepts multipart/form-data with fields:
 //   file     — the actual file
 //   name     — document name / label
@@ -177,7 +177,7 @@ export async function POST(
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
 
-  // ── Validate MIME type ────────────────────────────────────────────────────
+  // -- Validate MIME type ----------------------------------------------------
   if (!ALLOWED_MIME.includes(file.type)) {
     return NextResponse.json(
       {
@@ -187,7 +187,7 @@ export async function POST(
     );
   }
 
-  // ── Validate file size ────────────────────────────────────────────────────
+  // -- Validate file size ----------------------------------------------------
   if (file.size > MAX_FILE_SIZE) {
     return NextResponse.json(
       { error: "File size must not exceed 5 MB." },
@@ -210,7 +210,7 @@ export async function POST(
     CATEGORY_LABELS[category] ||
     file.name;
 
-  // ── Persist file to disk ──────────────────────────────────────────────────
+  // -- Persist file to disk --------------------------------------------------
   const uploadDir = path.join(process.cwd(), "public", "uploads", "student", id);
   if (!existsSync(uploadDir)) {
     await mkdir(uploadDir, { recursive: true });
@@ -225,7 +225,7 @@ export async function POST(
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(fullPath, buffer);
 
-  // ── Insert DB record ──────────────────────────────────────────────────────
+  // -- Insert DB record ------------------------------------------------------
   const conn = await pool.getConnection();
   try {
     await ensureTable(conn);
@@ -262,7 +262,7 @@ export async function POST(
   }
 }
 
-// ── DELETE /api/student/[id]/documents?docId=X ───────────────────────────────
+// -- DELETE /api/student/[id]/documents?docId=X -------------------------------
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },

@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import FAQAccordion from "@/app/college/[slug]/faqs/FAQAccordion";
 import type { FAQData } from "@/app/api/college/[slug]/route";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function slugToName(slug: string): string {
   return slug
@@ -29,7 +29,7 @@ async function safeQuery<T>(
   }
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface CollegeBaseRow {
   id: number;
@@ -44,7 +44,7 @@ interface FAQRow {
   refLinks: string | null;
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function CollegeFAQsPage({
   params,
@@ -53,7 +53,7 @@ export default async function CollegeFAQsPage({
 }) {
   const { slug } = await params;
 
-  // ── Fetch college base + FAQs in parallel ─────────────────────────────────
+  // -- Fetch college base + FAQs in parallel ---------------------------------
   const [baseRows, faqRows] = await Promise.all([
     safeQuery<CollegeBaseRow>(
       `SELECT
@@ -94,7 +94,7 @@ export default async function CollegeFAQsPage({
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-10 py-8 space-y-6">
-      {/* ── Page header ── */}
+      {/* -- Page header -- */}
       <div className="bg-white rounded-2xl border border-neutral-100 p-6">
         <div className="flex items-start gap-4">
           {/* Icon */}
@@ -131,7 +131,7 @@ export default async function CollegeFAQsPage({
         </div>
       </div>
 
-      {/* ── FAQ accordion / empty state ── */}
+      {/* -- FAQ accordion / empty state -- */}
       {faqs.length === 0 ? (
         <EmptyState collegeName={collegeName} slug={slug} />
       ) : (
@@ -147,7 +147,7 @@ export default async function CollegeFAQsPage({
   );
 }
 
-// ─── Empty State ──────────────────────────────────────────────────────────────
+// --- Empty State --------------------------------------------------------------
 
 function EmptyState({
   collegeName,
@@ -192,7 +192,7 @@ function EmptyState({
   );
 }
 
-// ─── Ask a question CTA ───────────────────────────────────────────────────────
+// --- Ask a question CTA -------------------------------------------------------
 
 function AskQuestionCTA({
   collegeName,

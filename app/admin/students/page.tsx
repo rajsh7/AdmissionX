@@ -2,7 +2,7 @@ import pool from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 
-// ─── Server Action ────────────────────────────────────────────────────────────
+// --- Server Action ------------------------------------------------------------
 
 async function toggleStudentAction(formData: FormData): Promise<void> {
   "use server";
@@ -20,7 +20,7 @@ async function toggleStudentAction(formData: FormData): Promise<void> {
   revalidatePath("/admin/students");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 const PAGE_SIZE = 25;
 
@@ -88,7 +88,7 @@ function obfuscatePhone(phone: string | null | undefined): string {
   return phone.slice(0, -4).replace(/./g, "•") + phone.slice(-4);
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface StudentRow  {
   id: number;
@@ -110,12 +110,12 @@ interface StatsRow  {
   this_month: number;
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
+// --- Styles -------------------------------------------------------------------
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function AdminStudentsPage({
   searchParams,
@@ -129,7 +129,7 @@ export default async function AdminStudentsPage({
   const filter = sp.filter ?? "all"; // all | active | inactive
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Build WHERE ────────────────────────────────────────────────────────────
+  // -- Build WHERE ------------------------------------------------------------
   const conditions: string[] = [];
   const params: (string | number)[] = [];
 
@@ -149,7 +149,7 @@ export default async function AdminStudentsPage({
   };
   const orderBy = orderMap[sort] ?? "created_at DESC";
 
-  // ── Parallel queries ───────────────────────────────────────────────────────
+  // -- Parallel queries -------------------------------------------------------
   const [students, countRows, statsRows, activeRow, inactiveRow] = await Promise.all([
     safeQuery<StudentRow>(
       `SELECT id, name, email, phone, is_active, created_at
@@ -181,7 +181,7 @@ export default async function AdminStudentsPage({
     ? Object.fromEntries(Object.entries(statsRows[0]).map(([k, v]) => [k, Number(v ?? 0)])) as unknown as StatsRow
     : {} as StatsRow;
 
-  // ── URL builder ────────────────────────────────────────────────────────────
+  // -- URL builder ------------------------------------------------------------
   function buildUrl(overrides: Record<string, string | number>) {
     const merged = { q, page: "1", sort, filter, ...overrides };
     const qs = Object.entries(merged)
@@ -197,7 +197,7 @@ export default async function AdminStudentsPage({
     { value: "inactive", label: "Inactive",      count: Number(inactiveRow[0]?.total ?? 0) },
   ];
 
-  // ── Avatar color based on id ───────────────────────────────────────────────
+  // -- Avatar color based on id -----------------------------------------------
   const AVATAR_COLORS = [
     "bg-emerald-500",
     "bg-blue-500",
@@ -216,7 +216,7 @@ export default async function AdminStudentsPage({
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
 
-      {/* ── Page header ──────────────────────────────────────────────────── */}
+      {/* -- Page header ---------------------------------------------------- */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -246,7 +246,7 @@ export default async function AdminStudentsPage({
         </button>
       </div>
 
-      {/* ── Stat mini-cards ───────────────────────────────────────────────── */}
+      {/* -- Stat mini-cards ------------------------------------------------- */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           {
@@ -300,7 +300,7 @@ export default async function AdminStudentsPage({
         ))}
       </div>
 
-      {/* ── Filter tabs + Search bar ──────────────────────────────────── */}
+      {/* -- Filter tabs + Search bar ------------------------------------ */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
 
         {/* Status filter tabs */}
@@ -384,7 +384,7 @@ export default async function AdminStudentsPage({
         </div>
       </div>
 
-      {/* ── Table ─────────────────────────────────────────────────────────── */}
+      {/* -- Table ----------------------------------------------------------- */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         {students.length === 0 ? (
           <div className="py-20 text-center">
@@ -532,7 +532,7 @@ export default async function AdminStudentsPage({
               </table>
             </div>
 
-            {/* ── Pagination ──────────────────────────────────────────────── */}
+            {/* -- Pagination ------------------------------------------------ */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-4 border-t border-slate-100 bg-slate-50/50">
               <p className="text-xs text-slate-500 order-2 sm:order-1">
                 Showing{" "}
@@ -620,7 +620,7 @@ export default async function AdminStudentsPage({
         )}
       </div>
 
-      {/* ── Footer info ───────────────────────────────────────────────────── */}
+      {/* -- Footer info ----------------------------------------------------- */}
       <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
         <span className="material-symbols-rounded text-[13px]" style={ICO}>
           shield

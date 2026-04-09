@@ -4,7 +4,7 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import EventListClient from "./EventListClient";
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+// --- Server Actions -----------------------------------------------------------
 
 async function createEvent(formData: FormData) {
   "use server";
@@ -76,11 +76,11 @@ async function deleteEventRow(id: string) {
   revalidatePath("/admin/colleges/events");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 const PAGE_SIZE = 25;
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface EventRow  {
   id: string;
@@ -105,7 +105,7 @@ interface OptionRow  {
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function CollegeEventsPage({
   searchParams,
@@ -223,7 +223,7 @@ export default async function CollegeEventsPage({
   return (
     <div className="p-6 space-y-6 w-full">
       
-      {/* ── Header ───────────────────────────────────────────────────────── */}
+      {/* -- Header --------------------------------------------------------- */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -263,7 +263,7 @@ export default async function CollegeEventsPage({
         onDelete={deleteEventRow}
       />
 
-      {/* ── Pagination ───────────────────────────────────────────────────── */}
+      {/* -- Pagination ----------------------------------------------------- */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
           <p className="text-xs text-slate-500">

@@ -2,7 +2,7 @@ import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import PageTypeListClient from "./PageTypeListClient";
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+// --- Server Actions -----------------------------------------------------------
 
 async function createPageType(formData: FormData) {
   "use server";
@@ -51,7 +51,7 @@ async function deletePageType(id: number) {
   revalidatePath("/admin/pages/types");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 async function getPageTypes() {
   try {
@@ -67,7 +67,7 @@ async function getPageTypes() {
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
-// ─── Page Component ──────────────────────────────────────────────────────────
+// --- Page Component ----------------------------------------------------------
 
 export default async function PageTypesPage() {
   const data = await getPageTypes();

@@ -59,14 +59,14 @@ function AvatarDropdown({ admin, onLogout }: { admin: Admin; onLogout: () => voi
   );
 }
 
-// ─── Dynamic components ────────────────────────────────────────────────────────
+// --- Dynamic components --------------------------------------------------------
 
 const UnifiedSidebarV3 = dynamic(() => import("./UnifiedSidebarV3").then(mod => mod.UnifiedSidebarV3), {
   ssr: false,
   loading: () => <SidebarSkeleton />,
 });
 
-// ─── Main shell ───────────────────────────────────────────────────────────────
+// --- Main shell ---------------------------------------------------------------
 
 export default function AdminShell({
   children,
@@ -145,12 +145,12 @@ export default function AdminShell({
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 font-display">
 
-      {/* ── Desktop sidebar (always visible ≥ lg) ──────────────────────────── */}
+      {/* -- Desktop sidebar (always visible ≥ lg) ---------------------------- */}
       <aside className="hidden lg:flex w-56 xl:w-60 flex-col flex-shrink-0 overflow-hidden" style={{ backgroundColor: "#313131" }}>
         <UnifiedSidebarV3 admin={admin} pathname={pathname} onLogout={handleLogout} />
       </aside>
 
-      {/* ── Mobile sidebar overlay ─────────────────────────────────────────── */}
+      {/* -- Mobile sidebar overlay ------------------------------------------- */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop */}
@@ -165,7 +165,7 @@ export default function AdminShell({
         </div>
       )}
 
-      {/* ── Main area ──────────────────────────────────────────────────────── */}
+      {/* -- Main area -------------------------------------------------------- */}
       <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
 
         {/* Top bar */}

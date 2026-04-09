@@ -85,7 +85,7 @@ export default async function CityPage({
   const page = Math.max(1, parseInt(sp.page || "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Build WHERE clause ─────────────────────────────────────────────────────
+  // -- Build WHERE clause -----------------------------------------------------
   const conditions: string[] = [];
   const queryParams: (string | number)[] = [];
 
@@ -96,7 +96,7 @@ export default async function CityPage({
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Query data ─────────────────────────────────────────────────────────────
+  // -- Query data -------------------------------------------------------------
   const [data, countRows, countries, states] = await Promise.all([
     safeQuery<CityRow>(
       `SELECT ci.id, ci.name, s.name as stateName, c.name as countryName, ci.state_id, s.country_id

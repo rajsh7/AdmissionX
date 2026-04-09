@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const LAST_UPDATED = "June 1, 2025";
 
-// ─── Section component ────────────────────────────────────────────────────────
+// --- Section component --------------------------------------------------------
 
 function Section({
   num,
@@ -54,7 +54,7 @@ function Ul({ items }: { items: string[] }) {
   );
 }
 
-// ─── TOC entries ──────────────────────────────────────────────────────────────
+// --- TOC entries --------------------------------------------------------------
 
 const TOC = [
   { num: "1",  title: "Introduction" },
@@ -71,14 +71,14 @@ const TOC = [
   { num: "12", title: "Grievance Officer & Contact" },
 ];
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* ── Hero ── */}
+      {/* -- Hero -- */}
       <div className="bg-neutral-900 pt-24 pb-14">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
@@ -108,7 +108,7 @@ export default function PrivacyPolicyPage() {
         </div>
       </div>
 
-      {/* ── Body ── */}
+      {/* -- Body -- */}
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8 items-start">
 

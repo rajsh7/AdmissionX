@@ -3,7 +3,7 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import SportsListClient from "./SportsListClient";
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+// --- Server Actions -----------------------------------------------------------
 
 async function createActivity(formData: FormData) {
   "use server";
@@ -53,7 +53,7 @@ async function deleteActivityRow(id: number) {
   revalidatePath("/admin/colleges/sports");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 const PAGE_SIZE = 25;
 
@@ -72,7 +72,7 @@ async function safeQuery<T >(
   }
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface SportsRow  {
   id: number;
@@ -94,7 +94,7 @@ interface OptionRow  {
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function CollegeSportsPage({
   searchParams,
@@ -109,7 +109,7 @@ export default async function CollegeSportsPage({
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Build WHERE clause ─────────────────────────────────────────────────────
+  // -- Build WHERE clause -----------------------------------------------------
   const conditions: string[] = [];
   const filterParams: (string | number)[] = [];
 
@@ -137,7 +137,7 @@ export default async function CollegeSportsPage({
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Fetch metadata + data ──────────────────────────────────────────────────
+  // -- Fetch metadata + data --------------------------------------------------
   const [activities, countRows, colleges] = await Promise.all([
     safeQuery<SportsRow>(
       `SELECT 
@@ -181,7 +181,7 @@ export default async function CollegeSportsPage({
   return (
     <div className="p-6 space-y-6 w-full">
       
-      {/* ── Header ───────────────────────────────────────────────────────── */}
+      {/* -- Header --------------------------------------------------------- */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -223,7 +223,7 @@ export default async function CollegeSportsPage({
         onDelete={deleteActivityRow}
       />
 
-      {/* ── Pagination ───────────────────────────────────────────────────── */}
+      {/* -- Pagination ----------------------------------------------------- */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
           <p className="text-xs text-slate-500">

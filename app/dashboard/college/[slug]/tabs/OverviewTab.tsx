@@ -121,7 +121,7 @@ export default function OverviewTab({ college, onNavigate }: Props) {
     load();
   }, [load]);
 
-  // ── Time-based greeting ───────────────────────────────────────────────────
+  // -- Time-based greeting ---------------------------------------------------
   function getGreeting() {
     const h = new Date().getHours();
     if (h < 12) return "Good morning";
@@ -177,7 +177,7 @@ export default function OverviewTab({ college, onNavigate }: Props) {
 
   const { profile, stats, placement, recentApplications, quickActions } = data;
 
-  // ── Stat cards config ─────────────────────────────────────────────────────
+  // -- Stat cards config -----------------------------------------------------
   const statCards = [
     {
       label: "Total Applications",
@@ -230,7 +230,7 @@ export default function OverviewTab({ college, onNavigate }: Props) {
     },
   ];
 
-  // ── Application status breakdown ──────────────────────────────────────────
+  // -- Application status breakdown ------------------------------------------
   const appBreakdown = [
     {
       label: "Submitted",
@@ -267,7 +267,7 @@ export default function OverviewTab({ college, onNavigate }: Props) {
 
   return (
     <div className="space-y-8 pb-24">
-      {/* ── Greeting + admission status ───────────────────────────────────── */}
+      {/* -- Greeting + admission status ------------------------------------- */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
@@ -333,7 +333,7 @@ export default function OverviewTab({ college, onNavigate }: Props) {
         </div>
       </div>
 
-      {/* ── Quick actions ─────────────────────────────────────────────────── */}
+      {/* -- Quick actions --------------------------------------------------- */}
       {quickActions.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {quickActions.map((action, i) => (
@@ -381,7 +381,7 @@ export default function OverviewTab({ college, onNavigate }: Props) {
         </div>
       )}
 
-      {/* ── Stats cards ───────────────────────────────────────────────────── */}
+      {/* -- Stats cards ----------------------------------------------------- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {statCards.map((card) => (
           <div
@@ -419,7 +419,7 @@ export default function OverviewTab({ college, onNavigate }: Props) {
         ))}
       </div>
 
-      {/* ── Main two-column content ────────────────────────────────────────── */}
+      {/* -- Main two-column content ------------------------------------------ */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Recent applications */}
         <div className="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">

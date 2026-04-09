@@ -5,7 +5,7 @@ import StatusListClient from "./StatusListClient";
 
 const PAGE_SIZE = 25;
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+// --- Server Actions -----------------------------------------------------------
 
 async function createStatus(formData: FormData) {
   "use server";
@@ -52,7 +52,7 @@ async function deleteStatus(id: number) {
   revalidatePath("/", "layout");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 async function safeQuery<T >(
   sql: string,

@@ -59,7 +59,7 @@ export default function ForgotPasswordPage() {
 
         <div className="w-full max-w-[480px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none p-8 md:p-12 relative z-10 border border-slate-100 dark:border-slate-800">
 
-          {/* ── Sent State ── */}
+          {/* -- Sent State -- */}
           {sent ? (
             <div className="text-center space-y-6">
               {/* Success icon */}
@@ -137,7 +137,7 @@ export default function ForgotPasswordPage() {
               </div>
             </div>
           ) : (
-            /* ── Form State ── */
+            /* -- Form State -- */
             <>
               {/* Header */}
               <div className="mb-8 text-center">

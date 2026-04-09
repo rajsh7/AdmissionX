@@ -94,7 +94,7 @@ export default function CollegeCard({
         href={`/college/${slug}`}
         className="group flex flex-col bg-white rounded-[10px] border border-slate-100 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300 overflow-hidden h-full"
       >
-        {/* ── Image ── */}
+        {/* -- Image -- */}
         <div className="relative aspect-[4/3] overflow-hidden bg-neutral-50 flex-shrink-0">
           {image && image !== "" ? (
             <Image
@@ -122,7 +122,7 @@ export default function CollegeCard({
           <StarRating rating={rating} count={totalRatingUser} />
         </div>
 
-        {/* ── Body ── */}
+        {/* -- Body -- */}
         <div className="p-8 flex flex-col flex-1">
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-[22px] font-bold text-[#6C6C6C] leading-snug group-hover:text-[#FF3C3C] transition-colors line-clamp-2">

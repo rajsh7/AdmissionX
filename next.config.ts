@@ -54,6 +54,8 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     // Keep optimised images in the disk cache for 7 days before re-generating.
     minimumCacheTTL: 60 * 60 * 24 * 7,
+    // Allow quality 60 used by AuthBackgroundSlider
+    qualities: [60, 75, 85, 90],
     // Allow reasonably large hero / banner images.
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],

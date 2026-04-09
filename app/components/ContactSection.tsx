@@ -5,7 +5,7 @@ export default function ContactSection() {
         <div className="bg-white p-2 sm:p-4 lg:p-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
 
-            {/* ── Left: Contact Info ────────────────────────────── */}
+            {/* -- Left: Contact Info ------------------------------ */}
             <div className="flex flex-col justify-center">
               <h2 className="tracking-tight leading-[1.1] mb-4" style={{ fontSize: '50px', fontWeight: '700', color: '#3E3E3E' }}>
                 Get in Touch
@@ -52,7 +52,7 @@ export default function ContactSection() {
               </div>
             </div>
 
-            {/* ── Right: Contact Form ─────────────────────────────── */}
+            {/* -- Right: Contact Form ------------------------------- */}
             <div className="bg-white rounded-[20px] p-10 lg:p-12 border border-slate-200/60 relative" style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
               <h3 className="font-bold mb-10 tracking-tight" style={{ fontSize: '30px', fontWeight: '700', color: '#6C6C6C' }}>Send a message</h3>
               <form className="space-y-6">

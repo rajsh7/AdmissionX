@@ -161,7 +161,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-// ── Sidebar ───────────────────────────────────────────────────────────────────
+// -- Sidebar -------------------------------------------------------------------
 function Sidebar({ college }: { college: Record<string, unknown> }) {
   const {
     slug, admissionStart, admissionEnd, collegecode,
@@ -287,7 +287,7 @@ function Sidebar({ college }: { college: Record<string, unknown> }) {
   );
 }
 
-// ── Layout ────────────────────────────────────────────────────────────────────
+// -- Layout --------------------------------------------------------------------
 export default async function CollegeLayout({
   params,
   children,

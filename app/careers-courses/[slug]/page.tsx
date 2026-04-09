@@ -23,7 +23,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
     <main className="min-h-screen bg-[#F8F9FB]">
       <Header />
       
-      {/* ─── Hero Section ──────────────────────────────────────────────────────── */}
+      {/* --- Hero Section -------------------------------------------------------- */}
       <section className="pt-24 pb-12 px-6 sm:px-12 lg:px-24">
         <div className="max-w-[1920px] mx-auto">
           <div className="bg-white rounded-[24px] p-8 lg:p-12 shadow-sm border border-slate-100 overflow-hidden relative group">
@@ -88,7 +88,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         </div>
       </section>
 
-      {/* ─── Stats Bar ────────────────────────────────────────────────────────── */}
+      {/* --- Stats Bar ---------------------------------------------------------- */}
       <section className="pb-16 px-6 sm:px-12 lg:px-24">
         <div className="max-w-[1920px] mx-auto">
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 grid grid-cols-2 lg:grid-cols-4 gap-8 divide-x divide-slate-100">
@@ -100,7 +100,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         </div>
       </section>
 
-      {/* ─── Course Overview ──────────────────────────────────────────────────── */}
+      {/* --- Course Overview ---------------------------------------------------- */}
       <section className="pb-24 px-6 sm:px-12 lg:px-24">
         <div className="max-w-[1920px] mx-auto">
           <div className="bg-white rounded-[32px] p-8 lg:p-12 shadow-xl shadow-black/5 border border-slate-100 overflow-hidden">
@@ -139,7 +139,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         </div>
       </section>
 
-      {/* ─── Specializations Grid ─────────────────────────────────────────────── */}
+      {/* --- Specializations Grid ----------------------------------------------- */}
       <section className="pb-32 px-6 sm:px-12 lg:px-24">
         <div className="max-w-[1920px] mx-auto">
           <h2 className="text-[32px] lg:text-[42px] font-bold text-slate-900 mb-12">

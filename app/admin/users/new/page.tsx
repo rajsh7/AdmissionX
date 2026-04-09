@@ -7,7 +7,7 @@ export default function AdminUsersNewPage() {
   return (
     <div className="p-6 max-w-[600px]">
 
-      {/* ── Breadcrumb ───────────────────────────────────────────────────── */}
+      {/* -- Breadcrumb ----------------------------------------------------- */}
       <div className="flex items-center gap-2 text-xs text-slate-400 mb-6">
         <Link
           href="/admin/users"
@@ -24,7 +24,7 @@ export default function AdminUsersNewPage() {
         <span className="text-slate-500 font-semibold">New Admin</span>
       </div>
 
-      {/* ── Card ─────────────────────────────────────────────────────────── */}
+      {/* -- Card ----------------------------------------------------------- */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
 
         {/* Header stripe */}
@@ -129,7 +129,7 @@ export default function AdminUsersNewPage() {
         </div>
       </div>
 
-      {/* ── Legacy note ───────────────────────────────────────────────────── */}
+      {/* -- Legacy note ----------------------------------------------------- */}
       <p className="text-xs text-slate-400 text-center mt-4">
         To create an admin account now, use the{" "}
         <code className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono text-[11px]">

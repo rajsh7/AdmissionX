@@ -25,7 +25,7 @@ interface DocumentsData {
   counts: { total: number };
 }
 
-// ── Shared Tab Navigation ─────────────────────────────────────────────────────
+// -- Shared Tab Navigation -----------------------------------------------------
 function ProfileTabs({ active = "academic" }: { active?: string }) {
   const tabs = [
     { id: "profile", label: "Profile", icon: "person" },
@@ -54,7 +54,7 @@ function ProfileTabs({ active = "academic" }: { active?: string }) {
   );
 }
 
-// ── Premium Document Card ────────────────────────────────────────────────────
+// -- Premium Document Card ----------------------------------------------------
 function DocumentCard({ doc, onDelete }: { doc: StudentDocument, onDelete: (id: number) => void }) {
   return (
     <div className="bg-white rounded-[12px] border-2 border-gray-100 p-4 hover:border-[#e31e24]/20 transition-all group relative">
@@ -96,7 +96,7 @@ function DocumentCard({ doc, onDelete }: { doc: StudentDocument, onDelete: (id: 
   );
 }
 
-// ── Main DocumentsTab ────────────────────────────────────────────────────────
+// -- Main DocumentsTab --------------------------------------------------------
 export default function DocumentsTab({ user }: Props) {
   const [data, setData] = useState<DocumentsData | null>(null);
   const [loading, setLoading] = useState(true);

@@ -4,7 +4,7 @@ import { verifyCollegeToken } from "@/lib/auth";
 import pool from "@/lib/db";
 import { sendMail } from "@/lib/email";
 
-// ── Auth + ownership helper ───────────────────────────────────────────────────
+// -- Auth + ownership helper ---------------------------------------------------
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_college")?.value;
@@ -30,7 +30,7 @@ async function checkAuth(slug: string) {
   }
 }
 
-// ── Status meta helpers ───────────────────────────────────────────────────────
+// -- Status meta helpers -------------------------------------------------------
 const STATUS_META: Record<
   string,
   { label: string; cls: string; icon: string; progress: number }
@@ -50,7 +50,7 @@ const PAY_META: Record<string, { label: string; cls: string; icon: string }> = {
   refunded: { label: "Refunded",        cls: "bg-slate-100 text-slate-600",    icon: "undo"      },
 };
 
-// ── GET /api/college/dashboard/[slug]/applications ────────────────────────────
+// -- GET /api/college/dashboard/[slug]/applications ----------------------------
 // Query params: status, search, page, limit
 export async function GET(
   req: NextRequest,
@@ -211,7 +211,7 @@ export async function GET(
   }
 }
 
-// ── PUT /api/college/dashboard/[slug]/applications ────────────────────────────
+// -- PUT /api/college/dashboard/[slug]/applications ----------------------------
 // Body: { application_id: number, status: string, notes?: string }
 export async function PUT(
   req: NextRequest,

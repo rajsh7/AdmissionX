@@ -3,8 +3,9 @@ import { ObjectId } from "mongodb";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
+import bcrypt from "bcryptjs";
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+// --- Server Actions -----------------------------------------------------------
 
 async function approveCollegeAction(formData: FormData) {
   "use server";
@@ -38,6 +39,22 @@ async function rejectCollegeAction(formData: FormData) {
   } catch (e) { console.error("[admin/colleges rejectAction]", e); }
   revalidatePath("/admin/colleges");
   revalidatePath("/", "layout");
+}
+
+async function setCollegePasswordAction(formData: FormData) {
+  "use server";
+  const id  = formData.get("id")  as string;
+  const src = formData.get("src") as string;
+  const pwd = (formData.get("new_password") as string)?.trim();
+  if (!id || !pwd || pwd.length < 6) return;
+  try {
+    const db  = await getDb();
+    const col = src === "old" ? "request_for_create_college_accounts" : "next_college_signups";
+    const filter = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: parseInt(id, 10) };
+    const hash = await bcrypt.hash(pwd, 12);
+    await db.collection(col).updateOne(filter, { $set: { password_hash: hash, updated_at: new Date() } });
+  } catch (e) { console.error("[admin/colleges setPassword]", e); }
+  revalidatePath("/admin/colleges");
 }
 
 async function pendingCollegeAction(formData: FormData) {
@@ -85,7 +102,7 @@ async function toggleCollegeLoginAction(formData: FormData): Promise<void> {
   revalidatePath("/admin/colleges");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 const PAGE_SIZE = 20;
 
@@ -102,7 +119,7 @@ function formatDate(d: string | Date | null | undefined): string {
   }
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface CollegeRow {
   _id: string;
@@ -115,9 +132,10 @@ interface CollegeRow {
   updated_at: Date | string;
   user_is_active?: number;
   _source?: "old" | "new";
+    temp_password?: string | null;
 }
 
-// ─── Status config ────────────────────────────────────────────────────────────
+// --- Status config ------------------------------------------------------------
 
 const STATUS_CONFIG: Record<
   string,
@@ -146,7 +164,7 @@ const STATUS_CONFIG: Record<
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function AdminCollegesPage({
   searchParams,
@@ -159,7 +177,7 @@ export default async function AdminCollegesPage({
   const status = sp.status ?? "all"; // all | pending | approved | rejected
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── MongoDB queries ────────────────────────────────────────────────────────
+  // -- MongoDB queries --------------------------------------------------------
   const db = await getDb();
 
   // Normalize old `request_for_create_college_accounts` docs to CollegeRow shape
@@ -223,6 +241,7 @@ export default async function AdminCollegesPage({
         created_at: "$created_at",
         updated_at: "$updated_at",
         _source: { $literal: "new" },
+        temp_password: { $ifNull: ["$temp_password", null] },
       },
     },
   ];
@@ -304,7 +323,7 @@ export default async function AdminCollegesPage({
   };
   const grandTotal = pendingOldCount + approvedOldCount + rejectedOldCount + pendingNewCount + approvedNewCount + rejectedNewCount;
 
-  // ── URL builder ────────────────────────────────────────────────────────────
+  // -- URL builder ------------------------------------------------------------
   function buildUrl(overrides: Record<string, string | number>) {
     const merged = { q, page: "1", status, ...overrides };
     const qs = Object.entries(merged)
@@ -314,7 +333,7 @@ export default async function AdminCollegesPage({
     return `/admin/colleges${qs ? `?${qs}` : ""}`;
   }
 
-  // ── Tab strip data ─────────────────────────────────────────────────────────
+  // -- Tab strip data ---------------------------------------------------------
   const TABS = [
     { value: "all",      label: "All",      count: grandTotal,               badge: "" },
     { value: "pending",  label: "Pending",  count: statusCounts.pending,     badge: statusCounts.pending > 0 ? "bg-amber-500 text-white" : "" },
@@ -325,7 +344,7 @@ export default async function AdminCollegesPage({
   return (
     <div className="p-6 space-y-6 w-full">
 
-      {/* ── Page header ──────────────────────────────────────────────────── */}
+      {/* -- Page header ---------------------------------------------------- */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -356,7 +375,7 @@ export default async function AdminCollegesPage({
         )}
       </div>
 
-      {/* ── Stat mini-cards ──────────────────────────────────────────────── */}
+      {/* -- Stat mini-cards ------------------------------------------------ */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           {
@@ -410,7 +429,7 @@ export default async function AdminCollegesPage({
         ))}
       </div>
 
-      {/* ── Filter tabs + Search ─────────────────────────────────────────── */}
+      {/* -- Filter tabs + Search ------------------------------------------- */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
 
         {/* Status tabs */}
@@ -479,7 +498,7 @@ export default async function AdminCollegesPage({
         )}
       </div>
 
-      {/* ── Table card ───────────────────────────────────────────────────── */}
+      {/* -- Table card ----------------------------------------------------- */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
 
         {colleges.length === 0 ? (
@@ -592,6 +611,14 @@ export default async function AdminCollegesPage({
 
                   {/* Approve/Reject/Reset + Delete */}
                   <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
+                    {college.status === "approved" && college.temp_password && (
+                      <div className="w-full mt-1 flex items-center gap-1.5 px-2 py-1.5 bg-amber-50 border border-amber-200 rounded-lg">
+                        <span className="material-symbols-outlined text-[13px] text-amber-600">key</span>
+                        <span className="text-[10px] font-mono font-bold text-amber-700 select-all">{college.temp_password}</span>
+                        <span className="text-[9px] text-amber-500 ml-1">Login password</span>
+                      </div>
+                    )}
+
                     {college.status !== "approved" && (
                       <form action={approveCollegeAction}>
                         <input type="hidden" name="id"  value={String(college._id)} />
@@ -620,6 +647,25 @@ export default async function AdminCollegesPage({
                       </form>
                     )}
                   </div>
+                  {/* Set Password */}
+                  {college.status === "approved" && (
+                    <form action={setCollegePasswordAction} className="flex items-center gap-1.5 mt-2">
+                      <input type="hidden" name="id"  value={String(college._id)} />
+                      <input type="hidden" name="src" value={college._source ?? "new"} />
+                      <input
+                        type="text"
+                        name="new_password"
+                        placeholder="Set new password"
+                        minLength={6}
+                        required
+                        className="flex-1 h-7 px-2 text-[10px] border border-slate-200 rounded-lg focus:outline-none focus:border-[#008080] bg-white"
+                      />
+                      <button type="submit" className="text-[10px] font-black px-2 py-1 rounded-lg bg-[#008080] text-white hover:bg-[#006666] transition-colors whitespace-nowrap">
+                        Set
+                      </button>
+                    </form>
+                  )}
+
                   <DeleteButton action={deleteCollegeById.bind(null, String(college._id), college._source ?? "new")} size="sm" />
                 </div>
               </div>
@@ -627,7 +673,7 @@ export default async function AdminCollegesPage({
           })}
         </div>
 
-            {/* ── Pagination ──────────────────────────────────────────────── */}
+            {/* -- Pagination ------------------------------------------------ */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
                 <p className="text-xs text-slate-500">

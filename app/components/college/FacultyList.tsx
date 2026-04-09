@@ -1,7 +1,7 @@
 import type { FacultyData } from "@/app/api/college/[slug]/route";
 import Image from "next/image";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function getInitials(name: string | null): string {
   if (!name) return "F";
@@ -31,7 +31,7 @@ function getAvatarColor(name: string | null): string {
   return colors[idx];
 }
 
-// ─── Faculty Card ─────────────────────────────────────────────────────────────
+// --- Faculty Card -------------------------------------------------------------
 
 function FacultyCard({ faculty }: { faculty: FacultyData }) {
   const { name, designation, description, image, suffix, stream_name, gender } =
@@ -105,7 +105,7 @@ function FacultyCard({ faculty }: { faculty: FacultyData }) {
   );
 }
 
-// ─── Empty state ──────────────────────────────────────────────────────────────
+// --- Empty state --------------------------------------------------------------
 
 function EmptyFaculty() {
   return (
@@ -125,7 +125,7 @@ function EmptyFaculty() {
   );
 }
 
-// ─── Main export ──────────────────────────────────────────────────────────────
+// --- Main export --------------------------------------------------------------
 
 interface FacultyListProps {
   faculty: FacultyData[];
@@ -219,7 +219,7 @@ export default function FacultyList({ faculty, collegeName }: FacultyListProps) 
   );
 }
 
-// ─── Reusable heading ─────────────────────────────────────────────────────────
+// --- Reusable heading ---------------------------------------------------------
 
 function SectionHeading({
   title,

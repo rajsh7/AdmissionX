@@ -7,7 +7,7 @@ export const revalidate = 300;
 import FacultyList from "@/app/components/college/FacultyList";
 import type { FacultyData } from "@/app/api/college/[slug]/route";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// --- Constants ----------------------------------------------------------------
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 
@@ -25,7 +25,7 @@ function slugToName(slug: string): string {
     .join(" ");
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface CollegeRow {
   id: number;
@@ -60,7 +60,7 @@ interface ManagementRow {
   phoneno: string | null;
 }
 
-// ─── Safe query helper ────────────────────────────────────────────────────────
+// --- Safe query helper --------------------------------------------------------
 
 async function safeQuery<T>(
   sql: string,
@@ -75,7 +75,7 @@ async function safeQuery<T>(
   }
 }
 
-// ─── Management member card ───────────────────────────────────────────────────
+// --- Management member card ---------------------------------------------------
 
 function ManagementCard({ member }: { member: ManagementRow }) {
   const displayName =
@@ -146,7 +146,7 @@ function ManagementCard({ member }: { member: ManagementRow }) {
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function FacultyPage({
   params,
@@ -155,7 +155,7 @@ export default async function FacultyPage({
 }) {
   const { slug } = await params;
 
-  // ── Fetch base info + faculty + management in one parallel batch ──────────
+  // -- Fetch base info + faculty + management in one parallel batch ----------
   // Faculty and management queries JOIN on cp.slug directly — no need to wait
   // for the base row's id before firing them.
   const [baseRows, facultyRows, managementRows] = await Promise.all([
@@ -225,7 +225,7 @@ export default async function FacultyPage({
       ? base.college_name
       : slugToName(slug);
 
-  // ── Normalise faculty rows → FacultyData ──────────────────────────────────
+  // -- Normalise faculty rows → FacultyData ----------------------------------
   const faculty: FacultyData[] = facultyRows.map((f) => ({
     id: f.id,
     name: f.name,
@@ -246,7 +246,7 @@ export default async function FacultyPage({
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-10 py-8 space-y-8">
-      {/* ── Management / Leadership section ── */}
+      {/* -- Management / Leadership section -- */}
       {hasManagement && (
         <section>
           {/* Section heading */}
@@ -275,12 +275,12 @@ export default async function FacultyPage({
         </section>
       )}
 
-      {/* ── Faculty section ── */}
+      {/* -- Faculty section -- */}
       <section>
         <FacultyList faculty={faculty} collegeName={collegeName} />
       </section>
 
-      {/* ── Empty state when neither management nor faculty ── */}
+      {/* -- Empty state when neither management nor faculty -- */}
       {faculty.length === 0 && !hasManagement && (
         <div className="bg-white rounded-2xl border border-neutral-100 p-16 flex flex-col items-center text-center">
           <div className="w-20 h-20 rounded-3xl bg-neutral-100 flex items-center justify-center mb-5">
@@ -307,7 +307,7 @@ export default async function FacultyPage({
         </div>
       )}
 
-      {/* ── CTA strip ── */}
+      {/* -- CTA strip -- */}
       {(faculty.length > 0 || hasManagement) && (
         <div className="bg-gradient-to-r from-neutral-900 to-neutral-800 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>

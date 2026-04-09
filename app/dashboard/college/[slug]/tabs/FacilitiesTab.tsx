@@ -209,7 +209,7 @@ export default function FacilitiesTab({ college }: Props) {
   return (
     <div className="space-y-6">
 
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      {/* -- Header ----------------------------------------------------------- */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">
@@ -232,7 +232,7 @@ export default function FacilitiesTab({ college }: Props) {
         </div>
       </div>
 
-      {/* ── Error ──────────────────────────────────────────────────────────── */}
+      {/* -- Error ------------------------------------------------------------ */}
       {error && (
         <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl px-5 py-4 text-red-700 dark:text-red-400">
           <span className="material-symbols-rounded text-xl">error</span>
@@ -246,7 +246,7 @@ export default function FacilitiesTab({ college }: Props) {
         </div>
       )}
 
-      {/* ── Pending-changes banner ──────────────────────────────────────────── */}
+      {/* -- Pending-changes banner -------------------------------------------- */}
       {hasPending && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl px-5 py-4">
           <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
@@ -284,7 +284,7 @@ export default function FacilitiesTab({ college }: Props) {
         </div>
       )}
 
-      {/* ── Search + Filter ─────────────────────────────────────────────────── */}
+      {/* -- Search + Filter --------------------------------------------------- */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-xl pointer-events-none">
@@ -324,7 +324,7 @@ export default function FacilitiesTab({ college }: Props) {
         </div>
       </div>
 
-      {/* ── Grid ───────────────────────────────────────────────────────────── */}
+      {/* -- Grid ------------------------------------------------------------- */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
@@ -409,7 +409,7 @@ export default function FacilitiesTab({ college }: Props) {
         </div>
       )}
 
-      {/* ── Summary footer ─────────────────────────────────────────────────── */}
+      {/* -- Summary footer --------------------------------------------------- */}
       {!loading && facilities.length > 0 && (
         <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-700">
           <p className="text-xs text-slate-400 dark:text-slate-500">
@@ -427,7 +427,7 @@ export default function FacilitiesTab({ college }: Props) {
         </div>
       )}
 
-      {/* ── Toast ──────────────────────────────────────────────────────────── */}
+      {/* -- Toast ------------------------------------------------------------ */}
       {toast && (
         <div
           className={`

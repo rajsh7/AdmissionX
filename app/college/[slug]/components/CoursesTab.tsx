@@ -29,7 +29,7 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
     <div className="w-full bg-white pb-24">
       <div className="max-w-[1920px] mx-auto px-8 lg:px-12 xl:px-20 py-12">
 
-        {/* ─── PHASE 1: SUB-TABS FILTERS ─── */}
+        {/* --- PHASE 1: SUB-TABS FILTERS --- */}
         <div className="flex flex-wrap items-center gap-3 mb-10 overflow-x-auto scrollbar-hide pb-2">
           {subTabs.map((tab, idx) => (
             <button
@@ -45,7 +45,7 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
           ))}
         </div>
 
-        {/* ─── PHASE 2: COURSES LISTING GRID ─── */}
+        {/* --- PHASE 2: COURSES LISTING GRID --- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           <div className="space-y-6">
             {courses.length > 0 ? courses.slice(0, 3).map((course, idx) => (
@@ -101,7 +101,7 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
           </div>
         </div>
 
-        {/* ─── PHASE 3: INSTRUCTORS SECTION ─── */}
+        {/* --- PHASE 3: INSTRUCTORS SECTION --- */}
         <div className="bg-slate-500 rounded-[24px] overflow-hidden p-12 lg:p-20 relative shadow-2xl">
           {/* Section Header */}
           <div className="flex flex-col lg:flex-row justify-between items-end gap-10 mb-16 relative z-10">

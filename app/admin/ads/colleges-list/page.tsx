@@ -8,7 +8,7 @@ interface OptionRow  {
   name: string;
 }
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+// --- Server Actions -----------------------------------------------------------
 
 async function toggleAdRowStatus(formData: FormData) {
   "use server";
@@ -112,7 +112,7 @@ async function updateAdRow(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 const PAGE_SIZE = 25;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -144,7 +144,7 @@ function formatDate(d: string | null | undefined): string {
   }
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface CollegeAdSignupRow  {
   id: number;
@@ -171,7 +171,7 @@ interface CollegeAdSignupRow  {
 
 interface CountRow  { total: number; }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function AdsCollegesListPage({
   searchParams,
@@ -184,7 +184,7 @@ export default async function AdsCollegesListPage({
   const status = sp.status ?? "all";
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── WHERE ──────────────────────────────────────────────────────────────────
+  // -- WHERE ------------------------------------------------------------------
   const conditions: string[] = [];
   const params: (string | number)[] = [];
 
@@ -199,7 +199,7 @@ export default async function AdsCollegesListPage({
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Fetch metadata + data ──────────────────────────────────────────────────
+  // -- Fetch metadata + data --------------------------------------------------
   const [collegesRows, countRows, statsRows, collegeOps, degreeOps, courseOps, cityOps, stateOps] = await Promise.all([
     safeQuery<CollegeAdSignupRow>(
       `SELECT 

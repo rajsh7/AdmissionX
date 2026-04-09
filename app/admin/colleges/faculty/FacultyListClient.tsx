@@ -120,7 +120,7 @@ export default function FacultyListClient({
         </button>
       </div>
 
-      {/* ── Search Box Match Design ───────────────────── */}
+      {/* -- Search Box Match Design --------------------- */}
       <div className="bg-white border border-slate-100/60 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] p-6 mb-6">
         <h1 className="text-[22px] font-medium text-slate-500 mb-8 border-b border-slate-100 pb-4">
           Search College Faculty

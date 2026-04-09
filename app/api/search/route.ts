@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     const suggestions: any[] = [];
 
-    // ── 1. "course in city" → colleges offering that course in that city ──
+    // -- 1. "course in city" → colleges offering that course in that city --
     if ((streamDocs.length > 0 || degreeDocs.length > 0) && cityIds.length > 0) {
       const streamIds = streamDocs.map((s) => s.id ?? s._id);
       const degreeIds = degreeDocs.map((d) => d.id ?? d._id);
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // ── 2. Direct college name match ──
+    // -- 2. Direct college name match --
     if (suggestions.length < 6) {
       const nameMatchedUsers = await db.collection("users")
         .find({ firstname: subjectRegex }, { projection: { id: 1, _id: 1 } })
@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // ── 3. Stream suggestions ──
+    // -- 3. Stream suggestions --
     streamDocs.slice(0, 2).forEach((s) => {
       suggestions.push({
         type: "stream",
@@ -135,14 +135,14 @@ export async function GET(request: NextRequest) {
       });
     });
 
-    // ── 4. Course suggestions ──
+    // -- 4. Course suggestions --
     if (!location) {
       courseDocs.slice(0, 3).forEach((c) => {
         suggestions.push({ type: "course", name: c.name, location: "Course", slug: c.pageslug });
       });
     }
 
-    // ── 5. City suggestions (only when no "in" pattern) ──
+    // -- 5. City suggestions (only when no "in" pattern) --
     if (!location) {
       const cities = await db.collection("city")
         .find({ name: subjectRegex })

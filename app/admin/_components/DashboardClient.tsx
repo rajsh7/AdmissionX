@@ -51,7 +51,7 @@ export default function DashboardClient({
   return (
     <div className="p-6 space-y-6 bg-slate-50 min-h-full">
 
-      {/* ── Welcome Banner ── */}
+      {/* -- Welcome Banner -- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 rounded-2xl p-8 flex flex-col justify-between min-h-[140px]"
           style={{ background: "linear-gradient(135deg, #1e293b 0%, #0f172a 60%, #1e1b4b 100%)" }}>
@@ -90,7 +90,7 @@ export default function DashboardClient({
         </div>
       </div>
 
-      {/* ── KPI Cards ── */}
+      {/* -- KPI Cards -- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
         {kpis.map((k, i) => (
           <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex flex-col gap-6">
@@ -108,7 +108,7 @@ export default function DashboardClient({
         ))}
       </div>
 
-      {/* ── Charts Row ── */}
+      {/* -- Charts Row -- */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
         {/* Area / Bar chart */}
@@ -210,7 +210,7 @@ export default function DashboardClient({
         </div>
       </div>
 
-      {/* ── Recent Students Table ── */}
+      {/* -- Recent Students Table -- */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
           <h2 className="text-base font-black text-slate-800">Recent Students</h2>

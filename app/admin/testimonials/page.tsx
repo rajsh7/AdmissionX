@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { saveUpload } from "@/lib/upload-utils";
 import TestimonialListClient from "./TestimonialListClient";
 
-// ─── Server Actions ────────────────────────────────────────────────────────────
+// --- Server Actions ------------------------------------------------------------
 
 async function createTestimonial(formData: FormData) {
   "use server";
@@ -74,7 +74,7 @@ async function deleteTestimonial(id: number) {
   revalidatePath("/admin/testimonials");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 async function safeQuery<T >(
   sql: string,
@@ -89,7 +89,7 @@ async function safeQuery<T >(
   }
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface TestimonialRow  {
   id: number;
@@ -106,7 +106,7 @@ interface CountRow  {
   total: number;
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };

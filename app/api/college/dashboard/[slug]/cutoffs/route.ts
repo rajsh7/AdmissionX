@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
 import pool from "@/lib/db";
 
-// ── Auth + ownership helper ───────────────────────────────────────────────────
+// -- Auth + ownership helper ---------------------------------------------------
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_college")?.value;
@@ -29,7 +29,7 @@ async function checkAuth(slug: string) {
   }
 }
 
-// ── GET /api/college/dashboard/[slug]/cutoffs ─────────────────────────────────
+// -- GET /api/college/dashboard/[slug]/cutoffs ---------------------------------
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
@@ -87,7 +87,7 @@ export async function GET(
   }
 }
 
-// ── POST /api/college/dashboard/[slug]/cutoffs ────────────────────────────────
+// -- POST /api/college/dashboard/[slug]/cutoffs --------------------------------
 // Body: { title: string, description?: string, degree_id?, course_id?, functionalarea_id? }
 export async function POST(
   req: NextRequest,
@@ -165,7 +165,7 @@ export async function POST(
   }
 }
 
-// ── PUT /api/college/dashboard/[slug]/cutoffs?cutoffId=X ─────────────────────
+// -- PUT /api/college/dashboard/[slug]/cutoffs?cutoffId=X ---------------------
 // Body: { title?, description?, degree_id?, course_id?, functionalarea_id? }
 export async function PUT(
   req: NextRequest,
@@ -273,7 +273,7 @@ export async function PUT(
   }
 }
 
-// ── DELETE /api/college/dashboard/[slug]/cutoffs?cutoffId=X ──────────────────
+// -- DELETE /api/college/dashboard/[slug]/cutoffs?cutoffId=X ------------------
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },

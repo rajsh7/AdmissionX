@@ -101,7 +101,7 @@ export default function TopCourse() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
-          {/* ── Left Column: Featured Course ──────────────────────────── */}
+          {/* -- Left Column: Featured Course ---------------------------- */}
           <FadeIn className="lg:col-span-8 flex flex-col gap-10" direction="left">
             <div className="relative aspect-[16/10] rounded-none overflow-hidden group shadow-2xl shadow-black/5">
               <AnimatePresence mode="wait">
@@ -155,7 +155,7 @@ export default function TopCourse() {
             </div>
           </FadeIn>
 
-          {/* ── Right Column: Selector List ───────────────────────────── */}
+          {/* -- Right Column: Selector List ----------------------------- */}
           <FadeIn className="lg:col-span-4 bg-white rounded-[10px] border border-slate-100 p-0 shadow-xl shadow-black/5 flex flex-col h-full overflow-hidden" direction="right" delay={0.1}>
              <div className="p-6 pb-4 border-b border-slate-50">
                 <div className="relative">

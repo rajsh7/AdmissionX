@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 export interface AskQuestionRow {
   id: number;
@@ -28,7 +28,7 @@ interface CountRow {
   total: number;
 }
 
-// ─── GET /api/ask ─────────────────────────────────────────────────────────────
+// --- GET /api/ask -------------------------------------------------------------
 // Query params:
 //   q      — full-text search on question text          (optional)
 //   tag    — filter by ask_question_tags.slug           (optional)
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
   try {
     const conn = await pool.getConnection();
 
-    // ── Resolve tag filter to an ID ────────────────────────────────────────────
+    // -- Resolve tag filter to an ID --------------------------------------------
     let tagId: number | null = null;
     if (tag) {
       const [tagRows] = (await conn.query(
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
       tagId = tagRows[0]?.id ?? null;
     }
 
-    // ── WHERE clauses ──────────────────────────────────────────────────────────
+    // -- WHERE clauses ----------------------------------------------------------
     const conditions: string[] = ["aq.status = 1"];
     const dataParams: (string | number)[] = [];
 
@@ -74,13 +74,13 @@ export async function GET(req: NextRequest) {
 
     const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-    // ── ORDER BY ───────────────────────────────────────────────────────────────
+    // -- ORDER BY ---------------------------------------------------------------
     let orderBy = "aq.created_at DESC";
     if (sort === "popular")  orderBy = "aq.likes DESC, aq.views DESC";
     if (sort === "answered") orderBy = "aq.totalAnswerCount DESC, aq.created_at DESC";
     if (sort === "views")    orderBy = "aq.views DESC";
 
-    // ── Data query ─────────────────────────────────────────────────────────────
+    // -- Data query -------------------------------------------------------------
     const [rows] = (await conn.query(
       `SELECT
          aq.id,
@@ -102,13 +102,13 @@ export async function GET(req: NextRequest) {
       [...dataParams, limit, offset],
     )) as [AskQuestionRow[], unknown];
 
-    // ── Count query ────────────────────────────────────────────────────────────
+    // -- Count query ------------------------------------------------------------
     const [countRows] = (await conn.query(
       `SELECT COUNT(*) AS total FROM ask_questions aq ${whereClause}`,
       dataParams,
     )) as [CountRow[], unknown];
 
-    // ── All tags (for filter UI) ───────────────────────────────────────────────
+    // -- All tags (for filter UI) -----------------------------------------------
     const [allTags] = (await conn.query(
       `SELECT id, name, slug FROM ask_question_tags ORDER BY name ASC`,
     )) as [AskTagRow[], unknown];

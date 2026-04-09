@@ -5,16 +5,16 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Image from "next/image";
 
-// ─── Dynamic page (requires database access at request time)
+// --- Dynamic page (requires database access at request time)
 export const dynamic = 'force-dynamic';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// --- Constants ----------------------------------------------------------------
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_BOARD_IMAGE =
   "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&q=80&w=800";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || !raw.trim()) return DEFAULT_BOARD_IMAGE;
@@ -54,7 +54,7 @@ interface BoardRow {
   about_board: string | null;
 }
 
-// ─── Metadata ─────────────────────────────────────────────────────────────────
+// --- Metadata -----------------------------------------------------------------
 
 export const metadata: Metadata = {
   title: "Boards — Counseling & Education Boards | AdmissionX",
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     "education boards, CBSE, ICSE, state board, board syllabus, board exam dates, board admissions",
 };
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function BoardsPage() {
   const db = await getDb();
@@ -98,7 +98,7 @@ export default async function BoardsPage() {
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* ── Hero ── */}
+      {/* -- Hero -- */}
       <div className="bg-neutral-900 pt-24 pb-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           {/* Breadcrumb */}
@@ -151,7 +151,7 @@ export default async function BoardsPage() {
         </div>
       </div>
 
-      {/* ── Quick-info strip ── */}
+      {/* -- Quick-info strip -- */}
       <div className="bg-white border-b border-neutral-100">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
@@ -176,7 +176,7 @@ export default async function BoardsPage() {
         </div>
       </div>
 
-      {/* ── Main content ── */}
+      {/* -- Main content -- */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
         {boards.length === 0 ? (
           <EmptyState />
@@ -204,7 +204,7 @@ export default async function BoardsPage() {
           </div>
         )}
 
-        {/* ── Bottom CTA ── */}
+        {/* -- Bottom CTA -- */}
         {boards.length > 0 && (
           <div className="mt-14 bg-gradient-to-r from-amber-500 to-orange-500 rounded-3xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div>
@@ -245,7 +245,7 @@ export default async function BoardsPage() {
   );
 }
 
-// ─── Board Card ───────────────────────────────────────────────────────────────
+// --- Board Card ---------------------------------------------------------------
 
 function BoardCard({
   board,
@@ -349,7 +349,7 @@ function BoardCard({
   );
 }
 
-// ─── Empty State ──────────────────────────────────────────────────────────────
+// --- Empty State --------------------------------------------------------------
 
 function EmptyState() {
   return (

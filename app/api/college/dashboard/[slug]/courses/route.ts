@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
 import pool from "@/lib/db";
 
-// ── Auth + ownership helper ───────────────────────────────────────────────────
+// -- Auth + ownership helper ---------------------------------------------------
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_college")?.value;
@@ -29,7 +29,7 @@ async function checkAuth(slug: string) {
   }
 }
 
-// ── GET /api/college/dashboard/[slug]/courses ─────────────────────────────────
+// -- GET /api/college/dashboard/[slug]/courses ---------------------------------
 // Returns all courses for this college + dropdown lists for the form
 export async function GET(
   _req: NextRequest,
@@ -89,7 +89,7 @@ export async function GET(
   }
 }
 
-// ── POST /api/college/dashboard/[slug]/courses ────────────────────────────────
+// -- POST /api/college/dashboard/[slug]/courses --------------------------------
 // Body: { course_id, degree_id, functionalarea_id, fees?, seats?, courseduration?, twelvemarks?, description? }
 export async function POST(
   req: NextRequest,
@@ -192,7 +192,7 @@ export async function POST(
   }
 }
 
-// ── PUT /api/college/dashboard/[slug]/courses?courseId=X ─────────────────────
+// -- PUT /api/college/dashboard/[slug]/courses?courseId=X ---------------------
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
@@ -300,7 +300,7 @@ export async function PUT(
   }
 }
 
-// ── DELETE /api/college/dashboard/[slug]/courses?courseId=X ──────────────────
+// -- DELETE /api/college/dashboard/[slug]/courses?courseId=X ------------------
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },

@@ -111,7 +111,7 @@ export default function HomepageClient({ settings, colleges }: Props) {
         ))}
       </div>
 
-      {/* ── Tab: Featured Colleges ── */}
+      {/* -- Tab: Featured Colleges -- */}
       {tab === "colleges" && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-4">
@@ -186,7 +186,7 @@ export default function HomepageClient({ settings, colleges }: Props) {
         </div>
       )}
 
-      {/* ── Tab: Top Universities ── */}
+      {/* -- Tab: Top Universities -- */}
       {tab === "universities" && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-100">
@@ -246,7 +246,7 @@ export default function HomepageClient({ settings, colleges }: Props) {
         </div>
       )}
 
-      {/* ── Tab: Hero / Stats / Sections (form) ── */}
+      {/* -- Tab: Hero / Stats / Sections (form) -- */}
       {(tab === "hero" || tab === "stats" || tab === "sections") && (
         <form onSubmit={handleSave} className="space-y-6">
           {/* Hero */}

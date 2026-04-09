@@ -1,11 +1,11 @@
 import { getDb } from "@/lib/db";
 import { notFound } from "next/navigation";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// --- Constants ----------------------------------------------------------------
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function buildImageUrl(raw: string | null): string {
   if (!raw || !raw.trim()) return "";
@@ -46,7 +46,7 @@ function isUpcoming(raw: string | null | undefined): boolean {
 }
 
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface ExamBaseRow {
   id: number;
@@ -117,7 +117,7 @@ interface AppProcessRow {
   eligibilitycriteria: string | null;
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function ExamOverviewPage({ params }: { params: Promise<{ stream: string; slug: string }> }) {
   const { slug } = await params;
@@ -136,7 +136,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
     exminationDate: examDoc.exminationDate ?? null, resultAnnounce: examDoc.resultAnnounce ?? null,
   };
 
-  // ── Step 2: fetch all sub-data in parallel using exam.id ─────────────────
+  // -- Step 2: fetch all sub-data in parallel using exam.id -----------------
   const [dateRows, eligibilityRows, patternRows, feeRows, appProcessRows] = await Promise.all([
     db.collection("exam_dates").find({ typeOfExaminations_id: exam.id }).sort({ eventDate: 1 }).toArray().then(docs => docs.map(r => ({ id: r.id, degreeId: r.degreeId ?? null, degreeName: r.degreeName ?? null, eventName: r.eventName ?? null, eventDate: r.eventDate ?? null, eventStatus: r.eventStatus ?? null } as ExamDateRow))),
     db.collection("exam_eligibilities").find({ typeOfExaminations_id: exam.id }).sort({ id: 1 }).toArray().then(docs => docs.map(r => ({ id: r.id, degreeId: r.degreeId ?? null, degreeName: r.degreeName ?? null, description: r.description ?? null } as EligibilityRow))),
@@ -145,13 +145,13 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
     db.collection("exam_application_processes").find({ typeOfExaminations_id: exam.id }).sort({ id: 1 }).toArray().then(docs => docs.map(r => ({ id: r.id, modeofapplication: r.modeofapplication ?? null, modeofpayment: r.modeofpayment ?? null, description: r.description ?? null, examinationtype: r.examinationtype ?? null, applicationandexamstatus: r.applicationandexamstatus ?? null, examinationmode: r.examinationmode ?? null, eligibilitycriteria: r.eligibilitycriteria ?? null } as AppProcessRow))),
   ]);
 
-    // ── Normalize text fields ─────────────────────────────────────────────────
+    // -- Normalize text fields -------------------------------------------------
   const descText = stripHtml(exam.description);
   const contentText = stripHtml(exam.content);
   const eligibilityCriteriaText = stripHtml(exam.examEligibilityCriteria);
   const examDatesText = stripHtml(exam.examDates);
 
-  // ── Section visibility flags ──────────────────────────────────────────────
+  // -- Section visibility flags ----------------------------------------------
   const hasAbout = !!descText || !!contentText;
   const hasDates = dateRows.length > 0 || !!examDatesText;
   const hasEligibility =
@@ -160,7 +160,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
   const hasFees = feeRows.length > 0;
   const hasProcess = appProcessRows.length > 0;
 
-  // ── Jump nav items ────────────────────────────────────────────────────────
+  // -- Jump nav items --------------------------------------------------------
   const jumpItems = [
     { id: "about", label: "About", show: hasAbout, icon: "info" },
     {
@@ -192,7 +192,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
 
   return (
     <div className="space-y-6">
-      {/* ── Jump Navigation ───────────────────────────────────────────────── */}
+      {/* -- Jump Navigation ------------------------------------------------- */}
       {jumpItems.length > 1 && (
         <nav className="bg-transparent rounded-2xl border border-neutral-200 px-5 py-3 flex items-center gap-1.5 flex-wrap shadow-sm">
           <span className="text-[10px] font-bold text-black uppercase tracking-widest mr-2">
@@ -213,7 +213,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
         </nav>
       )}
 
-      {/* ── Key Dates (quick overview row) ────────────────────────────────── */}
+      {/* -- Key Dates (quick overview row) ---------------------------------- */}
       {(exam.applicationFrom ||
         exam.applicationTo ||
         exam.exminationDate ||
@@ -278,7 +278,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
           </div>
         )}
 
-      {/* ── About ─────────────────────────────────────────────────────────── */}
+      {/* -- About ----------------------------------------------------------- */}
       {hasAbout && (
         <section
           id="about"
@@ -299,7 +299,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
         </section>
       )}
 
-      {/* ── Important Dates Table ─────────────────────────────────────────── */}
+      {/* -- Important Dates Table ------------------------------------------- */}
       {hasDates && (
         <section
           id="dates"
@@ -400,7 +400,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
         </section>
       )}
 
-      {/* ── Eligibility ───────────────────────────────────────────────────── */}
+      {/* -- Eligibility ----------------------------------------------------- */}
       {hasEligibility && (
         <section
           id="eligibility"
@@ -452,7 +452,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
         </section>
       )}
 
-      {/* ── Exam Pattern ──────────────────────────────────────────────────── */}
+      {/* -- Exam Pattern ---------------------------------------------------- */}
       {hasPattern && (
         <section
           id="pattern"
@@ -568,7 +568,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
         </section>
       )}
 
-      {/* ── Application Fees ──────────────────────────────────────────────── */}
+      {/* -- Application Fees ------------------------------------------------ */}
       {hasFees && (
         <section
           id="fees"
@@ -644,7 +644,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
         </section>
       )}
 
-      {/* ── Application Process ───────────────────────────────────────────── */}
+      {/* -- Application Process --------------------------------------------- */}
       {hasProcess && (
         <section
           id="process"
@@ -721,7 +721,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
         </section>
       )}
 
-      {/* ── Official link CTA ─────────────────────────────────────────────── */}
+      {/* -- Official link CTA ----------------------------------------------- */}
       {exam.getMoreInfoLink && (
         <div className="bg-neutral-900 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl border border-neutral-800 overflow-hidden relative">
           {/* Subtle gradient overlay */}
@@ -763,7 +763,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
   );
 }
 
-// ─── Section Title ────────────────────────────────────────────────────────────
+// --- Section Title ------------------------------------------------------------
 
 function SectionTitle({
   icon,

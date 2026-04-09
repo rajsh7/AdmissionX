@@ -1,6 +1,6 @@
 import type { CutoffData } from "@/app/api/college/[slug]/route";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function stripHtml(html: string | null | undefined): string {
   if (!html) return "";
@@ -15,7 +15,7 @@ function stripHtml(html: string | null | undefined): string {
     .trim();
 }
 
-// ─── Row Component ────────────────────────────────────────────────────────────
+// --- Row Component ------------------------------------------------------------
 
 function CutoffRow({
   cutoff,
@@ -92,7 +92,7 @@ function CutoffRow({
   );
 }
 
-// ─── Empty state ──────────────────────────────────────────────────────────────
+// --- Empty state --------------------------------------------------------------
 
 function EmptyCutoffs() {
   return (
@@ -112,7 +112,7 @@ function EmptyCutoffs() {
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// --- Main Component -----------------------------------------------------------
 
 interface CutOffTableProps {
   cutoffs: CutoffData[];
@@ -149,7 +149,7 @@ export default function CutOffTable({ cutoffs, collegeName }: CutOffTableProps) 
 
   return (
     <section className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden scroll-mt-24" id="cutoffs">
-      {/* ── Section header ── */}
+      {/* -- Section header -- */}
       <div className="px-6 pt-6 pb-4 border-b border-white/10">
         <Header count={cutoffs.length} />
 
@@ -168,7 +168,7 @@ export default function CutOffTable({ cutoffs, collegeName }: CutOffTableProps) 
         </div>
       </div>
 
-      {/* ── Stream legend ── */}
+      {/* -- Stream legend -- */}
       {uniqueStreams.length > 0 && (
         <div className="px-6 py-3 flex flex-wrap gap-2 bg-white/5 border-b border-white/10">
           <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wide self-center mr-1">
@@ -186,7 +186,7 @@ export default function CutOffTable({ cutoffs, collegeName }: CutOffTableProps) 
         </div>
       )}
 
-      {/* ── Table ── */}
+      {/* -- Table -- */}
       <div className="overflow-x-auto">
         <table className="w-full text-sm min-w-[720px]">
           <thead>
@@ -219,7 +219,7 @@ export default function CutOffTable({ cutoffs, collegeName }: CutOffTableProps) 
         </table>
       </div>
 
-      {/* ── Footer ── */}
+      {/* -- Footer -- */}
       <div className="px-6 py-4 bg-white/5 border-t border-white/10 flex items-center justify-between gap-4">
         <p className="text-[11px] text-neutral-400 flex items-center gap-1.5">
           <span className="material-symbols-outlined text-[13px]">info</span>
@@ -234,7 +234,7 @@ export default function CutOffTable({ cutoffs, collegeName }: CutOffTableProps) 
   );
 }
 
-// ─── Reusable Header ──────────────────────────────────────────────────────────
+// --- Reusable Header ----------------------------------------------------------
 
 function Header({ count }: { count: number }) {
   return (

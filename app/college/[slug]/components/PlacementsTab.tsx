@@ -35,7 +35,7 @@ export default function PlacementsTab({
 
   return (
     <div className="w-full bg-white pb-24">
-      {/* ─── PHASE 1: PLACEMENT STATS BANNER ─── */}
+      {/* --- PHASE 1: PLACEMENT STATS BANNER --- */}
       <section className="relative w-full overflow-hidden">
         {/* Background with Darkened Image */}
         <div className="absolute inset-0 z-0 h-[450px]">
@@ -93,7 +93,7 @@ export default function PlacementsTab({
         </div>
       </section>
 
-      {/* ─── PHASE 2: TOP RECRUITERS GRID ─── */}
+      {/* --- PHASE 2: TOP RECRUITERS GRID --- */}
       <section className="py-24">
         <div className="max-w-[1920px] mx-auto px-8 lg:px-12 xl:px-20">
           <div className="bg-white rounded-3xl border border-neutral-100 shadow-2xl shadow-slate-200/50 overflow-hidden">

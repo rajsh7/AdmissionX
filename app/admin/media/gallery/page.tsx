@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import GalleryClient from "./GalleryClient";
 import { saveUpload } from "@/lib/upload-utils";
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+// --- Server Actions -----------------------------------------------------------
 
 async function deleteGalleryItem(id: number) {
   "use server";

@@ -23,7 +23,7 @@ export default function CareerGuidance() {
 
           <div className="absolute -top-12 -left-12 w-64 h-64 bg-[#FF3C3C]/5 rounded-full blur-3xl opacity-40 z-0" />
 
-          {/* ── Left Content (60% width) ─────────────────────────────────── */}
+          {/* -- Left Content (60% width) ----------------------------------- */}
           <div className="flex-[1.2] text-center lg:text-left z-10 pb-8 lg:pb-16 flex flex-col justify-center">
             <h2 className="text-[#1F2937] leading-[1.2] mb-6 tracking-tight" style={{ fontSize: '45px', fontWeight: 600 }}>
               Confused about your <span className="text-[#FF3C3C]">career path?</span>
@@ -71,7 +71,7 @@ export default function CareerGuidance() {
             </div>
           </div>
 
-          {/* ── Right Content: Illustration (40% width) ────────────────────── */}
+          {/* -- Right Content: Illustration (40% width) ---------------------- */}
           <div className="flex-1 relative z-10 w-full flex items-end justify-center lg:justify-end pb-0">
             <div className="relative w-full max-w-[480px] flex items-end">
               <img

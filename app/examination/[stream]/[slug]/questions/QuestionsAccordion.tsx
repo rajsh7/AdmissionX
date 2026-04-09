@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import type { QuestionWithAnswers } from "./page";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function formatDate(raw: string | null | undefined): string {
   if (!raw) return "";
@@ -16,7 +16,7 @@ function formatDate(raw: string | null | undefined): string {
   });
 }
 
-// ─── Single Question Item ─────────────────────────────────────────────────────
+// --- Single Question Item -----------------------------------------------------
 
 function QuestionItem({
   q,
@@ -66,7 +66,7 @@ function QuestionItem({
           : "border-neutral-100 hover:border-blue-100"
       }`}
     >
-      {/* ── Question trigger ── */}
+      {/* -- Question trigger -- */}
       <button
         type="button"
         onClick={onToggle}
@@ -136,7 +136,7 @@ function QuestionItem({
         </span>
       </button>
 
-      {/* ── Answers (collapsible) ── */}
+      {/* -- Answers (collapsible) -- */}
       <div
         className={`transition-all duration-300 ease-in-out ${
           isOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
@@ -214,7 +214,7 @@ function QuestionItem({
   );
 }
 
-// ─── Main Accordion ───────────────────────────────────────────────────────────
+// --- Main Accordion -----------------------------------------------------------
 
 interface QuestionsAccordionProps {
   questions: QuestionWithAnswers[];
@@ -261,7 +261,7 @@ export default function QuestionsAccordion({
 
   return (
     <div className="space-y-4">
-      {/* ── Controls bar ── */}
+      {/* -- Controls bar -- */}
       <div className="bg-white rounded-2xl border border-neutral-100 p-4 space-y-3">
         {/* Search */}
         <div className="relative">
@@ -325,7 +325,7 @@ export default function QuestionsAccordion({
         </div>
       </div>
 
-      {/* ── Search result count ── */}
+      {/* -- Search result count -- */}
       {searchQuery.trim() && (
         <div className="flex items-center gap-2 px-1">
           <span className="material-symbols-outlined text-[15px] text-neutral-400">
@@ -353,7 +353,7 @@ export default function QuestionsAccordion({
         </div>
       )}
 
-      {/* ── Question list ── */}
+      {/* -- Question list -- */}
       {filteredQuestions.length === 0 ? (
         <div className="bg-white rounded-2xl border border-neutral-100 p-12 flex flex-col items-center text-center">
           <div className="w-14 h-14 rounded-2xl bg-neutral-100 flex items-center justify-center mb-3">
@@ -393,7 +393,7 @@ export default function QuestionsAccordion({
         </div>
       )}
 
-      {/* ── Footer note ── */}
+      {/* -- Footer note -- */}
       <p className="text-[11px] text-neutral-400 px-1 flex items-center gap-1.5">
         <span className="material-symbols-outlined text-[13px]">info</span>
         {questions.length} question{questions.length !== 1 ? "s" : ""} about{" "}

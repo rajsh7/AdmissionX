@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const LAST_UPDATED = "June 1, 2025";
 
-// ─── Shared prose helpers ─────────────────────────────────────────────────────
+// --- Shared prose helpers -----------------------------------------------------
 
 function Section({
   id,
@@ -87,7 +87,7 @@ function InfoBox({
   );
 }
 
-// ─── Table of contents ────────────────────────────────────────────────────────
+// --- Table of contents --------------------------------------------------------
 
 const TOC = [
   { id: "overview",       number: "1", label: "Overview" },
@@ -99,14 +99,14 @@ const TOC = [
   { id: "contact",        number: "7", label: "Contact Us" },
 ];
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default function CancellationRefundsPage() {
   return (
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* ── Hero ── */}
+      {/* -- Hero -- */}
       <div className="bg-neutral-900 pt-24 pb-14">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
@@ -146,7 +146,7 @@ export default function CancellationRefundsPage() {
         </div>
       </div>
 
-      {/* ── Content ── */}
+      {/* -- Content -- */}
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
 

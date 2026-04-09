@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
 import pool from "@/lib/db";
 
-// ── Auth + ownership helper ───────────────────────────────────────────────────
+// -- Auth + ownership helper ---------------------------------------------------
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_college")?.value;
@@ -29,7 +29,7 @@ async function checkAuth(slug: string) {
   }
 }
 
-// ── GET /api/college/dashboard/[slug]/faculty ─────────────────────────────────
+// -- GET /api/college/dashboard/[slug]/faculty ---------------------------------
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
@@ -90,7 +90,7 @@ export async function GET(
   }
 }
 
-// ── POST /api/college/dashboard/[slug]/faculty ────────────────────────────────
+// -- POST /api/college/dashboard/[slug]/faculty --------------------------------
 // Accepts multipart/form-data:
 //   name, suffix?, designation?, description?, email?, phone?, gender?,
 //   languageKnown?, sortorder?, functionalarea_id?, file? (photo)
@@ -212,7 +212,7 @@ export async function POST(
   }
 }
 
-// ── PUT /api/college/dashboard/[slug]/faculty?facultyId=X ─────────────────────
+// -- PUT /api/college/dashboard/[slug]/faculty?facultyId=X ---------------------
 // Accepts multipart/form-data (same fields as POST, all optional)
 export async function PUT(
   req: NextRequest,
@@ -372,7 +372,7 @@ export async function PUT(
   }
 }
 
-// ── DELETE /api/college/dashboard/[slug]/faculty?facultyId=X ─────────────────
+// -- DELETE /api/college/dashboard/[slug]/faculty?facultyId=X -----------------
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },

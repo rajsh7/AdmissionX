@@ -9,6 +9,7 @@ import Footer from "../../components/Footer";
 
 export default function CollegeSignupPage() {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -25,10 +26,20 @@ export default function CollegeSignupPage() {
     const phone = String(formData.get("phone") || "").trim();
     const address = String(formData.get("address") || "").trim();
     const courses = String(formData.get("courses") || "").trim();
+    const password = String(formData.get("password") || "").trim();
+    const confirmPassword = String(formData.get("confirmPassword") || "").trim();
     const captchaOk = formData.get("captcha") === "on";
 
-    if (!collegeName || !email || !contactName || !phone || !address || !courses) {
+    if (!collegeName || !email || !contactName || !phone || !address || !courses || !password) {
       setError("Please fill in all required fields.");
+      return;
+    }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
       return;
     }
     if (!captchaOk) {
@@ -41,11 +52,11 @@ export default function CollegeSignupPage() {
       const res = await fetch("/api/signup/college", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ collegeName, email, contactName, phone, address, courses, captchaOk, password: "pending_admin_approval" }),
+        body: JSON.stringify({ collegeName, email, contactName, phone, address, courses, captchaOk, password }),
       });
       const data = await res.json();
       if (res.ok) {
-        router.push("/signup/college/success");
+        router.push("/dashboard/college/");
       } else {
         setError(data.error || "Signup failed. Please try again.");
       }
@@ -64,7 +75,7 @@ export default function CollegeSignupPage() {
       <main className="relative flex-1 flex items-center justify-center px-4 py-24 overflow-hidden">
         <div className="w-full max-w-[1100px] grid grid-cols-1 lg:grid-cols-2 gap-0 rounded-2xl overflow-hidden shadow-2xl shadow-black/10 z-10">
 
-          {/* ── Left: Promo Panel ── */}
+          {/* -- Left: Promo Panel -- */}
           <div className="hidden lg:flex flex-col justify-between p-10 relative overflow-hidden"
             style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}>
             {/* Decorative circles */}
@@ -109,7 +120,7 @@ export default function CollegeSignupPage() {
             </p>
           </div>
 
-          {/* ── Right: Signup Form ── */}
+          {/* -- Right: Signup Form -- */}
           <div className="bg-white p-8 lg:p-10 flex flex-col justify-center">
             <div className="mb-6">
               <h1 className="text-2xl font-black text-slate-900 mb-1">Register Your College</h1>
@@ -184,6 +195,30 @@ export default function CollegeSignupPage() {
                 </div>
               </div>
 
+              {/* Password */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 block">Password <span className="text-primary">*</span></label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">lock</span>
+                    <input name="password" type={showPassword ? "text" : "password"} placeholder="Min. 8 characters" required minLength={8}
+                      className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all" />
+                    <button type="button" onClick={() => setShowPassword(p => !p)} tabIndex={-1}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                      <span className="material-symbols-outlined text-[18px]">{showPassword ? "visibility" : "visibility_off"}</span>
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 block">Confirm Password <span className="text-primary">*</span></label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">lock_reset</span>
+                    <input name="confirmPassword" type={showPassword ? "text" : "password"} placeholder="Re-enter password" required minLength={8}
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all" />
+                  </div>
+                </div>
+              </div>
+
               {/* Captcha */}
               <div className="flex items-start gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
                 <input id="college-captcha" name="captcha" type="checkbox"
@@ -197,7 +232,7 @@ export default function CollegeSignupPage() {
               <div className="flex items-start gap-2 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
                 <span className="material-symbols-outlined text-blue-500 text-[16px] shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>info</span>
                 <p className="text-xs text-blue-700 leading-relaxed">
-                  After approval, you will receive your <strong>login credentials via email</strong> within 1–2 business days. No password needed now.
+                  Set your password now. You can <strong>log in immediately</strong> after registration.
                 </p>
               </div>
 

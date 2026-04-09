@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { verifyCollegeToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 
-// ── Auth helper ───────────────────────────────────────────────────────────────
+// -- Auth helper ---------------------------------------------------------------
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_college")?.value;
@@ -21,7 +21,7 @@ async function checkAuth(slug: string) {
   return { payload, slug };
 }
 
-// ── PUT /api/college/dashboard/[slug]/settings ────────────────────────────────
+// -- PUT /api/college/dashboard/[slug]/settings --------------------------------
 // Body: { action: "change_password", currentPassword: string, newPassword: string }
 export async function PUT(
   req: NextRequest,
@@ -46,7 +46,7 @@ export async function PUT(
 
   const { action, currentPassword, newPassword } = body;
 
-  // ── Action: change_password ───────────────────────────────────────────────
+  // -- Action: change_password -----------------------------------------------
   if (action === "change_password") {
     if (!currentPassword || !newPassword) {
       return NextResponse.json({ error: "currentPassword and newPassword are required." }, { status: 400 });
@@ -82,7 +82,7 @@ export async function PUT(
     return NextResponse.json({ success: true, message: "Password changed successfully." });
   }
 
-  // ── Unknown action ────────────────────────────────────────────────────────
+  // -- Unknown action --------------------------------------------------------
   return NextResponse.json(
     { error: `Unknown action: "${action}". Supported: change_password` },
     { status: 400 },

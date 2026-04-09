@@ -1,6 +1,6 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 const PAGE_SIZE = 25;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -28,7 +28,7 @@ function formatDate(d: string | null | undefined): string {
   } catch { return "—"; }
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface CityRow  {
   id: number;
@@ -45,7 +45,7 @@ interface CityRow  {
 
 interface CountRow  { total: number; }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function AdminCitiesPage({
   searchParams,
@@ -58,7 +58,7 @@ export default async function AdminCitiesPage({
   const filter = sp.filter ?? "all"; // all | active | inactive
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── WHERE ──────────────────────────────────────────────────────────────────
+  // -- WHERE ------------------------------------------------------------------
   const conditions: string[] = [];
   const params: (string | number)[] = [];
 
@@ -71,7 +71,7 @@ export default async function AdminCitiesPage({
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // ── Parallel queries ───────────────────────────────────────────────────────
+  // -- Parallel queries -------------------------------------------------------
   const [cities, countRows, totalRow, topRow, homeRow, activeRow, inactiveRow] =
     await Promise.all([
       safeQuery<CityRow>(
@@ -120,7 +120,7 @@ export default async function AdminCitiesPage({
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
 
-      {/* ── Header ───────────────────────────────────────────────────────── */}
+      {/* -- Header --------------------------------------------------------- */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -138,7 +138,7 @@ export default async function AdminCitiesPage({
         </span>
       </div>
 
-      {/* ── Stat mini-cards ───────────────────────────────────────────────── */}
+      {/* -- Stat mini-cards ------------------------------------------------- */}
       <div className="grid grid-cols-3 gap-4">
         {STAT_CARDS.map((card) => (
           <div
@@ -158,7 +158,7 @@ export default async function AdminCitiesPage({
         ))}
       </div>
 
-      {/* ── Filter tabs + Search ──────────────────────────────────────────── */}
+      {/* -- Filter tabs + Search -------------------------------------------- */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
         <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl flex-shrink-0">
           {FILTER_TABS.map((tab) => (
@@ -206,7 +206,7 @@ export default async function AdminCitiesPage({
         )}
       </div>
 
-      {/* ── Table card ────────────────────────────────────────────────────── */}
+      {/* -- Table card ------------------------------------------------------ */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         {cities.length === 0 ? (
           <div className="py-20 text-center">
@@ -420,7 +420,7 @@ export default async function AdminCitiesPage({
         )}
       </div>
 
-      {/* ── Read-only notice ──────────────────────────────────────────────── */}
+      {/* -- Read-only notice ------------------------------------------------ */}
       <p className="text-xs text-slate-400 text-center">
         City data is read-only in this panel. Use the legacy admin for city management.
       </p>

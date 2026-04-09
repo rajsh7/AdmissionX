@@ -39,7 +39,7 @@ export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {
     <div className="w-full bg-[#f8fafc] pb-24">
       <div className="max-w-[1920px] mx-auto px-8 lg:px-12 xl:px-20 py-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
 
-        {/* ─── PHASE 1: LEFT SIDEBAR (RATING SUMMARY) ─── */}
+        {/* --- PHASE 1: LEFT SIDEBAR (RATING SUMMARY) --- */}
         <aside className="lg:col-span-4 space-y-8">
 
           {/* Overall Rating Card */}
@@ -101,7 +101,7 @@ export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {
           </div>
         </aside>
 
-        {/* ─── PHASE 2: REVIEWS CONTENT AREA ─── */}
+        {/* --- PHASE 2: REVIEWS CONTENT AREA --- */}
         <main className="lg:col-span-8">
 
           {/* Main Filter Tabs */}

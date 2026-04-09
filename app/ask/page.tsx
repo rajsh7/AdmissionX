@@ -7,7 +7,7 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
 export const dynamic = 'force-dynamic';
-// ─── Constants ────────────────────────────────────────────────────────────────
+// --- Constants ----------------------------------------------------------------
 
 export const metadata: Metadata = {
   title: "Community Q&A — Ask Questions | AdmissionX",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     "Browse thousands of questions and answers from students about admissions, exams, careers, and college life. Get answers from experts and peers.",
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 const PAGE_SIZE = 15;
 
@@ -59,7 +59,7 @@ interface TagRow {
   question_count: number;
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function AskPage({
   searchParams,
@@ -124,7 +124,7 @@ export default async function AskPage({
       .slice(0, 4);
   }
 
-  // ── URL builder ───────────────────────────────────────────────────────────
+  // -- URL builder -----------------------------------------------------------
   function buildUrl(overrides: Record<string, string | number | undefined>) {
     const base: Record<string, string> = {};
     if (q) base.q = q;
@@ -150,7 +150,7 @@ export default async function AskPage({
 
   return (
     <div className="min-h-screen relative">
-      {/* ── Full Page Background ── */}
+      {/* -- Full Page Background -- */}
       <div className="fixed inset-0 z-0 text-[0px] font-[0] leading-[0]">
         <Image
           src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
@@ -167,7 +167,7 @@ export default async function AskPage({
       <div className="relative z-10">
         <Header />
 
-        {/* ── Hero ─────────────────────────────────────────────────────────── */}
+        {/* -- Hero ----------------------------------------------------------- */}
         <div className="pt-24 pb-14">
           <div className="w-full px-4 lg:px-8 xl:px-12 flex flex-col items-center text-center">
             <nav className="flex items-center justify-center gap-2 text-xs text-neutral-500 mb-6 font-medium">
@@ -227,7 +227,7 @@ export default async function AskPage({
           </div>
         </div>
 
-        {/* ── Sort tabs ────────────────────────────────────────────────────────── */}
+        {/* -- Sort tabs ---------------------------------------------------------- */}
         <div className="border-b border-white/10" style={{ backgroundColor: 'transparent' }}>
           <div className="w-full px-4 lg:px-8 xl:px-12">
             <nav className="flex items-center justify-center overflow-x-auto scrollbar-hide">
@@ -251,11 +251,11 @@ export default async function AskPage({
           </div>
         </div>
 
-        {/* ── Main layout ──────────────────────────────────────────────────────── */}
+        {/* -- Main layout -------------------------------------------------------- */}
         <div className="w-full px-4 lg:px-8 xl:px-12 py-10">
           <div className="flex flex-col lg:flex-row gap-8 items-start">
 
-            {/* ── Questions list ───────────────────────────────────────────────── */}
+            {/* -- Questions list ------------------------------------------------- */}
             <div className="flex-1 min-w-0">
               {/* Active filters */}
               <div className="flex flex-wrap items-center gap-2 mb-5">
@@ -421,7 +421,7 @@ export default async function AskPage({
               )}
             </div>
 
-            {/* ── Sidebar ──────────────────────────────────────────────────────── */}
+            {/* -- Sidebar -------------------------------------------------------- */}
             <aside className="w-full lg:w-72 flex-shrink-0 space-y-5">
 
               {/* Topics / Tags */}

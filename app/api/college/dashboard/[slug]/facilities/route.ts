@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
 import pool from "@/lib/db";
 
-// ── Auth + ownership helper ───────────────────────────────────────────────────
+// -- Auth + ownership helper ---------------------------------------------------
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_college")?.value;
@@ -29,7 +29,7 @@ async function checkAuth(slug: string) {
   }
 }
 
-// ── GET /api/college/dashboard/[slug]/facilities ──────────────────────────────
+// -- GET /api/college/dashboard/[slug]/facilities ------------------------------
 // Returns all facilities from the reference table, each marked with whether
 // this college has enabled it (i.e. has a row in collegefacilities).
 export async function GET(
@@ -95,7 +95,7 @@ export async function GET(
   }
 }
 
-// ── PUT /api/college/dashboard/[slug]/facilities ──────────────────────────────
+// -- PUT /api/college/dashboard/[slug]/facilities ------------------------------
 // Body: { facilities_id: number, enabled: boolean, description?: string }
 // Adds or removes the facility for this college.
 export async function PUT(
@@ -186,7 +186,7 @@ export async function PUT(
   }
 }
 
-// ── POST /api/college/dashboard/[slug]/facilities ─────────────────────────────
+// -- POST /api/college/dashboard/[slug]/facilities -----------------------------
 // Bulk-update: Body: { updates: Array<{ facilities_id, enabled, description? }> }
 export async function POST(
   req: NextRequest,

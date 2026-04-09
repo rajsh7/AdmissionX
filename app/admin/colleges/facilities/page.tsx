@@ -4,7 +4,7 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import FacilitiesClient from "./FacilitiesClient";
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+// --- Server Actions -----------------------------------------------------------
 
 async function deleteFacilityRow(id: string) {
   "use server";
@@ -69,11 +69,11 @@ async function updateFacility(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 const PAGE_SIZE = 25;
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface FacilityRow  {
   id: string;
@@ -94,7 +94,7 @@ interface CountRow  {
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 export default async function CollegeFacilitiesPage({
   searchParams,
@@ -279,7 +279,7 @@ export default async function CollegeFacilitiesPage({
          description={description}
       />
 
-      {/* ── Pagination ───────────────────────────────────────────────────── */}
+      {/* -- Pagination ----------------------------------------------------- */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
           <p className="text-xs text-slate-500">

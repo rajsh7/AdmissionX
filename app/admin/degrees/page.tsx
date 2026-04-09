@@ -5,7 +5,7 @@ import DegreeListClient from "./DegreeListClient";
 
 const PAGE_SIZE = 25;
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+// --- Server Actions -----------------------------------------------------------
 
 async function createDegree(formData: FormData) {
   "use server";
@@ -102,7 +102,7 @@ async function toggleDegreeHome(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 async function safeQuery<T >(
   sql: string,

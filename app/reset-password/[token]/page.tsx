@@ -154,7 +154,7 @@ export default function ResetPasswordPage({ params }: PageProps) {
 
         <div className="w-full max-w-[480px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none p-8 md:p-12 relative z-10 border border-slate-100 dark:border-slate-800">
 
-          {/* ── Verifying State ── */}
+          {/* -- Verifying State -- */}
           {tokenState === "verifying" && (
             <div className="flex flex-col items-center justify-center py-10 gap-5">
               <svg
@@ -188,7 +188,7 @@ export default function ResetPasswordPage({ params }: PageProps) {
             </div>
           )}
 
-          {/* ── Invalid Token State ── */}
+          {/* -- Invalid Token State -- */}
           {tokenState === "invalid" && (
             <div className="text-center space-y-6">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full mx-auto">
@@ -255,7 +255,7 @@ export default function ResetPasswordPage({ params }: PageProps) {
             </div>
           )}
 
-          {/* ── Success State ── */}
+          {/* -- Success State -- */}
           {tokenState === "valid" && success && (
             <div className="text-center space-y-6">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full mx-auto">
@@ -319,7 +319,7 @@ export default function ResetPasswordPage({ params }: PageProps) {
             </div>
           )}
 
-          {/* ── Form State ── */}
+          {/* -- Form State -- */}
           {tokenState === "valid" && !success && (
             <>
               {/* Header */}

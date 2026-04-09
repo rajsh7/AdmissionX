@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import type { FAQData } from "@/app/api/college/[slug]/route";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 function stripHtml(html: string | null | undefined): string {
   if (!html) return "";
@@ -23,7 +23,7 @@ function highlight(text: string, query: string): string {
   return text; // plain text — no HTML injection; handled via CSS search highlight
 }
 
-// ─── Single FAQ Item ──────────────────────────────────────────────────────────
+// --- Single FAQ Item ----------------------------------------------------------
 
 interface FAQItemProps {
   faq: FAQData;
@@ -76,7 +76,7 @@ function FAQItem({ faq, index, isOpen, onToggle, searchQuery }: FAQItemProps) {
           : "border-neutral-100 hover:border-red-100"
       }`}
     >
-      {/* ── Question (trigger) ── */}
+      {/* -- Question (trigger) -- */}
       <button
         type="button"
         onClick={onToggle}
@@ -115,7 +115,7 @@ function FAQItem({ faq, index, isOpen, onToggle, searchQuery }: FAQItemProps) {
         </span>
       </button>
 
-      {/* ── Answer (collapsible) ── */}
+      {/* -- Answer (collapsible) -- */}
       <div
         className={`transition-all duration-300 ease-in-out ${
           isOpen ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0"
@@ -218,7 +218,7 @@ function FAQItem({ faq, index, isOpen, onToggle, searchQuery }: FAQItemProps) {
   );
 }
 
-// ─── Main Accordion Component ─────────────────────────────────────────────────
+// --- Main Accordion Component -------------------------------------------------
 
 interface FAQAccordionProps {
   faqs: FAQData[];
@@ -279,7 +279,7 @@ export default function FAQAccordion({ faqs, collegeName }: FAQAccordionProps) {
 
   return (
     <div className="space-y-4">
-      {/* ── Search + controls bar ── */}
+      {/* -- Search + controls bar -- */}
       <div className="bg-white rounded-2xl border border-neutral-100 p-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         {/* Search input */}
         <div className="relative flex-1">
@@ -320,7 +320,7 @@ export default function FAQAccordion({ faqs, collegeName }: FAQAccordionProps) {
         </div>
       </div>
 
-      {/* ── Results count (when searching) ── */}
+      {/* -- Results count (when searching) -- */}
       {searchQuery.trim() && (
         <div className="flex items-center gap-2 px-1">
           <span className="material-symbols-outlined text-[15px] text-neutral-400">
@@ -347,7 +347,7 @@ export default function FAQAccordion({ faqs, collegeName }: FAQAccordionProps) {
         </div>
       )}
 
-      {/* ── FAQ items ── */}
+      {/* -- FAQ items -- */}
       {filteredFaqs.length === 0 ? (
         <div className="bg-white rounded-2xl border border-neutral-100 p-12 flex flex-col items-center text-center">
           <div className="w-14 h-14 rounded-2xl bg-neutral-100 flex items-center justify-center mb-3">
@@ -384,7 +384,7 @@ export default function FAQAccordion({ faqs, collegeName }: FAQAccordionProps) {
         </div>
       )}
 
-      {/* ── Footer note ── */}
+      {/* -- Footer note -- */}
       <div className="flex items-center gap-2 px-1">
         <span className="material-symbols-outlined text-[14px] text-neutral-300">
           info

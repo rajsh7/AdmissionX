@@ -105,7 +105,7 @@ export default function QATab({ user, type }: Props) {
   return (
     <div className="space-y-6 max-w-4xl">
 
-      {/* ── Page header ── */}
+      {/* -- Page header -- */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 ${meta.bg} rounded-xl flex items-center justify-center`}>
@@ -135,7 +135,7 @@ export default function QATab({ user, type }: Props) {
         )}
       </div>
 
-      {/* ── Success toast ── */}
+      {/* -- Success toast -- */}
       {submitted && (
         <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
           <span
@@ -152,7 +152,7 @@ export default function QATab({ user, type }: Props) {
         </div>
       )}
 
-      {/* ── Coming Soon notice ── */}
+      {/* -- Coming Soon notice -- */}
       <div className="bg-gradient-to-r from-slate-50 to-green-50/40 border border-green-100 rounded-2xl p-5 flex items-start gap-4">
         <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
           <span
@@ -199,7 +199,7 @@ export default function QATab({ user, type }: Props) {
         </div>
       </div>
 
-      {/* ── Question / Review Form ── */}
+      {/* -- Question / Review Form -- */}
       {canSubmit && showForm && (
         <div className="bg-white rounded-2xl border border-green-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-50 bg-green-50/40">
@@ -371,7 +371,7 @@ export default function QATab({ user, type }: Props) {
         </div>
       )}
 
-      {/* ── Empty state ── */}
+      {/* -- Empty state -- */}
       {items.length === 0 && !showForm && (
         <div className="bg-white rounded-2xl border border-green-50 shadow-sm">
           <div className="flex flex-col items-center justify-center py-20 px-6 gap-4">

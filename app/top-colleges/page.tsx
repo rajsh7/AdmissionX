@@ -24,7 +24,7 @@ function buildImageUrl(raw: string | null | undefined): string | null {
   return `https://admin.admissionx.in/uploads/${raw}`;
 }
 
-// ── Filter data ───────────────────────────────────────────────────────────────
+// -- Filter data ---------------------------------------------------------------
 
 const getFilterData = unstable_cache(
   async () => {
@@ -83,7 +83,7 @@ const getFilterData = unstable_cache(
   { revalidate: 600 },
 );
 
-// ── Core fetch ────────────────────────────────────────────────────────────────
+// -- Core fetch ----------------------------------------------------------------
 
 async function fetchTopColleges(opts: {
   q: string; stream: string; degree: string; cityId: string;
@@ -215,7 +215,7 @@ const getCachedTopColleges = unstable_cache(
   { revalidate: 300 },
 );
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// -- Page ----------------------------------------------------------------------
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

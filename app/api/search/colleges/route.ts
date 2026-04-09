@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
   try {
     const db = await getDb();
 
-    // ── Resolve all filter IDs in parallel ──────────────────────────────────
+    // -- Resolve all filter IDs in parallel ----------------------------------
     const cityIntId = cityId ? (isNaN(parseInt(cityId)) ? null : parseInt(cityId)) : null;
 
     const [faDoc, degDoc] = await Promise.all([
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       degree ? db.collection("degree").findOne({ pageslug: degree }, { projection: { id: 1 } }) : null,
     ]);
 
-    // ── Resolve collegemaster IDs for stream/degree/fees in parallel ─────────
+    // -- Resolve collegemaster IDs for stream/degree/fees in parallel ---------
     const cmFilters: Promise<unknown[]>[] = [];
     if (faDoc?.id != null) cmFilters.push(
       db.collection("collegemaster").find({ functionalarea_id: faDoc.id }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
@@ -84,7 +84,7 @@ export async function GET(req: NextRequest) {
         : ids;
     }
 
-    // ── Build match ──────────────────────────────────────────────────────────
+    // -- Build match ----------------------------------------------------------
     const match: Record<string, unknown> = {};
     if (filteredIds) match.id = { $in: filteredIds };
     if (cityIntId) match.registeredAddressCityId = cityIntId;
@@ -92,7 +92,7 @@ export async function GET(req: NextRequest) {
     else if (type === "university") match.isTopUniversity = 1;
     else if (type === "abroad") match.registeredAddressCountryId = { $ne: 1 };
 
-    // ── Build aggregation pipeline ───────────────────────────────────────────
+    // -- Build aggregation pipeline -------------------------------------------
     const basePipeline: object[] = [
       { $match: match },
       { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
@@ -118,7 +118,7 @@ export async function GET(req: NextRequest) {
 
     basePipeline.push({ $sort: sortStage });
 
-    // ── Run count + data fetch in parallel, with enrichment inside pipeline ──
+    // -- Run count + data fetch in parallel, with enrichment inside pipeline --
     const [countResult, dataRows] = await Promise.all([
       db.collection("collegeprofile").aggregate([...basePipeline, { $count: "total" }]).toArray(),
       db.collection("collegeprofile").aggregate([

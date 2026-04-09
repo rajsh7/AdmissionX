@@ -12,7 +12,7 @@ import CostCalculator from "./components/CostCalculator";
 import JourneySteps from "./components/JourneySteps";
 import StudyAbroadFooter from "./components/StudyAbroadFooter";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface FilterOption {
   id: string | number;
@@ -59,7 +59,7 @@ interface CountRow {
   total: number;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_IMAGE =
@@ -134,7 +134,7 @@ function buildColleges(rows: CollegeRow[]): CollegeResult[] {
   });
 }
 
-// ─── Page-specific fetch (international colleges) ─────────────────────────────
+// --- Page-specific fetch (international colleges) -----------------------------
 
 async function fetchAbroadCollegesBase(opts: {
   stream: string;
@@ -262,7 +262,7 @@ const fetchAbroadColleges = unstable_cache(
   { revalidate: 300 }
 );
 
-// ─── Metadata ─────────────────────────────────────────────────────────────────
+// --- Metadata -----------------------------------------------------------------
 
 export const metadata: import("next").Metadata = {
   title: "Study Abroad — International Colleges & Universities | AdmissionX",

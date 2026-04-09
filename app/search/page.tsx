@@ -2,7 +2,7 @@ import pool from "@/lib/db";
 import SearchClient from "./SearchClient";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface FilterOption {
   id: string | number;
@@ -55,7 +55,7 @@ interface CountRow  {
   total: number;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_IMAGE =
@@ -131,7 +131,7 @@ function buildColleges(rows: CollegeRow[]): CollegeResult[] {
   });
 }
 
-// ─── Core DB fetch ────────────────────────────────────────────────────────────
+// --- Core DB fetch ------------------------------------------------------------
 
 async function fetchColleges(opts: {
   q: string;
@@ -279,7 +279,7 @@ async function fetchColleges(opts: {
   }
 }
 
-// ─── Page component ───────────────────────────────────────────────────────────
+// --- Page component -----------------------------------------------------------
 
 interface SearchPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -302,7 +302,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const page = Math.max(1, parseInt(getString("page", "1")));
   const limit = 12;
 
-  // ── Parallel: initial college results + filter options ─────────────────────
+  // -- Parallel: initial college results + filter options ---------------------
   const [{ colleges, total, totalPages }, streamRows, degreeRows, cityRows] =
     await Promise.all([
       // 1. College results
@@ -354,7 +354,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     `),
     ]);
 
-  // ── Build filter option lists ──────────────────────────────────────────────
+  // -- Build filter option lists ----------------------------------------------
   const streamOptions: FilterOption[] = streamRows.map((r) => ({
     id: r.id,
     name: r.name,
@@ -373,7 +373,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     name: r.name,
   }));
 
-  // ── Dynamic page title ─────────────────────────────────────────────────────
+  // -- Dynamic page title -----------------------------------------------------
   let pageTitle = "Search Colleges";
   let pageSubtitle = "Find and filter from thousands of colleges across India";
 

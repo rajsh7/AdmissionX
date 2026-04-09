@@ -2,7 +2,7 @@ import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import ExamListClient from "./ExamListClient";
 
-// ─── Server Actions ────────────────────────────────────────────────────────────
+// --- Server Actions ------------------------------------------------------------
 
 async function createExam(formData: FormData) {
   "use server";
@@ -98,7 +98,7 @@ async function deleteExam(id: number) {
   revalidatePath("/", "layout");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// --- Helpers ------------------------------------------------------------------
 
 const PAGE_SIZE = 25;
 
@@ -115,7 +115,7 @@ async function safeQuery<T >(
   }
 }
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface ExamRow  {
   id: number;
@@ -146,7 +146,7 @@ interface StatsRow  {
   inactive: number;
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// --- Page ---------------------------------------------------------------------
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };

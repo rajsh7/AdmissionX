@@ -20,7 +20,7 @@ import PaginationFixed from "@/app/components/PaginationFixed";
 import SearchBar from "@/app/components/SearchBar";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 interface FilterOption {
   id: string | number;
@@ -69,11 +69,11 @@ const SORT_OPTIONS = [
   { value: "newest", label: "Newest" },
 ];
 
-// ─── Search bar with typeahead ────────────────────────────────────────────────
+// --- Search bar with typeahead ------------------------------------------------
 
 
 
-// ─── Results skeleton ─────────────────────────────────────────────────────────
+// --- Results skeleton ---------------------------------------------------------
 
 function CollegeCardSkeleton() {
   return (
@@ -164,14 +164,14 @@ export default function SearchClient({
   const page = parseInt(searchParams.get("page") ?? String(initPage));
   const type = searchParams.get("type") ?? initType;
 
-  // ── Track whether we are on the very first mount ───────────────────────────
+  // -- Track whether we are on the very first mount ---------------------------
   // On initial mount the server has ALREADY rendered `initialColleges` for the
   // current URL params — there is nothing to fetch.  We only want the client-
   // side API call when the user actually changes a filter or page AFTER mount.
   const isMountedRef = useRef(false);
 
-  // ── Sync state when the server delivers fresh initialColleges after a
-  //    router.push() navigation (new SSR render completes) ───────────────────
+  // -- Sync state when the server delivers fresh initialColleges after a
+  //    router.push() navigation (new SSR render completes) -------------------
   useEffect(() => {
     setColleges(initialColleges);
     setTotal(initialTotal);
@@ -186,7 +186,7 @@ export default function SearchClient({
     }
   }, [isPending]);
 
-  // ── Handle search bar submit ───────────────────────────────────────────────
+  // -- Handle search bar submit -----------------------------------------------
   const handleSearch = useCallback(
     (newQ: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -264,10 +264,10 @@ export default function SearchClient({
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col min-h-screen">
-        {/* ── Main content ── */}
+        {/* -- Main content -- */}
         <div className="mx-auto max-w-[1920px] w-full px-8 lg:px-12 xl:px-20 pt-8 pb-8">
           <div className="flex gap-5">
-            {/* ── Filters sidebar ── */}
+            {/* -- Filters sidebar -- */}
             <div className="hidden lg:flex flex-col gap-6 flex-shrink-0 lg:sticky lg:top-28 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto lg:pr-2" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
               <SearchFilters
                 streams={streams}
@@ -287,9 +287,9 @@ export default function SearchClient({
 
             </div>
 
-            {/* ── Results column ── */}
+            {/* -- Results column -- */}
             <div className="flex-1 min-w-0">
-              {/* ── Results Toolbar (Figma Redesign) ── */}
+              {/* -- Results Toolbar (Figma Redesign) -- */}
               <div className="flex flex-col gap-5 mb-8">
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-1 pb-4 border-b border-neutral-100">
                   {/* Active Filters Row */}
@@ -392,7 +392,7 @@ export default function SearchClient({
                 </div>
               </div>
 
-              {/* ── College grid / list ── */}
+              {/* -- College grid / list -- */}
               {loading ? (
                 viewMode === "grid" ? (
                   <div className={`grid grid-cols-1 sm:grid-cols-2 ${gridCols === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-y-5 gap-x-[10px]`}>
@@ -408,7 +408,7 @@ export default function SearchClient({
                   </div>
                 )
               ) : colleges.length === 0 ? (
-                /* ── Empty state ── */
+                /* -- Empty state -- */
                 <div className="flex flex-col items-center justify-center py-24 text-center">
                   <div className="w-20 h-20 rounded-[10px] bg-neutral-100 flex items-center justify-center mb-5">
                     <span className="material-symbols-outlined text-[40px] text-neutral-300">
@@ -459,7 +459,7 @@ export default function SearchClient({
                 </div>
               )}
 
-              {/* ── Pagination ── */}
+              {/* -- Pagination -- */}
               {!loading && totalPages > 1 && (
                 <div className="mt-10">
                   <PaginationFixed
