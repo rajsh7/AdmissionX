@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import SearchClient from "@/app/search/SearchClient";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
-export const dynamic = 'force-dynamic';
+// Remove force-dynamic so unstable_cache works properly
 export const revalidate = 300;
 
 interface FilterOption {

@@ -326,7 +326,10 @@ export default function Header({ theme }: HeaderProps) {
                 <div key={link.label} className="relative group/nav">
                   <Link
                     href={link.href}
-                    className="flex items-center gap-1.5 px-4 py-2 text-[16px] font-medium transition-colors relative text-slate-700 hover:text-primary"
+                    prefetch={true}
+                    className={`flex items-center gap-1.5 px-4 py-2 text-[16px] font-medium transition-colors relative ${
+                      showActiveState ? "text-slate-700 hover:text-primary" : "text-white hover:text-white/80"
+                    }`}
                   >
                     {link.label}
                     {link.subItems && mounted && (
@@ -343,6 +346,7 @@ export default function Header({ theme }: HeaderProps) {
                           <Link
                             key={sub.label}
                             href={sub.href}
+                            prefetch={true}
                             className="flex items-center gap-3 px-4 py-2.5 text-[16px] font-normal text-slate-600 hover:bg-primary/5 hover:text-primary transition-colors"
                           >
                             {mounted && (

@@ -7,6 +7,9 @@ import { existsSync } from "fs";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+// Cache proxy responses for 7 days
+export const revalidate = 604800;
+
 // Proxy images from admin.admissionx.in which has an SSL SNI issue
 // AND serve local /uploads images dynamically to bypass dev server 404s.
 
@@ -35,7 +38,7 @@ export async function GET(req: NextRequest) {
       return new NextResponse(file as any, {
         headers: {
           "Content-Type": contentType,
-          "Cache-Control": "public, max-age=86400",
+          "Cache-Control": "public, max-age=604800, stale-while-revalidate=2592000, immutable",
         },
       });
     } catch (error) {
@@ -83,7 +86,7 @@ export async function GET(req: NextRequest) {
     return new NextResponse(buffer as any, {
       headers: {
         "Content-Type": contentType,
-        "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+        "Cache-Control": "public, max-age=604800, stale-while-revalidate=2592000",
       },
     });
   } catch (error) {

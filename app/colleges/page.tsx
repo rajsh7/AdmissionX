@@ -1,11 +1,12 @@
 import { getDb } from "@/lib/db";
+import { unstable_cache } from "next/cache";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CollegeListItem from "../components/CollegeListItem";
 import CollegeSearch from "./CollegeSearch";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=600";
@@ -21,21 +22,11 @@ function slugToName(slug: string): string {
   return slug.replace(/-\d+$/, "").split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 }
 
-export default async function CollegesPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const params = await searchParams;
-  const qRaw = params?.q;
-  const qStr = Array.isArray(qRaw) ? qRaw[0] : (qRaw || "");
-  const q = qStr.trim();
-  const db = await getDb();
-
-  let colleges: CollegeResult[] = [];
-  try {
+const getDefaultColleges = unstable_cache(
+  async () => {
+    const db = await getDb();
     const rows = await db.collection("collegeprofile").aggregate([
-      { $match: q.length >= 2 ? { $or: [{ slug: { $regex: q, $options: "i" } }, { registeredSortAddress: { $regex: q, $options: "i" } }] } : {} },
+      { $match: {} },
       { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
       { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
       { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "c" } },
@@ -46,13 +37,46 @@ export default async function CollegesPage({
       { $project: {
         id: 1, slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, ranking: 1,
         isTopUniversity: 1, topUniversityRank: 1, universityType: 1, estyear: 1, verified: 1, totalStudent: 1,
-        registeredSortAddress: 1,
-        name: "$u.firstname",
-        city_name: "$c.name",
-        state_id: "$c.state_id",
-        cm: 1,
+        registeredSortAddress: 1, name: "$u.firstname", city_name: "$c.name", state_id: "$c.state_id", cm: 1,
       }},
     ]).toArray();
+    return rows;
+  },
+  ["colleges-default-v1"],
+  { revalidate: 300 },
+);
+
+export default async function CollegesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const params = await searchParams;
+  const qRaw = params?.q;
+  const qStr = Array.isArray(qRaw) ? qRaw[0] : (qRaw || "");
+  const q = qStr.trim();
+
+  let colleges: CollegeResult[] = [];
+  try {
+    // Use cache for default load; bypass for search queries
+    const db = await getDb();
+    const rows = q.length >= 2
+      ? await db.collection("collegeprofile").aggregate([
+          { $match: { $or: [{ slug: { $regex: q, $options: "i" } }, { registeredSortAddress: { $regex: q, $options: "i" } }] } },
+          { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
+          { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
+          { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "c" } },
+          { $unwind: { path: "$c", preserveNullAndEmptyArrays: true } },
+          { $lookup: { from: "collegemaster", localField: "id", foreignField: "collegeprofile_id", as: "cm" } },
+          { $sort: { rating: -1, totalRatingUser: -1 } },
+          { $limit: 20 },
+          { $project: {
+            id: 1, slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, ranking: 1,
+            isTopUniversity: 1, topUniversityRank: 1, universityType: 1, estyear: 1, verified: 1, totalStudent: 1,
+            registeredSortAddress: 1, name: "$u.firstname", city_name: "$c.name", state_id: "$c.state_id", cm: 1,
+          }},
+        ]).toArray()
+      : await getDefaultColleges();
 
     colleges = rows.map((row) => {
       const streams = [...new Set((row.cm || []).map((m: Record<string, unknown>) => m.functionalarea_name).filter(Boolean))] as string[];
@@ -83,7 +107,7 @@ export default async function CollegesPage({
     console.error("Colleges page DB error:", err);
   }
 
-    return (
+  return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-display">
       <Header />
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-8 mt-16">

@@ -25,8 +25,8 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "5mb",
     },
     staleTimes: {
-      dynamic: 0,  // dynamic routes: no extra client-side staleness
-      static: 300, // statically cached routes: serve from cache for 5 min
+      dynamic: 30,  // cache dynamic pages in router for 30s — avoids re-fetch on back/forward
+      static: 300,  // statically cached routes: serve from cache for 5 min
     },
     optimizePackageImports: ["framer-motion"],
   },

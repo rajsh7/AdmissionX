@@ -1,39 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-const Header = dynamic(() => import("./components/Header"), { ssr: false });
+import Header from "./components/Header";
 import HeroSection from "./components/HeroSection";
 import FieldsOfStudy from "./components/FieldsOfStudy";
 import TopUniversities from "./components/TopUniversities";
 import TopCourse from "./components/TopCourse";
-import type { FilterCollegeResult } from "@/lib/college-filter";
-import type { AdItem } from "./components/AdsSection";
-import HomeTicker from "./components/HomeTicker";
-import type { TickerAdItem } from "./components/HomeTicker";
-
-// Below-the-fold components loaded lazily – they won't block the first paint
-const EntranceExams = dynamic(() => import("./components/EntranceExams"), {
-  ssr: true,
-});
-const NewsSection = dynamic(() => import("./components/NewsSection"), {
-  ssr: true,
-});
-import ContactSection from "./components/ContactSection";
 import StatsBar from "./components/StatsBar";
 import CareerGuidance from "./components/CareerGuidance";
 import Testimonials from "./components/Testimonials";
-
-const Footer = dynamic(() => import("./components/Footer"), { ssr: true });
-
-const AuthModal = dynamic(() => import("./components/AuthModal"), {
-  ssr: false,
-});
-
+import ContactSection from "./components/ContactSection";
+import HomeTicker from "./components/HomeTicker";
+import type { FilterCollegeResult } from "@/lib/college-filter";
+import type { AdItem } from "./components/AdsSection";
+import type { TickerAdItem } from "./components/HomeTicker";
 import type { University } from "./components/TopUniversities";
 import type { DbBlog } from "./api/home/latest-blogs/route";
 import type { DbExam } from "./api/home/exams/route";
 import type { HomeStat } from "./api/home/stats/route";
+
+// Heavy below-the-fold components — lazy loaded after first paint
+const NewsSection  = dynamic(() => import("./components/NewsSection"),  { ssr: true });
+const Footer       = dynamic(() => import("./components/Footer"),       { ssr: true });
+// AuthModal is client-only (uses portals/browser APIs) — rendered after mount only
+const AuthModal    = dynamic(() => import("./components/AuthModal"),    { ssr: false });
 
 interface HomePageClientProps {
   universities: University[];
@@ -57,34 +48,29 @@ export default function HomePageClient({
   tickerAds,
 }: HomePageClientProps) {
   const [authModal, setAuthModal] = useState<"login" | "register" | null>(null);
+  // Only render AuthModal after hydration to avoid SSR mismatch
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
-  const closeModal = () => setAuthModal(null);
-  const switchMode = (mode: "login" | "register") => setAuthModal(mode);
+  const closeModal  = () => setAuthModal(null);
+  const switchMode  = (mode: "login" | "register") => setAuthModal(mode);
 
   return (
     <div className="min-h-screen bg-white text-slate-900 selection:bg-primary selection:text-white">
-      {/* Auth Modal – only rendered when user clicks login */}
-      {authModal && (
-        <AuthModal
-          mode={authModal}
-          onClose={closeModal}
-          onSwitchMode={switchMode}
-        />
+      {/* AuthModal — only after hydration, never on server */}
+      {mounted && authModal && (
+        <AuthModal mode={authModal} onClose={closeModal} onSwitchMode={switchMode} />
       )}
 
-      {/* Floating Header */}
       <Header />
 
       <main>
-        {/* 1. Hero Section */}
         <HeroSection />
 
-        {/* 2. Stats Bar */}
         <div data-gsap="fade-up">
           <StatsBar />
         </div>
 
-        {/* 3. Discover the Top Universities */}
         <div data-gsap="fade-up">
           <TopUniversities
             universities={universities}
@@ -92,47 +78,34 @@ export default function HomePageClient({
           />
         </div>
 
-        {/* 3b. Ticker Ad Strip — controlled from Admin > Ads Management (position: home_ticker) */}
         <HomeTicker ads={tickerAds} />
 
-        {/* 4. Discover the Top Course */}
         <div data-gsap="fade-up">
           <TopCourse />
         </div>
 
-        {/* 5. Career Guidance */}
         <div data-gsap="fade-up">
           <CareerGuidance />
         </div>
 
-        {/* 6. Article Grid (Updated FieldsOfStudy) */}
         <div data-gsap="fade-up">
           <FieldsOfStudy />
         </div>
 
-        {/* 7. Student Life & Beyond (Blogs) */}
         <div data-gsap="fade-up">
           <NewsSection dbBlogs={dbBlogs} />
         </div>
 
-        {/* 8. Unfiltered Student Voices */}
         <div data-gsap="fade-up">
           <Testimonials />
         </div>
 
-        {/* 9. Get in Touch */}
         <div data-gsap="fade-up">
           <ContactSection />
         </div>
       </main>
 
-      {/* Footer */}
       <Footer />
-
     </div>
   );
 }
-
-
-
-
