@@ -8,9 +8,9 @@ import { signStudentToken, STUDENT_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, phone, password, dob, marks12, captchaOk } = body;
+    const { name, email, phone, password, captchaOk } = body;
 
-    if (!name || !email || !phone || !password || !dob || !marks12) {
+    if (!name || !email || !phone || !password) {
       return NextResponse.json({ error: "All fields are required." }, { status: 400 });
     }
     if (!captchaOk) {
@@ -39,8 +39,6 @@ export async function POST(req: NextRequest) {
       name: name.trim(),
       email: emailLower,
       phone: phone.trim(),
-      dob,
-      marks12: parseFloat(marks12),
       password_hash: hashed,
       is_active: 0,
       activation_token: activationToken,
