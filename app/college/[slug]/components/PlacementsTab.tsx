@@ -34,79 +34,82 @@ export default function PlacementsTab({
   ];
 
   return (
-    <div className="w-full bg-white pb-24">
-      {/* --- PHASE 1: PLACEMENT STATS BANNER --- */}
-      <section className="relative w-full overflow-hidden">
-        {/* Background with Darkened Image */}
-        <div className="absolute inset-0 z-0 h-[450px]">
-          {mosaicImage && (
-            <Image 
-              src={mosaicImage} 
-              alt="Placement Context" 
-              fill 
-              className="object-cover blur-[2px]" 
-            />
-          )}
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-[1px]" />
-        </div>
-
-        <div className="relative z-10 max-w-[1920px] mx-auto px-8 lg:px-12 xl:px-20 py-16 lg:py-24">
-          <div className="flex flex-col gap-10">
-            {/* Title & Location */}
-            <div className="animate-in fade-in slide-in-from-left duration-700">
-              <h2 className="text-3xl lg:text-5xl font-black text-white leading-tight">
-                India&apos;s biggest university,<br />
-                <span className="text-[#FF3C3C]">{collegeName}</span>
-              </h2>
-              <div className="mt-4 flex items-center gap-2 bg-slate-800/50 backdrop-blur-sm self-start px-4 py-2 rounded-full border border-white/10">
-                <span className="material-symbols-rounded text-white text-xl">location_on</span>
-                <span className="text-sm font-bold text-white/90 uppercase tracking-widest">{location}</span>
-              </div>
-            </div>
-
-            {/* Placement Stats Grid (4 Columns) */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 max-w-5xl animate-in fade-in slide-in-from-bottom duration-700 delay-200">
-              <div className="bg-white rounded-xl p-6 lg:p-8 flex flex-col items-start shadow-2xl border border-neutral-100 transition-transform hover:scale-[1.02]">
-                <span className="text-2xl lg:text-3xl font-black text-slate-900 leading-none">{placementRatio}</span>
-                <span className="text-xs lg:text-sm text-slate-500 font-bold mt-2 uppercase tracking-wide">Placement Ratio</span>
-              </div>
-              <div className="bg-white rounded-xl p-6 lg:p-8 flex flex-col items-start shadow-2xl border border-neutral-100 transition-transform hover:scale-[1.02]">
-                <span className="text-2xl lg:text-3xl font-black text-slate-900 leading-none">{avgPackage}</span>
-                <span className="text-xs lg:text-sm text-slate-500 font-bold mt-2 uppercase tracking-wide">Average Package</span>
-              </div>
-              <div className="bg-white rounded-xl p-6 lg:p-8 flex flex-col items-start shadow-2xl border border-neutral-100 transition-transform hover:scale-[1.02]">
-                <span className="text-2xl lg:text-3xl font-black text-slate-900 leading-none">{highPackage}</span>
-                <span className="text-xs lg:text-sm text-slate-500 font-bold mt-2 uppercase tracking-wide">Highest Package</span>
-              </div>
-              <div className="bg-white rounded-xl p-6 lg:p-8 flex flex-col items-start shadow-2xl border border-neutral-100 transition-transform hover:scale-[1.02]">
-                <span className="text-2xl lg:text-3xl font-black text-slate-900 leading-none">{recruitersCount}</span>
-                <span className="text-xs lg:text-sm text-slate-500 font-bold mt-2 uppercase tracking-wide">Recruiters</span>
-              </div>
-            </div>
-            
-            <div className="mt-4">
-              <button className="px-10 py-4 bg-[#FF3C3C] text-white font-black text-sm uppercase tracking-widest rounded-md shadow-lg shadow-red-500/20 transition-all hover:scale-105 active:scale-95">
-                Download Placement Report 2025
-              </button>
-            </div>
+    <div className="w-full bg-white pt-10 pb-24">
+      {/* --- PHASE 1: UNIFIED PLACEMENTS CARD --- */}
+      <div className="w-full px-4 md:px-10 lg:px-12 mx-auto max-w-[1920px]">
+        <div className="bg-white rounded-[5px] shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] overflow-hidden border border-neutral-100 mt-8 relative">
+          {/* Unified Background Image & Overlay */}
+          <div className="absolute inset-0 z-0">
+            {mosaicImage && (
+              <Image 
+                src={mosaicImage} 
+                alt="Placement Background" 
+                fill 
+                className="object-cover opacity-100" 
+                priority
+              />
+            )}
+            <div className="absolute inset-0 bg-black/75 backdrop-blur-[1px]" />
           </div>
-        </div>
-      </section>
+          
+          <div className="relative z-10 w-full">
+            {/* Top: Stats Header (Transparent) */}
+            <section className="relative w-full overflow-hidden py-12 lg:py-16 flex flex-col justify-center">
+              <div className="w-full px-6 md:px-10 lg:px-12">
+                <div className="flex flex-col gap-10">
+                  {/* Title & Location */}
+                  <div className="animate-in fade-in slide-in-from-left duration-700">
+                    <h2 className="text-[24px] font-bold leading-tight" style={{ color: 'rgba(255, 255, 255, 1)' }}>
+                      India&apos;s biggest university,<br />
+                      {collegeName}
+                    </h2>
+                    <div className="mt-4 flex items-center gap-2 bg-slate-800/50 backdrop-blur-sm self-start px-4 py-2 rounded-[5px] border border-white/10">
+                      <span className="material-symbols-rounded text-white text-xl">location_on</span>
+                      <span className="text-sm font-bold text-white/90 uppercase tracking-widest">{location}</span>
+                    </div>
+                  </div>
 
-      {/* --- PHASE 2: TOP RECRUITERS GRID --- */}
-      <section className="py-24">
-        <div className="max-w-[1920px] mx-auto px-8 lg:px-12 xl:px-20">
-          <div className="bg-white rounded-3xl border border-neutral-100 shadow-2xl shadow-slate-200/50 overflow-hidden">
-            <div className="border-b border-neutral-50 px-10 py-8 flex justify-between items-center text-slate-900">
-              <h3 className="text-2xl lg:text-3xl font-black tracking-tight">Top Recruiters 2025</h3>
-              <div className="h-1 lg:w-32 bg-[#FF3C3C] rounded-full hidden sm:block" />
-            </div>
-            
-            <div className="p-10 lg:p-16">
+                  {/* Placement Stats Grid */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 max-w-5xl animate-in fade-in slide-in-from-bottom duration-700 delay-200">
+                    <div className="bg-white rounded-[5px] p-6 lg:p-8 flex flex-col items-start shadow-xl border border-neutral-100 transition-transform hover:-translate-y-1">
+                      <span className="text-[24px] font-semibold leading-none" style={{ color: 'rgba(62, 62, 62, 1)' }}>{placementRatio}</span>
+                      <span className="text-[18px] font-semibold mt-1.5 leading-tight" style={{ color: 'rgba(62, 62, 62, 1)' }}>Placement Ratio</span>
+                    </div>
+                    <div className="bg-white rounded-[5px] p-6 lg:p-8 flex flex-col items-start shadow-xl border border-neutral-100 transition-transform hover:-translate-y-1">
+                      <span className="text-[24px] font-semibold leading-none" style={{ color: 'rgba(62, 62, 62, 1)' }}>{avgPackage}</span>
+                      <span className="text-[18px] font-semibold mt-1.5 leading-tight" style={{ color: 'rgba(62, 62, 62, 1)' }}>Average Package</span>
+                    </div>
+                    <div className="bg-white rounded-[5px] p-6 lg:p-8 flex flex-col items-start shadow-xl border border-neutral-100 transition-transform hover:-translate-y-1">
+                      <span className="text-[24px] font-semibold leading-none" style={{ color: 'rgba(62, 62, 62, 1)' }}>{highPackage}</span>
+                      <span className="text-[18px] font-semibold mt-1.5 leading-tight" style={{ color: 'rgba(62, 62, 62, 1)' }}>Highest Package</span>
+                    </div>
+                    <div className="bg-white rounded-[5px] p-6 lg:p-8 flex flex-col items-start shadow-xl border border-neutral-100 transition-transform hover:-translate-y-1">
+                      <span className="text-[24px] font-semibold leading-none" style={{ color: 'rgba(62, 62, 62, 1)' }}>{recruitersCount}</span>
+                      <span className="text-[18px] font-semibold mt-1.5 leading-tight" style={{ color: 'rgba(62, 62, 62, 1)' }}>Recruiters</span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <button className="px-10 py-3 bg-[#FF3C3C] text-white font-black text-sm uppercase tracking-widest rounded-[5px] shadow-lg shadow-red-500/20 transition-all hover:bg-red-700">
+                      Download Placement Report 2025
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Bottom: Top Recruiters Inside Card */}
+            <div className="px-6 md:px-10 lg:px-12 pb-16 lg:pb-24">
+              <section className="bg-white rounded-[5px] shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] p-10 lg:p-16 border border-neutral-100 relative z-30">
+              <div className="border-b border-neutral-200 pb-8 mb-12 flex justify-between items-center text-slate-900">
+                <h3 className="text-3xl lg:text-4xl font-bold tracking-tight">Top Recruiters 2025</h3>
+                <div className="h-1 lg:w-32 bg-[#FF3C3C] rounded-full hidden sm:block" />
+              </div>
+              
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
                 {topRecruiters.map((recruiter, idx) => (
-                  <div key={idx} className="group border border-neutral-50 rounded-2xl flex flex-col items-center justify-center p-8 transition-all duration-300 hover:border-[#FF3C3C]/30 hover:shadow-xl hover:shadow-[#FF3C3C]/5 h-32 lg:h-40 relative">
-                    <div className="relative w-full h-12 lg:h-16 flex items-center justify-center grayscale transition-all duration-500 group-hover:grayscale-0 group-hover:scale-110">
+                  <div key={idx} className="group bg-white rounded-[5px] flex flex-col items-center justify-center p-8 transition-all duration-500 shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] hover:shadow-[0_25px_80px_-20px_rgba(0,0,0,0.3)] border border-neutral-100 h-32 lg:h-40 relative hover:-translate-y-2">
+                    <div className="relative w-full h-12 lg:h-16 flex items-center justify-center transition-all duration-500 group-hover:scale-110">
                       <Image 
                         src={recruiter.logo} 
                         alt={recruiter.name} 
@@ -115,7 +118,6 @@ export default function PlacementsTab({
                         unoptimized
                       />
                     </div>
-                    {/* Tooltip or Label on Hover */}
                     <div className="absolute bottom-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <span className="text-[10px] font-black text-[#FF3C3C] uppercase tracking-widest">{recruiter.name}</span>
                     </div>
@@ -123,17 +125,18 @@ export default function PlacementsTab({
                 ))}
               </div>
               
-              {/* Decorative Footer */}
-              <div className="mt-16 pt-10 border-t border-neutral-50 flex flex-col md:flex-row justify-between items-center gap-8">
+              {/* Joined Status */}
+              <div className="mt-16 pt-10 border-t border-neutral-100 flex flex-col md:flex-row justify-between items-center gap-8">
                 <p className="text-slate-500 font-bold text-sm">Join the 10,000+ graduates placed at top Fortune 500 companies.</p>
-                <button className="px-8 py-3 rounded-full bg-slate-900 text-white font-black text-xs uppercase tracking-widest transition-all hover:bg-[#FF3C3C]">
+                <button className="px-10 py-3 rounded-[5px] bg-slate-900 text-white font-black text-xs uppercase tracking-widest transition-all hover:bg-[#FF3C3C]">
                   View All Companies
                 </button>
               </div>
-            </div>
+            </section>
           </div>
         </div>
-      </section>
+      </div>
     </div>
+  </div>
   );
 }

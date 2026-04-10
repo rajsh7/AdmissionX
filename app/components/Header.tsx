@@ -331,9 +331,7 @@ export default function Header({ theme }: HeaderProps) {
                   <Link
                     href={link.href}
                     prefetch={true}
-                    className={`flex items-center gap-1.5 px-4 py-2 text-[16px] font-medium transition-colors relative ${
-                      showActiveState ? "text-slate-700 hover:text-primary" : "text-white hover:text-white/80"
-                    }`}
+                    className={`flex items-center gap-1.5 px-4 py-2 text-[16px] font-medium transition-colors relative text-slate-700 hover:text-primary`}
                   >
                     {link.label}
                     {link.subItems && mounted && (

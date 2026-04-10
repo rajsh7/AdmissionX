@@ -302,7 +302,10 @@ export default async function Page() {
       streamCounts={streamCounts}
       initialStreamColleges={initialStreamColleges}
       ads={adRows}
+      partnerAds={[]}
+      featuredAds={[]}
       tickerAds={tickerAdRows}
+      testimonials={[]}
     />
   );
 }

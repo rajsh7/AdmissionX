@@ -126,10 +126,9 @@ export default async function CollegeOverviewPage({
   ];
 
   const stats = [
-    { value: totalStudentDisplay, label: "Total students" },
+    { value: totalStudentDisplay, label: "Total student" },
     { value: courseDisplay, label: "Courses offered" },
-    { value: avgCTCDisplay, label: "Average package" },
-    { value: "2025", label: "Placement year" },
+    { value: avgCTCDisplay, label: "2025 Placement" },
   ];
 
   return (

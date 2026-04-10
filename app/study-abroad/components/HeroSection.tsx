@@ -1,11 +1,50 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+
+const ALL_COUNTRIES = [
+  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia",
+  "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Belarus", "Belgium", "Belize",
+  "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei",
+  "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Chad", "Chile",
+  "China", "Colombia", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic",
+  "Denmark", "Djibouti", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Estonia",
+  "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Georgia", "Germany", "Ghana", "Greece",
+  "Guatemala", "Guinea", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia",
+  "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan",
+  "Kenya", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Libya", "Liechtenstein",
+  "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta",
+  "Mauritius", "Mexico", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique",
+  "Myanmar", "Namibia", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria",
+  "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Panama", "Paraguay", "Peru",
+  "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saudi Arabia",
+  "Senegal", "Serbia", "Singapore", "Slovakia", "Slovenia", "Somalia", "South Africa",
+  "South Korea", "Spain", "Sri Lanka", "Sudan", "Sweden", "Switzerland", "Syria", "Taiwan",
+  "Tajikistan", "Tanzania", "Thailand", "Tunisia", "Turkey", "Turkmenistan", "Uganda", "Ukraine",
+  "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan",
+  "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe",
+];
 
 export default function HeroSection() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("Any Country");
+  const [countrySearch, setCountrySearch] = useState("");
+  const [isCountryOpen, setIsCountryOpen] = useState(false);
+  const countryRef = useRef<HTMLDivElement>(null);
+
+  const filteredCountries = countrySearch.trim()
+    ? ALL_COUNTRIES.filter((c) => c.toLowerCase().includes(countrySearch.toLowerCase()))
+    : ALL_COUNTRIES;
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (countryRef.current && !countryRef.current.contains(e.target as Node))
+        setIsCountryOpen(false);
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24" };
 
@@ -97,24 +136,65 @@ export default function HeroSection() {
             </div>
 
             {/* Country Dropdown */}
-            <div className="w-full lg:w-[280px] relative">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2">
+            <div ref={countryRef} className="w-full lg:w-[280px] relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
                 <span className="material-symbols-rounded text-[#FF3C3C] text-[22px]" style={ICO_FILL}>location_on</span>
               </div>
-              <select 
-                className="w-full pl-12 pr-10 h-14 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all font-bold text-slate-600 appearance-none cursor-pointer"
-                value={selectedCountry}
-                onChange={(e) => setSelectedCountry(e.target.value)}
+              <button
+                type="button"
+                onClick={() => { setIsCountryOpen(!isCountryOpen); setCountrySearch(""); }}
+                className="w-full pl-12 pr-10 h-14 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all font-bold text-slate-600 text-left cursor-pointer"
               >
-                 <option>Any Country</option>
-                 <option>United States</option>
-                 <option>United Kingdom</option>
-                 <option>Canada</option>
-                 <option>Australia</option>
-              </select>
+                {selectedCountry}
+              </button>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                <span className="material-symbols-rounded text-slate-400">expand_more</span>
+                <span className="material-symbols-rounded text-slate-400">{isCountryOpen ? "expand_less" : "expand_more"}</span>
               </div>
+
+              {isCountryOpen && (
+                <div className="absolute bottom-full left-0 w-full mb-2 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 overflow-hidden">
+                  {/* Search inside dropdown */}
+                  <div className="p-2 border-b border-slate-100">
+                    <input
+                      autoFocus
+                      type="text"
+                      placeholder="Search country..."
+                      value={countrySearch}
+                      onChange={(e) => setCountrySearch(e.target.value)}
+                      className="w-full px-3 py-2 text-sm text-slate-700 placeholder:text-slate-300 bg-slate-50 rounded-lg outline-none font-medium"
+                    />
+                  </div>
+                  <ul className="max-h-40 overflow-y-auto">
+                    <li>
+                      <button
+                        type="button"
+                        onClick={() => { setSelectedCountry("Any Country"); setIsCountryOpen(false); }}
+                        className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition-colors ${
+                          selectedCountry === "Any Country" ? "text-[#FF3C3C]" : "text-slate-600"
+                        }`}
+                      >
+                        Any Country
+                      </button>
+                    </li>
+                    {filteredCountries.map((country) => (
+                      <li key={country}>
+                        <button
+                          type="button"
+                          onClick={() => { setSelectedCountry(country); setIsCountryOpen(false); }}
+                          className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition-colors ${
+                            selectedCountry === country ? "text-[#FF3C3C]" : "text-slate-600"
+                          }`}
+                        >
+                          {country}
+                        </button>
+                      </li>
+                    ))}
+                    {filteredCountries.length === 0 && (
+                      <li className="px-4 py-3 text-sm text-slate-400 text-center">No countries found</li>
+                    )}
+                  </ul>
+                </div>
+              )}
             </div>
 
             {/* Main Search Button */}

@@ -31,26 +31,27 @@ export default function CollegeTabs({ slug, counts = {} }: CollegeTabsProps) {
   const base = `/college/${slug}`;
 
   return (
-    <div className="sticky top-16 z-40 bg-white w-full shadow-sm" style={{ borderBottom: "2px solid #e5e7eb" }}>
-      <div className="w-full px-6 md:px-12 lg:px-16">
-        <nav className="flex items-center overflow-x-auto hide-scrollbar">
-          {TABS.map((tab) => {
+    <div className="sticky top-[58px] z-40 w-full px-6 md:px-16 lg:px-24 mx-auto max-w-[1920px] -mt-[26px]">
+      <div className="w-full">
+        <nav className="flex items-center h-[52px] overflow-x-auto hide-scrollbar shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] bg-white border border-[#d1d5db] rounded-[5px] overflow-hidden w-full">
+          <div className="flex w-full h-full justify-between sm:justify-start">
+            {TABS.map((tab) => {
             const href = `${base}${tab.href}`;
             const isActive = tab.href === "" ? pathname === base : pathname === href || pathname.startsWith(href + "/");
             return (
               <Link key={tab.label} href={href}
-                className="relative flex-shrink-0 px-5 md:px-6 py-4 text-sm font-semibold whitespace-nowrap transition-colors duration-150"
+                className="flex items-center h-full px-6 md:px-10 text-sm font-bold transition-colors whitespace-nowrap border-r border-[#d1d5db] last:border-r-0"
                 style={{
-                  color: isActive ? "#FF3C3C" : "#6b7280",
-                  borderBottom: isActive ? "2.5px solid #FF3C3C" : "2.5px solid transparent",
-                  marginBottom: "-2px",
+                  background: isActive ? "linear-gradient(135deg, #F6A1A1 0%, #E87B7B 100%)" : "transparent",
+                  color: isActive ? "#A72A2A" : "#C44141",
                 }}
               >
                 {tab.label}
               </Link>
             );
           })}
-        </nav>
+        </div>
+      </nav>
       </div>
     </div>
   );

@@ -231,7 +231,7 @@ export default function SearchClient({
         </div>
         <div className="relative z-10 w-full h-full flex flex-col">
           <div className="flex-1 flex items-center justify-start relative">
-            <div className="mx-auto max-w-[1920px] w-full px-8 lg:px-12 xl:px-20 h-full relative">
+            <div className="mx-auto max-w-[1920px] w-full px-4 md:px-8 lg:px-10 h-full relative">
               <div className="flex flex-col justify-center h-full relative z-20">
                 <div className={`transition-opacity duration-300 mt-6 flex flex-col justify-center ${heroRightImage ? "lg:max-w-[55%] text-left" : "max-w-4xl text-left"} ${hasMounted ? "opacity-100" : "opacity-0"}`}>
                   <h1 className="font-poppins text-white leading-[1.05] tracking-[0.02em] mb-4 drop-shadow-2xl">
@@ -267,7 +267,7 @@ export default function SearchClient({
 
       <div className="relative z-10 flex-1 flex flex-col min-h-screen">
         {/* -- Main content -- */}
-        <div className="mx-auto max-w-[1920px] w-full px-8 lg:px-12 xl:px-20 pt-8 pb-8">
+        <div className="mx-auto max-w-[1920px] w-full px-4 md:px-8 lg:px-10 pt-8 pb-8">
           <div className="flex gap-5">
             {/* -- Filters sidebar -- */}
             <div className="hidden lg:flex flex-col gap-6 flex-shrink-0 lg:sticky lg:top-28 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto lg:pr-2" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>

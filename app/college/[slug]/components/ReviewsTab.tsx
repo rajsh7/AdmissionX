@@ -37,27 +37,27 @@ export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {
 
   return (
     <div className="w-full bg-[#f8fafc] pb-24">
-      <div className="max-w-[1920px] mx-auto px-8 lg:px-12 xl:px-20 py-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      <div className="max-w-[1920px] mx-auto px-4 md:px-10 lg:px-12 py-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
 
         {/* --- PHASE 1: LEFT SIDEBAR (RATING SUMMARY) --- */}
         <aside className="lg:col-span-4 space-y-8">
 
           {/* Overall Rating Card */}
-          <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-8 border border-neutral-100">
+          <div className="bg-white rounded-[5px] shadow-[0_20px_80px_-10px_rgba(0,0,0,0.25)] pl-4 md:pl-6 pr-8 py-8 border border-neutral-100">
             <h4 className="text-slate-900 font-black text-sm uppercase tracking-widest mb-6 flex items-center gap-2">
               <span className="w-2 h-2 bg-[#FF3C3C] rounded-full" />
               Overall Rating
             </h4>
 
             <div className="flex items-center gap-6 mb-8">
-              <div className="text-6xl font-black text-slate-900 leading-none tracking-tighter">4.8</div>
+              <div className="text-[40px] font-bold leading-none tracking-tighter" style={{ color: 'rgba(62, 62, 62, 1)' }}>4.8</div>
               <div className="flex flex-col gap-1">
                 <div className="flex text-[#FF3C3C] text-xl">
                   {Array.from({ length: 5 }).map((_, idx) => (
                     <span key={idx} className="material-symbols-rounded fill-1">star</span>
                   ))}
                 </div>
-                <span className="text-[11px] text-slate-400 font-black uppercase tracking-wider">Based on 5,249 reviews</span>
+                <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Based on 5,249 reviews</span>
               </div>
             </div>
 
@@ -66,9 +66,9 @@ export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {
               {ratingStats.map((stat, idx) => (
                 <div key={idx} className="flex items-center gap-4">
                   <span className="text-xs font-black text-slate-500 w-12">{stat.star} Stars</span>
-                  <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-slate-100 rounded-[5px] overflow-hidden">
                     <div
-                      className="h-full bg-[#FF3C3C] rounded-full"
+                      className="h-full bg-[#FF3C3C] rounded-[5px]"
                       style={{ width: `${stat.pct}%` }}
                     />
                   </div>
@@ -79,24 +79,21 @@ export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {
           </div>
 
           {/* Satisfaction Stats Card */}
-          <div className="bg-slate-900 rounded-2xl shadow-2xl p-8 text-white relative overflow-hidden">
-            {/* Decorative pattern */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-
+          <div className="bg-white rounded-[5px] shadow-[0_20px_80px_-10px_rgba(0,0,0,0.25)] pl-4 md:pl-6 pr-8 py-8 border border-neutral-100 relative overflow-hidden">
             <span className="text-[#FF3C3C] text-[10px] font-black tracking-[0.3em] uppercase block mb-2">STUDENT</span>
-            <h4 className="text-2xl font-black mb-8">Student Satisfaction</h4>
+            <h4 className="text-2xl font-bold text-slate-900 mb-8">Student Satisfaction</h4>
 
             <div className="flex gap-4">
-               <div className="flex-1 bg-white/5 backdrop-blur-md rounded-xl p-6 border border-white/10 text-center transition-all hover:bg-white/10">
-                  <span className="material-symbols-rounded text-[#FF3C3C] text-4xl mb-3">thumb_up</span>
-                  <h5 className="font-black text-2xl text-white mb-1">94%</h5>
-                  <p className="text-[10px] text-white/50 font-black uppercase tracking-widest leading-tight">Recommend to <br /> a friend</p>
-               </div>
-               <div className="flex-1 bg-white/5 backdrop-blur-md rounded-xl p-6 border border-white/10 text-center transition-all hover:bg-white/10">
-                  <span className="material-symbols-rounded text-green-400 text-4xl mb-3">work</span>
-                  <h5 className="font-black text-2xl text-white mb-1">92%</h5>
-                  <p className="text-[10px] text-white/50 font-black uppercase tracking-widest leading-tight">Employed <br /> in 6 months</p>
-               </div>
+                <div className="flex-1 bg-white rounded-[5px] p-6 border text-center transition-all hover:bg-slate-50 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.1)] hover:shadow-[0_10px_35px_-10px_rgba(0,0,0,0.15)] hover:-translate-y-1 duration-300" style={{ borderColor: 'rgba(184, 181, 181, 0.5)' }}>
+                   <span className="material-symbols-rounded text-[#FF3C3C] text-4xl mb-3">thumb_up</span>
+                   <h5 className="font-semibold text-[24px] leading-none mb-1" style={{ color: 'rgba(62, 62, 62, 1)' }}>94%</h5>
+                   <p className="text-[12px] text-slate-500 font-semibold uppercase tracking-widest leading-tight mt-2">Recommend to <br /> a friend</p>
+                </div>
+                <div className="flex-1 bg-white rounded-[5px] p-6 border text-center transition-all hover:bg-slate-50 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.1)] hover:shadow-[0_10px_35px_-10px_rgba(0,0,0,0.15)] hover:-translate-y-1 duration-300" style={{ borderColor: 'rgba(184, 181, 181, 0.5)' }}>
+                   <span className="material-symbols-rounded text-green-600 text-4xl mb-3">work</span>
+                   <h5 className="font-semibold text-[24px] leading-none mb-1" style={{ color: 'rgba(62, 62, 62, 1)' }}>92%</h5>
+                   <p className="text-[12px] text-slate-500 font-semibold uppercase tracking-widest leading-tight mt-2">Employed <br /> in 6 months</p>
+                </div>
             </div>
           </div>
         </aside>
@@ -104,16 +101,17 @@ export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {
         {/* --- PHASE 2: REVIEWS CONTENT AREA --- */}
         <main className="lg:col-span-8">
 
-          {/* Main Filter Tabs */}
-          <div className="flex flex-wrap items-center gap-3 mb-10 overflow-x-auto scrollbar-hide pb-2">
+          {/* Main Filter Tabs - Unified Block */}
+          <div className="mb-10 inline-flex items-center bg-white border border-neutral-200 rounded-[5px] shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] overflow-hidden">
             {["All Reviews", "Student", "Alumni", "Campus Life", "Placements"].map((tag, idx) => (
               <button
                 key={idx}
-                className={`px-8 py-3 text-xs font-black whitespace-nowrap transition-all duration-300 border-2 rounded-full uppercase tracking-widest ${
+                className={`px-6 md:px-8 py-3.5 text-xs font-black whitespace-nowrap transition-all duration-300 uppercase tracking-widest border-r border-neutral-100 last:border-r-0 ${
                   idx === 0
-                    ? 'bg-slate-900 text-white border-slate-900 shadow-xl'
-                    : 'bg-white text-slate-500 border-neutral-100 hover:border-slate-300 hover:text-slate-900'
+                    ? 'text-[#FF3C3C]'
+                    : 'bg-white text-slate-400 hover:text-slate-900 hover:bg-slate-50'
                 }`}
+                style={idx === 0 ? { backgroundColor: 'rgba(255, 60, 60, 0.2)' } : {}}
               >
                 {tag}
               </button>
@@ -125,7 +123,7 @@ export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {
             {reviews.map((rev) => (
               <div
                 key={rev.id}
-                className="bg-white rounded-2xl p-8 shadow-2xl shadow-slate-200/40 border border-neutral-50 relative group transition-all duration-500 hover:-translate-y-2 hover:shadow-red-500/10"
+                className="bg-white rounded-[5px] pl-4 md:pl-6 pr-8 py-8 shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] border border-neutral-50 relative group transition-all duration-500 hover:-translate-y-2 hover:shadow-red-500/10"
               >
                 {/* Visual Quote Accent */}
                 <div className="absolute top-8 right-8 text-neutral-100 group-hover:text-red-50 transition-colors duration-500">
@@ -135,11 +133,11 @@ export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {
                 <div className="relative z-10">
                   {/* User Info */}
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-white shadow-xl">
+                    <div className="relative w-14 h-14 rounded-[5px] overflow-hidden border-2 border-white shadow-xl">
                        <Image src={rev.avatar} alt={rev.name} fill className="object-cover" />
                     </div>
                     <div>
-                      <h5 className="text-base font-black text-slate-900 leading-none mb-1">{rev.name}</h5>
+                      <h5 className="text-base font-bold text-slate-900 leading-none mb-1">{rev.name}</h5>
                       <span className="text-[11px] font-black text-[#FF3C3C] uppercase tracking-widest">{rev.role}</span>
                     </div>
                   </div>
@@ -165,11 +163,11 @@ export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {
              <button className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-[#FF3C3C] transition-colors">
                <span className="material-symbols-rounded">chevron_left</span>
              </button>
-             <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#FF3C3C] text-white font-black text-sm shadow-xl shadow-red-500/20">1</button>
-             <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-slate-600 font-black text-sm border border-neutral-100 shadow-sm transition-all hover:border-[#FF3C3C] hover:text-[#FF3C3C]">2</button>
-             <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-slate-600 font-black text-sm border border-neutral-100 shadow-sm transition-all hover:border-[#FF3C3C] hover:text-[#FF3C3C]">3</button>
+             <button className="w-12 h-12 flex items-center justify-center rounded-[5px] bg-[#FF3C3C] text-white font-black text-sm shadow-xl shadow-red-500/20">1</button>
+             <button className="w-12 h-12 flex items-center justify-center rounded-[5px] bg-white text-slate-600 font-black text-sm border border-neutral-100 shadow-sm transition-all hover:border-[#FF3C3C] hover:text-[#FF3C3C]">2</button>
+             <button className="w-12 h-12 flex items-center justify-center rounded-[5px] bg-white text-slate-600 font-black text-sm border border-neutral-100 shadow-sm transition-all hover:border-[#FF3C3C] hover:text-[#FF3C3C]">3</button>
              <span className="text-slate-300 font-black px-2">...</span>
-             <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-slate-600 font-black text-sm border border-neutral-100 shadow-sm transition-all hover:border-[#FF3C3C] hover:text-[#FF3C3C]">9</button>
+             <button className="w-12 h-12 flex items-center justify-center rounded-[5px] bg-white text-slate-600 font-black text-sm border border-neutral-100 shadow-sm transition-all hover:border-[#FF3C3C] hover:text-[#FF3C3C]">9</button>
              <button className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-[#FF3C3C] transition-colors">
                <span className="material-symbols-rounded">chevron_right</span>
              </button>

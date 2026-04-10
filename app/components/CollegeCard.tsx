@@ -144,13 +144,13 @@ export default function CollegeCard({
             {(streams.length > 0 ? streams : ["Engineering"]).slice(0, 3).map((course) => (
               <span
                 key={course}
-                className="inline-flex items-center rounded-full border border-slate-400 px-3 py-1.5 text-[13px] font-semibold text-[#6C6C6C] leading-none"
+                className="inline-flex items-center rounded-[5px] border border-slate-400 px-3 py-1.5 text-[13px] font-semibold text-[#6C6C6C] leading-none"
               >
                 {course}
               </span>
             ))}
             {streams.length > 3 && (
-              <span className="inline-flex items-center rounded-full border border-slate-400 px-3 py-1.5 text-[13px] font-semibold text-[#6C6C6C] leading-none">
+              <span className="inline-flex items-center rounded-[5px] border border-slate-400 px-3 py-1.5 text-[13px] font-semibold text-[#6C6C6C] leading-none">
                 +{streams.length - 3} More
               </span>
             )}

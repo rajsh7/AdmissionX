@@ -42,20 +42,20 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
   const initial = college_name.trim().charAt(0).toUpperCase();
 
   return (
-    <div className="relative w-full overflow-hidden bg-neutral-900" style={{ height: 400 }}>
+    <div className="relative w-full overflow-hidden bg-neutral-900" style={{ height: 550 }}>
       <Image src={image} alt={college_name} fill priority sizes="100vw" className="object-cover" unoptimized />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
-      <div className="absolute bottom-0 left-0 px-6 md:px-12 lg:px-16 pb-8 z-10 flex flex-col items-start gap-3">
-        <div className="flex items-center gap-3 bg-[#FF3C3C] px-5 py-3.5 rounded-md shadow-xl max-w-xs md:max-w-sm">
-          <div className="flex-shrink-0 w-9 h-9 rounded-full bg-white flex items-center justify-center shadow">
-            <span className="text-base font-black" style={{ color: "#FF3C3C" }}>{initial}</span>
+      <div className="absolute bottom-12 left-0 px-6 md:px-16 lg:px-24 z-10 flex flex-col items-start gap-4">
+        <div className="flex items-center gap-4 md:gap-6 bg-white/10 border border-white/20 backdrop-blur-md px-6 py-4 md:px-8 md:py-6 rounded-xl shadow-2xl max-w-2xl lg:max-w-5xl">
+          <div className="flex-shrink-0 w-14 h-14 md:w-20 md:h-20 rounded-full bg-white flex items-center justify-center shadow-lg">
+            <span className="text-2xl md:text-[40px] font-bold" style={{ color: "#FF3C3C" }}>{initial}</span>
           </div>
-          <h1 className="text-base md:text-lg font-black text-white leading-tight">{college_name}</h1>
+          <h1 className="text-[36px] md:text-[48px] font-bold leading-tight tracking-tight text-white">{college_name}</h1>
         </div>
-        <Link href={`/college/${slug}`} className="text-sm font-semibold text-white/80 hover:text-white flex items-center gap-1.5 ml-1 transition-colors">
+        <Link href={`/college/${slug}`} className="mt-2 bg-transparent border border-white/40 text-white hover:bg-white/10 flex items-center justify-between gap-2 px-5 py-2.5 rounded-[5px] text-sm font-black transition-all w-fit ml-1 uppercase tracking-tight">
           Take a look
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
         </Link>
       </div>

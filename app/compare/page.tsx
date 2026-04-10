@@ -47,8 +47,8 @@ function formatFees(val: number | null): string {
 function Cell({ value, sub }: { value: string; sub?: string }) {
   return (
     <div>
-      <p className="text-sm font-semibold text-slate-800">{value || "—"}</p>
-      {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
+      <p className="text-[16px] font-semibold text-[#3e3e3e]">{value || "—"}</p>
+      {sub && <p className="text-[13px] font-semibold text-[#3e3e3e]/60 mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -146,13 +146,13 @@ function ComparePageInner() {
       <main className="pt-[104px] pb-16">
         {/* Hero Section with Search */}
         <div 
-          className="relative w-full mb-12 py-32 px-4 sm:px-8 lg:px-12 bg-cover bg-center bg-no-repeat overflow-hidden min-h-[480px] flex items-center"
+          className="relative w-full mb-12 py-32 px-4 sm:px-8 lg:px-12 bg-cover bg-center bg-no-repeat min-h-[480px] flex items-center"
           style={{ backgroundImage: "url('/Background-images/f0b10acfd1d98e25c40741fa92c81454f3557e55.png')" }}
         >
           {/* Subtle overlay for better text readability if image is too bright */}
           <div className="absolute inset-0 bg-white/10" />
           
-          <div className="relative z-10 max-w-7xl">
+          <div className="relative z-30 max-w-7xl">
             {/* Page Title */}
             <div className="mb-8">
               <h1 className="text-[48px] font-semibold text-slate-800 leading-tight">Compare College</h1>
@@ -187,7 +187,7 @@ function ComparePageInner() {
 
               {/* Suggestions dropdown */}
               {suggestions.length > 0 && (
-                <div className="absolute top-full left-0 w-full md:w-[calc(100%-140px)] mt-2 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden">
+                <div className="absolute top-full left-0 w-full md:w-[calc(100%-140px)] mt-2 bg-white rounded-[5px] shadow-xl border border-slate-100 z-50 overflow-hidden">
                   {suggestions.map((s) => (
                     <button
                       key={s.slug}
@@ -218,63 +218,63 @@ function ComparePageInner() {
                 <thead>
                   <tr>
                     {/* Metrics label column */}
-                    <th className="w-[280px] bg-white px-8 py-10 text-left border-b border-r border-slate-100">
-                      <h2 className="text-[32px] font-semibold text-slate-800 leading-tight">Comparing Metrics</h2>
+                    <th className="w-[280px] bg-[#FAFAFA] px-8 py-8 text-left border-b border-r border-slate-100 align-middle">
+                      <h2 className="text-[32px] font-semibold text-[#3e3e3e] leading-tight">Comparing Metrics</h2>
                     </th>
 
                     {/* College columns */}
                     {colleges.map((college, i) => (
-                      <th key={i} className="px-6 py-10 border-b border-r border-slate-100 last:border-r-0 min-w-[280px]">
+                      <th key={i} className="relative px-6 py-6 border-b border-r border-slate-100 last:border-r-0 min-w-[280px] align-top bg-white">
                         {college ? (
-                          <div className="relative pt-4">
+                          <div className="flex flex-col h-full justify-between">
                             {/* Remove button (X) top-right */}
                             <button
                               onClick={() => removeCollege(i)}
-                              className="absolute -top-10 -right-6 w-11 h-8 bg-[#FFB3B3] text-white rounded-bl-xl flex items-center justify-center hover:bg-red-400 transition-colors z-10"
+                              className="absolute top-0 right-0 w-10 h-7 bg-[#FFA8A8] text-white flex items-center justify-center hover:bg-red-400 transition-colors z-10"
                             >
-                              <span className="material-symbols-outlined text-[20px] font-bold">close</span>
+                              <span className="material-symbols-outlined text-[18px]">close</span>
                             </button>
 
                             {/* College card */}
-                            <div className="flex flex-col items-start text-left gap-4">
+                            <div className="flex flex-col items-start text-left mt-3 mb-5">
                               <div className="flex items-center gap-3">
-                                <div className="w-14 h-14 rounded-lg overflow-hidden bg-slate-50 border border-slate-100 flex-shrink-0 flex items-center justify-center p-1">
+                                <div className="w-12 h-12 rounded-[5px] overflow-hidden bg-white border border-slate-200 flex-shrink-0 flex items-center justify-center p-1">
                                   {college.image ? (
                                     <img src={college.image} alt={college.name} className="w-full h-full object-contain" />
                                   ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-black text-xl">
+                                    <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-black text-xl rounded-[5px]">
                                       {college.name.charAt(0)}
                                     </div>
                                   )}
                                 </div>
-                                <div>
-                                  <p className="text-[17px] font-bold text-slate-800 leading-tight line-clamp-2">{college.name}</p>
-                                  <p className="text-sm text-slate-400 flex items-center gap-1 mt-1">
+                                <div className="flex-1">
+                                  <p className="text-[16px] font-semibold text-[#3e3e3e] leading-tight line-clamp-2">{college.name}</p>
+                                  <p className="text-[15px] text-[#3e3e3e]/60 font-medium flex items-center gap-1 mt-1">
                                     <span className="material-symbols-outlined text-[16px]">location_on</span>
                                     {college.location}
                                   </p>
                                 </div>
                               </div>
-                              
-                              <Link
-                                href={`/college/${college.slug}`}
-                                className="w-full bg-[#333333] text-white text-[15px] font-bold py-3.5 rounded-[5px] hover:bg-black transition-colors text-center"
-                              >
-                                Apply
-                              </Link>
                             </div>
+                              
+                            <Link
+                              href={`/college/${college.slug}`}
+                              className="w-full bg-[#424242] text-white text-[15px] font-bold py-2.5 rounded-[5px] hover:bg-[#2A2A2A] transition-colors text-center block mt-auto"
+                            >
+                              Apply
+                            </Link>
                           </div>
                         ) : (
                           /* Empty slot */
-                          <button
-                            onClick={() => { setAddingSlot(i); setSearchQ(""); }}
-                            className="w-full flex flex-col items-center justify-center gap-3 py-10 border-2 border-dashed border-slate-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all group"
-                          >
-                            <span className="w-12 h-12 rounded-full bg-slate-50 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                          <div className="h-full flex items-center justify-center min-h-[120px]">
+                            <button
+                              onClick={() => { setAddingSlot(i); setSearchQ(""); }}
+                              className="w-full h-full min-h-[120px] flex flex-col items-center justify-center gap-2 border-2 border-dashed border-slate-200 rounded-[5px] hover:border-primary hover:bg-primary/5 transition-all group"
+                            >
                               <span className="material-symbols-outlined text-slate-400 group-hover:text-primary text-[24px]">add</span>
-                            </span>
-                            <span className="text-sm font-semibold text-slate-400 group-hover:text-primary transition-colors">Add College</span>
-                          </button>
+                              <span className="text-[13px] font-semibold text-slate-400 group-hover:text-primary transition-colors">Add College</span>
+                            </button>
+                          </div>
                         )}
                       </th>
                     ))}
@@ -285,7 +285,7 @@ function ComparePageInner() {
                   {METRICS.map((metric, mi) => (
                     <tr key={metric.key} className={mi % 2 === 0 ? "bg-white" : "bg-slate-50/30"}>
                       <td className="px-8 py-7 border-r border-slate-100">
-                        <span className="text-[15px] font-bold text-slate-700">{metric.label}</span>
+                        <span className="text-[16px] font-semibold text-[#3e3e3e]">{metric.label}</span>
                       </td>
                       {colleges.map((college, ci) => (
                         <td key={ci} className="px-6 py-7 border-r border-slate-100 last:border-r-0">

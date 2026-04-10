@@ -362,13 +362,13 @@ export default function TopUniversities({
                         {(uni.offeredCourses?.length ? uni.offeredCourses : [activeTab]).slice(0, 4).map((course) => (
                           <span
                             key={`${uni.name}-${course}`}
-                            className="inline-flex items-center rounded-full border border-slate-400 px-4 py-2 text-[14px] font-semibold text-[#6C6C6C] leading-none"
+                            className="inline-flex items-center rounded-[5px] border border-slate-400 px-4 py-2 text-[14px] font-semibold text-[#6C6C6C] leading-none"
                           >
                             {course}
                           </span>
                         ))}
                         {(uni.offeredCourses?.length ?? 0) > 4 && (
-                          <span className="inline-flex items-center rounded-full border border-slate-400 px-4 py-2 text-[14px] font-semibold text-[#6C6C6C] leading-none">
+                          <span className="inline-flex items-center rounded-[5px] border border-slate-400 px-4 py-2 text-[14px] font-semibold text-[#6C6C6C] leading-none">
                             +{(uni.offeredCourses?.length ?? 0) - 4} More
                           </span>
                         )}
