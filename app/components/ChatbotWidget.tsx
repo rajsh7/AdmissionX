@@ -189,6 +189,7 @@ export default function ChatbotWidget() {
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl shadow-2xl shadow-primary/30 flex items-center justify-center overflow-hidden"
         style={{ background: open ? "#e63535" : "linear-gradient(135deg, #FF3C3C 0%, #c0392b 100%)" }}
         aria-label="Toggle Assistant"
+        suppressHydrationWarning
       >
         <AnimatePresence mode="wait">
           {open ? (
