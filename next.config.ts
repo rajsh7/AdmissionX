@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),
   turbopack: {
     root: path.join(__dirname),
+    persistentCaching: false,
   },
 
   // Reduces JS bundle size by tree-shaking large packages to only import what's used.
@@ -84,7 +85,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
+            value: "public, max-age=0, must-revalidate",
           },
         ],
       },

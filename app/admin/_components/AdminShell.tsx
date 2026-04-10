@@ -183,28 +183,8 @@ export default function AdminShell({
             </span>
           </button>
 
-          {/* Search bar */}
-          <div className="flex-1 flex items-center px-4">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const q = (e.currentTarget.elements.namedItem("q") as HTMLInputElement)?.value.trim();
-                if (q) router.push(`/admin/colleges/profile?q=${encodeURIComponent(q)}`);
-              }}
-              className="flex items-center gap-2 bg-slate-100 text-slate-500 px-4 py-2 rounded-lg w-full max-w-md"
-            >
-              <span className="material-symbols-rounded text-[20px]" style={ICO}>search</span>
-              <input
-                name="q"
-                type="text"
-                placeholder="Search by college name..."
-                className="bg-transparent border-none outline-none text-sm w-full text-slate-700 placeholder-slate-400 font-medium"
-              />
-            </form>
-          </div>
-
           {/* Right side actions */}
-          <div className="flex items-center gap-5 flex-shrink-0 pr-2">
+          <div className="flex items-center gap-5 flex-shrink-0 pr-2 ml-auto">
             
             {/* Action Icons */}
             <div className="flex items-center gap-3 text-slate-600">

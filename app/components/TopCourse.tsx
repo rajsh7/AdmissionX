@@ -171,13 +171,7 @@ export default function TopCourse() {
                   />
                 </div>
              </div>
-             <div className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-2 max-h-[400px]">
-               <style jsx>{`
-                 div::-webkit-scrollbar { width: 4px; }
-                 div::-webkit-scrollbar-track { background: transparent; }
-                 div::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
-                 div::-webkit-scrollbar-thumb:hover { background: #CBD5E0; }
-               `}</style>
+             <div className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-2 max-h-[400px] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full">
                {filteredCourses.map((course, idx) => {
                  const originalIdx = courses.findIndex(c => c.id === course.id);
                  return (

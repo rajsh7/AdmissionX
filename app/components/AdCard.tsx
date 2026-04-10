@@ -156,9 +156,7 @@ export default function AdCard({ ads, className = "" }: AdCardProps) {
           WebkitOverflowScrolling: "touch",
         }}
       >
-        <style dangerouslySetInnerHTML={{ __html: `
-          #ad-scroll-container::-webkit-scrollbar { display: none; }
-        `}} />
+      <style dangerouslySetInnerHTML={{ __html: `#ad-scroll-container::-webkit-scrollbar { display: none; }` }} />
         
         {source.map((ad, idx) => {
           const imgSrc = buildImgUrl(ad.img);
@@ -350,12 +348,7 @@ export default function AdCard({ ads, className = "" }: AdCardProps) {
         />
       </div>
 
-      <style jsx>{`
-        @keyframes adcard-progress {
-          from { width: 0%; }
-          to { width: 100%; }
-        }
-      `}</style>
+      <style dangerouslySetInnerHTML={{ __html: `@keyframes adcard-progress { from { width: 0%; } to { width: 100%; } }` }} />
     </div>
   );
 }

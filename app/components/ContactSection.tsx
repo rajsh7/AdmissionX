@@ -87,7 +87,6 @@ export default function ContactSection() {
                       placeholder="Your name"
                       value={form.name}
                       onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                      required
                       className="w-full h-14 px-6 rounded-[10px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm"
                     />
                   </div>
@@ -98,7 +97,6 @@ export default function ContactSection() {
                       placeholder="your.email@example.com"
                       value={form.email}
                       onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                      required
                       className="w-full h-14 px-6 rounded-[10px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm"
                     />
                   </div>
@@ -122,7 +120,6 @@ export default function ContactSection() {
                     placeholder="Tell us about your inquiry..."
                     value={form.message}
                     onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-                    required
                     className="w-full px-6 py-5 rounded-[10px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none font-medium shadow-sm"
                   />
                 </div>

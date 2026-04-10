@@ -180,10 +180,12 @@ export default function SearchClient({
 
   const handleLoadMore = useCallback(async () => {
     const nextCount = visibleCount + 12;
+    // Already have enough fetched, just show more
     if (nextCount <= colleges.length) {
       setVisibleCount(nextCount);
       return;
     }
+    // Need to fetch more from API
     setLoadingMore(true);
     try {
       const params = new URLSearchParams(searchParams.toString());
@@ -191,12 +193,16 @@ export default function SearchClient({
       params.delete("page");
       const res = await fetch(`/api/search/colleges?${params.toString()}`);
       const data = await res.json();
-      if (data.success) {
+      if (data.success && data.colleges.length > 0) {
         setColleges(data.colleges);
+        setVisibleCount(nextCount);
+      } else {
+        setVisibleCount(nextCount);
       }
+    } catch {
+      setVisibleCount(nextCount);
     } finally {
       setLoadingMore(false);
-      setVisibleCount(nextCount);
     }
   }, [visibleCount, colleges.length, searchParams]);
 
