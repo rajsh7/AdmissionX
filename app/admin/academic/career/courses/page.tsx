@@ -2,7 +2,7 @@ import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import CareerCourseListClient from "./CareerCourseListClient";
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function createCourse(formData: FormData) {
   "use server";
@@ -63,7 +63,7 @@ async function deleteCourse(id: number) {
   revalidatePath("/", "layout");
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T >(
   sql: string,

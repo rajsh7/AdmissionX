@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { saveUpload } from "@/lib/upload-utils";
 import path from "path";
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function deleteSlider(id: number) {
   "use server";

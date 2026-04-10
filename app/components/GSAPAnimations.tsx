@@ -20,7 +20,7 @@ export default function GSAPAnimations() {
 
     const timer = setTimeout(() => {
 
-      // -- Fade up ------------------------------------------------------------
+      // ── Fade up ────────────────────────────────────────────────────────────
       gsap.utils.toArray<HTMLElement>("[data-gsap='fade-up']").forEach((el) => {
         gsap.fromTo(el,
           { opacity: 0, y: 50 },
@@ -31,7 +31,7 @@ export default function GSAPAnimations() {
         );
       });
 
-      // -- Fade in ------------------------------------------------------------
+      // ── Fade in ────────────────────────────────────────────────────────────
       gsap.utils.toArray<HTMLElement>("[data-gsap='fade-in']").forEach((el) => {
         gsap.fromTo(el,
           { opacity: 0 },
@@ -42,7 +42,7 @@ export default function GSAPAnimations() {
         );
       });
 
-      // -- Fade left ----------------------------------------------------------
+      // ── Fade left ──────────────────────────────────────────────────────────
       gsap.utils.toArray<HTMLElement>("[data-gsap='fade-left']").forEach((el) => {
         gsap.fromTo(el,
           { opacity: 0, x: -60 },
@@ -53,7 +53,7 @@ export default function GSAPAnimations() {
         );
       });
 
-      // -- Fade right ---------------------------------------------------------
+      // ── Fade right ─────────────────────────────────────────────────────────
       gsap.utils.toArray<HTMLElement>("[data-gsap='fade-right']").forEach((el) => {
         gsap.fromTo(el,
           { opacity: 0, x: 60 },
@@ -64,7 +64,7 @@ export default function GSAPAnimations() {
         );
       });
 
-      // -- Scale in -----------------------------------------------------------
+      // ── Scale in ───────────────────────────────────────────────────────────
       gsap.utils.toArray<HTMLElement>("[data-gsap='scale-in']").forEach((el) => {
         gsap.fromTo(el,
           { opacity: 0, scale: 0.85 },
@@ -75,7 +75,7 @@ export default function GSAPAnimations() {
         );
       });
 
-      // -- Stagger children ---------------------------------------------------
+      // ── Stagger children ───────────────────────────────────────────────────
       gsap.utils.toArray<HTMLElement>("[data-gsap='stagger']").forEach((parent) => {
         gsap.fromTo(
           parent.children,
@@ -87,7 +87,7 @@ export default function GSAPAnimations() {
         );
       });
 
-      // -- Parallax -----------------------------------------------------------
+      // ── Parallax ───────────────────────────────────────────────────────────
       gsap.utils.toArray<HTMLElement>("[data-gsap='parallax']").forEach((el) => {
         const speed = parseFloat((el as HTMLElement).dataset.speed || "0.3");
         gsap.to(el, {

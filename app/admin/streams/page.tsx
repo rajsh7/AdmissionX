@@ -7,7 +7,7 @@ import StreamListClient from "./StreamListClient";
 
 const PAGE_SIZE = 25;
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function createStream(formData: FormData) {
   "use server";
@@ -120,7 +120,7 @@ async function toggleStreamHome(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T >(
   sql: string,

@@ -4,8 +4,8 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import ExamListClient from "./ExamListClient";
 
-// --- Dynamic page (requires database access at request time)
 export const dynamic = 'force-dynamic';
 
 const DEFAULT_EXAM_IMAGE =
@@ -70,12 +70,11 @@ export default async function ExaminationHubPage() {
     db.collection("examination_details")
       .find({ status: 1 })
       .sort({ created_at: -1 })
-      .limit(12)
+      .limit(50)
       .project({ id: 1, title: 1, slug: 1, image: 1, description: 1, applicationFrom: 1, applicationTo: 1, exminationDate: 1, functionalarea_id: 1 })
       .toArray(),
   ]);
 
-  // Enrich sections with exam counts and fa names
   const faIds = [...new Set([
     ...sectionRows.map((s) => s.functionalarea_id),
     ...examRows.map((e) => e.functionalarea_id),
@@ -102,194 +101,165 @@ export default async function ExaminationHubPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 relative">
-      <div className="fixed inset-0 z-0 text-[0px] font-[0] leading-[0]">
-        <Image
-          src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000"
-          alt="Campus Background" fill priority sizes="100vw" quality={80} className="object-cover"
-        />
-        <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
-      </div>
-
       <div className="relative z-10">
         <Header />
 
-        <div className="pt-24 pb-16 relative overflow-hidden">
-          <div className="relative w-full px-4 lg:px-8 xl:px-12 flex flex-col items-center text-center">
-            <nav className="flex items-center justify-center gap-2 text-xs text-neutral-500 mb-6 font-medium">
-              <Link href="/" className="hover:text-white transition-colors">Home</Link>
-              <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-              <span className="text-neutral-300">Examinations</span>
-            </nav>
+        {/* Hero section */}
+        <div className="pt-24 pb-8 w-full px-4 lg:px-8 xl:px-12 max-w-[1400px] mx-auto min-h-[500px]">
+          <div className="relative bg-white rounded-xl shadow-lg border border-neutral-200 overflow-hidden flex flex-col md:flex-row" style={{ minHeight: "360px" }}>
+            <div className="absolute inset-0 z-0" style={{ background: "repeating-linear-gradient(-45deg, #f8fafc, #f8fafc 60px, #ffffff 60px, #ffffff 120px)" }}></div>
 
-            <div className="w-full max-w-4xl flex flex-col items-center">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <span className="inline-flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-                  <span className="material-symbols-outlined text-[13px]">quiz</span>
-                  Entrance Exams
-                </span>
-              </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight mb-4">
-                India&apos;s{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-rose-500">
-                  Entrance Exams
-                </span>{" "}
-                — All in One Place
+            <div className="relative z-10 p-8 md:p-12 lg:p-16 flex-1 flex flex-col justify-center">
+              <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-black text-neutral-700 leading-[1.15] mb-4">
+                Finds Your Next <br /> Competitive exam
               </h1>
-              <p className="text-neutral-400 text-base max-w-2xl leading-relaxed mb-8 text-center">
-                Dates, syllabus, eligibility, admit cards, results and preparation tips for every major entrance examination.
+              <p className="text-neutral-500 font-semibold text-sm md:text-base max-w-[400px] mb-8 leading-relaxed">
+                Discover all exams which can refine your future, unlock gate for dream University.
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-6">
-                {[
-                  { label: "Exams", value: totalExams, icon: "description" },
-                  { label: "Streams", value: totalStreams, icon: "category" },
-                ].map((s) => (
-                  <div key={s.label} className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[18px] text-red-400" style={{ fontVariationSettings: "'FILL' 1" }}>{s.icon}</span>
-                    <span className="text-white font-black text-lg leading-none">{s.value.toLocaleString("en-IN")}+</span>
-                    <span className="text-neutral-500 text-sm">{s.label}</span>
-                  </div>
-                ))}
+
+              <div className="flex w-full max-w-[420px] bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm">
+                <div className="flex items-center pl-4 pr-2 text-neutral-400">
+                  <span className="material-symbols-outlined text-[20px]">search</span>
+                </div>
+                <input
+                  type="text"
+                  suppressHydrationWarning
+                  placeholder="Location, universities, courses..."
+                  className="flex-1 py-3 px-2 text-sm text-neutral-800 placeholder-neutral-400 focus:outline-none bg-transparent font-medium"
+                />
+                <button suppressHydrationWarning className="bg-red-500 hover:bg-red-600 text-white font-bold px-6 py-3 transition-colors text-sm tracking-wide">
+                  Search
+                </button>
               </div>
+            </div>
+
+            <div className="relative w-[40%] min-h-[250px] md:min-h-full flex-shrink-0">
+              <Image
+                src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&q=80&w=1200"
+                alt="Competitive Exam"
+                fill
+                sizes="(max-width: 768px) 100vw, 40vw"
+                className="object-cover"
+              />
+              <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white to-transparent hidden md:block"></div>
             </div>
           </div>
         </div>
 
-        <div className="w-full px-4 lg:px-8 xl:px-12 py-10 space-y-14">
-          <section>
-            <div className="mb-6">
-              <h2 className="text-xl font-black text-white">Browse by Stream</h2>
-              <p className="text-sm text-neutral-300 mt-0.5">Select a category to view all exams in that stream</p>
+        {/* Main content */}
+        <div className="w-full px-4 lg:px-8 xl:px-12 py-10 max-w-[1400px] mx-auto">
+          <div className="flex flex-col lg:flex-row gap-6 items-start justify-center">
+
+            {/* Left Column */}
+            <div className="flex-1 w-full max-w-[800px]">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-[17px] sm:text-[19px] font-black text-[#444]">Upcoming & Urgent</h2>
+                <Link href="/examination" className="text-[13px] font-bold text-neutral-500 hover:text-neutral-800 transition-colors">View All</Link>
+              </div>
+
+              {examRows.length === 0 ? (
+                <div className="bg-white rounded-md p-8 text-center text-neutral-500 border border-neutral-200 shadow-sm">No exams available.</div>
+              ) : (
+                <ExamListClient
+                  exams={examRows.map((exam) => ({
+                    id: exam.id,
+                    title: exam.title,
+                    slug: exam.slug,
+                    streamSlug: exam.functionalarea_id ? faMap[exam.functionalarea_id]?.pageslug ?? "general" : "general",
+                    streamName: exam.functionalarea_id ? faMap[exam.functionalarea_id]?.name ?? null : null,
+                    description: stripHtml(exam.description),
+                    applicationTo: exam.applicationTo ?? null,
+                    exminationDate: exam.exminationDate ?? null,
+                  }))}
+                />
+              )}
             </div>
 
-            {sectionRows.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-neutral-100 p-12 flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-3xl bg-neutral-100 flex items-center justify-center mb-4">
-                  <span className="material-symbols-outlined text-[30px] text-neutral-300">category</span>
+            {/* Right Sidebar */}
+            <div className="w-full max-w-[280px] flex-shrink-0 space-y-6 pt-10">
+
+              {/* Calendar Card */}
+              <div className="bg-white border border-neutral-200 rounded-3xl p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-6">
+                  <button className="text-neutral-400 hover:text-neutral-700 transition-colors">
+                    <span className="material-symbols-outlined text-3xl">chevron_left</span>
+                  </button>
+                  <div className="font-black text-2xl text-neutral-900">March 2026</div>
+                  <button className="text-neutral-400 hover:text-neutral-700 transition-colors">
+                    <span className="material-symbols-outlined text-3xl">chevron_right</span>
+                  </button>
                 </div>
-                <p className="text-sm font-bold text-neutral-600 mb-1">No exam categories yet</p>
-                <p className="text-xs text-neutral-400 max-w-xs">Exam categories are being added. Check back soon.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
-                {sectionRows.map((sec) => {
-                  const meta = getSectionMeta(sec.name);
-                  const examCount = examCountMap[sec.functionalarea_id] ?? 0;
-                  return (
-                    <Link
-                      key={sec.id}
-                      href={`/examination/${sec.slug}`}
-                      className="group flex flex-col items-center text-center p-4 bg-white rounded-2xl border border-neutral-100 hover:border-red-200 hover:shadow-md hover:shadow-red-500/5 transition-all duration-200"
-                    >
-                      <div className={`w-12 h-12 rounded-2xl ${meta.bg} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-200`}>
-                        <span className={`material-symbols-outlined text-[24px] ${meta.color}`} style={{ fontVariationSettings: "'FILL' 1" }}>{meta.icon}</span>
-                      </div>
-                      <p className="text-xs font-bold text-neutral-800 group-hover:text-red-600 transition-colors leading-snug mb-1">{sec.name}</p>
-                      <p className="text-[10px] text-neutral-400 font-semibold">
-                        {examCount > 0 ? `${examCount} exam${examCount !== 1 ? "s" : ""}` : "View exams"}
-                      </p>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-
-          <section>
-            <div className="mb-6">
-              <h2 className="text-xl font-black text-white">Popular Entrance Exams</h2>
-              <p className="text-sm text-neutral-300 mt-0.5">Most-searched exams with key dates and info</p>
-            </div>
-
-            {examRows.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-neutral-100 p-12 flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-3xl bg-neutral-100 flex items-center justify-center mb-4">
-                  <span className="material-symbols-outlined text-[30px] text-neutral-300">quiz</span>
+                <div className="flex justify-around text-center text-xs font-semibold text-neutral-400 mb-3">
+                  {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((day) => (
+                    <div key={day}>{day}</div>
+                  ))}
                 </div>
-                <p className="text-sm font-bold text-neutral-600 mb-1">No exams published yet</p>
-                <p className="text-xs text-neutral-400 max-w-xs">Exam information is being updated. Please check back soon.</p>
+                <div className="flex justify-between gap-3 flex-wrap text-center text-sm font-medium">
+                  {(() => {
+                    const year = 2026, month = 2;
+                    const firstDay = new Date(year, month, 1).getDay();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    const total = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+                    return Array.from({ length: total }, (_, i) => {
+                      const dayNum = i - firstDay + 1;
+                      if (dayNum < 1 || dayNum > daysInMonth) return <div key={i} className="h-9" />;
+                      let cls = "h-7 w-7 flex items-center justify-center rounded-2xl transition-colors hover:bg-neutral-100";
+                      if (dayNum === 19) cls += " bg-red-100 text-red-600 font-bold";
+                      else if (dayNum === 23) cls += " bg-red-600 text-white font-bold";
+                      return <div key={i} className={cls}>{dayNum}</div>;
+                    });
+                  })()}
+                </div>
+                <div className="mt-2 pt-2 border-t border-neutral-100 space-y-4 text-sm">
+                  <div className="flex gap-3">
+                    <span className="text-red-500 mt-px">•</span>
+                    <div>
+                      <div className="font-semibold text-red-500">NOV 28, 2026</div>
+                      <div className="text-neutral-600">CAT 2026 EXAM DAY</div>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="text-red-500 mt-px">•</span>
+                    <div>
+                      <div className="font-semibold text-red-500">NOV 28, 2026</div>
+                      <div className="text-neutral-600">CAT 2026 EXAM DAY</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-5">
-                {examRows.map((exam) => {
-                  const fa = exam.functionalarea_id ? faMap[exam.functionalarea_id] : null;
-                  const streamSlug = fa?.pageslug ?? "general";
-                  const description = stripHtml(exam.description);
-                  return (
-                    <Link
-                      key={exam.id}
-                      href={`/examination/${streamSlug}/${exam.slug}`}
-                      className="group flex flex-col bg-white rounded-2xl border border-neutral-100 hover:border-red-200 hover:shadow-lg transition-all duration-200 overflow-hidden"
-                    >
-                      <div className="relative h-36 overflow-hidden bg-neutral-100 flex-shrink-0">
-                        <Image
-                          src={buildImageUrl(exam.image)}
-                          alt={exam.title}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                        {fa?.name && (
-                          <span className="absolute top-2 left-2 bg-white/90 text-neutral-700 text-[10px] font-bold px-2 py-0.5 rounded-full">{fa.name}</span>
-                        )}
-                      </div>
-                      <div className="flex flex-col flex-1 p-4 gap-3">
-                        <h3 className="text-sm font-black text-neutral-900 group-hover:text-red-600 transition-colors leading-snug line-clamp-2">{exam.title}</h3>
-                        {description && <p className="text-[11px] text-neutral-500 line-clamp-2 leading-relaxed flex-1">{description}</p>}
-                        <div className="flex flex-col gap-1.5 mt-auto pt-2 border-t border-neutral-50">
-                          {exam.applicationTo && (
-                            <div className="flex items-center gap-1.5">
-                              <span className="material-symbols-outlined text-[13px] text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>edit_document</span>
-                              <span className="text-[10px] text-neutral-500 font-medium">Apply by: <span className="font-bold text-neutral-700">{formatDate(exam.applicationTo)}</span></span>
-                            </div>
-                          )}
-                          {exam.exminationDate && (
-                            <div className="flex items-center gap-1.5">
-                              <span className="material-symbols-outlined text-[13px] text-red-500" style={{ fontVariationSettings: "'FILL' 1" }}>event</span>
-                              <span className="text-[10px] text-neutral-500 font-medium">Exam: <span className="font-bold text-neutral-700">{formatDate(exam.exminationDate)}</span></span>
-                            </div>
-                          )}
-                        </div>
-                        <span className="text-[11px] font-bold text-red-600 flex items-center gap-1">
-                          View Details
-                          <span className="material-symbols-outlined text-[13px]">arrow_forward</span>
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </section>
 
-          <section className="bg-gradient-to-r from-neutral-900 to-neutral-800 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-start gap-4 max-w-xl">
-              <div className="w-12 h-12 rounded-2xl bg-red-600/20 flex items-center justify-center flex-shrink-0">
-                <span className="material-symbols-outlined text-[24px] text-red-400" style={{ fontVariationSettings: "'FILL' 1" }}>notifications_active</span>
-              </div>
-              <div>
-                <h3 className="text-white font-black text-lg mb-1">Never Miss an Exam Deadline</h3>
-                <p className="text-neutral-400 text-sm leading-relaxed">Register as a student to track exams you&apos;re appearing for.</p>
+              {/* Most Searched Card */}
+              <div className="bg-white border border-neutral-200 rounded-3xl p-6 shadow-sm">
+                <h3 className="font-black text-xl mb-5 text-neutral-900">Most Searched</h3>
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center group cursor-pointer">
+                    <div>
+                      <div className="font-semibold text-neutral-900">JEE Mains</div>
+                      <div className="text-xs text-neutral-500">Central Universities</div>
+                    </div>
+                    <span className="material-symbols-outlined text-2xl text-neutral-400 group-hover:text-red-500 transition-colors">arrow_forward</span>
+                  </div>
+                  <div className="flex justify-between items-center group cursor-pointer">
+                    <div>
+                      <div className="font-semibold text-neutral-900">CUET UG</div>
+                      <div className="text-xs text-neutral-500">State Universities</div>
+                    </div>
+                    <span className="material-symbols-outlined text-2xl text-neutral-400 group-hover:text-red-500 transition-colors">arrow_forward</span>
+                  </div>
+                  <div className="flex justify-between items-center group cursor-pointer">
+                    <div>
+                      <div className="font-semibold text-neutral-900">CUET UG</div>
+                      <div className="text-xs text-neutral-500">State Universities</div>
+                    </div>
+                    <span className="material-symbols-outlined text-2xl text-neutral-400 group-hover:text-red-500 transition-colors">arrow_forward</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex gap-3 flex-shrink-0">
-              <Link href="/signup/student" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white font-bold text-sm px-5 py-3 rounded-xl transition-colors shadow-lg shadow-red-600/20">
-                <span className="material-symbols-outlined text-[17px]">person_add</span>
-                Register Free
-              </Link>
-              <Link href="/top-colleges" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold text-sm px-5 py-3 rounded-xl transition-colors border border-white/10">
-                <span className="material-symbols-outlined text-[17px]">apartment</span>
-                Top Colleges
-              </Link>
-            </div>
-          </section>
+          </div>
         </div>
         <Footer />
       </div>
     </div>
   );
 }
-
-
-
-

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import ApplicationsListClient from "./ApplicationsListClient";
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function updateApplicationStatus(formData: FormData): Promise<void> {
   "use server";
@@ -23,7 +23,7 @@ async function updateApplicationStatus(formData: FormData): Promise<void> {
   revalidatePath("/", "layout");
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
 
@@ -37,7 +37,7 @@ function formatDate(d: string | Date | null | undefined): string {
   } catch { return "—"; }
 }
 
-// --- Status badge config ------------------------------------------------------
+// ─── Status badge config ──────────────────────────────────────────────────────
 
 const STATUS_TABS = [
   { value: "all",       label: "All"          },
@@ -61,7 +61,7 @@ function getStatusStyle(name: string | null) {
   return STATUS_STYLE[key] ?? STATUS_STYLE.default;
 }
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function AdminApplicationsPage({
   searchParams,
@@ -77,7 +77,7 @@ export default async function AdminApplicationsPage({
 
   const db = await getDb();
 
-  // -- Load lookup maps -------------------------------------------------------
+  // ── Load lookup maps ───────────────────────────────────────────────────────
   const [appStatuses, collegeMasters, collegeProfiles, courses, degrees] = await Promise.all([
     db.collection("applicationstatus").find({}).toArray(),
     db.collection("collegemaster").find({}, { projection: { id: 1, course_id: 1, degree_id: 1, collegeprofile_id: 1 } }).toArray(),
@@ -93,7 +93,7 @@ export default async function AdminApplicationsPage({
   const cpMap      = Object.fromEntries(collegeProfiles.map(cp => [cp.id, { slug: String(cp.slug ?? "").trim(), name: String(cp.contactpersonname ?? cp.slug ?? "").trim() }]));
   const cmMap      = Object.fromEntries(collegeMasters.map(cm => [cm.id, { course_id: cm.course_id, degree_id: cm.degree_id, collegeprofile_id: cm.collegeprofile_id }]));
 
-  // -- Build filter -----------------------------------------------------------
+  // ── Build filter ───────────────────────────────────────────────────────────
   // Resolve status id filter
   let statusIdFilter: number | null = null;
   if (statusFilter !== "all") {
@@ -189,7 +189,7 @@ export default async function AdminApplicationsPage({
     .filter(c => c.slug)
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  // -- URL builder ------------------------------------------------------------
+  // ── URL builder ────────────────────────────────────────────────────────────
   function buildUrl(overrides: Record<string, string | number>) {
     const merged = { q, page: String(page), status: statusFilter, college: collegeFilter, ...overrides };
     const qs = Object.entries(merged)
@@ -202,7 +202,7 @@ export default async function AdminApplicationsPage({
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
 
-      {/* -- Page Header ----------------------------------------------------- */}
+      {/* ── Page Header ───────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -217,7 +217,7 @@ export default async function AdminApplicationsPage({
         </div>
       </div>
 
-      {/* -- Stat cards ------------------------------------------------------- */}
+      {/* ── Stat cards ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {STATUS_TABS.map((tab) => {
           const val      = tab.value === "all" ? grandTotal : (statusCountMap[tab.value] ?? 0);
@@ -244,7 +244,7 @@ export default async function AdminApplicationsPage({
         })}
       </div>
 
-      {/* -- Filter & Search Bar ---------------------------------------------- */}
+      {/* ── Filter & Search Bar ────────────────────────────────────────────── */}
       <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center">
 
         {/* Status tabs */}
@@ -311,7 +311,7 @@ export default async function AdminApplicationsPage({
         </form>
       </div>
 
-      {/* -- Applications Table ----------------------------------------------- */}
+      {/* ── Applications Table ─────────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
         {appRows.length === 0 ? (
           <div className="py-24 text-center">
@@ -332,7 +332,7 @@ export default async function AdminApplicationsPage({
           <>
             <ApplicationsListClient initialRows={appRows} offset={offset} />
 
-            {/* -- Pagination ----------------------------------------------- */}
+            {/* ── Pagination ─────────────────────────────────────────────── */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-5 border-t border-slate-50 bg-slate-50/50">
               <p className="text-xs text-slate-500 font-semibold">
                 Showing <span className="text-slate-900">{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</span> of <span className="text-slate-900">{total.toLocaleString()}</span> entries
@@ -379,7 +379,7 @@ export default async function AdminApplicationsPage({
         )}
       </div>
 
-      {/* -- Footer Notice -------------------------------------------------- */}
+      {/* ── Footer Notice ────────────────────────────────────────────────── */}
       <div className="flex items-start gap-3 bg-slate-100/50 border border-slate-200/50 rounded-2xl px-6 py-5 text-xs text-slate-500">
         <span className="material-symbols-rounded text-slate-400 text-[20px]" style={ICO_FILL}>info</span>
         <div className="space-y-1">

@@ -26,7 +26,7 @@ interface Bookmark {
   blog_slug: string | null;
 }
 
-// -- Bookmark Card ------------------------------------------------------------
+// ── Bookmark Card ────────────────────────────────────────────────────────────
 function BookmarkCard({ bm, onRemove }: { bm: Bookmark, onRemove: (id: number) => void }) {
   const isCollege = bm.type === "college";
   const isCourse = bm.type === "course";

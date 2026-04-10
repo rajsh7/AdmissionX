@@ -3,7 +3,7 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import AdsCollegeClient from "./AdsCollegeClient";
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function toggleAdRowStatus(formData: FormData) {
   "use server";
@@ -108,7 +108,7 @@ async function updateAdRow(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -127,7 +127,7 @@ async function safeQuery<T >(
   }
 }
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AdCollegeRow  {
   id: number;
@@ -156,7 +156,7 @@ interface CountRow  {
   total: number;
 }
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function AdsCollegesListPage({
   searchParams,
@@ -168,7 +168,7 @@ export default async function AdsCollegesListPage({
   const page   = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // -- WHERE ------------------------------------------------------------------
+  // ── WHERE ──────────────────────────────────────────────────────────────────
   const conditions: string[] = [];
   const params: (string | number)[] = [];
 
@@ -179,7 +179,7 @@ export default async function AdsCollegesListPage({
 
   const where = conditions.length ? "WHERE " + conditions.join(" AND ") : "";
 
-  // -- Queries ----------------------------------------------------------------
+  // ── Queries ────────────────────────────────────────────────────────────────
   const [adsRows, countRows, statsRows] = await Promise.all([
     safeQuery<AdCollegeRow>(
       `SELECT 

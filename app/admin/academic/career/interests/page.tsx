@@ -2,7 +2,7 @@ import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import InterestListClient from "./InterestListClient";
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function createInterest(formData: FormData) {
   "use server";
@@ -63,7 +63,7 @@ async function deleteInterest(id: number) {
   revalidatePath("/", "layout");
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T >(
   sql: string,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import OverviewTab from "./tabs/OverviewTab";
 import ProfileTab from "./tabs/ProfileTab";
@@ -17,7 +18,7 @@ import SportsTab from "./tabs/SportsTab";
 import SettingsTab from "./tabs/SettingsTab";
 import QueriesTab from "./tabs/QueriesTab";
 
-// -- Types ---------------------------------------------------------------------
+// ── Types ─────────────────────────────────────────────────────────────────────
 export interface CollegeUser {
   id: string;
   name: string;
@@ -49,7 +50,7 @@ interface Tab {
   mobileLabel: string;
 }
 
-// -- Tab definitions -----------------------------------------------------------
+// ── Tab definitions ───────────────────────────────────────────────────────────
 const TABS: Tab[] = [
   { id: "overview", label: "Overview", icon: "dashboard", mobileLabel: "Home" },
   { id: "profile", label: "Profile", icon: "edit", mobileLabel: "Profile" },
@@ -110,7 +111,7 @@ const TABS: Tab[] = [
 const PRIMARY_TABS = TABS.slice(0, 4); // visible in mobile bottom bar
 const OVERFLOW_TABS = TABS.slice(4); // in "More" drawer
 
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 export default function CollegeDashboardClient({
   college,
 }: {
@@ -118,6 +119,12 @@ export default function CollegeDashboardClient({
 }) {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const slug = college.slug;
+  const router = useRouter();
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/");
+  }
 
   function handleTabChange(tab: TabId) {
     setActiveTab(tab);
@@ -171,7 +178,7 @@ export default function CollegeDashboardClient({
 
   return (
     <div className="min-h-screen bg-[#f8f6f6] dark:bg-[#0f1623] font-display">
-      {/* -- Top header ------------------------------------------------------ */}
+      {/* ── Top header ────────────────────────────────────────────────────── */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           {/* Logo */}
@@ -224,25 +231,21 @@ export default function CollegeDashboardClient({
             </div>
 
             {/* Sign out */}
-            <form action="/api/auth/logout" method="POST">
-              <button
-                type="submit"
-                title="Sign out"
-                className="flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-red-500 transition-colors"
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  logout
-                </span>
-                <span className="hidden sm:inline text-xs">Sign out</span>
-              </button>
-            </form>
+            <button
+              onClick={handleLogout}
+              title="Sign out"
+              className="flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-red-500 transition-colors"
+            >
+              <span className="material-symbols-outlined text-[20px]">logout</span>
+              <span className="hidden sm:inline text-xs">Sign out</span>
+            </button>
           </div>
         </div>
       </header>
 
-      {/* -- Content below header --------------------------------------------- */}
+      {/* ── Content below header ───────────────────────────────────────────── */}
       <div className="pt-16">
-        {/* -- Sticky desktop tab bar --------------------------------------- */}
+        {/* ── Sticky desktop tab bar ─────────────────────────────────────── */}
         <div className="sticky top-16 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 shadow-sm">
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
             <div className="flex items-center overflow-x-auto hide-scrollbar gap-0.5">
@@ -277,13 +280,13 @@ export default function CollegeDashboardClient({
           </div>
         </div>
 
-        {/* -- Main content ------------------------------------------------- */}
+        {/* ── Main content ───────────────────────────────────────────────── */}
         <main className="max-w-[1400px] mx-auto px-4 sm:px-6 pt-6 pb-28 md:pb-10">
           {renderTab()}
         </main>
       </div>
 
-      {/* -- Mobile bottom navigation ----------------------------------------- */}
+      {/* ── Mobile bottom navigation ───────────────────────────────────────── */}
       <MobileBottomNav
         activeTab={activeTab}
         onTabChange={handleTabChange}
@@ -294,7 +297,7 @@ export default function CollegeDashboardClient({
   );
 }
 
-// -- Mobile Bottom Nav ---------------------------------------------------------
+// ── Mobile Bottom Nav ─────────────────────────────────────────────────────────
 function MobileBottomNav({
   activeTab,
   onTabChange,
@@ -423,7 +426,7 @@ function MobileBottomNav({
   );
 }
 
-// -- Pending profile state -----------------------------------------------------
+// ── Pending profile state ─────────────────────────────────────────────────────
 // Shown when the college account hasn't been linked to a collegeprofile yet
 function PendingProfileState({ college }: { college: CollegeUser }) {
   return (

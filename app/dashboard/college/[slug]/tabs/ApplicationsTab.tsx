@@ -94,7 +94,7 @@ const FILTER_TABS = [
   { value: "rejected", label: "Rejected" },
 ];
 
-// -- Helpers --------------------------------------------------------------------
+// ── Helpers ────────────────────────────────────────────────────────────────────
 function formatCurrency(n: number) {
   if (!n) return "—";
   if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`;
@@ -102,7 +102,7 @@ function formatCurrency(n: number) {
   return `₹${n}`;
 }
 
-// -- Status chip ----------------------------------------------------------------
+// ── Status chip ────────────────────────────────────────────────────────────────
 function StatusChip({
   label,
   icon,
@@ -129,7 +129,7 @@ function StatusChip({
   );
 }
 
-// -- Status dropdown ------------------------------------------------------------
+// ── Status dropdown ────────────────────────────────────────────────────────────
 function StatusDropdown({
   appId,
   current,
@@ -249,7 +249,7 @@ function StatusDropdown({
   );
 }
 
-// -- Application row ------------------------------------------------------------
+// ── Application row ────────────────────────────────────────────────────────────
 function AppRow({
   app,
   slug,
@@ -435,7 +435,7 @@ function AppRow({
   );
 }
 
-// -- Skeleton row ---------------------------------------------------------------
+// ── Skeleton row ───────────────────────────────────────────────────────────────
 function SkeletonRow() {
   return (
     <tr className="border-b border-slate-100 dark:border-slate-700/60 animate-pulse">
@@ -473,7 +473,7 @@ function SkeletonRow() {
   );
 }
 
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 export default function ApplicationsTab({ college }: Props) {
   const slug = college.slug;
 
@@ -612,7 +612,7 @@ export default function ApplicationsTab({ college }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* -- Header ----------------------------------------------------------- */}
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div>
         <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">
           Applications
@@ -622,7 +622,7 @@ export default function ApplicationsTab({ college }: Props) {
         </p>
       </div>
 
-      {/* -- Stat cards ------------------------------------------------------- */}
+      {/* ── Stat cards ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {STAT_CARDS.map((s) => (
           <button
@@ -662,7 +662,7 @@ export default function ApplicationsTab({ college }: Props) {
         ))}
       </div>
 
-      {/* -- Search + filter row ----------------------------------------------- */}
+      {/* ── Search + filter row ─────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row gap-3">
         {/* Search */}
         <div className="relative flex-1">
@@ -707,7 +707,7 @@ export default function ApplicationsTab({ college }: Props) {
         </div>
       </div>
 
-      {/* -- Error ------------------------------------------------------------ */}
+      {/* ── Error ──────────────────────────────────────────────────────────── */}
       {error && (
         <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl px-5 py-4 text-red-700 dark:text-red-400">
           <span className="material-symbols-rounded text-xl">error</span>
@@ -721,7 +721,7 @@ export default function ApplicationsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Table ------------------------------------------------------------ */}
+      {/* ── Table ──────────────────────────────────────────────────────────── */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px]">
@@ -795,7 +795,7 @@ export default function ApplicationsTab({ college }: Props) {
           </table>
         </div>
 
-        {/* -- Pagination -- */}
+        {/* ── Pagination ── */}
         {!loading && pagination.totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100 dark:border-slate-700">
             <p className="text-xs text-slate-400 dark:text-slate-500">

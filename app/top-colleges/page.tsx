@@ -24,7 +24,7 @@ function buildImageUrl(raw: string | null | undefined): string | null {
   return `https://admin.admissionx.in/uploads/${raw}`;
 }
 
-// -- Filter data ---------------------------------------------------------------
+// ── Filter data ───────────────────────────────────────────────────────────────
 
 const getFilterData = unstable_cache(
   async () => {
@@ -58,7 +58,7 @@ const getFilterData = unstable_cache(
       db.collection("collegeprofile")
         .find({ isShowOnTop: 1, registeredAddressCityId: { $ne: null } })
         .limit(5000)
-        .project({ registeredAddressCityId: 1 })
+        .project({ registeredAddressCityId: 1, registeredAddressCountryId: 1 })
         .toArray(),
     ]);
 
@@ -67,29 +67,48 @@ const getFilterData = unstable_cache(
       (a, b) => (countMap.get(String(b._id)) ?? 0) - (countMap.get(String(a._id)) ?? 0)
     );
 
-    const uniqueCityIds = [...new Set(cityIdRows.map((r) => r.registeredAddressCityId))].slice(0, 400);
-    const cityRows = uniqueCityIds.length > 0
-      ? await db.collection("city")
-        .find({ _id: { $in: uniqueCityIds }, name: { $exists: true, $ne: "" } })
+    const uniqueCityIds = [...new Set(cityIdRows.map((r) => Number(r.registeredAddressCityId)).filter(Boolean))].slice(0, 400);
+    const uniqueCountryIds = [...new Set(cityIdRows.map((r: any) => Number(r.registeredAddressCountryId)).filter(Boolean))];
+
+    const [cityRows, countryRows] = await Promise.all([
+      uniqueCityIds.length > 0
+        ? db.collection("city")
+          .find({ id: { $in: uniqueCityIds } })
+          .sort({ name: 1 }).limit(500)
+          .project({ _id: 0, id: 1, name: 1, state_id: 1 })
+          .toArray()
+        : Promise.resolve([]),
+      uniqueCountryIds.length > 0
+        ? db.collection("country")
+          .find({ id: { $in: uniqueCountryIds } })
+          .sort({ name: 1 })
+          .project({ _id: 0, id: 1, name: 1 })
+          .toArray()
+        : Promise.resolve([]),
+    ]);
+
+    const uniqueStateIds = [...new Set(cityRows.map((c: any) => Number(c.state_id)).filter(Boolean))];
+    const stateRows = uniqueStateIds.length > 0
+      ? await db.collection("state")
+        .find({ id: { $in: uniqueStateIds } })
         .sort({ name: 1 })
-        .limit(100)
-        .project({ _id: 1, name: 1 })
+        .project({ _id: 0, id: 1, name: 1, country_id: 1 })
         .toArray()
       : [];
 
-    return { streamRows: sortedStreamRows, degreeRows, cityRows };
+    return { streamRows: sortedStreamRows, degreeRows, cityRows, stateRows, countryRows };
   },
-  ["top-colleges-filters-mongo-v2"],
+  ["top-colleges-filters-mongo-v3"],
   { revalidate: 600 },
 );
 
-// -- Core fetch ----------------------------------------------------------------
+// ── Core fetch ────────────────────────────────────────────────────────────────
 
 async function fetchTopColleges(opts: {
-  q: string; stream: string; degree: string; cityId: string;
+  q: string; stream: string; degree: string; cityId: string; stateId: string; countryId: string;
   sort: string; page: number; limit: number;
 }): Promise<{ colleges: CollegeResult[]; total: number; totalPages: number }> {
-  const { q, stream, degree, cityId, sort, page, limit } = opts;
+  const { q, stream, degree, cityId, stateId, countryId, sort, page, limit } = opts;
   const db = await getDb();
 
   const match: Record<string, unknown> = { isShowOnTop: 1 };
@@ -101,7 +120,14 @@ async function fetchTopColleges(opts: {
     ];
   }
 
-  if (cityId) match.registeredAddressCityId = isNaN(Number(cityId)) ? cityId : Number(cityId);
+  if (cityId) {
+    match.registeredAddressCityId = Number(cityId);
+  } else if (stateId) {
+    const stateCities = await db.collection("city").find({ state_id: Number(stateId) }, { projection: { _id: 0, id: 1 } }).toArray();
+    match.registeredAddressCityId = { $in: stateCities.map((c: any) => Number(c.id)) };
+  } else if (countryId) {
+    match.registeredAddressCountryId = Number(countryId);
+  }
 
   // Resolve stream + degree filters in parallel
   const [faDoc, degDoc] = await Promise.all([
@@ -211,11 +237,11 @@ async function fetchTopColleges(opts: {
 
 const getCachedTopColleges = unstable_cache(
   fetchTopColleges,
-  ["top-colleges-mongo-v2"],
+  ["top-colleges-mongo-v4"],
   { revalidate: 300 },
 );
 
-// -- Page ----------------------------------------------------------------------
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -236,28 +262,41 @@ export default async function TopCollegesPage({ searchParams }: PageProps) {
   const degree = getString("degree");
   const cityId = getString("city_id");
   const stateId = getString("state_id");
+  const countryId = getString("country_id");
   const feesMax = getString("fees_max");
   const sort = getString("sort", "rating");
   const page = Math.max(1, parseInt(getString("page", "1")));
   const limit = 12;
 
-  const [{ colleges, total, totalPages }, { streamRows, degreeRows, cityRows }] =
+  const [{ colleges, total, totalPages }, { streamRows, degreeRows, cityRows, stateRows, countryRows }] =
     await Promise.all([
-      getCachedTopColleges({ q, stream, degree, cityId, sort, page, limit }),
+      getCachedTopColleges({ q, stream, degree, cityId, stateId, countryId, sort, page, limit }),
       getFilterData(),
     ]);
 
   const streamOptions: FilterOption[] = streamRows.map((r) => ({
-    id: String(r._id), name: r.name,
-    slug: r.pageslug ?? r.name.toLowerCase().replace(/\s+/g, "-"),
+    id: String(r._id), name: String(r.name).trim(),
+    slug: r.pageslug ? String(r.pageslug).trim() : String(r.name).trim().toLowerCase().replace(/\s+/g, "-"),
   }));
 
   const degreeOptions: FilterOption[] = degreeRows.map((r) => ({
-    id: String(r._id), name: r.name,
-    slug: r.pageslug ?? r.name.toLowerCase().replace(/\s+/g, "-"),
+    id: String(r._id), name: String(r.name).trim(),
+    slug: r.pageslug ? String(r.pageslug).trim() : String(r.name).trim().toLowerCase().replace(/\s+/g, "-"),
   }));
 
-  const cityOptions: FilterOption[] = cityRows.map((r) => ({ id: String(r._id), name: r.name }));
+  const cityOptions: FilterOption[] = cityRows.map((r: any) => ({
+    id: r.id, name: String(r.name).trim(),
+    slug: r.state_id ? String(r.state_id) : undefined,
+  }));
+
+  const stateOptions: FilterOption[] = (stateRows ?? []).map((r: any) => ({
+    id: r.id, name: String(r.name).trim(),
+    slug: r.country_id ? String(Number(r.country_id)) : undefined,
+  }));
+
+  const countryOptions: FilterOption[] = (countryRows ?? []).map((r: any) => ({
+    id: r.id, name: String(r.name).trim(),
+  }));
 
   const streamName = streamOptions.find((s) => s.slug === stream)?.name ?? stream;
   const pageSubtitle = stream
@@ -272,6 +311,8 @@ export default async function TopCollegesPage({ searchParams }: PageProps) {
       streams={streamOptions}
       degrees={degreeOptions}
       cities={cityOptions}
+      states={stateOptions}
+      countries={countryOptions}
       initQ=""
       initStream={stream}
       initDegree={degree}

@@ -6,10 +6,6 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import type { FilterCollegeResult } from "@/lib/college-filter";
 import FadeIn from "./FadeIn";
-import MovingAdsCard from "./MovingAdsCard";
-import HomeTicker, { TickerAdItem } from "./HomeTicker";
-import AdCard from "./AdCard";
-import type { AdItem } from "./AdsSection";
 
 export interface University {
   name: string;
@@ -20,8 +16,6 @@ export interface University {
   abbrBg: string;
   tags: string[];
   tuition: string;
-  offeredCourses: string[];
-  avgPackage: string;
   href: string;
 }
 
@@ -29,10 +23,6 @@ interface TopUniversitiesProps {
   universities: University[];
   /** Pre-fetched colleges for the default "Engineering" tab (SSR warm-up). */
   initialStreamColleges?: FilterCollegeResult[];
-  ads?: AdItem[];
-  partnerAds?: AdItem[];
-  featuredAds?: AdItem[];
-  tickerAds?: TickerAdItem[];
 }
 
 const categories = [
@@ -49,19 +39,7 @@ const categories = [
 export default function TopUniversities({
   universities: initialUniversities,
   initialStreamColleges = [],
-  ads = [],
-  partnerAds = [],
-  featuredAds = [],
-  tickerAds = [],
 }: TopUniversitiesProps) {
-  // Combine all available ads into a single pool for the large featured card
-  const displayAds = [
-    ...(partnerAds || []), 
-    ...(featuredAds || []), 
-    ...(ads || [])
-  ].filter((ad) => ad && typeof ad === 'object' && ad.id)
-   .filter((ad, index, self) => index === self.findIndex((t) => t.id === ad.id));
-
   const [activeTab, setActiveTab] = useState("Engineering");
   const [searchQuery, setSearchQuery] = useState("");
   // If the server pre-fetched Engineering colleges, show them immediately.
@@ -145,30 +123,19 @@ export default function TopUniversities({
 
   const activeTabSlug = categoryToSlug(activeTab);
 
-
   return (
-    <section className="w-full py-24 lg:py-32 bg-[#f8fafc]/30 border-b border-slate-200">
+    <section className="w-full py-24 lg:py-32 bg-[#f8fafc]/30">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
         <FadeIn>
-          <div className="mb-12 flex flex-col lg:flex-row lg:items-start justify-between gap-8">
-            <div className="max-w-4xl">
-              <h2 className="text-[40px] lg:text-[68px] font-semibold text-slate-900 tracking-tight leading-[1.1] whitespace-nowrap">
-                Discover the Top <span className="text-primary">Universities</span>
-              </h2>
-              <p className="mt-6 text-[25px] text-slate-500 font-medium leading-relaxed antialiased">
-                Filter through thousands of institutions worldwide based on your
-                specific academic preferences and career goals.
-              </p>
-            </div>
-            
-            <div style={{ flexShrink: 0 }}>
-              <div style={{ textAlign: 'right', marginBottom: 12 }}>
-                <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] opacity-60">Exclusive Partnerships</span>
-              </div>
-              <AdCard ads={tickerAds.length > 0 ? tickerAds : (ads as any)} />
-            </div>
+          <div className="mb-12">
+            <h2 className="text-[40px] lg:text-[68px] font-semibold text-slate-900 tracking-tight leading-[1.1]">
+              Discover the Top <span className="text-primary">Universities</span>
+            </h2>
+            <p className="mt-6 text-[25px] text-slate-500 font-medium max-w-4xl leading-relaxed antialiased">
+              Filter through thousands of institutions worldwide based on your
+              specific academic preferences and career goals.
+            </p>
           </div>
-
         </FadeIn>
 
         {/* Section Search & Filters - Separated into Blocks */}
@@ -378,14 +345,12 @@ export default function TopUniversities({
                         <div className="text-[18px] font-medium text-[#6C6C6C]">
                           Avg. Package: <span className="font-bold text-primary">{uni.avgPackage}</span>
                         </div>
+                        </div>
                         <Link
                           href={uni.href}
-                          className="inline-flex items-center gap-2 text-[18px] font-bold text-primary hover:translate-x-1 transition-transform"
+                          className="px-4 py-2 rounded-[10px] bg-slate-900 text-white text-xs font-normal hover:bg-primary transition-all active:scale-95"
                         >
-                          View Details
-                          <span className="material-symbols-rounded text-[24px]">
-                            arrow_forward
-                          </span>
+                          Apply Now
                         </Link>
                       </div>
                     </div>
@@ -414,13 +379,10 @@ export default function TopUniversities({
         <div className="mt-12 text-center">
           <Link
             href={`/search?stream=${activeTabSlug}`}
-            className="group inline-flex mx-auto items-center justify-center gap-3 px-10 py-4 rounded-[18px] bg-white border border-slate-200 text-slate-700 text-[20px] font-semibold transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:text-primary"
-            style={{ boxShadow: "0 10px 24px -12px rgba(15, 23, 42, 0.22)" }}
+            className="group inline-flex items-center gap-2 text-sm font-normal text-slate-400 hover:text-primary transition-colors"
           >
-            <span>
-              View All University
-            </span>
-            <span className="material-symbols-rounded text-[24px] transition-transform group-hover:translate-x-1">
+            Explore 120+ More {activeTab} Colleges
+            <span className="material-symbols-rounded text-[20px] transition-transform group-hover:translate-x-1">
               arrow_forward
             </span>
           </Link>

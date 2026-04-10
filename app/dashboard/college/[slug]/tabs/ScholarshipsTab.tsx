@@ -15,7 +15,7 @@ interface Scholarship {
   updated_at: string;
 }
 
-// -- Skeleton row --------------------------------------------------------------
+// ── Skeleton row ──────────────────────────────────────────────────────────────
 function SkeletonRow() {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 animate-pulse">
@@ -34,7 +34,7 @@ function SkeletonRow() {
   );
 }
 
-// -- Inline form (add or edit) -------------------------------------------------
+// ── Inline form (add or edit) ─────────────────────────────────────────────────
 function ScholarshipForm({
   initial,
   slug,
@@ -183,7 +183,7 @@ function ScholarshipForm({
   );
 }
 
-// -- Delete Confirm -------------------------------------------------------------
+// ── Delete Confirm ─────────────────────────────────────────────────────────────
 function DeleteConfirm({
   scholarship,
   slug,
@@ -272,7 +272,7 @@ function DeleteConfirm({
   );
 }
 
-// -- Scholarship Row ------------------------------------------------------------
+// ── Scholarship Row ────────────────────────────────────────────────────────────
 function ScholarshipRow({
   scholarship,
   onEdit,
@@ -357,7 +357,7 @@ function ScholarshipRow({
   );
 }
 
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 export default function ScholarshipsTab({ college }: Props) {
   const slug = college.slug;
 
@@ -380,7 +380,7 @@ export default function ScholarshipsTab({ college }: Props) {
     setTimeout(() => setToast(null), 3500);
   }
 
-  // -- Load ------------------------------------------------------------------
+  // ── Load ──────────────────────────────────────────────────────────────────
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -398,7 +398,7 @@ export default function ScholarshipsTab({ college }: Props) {
 
   useEffect(() => { load(); }, [load]);
 
-  // -- Handlers --------------------------------------------------------------
+  // ── Handlers ──────────────────────────────────────────────────────────────
   function handleSaved(s: Scholarship) {
     setScholarships((prev) => {
       const idx = prev.findIndex((x) => x.id === s.id);
@@ -432,7 +432,7 @@ export default function ScholarshipsTab({ college }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* -- Toast ------------------------------------------------------------ */}
+      {/* ── Toast ──────────────────────────────────────────────────────────── */}
       {toast && (
         <div
           className={`fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50
@@ -450,7 +450,7 @@ export default function ScholarshipsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Header ----------------------------------------------------------- */}
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">
@@ -477,7 +477,7 @@ export default function ScholarshipsTab({ college }: Props) {
         )}
       </div>
 
-      {/* -- Error ------------------------------------------------------------ */}
+      {/* ── Error ──────────────────────────────────────────────────────────── */}
       {error && (
         <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl px-5 py-4 text-red-700 dark:text-red-400">
           <span className="material-symbols-rounded text-xl">error</span>
@@ -491,7 +491,7 @@ export default function ScholarshipsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Add form (shown at top when adding new) --------------------------- */}
+      {/* ── Add form (shown at top when adding new) ─────────────────────────── */}
       {showFormAdd && (
         <ScholarshipForm
           initial={null}
@@ -501,7 +501,7 @@ export default function ScholarshipsTab({ college }: Props) {
         />
       )}
 
-      {/* -- Search ----------------------------------------------------------- */}
+      {/* ── Search ─────────────────────────────────────────────────────────── */}
       {!loading && scholarships.length > 3 && (
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-xl pointer-events-none">
@@ -525,7 +525,7 @@ export default function ScholarshipsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- List ------------------------------------------------------------- */}
+      {/* ── List ───────────────────────────────────────────────────────────── */}
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -584,7 +584,7 @@ export default function ScholarshipsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Bottom Add button (when list has items and form is hidden) --------- */}
+      {/* ── Bottom Add button (when list has items and form is hidden) ───────── */}
       {!loading && scholarships.length > 0 && formTarget === undefined && (
         <button
           onClick={() => setFormTarget(null)}
@@ -600,7 +600,7 @@ export default function ScholarshipsTab({ college }: Props) {
         </button>
       )}
 
-      {/* -- Delete Confirm Modal ---------------------------------------------- */}
+      {/* ── Delete Confirm Modal ────────────────────────────────────────────── */}
       {deleteTarget && (
         <DeleteConfirm
           scholarship={deleteTarget}

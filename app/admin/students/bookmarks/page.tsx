@@ -17,7 +17,7 @@ async function safeQuery<T >(
   }
 }
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function createBookmark(formData: FormData) {
   "use server";
@@ -84,7 +84,7 @@ async function deleteBookmark(id: number) {
   revalidatePath("/student/dashboard/bookmarks");
 }
 
-// --- Interfaces ---------------------------------------------------------------
+// ─── Interfaces ───────────────────────────────────────────────────────────────
 
 interface BookmarkRow  {
   id: number;

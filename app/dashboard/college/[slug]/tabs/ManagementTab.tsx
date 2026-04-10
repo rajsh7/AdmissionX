@@ -46,7 +46,7 @@ const SUFFIX_OPTIONS = [
 ];
 const GENDER_OPTIONS = ["Male", "Female", "Other"];
 
-// -- Skeleton -------------------------------------------------------------------
+// ── Skeleton ───────────────────────────────────────────────────────────────────
 function SkeletonCard() {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 animate-pulse">
@@ -66,7 +66,7 @@ function SkeletonCard() {
   );
 }
 
-// -- Photo Picker ---------------------------------------------------------------
+// ── Photo Picker ───────────────────────────────────────────────────────────────
 function PhotoPicker({
   currentUrl,
   onChange,
@@ -153,7 +153,7 @@ function PhotoPicker({
   );
 }
 
-// -- Add / Edit Modal -----------------------------------------------------------
+// ── Add / Edit Modal ───────────────────────────────────────────────────────────
 function MemberModal({
   member,
   slug,
@@ -446,7 +446,7 @@ function MemberModal({
   );
 }
 
-// -- Delete Confirm -------------------------------------------------------------
+// ── Delete Confirm ─────────────────────────────────────────────────────────────
 function DeleteConfirm({
   member,
   slug,
@@ -533,7 +533,7 @@ function DeleteConfirm({
   );
 }
 
-// -- Member Card ----------------------------------------------------------------
+// ── Member Card ────────────────────────────────────────────────────────────────
 function MemberCard({
   member,
   onEdit,
@@ -656,7 +656,7 @@ function MemberCard({
   );
 }
 
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 export default function ManagementTab({ college }: Props) {
   const slug = college.slug;
 
@@ -727,7 +727,7 @@ export default function ManagementTab({ college }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* -- Header ----------------------------------------------------------- */}
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">
@@ -752,7 +752,7 @@ export default function ManagementTab({ college }: Props) {
         </button>
       </div>
 
-      {/* -- Error ----------------------------------------------------------- */}
+      {/* ── Error ─────────────────────────────────────────────────────────── */}
       {error && (
         <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl px-5 py-4 text-red-700 dark:text-red-400">
           <span className="material-symbols-rounded text-xl">error</span>
@@ -766,7 +766,7 @@ export default function ManagementTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Search ---------------------------------------------------------- */}
+      {/* ── Search ────────────────────────────────────────────────────────── */}
       {!loading && members.length > 3 && (
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-xl pointer-events-none">
@@ -790,7 +790,7 @@ export default function ManagementTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Grid ------------------------------------------------------------ */}
+      {/* ── Grid ──────────────────────────────────────────────────────────── */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -838,7 +838,7 @@ export default function ManagementTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Modals ---------------------------------------------------------- */}
+      {/* ── Modals ────────────────────────────────────────────────────────── */}
       {showModal && (
         <MemberModal
           member={editing}

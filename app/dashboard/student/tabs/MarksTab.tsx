@@ -32,7 +32,7 @@ const BOARDS = ["CBSE", "ICSE", "State Board", "IB", "IGCSE", "NIOS", "Other"];
 const STREAMS_12 = ["Science (PCM)", "Science (PCB)", "Commerce", "Arts", "Vocational", "Other"];
 const YEAR_OPTIONS = Array.from({ length: 30 }, (_, i) => String(new Date().getFullYear() - i));
 
-// -- Shared Tab Navigation -----------------------------------------------------
+// ── Shared Tab Navigation ─────────────────────────────────────────────────────
 function ProfileTabs({ active = "academic" }: { active?: string }) {
   const tabs = [
     { id: "profile", label: "Profile", icon: "person" },
@@ -61,7 +61,7 @@ function ProfileTabs({ active = "academic" }: { active?: string }) {
   );
 }
 
-// -- Premium Input Field ------------------------------------------------------
+// ── Premium Input Field ──────────────────────────────────────────────────────
 function InputField({
   label,
   value,

@@ -2,14 +2,6 @@
 
 import React, { useState, useMemo } from "react";
 
-const USD_TO_INR = 83.5;
-function toINR(usd: number): string {
-  const inr = Math.round(usd * USD_TO_INR);
-  if (inr >= 10000000) return `₹${(inr / 10000000).toFixed(1)} Cr`;
-  if (inr >= 100000) return `₹${(inr / 100000).toFixed(1)} L`;
-  return `₹${inr.toLocaleString("en-IN")}`;
-}
-
 const countries = [
   { name: "United States", tuition: 35000, living: 18000, scholarship: 10000, salary: 85000 },
   { name: "United Kingdom", tuition: 28000, living: 15000, scholarship: 8000, salary: 65000 },
@@ -38,12 +30,12 @@ export default function CostCalculator() {
     <section className="py-24 bg-white">
       <div className="max-w-[1920px] mx-auto px-8 lg:px-12">
         
-        <div className="bg-white rounded-[5px] overflow-hidden shadow-[0_32px_80px_-16px_rgba(0,0,0,0.08)] flex flex-col xl:flex-row border border-slate-100/60">
+        <div className="bg-white rounded-[32px] overflow-hidden shadow-[0_32px_80px_-16px_rgba(0,0,0,0.08)] flex flex-col xl:flex-row border border-slate-100/60">
           
           {/* Left Side - Control Panel */}
           <div className="flex-1 bg-gradient-to-br from-[#12A082] to-[#0A6D58] p-12 xl:p-14 text-white relative">
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 rounded-[5px] text-[13px] font-bold mb-8 backdrop-blur-md border border-white/10">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 rounded-lg text-[13px] font-bold mb-8 backdrop-blur-md border border-white/10">
                 <span className="material-symbols-rounded text-[18px]">calculate</span>
                 Smart Calculator
               </div>
@@ -59,7 +51,7 @@ export default function CostCalculator() {
                   <label className="block text-[13px] font-bold text-white/70 uppercase tracking-widest">Select Destination</label>
                   <div className="relative">
                     <select 
-                      className="w-full bg-white/10 border border-white/20 rounded-[5px] px-5 py-4 text-[16px] text-white font-bold outline-none focus:border-white/50 transition-all appearance-none cursor-pointer"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl px-5 py-4 text-[16px] text-white font-bold outline-none focus:border-white/50 transition-all appearance-none cursor-pointer"
                       value={selectedCountry}
                       onChange={(e) => setSelectedCountry(e.target.value)}
                     >
@@ -72,12 +64,12 @@ export default function CostCalculator() {
                 {/* Degree Level */}
                 <div className="space-y-3">
                   <label className="block text-[13px] font-bold text-white/70 uppercase tracking-widest">Degree Level</label>
-                  <div className="bg-white/10 p-1 rounded-[5px] flex gap-1">
+                  <div className="bg-white/10 p-1 rounded-xl flex gap-1">
                     {["Bachelors", "Masters"].map((type) => (
                       <button 
                         key={type}
                         onClick={() => setDegree(type)}
-                        className={`flex-1 py-3 rounded-[5px] font-bold text-[15px] transition-all ${degree === type ? "bg-white text-[#0A6D58] shadow-lg" : "text-white/70 hover:bg-white/5"}`}
+                        className={`flex-1 py-3 rounded-lg font-bold text-[15px] transition-all ${degree === type ? "bg-white text-[#0A6D58] shadow-lg" : "text-white/70 hover:bg-white/5"}`}
                       >
                         {type}
                       </button>
@@ -116,7 +108,7 @@ export default function CostCalculator() {
             
             <div className="space-y-4 flex-1">
               {/* Cost Rows */}
-              <div className="bg-[#F0F7FF] rounded-[5px] p-5 border border-blue-50/50">
+              <div className="bg-[#F0F7FF] rounded-2xl p-5 border border-blue-50/50">
                 <div className="flex items-center gap-5">
                   <div className="w-12 h-12 bg-[#D1E9FF] rounded-full flex items-center justify-center text-blue-600">
                     <span className="material-symbols-rounded text-[24px]">school</span>
@@ -124,14 +116,14 @@ export default function CostCalculator() {
                   <div className="flex-1">
                     <div className="flex justify-between items-center">
                        <span className="text-[15px] font-bold text-slate-700">Tuition Fees</span>
-                       <span className="text-[18px] font-bold text-slate-900">{toINR(stats.tuition)}</span>
+                       <span className="text-[18px] font-bold text-slate-900">${stats.tuition.toLocaleString('en-US')}</span>
                     </div>
                     <p className="text-[13px] text-slate-400 font-medium">For {duration} years</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-[#F2FBF2] rounded-[5px] p-5 border border-green-50/50">
+              <div className="bg-[#F2FBF2] rounded-2xl p-5 border border-green-50/50">
                 <div className="flex items-center gap-5">
                   <div className="w-12 h-12 bg-[#DDF5DD] rounded-full flex items-center justify-center text-green-600">
                     <span className="material-symbols-rounded text-[24px]">home</span>
@@ -139,14 +131,14 @@ export default function CostCalculator() {
                   <div className="flex-1">
                     <div className="flex justify-between items-center">
                        <span className="text-[15px] font-bold text-slate-700">Living Expenses</span>
-                       <span className="text-[18px] font-bold text-slate-900">{toINR(stats.living)}</span>
+                       <span className="text-[18px] font-bold text-slate-900">${stats.living.toLocaleString('en-US')}</span>
                     </div>
                     <p className="text-[13px] text-slate-400 font-medium">Accommodation, Food, etc</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-[#FFF9F0] rounded-[5px] p-5 border border-orange-50/50">
+              <div className="bg-[#FFF9F0] rounded-2xl p-5 border border-orange-50/50">
                 <div className="flex items-center gap-5">
                   <div className="w-12 h-12 bg-[#FFEED6] rounded-full flex items-center justify-center text-orange-600">
                     <span className="material-symbols-rounded text-[24px]">stars</span>
@@ -154,7 +146,7 @@ export default function CostCalculator() {
                   <div className="flex-1">
                     <div className="flex justify-between items-center">
                        <span className="text-[15px] font-bold text-slate-700">Expected scholarship</span>
-                       <span className="text-[18px] font-bold text-slate-900">-{toINR(stats.scholarship)}</span>
+                       <span className="text-[18px] font-bold text-slate-900">-${stats.scholarship.toLocaleString('en-US')}</span>
                     </div>
                     <p className="text-[13px] text-slate-400 font-medium">Based on average profile</p>
                   </div>
@@ -166,15 +158,15 @@ export default function CostCalculator() {
                <div className="flex items-end justify-between gap-8 mb-10">
                   <div className="space-y-2">
                     <span className="text-slate-400 text-[12px] font-bold uppercase tracking-wider">Net Estimated Cost</span>
-                    <div className="text-[40px] font-bold text-slate-800 leading-none tracking-tight">{toINR(stats.total)}</div>
+                    <div className="text-[40px] font-bold text-slate-800 leading-none tracking-tight">${stats.total.toLocaleString('en-US')}</div>
                   </div>
                   <div className="text-right space-y-2">
                     <span className="text-slate-400 text-[12px] font-bold uppercase tracking-wider">Avg. Starting Salary</span>
-                    <div className="text-[28px] font-bold text-[#22C55E] leading-none tracking-tight">{toINR(stats.salary)}/yr</div>
+                    <div className="text-[28px] font-bold text-[#22C55E] leading-none tracking-tight">${stats.salary.toLocaleString('en-US')}/yr</div>
                   </div>
                </div>
 
-               <button className="w-full bg-[#333333] hover:bg-black text-white py-5 rounded-[5px] font-bold text-[16px] transition-all shadow-xl shadow-slate-900/10 active:scale-[0.98]">
+               <button className="w-full bg-[#333333] hover:bg-black text-white py-5 rounded-xl font-bold text-[16px] transition-all shadow-xl shadow-slate-900/10 active:scale-[0.98]">
                   Get Detailed financial Plan
                </button>
             </div>

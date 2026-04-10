@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface ExamFAQ {
   id: number;
@@ -11,7 +11,7 @@ export interface ExamFAQ {
   refLinks: string | null;
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function stripHtml(html: string | null | undefined): string {
   if (!html) return "";
@@ -27,7 +27,7 @@ function stripHtml(html: string | null | undefined): string {
     .trim();
 }
 
-// --- Single FAQ item ----------------------------------------------------------
+// ─── Single FAQ item ──────────────────────────────────────────────────────────
 
 function FAQItem({
   faq,
@@ -197,7 +197,7 @@ function FAQItem({
   );
 }
 
-// --- Main Accordion -----------------------------------------------------------
+// ─── Main Accordion ───────────────────────────────────────────────────────────
 
 interface ExamFAQAccordionProps {
   faqs: ExamFAQ[];

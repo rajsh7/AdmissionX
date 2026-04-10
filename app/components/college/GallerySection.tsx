@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import type { GalleryData } from "@/app/api/college/[slug]/route";
 import Image from "next/image";
 
-// --- Lightbox -----------------------------------------------------------------
+// ─── Lightbox ─────────────────────────────────────────────────────────────────
 
 interface LightboxProps {
   images: GalleryData[];
@@ -148,7 +148,7 @@ function Lightbox({ images, index, onClose }: LightboxProps) {
   );
 }
 
-// --- Gallery grid item --------------------------------------------------------
+// ─── Gallery grid item ────────────────────────────────────────────────────────
 
 function GalleryItem({
   image,
@@ -208,7 +208,7 @@ function GalleryItem({
   );
 }
 
-// --- Main component -----------------------------------------------------------
+// ─── Main component ───────────────────────────────────────────────────────────
 
 interface GallerySectionProps {
   gallery: GalleryData[];

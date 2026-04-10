@@ -29,7 +29,7 @@ async function updateUniversityImages(formData: FormData) {
   revalidatePath("/admin/universities");
   revalidatePath("/", "layout");
 }
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -57,7 +57,7 @@ function formatDate(d: string | null | undefined): string {
   } catch { return "—"; }
 }
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface UniversityRow  {
   id: number;
@@ -84,7 +84,7 @@ interface CountRow  {
   paid_count?: number;
 }
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function AdminUniversitiesPage({
   searchParams,
@@ -97,7 +97,7 @@ export default async function AdminUniversitiesPage({
   const verified = sp.verified ?? "all"; // all | yes | no
   const offset   = (page - 1) * PAGE_SIZE;
 
-  // -- Build WHERE ------------------------------------------------------------
+  // ── Build WHERE ────────────────────────────────────────────────────────────
   const conditions: string[] = ["cp.isTopUniversity = 1"];
   const params: (string | number)[] = [];
 
@@ -110,7 +110,7 @@ export default async function AdminUniversitiesPage({
 
   const where = `WHERE ${conditions.join(" AND ")}`;
 
-  // -- Parallel queries -------------------------------------------------------
+  // ── Parallel queries ───────────────────────────────────────────────────────
   const [rows, countRows, statsRows] = await Promise.all([
     safeQuery<UniversityRow>(
       `SELECT
@@ -180,7 +180,7 @@ export default async function AdminUniversitiesPage({
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
 
-      {/* -- Page header ---------------------------------------------------- */}
+      {/* ── Page header ──────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -205,7 +205,7 @@ export default async function AdminUniversitiesPage({
         </Link>
       </div>
 
-      {/* -- Stat cards ----------------------------------------------------- */}
+      {/* ── Stat cards ───────────────────────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: "Total Universities", value: statsTotal.total,          icon: "account_balance", color: "text-indigo-600", bg: "bg-indigo-50" },
@@ -224,7 +224,7 @@ export default async function AdminUniversitiesPage({
         ))}
       </div>
 
-      {/* -- Search + verified filter ---------------------------------------- */}
+      {/* ── Search + verified filter ──────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
 
         {/* Search */}
@@ -273,7 +273,7 @@ export default async function AdminUniversitiesPage({
         </div>
       </div>
 
-      {/* -- Table ----------------------------------------------------------- */}
+      {/* ── Table ─────────────────────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         {rows.length === 0 ? (
           <div className="py-20 text-center">
@@ -291,7 +291,7 @@ export default async function AdminUniversitiesPage({
           <>
             <UniversityListClient rows={rows} offset={offset} updateImages={updateUniversityImages} />
 
-            {/* -- Pagination ------------------------------------------------ */}
+            {/* ── Pagination ──────────────────────────────────────────────── */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
                 <p className="text-xs text-slate-500">
@@ -335,7 +335,7 @@ export default async function AdminUniversitiesPage({
         )}
       </div>
 
-      {/* -- Footer note ----------------------------------------------------- */}
+      {/* ── Footer note ───────────────────────────────────────────────────── */}
       <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
         <span className="material-symbols-rounded text-[13px]" style={ICO}>info</span>
         Universities are colleges with <code className="bg-slate-100 px-1 rounded">isTopUniversity = 1</code> in the collegeprofile table.

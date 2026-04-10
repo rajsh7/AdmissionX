@@ -116,7 +116,7 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* --- Floating Search Card --------------------------------------- */}
+      {/* ─── Floating Search Card ─────────────────────────────────────── */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[90%] max-w-[1300px] z-50 animate-in fade-in slide-in-from-bottom duration-700 delay-300">
         <div className="bg-white rounded-[24px] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.2)] p-8 md:p-10 border border-slate-100/50">
           

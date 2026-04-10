@@ -111,9 +111,9 @@ export default function ListingSearchV4({
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
       <Header />
-      {/* -- Hero section -- */}
+      {/* ── Hero section ── */}
       <div className="relative w-full overflow-hidden" style={{ height: heroHeight }}>
-        {/* -- Hero Background -- */}
+        {/* ── Hero Background ── */}
         <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
             <Image
               src={heroImage}
@@ -178,7 +178,7 @@ export default function ListingSearchV4({
             </div>
             <div className="flex-1 min-w-0">
               <h2 className="text-2xl font-medium text-neutral-900 mb-2 tracking-tight">Active filters</h2>
-              {/* -- Active Filters + Sort bar -- */}
+              {/* ── Active Filters + Sort bar ── */}
               <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
                 {/* Active Filters chips */}
                 <div className="flex flex-wrap items-center gap-2">

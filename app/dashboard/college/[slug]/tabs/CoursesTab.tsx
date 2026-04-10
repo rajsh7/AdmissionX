@@ -304,7 +304,7 @@ export default function CoursesTab({ college }: Props) {
     }
   }
 
-  // -- Filter / search --------------------------------------------------------
+  // ── Filter / search ────────────────────────────────────────────────────────
   const filtered = courses.filter((c) => {
     const q = searchQ.toLowerCase();
     if (
@@ -329,7 +329,7 @@ export default function CoursesTab({ college }: Props) {
 
   return (
     <div className="space-y-6 pb-24">
-      {/* -- Header ---------------------------------------------------------- */}
+      {/* ── Header ────────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
@@ -350,7 +350,7 @@ export default function CoursesTab({ college }: Props) {
         </button>
       </div>
 
-      {/* -- Error ----------------------------------------------------------- */}
+      {/* ── Error ─────────────────────────────────────────────────────────── */}
       {error && (
         <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl px-5 py-4">
           <span
@@ -371,7 +371,7 @@ export default function CoursesTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Search + Filter ------------------------------------------------- */}
+      {/* ── Search + Filter ───────────────────────────────────────────────── */}
       {!loading && courses.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
@@ -401,7 +401,7 @@ export default function CoursesTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Loading skeletons ----------------------------------------------- */}
+      {/* ── Loading skeletons ─────────────────────────────────────────────── */}
       {loading && (
         <div className="space-y-3">
           {[1, 2, 3, 4].map((i) => (
@@ -410,7 +410,7 @@ export default function CoursesTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Empty state ----------------------------------------------------- */}
+      {/* ── Empty state ───────────────────────────────────────────────────── */}
       {!loading && courses.length === 0 && (
         <div className="flex flex-col items-center py-24 text-center">
           <span
@@ -435,7 +435,7 @@ export default function CoursesTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- No filter results ----------------------------------------------- */}
+      {/* ── No filter results ─────────────────────────────────────────────── */}
       {!loading && courses.length > 0 && filtered.length === 0 && (
         <div className="text-center py-16">
           <span className="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-600 block mb-3">
@@ -456,7 +456,7 @@ export default function CoursesTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Courses grouped by stream --------------------------------------- */}
+      {/* ── Courses grouped by stream ─────────────────────────────────────── */}
       {!loading &&
         filtered.length > 0 &&
         streamGroups.map((streamName) => {
@@ -571,7 +571,7 @@ export default function CoursesTab({ college }: Props) {
           );
         })}
 
-      {/* -- Add / Edit Modal ------------------------------------------------ */}
+      {/* ── Add / Edit Modal ──────────────────────────────────────────────── */}
       {showForm && (
         <>
           {/* Backdrop */}
@@ -729,7 +729,7 @@ export default function CoursesTab({ college }: Props) {
         </>
       )}
 
-      {/* -- Delete Confirmation Modal --------------------------------------- */}
+      {/* ── Delete Confirmation Modal ─────────────────────────────────────── */}
       {deleteId !== null && (
         <>
           <div

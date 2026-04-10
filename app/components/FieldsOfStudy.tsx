@@ -38,7 +38,7 @@ const searchOptions = [
 
 export default function FieldsOfStudy() {
   return (
-    <section className="relative w-full py-24 lg:py-32 overflow-hidden border-b border-slate-200">
+    <section className="relative w-full py-24 lg:py-32 overflow-hidden">
       {/* Background Image without Overlay */}
       <div className="absolute inset-0 z-0">
         <img

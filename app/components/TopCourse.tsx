@@ -67,66 +67,6 @@ const courses = [
     description: "Design the spaces of the future. Our architecture programs blend creativity with technical expertise.",
     stats: { colleges: "310+", salary: "$80K+", growth: "14%+" },
     image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?q=80&w=2664&auto=format&fit=crop"
-  },
-  {
-    id: 7,
-    name: "Pharmacy",
-    count: "10 universities +",
-    icon: "biotech",
-    slug: "pharmacy",
-    description: "Build a career in medicines, drug research, and healthcare innovation with programs focused on science and patient care.",
-    stats: { colleges: "390+", salary: "$78K+", growth: "11%+" },
-    image: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?q=80&w=2670&auto=format&fit=crop"
-  },
-  {
-    id: 8,
-    name: "Science",
-    count: "10 universities +",
-    icon: "science",
-    slug: "science",
-    description: "Explore physics, chemistry, biology, and research-led programs that prepare you for innovation across industries.",
-    stats: { colleges: "520+", salary: "$82K+", growth: "13%+" },
-    image: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=2670&auto=format&fit=crop"
-  },
-  {
-    id: 9,
-    name: "Arts",
-    count: "10 universities +",
-    icon: "palette",
-    slug: "arts",
-    description: "Shape ideas, culture, and communication through programs in literature, history, fine arts, and creative expression.",
-    stats: { colleges: "460+", salary: "$68K+", growth: "9%+" },
-    image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?q=80&w=2670&auto=format&fit=crop"
-  },
-  {
-    id: 10,
-    name: "Computer Applications",
-    count: "10 universities +",
-    icon: "computer",
-    slug: "computer-applications",
-    description: "Learn software development, app building, databases, and digital systems through practical technology-focused programs.",
-    stats: { colleges: "610+", salary: "$98K+", growth: "18%+" },
-    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2670&auto=format&fit=crop"
-  },
-  {
-    id: 11,
-    name: "Hotel Management",
-    count: "10 universities +",
-    icon: "hotel",
-    slug: "hotel-management",
-    description: "Step into global hospitality with industry-ready programs in hotel operations, guest experience, and tourism management.",
-    stats: { colleges: "260+", salary: "$72K+", growth: "10%+" },
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2670&auto=format&fit=crop"
-  },
-  {
-    id: 12,
-    name: "Education & Languages",
-    count: "10 universities +",
-    icon: "menu_book",
-    slug: "education-languages",
-    description: "Develop teaching, communication, and language skills through programs designed for educators and academic leaders.",
-    stats: { colleges: "340+", salary: "$64K+", growth: "8%+" },
-    image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=2670&auto=format&fit=crop"
   }
 ];
 
@@ -137,12 +77,11 @@ export default function TopCourse() {
   const filteredCourses = courses.filter(course => 
     course.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const displayedCourses = filteredCourses.slice(0, 10);
   
   const current = courses[active] || courses[0];
 
   return (
-    <section className="w-full py-24 lg:py-32 bg-[#fdfdfd] relative overflow-hidden border-b border-slate-200">
+    <section className="w-full py-24 lg:py-32 bg-[#fdfdfd] relative overflow-hidden">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24 relative z-10">
         <FadeIn>
           <div className="mb-16">
@@ -162,7 +101,7 @@ export default function TopCourse() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
-          {/* -- Left Column: Featured Course ---------------------------- */}
+          {/* ── Left Column: Featured Course ──────────────────────────── */}
           <FadeIn className="lg:col-span-8 flex flex-col gap-10" direction="left">
             <div className="relative aspect-[16/10] rounded-none overflow-hidden group shadow-2xl shadow-black/5">
               <AnimatePresence mode="wait">
@@ -217,7 +156,7 @@ export default function TopCourse() {
           </FadeIn>
 
           {/* ── Right Column: Selector List ───────────────────────────── */}
-          <FadeIn className="lg:col-span-4 bg-white rounded-[10px] border border-slate-100 p-0 shadow-xl shadow-black/5 flex flex-col overflow-hidden h-full" direction="right" delay={0.1}>
+          <FadeIn className="lg:col-span-4 bg-white rounded-[10px] border border-slate-100 p-0 shadow-xl shadow-black/5 flex flex-col h-full overflow-hidden" direction="right" delay={0.1}>
              <div className="p-6 pb-4 border-b border-slate-50">
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -232,16 +171,10 @@ export default function TopCourse() {
                   />
                 </div>
              </div>
-             <div className="px-3 py-3 flex flex-col gap-2 h-full">
-                <style jsx>{`
-                  div::-webkit-scrollbar { width: 4px; }
-                  div::-webkit-scrollbar-track { background: transparent; }
-                  div::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
-                 div::-webkit-scrollbar-thumb:hover { background: #CBD5E0; }
-               `}</style>
-               {displayedCourses.map((course) => {
-                   const originalIdx = courses.findIndex(c => c.id === course.id);
-                   return (
+             <div className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-2 max-h-[400px] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full">
+               {filteredCourses.map((course, idx) => {
+                 const originalIdx = courses.findIndex(c => c.id === course.id);
+                 return (
                   <button
                     key={course.id}
                     onMouseEnter={() => setActive(originalIdx)}
@@ -274,15 +207,10 @@ export default function TopCourse() {
                   </button>
                  );
                })}
-               {displayedCourses.length === 0 && (
-                 <div className="px-3 py-10 text-center text-sm font-medium text-slate-400">
-                   No matching course found.
-                 </div>
-               )}
              </div>
-           </FadeIn>
-         </div>
-       </div>
+          </FadeIn>
+        </div>
+      </div>
     </section>
   );
 }

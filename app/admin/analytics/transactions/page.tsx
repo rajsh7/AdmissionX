@@ -1,6 +1,6 @@
 import pool from "@/lib/db";
 import Link from "next/link";
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -40,7 +40,7 @@ function formatDate(d: string | null | undefined): string {
   }
 }
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface TransactionRow  {
   id: number;
@@ -53,7 +53,7 @@ interface TransactionRow  {
 
 interface CountRow  { total: number; }
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function TransactionsAnalyticsPage({
   searchParams,
@@ -66,7 +66,7 @@ export default async function TransactionsAnalyticsPage({
   const status = sp.status ?? "all";
   const offset = (page - 1) * PAGE_SIZE;
 
-  // -- WHERE ------------------------------------------------------------------
+  // ── WHERE ──────────────────────────────────────────────────────────────────
   const conditions: string[] = [];
   const params: (string | number)[] = [];
 
@@ -81,7 +81,7 @@ export default async function TransactionsAnalyticsPage({
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // -- Queries ----------------------------------------------------------------
+  // ── Queries ────────────────────────────────────────────────────────────────
   const [transactions, countRows, statsRows] = await Promise.all([
     safeQuery<TransactionRow>(
       `SELECT t.*, ps.name as status_name, CAST(COALESCE(a.byafees, '0') AS DECIMAL(10,2)) as amount

@@ -3,10 +3,10 @@ import React from "react";
 export default function Loading() {
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* -- Fixed Header Placeholder -- */}
+      {/* ── Fixed Header Placeholder ── */}
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl h-16 bg-white/80 backdrop-blur-md border border-neutral-200 rounded-full animate-pulse" />
 
-      {/* -- Hero Skeleton -- */}
+      {/* ── Hero Skeleton ── */}
       <div className="relative bg-neutral-900 pt-32 pb-24 overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
           <div className="w-32 h-4 bg-white/10 rounded-full mb-8 animate-pulse" />
@@ -33,7 +33,7 @@ export default function Loading() {
         </div>
       </div>
 
-      {/* -- Features Skeleton -- */}
+      {/* ── Features Skeleton ── */}
       <div className="bg-white py-16 border-b border-neutral-100">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex flex-col items-center mb-12">
@@ -52,7 +52,7 @@ export default function Loading() {
         </div>
       </div>
 
-      {/* -- Destinations Skeleton -- */}
+      {/* ── Destinations Skeleton ── */}
       <div className="py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mb-10">
@@ -67,7 +67,7 @@ export default function Loading() {
         </div>
       </div>
 
-      {/* -- Streams Skeleton -- */}
+      {/* ── Streams Skeleton ── */}
       <div className="bg-white py-16 border-t border-neutral-100">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex items-center justify-between mb-10">

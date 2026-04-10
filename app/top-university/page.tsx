@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import SearchClient from "@/app/search/SearchClient";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
-// Remove force-dynamic so unstable_cache works properly
+export const dynamic = 'force-dynamic';
 export const revalidate = 300;
 
 interface FilterOption {
@@ -24,7 +24,7 @@ function buildImageUrl(raw: string | null | undefined): string | null {
   return `/uploads/${raw}`;
 }
 
-// -- Filter data ---------------------------------------------------------------
+// ── Filter data ───────────────────────────────────────────────────────────────
 
 const getFilterData = unstable_cache(
   async () => {
@@ -48,28 +48,46 @@ const getFilterData = unstable_cache(
       db.collection("collegeprofile")
         .find({ isTopUniversity: 1, registeredAddressCityId: { $ne: null } })
         .limit(2000)
-        .project({ registeredAddressCityId: 1 })
+        .project({ registeredAddressCityId: 1, registeredAddressCountryId: 1 })
         .toArray(),
     ]);
 
-    const uniqueCityIds = [...new Set(cityIdRows.map((r) => r.registeredAddressCityId))].slice(0, 400);
+    const uniqueCityIds = [...new Set(cityIdRows.map((r) => Number(r.registeredAddressCityId)).filter(Boolean))].slice(0, 400);
+    const uniqueCountryIds = [...new Set(cityIdRows.map((r: any) => Number(r.registeredAddressCountryId)).filter(Boolean))];
 
-    const cityRows = uniqueCityIds.length > 0
-      ? await db.collection("city")
-        .find({ _id: { $in: uniqueCityIds }, name: { $exists: true, $ne: "" } })
+    const [cityRows, countryRows] = await Promise.all([
+      uniqueCityIds.length > 0
+        ? db.collection("city")
+          .find({ id: { $in: uniqueCityIds } })
+          .sort({ name: 1 }).limit(500)
+          .project({ _id: 0, id: 1, name: 1, state_id: 1 })
+          .toArray()
+        : Promise.resolve([]),
+      uniqueCountryIds.length > 0
+        ? db.collection("country")
+          .find({ id: { $in: uniqueCountryIds } })
+          .sort({ name: 1 })
+          .project({ _id: 0, id: 1, name: 1 })
+          .toArray()
+        : Promise.resolve([]),
+    ]);
+
+    const uniqueStateIds = [...new Set(cityRows.map((c: any) => Number(c.state_id)).filter(Boolean))];
+    const stateRows = uniqueStateIds.length > 0
+      ? await db.collection("state")
+        .find({ id: { $in: uniqueStateIds } })
         .sort({ name: 1 })
-        .limit(100)
-        .project({ _id: 1, name: 1 })
+        .project({ _id: 0, id: 1, name: 1, country_id: 1 })
         .toArray()
       : [];
 
-    return { streamRows, degreeRows, cityRows };
+    return { streamRows, degreeRows, cityRows, stateRows, countryRows };
   },
-  ["top-university-filters-mongo-v1"],
+  ["top-university-filters-mongo-v2"],
   { revalidate: 3600 },
 );
 
-// -- Core fetch ----------------------------------------------------------------
+// ── Core fetch ────────────────────────────────────────────────────────────────
 
 async function fetchTopUniversities(opts: {
   q: string; stream: string; degree: string; cityId: string;
@@ -201,7 +219,7 @@ const getCachedTopUniversities = unstable_cache(
   { revalidate: 300 },
 );
 
-// -- Page ----------------------------------------------------------------------
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -227,7 +245,7 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
   const page = Math.max(1, parseInt(getString("page", "1")));
   const limit = 12;
 
-  const [{ universities, total, totalPages }, { streamRows, degreeRows, cityRows }] =
+  const [{ universities, total, totalPages }, { streamRows, degreeRows, cityRows, stateRows, countryRows }] =
     await Promise.all([
       getCachedTopUniversities({ q, stream, degree, cityId, sort, page, limit }),
       getFilterData(),
@@ -243,7 +261,19 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
     slug: r.pageslug ?? r.name.toLowerCase().replace(/\s+/g, "-"),
   }));
 
-  const cityOptions: FilterOption[] = cityRows.map((r) => ({ id: String(r._id), name: r.name }));
+  const cityOptions: FilterOption[] = cityRows.map((r: any) => ({
+    id: r.id, name: String(r.name).trim(),
+    slug: r.state_id ? String(r.state_id) : undefined,
+  }));
+
+  const stateOptions: FilterOption[] = (stateRows ?? []).map((r: any) => ({
+    id: r.id, name: String(r.name).trim(),
+    slug: r.country_id ? String(Number(r.country_id)) : undefined,
+  }));
+
+  const countryOptions: FilterOption[] = (countryRows ?? []).map((r: any) => ({
+    id: r.id, name: String(r.name).trim(),
+  }));
 
   const streamName = streamOptions.find((s) => s.slug === stream)?.name ?? stream;
   const pageSubtitle = stream
@@ -258,6 +288,8 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
       streams={streamOptions}
       degrees={degreeOptions}
       cities={cityOptions}
+      states={stateOptions}
+      countries={countryOptions}
       initQ=""
       initStream={stream}
       initDegree={degree}

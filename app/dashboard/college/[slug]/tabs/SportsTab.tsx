@@ -54,7 +54,7 @@ const TYPE_META: Record<
   },
 };
 
-// -- Delete Confirm -------------------------------------------------------------
+// ── Delete Confirm ─────────────────────────────────────────────────────────────
 function DeleteConfirm({
   activity,
   slug,
@@ -149,7 +149,7 @@ function DeleteConfirm({
   );
 }
 
-// -- Inline add input -----------------------------------------------------------
+// ── Inline add input ───────────────────────────────────────────────────────────
 function AddActivityInput({
   type,
   slug,
@@ -270,7 +270,7 @@ function AddActivityInput({
   );
 }
 
-// -- Activity chip --------------------------------------------------------------
+// ── Activity chip ──────────────────────────────────────────────────────────────
 function ActivityChip({
   activity,
   chipCls,
@@ -305,7 +305,7 @@ function ActivityChip({
   );
 }
 
-// -- Section skeleton -----------------------------------------------------------
+// ── Section skeleton ───────────────────────────────────────────────────────────
 function SectionSkeleton() {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 space-y-4 animate-pulse">
@@ -332,7 +332,7 @@ function SectionSkeleton() {
   );
 }
 
-// -- Type section ---------------------------------------------------------------
+// ── Type section ───────────────────────────────────────────────────────────────
 function TypeSection({
   type,
   activities,
@@ -442,7 +442,7 @@ function TypeSection({
   );
 }
 
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 export default function SportsTab({ college }: Props) {
   const slug = college.slug;
 
@@ -530,7 +530,7 @@ export default function SportsTab({ college }: Props) {
     );
   }
 
-  // -- Summary stats for header -----------------------------------------------
+  // ── Summary stats for header ───────────────────────────────────────────────
   const groupCounts = ACTIVITY_TYPES.map((t) => ({
     type: t,
     count: (grouped[t] ?? []).length,
@@ -538,7 +538,7 @@ export default function SportsTab({ college }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* -- Toast ------------------------------------------------------------ */}
+      {/* ── Toast ──────────────────────────────────────────────────────────── */}
       {toast && (
         <div
           className={`
@@ -558,7 +558,7 @@ export default function SportsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Header ----------------------------------------------------------- */}
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">
@@ -599,7 +599,7 @@ export default function SportsTab({ college }: Props) {
         )}
       </div>
 
-      {/* -- Error ------------------------------------------------------------ */}
+      {/* ── Error ──────────────────────────────────────────────────────────── */}
       {error && (
         <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl px-5 py-4 text-red-700 dark:text-red-400">
           <span className="material-symbols-rounded text-xl">error</span>
@@ -613,7 +613,7 @@ export default function SportsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Sections --------------------------------------------------------- */}
+      {/* ── Sections ───────────────────────────────────────────────────────── */}
       {loading ? (
         <div className="space-y-4">
           {ACTIVITY_TYPES.map((t) => (
@@ -635,7 +635,7 @@ export default function SportsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Tips ------------------------------------------------------------- */}
+      {/* ── Tips ───────────────────────────────────────────────────────────── */}
       {!loading && (
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 rounded-2xl p-5">
           <div className="flex items-start gap-3">
@@ -672,7 +672,7 @@ export default function SportsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Delete confirm ---------------------------------------------------- */}
+      {/* ── Delete confirm ──────────────────────────────────────────────────── */}
       {deleteTarget && (
         <DeleteConfirm
           activity={deleteTarget}

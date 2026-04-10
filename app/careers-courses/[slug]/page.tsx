@@ -71,7 +71,6 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   return (
     <main className="min-h-screen bg-[#F8F9FB]">
       <Header />
-
       {/* --- Hero Section -------------------------------------------------------- */}
       <section className="pt-24 pb-12 px-6 sm:px-12 lg:px-24">
         <div className="max-w-[1920px] mx-auto">
@@ -141,7 +140,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         </div>
       </section>
 
-      {/* --- Stats Bar ---------------------------------------------------------- */}
+      {/* ─── Stats Bar ────────────────────────────────────────────────────────── */}
       <section className="pb-16 px-6 sm:px-12 lg:px-24">
         <div className="max-w-[1920px] mx-auto">
           <div className="bg-white rounded-[5px] border border-slate-100 p-8 grid grid-cols-2 lg:grid-cols-4 gap-8 divide-x divide-slate-100" style={{ boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>

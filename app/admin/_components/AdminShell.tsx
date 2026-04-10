@@ -59,14 +59,14 @@ function AvatarDropdown({ admin, onLogout }: { admin: Admin; onLogout: () => voi
   );
 }
 
-// --- Dynamic components --------------------------------------------------------
+// ─── Dynamic components ────────────────────────────────────────────────────────
 
 const UnifiedSidebarV3 = dynamic(() => import("./UnifiedSidebarV3").then(mod => mod.UnifiedSidebarV3), {
   ssr: false,
   loading: () => <SidebarSkeleton />,
 });
 
-// --- Main shell ---------------------------------------------------------------
+// ─── Main shell ───────────────────────────────────────────────────────────────
 
 export default function AdminShell({
   children,
@@ -76,6 +76,7 @@ export default function AdminShell({
   admin: Admin;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -145,12 +146,12 @@ export default function AdminShell({
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 font-display">
 
-      {/* -- Desktop sidebar (always visible ≥ lg) ---------------------------- */}
-      <aside className="hidden lg:flex w-56 xl:w-60 flex-col flex-shrink-0 overflow-hidden" style={{ backgroundColor: "#313131" }}>
-        <UnifiedSidebarV3 admin={admin} pathname={pathname} onLogout={handleLogout} />
+      {/* ── Desktop sidebar (always visible ≥ lg) ──────────────────────────── */}
+      <aside className={`hidden lg:flex flex-col flex-shrink-0 overflow-hidden transition-all duration-300 ${collapsed ? "w-16" : "w-56 xl:w-60"}`} style={{ backgroundColor: "#313131" }}>
+        <UnifiedSidebarV3 admin={admin} pathname={pathname} onLogout={handleLogout} collapsed={collapsed} onToggleCollapse={() => setCollapsed(v => !v)} />
       </aside>
 
-      {/* -- Mobile sidebar overlay ------------------------------------------- */}
+      {/* ── Mobile sidebar overlay ─────────────────────────────────────────── */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop */}
@@ -165,7 +166,7 @@ export default function AdminShell({
         </div>
       )}
 
-      {/* -- Main area -------------------------------------------------------- */}
+      {/* ── Main area ──────────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
 
         {/* Top bar */}
@@ -182,28 +183,8 @@ export default function AdminShell({
             </span>
           </button>
 
-          {/* Search bar */}
-          <div className="flex-1 flex items-center px-4">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const q = (e.currentTarget.elements.namedItem("q") as HTMLInputElement)?.value.trim();
-                if (q) router.push(`/admin/colleges/profile?q=${encodeURIComponent(q)}`);
-              }}
-              className="flex items-center gap-2 bg-slate-100 text-slate-500 px-4 py-2 rounded-lg w-full max-w-md"
-            >
-              <span className="material-symbols-rounded text-[20px]" style={ICO}>search</span>
-              <input
-                name="q"
-                type="text"
-                placeholder="Search by college name..."
-                className="bg-transparent border-none outline-none text-sm w-full text-slate-700 placeholder-slate-400 font-medium"
-              />
-            </form>
-          </div>
-
           {/* Right side actions */}
-          <div className="flex items-center gap-5 flex-shrink-0 pr-2">
+          <div className="flex items-center gap-5 flex-shrink-0 pr-2 ml-auto">
             
             {/* Action Icons */}
             <div className="flex items-center gap-3 text-slate-600">

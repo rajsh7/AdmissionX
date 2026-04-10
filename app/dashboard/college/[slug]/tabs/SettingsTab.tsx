@@ -7,7 +7,7 @@ interface Props {
   college: CollegeUser;
 }
 
-// -- Password strength helpers --------------------------------------------------
+// ── Password strength helpers ──────────────────────────────────────────────────
 interface StrengthResult {
   score: number;       // 0–4
   label: string;
@@ -52,7 +52,7 @@ function analysePassword(pw: string): StrengthResult {
   };
 }
 
-// -- Strength bar ---------------------------------------------------------------
+// ── Strength bar ───────────────────────────────────────────────────────────────
 function StrengthBar({ strength }: { strength: StrengthResult }) {
   if (strength.score === 0) return null;
 
@@ -116,7 +116,7 @@ function StrengthBar({ strength }: { strength: StrengthResult }) {
   );
 }
 
-// -- Password field -------------------------------------------------------------
+// ── Password field ─────────────────────────────────────────────────────────────
 function PasswordField({
   label,
   value,
@@ -165,11 +165,11 @@ function PasswordField({
   );
 }
 
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 export default function SettingsTab({ college }: Props) {
   const slug = college.slug;
 
-  // -- Password change state -------------------------------------------------
+  // ── Password change state ─────────────────────────────────────────────────
   const [currentPw, setCurrentPw] = useState("");
   const [newPw,     setNewPw]     = useState("");
   const [confirmPw, setConfirmPw] = useState("");
@@ -221,7 +221,7 @@ export default function SettingsTab({ college }: Props) {
   return (
     <div className="max-w-2xl mx-auto space-y-8">
 
-      {/* -- Page header ------------------------------------------------------ */}
+      {/* ── Page header ────────────────────────────────────────────────────── */}
       <div>
         <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">
           Settings
@@ -231,7 +231,7 @@ export default function SettingsTab({ college }: Props) {
         </p>
       </div>
 
-      {/* -- Account info card ------------------------------------------------ */}
+      {/* ── Account info card ──────────────────────────────────────────────── */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6">
         <div className="flex items-center gap-4">
           {/* Avatar */}
@@ -264,7 +264,7 @@ export default function SettingsTab({ college }: Props) {
         </div>
       </div>
 
-      {/* -- Change Password card ---------------------------------------------- */}
+      {/* ── Change Password card ────────────────────────────────────────────── */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden">
 
         {/* Card header */}
@@ -414,7 +414,7 @@ export default function SettingsTab({ college }: Props) {
         </form>
       </div>
 
-      {/* -- Security tips ----------------------------------------------------- */}
+      {/* ── Security tips ───────────────────────────────────────────────────── */}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 rounded-2xl p-5">
         <div className="flex items-start gap-3">
           <span
@@ -437,7 +437,7 @@ export default function SettingsTab({ college }: Props) {
         </div>
       </div>
 
-      {/* -- Account info (read-only) ------------------------------------------ */}
+      {/* ── Account info (read-only) ────────────────────────────────────────── */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden">
         <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40">
           <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0">

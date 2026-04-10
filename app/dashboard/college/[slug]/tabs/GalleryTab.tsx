@@ -311,7 +311,7 @@ export default function GalleryTab({ college }: Props) {
     <>
       <div className="space-y-8 pb-24">
 
-        {/* -- Header ------------------------------------------------------- */}
+        {/* ── Header ─────────────────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
@@ -335,7 +335,7 @@ export default function GalleryTab({ college }: Props) {
           </button>
         </div>
 
-        {/* -- Tip banner (when empty) --------------------------------------- */}
+        {/* ── Tip banner (when empty) ─────────────────────────────────────── */}
         {!loading && images.length === 0 && !error && (
           <div className="flex items-start gap-4 bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 rounded-2xl px-6 py-5">
             <span
@@ -357,7 +357,7 @@ export default function GalleryTab({ college }: Props) {
           </div>
         )}
 
-        {/* -- Error -------------------------------------------------------- */}
+        {/* ── Error ──────────────────────────────────────────────────────── */}
         {!loading && error && (
           <div className="flex flex-col items-center py-20 gap-4">
             <span className="material-symbols-outlined text-6xl text-red-300">error_outline</span>
@@ -371,7 +371,7 @@ export default function GalleryTab({ college }: Props) {
           </div>
         )}
 
-        {/* -- Loading skeleton ---------------------------------------------- */}
+        {/* ── Loading skeleton ────────────────────────────────────────────── */}
         {loading && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {Array.from({ length: 12 }).map((_, i) => (
@@ -380,7 +380,7 @@ export default function GalleryTab({ college }: Props) {
           </div>
         )}
 
-        {/* -- Gallery grid -------------------------------------------------- */}
+        {/* ── Gallery grid ────────────────────────────────────────────────── */}
         {!loading && !error && images.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {images.map((img) => {
@@ -456,7 +456,7 @@ export default function GalleryTab({ college }: Props) {
           </div>
         )}
 
-        {/* -- Refresh ------------------------------------------------------- */}
+        {/* ── Refresh ─────────────────────────────────────────────────────── */}
         {!loading && !error && (
           <div className="flex justify-center pt-2">
             <button
@@ -470,7 +470,7 @@ export default function GalleryTab({ college }: Props) {
         )}
       </div>
 
-      {/* -- Upload Modal ----------------------------------------------------- */}
+      {/* ── Upload Modal ───────────────────────────────────────────────────── */}
       {showUpload && (
         <UploadModal
           slug={slug}
@@ -479,7 +479,7 @@ export default function GalleryTab({ college }: Props) {
         />
       )}
 
-      {/* -- Lightbox --------------------------------------------------------- */}
+      {/* ── Lightbox ───────────────────────────────────────────────────────── */}
       {lightbox && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"

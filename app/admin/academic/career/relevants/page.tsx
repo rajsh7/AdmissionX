@@ -2,7 +2,7 @@ import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import RelevantListClient from "./RelevantListClient";
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function createRelevant(formData: FormData) {
   "use server";
@@ -71,7 +71,7 @@ async function deleteRelevant(id: number) {
   revalidatePath("/", "layout");
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T >(
   sql: string,

@@ -2,7 +2,7 @@ import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import BoardListClient from "./BoardListClient";
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function createBoard(formData: FormData) {
   "use server";
@@ -63,7 +63,7 @@ async function deleteBoard(id: number) {
   revalidatePath("/", "layout");
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T >(
   sql: string,

@@ -10,9 +10,9 @@ import HeroSection from "./components/HeroSection";
 import TopDestinations from "./components/TopDestinations";
 import CostCalculator from "./components/CostCalculator";
 import JourneySteps from "./components/JourneySteps";
-import Footer from "@/app/components/Footer";
+import StudyAbroadFooter from "./components/StudyAbroadFooter";
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface FilterOption {
   id: string | number;
@@ -59,7 +59,7 @@ interface CountRow {
   total: number;
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_IMAGE =
@@ -134,19 +134,17 @@ function buildColleges(rows: CollegeRow[]): CollegeResult[] {
   });
 }
 
-// --- Page-specific fetch (international colleges) -----------------------------
+// ─── Page-specific fetch (international colleges) ─────────────────────────────
 
 async function fetchAbroadCollegesBase(opts: {
-  q: string;
   stream: string;
   degree: string;
   feesMax: string;
-  country: string;
   sort: string;
   page: number;
   limit: number;
 }): Promise<{ colleges: CollegeResult[]; total: number; totalPages: number }> {
-  const { q, stream, degree, feesMax, country, sort, page, limit } = opts;
+  const { stream, degree, feesMax, sort, page, limit } = opts;
   const offset = (page - 1) * limit;
 
   const conditions: string[] = [
@@ -154,25 +152,6 @@ async function fetchAbroadCollegesBase(opts: {
     "(cp.registeredAddressCountryId IS NOT NULL OR cp.campusAddressCountryId IS NOT NULL)",
   ];
   const params: (string | number)[] = [];
-
-  if (q) {
-    conditions.push(`(
-      cp.slug LIKE ? OR
-      cp.registeredSortAddress LIKE ? OR
-      EXISTS (SELECT 1 FROM users u WHERE u.id = cp.users_id AND u.firstname LIKE ?)
-    )`);
-    const like = `%${q}%`;
-    params.push(like, like, like);
-  }
-
-  if (country && country !== "Any Country") {
-    conditions.push(`EXISTS (
-      SELECT 1 FROM country co
-      WHERE (co.id = cp.registeredAddressCountryId OR co.id = cp.campusAddressCountryId)
-        AND co.name = ?
-    )`);
-    params.push(country);
-  }
 
   if (stream) {
     conditions.push(`EXISTS (
@@ -279,11 +258,11 @@ async function fetchAbroadCollegesBase(opts: {
 
 const fetchAbroadColleges = unstable_cache(
   fetchAbroadCollegesBase,
-  ["study-abroad-colleges-v2"],
+  ["study-abroad-colleges"],
   { revalidate: 300 }
 );
 
-// --- Metadata -----------------------------------------------------------------
+// ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: import("next").Metadata = {
   title: "Study Abroad — International Colleges & Universities | AdmissionX",
@@ -301,19 +280,17 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
   const getString = (key: string, fallback = "") =>
     typeof sp[key] === "string" ? (sp[key] as string) : fallback;
 
-  const q = getString("q");
   const stream = getString("stream");
   const degree = getString("degree");
   const feesMax = getString("fees_max");
-  const country = getString("country");
   const sort = getString("sort", "rating");
   const page = Math.max(1, parseInt(getString("page", "1")));
-  const showSearchResults = !!(q || stream || degree || feesMax || country || page > 1);
+  const showSearchResults = !!(stream || degree || feesMax || page > 1);
 
   if (showSearchResults) {
     const [{ colleges, total, totalPages }, streamRows, degreeRows] =
       await Promise.all([
-        fetchAbroadColleges({ q, stream, degree, feesMax, country, sort, page, limit: 12 }),
+        fetchAbroadColleges({ stream, degree, feesMax, sort, page, limit: 12 }),
         safeQuery<StreamRow>(`
           SELECT id, name, pageslug
           FROM functionalarea
@@ -376,7 +353,7 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
         <JourneySteps />
       </main>
 
-      <Footer />
+      <StudyAbroadFooter />
     </div>
   );
 }

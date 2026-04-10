@@ -1,8 +1,9 @@
 import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import SearchClient from "./SearchClient";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface FilterOption {
   id: string | number;
@@ -49,13 +50,25 @@ interface DegreeRow  {
 interface CityRow  {
   id: number;
   name: string;
+  state_id: number | null;
+}
+
+interface StateRow {
+  id: number;
+  name: string;
+  country_id: number | null;
+}
+
+interface CountryRow {
+  id: number;
+  name: string;
 }
 
 interface CountRow  {
   total: number;
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_IMAGE =
@@ -131,7 +144,7 @@ function buildColleges(rows: CollegeRow[]): CollegeResult[] {
   });
 }
 
-// --- Core DB fetch ------------------------------------------------------------
+// ─── Core DB fetch ────────────────────────────────────────────────────────────
 
 async function fetchColleges(opts: {
   q: string;
@@ -139,6 +152,7 @@ async function fetchColleges(opts: {
   degree: string;
   cityId: string;
   stateId: string;
+  countryId: string;
   feesMax: string;
   sort: string;
   type: string;
@@ -151,6 +165,7 @@ async function fetchColleges(opts: {
     degree,
     cityId,
     stateId,
+    countryId,
     feesMax,
     sort,
     type,
@@ -189,12 +204,16 @@ async function fetchColleges(opts: {
     conditions.push("c.state_id = ?");
     params.push(parseInt(stateId));
   }
+  if (countryId && !isNaN(parseInt(countryId))) {
+    conditions.push("cp.registeredAddressCountryId = ?");
+    params.push(parseInt(countryId));
+  }
   if (type === "top") {
     conditions.push("cp.isShowOnTop = 1");
   } else if (type === "university") {
     conditions.push("cp.isTopUniversity = 1");
   } else if (type === "abroad") {
-    conditions.push("(cp.registeredAddressCountryId IS NOT NULL AND cp.registeredAddressCountryId != 1)");
+    conditions.push("cp.registeredAddressCountryId != 1");
   }
 
   const whereClause = conditions.join(" AND ");
@@ -279,7 +298,7 @@ async function fetchColleges(opts: {
   }
 }
 
-// --- Page component -----------------------------------------------------------
+// ─── Page component ───────────────────────────────────────────────────────────
 
 interface SearchPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -296,14 +315,15 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const degree = getString("degree");
   const cityId = getString("city_id");
   const stateId = getString("state_id");
+  const countryId = getString("country_id");
   const feesMax = getString("fees_max");
   const sort = getString("sort", "rating");
   const type = getString("type");
   const page = Math.max(1, parseInt(getString("page", "1")));
   const limit = 12;
 
-  // -- Parallel: initial college results + filter options ---------------------
-  const [{ colleges, total, totalPages }, streamRows, degreeRows, cityRows] =
+  // ── Parallel: initial college results + filter options ─────────────────────
+  const [{ colleges, total, totalPages }, streamRows, degreeRows, cityRows, stateRows, countryRows] =
     await Promise.all([
       // 1. College results
       fetchColleges({
@@ -312,6 +332,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         degree,
         cityId,
         stateId,
+        countryId,
         feesMax,
         sort,
         type,
@@ -343,18 +364,55 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       LIMIT 50
     `),
 
-      // 4. Popular cities (cities that have colleges)
-      safeQuery<CityRow>(`
-      SELECT DISTINCT c.id, c.name
-      FROM city c
-      INNER JOIN collegeprofile cp ON cp.registeredAddressCityId = c.id
-      WHERE c.name IS NOT NULL AND c.name != ''
-      ORDER BY c.name
-      LIMIT 100
-    `),
+      // 4. Cities that have colleges — direct MongoDB
+      (async (): Promise<CityRow[]> => {
+        try {
+          const db = await getDb();
+          const collegeCityIds = await db.collection("collegeprofile").distinct("registeredAddressCityId");
+          const numericIds = collegeCityIds.map(Number).filter(Boolean);
+          const cities = await db.collection("city").find(
+            { id: { $in: numericIds } },
+            { projection: { _id: 0, id: 1, name: 1, state_id: 1 } }
+          ).sort({ name: 1 }).limit(500).toArray();
+          return cities.map((c: any) => ({ id: c.id, name: String(c.name).trim(), state_id: c.state_id })) as CityRow[];
+        } catch { return []; }
+      })(),
+
+      // 5. States that have colleges — direct MongoDB
+      (async (): Promise<StateRow[]> => {
+        try {
+          const db = await getDb();
+          const collegeCityIds = await db.collection("collegeprofile").distinct("registeredAddressCityId");
+          const numericCityIds = collegeCityIds.map(Number).filter(Boolean);
+          const cities = await db.collection("city").find(
+            { id: { $in: numericCityIds } },
+            { projection: { _id: 0, state_id: 1 } }
+          ).toArray();
+          const stateIds = [...new Set(cities.map((c: any) => Number(c.state_id)).filter(Boolean))];
+          const states = await db.collection("state").find(
+            { id: { $in: stateIds } },
+            { projection: { _id: 0, id: 1, name: 1, country_id: 1 } }
+          ).sort({ name: 1 }).toArray();
+          return states.map((s: any) => ({ id: s.id, name: String(s.name).trim(), country_id: Number(s.country_id) })) as StateRow[];
+        } catch { return []; }
+      })(),
+
+      // 6. Countries that have colleges — direct MongoDB
+      (async (): Promise<CountryRow[]> => {
+        try {
+          const db = await getDb();
+          const countryIds = await db.collection("collegeprofile").distinct("registeredAddressCountryId");
+          const numericIds = countryIds.map(Number).filter(Boolean);
+          const countries = await db.collection("country").find(
+            { id: { $in: numericIds } },
+            { projection: { _id: 0, id: 1, name: 1 } }
+          ).sort({ name: 1 }).toArray();
+          return countries.map((c: any) => ({ id: c.id, name: String(c.name).trim() })) as CountryRow[];
+        } catch { return []; }
+      })(),
     ]);
 
-  // -- Build filter option lists ----------------------------------------------
+  // ── Build filter option lists ──────────────────────────────────────────────
   const streamOptions: FilterOption[] = streamRows.map((r) => ({
     id: r.id,
     name: r.name,
@@ -371,9 +429,21 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const cityOptions: FilterOption[] = cityRows.map((r) => ({
     id: r.id,
     name: r.name,
+    slug: r.state_id ? String(r.state_id) : undefined, // slug = parent state_id
   }));
 
-  // -- Dynamic page title -----------------------------------------------------
+  const stateOptions: FilterOption[] = stateRows.map((r) => ({
+    id: r.id,
+    name: r.name,
+    slug: r.country_id ? String(r.country_id) : undefined, // slug = parent country_id
+  }));
+
+  const countryOptions: FilterOption[] = countryRows.map((r) => ({
+    id: r.id,
+    name: r.name,
+  }));
+
+  // ── Dynamic page title ─────────────────────────────────────────────────────
   let pageTitle = "Search Colleges";
   let pageSubtitle = "Find and filter from thousands of colleges across India";
 
@@ -404,6 +474,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       streams={streamOptions}
       degrees={degreeOptions}
       cities={cityOptions}
+      states={stateOptions}
+      countries={countryOptions}
       initQ={q}
       initStream={stream}
       initDegree={degree}

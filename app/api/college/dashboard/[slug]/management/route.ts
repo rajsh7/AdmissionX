@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
 import pool from "@/lib/db";
 
-// -- Auth + ownership helper ---------------------------------------------------
+// ── Auth + ownership helper ───────────────────────────────────────────────────
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_college")?.value;
@@ -29,7 +29,7 @@ async function checkAuth(slug: string) {
   }
 }
 
-// -- GET /api/college/dashboard/[slug]/management ------------------------------
+// ── GET /api/college/dashboard/[slug]/management ──────────────────────────────
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
@@ -79,7 +79,7 @@ export async function GET(
   }
 }
 
-// -- POST /api/college/dashboard/[slug]/management -----------------------------
+// ── POST /api/college/dashboard/[slug]/management ─────────────────────────────
 // Accepts multipart/form-data:
 //   name (required), suffix?, designation?, gender?, about?,
 //   emailaddress?, phoneno?, landlineNo?, file? (photo)
@@ -179,7 +179,7 @@ export async function POST(
   }
 }
 
-// -- PUT /api/college/dashboard/[slug]/management?memberId=X ------------------
+// ── PUT /api/college/dashboard/[slug]/management?memberId=X ──────────────────
 // Accepts multipart/form-data (same fields as POST, all optional)
 export async function PUT(
   req: NextRequest,
@@ -309,7 +309,7 @@ export async function PUT(
   }
 }
 
-// -- DELETE /api/college/dashboard/[slug]/management?memberId=X ---------------
+// ── DELETE /api/college/dashboard/[slug]/management?memberId=X ───────────────
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },

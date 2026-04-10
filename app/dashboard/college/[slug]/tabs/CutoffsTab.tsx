@@ -40,7 +40,7 @@ const EMPTY_FORM = {
   functionalarea_id: "",
 };
 
-// -- Skeleton row ---------------------------------------------------------------
+// ── Skeleton row ───────────────────────────────────────────────────────────────
 function SkeletonRow() {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 animate-pulse">
@@ -63,7 +63,7 @@ function SkeletonRow() {
   );
 }
 
-// -- Badge ----------------------------------------------------------------------
+// ── Badge ──────────────────────────────────────────────────────────────────────
 function Badge({
   icon,
   label,
@@ -90,7 +90,7 @@ function Badge({
   );
 }
 
-// -- Select helper --------------------------------------------------------------
+// ── Select helper ──────────────────────────────────────────────────────────────
 function SelectField({
   label,
   value,
@@ -125,7 +125,7 @@ function SelectField({
   );
 }
 
-// -- Add / Edit Modal -----------------------------------------------------------
+// ── Add / Edit Modal ───────────────────────────────────────────────────────────
 function CutoffModal({
   cutoff,
   options,
@@ -353,7 +353,7 @@ function CutoffModal({
   );
 }
 
-// -- Delete Confirm -------------------------------------------------------------
+// ── Delete Confirm ─────────────────────────────────────────────────────────────
 function DeleteConfirm({
   cutoff,
   slug,
@@ -440,7 +440,7 @@ function DeleteConfirm({
   );
 }
 
-// -- Cutoff Row -----------------------------------------------------------------
+// ── Cutoff Row ─────────────────────────────────────────────────────────────────
 function CutoffRow({
   cutoff,
   onEdit,
@@ -560,7 +560,7 @@ function CutoffRow({
   );
 }
 
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 export default function CutoffsTab({ college }: Props) {
   const slug = college.slug;
 
@@ -647,7 +647,7 @@ export default function CutoffsTab({ college }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* -- Toast ------------------------------------------------------------ */}
+      {/* ── Toast ──────────────────────────────────────────────────────────── */}
       {toast && (
         <div
           className={`fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50
@@ -665,7 +665,7 @@ export default function CutoffsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Header ----------------------------------------------------------- */}
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">
@@ -690,7 +690,7 @@ export default function CutoffsTab({ college }: Props) {
         </button>
       </div>
 
-      {/* -- Error ------------------------------------------------------------ */}
+      {/* ── Error ──────────────────────────────────────────────────────────── */}
       {error && (
         <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl px-5 py-4 text-red-700 dark:text-red-400">
           <span className="material-symbols-rounded text-xl">error</span>
@@ -704,7 +704,7 @@ export default function CutoffsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Search ----------------------------------------------------------- */}
+      {/* ── Search ─────────────────────────────────────────────────────────── */}
       {!loading && cutoffs.length > 3 && (
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-xl pointer-events-none">
@@ -728,7 +728,7 @@ export default function CutoffsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Legend pills ----------------------------------------------------- */}
+      {/* ── Legend pills ───────────────────────────────────────────────────── */}
       {!loading && cutoffs.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs text-slate-400 dark:text-slate-500 font-medium mr-1">
@@ -752,7 +752,7 @@ export default function CutoffsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- List ------------------------------------------------------------- */}
+      {/* ── List ───────────────────────────────────────────────────────────── */}
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -800,7 +800,7 @@ export default function CutoffsTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Bottom Add button ------------------------------------------------ */}
+      {/* ── Bottom Add button ──────────────────────────────────────────────── */}
       {!loading && cutoffs.length > 0 && (
         <button
           onClick={openAdd}
@@ -816,7 +816,7 @@ export default function CutoffsTab({ college }: Props) {
         </button>
       )}
 
-      {/* -- Modals ----------------------------------------------------------- */}
+      {/* ── Modals ─────────────────────────────────────────────────────────── */}
       {showModal && (
         <CutoffModal
           cutoff={editing}

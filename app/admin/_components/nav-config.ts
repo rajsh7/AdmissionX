@@ -118,13 +118,22 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "Queries & User Interaction",
     items: [
       { href: "/admin/queries", icon: "help_outline", label: "Query" },
+      { href: "/admin/queries/contact", icon: "contact_mail", label: "Contact Us Query" },
       { href: "/admin/queries/college-student", icon: "forum", label: "Query Between College & Student" },
       { href: "/admin/queries/admissionx", icon: "contact_support", label: "Query to Admission X" },
       { href: "/admin/academic/ask-qa", icon: "question_answer", label: "Ask Question & Answers" },
       { href: "/admin/landing-page-query", icon: "feed", label: "Landing Page Query Form" },
     ],
   },
-
+  {
+    label: "Members",
+    items: [
+      { href: "/admin/members/registrations", icon: "how_to_reg", label: "Registrations" },
+      { href: "/admin/members/users", icon: "group", label: "Platform Users" },
+      { href: "/admin/members/roles", icon: "manage_accounts", label: "Roles" },
+      { href: "/admin/members/status", icon: "toggle_on", label: "Status" },
+    ],
+  },
   {
     label: "Communication & Feedback",
     items: [

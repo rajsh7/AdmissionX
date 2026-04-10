@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   const apiKey = process.env.GEMINI_API_KEY;
 
-  // -- Try Gemini first ------------------------------------------------------
+  // ── Try Gemini first ──────────────────────────────────────────────────────
   if (apiKey && apiKey !== "your_gemini_api_key_here") {
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // -- DB fallback (keyword-based) -------------------------------------------
+  // ── DB fallback (keyword-based) ───────────────────────────────────────────
   const text = message.toLowerCase().trim();
 
   const match = (keywords: string[]) => keywords.some((k) => text.includes(k));

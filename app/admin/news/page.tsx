@@ -6,7 +6,7 @@ import NewsListClientV2 from "./NewsListClient";
 // Force re-render after UI update
 
 
-// --- Server Actions ------------------------------------------------------------
+// ─── Server Actions ────────────────────────────────────────────────────────────
 
 async function createNews(formData: FormData) {
   "use server";
@@ -96,7 +96,7 @@ async function deleteNewsItem(id: number): Promise<void> {
   revalidatePath("/", "layout");
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 20;
 
@@ -113,7 +113,7 @@ async function safeQuery<T >(
   }
 }
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 import { NewsRow } from "./NewsListClient";
 
@@ -135,7 +135,7 @@ interface CountRow  {
   total: number;
 }
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };

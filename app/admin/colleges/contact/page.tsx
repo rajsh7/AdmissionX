@@ -5,7 +5,7 @@ import ContactActions from "./ContactActions";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function deleteContactRow(id: string, src: string) {
   "use server";
@@ -21,7 +21,7 @@ async function deleteContactRow(id: string, src: string) {
   revalidatePath("/", "layout");
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 15;
 
@@ -37,7 +37,7 @@ interface ContactRow {
   _source: "old" | "new";
 }
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function CollegeContactPage({
   searchParams,
@@ -114,7 +114,7 @@ export default async function CollegeContactPage({
   return (
     <div className="p-6 space-y-6 w-full max-w-none">
 
-      {/* -- Grid of Contact Cards -------------------------------------- */}
+      {/* ── Grid of Contact Cards ────────────────────────────────────── */}
       <div className="bg-transparent rounded-2xl overflow-hidden">
         {rows.length === 0 ? (
           <div className="bg-white rounded-2xl border border-slate-100 py-20 text-center shadow-sm">
@@ -202,7 +202,7 @@ export default async function CollegeContactPage({
           </div>
         )}
 
-        {/* -- Pagination ----------------------------------------------------- */}
+        {/* ── Pagination ───────────────────────────────────────────────────── */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-5 py-4 border border-slate-100 bg-white rounded-2xl shadow-sm mt-6">
             <p className="text-xs text-slate-500 font-medium">

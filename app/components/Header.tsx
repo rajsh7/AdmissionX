@@ -23,12 +23,12 @@ const navLinks = [
   { label: "Colleges", href: "/top-colleges" },
   { label: "Top University", href: "/top-university" },
   { label: "Top Courses", href: "/careers-courses" },
+  { label: "Compare", href: "/compare" },
   { label: "Study Abroad", href: "/study-abroad" },
   {
     label: "More",
     href: "#",
     subItems: [
-      { label: "Compare", href: "/compare", icon: "compare" },
       { label: "Counselling", href: "/counselling", icon: "support_agent" },
       { label: "Examination", href: "/examination", icon: "engineering" },
       { label: "Streams", href: "/stream", icon: "grid_view" },
@@ -206,7 +206,7 @@ export default function Header({ theme }: HeaderProps) {
   const loginTimer = useRef<ReturnType<typeof setTimeout>>(null);
   const signupTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
-  // -- Auth check ------------------------------------------------------------
+  // ── Auth check ────────────────────────────────────────────────────────────
   const checkAuth = useCallback(async () => {
     try {
       const res = await fetch("/api/auth/me", {
@@ -241,7 +241,7 @@ export default function Header({ theme }: HeaderProps) {
   // Determine if we should show the "active/scrolled" state (white bg, dark text)
   const showActiveState = theme === "dark" || isScrolled;
 
-  // -- Logout ----------------------------------------------------------------
+  // ── Logout ────────────────────────────────────────────────────────────────
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
@@ -253,7 +253,7 @@ export default function Header({ theme }: HeaderProps) {
     router.refresh();
   };
 
-  // -- Dropdown helpers ------------------------------------------------------
+  // ── Dropdown helpers ──────────────────────────────────────────────────────
   const openLogin = () => {
     if (loginTimer.current) clearTimeout(loginTimer.current);
     setSignupOpen(false);
@@ -271,7 +271,7 @@ export default function Header({ theme }: HeaderProps) {
     signupTimer.current = setTimeout(() => setSignupOpen(false), 150);
   };
 
-  // -- Close dropdowns on outside click -------------------------------------
+  // ── Close dropdowns on outside click ─────────────────────────────────────
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (loginRef.current && !loginRef.current.contains(e.target as Node))
@@ -288,7 +288,7 @@ export default function Header({ theme }: HeaderProps) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  // -- User initials avatar --------------------------------------------------
+  // ── User initials avatar ──────────────────────────────────────────────────
   const initials = authUser
     ? authUser.name
       .split(" ")
@@ -308,11 +308,7 @@ export default function Header({ theme }: HeaderProps) {
       )}
 
       <motion.header 
-        className={`site-header fixed top-0 left-0 right-0 z-[60] w-full flex items-center transition-all duration-300 min-h-[58px] ${
-          isScrolled 
-            ? "bg-white/95 backdrop-blur-md shadow-lg py-2 border-b border-neutral-100" 
-            : "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.08)] py-3"
-        }`}
+        className="site-header fixed top-0 left-0 right-0 z-[100] w-full flex items-center transition-all duration-300 bg-white shadow-[0_4px_30px_rgba(0,0,0,0.08)] py-3 min-h-[58px]"
       >
         <div className="flex items-center justify-between px-6 sm:px-12 w-full max-w-[1920px] mx-auto">
           {/* Logo Area */}
@@ -348,7 +344,6 @@ export default function Header({ theme }: HeaderProps) {
                           <Link
                             key={sub.label}
                             href={sub.href}
-                            prefetch={true}
                             className="flex items-center gap-3 px-4 py-2.5 text-[16px] font-normal text-slate-600 hover:bg-primary/5 hover:text-primary transition-colors"
                           >
                             {mounted && (

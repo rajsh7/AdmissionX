@@ -156,7 +156,7 @@ export default function TrendingDegrees() {
       <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-red-500/[0.03] rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
-        {/* --- Chapter Heading --- */}
+        {/* ─── Chapter Heading ─── */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -182,7 +182,7 @@ export default function TrendingDegrees() {
           </p>
         </motion.div>
 
-        {/* --- Degree Cards Grid --- */}
+        {/* ─── Degree Cards Grid ─── */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -196,7 +196,7 @@ export default function TrendingDegrees() {
                 href={deg.href}
                 className="group flex flex-col bg-white rounded-2xl border border-neutral-100 hover:border-red-200 hover:shadow-xl hover:shadow-red-500/5 transition-all duration-500 h-[420px] overflow-hidden"
               >
-                {/* -- Top: Icon + Badge Row -- */}
+                {/* ── Top: Icon + Badge Row ── */}
                 <div className="flex items-start justify-between p-6 pb-0">
                   <div className={`h-14 w-14 rounded-2xl ${deg.colorLight} ${deg.color} flex items-center justify-center flex-shrink-0`}>
                     <span className="material-symbols-outlined text-2xl">
@@ -208,7 +208,7 @@ export default function TrendingDegrees() {
                   </span>
                 </div>
 
-                {/* -- Title + Meta -- */}
+                {/* ── Title + Meta ── */}
                 <div className="px-6 pt-4 pb-0">
                   <h3 className="text-lg font-bold text-neutral-900 leading-snug group-hover:text-red-600 transition-colors">
                     {deg.title}
@@ -223,7 +223,7 @@ export default function TrendingDegrees() {
                   </div>
                 </div>
 
-                {/* -- Stats Row -- */}
+                {/* ── Stats Row ── */}
                 <div className="px-6 pt-5 flex-1">
                   <div className="grid grid-cols-3 gap-3 mb-5">
                     <div>
@@ -250,7 +250,7 @@ export default function TrendingDegrees() {
                   </div>
                 </div>
 
-                {/* -- Bottom: Recruiters + Arrow -- */}
+                {/* ── Bottom: Recruiters + Arrow ── */}
                 <div className="px-6 py-4 mt-auto border-t border-neutral-100">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1 min-w-0">
@@ -283,7 +283,7 @@ export default function TrendingDegrees() {
           ))}
         </motion.div>
 
-        {/* --- View All Link --- */}
+        {/* ─── View All Link ─── */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

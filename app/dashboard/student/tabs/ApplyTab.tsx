@@ -7,7 +7,7 @@ interface Props {
   user: { id: string | number; name: string; email: string } | null;
 }
 
-// -- Types ---------------------------------------------------------------------
+// ── Types ─────────────────────────────────────────────────────────────────────
 interface Course {
   collegemaster_id: number;
   course_name: string | null;
@@ -75,7 +75,7 @@ interface PaymentReceipt {
 
 type Step = "browse" | "form" | "payment" | "receipt";
 
-// -- Helpers -------------------------------------------------------------------
+// ── Helpers ───────────────────────────────────────────────────────────────────
 function formatCurrency(amount: number | null) {
   if (amount === null) return "Contact College";
   if (amount === 0) return "Free";
@@ -124,7 +124,7 @@ function SkeletonCollegeCard() {
   );
 }
 
-// -- Step indicator bar --------------------------------------------------------
+// ── Step indicator bar ────────────────────────────────────────────────────────
 function StepBar({ step }: { step: Step }) {
   const steps: { key: Step; label: string; icon: string }[] = [
     { key: "browse",  label: "Browse",    icon: "search"       },
@@ -174,9 +174,9 @@ function StepBar({ step }: { step: Step }) {
   );
 }
 
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 // STEP 1 — Browse Colleges
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 function BrowseStep({
   onSelectCourse,
 }: {
@@ -604,9 +604,9 @@ function BrowseStep({
   );
 }
 
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 // STEP 2 — Application Form
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 function ApplicationFormStep({
   user,
   college,
@@ -624,7 +624,7 @@ function ApplicationFormStep({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // -- Document upload state --------------------------------------------------
+  // ── Document upload state ──────────────────────────────────────────────────
   const REQUIRED_DOCS = [
     { type: "10th Marksheet", icon: "description" },
     { type: "12th Marksheet", icon: "description" },
@@ -925,9 +925,9 @@ function ApplicationFormStep({
   );
 }
 
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 // STEP 3 — Payment
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 function PaymentStep({
   user,
   application,
@@ -1257,9 +1257,9 @@ function PaymentStep({
   );
 }
 
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 // STEP 4 — Receipt
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 function ReceiptStep({
   receipt,
   onDone,
@@ -1376,9 +1376,9 @@ function ReceiptStep({
   );
 }
 
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 // MAIN — ApplyTab
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 export default function ApplyTab({ user }: Props) {
   const [step, setStep] = useState<Step>("browse");
   const [college, setCollege] = useState<College | null>(null);

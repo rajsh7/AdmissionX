@@ -6,13 +6,13 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Image from "next/image";
 
-// --- Constants ----------------------------------------------------------------
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_IMAGE =
   "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=600";
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || !raw.trim()) return DEFAULT_IMAGE;
@@ -56,7 +56,7 @@ function formatSalary(raw: string | null | undefined): string {
 }
 
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface StreamRow {
   id: number;
@@ -86,7 +86,7 @@ interface RelatedStreamRow {
   career_count: number;
 }
 
-// --- Difficulty helpers -------------------------------------------------------
+// ─── Difficulty helpers ───────────────────────────────────────────────────────
 
 const DIFFICULTY_META: Record<
   string,
@@ -130,7 +130,7 @@ function getDifficultyMeta(raw: string | null) {
   return { ...DIFFICULTY_META.default, label: raw.slice(0, 20) };
 }
 
-// --- Metadata -----------------------------------------------------------------
+// ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export async function generateMetadata({ params }: { params: Promise<{ stream: string }> }): Promise<Metadata> {
   const { stream } = await params;
@@ -176,7 +176,7 @@ export default async function CareerOpportunitiesByStreamPage({ params }: { para
   const relatedStreams: RelatedStreamRow[] = relatedFaDocs.map((r) => ({ id: r.id, name: r.name, pageslug: r.pageslug ?? null, career_count: r.career_count }));
   const totalCareers = careers.length;
 
-  // -- Group careers by careerInterest --------------------------------------
+  // ── Group careers by careerInterest ──────────────────────────────────────
   const byInterest = new Map<string, CareerRelevantRow[]>();
   for (const c of careers) {
     const key = c.careerInterest?.trim() || "General";
@@ -192,7 +192,7 @@ export default async function CareerOpportunitiesByStreamPage({ params }: { para
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* -- Hero ----------------------------------------------------------- */}
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <div className="bg-neutral-900 pt-24 pb-14 relative overflow-hidden">
         {/* Subtle tinted background */}
         {streamInfo.bannerimage && (
@@ -272,7 +272,7 @@ export default async function CareerOpportunitiesByStreamPage({ params }: { para
         </div>
       </div>
 
-      {/* -- Interest Group Filter ------------------------------------------- */}
+      {/* ── Interest Group Filter ─────────────────────────────────────────── */}
       {useGrouped && (
         <div className="bg-white border-b border-neutral-100 sticky top-0 z-30 shadow-sm">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -294,7 +294,7 @@ export default async function CareerOpportunitiesByStreamPage({ params }: { para
         </div>
       )}
 
-      {/* -- Main content --------------------------------------------------- */}
+      {/* ── Main content ─────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
         {totalCareers === 0 ? (
           <EmptyState streamName={streamName} />
@@ -332,7 +332,7 @@ export default async function CareerOpportunitiesByStreamPage({ params }: { para
           </div>
         )}
 
-        {/* -- Related Streams -------------------------------------------- */}
+        {/* ── Related Streams ──────────────────────────────────────────── */}
         {relatedStreams.length > 0 && (
           <div className="mt-14">
             <h3 className="text-base font-black text-neutral-900 mb-4 flex items-center gap-2">
@@ -366,7 +366,7 @@ export default async function CareerOpportunitiesByStreamPage({ params }: { para
           </div>
         )}
 
-        {/* -- CTA strip --------------------------------------------------- */}
+        {/* ── CTA strip ─────────────────────────────────────────────────── */}
         <div className="mt-14 bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-3xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-2xl bg-red-500/20 flex items-center justify-center shrink-0">
@@ -415,7 +415,7 @@ export default async function CareerOpportunitiesByStreamPage({ params }: { para
   );
 }
 
-// --- Career Card --------------------------------------------------------------
+// ─── Career Card ──────────────────────────────────────────────────────────────
 
 function CareerCard({ career }: { career: CareerRelevantRow }) {
   const imgUrl = buildImageUrl(career.image);
@@ -515,7 +515,7 @@ function CareerCard({ career }: { career: CareerRelevantRow }) {
   );
 }
 
-// --- Empty State --------------------------------------------------------------
+// ─── Empty State ──────────────────────────────────────────────────────────────
 
 function EmptyState({ streamName }: { streamName: string }) {
   return (

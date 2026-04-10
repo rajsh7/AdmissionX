@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
-// --- Metadata -----------------------------------------------------------------
+// ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
   title: "Contact Us | AdmissionX",
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "Get in touch with the AdmissionX team. We're here to help with college admissions, exam guidance, and any platform queries.",
 };
 
-// --- Server Action ------------------------------------------------------------
+// ─── Server Action ────────────────────────────────────────────────────────────
 
 async function submitContactForm(formData: FormData): Promise<void> {
   "use server";
@@ -43,7 +43,7 @@ async function submitContactForm(formData: FormData): Promise<void> {
   redirect("/contact-us?sent=1");
 }
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function ContactUsPage({
   searchParams,
@@ -100,7 +100,7 @@ export default async function ContactUsPage({
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* -- Hero ----------------------------------------------------------- */}
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <div className="bg-neutral-900 pt-24 pb-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           {/* Breadcrumb */}
@@ -138,11 +138,11 @@ export default async function ContactUsPage({
         </div>
       </div>
 
-      {/* -- Main grid ------------------------------------------------------ */}
+      {/* ── Main grid ────────────────────────────────────────────────────── */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
-          {/* -- Left: contact info --------------------------------------- */}
+          {/* ── Left: contact info ─────────────────────────────────────── */}
           <div className="space-y-5">
             <h2 className="text-sm font-black text-neutral-400 uppercase tracking-widest mb-1">
               Contact Information
@@ -213,7 +213,7 @@ export default async function ContactUsPage({
             </div>
           </div>
 
-          {/* -- Right: form (spans 2 cols) -------------------------------- */}
+          {/* ── Right: form (spans 2 cols) ──────────────────────────────── */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden">
 
@@ -238,7 +238,7 @@ export default async function ContactUsPage({
               </div>
 
               <div className="px-6 py-6">
-                {/* -- Success banner ------------------------------------ */}
+                {/* ── Success banner ──────────────────────────────────── */}
                 {sent && (
                   <div className="mb-6 flex items-start gap-3 bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-4">
                     <span
@@ -259,7 +259,7 @@ export default async function ContactUsPage({
                   </div>
                 )}
 
-                {/* -- Error banner -------------------------------------- */}
+                {/* ── Error banner ────────────────────────────────────── */}
                 {error && (
                   <div className="mb-6 flex items-start gap-3 bg-red-50 border border-red-200 rounded-2xl px-5 py-4">
                     <span
@@ -278,7 +278,7 @@ export default async function ContactUsPage({
                   </div>
                 )}
 
-                {/* -- Contact form --------------------------------------- */}
+                {/* ── Contact form ─────────────────────────────────────── */}
                 {!sent && (
                   <form action={submitContactForm} className="space-y-5">
                     {/* Row 1: Name + Email */}

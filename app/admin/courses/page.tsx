@@ -29,7 +29,7 @@ async function updateCourse(formData: FormData) {
   revalidatePath("/admin/courses");
   revalidatePath("/", "layout");
 }
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -72,7 +72,7 @@ interface StatsRow  {
   on_home: number;
 }
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function AdminCoursesPage({
   searchParams,
@@ -85,7 +85,7 @@ export default async function AdminCoursesPage({
   const filter = sp.filter ?? "all"; // all | top | home
   const offset = (page - 1) * PAGE_SIZE;
 
-  // -- Build WHERE ------------------------------------------------------------
+  // ── Build WHERE ────────────────────────────────────────────────────────────
   const conditions: string[] = [];
   const params: (string | number)[] = [];
 
@@ -98,7 +98,7 @@ export default async function AdminCoursesPage({
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // -- Parallel queries -------------------------------------------------------
+  // ── Parallel queries ───────────────────────────────────────────────────────
   const [courses, countRows, statsRows] = await Promise.all([
     safeQuery<CourseRow>(
       `SELECT
@@ -138,7 +138,7 @@ export default async function AdminCoursesPage({
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const stats      = statsRows[0];
 
-  // -- URL builder ------------------------------------------------------------
+  // ── URL builder ────────────────────────────────────────────────────────────
   function buildUrl(overrides: Record<string, string | number>) {
     const merged = { q, page: "1", filter, ...overrides };
     const qs = Object.entries(merged)
@@ -151,7 +151,7 @@ export default async function AdminCoursesPage({
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
 
-      {/* -- Page header ---------------------------------------------------- */}
+      {/* ── Page header ──────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -174,7 +174,7 @@ export default async function AdminCoursesPage({
         </div>
       </div>
 
-      {/* -- Stats bar ------------------------------------------------------- */}
+      {/* ── Stats bar ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-4">
         {[
           {
@@ -226,7 +226,7 @@ export default async function AdminCoursesPage({
         ))}
       </div>
 
-      {/* -- Search + filter bar --------------------------------------------- */}
+      {/* ── Search + filter bar ───────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
         {/* Search */}
         <form method="GET" action="/admin/courses" className="flex-1 flex gap-2">
@@ -285,7 +285,7 @@ export default async function AdminCoursesPage({
         </div>
       </div>
 
-      {/* -- Table ----------------------------------------------------------- */}
+      {/* ── Table ─────────────────────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         {courses.length === 0 ? (
           <div className="py-24 text-center">
@@ -307,7 +307,7 @@ export default async function AdminCoursesPage({
               buildUrl={buildUrl}
             />
 
-            {/* -- Pagination ------------------------------------------------ */}
+            {/* ── Pagination ──────────────────────────────────────────────── */}
             <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
               <p className="text-xs text-slate-500">
                 Showing{" "}

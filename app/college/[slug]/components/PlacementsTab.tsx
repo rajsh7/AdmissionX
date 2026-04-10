@@ -105,7 +105,8 @@ export default function PlacementsTab({
                 <h3 className="text-3xl lg:text-4xl font-bold tracking-tight">Top Recruiters 2025</h3>
                 <div className="h-1 lg:w-32 bg-[#FF3C3C] rounded-full hidden sm:block" />
               </div>
-              
+
+              <div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
                 {topRecruiters.map((recruiter, idx) => (
                   <div key={idx} className="group bg-white rounded-[5px] flex flex-col items-center justify-center p-8 transition-all duration-500 shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] hover:shadow-[0_25px_80px_-20px_rgba(0,0,0,0.3)] border border-neutral-100 h-32 lg:h-40 relative hover:-translate-y-2">

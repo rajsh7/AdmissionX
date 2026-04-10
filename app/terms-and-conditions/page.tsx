@@ -16,7 +16,7 @@ export default function TermsAndConditionsPage() {
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* -- Hero ------------------------------------------------------------ */}
+      {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <div className="bg-neutral-900 pt-24 pb-14">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
@@ -56,7 +56,7 @@ export default function TermsAndConditionsPage() {
         </div>
       </div>
 
-      {/* -- Quick nav ------------------------------------------------------- */}
+      {/* ── Quick nav ─────────────────────────────────────────────────────── */}
       <div className="bg-white border-b border-neutral-100 sticky top-0 z-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 py-3 overflow-x-auto">
           <div className="flex items-center gap-1 text-xs font-semibold whitespace-nowrap">
@@ -82,7 +82,7 @@ export default function TermsAndConditionsPage() {
         </div>
       </div>
 
-      {/* -- Content --------------------------------------------------------- */}
+      {/* ── Content ───────────────────────────────────────────────────────── */}
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12">
         <div className="bg-white rounded-3xl border border-neutral-100 shadow-sm overflow-hidden">
           {/* Alert banner */}
@@ -478,7 +478,7 @@ export default function TermsAndConditionsPage() {
   );
 }
 
-// --- Shared sub-components ----------------------------------------------------
+// ─── Shared sub-components ────────────────────────────────────────────────────
 
 function SectionHeading({
   number,

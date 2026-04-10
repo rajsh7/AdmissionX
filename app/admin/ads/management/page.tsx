@@ -2,7 +2,7 @@ import pool from "@/lib/db";
 import Link from "next/link";
 import AdsManagementDashboardClient from "./AdsManagementDashboardClient";
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -21,7 +21,7 @@ async function safeQuery<T >(
   }
 }
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AdRow  {
   id: number;
@@ -42,7 +42,7 @@ interface AdRow  {
 
 interface CountRow  { total: number; }
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function AdminAdsPage({
   searchParams,
@@ -55,7 +55,7 @@ export default async function AdminAdsPage({
   const filter = sp.filter ?? "all"; // all | active | inactive
   const offset = (page - 1) * PAGE_SIZE;
 
-  // -- WHERE ------------------------------------------------------------------
+  // ── WHERE ──────────────────────────────────────────────────────────────────
   const conditions: string[] = [];
   const params: (string | number)[] = [];
 
@@ -68,7 +68,7 @@ export default async function AdminAdsPage({
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // -- Parallel queries -------------------------------------------------------
+  // ── Parallel queries ───────────────────────────────────────────────────────
   const [ads, countRows, totalRow, activeRow, inactiveRow] = await Promise.all([
     safeQuery<AdRow>(
       `SELECT a.*, cp.bannerimage AS college_banner
@@ -114,7 +114,7 @@ export default async function AdminAdsPage({
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
 
-      {/* -- Header --------------------------------------------------------- */}
+      {/* ── Header ───────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -132,7 +132,7 @@ export default async function AdminAdsPage({
         </span>
       </div>
 
-      {/* -- Stat mini-cards ------------------------------------------------- */}
+      {/* ── Stat mini-cards ───────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {STAT_CARDS.map((card, i) => (
           <div
@@ -152,7 +152,7 @@ export default async function AdminAdsPage({
         ))}
       </div>
 
-      {/* -- Filter tabs + Search -------------------------------------------- */}
+      {/* ── Filter tabs + Search ──────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
         <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl flex-shrink-0">
           {FILTER_TABS.map((tab) => (

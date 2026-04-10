@@ -5,7 +5,7 @@ import { fetchCollegeOptions } from "../_components/college-options";
 import CollegeFilterBar from "../_components/CollegeFilterBar";
 import ReviewsListClient from "./ReviewsListClient";
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 function parseNumber(formData: FormData, key: string) {
   const v = formData.get(key) as string;
@@ -119,7 +119,7 @@ interface CollegeOption {
   name: string;
 }
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function CollegeReviewsPage({
   searchParams,

@@ -20,13 +20,13 @@ export interface TickerAdItem {
   redirectto: string | null;
 }
 
-// -- Route-level cache ---------------------------------------------------------
+// ── Route-level cache ─────────────────────────────────────────────────────────
 // Tells Next.js to cache the fully-rendered page for 5 minutes.
 // Works in both development and production, unlike unstable_cache alone.
 // export const revalidate = 300;
 export const dynamic = "force-dynamic";
 
-// -- Types ---------------------------------------------------------------------
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 interface CollegeRow {
   slug: string;
@@ -36,7 +36,7 @@ interface CollegeRow {
   rating: string | null;
 }
 
-// -- Helpers -------------------------------------------------------------------
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function slugToName(slug: string): string {
   return slug
@@ -55,7 +55,7 @@ async function safeQuery<T>(collection: string): Promise<T[]> {
   }
 }
 
-// -- Cached data fetcher -------------------------------------------------------
+// ── Cached data fetcher ───────────────────────────────────────────────────────
 //
 // WHAT WAS SLOW (69 s → 45 s render):
 //
@@ -84,7 +84,7 @@ async function safeQuery<T>(collection: string): Promise<T[]> {
 //
 //   D. Stats query replaced with information_schema.tables — reads the InnoDB
 //      data dictionary (microseconds) instead of scanning every row.
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
 const getHomePageData = unstable_cache(
   async () => {
@@ -192,7 +192,7 @@ const getHomePageData = unstable_cache(
   { revalidate: 300 },
 );
 
-// -- Page ----------------------------------------------------------------------
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function Page() {
   let collegeRows: CollegeRow[] = [];
@@ -214,7 +214,7 @@ export default async function Page() {
     console.error("[homepage] Failed to fetch data:", error);
   }
 
-  // -- Transform colleges --------------------------------------------------
+  // ── Transform colleges ──────────────────────────────────────────────────
   const universities: University[] = collegeRows.map((row) => {
     const rawName = row.name && row.name !== row.slug ? row.name : null;
     const name = rawName ?? slugToName(row.slug || "university");
@@ -255,7 +255,7 @@ export default async function Page() {
     { value: Math.max(courseCount, 100),  suffix: "+", label: "Courses Available" },
   ];
 
-  // -- Stream counts --------------------------------------------------------
+  // ── Stream counts ────────────────────────────────────────────────────────
   // We intentionally skip the COUNT(DISTINCT …) GROUP BY streams query.
   // Reason: it caused 120 s+ timeouts (no covering index on collegemaster).
   // The FieldsOfStudy component has its own hardcoded static counts
@@ -278,7 +278,7 @@ export default async function Page() {
   //
   const streamCounts: Record<string, number> = {};
 
-  // -- Pre-warm the default "Engineering" tab cache --------------------------
+  // ── Pre-warm the default "Engineering" tab cache ──────────────────────────
   // The TopUniversities component mounts with "Engineering" as the active tab.
   // By fetching it here (server-side, cached), the first tab click is instant
   // and the API route serves from the warm cache rather than hitting the DB.

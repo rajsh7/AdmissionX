@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),
   turbopack: {
     root: path.join(__dirname),
+    persistentCaching: false,
   },
 
   // Reduces JS bundle size by tree-shaking large packages to only import what's used.
@@ -25,8 +26,8 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "5mb",
     },
     staleTimes: {
-      dynamic: 30,  // cache dynamic pages in router for 30s — avoids re-fetch on back/forward
-      static: 300,  // statically cached routes: serve from cache for 5 min
+      dynamic: 0,  // dynamic routes: no extra client-side staleness
+      static: 300, // statically cached routes: serve from cache for 5 min
     },
     optimizePackageImports: ["framer-motion"],
   },
@@ -54,8 +55,6 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     // Keep optimised images in the disk cache for 7 days before re-generating.
     minimumCacheTTL: 60 * 60 * 24 * 7,
-    // Allow quality 60 used by AuthBackgroundSlider
-    qualities: [60, 75, 85, 90],
     // Allow reasonably large hero / banner images.
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
@@ -86,7 +85,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
+            value: "public, max-age=0, must-revalidate",
           },
         ],
       },

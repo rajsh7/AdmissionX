@@ -45,10 +45,10 @@ export default function CollegeSignupSuccessPage() {
       <AuthBackgroundSlider />
       <Header />
 
-      {/* -- Main --------------------------------------------------- */}
+      {/* ── Main ─────────────────────────────────────────────────── */}
       <main className="flex-1 flex flex-col items-center py-12 px-6 pt-32">
         <div className="max-w-4xl w-full space-y-8">
-          {/* -- Hero Card ------------------------------------------ */}
+          {/* ── Hero Card ────────────────────────────────────────── */}
           <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl shadow-primary/5 border border-slate-100 dark:border-slate-800 overflow-hidden">
             <div className="grid md:grid-cols-2">
               {/* Left — Text Content */}
@@ -133,7 +133,7 @@ export default function CollegeSignupSuccessPage() {
             </div>
           </div>
 
-          {/* -- Next Steps Timeline --------------------------------- */}
+          {/* ── Next Steps Timeline ───────────────────────────────── */}
           <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 p-8">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-3">
               <span className="material-symbols-outlined text-primary">
@@ -190,7 +190,7 @@ export default function CollegeSignupSuccessPage() {
             </div>
           </div>
 
-          {/* -- Support Contact Strip ------------------------------- */}
+          {/* ── Support Contact Strip ─────────────────────────────── */}
           <div className="text-center bg-slate-100 dark:bg-slate-800/50 rounded-xl p-6 border border-slate-200 dark:border-slate-800">
             <p className="text-slate-600 dark:text-slate-400 font-medium">
               Need immediate assistance with your application?

@@ -27,7 +27,7 @@ const EMPTY: PlacementData = {
   placementinfo: "",
 };
 
-// -- Completeness ring ---------------------------------------------------------
+// ── Completeness ring ─────────────────────────────────────────────────────────
 function CompletenessRing({ pct }: { pct: number }) {
   const r = 36;
   const circ = 2 * Math.PI * r;
@@ -70,7 +70,7 @@ function CompletenessRing({ pct }: { pct: number }) {
   );
 }
 
-// -- Field component -----------------------------------------------------------
+// ── Field component ───────────────────────────────────────────────────────────
 function Field({
   label,
   hint,
@@ -134,7 +134,7 @@ function Field({
   );
 }
 
-// -- Stat card (read-only display when saved) ----------------------------------
+// ── Stat card (read-only display when saved) ──────────────────────────────────
 function StatCard({
   icon,
   label,
@@ -175,7 +175,7 @@ function StatCard({
   );
 }
 
-// ------------------------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════════
 export default function PlacementTab({ college }: Props) {
   const [form, setForm] = useState<PlacementData>(EMPTY);
   const [completeness, setCompleteness] = useState(0);
@@ -189,7 +189,7 @@ export default function PlacementTab({ college }: Props) {
 
   const slug = college.slug;
 
-  // -- Fetch -----------------------------------------------------------------
+  // ── Fetch ─────────────────────────────────────────────────────────────────
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -212,19 +212,19 @@ export default function PlacementTab({ college }: Props) {
     load();
   }, [load]);
 
-  // -- Toast -----------------------------------------------------------------
+  // ── Toast ─────────────────────────────────────────────────────────────────
   function showToast(type: "success" | "error", msg: string) {
     setToast({ type, msg });
     setTimeout(() => setToast(null), 4000);
   }
 
-  // -- Field updater ---------------------------------------------------------
+  // ── Field updater ─────────────────────────────────────────────────────────
   function update(field: keyof PlacementData, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
     setDirty(true);
   }
 
-  // -- Save ------------------------------------------------------------------
+  // ── Save ──────────────────────────────────────────────────────────────────
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -265,7 +265,7 @@ export default function PlacementTab({ college }: Props) {
     }
   }
 
-  // -- Skeleton --------------------------------------------------------------
+  // ── Skeleton ──────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto space-y-6 animate-pulse">
@@ -286,7 +286,7 @@ export default function PlacementTab({ college }: Props) {
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
-      {/* -- Toast -- */}
+      {/* ── Toast ── */}
       {toast && (
         <div
           className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl text-sm font-semibold transition-all
@@ -309,7 +309,7 @@ export default function PlacementTab({ college }: Props) {
         </div>
       )}
 
-      {/* -- Header + ring -- */}
+      {/* ── Header + ring ── */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6">
         <CompletenessRing pct={completeness} />
         <div className="flex-1 min-w-0">
@@ -340,7 +340,7 @@ export default function PlacementTab({ college }: Props) {
         </div>
       </div>
 
-      {/* -- Snapshot cards -- */}
+      {/* ── Snapshot cards ── */}
       <div>
         <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
           Current Snapshot
@@ -379,7 +379,7 @@ export default function PlacementTab({ college }: Props) {
         </div>
       </div>
 
-      {/* -- Form -- */}
+      {/* ── Form ── */}
       <form
         onSubmit={handleSave}
         className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-5"
@@ -502,7 +502,7 @@ export default function PlacementTab({ college }: Props) {
         </div>
       </form>
 
-      {/* -- Tips -- */}
+      {/* ── Tips ── */}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 rounded-2xl p-5">
         <div className="flex items-start gap-3">
           <span

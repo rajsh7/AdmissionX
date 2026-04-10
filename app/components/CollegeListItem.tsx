@@ -91,7 +91,7 @@ export default function CollegeListItem({
         href={`/college/${slug}`}
         className="group flex items-start gap-4 bg-white rounded-[10px] border border-neutral-100 hover:border-[#FF3C3C]/20 hover:shadow-xl hover:shadow-[#FF3C3C]/5 transition-all duration-300 p-4 sm:p-5"
       >
-        {/* -- Thumbnail -- */}
+        {/* ── Thumbnail ── */}
         <div className="relative w-24 h-20 sm:w-32 sm:h-24 flex-shrink-0 rounded-[10px] overflow-hidden bg-neutral-100 flex items-center justify-center">
           {image && image !== "" ? (
             <Image
@@ -114,7 +114,7 @@ export default function CollegeListItem({
           ) : null}
         </div>
 
-        {/* -- Main Info -- */}
+        {/* ── Main Info ── */}
         <div className="flex-1 min-w-0">
           {/* Top row: name + badges */}
           <div className="flex items-start justify-between gap-2 mb-1.5">

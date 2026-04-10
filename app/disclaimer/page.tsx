@@ -3,7 +3,7 @@ import Link from "next/link";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
-// --- Metadata -----------------------------------------------------------------
+// ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
   title: "Disclaimer | AdmissionX",
@@ -11,11 +11,11 @@ export const metadata: Metadata = {
     "Read the AdmissionX disclaimer. Understand the limitations of information provided on our platform regarding college admissions, fees, and exam details.",
 };
 
-// --- Last Updated -------------------------------------------------------------
+// ─── Last Updated ─────────────────────────────────────────────────────────────
 
 const LAST_UPDATED = "June 1, 2025";
 
-// --- Sections -----------------------------------------------------------------
+// ─── Sections ─────────────────────────────────────────────────────────────────
 
 const SECTIONS = [
   {
@@ -117,14 +117,14 @@ const SECTIONS = [
   },
 ];
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function DisclaimerPage() {
   return (
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* -- Hero -- */}
+      {/* ── Hero ── */}
       <div className="bg-neutral-900 pt-24 pb-14">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
@@ -168,7 +168,7 @@ export default function DisclaimerPage() {
         </div>
       </div>
 
-      {/* -- Quick-nav strip -- */}
+      {/* ── Quick-nav strip ── */}
       <div className="bg-white border-b border-neutral-100 sticky top-0 z-10">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <div className="flex items-center gap-1 overflow-x-auto py-3 scrollbar-none">
@@ -185,7 +185,7 @@ export default function DisclaimerPage() {
         </div>
       </div>
 
-      {/* -- Body -- */}
+      {/* ── Body ── */}
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12">
         <div className="bg-white rounded-3xl border border-neutral-100 shadow-sm overflow-hidden">
 
@@ -241,7 +241,7 @@ export default function DisclaimerPage() {
           </div>
         </div>
 
-        {/* -- Related legal links -- */}
+        {/* ── Related legal links ── */}
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             {

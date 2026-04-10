@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
@@ -17,7 +17,7 @@ async function safeQuery<T >(
   }
 }
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface MetricRow  {
   id: number;
@@ -29,7 +29,7 @@ interface MetricRow  {
   updated_at: string;
 }
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function WebsiteMetricsPage() {
   const metrics = await safeQuery<MetricRow>("SELECT * FROM homepage_stats WHERE is_active = 1 ORDER BY id ASC");

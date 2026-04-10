@@ -6,7 +6,7 @@ interface Props {
   user: { id: string | number; name: string; email: string } | null;
 }
 
-// -- Shared Tab Navigation -----------------------------------------------------
+// ── Shared Tab Navigation ─────────────────────────────────────────────────────
 function ProfileTabs({ active = "settings" }: { active?: string }) {
   const tabs = [
     { id: "profile", label: "Profile", icon: "person" },
@@ -35,7 +35,7 @@ function ProfileTabs({ active = "settings" }: { active?: string }) {
   );
 }
 
-// -- Premium Input Field ------------------------------------------------------
+// ── Premium Input Field ──────────────────────────────────────────────────────
 function InputField({
   label,
   value,

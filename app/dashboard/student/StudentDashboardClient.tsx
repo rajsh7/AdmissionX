@@ -18,7 +18,7 @@ import CounselingTab from "./tabs/CounselingTab";
 import HelpDeskTab from "./tabs/HelpDeskTab";
 import ProfileViewTab from "./tabs/ProfileViewTab";
 
-// -- Types ---------------------------------------------------------------------
+// ── Types ─────────────────────────────────────────────────────────────────────
 interface Props {
   user: { id: string | number; name: string; email: string } | null;
   activated?: boolean;
@@ -36,7 +36,7 @@ type TabId =
 
 interface NavItem { id: TabId; label: string; icon: string; groupId?: string }
 
-// -- Main Component ------------------------------------------------------------
+// ── Main Component ────────────────────────────────────────────────────────────
 export default function StudentDashboardClient({ user, activated }: Props) {
   const [activeTab, setActiveTab]     = useState<TabId>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -50,7 +50,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
   const initials = (user?.name ?? "ST")
     .split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase();
 
-  // -- Tab renderer ----------------------------------------------------------
+  // ── Tab renderer ──────────────────────────────────────────────────────────
   function renderTab() {
     switch (activeTab) {
       case "overview":               return <OverviewTab           user={user} />;
@@ -71,7 +71,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
     }
   }
 
-  // -- Sidebar Inner ----------------------------------------------------------
+  // ── Sidebar Inner ──────────────────────────────────────────────────────────
   function SidebarContent() {
     const MENU_ITEMS: NavItem[] = [
       { id: "account-details", label: "Student Details", icon: "person" },

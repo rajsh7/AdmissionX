@@ -92,9 +92,9 @@ export default function CourseSearchClient({
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
       <Header />
-      {/* -- Hero section -- */}
+      {/* ── Hero section ── */}
       <div className="relative w-full overflow-hidden" style={{ height: '560px' }}>
-        {/* -- Hero Background -- */}
+        {/* ── Hero Background ── */}
         <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
           <Image
             src="/images/hero-student.png"
@@ -110,7 +110,7 @@ export default function CourseSearchClient({
 
         <div className="relative z-10 w-full h-full flex flex-col">
 
-          {/* -- Hero / Search Banner -- */}
+          {/* ── Hero / Search Banner ── */}
           <div className="flex-1 flex items-center justify-start relative">
             <div className="mx-auto w-full px-4 lg:px-12 xl:px-20">
               <div className="max-w-4xl text-left transition-opacity duration-700" style={{ opacity: mounted ? 1 : 0 }}>

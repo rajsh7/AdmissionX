@@ -36,7 +36,7 @@ export default function CourseCardV3({
       }}
     >
       <div className="group flex flex-col bg-white rounded-[8px] border border-neutral-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden h-full">
-        {/* -- Image -- */}
+        {/* ── Image ── */}
         <div className="relative h-[140px] overflow-hidden bg-neutral-100 flex-shrink-0">
           {image ? (
             <Image
@@ -59,7 +59,7 @@ export default function CourseCardV3({
           </button>
         </div>
 
-        {/* -- Body -- */}
+        {/* ── Body ── */}
         <div className="flex flex-col flex-1 p-3">
           {/* Title */}
           <h3 className="text-[14px] font-medium text-neutral-800 mb-2.5 line-clamp-2 leading-snug">

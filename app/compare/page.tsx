@@ -55,11 +55,14 @@ function Cell({ value, sub }: { value: string; sub?: string }) {
 
 const METRICS = [
   { label: "Global Ranking", key: "ranking", render: (c: CollegeData) => <Cell value={c.ranking ? `#${c.ranking}` : "—"} sub="QS World 2026" /> },
-  { label: "Tuition Fees/Yr", key: "fees", render: (c: CollegeData) => <Cell value={c.min_fees ? `${formatFees(c.min_fees)}` : "—"} sub="Out of state" /> },
-  { label: "Acceptance Rate", key: "acceptance", render: (c: CollegeData) => <Cell value={c.rating > 4 ? "4.0%" : "5.5%"} sub={c.rating > 4 ? "Highly Selective" : "Selective"} /> },
-  { label: "Placement Rate", key: "placement", render: (c: CollegeData) => <Cell value={c.placement_last_year ? `${c.placement_last_year}%` : "94%"} sub="Within 6 months" /> },
-  { label: "Student-Faculty Ratio", key: "ratio", render: (c: CollegeData) => <Cell value={c.totalStudent && c.totalStudent > 5000 ? "30:1" : "20:1"} sub={c.totalStudent && c.totalStudent > 5000 ? "Exceptional" : "Excellent"} /> },
-  { label: "Top Programs", key: "programs", render: (c: CollegeData) => <Cell value={c.total_streams > 5 ? "Engineering, Computer Science" : "Computer Science, Business"} /> },
+  { label: "Tuition Fees/yr", key: "fees", render: (c: CollegeData) => <Cell value={c.min_fees ? `${formatFees(c.min_fees)} – ${formatFees(c.max_fees)}` : "—"} sub={c.universityType ?? undefined} /> },
+  { label: "Rating", key: "rating", render: (c: CollegeData) => <Cell value={c.rating ? `${c.rating.toFixed(1)} ★` : "—"} sub={`${c.totalRatingUser} reviews`} /> },
+  { label: "Placement Rate", key: "placement", render: (c: CollegeData) => <Cell value={c.placement_last_year || "—"} sub={c.placement_companies ? `${c.placement_companies} companies` : undefined} /> },
+  { label: "Highest CTC", key: "ctc_highest", render: (c: CollegeData) => <Cell value={c.ctc_highest || "—"} /> },
+  { label: "Average CTC", key: "ctc_average", render: (c: CollegeData) => <Cell value={c.ctc_average || "—"} /> },
+  { label: "Total Courses", key: "courses", render: (c: CollegeData) => <Cell value={c.total_courses ? String(c.total_courses) : "—"} sub={c.total_streams ? `${c.total_streams} streams` : undefined} /> },
+  { label: "Established", key: "estyear", render: (c: CollegeData) => <Cell value={c.estyear || "—"} /> },
+  { label: "University Type", key: "type", render: (c: CollegeData) => <Cell value={c.universityType || "—"} /> },
 ];
 
 function ComparePageInner() {
@@ -161,18 +164,22 @@ function ComparePageInner() {
               </p>
             </div>
 
-            {/* Search Bar Group */}
-            <div ref={searchRef} className="relative flex items-center gap-4 max-w-4xl">
-              <div className="flex-1 flex items-center gap-3 bg-white border border-slate-200 rounded-[5px] px-4 py-3 shadow-sm focus-within:border-primary transition-all">
-                <span className="text-[#FF3C3C] font-bold text-xl">+</span>
-                <input
-                  value={searchQ}
-                  onChange={(e) => { setSearchQ(e.target.value); setAddingSlot(colleges.findIndex((c) => !c)); }}
-                  placeholder="Location, universities, courses..."
-                  className="flex-1 text-[15px] text-slate-700 placeholder:text-slate-400 bg-transparent outline-none"
-                />
-              </div>
-              
+          {/* Page Title */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-black text-slate-900">Compare College</h1>
+            <p className="text-slate-500 mt-2">Evaluate multiple institutions side by side to find your perfect match based on fees, placement, and academic quality.</p>
+          </div>
+
+          {/* Search Bar */}
+          <div ref={searchRef} className="relative mb-8 max-w-xl">
+            <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition-all">
+              <span className="text-primary font-bold text-lg">+</span>
+              <input
+                value={searchQ}
+                onChange={(e) => { setSearchQ(e.target.value); setAddingSlot(colleges.findIndex((c) => !c)); }}
+                placeholder="Location, universities, courses..."
+                className="flex-1 text-sm text-slate-700 placeholder:text-slate-400 bg-transparent outline-none"
+              />
               <button
                 onClick={() => {
                   if (searchQ.trim()) {
@@ -180,11 +187,10 @@ function ComparePageInner() {
                     if (slot !== -1) addCollege(searchQ.trim(), slot);
                   }
                 }}
-                className="bg-[#FF3C3C] text-white text-[15px] font-bold px-8 py-3.5 rounded-[5px] hover:bg-red-600 transition-colors"
+                className="bg-primary text-white text-sm font-bold px-5 py-2 rounded-lg hover:bg-red-700 transition-colors"
               >
                 Add College
               </button>
-
               {/* Suggestions dropdown */}
               {suggestions.length > 0 && (
                 <div className="absolute top-full left-0 w-full md:w-[calc(100%-140px)] mt-2 bg-white rounded-[5px] shadow-xl border border-slate-100 z-50 overflow-hidden">
@@ -207,12 +213,32 @@ function ComparePageInner() {
                 </div>
               )}
             </div>
-          </div>
-        </div>
 
-        <div className="relative z-20 w-full px-4 sm:px-8 lg:px-12 -mt-32">
+            {/* Suggestions dropdown */}
+            {suggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden">
+                {suggestions.map((s) => (
+                  <button
+                    key={s.slug}
+                    onClick={() => {
+                      const slot = addingSlot !== null ? addingSlot : colleges.findIndex((c) => !c);
+                      if (slot !== -1) addCollege(s.slug, slot);
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-left border-b border-slate-50 last:border-0 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-slate-400 text-[18px]">account_balance</span>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">{s.name}</p>
+                      <p className="text-xs text-slate-400">{s.location}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Comparison Table */}
-          <div className="bg-white rounded-[5px] shadow-sm border border-slate-100 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
@@ -288,17 +314,15 @@ function ComparePageInner() {
                         <span className="text-[16px] font-semibold text-[#3e3e3e]">{metric.label}</span>
                       </td>
                       {colleges.map((college, ci) => (
-                        <td key={ci} className="px-6 py-7 border-r border-slate-100 last:border-r-0">
+                        <td key={ci} className="px-4 py-4 border-r border-slate-100 last:border-r-0">
                           {college ? (
                             loading ? (
-                              <div className="h-6 bg-slate-100 rounded animate-pulse w-24" />
+                              <div className="h-4 bg-slate-100 rounded animate-pulse w-20" />
                             ) : (
-                              <div className="text-[15px]">
-                                {metric.render(college)}
-                              </div>
+                              metric.render(college)
                             )
                           ) : (
-                            <div className="w-full h-1" />
+                            <span className="text-slate-200 text-sm">—</span>
                           )}
                         </td>
                       ))}

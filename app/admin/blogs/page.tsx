@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import DeleteButton from "../_components/DeleteButton";
 import BlogClient from "./BlogClient";
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function toggleBlogAction(formData: FormData) {
   "use server";
@@ -32,7 +32,7 @@ async function deleteBlogById(id: number): Promise<void> {
   revalidatePath("/admin/blogs");
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T >(
   sql: string,
@@ -65,7 +65,7 @@ function stripHtml(html: string | null | undefined): string {
   return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 100);
 }
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface BlogRow  {
   id: number;
@@ -88,13 +88,13 @@ interface StatsRow  {
   inactive: number;
 }
 
-// --- Constants ----------------------------------------------------------------
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 20;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function AdminBlogsPage({
   searchParams,
@@ -107,7 +107,7 @@ export default async function AdminBlogsPage({
   const filter = sp.filter ?? "all"; // all | active | inactive
   const offset = (page - 1) * PAGE_SIZE;
 
-  // -- Build query conditions -------------------------------------------------
+  // ── Build query conditions ─────────────────────────────────────────────────
   const conditions: string[] = [];
   const params: (string | number)[] = [];
 
@@ -120,7 +120,7 @@ export default async function AdminBlogsPage({
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // -- Fetch data + stats in parallel ----------------------------------------
+  // ── Fetch data + stats in parallel ────────────────────────────────────────
   const [blogs, countRows, statsRows] = await Promise.all([
     safeQuery<BlogRow>(
       `SELECT id, topic, slug, isactive, description, featimage, created_at, updated_at
@@ -146,7 +146,7 @@ export default async function AdminBlogsPage({
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const stats      = statsRows[0];
 
-  // -- URL builder -----------------------------------------------------------
+  // ── URL builder ───────────────────────────────────────────────────────────
   function buildUrl(overrides: Record<string, string | number>) {
     const merged = { page: "1", q, filter, ...overrides };
     const qs = Object.entries(merged)
@@ -159,7 +159,7 @@ export default async function AdminBlogsPage({
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
 
-      {/* -- Page header ---------------------------------------------------- */}
+      {/* ── Page header ──────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -179,7 +179,7 @@ export default async function AdminBlogsPage({
         </div>
       </div>
 
-      {/* -- Stats bar ------------------------------------------------------ */}
+      {/* ── Stats bar ────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-4">
         {[
           {
@@ -221,7 +221,7 @@ export default async function AdminBlogsPage({
         ))}
       </div>
 
-      {/* -- Search + filter bar --------------------------------------------- */}
+      {/* ── Search + filter bar ───────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3">
         {/* Search */}
         <form method="GET" action="/admin/blogs" className="flex-1 flex gap-2">
@@ -281,7 +281,7 @@ export default async function AdminBlogsPage({
         offset={offset}
       />
 
-      {/* -- Pagination ------------------------------------------------ */}
+      {/* ── Pagination ──────────────────────────────────────────────── */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
           <p className="text-xs text-slate-500">

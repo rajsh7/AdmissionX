@@ -5,7 +5,7 @@ import RoleListClient from "./RoleListClient";
 
 const PAGE_SIZE = 25;
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function createRole(formData: FormData) {
   "use server";
@@ -52,7 +52,7 @@ async function deleteRole(id: number) {
   revalidatePath("/", "layout");
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T >(
   sql: string,

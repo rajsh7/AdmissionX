@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCachedCollegesForSlug, CATEGORY_SLUG } from "@/lib/college-filter";
 
-// --- GET /api/colleges/filter -------------------------------------------------
+// ─── GET /api/colleges/filter ─────────────────────────────────────────────────
 //
 //  Query param:
 //    stream – UI category label  e.g. "MBA" | "Engineering" | "MBBS" …
@@ -9,7 +9,7 @@ import { getCachedCollegesForSlug, CATEGORY_SLUG } from "@/lib/college-filter";
 //
 //  All heavy lifting (3-step query + caching) lives in lib/college-filter.ts.
 //
-// -----------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

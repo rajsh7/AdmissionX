@@ -181,7 +181,7 @@ export default function ChatbotWidget() {
 
   return (
     <>
-      {/* -- Floating Button -- */}
+      {/* ── Floating Button ── */}
       <motion.button
         onClick={() => setOpen((o) => !o)}
         whileHover={{ scale: 1.05 }}
@@ -189,6 +189,7 @@ export default function ChatbotWidget() {
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl shadow-2xl shadow-primary/30 flex items-center justify-center overflow-hidden"
         style={{ background: open ? "#e63535" : "linear-gradient(135deg, #FF3C3C 0%, #c0392b 100%)" }}
         aria-label="Toggle Assistant"
+        suppressHydrationWarning
       >
         <AnimatePresence mode="wait">
           {open ? (
@@ -203,7 +204,7 @@ export default function ChatbotWidget() {
         {!open && <span className="absolute inset-0 rounded-2xl animate-ping opacity-20 bg-primary" />}
       </motion.button>
 
-      {/* -- Chat Window -- */}
+      {/* ── Chat Window ── */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -224,7 +225,7 @@ export default function ChatbotWidget() {
               boxShadow: "0 25px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.06)",
             }}
           >
-            {/* -- Header -- */}
+            {/* ── Header ── */}
             <div className="flex-shrink-0 px-5 py-4 flex items-center gap-3"
               style={{ background: "linear-gradient(135deg, #FF3C3C 0%, #c0392b 100%)" }}>
               <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0 overflow-hidden p-1.5">
@@ -243,7 +244,7 @@ export default function ChatbotWidget() {
               </button>
             </div>
 
-            {/* -- Messages -- */}
+            {/* ── Messages ── */}
             <div
               ref={messagesRef}
               className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-4"
@@ -287,7 +288,7 @@ export default function ChatbotWidget() {
                 </motion.div>
               )}
 
-              {/* -- Inline Contact Form (appears after CONTACT_TRIGGER messages) -- */}
+              {/* ── Inline Contact Form (appears after CONTACT_TRIGGER messages) ── */}
               <AnimatePresence>
                 {showContactForm && (
                   <motion.div
@@ -393,7 +394,7 @@ export default function ChatbotWidget() {
               <div ref={bottomRef} />
             </div>
 
-            {/* -- Suggestions (only on first message) -- */}
+            {/* ── Suggestions (only on first message) ── */}
             {messages.length <= 1 && (
               <div className="flex-shrink-0 px-4 py-3 grid grid-cols-1 gap-2"
                 style={{ borderTop: "1px solid #f1f5f9", background: "#ffffff" }}>
@@ -408,7 +409,7 @@ export default function ChatbotWidget() {
               </div>
             )}
 
-            {/* -- Input -- */}
+            {/* ── Input ── */}
             <div className="flex-shrink-0 px-4 py-3" style={{ borderTop: "1px solid #f1f5f9", background: "#ffffff" }}>
               <form onSubmit={(e) => { e.preventDefault(); sendMessage(input); }}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 transition-all bg-slate-50">

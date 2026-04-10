@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
 import pool from "@/lib/db";
 
-// -- Auth + ownership helper ---------------------------------------------------
+// ── Auth + ownership helper ───────────────────────────────────────────────────
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_college")?.value;
@@ -29,7 +29,7 @@ async function checkAuth(slug: string) {
   }
 }
 
-// -- GET /api/college/dashboard/[slug]/profile ---------------------------------
+// ── GET /api/college/dashboard/[slug]/profile ─────────────────────────────────
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
@@ -103,7 +103,7 @@ export async function GET(
   }
 }
 
-// -- PUT /api/college/dashboard/[slug]/profile ---------------------------------
+// ── PUT /api/college/dashboard/[slug]/profile ─────────────────────────────────
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
@@ -192,7 +192,7 @@ export async function PUT(
   }
 }
 
-// -- PATCH /api/college/dashboard/[slug]/profile  (banner image upload) --------
+// ── PATCH /api/college/dashboard/[slug]/profile  (banner image upload) ────────
 // Accepts multipart/form-data with field: file
 export async function PATCH(
   req: NextRequest,

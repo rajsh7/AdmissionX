@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-// -- Types ---------------------------------------------------------------------
+// ── Types ─────────────────────────────────────────────────────────────────────
 interface Props {
   user: { id: string | number; name: string; email: string } | null;
 }
@@ -27,7 +27,7 @@ interface AppStats {
   pending_pay: number;
 }
 
-// -- Sub-components ------------------------------------------------------------
+// ── Sub-components ────────────────────────────────────────────────────────────
 
 function StatCard({
   title,

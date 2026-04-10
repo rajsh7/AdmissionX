@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { Suspense } from "react";
 import ProfileClient from "./ProfileClient";
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function deleteProfileRow(id: string) {
   "use server";
@@ -17,7 +17,7 @@ async function deleteProfileRow(id: string) {
   revalidatePath("/", "layout");
 }
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface ProfileRow {
   id: number | string;
@@ -43,11 +43,11 @@ interface ProfileRow {
   created_at: string | null;
 }
 
-// --- Constants ----------------------------------------------------------------
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 20;
 
-// --- Helpers -----------------------------------------------------------------
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function toBool(v: unknown, trueVal = 1): boolean {
   if (v === null || v === undefined) return false;
@@ -69,7 +69,7 @@ function toStr(v: unknown): string | null {
   return s;
 }
 
-// --- Page ---------------------------------------------------------------------
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function CollegeProfilePage({
   searchParams,
@@ -86,7 +86,7 @@ export default async function CollegeProfilePage({
   const page          = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset        = (page - 1) * PAGE_SIZE;
 
-  // -- Build MongoDB filter --------------------------------------------------
+  // ── Build MongoDB filter ──────────────────────────────────────────────────
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mongoFilter: Record<string, any> = {};
 
@@ -191,7 +191,7 @@ export default async function CollegeProfilePage({
     ];
   }
 
-  // -- Query MongoDB ---------------------------------------------------------
+  // ── Query MongoDB ─────────────────────────────────────────────────────────
   const db  = await getDb();
   const col = db.collection("collegeprofile");
 
@@ -224,7 +224,7 @@ export default async function CollegeProfilePage({
       .toArray(),
   ]);
 
-  // -- Batch-fetch users for names/emails ------------------------------------
+  // ── Batch-fetch users for names/emails ────────────────────────────────────
   const userIds = [
     ...new Set(
       rawProfiles
@@ -247,7 +247,7 @@ export default async function CollegeProfilePage({
     }
   }
 
-  // -- Batch-fetch city names ------------------------------------------------
+  // ── Batch-fetch city names ────────────────────────────────────────────────
   const cityIds = [
     ...new Set(
       rawProfiles
@@ -270,7 +270,7 @@ export default async function CollegeProfilePage({
     }
   }
 
-  // -- Batch-count related collections --------------------------------------
+  // ── Batch-count related collections ──────────────────────────────────────
   const profileIds = rawProfiles
     .map((p) => p.id ?? p._id)
     .filter(Boolean);
@@ -301,7 +301,7 @@ export default async function CollegeProfilePage({
       countCol("college_scholarships"),
     ]);
 
-  // -- Shape ProfileRow[] ----------------------------------------------------
+  // ── Shape ProfileRow[] ────────────────────────────────────────────────────
   const profiles: ProfileRow[] = rawProfiles.map((p) => {
     const uid     = String(p.users_id ?? "");
     const cityId  = String(p.registeredAddressCityId ?? "");
@@ -337,7 +337,7 @@ export default async function CollegeProfilePage({
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  // -- University type options (distinct, clean) -----------------------------
+  // ── University type options (distinct, clean) ─────────────────────────────
   const rawTypes = await col
     .distinct("universityType", {
       universityType: { $nin: [null, "", "NULL"] },

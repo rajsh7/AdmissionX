@@ -22,12 +22,12 @@ export default function StudentSignupSuccessPage() {
       <AuthBackgroundSlider />
       <Header />
 
-      {/* -- Main --------------------------------------------------- */}
+      {/* ── Main ─────────────────────────────────────────────────── */}
       <main className="flex-1 flex items-center justify-center p-6 md:p-12 pt-32">
         <div className="max-w-2xl w-full bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-primary/5 border border-primary/5 overflow-hidden">
           {/* Card Body */}
           <div className="flex flex-col items-center text-center p-8 md:p-16">
-            {/* -- Illustration ----------------------------------- */}
+            {/* ── Illustration ─────────────────────────────────── */}
             <div className="relative mb-10">
               {/* Glow blob */}
               <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-full scale-150 pointer-events-none" />
@@ -63,7 +63,7 @@ export default function StudentSignupSuccessPage() {
               </div>
             </div>
 
-            {/* -- Text Content ----------------------------------- */}
+            {/* ── Text Content ─────────────────────────────────── */}
             <div className="space-y-4 mb-10">
               <h1 className="text-slate-900 dark:text-slate-100 text-3xl md:text-4xl font-bold tracking-tight">
                 Thank you for registering in{" "}
@@ -90,7 +90,7 @@ export default function StudentSignupSuccessPage() {
               </div>
             </div>
 
-            {/* -- Action Buttons ---------------------------------- */}
+            {/* ── Action Buttons ────────────────────────────────── */}
             <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
               <Link
                 href="/"
@@ -139,7 +139,7 @@ export default function StudentSignupSuccessPage() {
             </div>
           </div>
 
-          {/* -- Support Footer Strip -------------------------------- */}
+          {/* ── Support Footer Strip ──────────────────────────────── */}
           <div className="bg-primary/5 px-6 py-5 border-t border-primary/10 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-primary shadow-sm shrink-0">

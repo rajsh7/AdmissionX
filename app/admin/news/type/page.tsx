@@ -2,7 +2,7 @@ import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import NewsTypeListClient from "./NewsTypeListClient";
 
-// --- Server Actions -----------------------------------------------------------
+// ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function createNewsType(formData: FormData) {
   "use server";
@@ -52,7 +52,7 @@ async function deleteNewsType(id: number) {
   revalidatePath("/", "layout");
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function getNewsTypes(q?: string) {
   try {
@@ -71,7 +71,7 @@ async function getNewsTypes(q?: string) {
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
-// --- Page Component ----------------------------------------------------------
+// ─── Page Component ──────────────────────────────────────────────────────────
 
 export default async function NewsTypePage({
   searchParams,

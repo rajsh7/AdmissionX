@@ -16,7 +16,7 @@ const INDIAN_STATES = [
   "Daman and Diu","Delhi","Jammu and Kashmir","Ladakh","Lakshadweep","Puducherry",
 ];
 
-// -- Shared Tab Navigation (Matching ProfileTab) --------------------------------
+// ── Shared Tab Navigation (Matching ProfileTab) ────────────────────────────────
 function ProfileTabs({ active = "address" }: { active?: string }) {
   const tabs = [
     { id: "profile", label: "Profile", icon: "person" },
@@ -45,7 +45,7 @@ function ProfileTabs({ active = "address" }: { active?: string }) {
   );
 }
 
-// -- Premium Input Field ------------------------------------------------------
+// ── Premium Input Field ──────────────────────────────────────────────────────
 function InputField({
   label,
   value,

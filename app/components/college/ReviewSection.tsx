@@ -1,6 +1,6 @@
 import type { ReviewData } from "@/app/api/college/[slug]/route";
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function stripHtml(html: string | null | undefined): string {
   if (!html) return "";
@@ -66,7 +66,7 @@ function getAvatarColor(name: string): string {
   return palette[idx];
 }
 
-// --- Star row -----------------------------------------------------------------
+// ─── Star row ─────────────────────────────────────────────────────────────────
 
 function StarRow({
   rating,
@@ -93,7 +93,7 @@ function StarRow({
   );
 }
 
-// --- Rating bar ---------------------------------------------------------------
+// ─── Rating bar ───────────────────────────────────────────────────────────────
 
 function RatingBar({
   label,
@@ -133,7 +133,7 @@ function RatingBar({
   );
 }
 
-// --- Overall score circle -----------------------------------------------------
+// ─── Overall score circle ─────────────────────────────────────────────────────
 
 function ScoreCircle({
   rating,
@@ -184,7 +184,7 @@ function ScoreCircle({
   );
 }
 
-// --- Individual review card ---------------------------------------------------
+// ─── Individual review card ───────────────────────────────────────────────────
 
 function ReviewCard({ review }: { review: ReviewData }) {
   const overallRating = computeReviewRating(review);
@@ -296,7 +296,7 @@ function ReviewCard({ review }: { review: ReviewData }) {
   );
 }
 
-// --- Rating breakdown panel ---------------------------------------------------
+// ─── Rating breakdown panel ───────────────────────────────────────────────────
 
 function RatingBreakdown({
   reviews,
@@ -383,7 +383,7 @@ function RatingBreakdown({
   );
 }
 
-// --- Main export --------------------------------------------------------------
+// ─── Main export ──────────────────────────────────────────────────────────────
 
 interface ReviewSectionProps {
   reviews: ReviewData[];

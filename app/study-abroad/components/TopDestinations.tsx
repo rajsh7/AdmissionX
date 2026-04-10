@@ -22,7 +22,7 @@ const DestinationCard = ({
   visaSuccess,
   postStudyWork,
 }: Omit<DestinationCardProps, "feesProgress" | "visaProgress" | "workProgress">) => (
-  <div className="bg-white rounded-[5px] overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 group">
+  <div className="bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 group">
     <div className="relative h-[240px] overflow-hidden">
       <Image 
         src={image} 
@@ -66,7 +66,7 @@ const DestinationCard = ({
         </div>
       </div>
 
-      <button className="w-full mt-8 py-3.5 border border-[#FF3C3C] text-[#FF3C3C] hover:bg-[#FF3C3C] hover:text-white rounded-[5px] font-bold text-[15px] transition-all flex items-center justify-center active:scale-[0.98]">
+      <button className="w-full mt-8 py-3.5 border border-[#FF3C3C] text-[#FF3C3C] hover:bg-[#FF3C3C] hover:text-white rounded-xl font-bold text-[15px] transition-all flex items-center justify-center active:scale-[0.98]">
         Explore {country}
       </button>
     </div>

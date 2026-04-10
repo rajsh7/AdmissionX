@@ -469,7 +469,7 @@ export default function ProfileTab({ college }: Props) {
         )}
       </div>
 
-      {/* -- Banner Image ---------------------------------------------- */}
+      {/* ── Banner Image ────────────────────────────────────────────── */}
       <FieldGroup title="Banner / Logo Image" icon="image">
         <div className="flex flex-col sm:flex-row gap-6 items-start">
           {/* Preview */}
@@ -563,7 +563,7 @@ export default function ProfileTab({ college }: Props) {
         />
       </FieldGroup>
 
-      {/* -- Basic Information ---------------------------------------- */}
+      {/* ── Basic Information ──────────────────────────────────────── */}
       <FieldGroup title="Basic Information" icon="domain">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <InputField
@@ -610,7 +610,7 @@ export default function ProfileTab({ college }: Props) {
         </div>
       </FieldGroup>
 
-      {/* -- Academic Details ----------------------------------------- */}
+      {/* ── Academic Details ───────────────────────────────────────── */}
       <FieldGroup title="Academic Details" icon="school">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <SelectField
@@ -651,7 +651,7 @@ export default function ProfileTab({ college }: Props) {
         </div>
       </FieldGroup>
 
-      {/* -- Admission Window ----------------------------------------- */}
+      {/* ── Admission Window ───────────────────────────────────────── */}
       <FieldGroup title="Admission Window" icon="event">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <InputField
@@ -677,7 +677,7 @@ export default function ProfileTab({ college }: Props) {
         )}
       </FieldGroup>
 
-      {/* -- Contact Person ------------------------------------------- */}
+      {/* ── Contact Person ─────────────────────────────────────────── */}
       <FieldGroup title="Contact Person" icon="person">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <InputField
@@ -703,7 +703,7 @@ export default function ProfileTab({ college }: Props) {
         </div>
       </FieldGroup>
 
-      {/* -- Address -------------------------------------------------- */}
+      {/* ── Address ────────────────────────────────────────────────── */}
       <FieldGroup title="Registered Address" icon="location_on">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <InputField
@@ -727,7 +727,7 @@ export default function ProfileTab({ college }: Props) {
         </div>
       </FieldGroup>
 
-      {/* -- Campus Address ------------------------------------------- */}
+      {/* ── Campus Address ─────────────────────────────────────────── */}
       <FieldGroup title="Campus Address" icon="place">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <InputField
@@ -751,7 +751,7 @@ export default function ProfileTab({ college }: Props) {
         </div>
       </FieldGroup>
 
-      {/* -- Social Media --------------------------------------------- */}
+      {/* ── Social Media ───────────────────────────────────────────── */}
       <FieldGroup title="Social Media" icon="share">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="flex flex-col gap-1.5">
@@ -801,7 +801,7 @@ export default function ProfileTab({ college }: Props) {
         </div>
       </FieldGroup>
 
-      {/* -- Save button (bottom) ------------------------------------ */}
+      {/* ── Save button (bottom) ──────────────────────────────────── */}
       <div className="flex justify-end pt-2">
         <button
           onClick={handleSave}

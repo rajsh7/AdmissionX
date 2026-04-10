@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export interface TickerAdItem {
   id: number;
@@ -32,177 +32,118 @@ function buildImgUrl(raw: string | null): string | null {
   return `/uploads/${t}`;
 }
 
-import { motion, AnimatePresence } from "framer-motion";
-
-export default function HomeTicker({ ads, className = "" }: HomeTickerProps & { className?: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(0);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+export default function HomeTicker({ ads }: HomeTickerProps) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const rafRef   = useRef<number>(0);
 
   const source = ads && ads.length > 0 ? ads : FALLBACK_ITEMS;
+  // Triple for seamless infinite scroll
+  const items = [...source, ...source, ...source];
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const track = trackRef.current;
+    if (!track) return;
 
-    const updateWidth = () => {
-      if (containerRef.current) {
-        setContainerWidth(containerRef.current.offsetWidth);
-      }
-    };
+    let x = 0;
+    const speed = 0.8;
 
-    updateWidth();
-    const ro = new ResizeObserver(updateWidth);
-    ro.observe(containerRef.current);
-    window.addEventListener("resize", updateWidth);
+    function step() {
+      x -= speed;
+      const singleWidth = track!.scrollWidth / 3;
+      if (Math.abs(x) >= singleWidth) x = 0;
+      track!.style.transform = `translateX(${x}px)`;
+      rafRef.current = requestAnimationFrame(step);
+    }
 
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", updateWidth);
-    };
-  }, []);
-
-  // Auto-slide effect
-  useEffect(() => {
-    if (source.length <= 1) return;
-    
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % source.length);
-    }, 4500);
-
-    return () => clearInterval(interval);
+    rafRef.current = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafRef.current);
   }, [source.length]);
 
-  if (!mounted) return null;
-
-  const currentAd = source[currentIndex];
-
   return (
-    <div className={`w-full flex justify-center py-6 ${className.includes('w-') ? '' : ''}`}>
+    <div className="w-full flex justify-center py-6">
       <div
-        ref={containerRef}
-        className={`relative overflow-hidden rounded-2xl shadow-xl border border-slate-200/50 backdrop-blur-sm bg-white/50 ${className || "w-[90%] max-w-[1400px]"}`}
-        style={{ height: 120 }}
+        className="relative overflow-hidden rounded-2xl shadow-md border border-slate-100"
+        style={{ width: "70%", height: 110 }}
       >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
-            className="absolute inset-0 w-full h-full"
-          >
-            {(() => {
-              const imgSrc = buildImgUrl(currentAd.img);
-              const inner = (
-                <div className="relative w-full h-full overflow-hidden group">
-                  {imgSrc ? (
-                    <motion.div
-                      initial={{ scale: 1.1 }}
-                      animate={{ scale: 1 }}
-                      transition={{ duration: 1.2 }}
-                      className="absolute inset-0"
-                    >
-                      <Image
-                        src={imgSrc}
-                        alt={currentAd.title || "Ad"}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        unoptimized
-                        sizes="(max-width: 768px) 100vw, 800px"
-                      />
-                    </motion.div>
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-                      <span className="text-white/30 text-xs font-bold uppercase tracking-widest">Featured</span>
-                    </div>
-                  )}
+        {/* Scrolling image track */}
+        <div
+          ref={trackRef}
+          className="flex h-full will-change-transform"
+          style={{ width: "max-content" }}
+        >
+          {items.map((ad, i) => {
+            const imgSrc = buildImgUrl(ad.img);
+            const inner = (
+              <div
+                className="relative flex-shrink-0 overflow-hidden group"
+                style={{ width: 320, height: 110 }}
+              >
+                {imgSrc ? (
+                  <Image
+                    src={imgSrc}
+                    alt={ad.title || "Ad"}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    unoptimized
+                    sizes="320px"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
+                    <span className="text-white/30 text-xs font-bold uppercase tracking-widest">Ad</span>
+                  </div>
+                )}
 
-                  {/* Glassy overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                {/* Dark overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                  {/* Text with internal sequence animation */}
-                  {(currentAd.title || currentAd.description) && (
-                    <div className="absolute inset-0 flex flex-col justify-end px-8 pb-5">
-                      {currentAd.title && (
-                        <motion.p 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.3, duration: 0.5 }}
-                          className="text-white text-[18px] lg:text-[22px] font-bold leading-tight truncate drop-shadow-xl"
-                        >
-                          {currentAd.title}
-                        </motion.p>
-                      )}
-                      {currentAd.description && (
-                        <motion.p 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.45, duration: 0.5 }}
-                          className="text-white/90 text-[13px] lg:text-[14px] font-medium truncate mt-1.5"
-                        >
-                          {currentAd.description}
-                        </motion.p>
-                      )}
-                    </div>
-                  )}
+                {/* Text */}
+                {(ad.title || ad.description) && (
+                  <div className="absolute bottom-0 left-0 right-0 px-4 pb-3">
+                    {ad.title && (
+                      <p className="text-white text-[13px] font-bold leading-tight truncate drop-shadow">
+                        {ad.title}
+                      </p>
+                    )}
+                    {ad.description && (
+                      <p className="text-white/75 text-[11px] font-medium truncate mt-0.5">
+                        {ad.description}
+                      </p>
+                    )}
+                  </div>
+                )}
 
-                  {/* Premium Badge */}
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.6 }}
-                    className="absolute top-4 right-6 flex items-center gap-2"
-                  >
-                    <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] bg-white/10 text-white/90 px-3 py-1 rounded-full backdrop-blur-md border border-white/10">
-                      Partner
-                    </span>
-                  </motion.div>
-                </div>
-              );
+                {/* Ad badge */}
+                <span className="absolute top-2 right-2 text-[9px] font-black uppercase tracking-widest bg-black/40 text-white/80 px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+                  Ad
+                </span>
 
-              return currentAd.redirectto ? (
-                <Link
-                  href={currentAd.redirectto}
-                  target={currentAd.id > 0 ? "_blank" : "_self"}
-                  rel={currentAd.id > 0 ? "noopener noreferrer sponsored" : undefined}
-                  className="block w-full h-full"
-                >
-                  {inner}
-                </Link>
-              ) : (
-                <div className="w-full h-full">
-                  {inner}
-                </div>
-              );
-            })()}
-          </motion.div>
-        </AnimatePresence>
+                {/* Divider */}
+                <div className="absolute right-0 top-0 bottom-0 w-px bg-white/10" />
+              </div>
+            );
 
-        {/* Dynamic Progress Indicator (Visual timer) */}
-        <motion.div 
-          key={`timer-${currentIndex}`}
-          initial={{ width: "0%" }}
-          animate={{ width: "100%" }}
-          transition={{ duration: 4.5, ease: "linear" }}
-          className="absolute bottom-0 left-0 h-1 bg-primary/40 z-30"
-        />
-
-        {/* Navigation Dots (Subtle) */}
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col gap-1.5 z-30">
-          {source.map((_, i) => (
-            <div 
-              key={i} 
-              className={`w-1 h-3 rounded-full transition-all duration-300 ${i === currentIndex ? 'bg-primary h-6' : 'bg-white/30'}`}
-            />
-          ))}
+            return ad.redirectto ? (
+              <Link
+                key={`${ad.id}-${i}`}
+                href={ad.redirectto}
+                target={ad.id > 0 ? "_blank" : "_self"}
+                rel={ad.id > 0 ? "noopener noreferrer sponsored" : undefined}
+                className="flex-shrink-0"
+              >
+                {inner}
+              </Link>
+            ) : (
+              <div key={`${ad.id}-${i}`} className="flex-shrink-0">
+                {inner}
+              </div>
+            );
+          })}
         </div>
+
+        {/* Left fade */}
+        <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white/20 to-transparent pointer-events-none z-10" />
+        {/* Right fade */}
+        <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white/20 to-transparent pointer-events-none z-10" />
       </div>
     </div>
   );

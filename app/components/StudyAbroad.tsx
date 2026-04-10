@@ -179,7 +179,7 @@ export default function StudyAbroad() {
       <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-red-500/[0.03] rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
-        {/* --- Header Row --- */}
+        {/* ─── Header Row ─── */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-14 lg:mb-16">
           {/* Chapter Heading */}
           <motion.div
@@ -241,7 +241,7 @@ export default function StudyAbroad() {
           </motion.div>
         </div>
 
-        {/* --- Horizontal Scroll Cards --- */}
+        {/* ─── Horizontal Scroll Cards ─── */}
         <div className="relative -mx-4 sm:-mx-6 px-4 sm:px-6">
           <div
             ref={scrollRef}

@@ -124,7 +124,7 @@ export default function CityClient({
           </table>
         </div>
 
-        {/* -- Pagination ----------------------------------------------------- */}
+        {/* ── Pagination ───────────────────────────────────────────────────── */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
             <p className="text-xs text-slate-500">

@@ -45,7 +45,7 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
           ))}
         </div>
 
-        {/* --- PHASE 2: COURSES LISTING GRID --- */}
+        {/* ─── PHASE 2: COURSES LISTING GRID ─── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           <div className="space-y-6">
             {courses.length > 0 ? courses.slice(0, 3).map((course, idx) => (

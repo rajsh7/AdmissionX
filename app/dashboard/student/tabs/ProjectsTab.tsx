@@ -23,7 +23,7 @@ const EMPTY_FORM = {
   from_date: "", to_date: "",
 };
 
-// -- Shared Tab Navigation -----------------------------------------------------
+// ── Shared Tab Navigation ─────────────────────────────────────────────────────
 function ProfileTabs({ active = "projects" }: { active?: string }) {
   const tabs = [
     { id: "profile", label: "Profile", icon: "person" },
@@ -52,7 +52,7 @@ function ProfileTabs({ active = "projects" }: { active?: string }) {
   );
 }
 
-// -- Premium Input Field ------------------------------------------------------
+// ── Premium Input Field ──────────────────────────────────────────────────────
 function InputField({
   label,
   value,

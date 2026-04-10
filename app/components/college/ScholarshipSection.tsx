@@ -1,6 +1,6 @@
 import type { ScholarshipData } from "@/app/api/college/[slug]/route";
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function stripHtml(html: string | null | undefined): string {
   if (!html) return "";
@@ -15,7 +15,7 @@ function stripHtml(html: string | null | undefined): string {
     .trim();
 }
 
-// --- Scholarship Card ---------------------------------------------------------
+// ─── Scholarship Card ─────────────────────────────────────────────────────────
 
 const CARD_ACCENT_COLORS = [
   {
@@ -185,7 +185,7 @@ function ScholarshipCard({
   );
 }
 
-// --- Summary stats strip ------------------------------------------------------
+// ─── Summary stats strip ──────────────────────────────────────────────────────
 
 function SummaryStrip({ count }: { count: number }) {
   return (
@@ -241,7 +241,7 @@ function SummaryStrip({ count }: { count: number }) {
   );
 }
 
-// --- General eligibility tips -------------------------------------------------
+// ─── General eligibility tips ─────────────────────────────────────────────────
 
 function EligibilityTips() {
   const tips = [
@@ -311,7 +311,7 @@ function EligibilityTips() {
   );
 }
 
-// --- Empty state --------------------------------------------------------------
+// ─── Empty state ──────────────────────────────────────────────────────────────
 
 function EmptyState({ collegeName }: { collegeName: string }) {
   return (
@@ -332,7 +332,7 @@ function EmptyState({ collegeName }: { collegeName: string }) {
   );
 }
 
-// --- Main export --------------------------------------------------------------
+// ─── Main export ──────────────────────────────────────────────────────────────
 
 interface ScholarshipSectionProps {
   scholarships: ScholarshipData[];
@@ -345,7 +345,7 @@ export default function ScholarshipSection({
 }: ScholarshipSectionProps) {
   return (
     <section className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden scroll-mt-24" id="scholarships">
-      {/* -- Section header -- */}
+      {/* ── Section header ── */}
       <div className="px-6 pt-6 pb-4 border-b border-white/10 flex items-center justify-between gap-3">
         <h2 className="text-lg font-black text-white flex items-center gap-2">
           <span className="w-1 h-5 bg-red-500 rounded-full block flex-shrink-0" />
@@ -380,7 +380,7 @@ export default function ScholarshipSection({
         )}
       </div>
 
-      {/* -- Footer CTA -- */}
+      {/* ── Footer CTA ── */}
       <div className="px-6 py-4 bg-white/5 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-start gap-2">
           <span

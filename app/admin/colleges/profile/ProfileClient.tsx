@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface ProfileRow {
   id: number | string;
@@ -49,7 +49,7 @@ interface ProfileClientProps {
   onDelete: (id: string) => Promise<void>;
 }
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 
@@ -93,7 +93,7 @@ function StatBadge({
   );
 }
 
-// --- Main Component -----------------------------------------------------------
+// ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function ProfileClient({
   profiles,
@@ -109,7 +109,7 @@ export default function ProfileClient({
   const router = useRouter();
   const pathname = usePathname();
 
-  // -- Filter state — one entry per form field ---------------------------------
+  // ── Filter state — one entry per form field ─────────────────────────────────
   const [f, setF] = useState({
     collegeName:    q,
     email:          "",
@@ -122,13 +122,6 @@ export default function ProfileClient({
     showOnTop:      filters.showOnTop,
     lastUpdatedBy:  "",
   });
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-  // Count active filters for badge
-  const activeFilterCount = [
-    f.collegeName, f.email, f.university, f.review, f.agreement,
-    f.verified, f.addressType, f.showOnHome, f.showOnTop, f.lastUpdatedBy,
-  ].filter(Boolean).length;
 
   const set = (key: string, val: string) => setF((prev) => ({ ...prev, [key]: val }));
 
@@ -186,7 +179,7 @@ export default function ProfileClient({
 
   return (
     <div className="space-y-0 mx-[10px]">
-      {/* -- Page Header -- */}
+      {/* ── Page Header ── */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
         <div>
           <h1 className="text-lg font-black text-slate-800">
@@ -206,44 +199,17 @@ export default function ProfileClient({
         </div>
       </div>
 
-      {/* -- Search & Filters -- */}
+      {/* ── Search & Filters ── */}
       <div className="bg-white border-b border-slate-100">
-        <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-end">
-          <button
-            type="button"
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all active:scale-95 border ${
-              isFilterOpen
-                ? 'bg-slate-100 text-black border-slate-300 shadow-sm'
-                : 'bg-white text-black border-slate-200 hover:border-slate-400'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[16px]">
-              {isFilterOpen ? 'filter_list_off' : 'filter_list'}
-            </span>
-            Filters
-            {activeFilterCount > 0 && (
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-[10px] font-black">
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
+        {/* Section heading */}
+        <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px] text-[#008080]">filter_list</span>
+            <h2 className="text-sm font-black text-slate-700">Search College Profile Details</h2>
+          </div>
         </div>
 
-        <div
-          style={{
-            maxHeight: isFilterOpen ? 600 : 0,
-            overflow: 'hidden',
-            transition: 'max-height 0.35s ease',
-          }}
-        >
-
         <form onSubmit={handleSearch} className="px-6 py-5">
-
-          <div className="flex items-center gap-2 mb-5 pb-3 border-b border-slate-100">
-            <span className="material-symbols-outlined text-[18px] text-[#008080]">search</span>
-            <h3 className="text-sm font-black text-slate-700">Search College Profile Details</h3>
-          </div>
 
           {/* Row 1 — College Name + Email */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-5">
@@ -397,10 +363,9 @@ export default function ProfileClient({
           </div>
 
         </form>
-        </div>
       </div>
 
-      {/* -- Results Table -- */}
+      {/* ── Results Table ── */}
       <div className="bg-white">
         {/* Table header info */}
         <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
@@ -480,14 +445,14 @@ export default function ProfileClient({
                   key={p.slug}
                   className="hover:bg-slate-50/60 transition-colors group"
                 >
-                  {/* -- S.No -- */}
+                  {/* ── S.No ── */}
                   <td className="px-3 py-2.5 text-center">
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
                       {(page - 1) * pageSize + index + 1}
                     </span>
                   </td>
 
-                  {/* -- College -- */}
+                  {/* ── College ── */}
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-2.5">
                       {/* Thumbnail */}
@@ -526,7 +491,7 @@ export default function ProfileClient({
                     </div>
                   </td>
 
-                  {/* -- Location -- */}
+                  {/* ── Location ── */}
                   <td className="px-3 py-2.5">
                     {p.city_name || p.state_name ? (
                       <div className="space-y-0.5">
@@ -546,7 +511,7 @@ export default function ProfileClient({
                     )}
                   </td>
 
-                  {/* -- Type -- */}
+                  {/* ── Type ── */}
                   <td className="px-3 py-2.5">
                     {p.universityType ? (
                       <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold truncate max-w-full">
@@ -562,7 +527,7 @@ export default function ProfileClient({
                     )}
                   </td>
 
-                  {/* -- Status & Flags -- */}
+                  {/* ── Status & Flags ── */}
                   <td className="px-3 py-2.5">
                     <div className="flex flex-wrap gap-1.5">
                       {/* Verified */}
@@ -621,7 +586,7 @@ export default function ProfileClient({
                     </div>
                   </td>
 
-                  {/* -- Content Counts -- */}
+                  {/* ── Content Counts ── */}
                   <td className="px-3 py-2.5">
                     <div className="flex flex-col gap-1">
                       <StatBadge
@@ -653,7 +618,7 @@ export default function ProfileClient({
                     </div>
                   </td>
 
-                  {/* -- Actions -- */}
+                  {/* ── Actions ── */}
                   <td className="px-3 py-2.5">
                     <div className="flex flex-row items-center justify-end gap-1.5">
                       {/* Edit → full edit page */}
@@ -702,7 +667,7 @@ export default function ProfileClient({
           </table>
         )}
 
-        {/* -- Pagination -- */}
+        {/* ── Pagination ── */}
         {totalPages > 1 && (
           <div className="px-6 py-3 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
             <p className="text-sm text-slate-400 font-medium">

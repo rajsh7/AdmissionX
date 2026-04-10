@@ -6,9 +6,7 @@ import {
   useState,
   useEffect,
   useCallback,
-  useRef,
   useTransition,
-  useMemo,
 } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Header from "@/app/components/Header";
@@ -20,7 +18,7 @@ import PaginationFixed from "@/app/components/PaginationFixed";
 import SearchBar from "@/app/components/SearchBar";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 
-// --- Types --------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface FilterOption {
   id: string | number;
@@ -36,6 +34,8 @@ interface SearchClientProps {
   streams: FilterOption[];
   degrees: FilterOption[];
   cities: FilterOption[];
+  states?: FilterOption[];
+  countries?: FilterOption[];
   // Initial URL params (from server)
   initQ: string;
   initStream: string;
@@ -69,11 +69,11 @@ const SORT_OPTIONS = [
   { value: "newest", label: "Newest" },
 ];
 
-// --- Search bar with typeahead ------------------------------------------------
+// ─── Search bar with typeahead ────────────────────────────────────────────────
 
 
 
-// --- Results skeleton ---------------------------------------------------------
+// ─── Results skeleton ─────────────────────────────────────────────────────────
 
 function CollegeCardSkeleton() {
   return (
@@ -115,6 +115,8 @@ export default function SearchClient({
   streams,
   degrees,
   cities,
+  states = [],
+  countries = [],
   initQ,
   initStream,
   initDegree,
@@ -148,6 +150,8 @@ export default function SearchClient({
   const [loading, setLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [hasMounted, setHasMounted] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(12);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     setHasMounted(true);
@@ -164,20 +168,43 @@ export default function SearchClient({
   const page = parseInt(searchParams.get("page") ?? String(initPage));
   const type = searchParams.get("type") ?? initType;
 
-  // -- Track whether we are on the very first mount ---------------------------
-  // On initial mount the server has ALREADY rendered `initialColleges` for the
-  // current URL params — there is nothing to fetch.  We only want the client-
-  // side API call when the user actually changes a filter or page AFTER mount.
-  const isMountedRef = useRef(false);
-
-  // -- Sync state when the server delivers fresh initialColleges after a
-  //    router.push() navigation (new SSR render completes) -------------------
+  // ── Sync state when the server delivers fresh initialColleges after a
+  //    router.push() navigation (new SSR render completes) ───────────────────
   useEffect(() => {
     setColleges(initialColleges);
     setTotal(initialTotal);
     setTotalPages(initialTotalPages);
     setCurrentPage(initPage);
+    setVisibleCount(12);
   }, [initialColleges, initialTotal, initialTotalPages, initPage]);
+
+  const handleLoadMore = useCallback(async () => {
+    const nextCount = visibleCount + 12;
+    // Already have enough fetched, just show more
+    if (nextCount <= colleges.length) {
+      setVisibleCount(nextCount);
+      return;
+    }
+    // Need to fetch more from API
+    setLoadingMore(true);
+    try {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("limit", "48");
+      params.delete("page");
+      const res = await fetch(`/api/search/colleges?${params.toString()}`);
+      const data = await res.json();
+      if (data.success && data.colleges.length > 0) {
+        setColleges(data.colleges);
+        setVisibleCount(nextCount);
+      } else {
+        setVisibleCount(nextCount);
+      }
+    } catch {
+      setVisibleCount(nextCount);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [visibleCount, colleges.length, searchParams]);
 
   // Loading state cleanly aligns with Next.js router transitions
   useEffect(() => {
@@ -186,7 +213,7 @@ export default function SearchClient({
     }
   }, [isPending]);
 
-  // -- Handle search bar submit -----------------------------------------------
+  // ── Handle search bar submit ───────────────────────────────────────────────
   const handleSearch = useCallback(
     (newQ: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -196,14 +223,12 @@ export default function SearchClient({
         params.delete("q");
       }
       params.delete("page");
-      // preserve type param
-      if (initType && !params.has("type")) params.set("type", initType);
       setLoading(true);
       startTransition(() => {
         router.push(`${pathname}?${params.toString()}`);
       });
     },
-    [searchParams, router, pathname, initType],
+    [searchParams, router, pathname],
   );
 
   const isFiltered = !!(q || stream || degree || cityId || stateId || feesMax);
@@ -214,7 +239,6 @@ export default function SearchClient({
 
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
-      <Header theme="dark" />
       <div className="relative w-full overflow-hidden" style={{ height: heroHeight }}>
         <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
           <Image
@@ -230,6 +254,7 @@ export default function SearchClient({
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
         </div>
         <div className="relative z-10 w-full h-full flex flex-col">
+          <Header />
           <div className="flex-1 flex items-center justify-start relative">
             <div className="mx-auto max-w-[1920px] w-full px-4 md:px-8 lg:px-10 h-full relative">
               <div className="flex flex-col justify-center h-full relative z-20">
@@ -269,12 +294,14 @@ export default function SearchClient({
         {/* -- Main content -- */}
         <div className="mx-auto max-w-[1920px] w-full px-4 md:px-8 lg:px-10 pt-8 pb-8">
           <div className="flex gap-5">
-            {/* -- Filters sidebar -- */}
-            <div className="hidden lg:flex flex-col gap-6 flex-shrink-0 lg:sticky lg:top-28 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto lg:pr-2" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
+            {/* ── Filters sidebar ── */}
+            <div className="hidden lg:flex flex-col gap-6 flex-shrink-0 lg:sticky lg:top-[72px] lg:self-start" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
               <SearchFilters
                 streams={streams}
                 degrees={degrees}
                 cities={cities}
+                states={states}
+                countries={countries}
                 activeStream={stream}
                 activeDegree={degree}
                 activeCityId={cityId}
@@ -289,9 +316,9 @@ export default function SearchClient({
 
             </div>
 
-            {/* -- Results column -- */}
-            <div className="flex-1 min-w-0">
-              {/* -- Results Toolbar (Figma Redesign) -- */}
+            {/* ── Results column ── */}
+            <div className="flex-1 min-w-0 pl-4">
+              {/* ── Results Toolbar (Figma Redesign) ── */}
               <div className="flex flex-col gap-5 mb-8">
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-1 pb-4 border-b border-neutral-100">
                   {/* Active Filters Row */}
@@ -394,7 +421,7 @@ export default function SearchClient({
                 </div>
               </div>
 
-              {/* -- College grid / list -- */}
+              {/* ── College grid / list ── */}
               {loading ? (
                 viewMode === "grid" ? (
                   <div className={`grid grid-cols-1 sm:grid-cols-2 ${gridCols === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-y-5 gap-x-[10px]`}>
@@ -410,7 +437,7 @@ export default function SearchClient({
                   </div>
                 )
               ) : colleges.length === 0 ? (
-                /* -- Empty state -- */
+                /* ── Empty state ── */
                 <div className="flex flex-col items-center justify-center py-24 text-center">
                   <div className="w-20 h-20 rounded-[10px] bg-neutral-100 flex items-center justify-center mb-5">
                     <span className="material-symbols-outlined text-[40px] text-neutral-300">
@@ -439,7 +466,7 @@ export default function SearchClient({
                 </div>
               ) : viewMode === "grid" ? (
                 <div className={`grid grid-cols-1 sm:grid-cols-2 ${gridCols === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-y-5 gap-x-[10px]`}>
-                  {colleges.map((college, i) => (
+                  {colleges.slice(0, visibleCount).map((college, i) => (
                     <CollegeCard
                       key={college.id}
                       college={college}
@@ -450,7 +477,7 @@ export default function SearchClient({
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {colleges.map((college, i) => (
+                  {colleges.slice(0, visibleCount).map((college, i) => (
                     <CollegeListItem
                       key={college.id}
                       college={college}
@@ -461,8 +488,26 @@ export default function SearchClient({
                 </div>
               )}
 
-              {/* -- Pagination -- */}
-              {!loading && totalPages > 1 && (
+              {/* ── Load More arrow ── */}
+              {hasMounted && !loading && colleges.length > 0 && visibleCount < 36 && visibleCount < total && (
+                <div className="mt-10 flex flex-col items-center gap-2">
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors disabled:opacity-50"
+                  >
+                    <span className="text-xs font-bold uppercase tracking-widest">
+                      {loadingMore ? "Loading..." : "Show More"}
+                    </span>
+                    <span className={`material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] ${loadingMore ? "animate-spin" : "animate-bounce"}`}>
+                      {loadingMore ? "progress_activity" : "keyboard_arrow_down"}
+                    </span>
+                  </button>
+                </div>
+              )}
+
+              {/* ── Pagination (shows after 36 visible or no more to load) ── */}
+              {hasMounted && !loading && totalPages > 1 && visibleCount >= 36 && (
                 <div className="mt-10">
                   <PaginationFixed
                     currentPage={currentPage}
