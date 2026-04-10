@@ -1,0 +1,193 @@
+/* Study Abroad Page - Premium Design Styles */
+
+:root {
+  --sa-primary: #FF3C3C;
+  --sa-primary-hover: #E63535;
+  --sa-text-main: #1D1D1F;
+  --sa-text-muted: #6E6E73;
+  --sa-bg-light: #FBFBFD;
+  --sa-border-radius: 12px;
+  --sa-shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --sa-shadow-md: 0 10px 40px rgba(0,0,0,0.08);
+  --sa-shadow-lg: 0 20px 60px rgba(0,0,0,0.12);
+}
+
+.sa-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* Typography */
+.sa-title-h1 {
+  font-size: 80px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--sa-text-main);
+}
+
+.sa-title-h2 {
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--sa-text-main);
+}
+
+.sa-subtitle {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--sa-text-muted);
+}
+
+/* Section Paddings */
+.sa-section-py {
+  padding-top: 120px;
+  padding-bottom: 120px;
+}
+
+/* Hero Section */
+.sa-hero {
+  background: white;
+  padding: 140px 0 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.sa-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFF5F5;
+  color: var(--sa-primary);
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+/* Search Bar */
+.sa-search-wrapper {
+  background: white;
+  border-radius: 16px;
+  box-shadow: var(--sa-shadow-lg);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 900px;
+  margin-top: 48px;
+}
+
+.sa-search-input-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-right: 1px solid #EDEDED;
+}
+
+.sa-search-select-group {
+  width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+}
+
+/* Destination Cards */
+.sa-destination-card {
+  background: white;
+  border-radius: var(--sa-border-radius);
+  overflow: hidden;
+  box-shadow: var(--sa-shadow-md);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #F2F2F2;
+}
+
+.sa-destination-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--sa-shadow-lg);
+}
+
+.sa-card-image {
+  height: 200px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.sa-card-content {
+  padding: 24px;
+}
+
+.sa-stat-row {
+  margin-top: 16px;
+}
+
+.sa-progress-bar {
+  height: 6px;
+  background: #F2F2F2;
+  border-radius: 100px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.sa-progress-fill {
+  height: 100%;
+  border-radius: 100px;
+}
+
+/* Calculator */
+.sa-calc-container {
+  background: #00A68A;
+  border-radius: 16px;
+  padding: 40px;
+  color: white;
+}
+
+.sa-calc-green-label {
+  background: rgba(255,255,255,0.2);
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.sa-tab {
+  background: rgba(255,255,255,0.1);
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sa-tab-active {
+  background: white;
+  color: #00A68A;
+  font-weight: 600;
+}
+
+/* Journey Steps */
+.sa-step-box {
+  width: 60px;
+  height: 60px;
+  background: #FF3C3C;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 800;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+/* Footer Light */
+.sa-footer-light {
+  background: white;
+  padding: 80px 0 40px;
+  border-top: 1px solid #EDEDED;
+}
