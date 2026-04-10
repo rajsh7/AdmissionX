@@ -1,19 +1,17 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import Link from "next/link";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
 import { AuthBackgroundSlider } from "../components/AuthBackgroundSlider";
+import Header from "../components/Header";
+import Link from "next/link";
+import Footer from "../components/Footer";
 
 function AdminLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/admin/dashboard";
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,13 +20,23 @@ function AdminLoginForm() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const body = {
+      email: String(formData.get("email") || "").trim(),
+      password: String(formData.get("password") || ""),
+    };
+
     try {
       const res = await fetch("/api/login/admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(body),
       });
+
       const data = await res.json();
+
       if (res.ok) {
         router.push(redirectTo);
         router.refresh();
@@ -43,79 +51,205 @@ function AdminLoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-display relative">
+    <div className="min-h-screen text-slate-900 dark:text-slate-100 font-display relative flex flex-col">
       <AuthBackgroundSlider />
       <Header />
 
-      <main className="relative flex-1 flex items-center justify-center px-6 py-60 z-10">
-        <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-8 py-8">
+      <main className="relative flex-1 flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
+        {/* Background decorations */}
+        <div className="absolute top-20 left-10 opacity-10 pointer-events-none select-none">
+          <span className="material-symbols-outlined text-9xl">
+            admin_panel_settings
+          </span>
+        </div>
+        <div className="absolute bottom-20 right-10 opacity-10 pointer-events-none select-none">
+          <span className="material-symbols-outlined text-9xl">
+            shield_lock
+          </span>
+        </div>
 
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-primary text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>admin_panel_settings</span>
+        {/* Login Card */}
+        <div className="w-full max-w-[500px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none p-8 md:p-12 relative z-10 border border-slate-100 dark:border-slate-800">
+          {/* Header */}
+          <div className="mb-8 text-center">
+            <div className="inline-flex items-center justify-center w-14 h-14 bg-primary/10 rounded-2xl mb-4">
+              <span
+                className="material-symbols-outlined text-primary text-3xl"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                admin_panel_settings
+              </span>
             </div>
-            <div>
-              <h1 className="text-[22px] font-bold text-[#111] leading-tight">Admin Login</h1>
-              <p className="text-[12px] text-gray-500">Secure access for administrators only.</p>
-            </div>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+              Admin Login
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">
+              Secure access for AdmissionX administrators only.
+            </p>
           </div>
 
+          {/* Error Banner */}
           {error && (
-            <div className="mb-4 px-3 py-2.5 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">
-              {error}
+            <div className="mb-5 flex items-start gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3">
+              <span
+                className="material-symbols-outlined text-red-500 text-[20px] mt-0.5 shrink-0"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                error
+              </span>
+              <p className="text-sm text-red-700 dark:text-red-400 font-medium">
+                {error}
+              </p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1">
-              <label className="text-[12px] font-semibold text-gray-700">
-                Admin Email<span className="text-red-500 ml-0.5">*</span>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                Admin Email
               </label>
-              <input
-                type="email" placeholder="admin@admissionx.com" required
-                value={email} onChange={e => setEmail(e.target.value)} suppressHydrationWarning
-                className="px-3 py-2 border border-gray-300 rounded-[7px] text-[13px] text-[#111] outline-none focus:border-black transition-colors"
-              />
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
+                  mail
+                </span>
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="admin@admissionx.com"
+                  required
+                  autoComplete="email"
+                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-slate-900 dark:text-white placeholder:text-slate-400 transition-all"
+                />
+              </div>
             </div>
 
-            <div className="flex flex-col gap-1">
+            {/* Password */}
+            <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
-                <label className="text-[12px] font-semibold text-gray-700">
-                  Password<span className="text-red-500 ml-0.5">*</span>
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Password
                 </label>
-                <Link href="/forgot-password" className="text-[11px] text-gray-500 hover:text-black hover:underline">
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-medium text-primary hover:underline"
+                >
                   Forgot password?
                 </Link>
               </div>
               <div className="relative">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
+                  lock
+                </span>
                 <input
-                  type={showPassword ? "text" : "password"} placeholder="Enter your password" required
-                  value={password} onChange={e => setPassword(e.target.value)} suppressHydrationWarning
-                  className="w-full px-3 py-2 border border-gray-300 rounded-[7px] text-[13px] text-[#111] outline-none focus:border-black transition-colors pr-9"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  required
+                  autoComplete="current-password"
+                  className="w-full pl-12 pr-12 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-slate-900 dark:text-white placeholder:text-slate-400 transition-all"
                 />
-                <button type="button" tabIndex={-1} onClick={() => setShowPassword(p => !p)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                  <span className="material-symbols-outlined text-[17px]">{showPassword ? "visibility_off" : "visibility"}</span>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((p) => !p)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  tabIndex={-1}
+                >
+                  <span className="material-symbols-outlined text-[20px]">
+                    {showPassword ? "visibility" : "visibility_off"}
+                  </span>
                 </button>
               </div>
             </div>
 
-            <button type="submit" disabled={loading}
-              className="mt-2 py-2.5 bg-[#111] hover:bg-[#333] disabled:opacity-60 text-white rounded-lg text-[13.5px] font-semibold transition-colors w-full">
-              {loading ? "Signing in…" : "Sign in as Admin"}
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all transform active:scale-[0.98] mt-2 flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8H4z"
+                    />
+                  </svg>
+                  Signing in…
+                </>
+              ) : (
+                <>
+                  <span
+                    className="material-symbols-outlined text-[20px]"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    login
+                  </span>
+                  Sign in as Admin
+                </>
+              )}
             </button>
           </form>
 
-          <div className="mt-4 flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">
-            <span className="material-symbols-outlined text-amber-500 text-[14px] shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
-            <p className="text-[10px] text-amber-700 leading-relaxed">
-              This is a restricted area. Unauthorized access attempts are logged and monitored.
+          {/* Security note */}
+          <div className="mt-8 flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-3">
+            <span
+              className="material-symbols-outlined text-amber-500 text-[18px] shrink-0"
+              style={{ fontVariationSettings: "'FILL' 1" }}
+            >
+              warning
+            </span>
+            <p className="text-xs text-amber-700 dark:text-amber-400">
+              This is a restricted area. Unauthorized access attempts are
+              logged.
             </p>
           </div>
+        </div>
 
+        {/* Bottom floating cards */}
+        <div className="hidden lg:flex fixed bottom-12 left-12 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700 items-center gap-3 z-10">
+          <div className="bg-primary/10 text-primary p-2 rounded-lg">
+            <span className="material-symbols-outlined text-[20px]">
+              verified
+            </span>
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-900 dark:text-white">
+              Trusted by 500+ Institutions
+            </p>
+            <p className="text-[10px] text-slate-500">Official admin portal</p>
+          </div>
+        </div>
+
+        <div className="hidden lg:flex fixed bottom-12 right-12 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700 items-center gap-3 z-10">
+          <div className="bg-blue-100 text-blue-600 p-2 rounded-lg">
+            <span className="material-symbols-outlined text-[20px]">
+              support_agent
+            </span>
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-900 dark:text-white">
+              Need help?
+            </p>
+            <p className="text-[10px] text-slate-500">support@admissionx.com</p>
+          </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );
@@ -123,12 +257,12 @@ function AdminLoginForm() {
 
 export default function AdminLoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#f3f4f6]">
-        <div className="w-6 h-6 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
-      </div>
-    }>
+    <Suspense>
       <AdminLoginForm />
     </Suspense>
   );
 }
+
+
+
+

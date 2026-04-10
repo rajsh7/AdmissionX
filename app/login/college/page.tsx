@@ -1,19 +1,11 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import Link from "next/link";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
 import { AuthBackgroundSlider } from "../../components/AuthBackgroundSlider";
-
-const SLIDES = [
-  "/Background-images/bg-signup1.jpg",
-  "/Background-images/1.jpg",
-  "/Background-images/17.jpg",
-  "/Background-images/18.jpg",
-  "/Background-images/19.jpg",
-];
+import Header from "../../components/Header";
+import Link from "next/link";
+import Footer from "../../components/Footer";
 
 function isTempPassword(pw: string) {
   return /^Adx@\d{4}#/.test(pw);
@@ -97,35 +89,26 @@ function CollegeLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || null;
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [forceChangePw, setForceChangePw] = useState<{ slug: string } | null>(null);
-  const [slideIndex, setSlideIndex] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setSlideIndex(i => (i + 1) % SLIDES.length), 4000);
-    return () => clearInterval(t);
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setLoading(true);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const body = { email: String(formData.get("email") || "").trim(), password: String(formData.get("password") || "") };
     try {
-      const res = await fetch("/api/login/college", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await fetch("/api/login/college", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();
       if (res.ok) {
         const slug = data.user?.slug;
         const id = data.user?.id;
         const destination = redirectTo || `/dashboard/college/${slug ?? id}`;
-        if (isTempPassword(password) && slug) { setForceChangePw({ slug }); }
+        if (isTempPassword(body.password) && slug) { setForceChangePw({ slug }); }
         else { router.push(destination); router.refresh(); }
       } else {
         setError(data.error || "Login failed. Please check your credentials.");
@@ -147,93 +130,72 @@ function CollegeLoginForm() {
         }} />
       )}
 
-      <main className="relative flex-1 flex items-center justify-center px-6 py-48 z-10">
-        <div className="flex w-full max-w-[920px] rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.12)] overflow-hidden" style={{ minHeight: "520px" }}>
+      {/* Full-height main — pushes footer to bottom */}
+      <main className="relative flex-1 flex items-center justify-center px-4 py-8 z-10">
+        <div className="w-full max-w-md">
+          {/* Login Card */}
+          <div className="bg-white rounded-2xl shadow-2xl shadow-black/10 overflow-hidden">
+            {/* Card header strip */}
+            <div className="h-1.5 w-full" style={{ background: "linear-gradient(90deg, #FF3C3C, #c0392b)" }} />
 
-          {/* ── LEFT: Image Slider ───────────────────────────── */}
-          <div className="w-[38%] relative flex-shrink-0" style={{ minHeight: "520px" }}>
-            {SLIDES.map((src, i) => (
-              <div key={src} className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: i === slideIndex ? 1 : 0 }}>
-                <img src={src} alt="" className="w-full h-full object-cover" />
-              </div>
-            ))}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent z-10" />
-            <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
-              {SLIDES.map((_, i) => (
-                <button key={i} onClick={() => setSlideIndex(i)}
-                  className={`rounded-full transition-all ${i === slideIndex ? "w-5 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/50"}`} />
-              ))}
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
-              <h2 className="text-white text-xl font-bold leading-snug mb-3">
-                Welcome back to<br /><span className="font-light">AdmissionX</span>
-              </h2>
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-3 py-2">
-                  <span className="material-symbols-outlined text-white text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>apartment</span>
-                  <p className="text-white text-[10px] font-medium leading-tight">Manage your college<br /><span className="text-white/60 font-normal">profile & applications</span></p>
+            <div className="p-8 sm:p-10">
+              {/* Icon + title */}
+              <div className="flex flex-col items-center text-center mb-8">
+                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
+                  <span className="material-symbols-outlined text-primary text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>apartment</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-3 py-2">
-                  <span className="material-symbols-outlined text-white text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>analytics</span>
-                  <p className="text-white text-[10px] font-medium leading-tight">Track analytics<br /><span className="text-white/60 font-normal">and student reach</span></p>
-                </div>
+                <h2 className="text-2xl font-black text-slate-900">College Login</h2>
+                <p className="text-slate-500 text-sm mt-1.5">Sign in to manage your college profile and applications.</p>
               </div>
-            </div>
-          </div>
-
-          {/* ── RIGHT: Form Panel ────────────────────────────── */}
-          <div className="flex-1 bg-[#f3f4f6] flex items-center justify-center px-8 py-10">
-            <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-8 py-8">
-              <h1 className="text-[24px] font-bold text-[#111] mb-1">College Login</h1>
-              <p className="text-[13px] text-gray-500 mb-6">Sign in to manage your college dashboard.</p>
 
               {error && (
-                <div className="mb-4 px-3 py-2.5 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">
-                  {error}
+                <div className="mb-6 flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                  <span className="material-symbols-outlined text-red-500 text-[18px] mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>error</span>
+                  <p className="text-sm text-red-700 font-medium">{error}</p>
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                <div className="flex flex-col gap-1">
-                  <label className="text-[12px] font-semibold text-gray-700">Official Email<span className="text-red-500 ml-0.5">*</span></label>
-                  <input type="email" placeholder="admissions@yourcollege.com" required
-                    value={email} onChange={e => setEmail(e.target.value)} suppressHydrationWarning
-                    className="px-3 py-2 border border-gray-300 rounded-[7px] text-[13px] text-[#111] outline-none focus:border-black transition-colors" />
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 block">Official Email</label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">mail</span>
+                    <input name="email" type="email" placeholder="admissions@yourcollege.com" required autoComplete="email"
+                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all" />
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[12px] font-semibold text-gray-700">Password<span className="text-red-500 ml-0.5">*</span></label>
-                    <Link href="/forgot-password" className="text-[11px] text-gray-500 hover:text-black hover:underline">Forgot password?</Link>
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Password</label>
+                    <Link href="/forgot-password" className="text-xs font-medium text-primary hover:underline">Forgot password?</Link>
                   </div>
                   <div className="relative">
-                    <input type={showPassword ? "text" : "password"} placeholder="Enter your password" required
-                      value={password} onChange={e => setPassword(e.target.value)} suppressHydrationWarning
-                      className="w-full px-3 py-2 border border-gray-300 rounded-[7px] text-[13px] text-[#111] outline-none focus:border-black transition-colors pr-9" />
-                    <button type="button" tabIndex={-1} onClick={() => setShowPassword(p => !p)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                      <span className="material-symbols-outlined text-[17px]">{showPassword ? "visibility_off" : "visibility"}</span>
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">lock</span>
+                    <input name="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" required autoComplete="current-password"
+                      className="w-full pl-10 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm text-slate-800 placeholder:text-slate-400 transition-all" />
+                    <button type="button" onClick={() => setShowPassword(p => !p)} tabIndex={-1}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                      <span className="material-symbols-outlined text-[18px]">{showPassword ? "visibility" : "visibility_off"}</span>
                     </button>
                   </div>
                 </div>
 
                 <button type="submit" disabled={loading}
-                  className="mt-2 py-2.5 bg-[#111] hover:bg-[#333] disabled:opacity-60 text-white rounded-lg text-[13.5px] font-semibold transition-colors w-full">
-                  {loading ? "Signing in…" : "Log in"}
+                  className="w-full bg-primary hover:bg-red-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 mt-2">
+                  {loading
+                    ? <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                    : <><span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>login</span>Sign in as College</>
+                  }
                 </button>
               </form>
 
-              <p className="mt-4 text-[12px] text-gray-500 text-center">
+              <p className="mt-6 text-center text-slate-500 text-sm">
                 Not registered yet?{" "}
-                <Link href="/signup/college" className="text-[#111] font-semibold hover:underline">Register your college</Link>
-              </p>
-              <p className="mt-2.5 text-[11px] text-gray-400 text-center">
-                By logging in, you agree to our{" "}
-                <Link href="/terms-and-conditions" className="text-gray-500 underline">terms of use</Link>.
+                <Link href="/signup/college" className="text-primary font-bold hover:underline">Register your college</Link>
               </p>
             </div>
           </div>
-
         </div>
       </main>
 
@@ -244,11 +206,7 @@ function CollegeLoginForm() {
 
 export default function CollegeLoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#f3f4f6]">
-        <div className="w-6 h-6 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
-      </div>
-    }>
+    <Suspense>
       <CollegeLoginForm />
     </Suspense>
   );
