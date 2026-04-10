@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import OverviewTab from "./tabs/OverviewTab";
 import ProfileTab from "./tabs/ProfileTab";
@@ -118,6 +119,12 @@ export default function CollegeDashboardClient({
 }) {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const slug = college.slug;
+  const router = useRouter();
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/");
+  }
 
   function handleTabChange(tab: TabId) {
     setActiveTab(tab);
@@ -224,18 +231,14 @@ export default function CollegeDashboardClient({
             </div>
 
             {/* Sign out */}
-            <form action="/api/auth/logout" method="POST">
-              <button
-                type="submit"
-                title="Sign out"
-                className="flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-red-500 transition-colors"
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  logout
-                </span>
-                <span className="hidden sm:inline text-xs">Sign out</span>
-              </button>
-            </form>
+            <button
+              onClick={handleLogout}
+              title="Sign out"
+              className="flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-red-500 transition-colors"
+            >
+              <span className="material-symbols-outlined text-[20px]">logout</span>
+              <span className="hidden sm:inline text-xs">Sign out</span>
+            </button>
           </div>
         </div>
       </header>
