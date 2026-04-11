@@ -3,8 +3,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 interface FilterOption {
   id: string | number;
   name: string;
@@ -42,31 +40,20 @@ export interface ActiveFilters {
   ranking?: string;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const SORT_OPTIONS = [
-  { value: "rating",  label: "Top Rated",    icon: "star" },
-  { value: "ranking", label: "Best Ranked",  icon: "emoji_events" },
-  { value: "fees",    label: "Lowest Fees",  icon: "currency_rupee" },
-  { value: "newest",  label: "Newest First", icon: "schedule" },
-];
-
 const RANKING_OPTIONS = [
-  { id: "1-50",   name: "Top 50" },
-  { id: "51-100",  name: "Top 100" },
-  { id: "101-200", name: "Top 200" },
+  { id: "1-50",    name: "Top 50"    },
+  { id: "51-100",  name: "Top 100"   },
+  { id: "101-200", name: "Top 200"   },
   { id: "201+",    name: "Above 200" },
 ];
 
 const FEES_OPTIONS = [
-  { label: "Up to ₹1 Lakh",   value: "100000" },
-  { label: "Up to ₹3 Lakhs",  value: "300000" },
-  { label: "Up to ₹5 Lakhs",  value: "500000" },
+  { label: "Up to ₹1 Lakh",   value: "100000"  },
+  { label: "Up to ₹3 Lakhs",  value: "300000"  },
+  { label: "Up to ₹5 Lakhs",  value: "500000"  },
   { label: "Up to ₹10 Lakhs", value: "1000000" },
   { label: "Up to ₹20 Lakhs", value: "2000000" },
 ];
-
-// ─── Main SearchFilters component ─────────────────────────────────────────────
 
 export default function SearchFilters({
   streams = [],
@@ -89,25 +76,21 @@ export default function SearchFilters({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Local state
-  const [stream, setStream]   = useState(activeStream);
-  const [degree, setDegree]   = useState(activeDegree);
-  const [cityId, setCityId]     = useState(activeCityId);
-  const [stateId, setStateId]   = useState(activeStateId);
+  const [stream, setStream]       = useState(activeStream);
+  const [degree, setDegree]       = useState(activeDegree);
+  const [cityId, setCityId]       = useState(activeCityId);
+  const [stateId, setStateId]     = useState(activeStateId);
   const [countryId, setCountryId] = useState("");
-  const [feesMax, setFeesMax] = useState(activeFeesMax);
-  const [sort, setSort]       = useState(activeSort || "rating");
-  const [ranking, setRanking] = useState("");
+  const [feesMax, setFeesMax]     = useState(activeFeesMax);
+  const [sort, setSort]           = useState(activeSort || "rating");
+  const [ranking, setRanking]     = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted]     = useState(false);
   const [citySearch, setCitySearch] = useState("");
   const [cityDropOpen, setCityDropOpen] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
-  // Sync state with URL
   useEffect(() => {
     setStream(activeStream);
     setDegree(activeDegree);
@@ -122,17 +105,16 @@ export default function SearchFilters({
   const applyFilters = useCallback(
     (overrides: Partial<ActiveFilters> = {}) => {
       const next: ActiveFilters = {
-        stream:     overrides.stream      !== undefined ? overrides.stream      : stream,
-        degree:     overrides.degree      !== undefined ? overrides.degree      : degree,
-        city_id:    overrides.city_id     !== undefined ? overrides.city_id     : cityId,
-        state_id:   overrides.state_id    !== undefined ? overrides.state_id    : stateId,
-        country_id: overrides.country_id  !== undefined ? overrides.country_id  : countryId,
-        fees_max:   overrides.fees_max    !== undefined ? overrides.fees_max    : feesMax,
-        sort:       overrides.sort        !== undefined ? overrides.sort        : sort,
-        q:          overrides.q           !== undefined ? overrides.q           : undefined,
-        ranking:    overrides.ranking     !== undefined ? overrides.ranking     : ranking,
+        stream:     overrides.stream     !== undefined ? overrides.stream     : stream,
+        degree:     overrides.degree     !== undefined ? overrides.degree     : degree,
+        city_id:    overrides.city_id    !== undefined ? overrides.city_id    : cityId,
+        state_id:   overrides.state_id   !== undefined ? overrides.state_id   : stateId,
+        country_id: overrides.country_id !== undefined ? overrides.country_id : countryId,
+        fees_max:   overrides.fees_max   !== undefined ? overrides.fees_max   : feesMax,
+        sort:       overrides.sort       !== undefined ? overrides.sort       : sort,
+        q:          overrides.q          !== undefined ? overrides.q          : undefined,
+        ranking:    overrides.ranking    !== undefined ? overrides.ranking    : ranking,
       };
-
       const params = new URLSearchParams(searchParams.toString());
       Object.entries(next).forEach(([key, val]) => {
         if (val) params.set(key, val);
@@ -149,16 +131,10 @@ export default function SearchFilters({
     const params = new URLSearchParams();
     params.set("sort", "rating");
     router.push(`${pathname}?${params.toString()}`);
-    setStream("");
-    setDegree("");
-    setCityId("");
-    setStateId("");
-    setCountryId("");
-    setFeesMax("");
-    setRanking("");
-    setCitySearch("");
-    setCityDropOpen(false);
-    if (onFilterChange) onFilterChange({} as any);
+    setStream(""); setDegree(""); setCityId(""); setStateId("");
+    setCountryId(""); setFeesMax(""); setRanking("");
+    setCitySearch(""); setCityDropOpen(false);
+    if (onFilterChange) onFilterChange({} as ActiveFilters);
   };
 
   const handleStream = (val: string) => { setStream(val); applyFilters({ stream: val }); };
@@ -166,13 +142,9 @@ export default function SearchFilters({
   const handleFees   = (val: string) => { setFeesMax(val); applyFilters({ fees_max: val }); };
 
   const handleCityClick = (cId: string, sId: string, coId: string) => {
-    setCityId(cId);
-    setStateId(sId);
-    setCountryId(coId);
+    setCityId(cId); setStateId(sId); setCountryId(coId);
     applyFilters({ city_id: cId, state_id: sId, country_id: coId });
   };
-
-
 
   if (!mounted) return null;
 
@@ -189,23 +161,18 @@ export default function SearchFilters({
         </button>
       </div>
 
-      {/* Filter list */}
       <div className="space-y-4">
         {/* University Name */}
         <div>
           <label className="text-xs font-bold text-neutral-600 block">University Name</label>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search your university..."
-              className="w-full pl-3 pr-3 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-400"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  applyFilters({ q: (e.target as HTMLInputElement).value });
-                }
-              }}
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Search your university..."
+            className="w-full pl-3 pr-3 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-400"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") applyFilters({ q: (e.target as HTMLInputElement).value });
+            }}
+          />
         </div>
 
         {/* Location — Nested Country → State → City */}
@@ -215,8 +182,8 @@ export default function SearchFilters({
           {/* Step indicator */}
           <div className="flex items-center gap-1 mb-2">
             {["Country", "State", "City"].map((step, i) => {
-              const done = i === 0 ? !!countryId : i === 1 ? !!stateId : !!cityId;
-              const active = i === 0 ? !countryId : i === 1 ? !!countryId && !stateId : !!stateId && !cityId;
+              const done   = i === 0 ? !!countryId : i === 1 ? !!stateId : !!cityId;
+              const active = i === 0 ? !countryId  : i === 1 ? !!countryId && !stateId : !!stateId && !cityId;
               return (
                 <span key={step} className="inline-flex items-center gap-1">
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
@@ -233,7 +200,7 @@ export default function SearchFilters({
             )}
           </div>
 
-          {/* Country selector */}
+          {/* Country */}
           {!countryId && (
             <div className="relative">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-neutral-400 pointer-events-none">public</span>
@@ -262,7 +229,7 @@ export default function SearchFilters({
             </div>
           )}
 
-          {/* State selector */}
+          {/* State */}
           {countryId && !stateId && (() => {
             const countryStates = states.filter(s => String(s.slug) === countryId);
             return (
@@ -300,7 +267,7 @@ export default function SearchFilters({
             );
           })()}
 
-          {/* City selector */}
+          {/* City */}
           {stateId && !cityId && (() => {
             const stateCities = cities.filter(c => String(c.slug) === stateId);
             return (
@@ -354,109 +321,15 @@ export default function SearchFilters({
             </div>
           )}
         </div>
-                <span className="material-symbols-outlined absolute left-3 top-[calc(50%+10px)] -translate-y-1/2 text-[16px] text-neutral-400 pointer-events-none">map</span>
-                <input
-                  type="text"
-                  placeholder="Search state..."
-                  value={citySearch}
-                  onChange={(e) => { setCitySearch(e.target.value); setCityDropOpen(true); }}
-                  onFocus={() => setCityDropOpen(true)}
-                  onBlur={() => setTimeout(() => setCityDropOpen(false), 150)}
-                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-400"
-                />
-                {cityDropOpen && (
-                  <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-[10px] shadow-xl max-h-48 overflow-y-auto">
-                    {(countryStates.filter(s => !citySearch || s.name.toLowerCase().includes(citySearch.toLowerCase()))).map((state) => (
-                      <button key={state.id} type="button"
-                        onMouseDown={() => { setStateId(String(state.id)); setCitySearch(""); setCityDropOpen(false); }}
-                        className="w-full text-left px-3 py-2 text-sm hover:bg-[#FF3C3C]/5 text-neutral-700 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[14px] text-neutral-400">map</span>
-                        {state.name}
-                      </button>
-                    ))}
-                    {countryStates.filter(s => !citySearch || s.name.toLowerCase().includes(citySearch.toLowerCase())).length === 0 && (
-                      <p className="px-3 py-2 text-xs text-neutral-400">No states found</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-
-          {/* City selector */}
-          {stateId && !cityId && (() => {
-            const stateCities = cities.filter(c => String(c.slug) === stateId);
-            return (
-              <div className="relative">
-                <div className="flex items-center gap-1 mb-1.5">
-                  <span className="text-[11px] font-bold text-[#FF3C3C]">{countries.find(c => String(c.id) === countryId)?.name}</span>
-                  <span className="material-symbols-outlined text-[11px] text-neutral-400">chevron_right</span>
-                  <span className="text-[11px] font-bold text-[#FF3C3C]">{states.find(s => String(s.id) === stateId)?.name}</span>
-                  <button type="button" onClick={() => { setStateId(""); setCitySearch(""); }} className="text-neutral-400 hover:text-[#FF3C3C]">
-                    <span className="material-symbols-outlined text-[13px]">close</span>
-                  </button>
-                </div>
-                <span className="material-symbols-outlined absolute left-3 top-[calc(50%+10px)] -translate-y-1/2 text-[16px] text-neutral-400 pointer-events-none">location_city</span>
-                <input
-                  type="text"
-                  placeholder="Search city..."
-                  value={citySearch}
-                  onChange={(e) => { setCitySearch(e.target.value); setCityDropOpen(true); }}
-                  onFocus={() => setCityDropOpen(true)}
-                  onBlur={() => setTimeout(() => setCityDropOpen(false), 150)}
-                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-400"
-                />
-                {cityDropOpen && (
-                  <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-[10px] shadow-xl max-h-48 overflow-y-auto">
-                    {(stateCities.filter(c => !citySearch || c.name.toLowerCase().includes(citySearch.toLowerCase()))).map((city) => (
-                      <button key={city.id} type="button"
-                        onMouseDown={() => {
-                          const coId = countryId;
-                          setCitySearch(""); setCityDropOpen(false);
-                          handleCityClick(String(city.id), stateId, coId);
-                        }}
-                        className="w-full text-left px-3 py-2 text-sm hover:bg-[#FF3C3C]/5 text-neutral-700 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[14px] text-neutral-400">location_on</span>
-                        {city.name}
-                      </button>
-                    ))}
-                    {stateCities.filter(c => !citySearch || c.name.toLowerCase().includes(citySearch.toLowerCase())).length === 0 && (
-                      <p className="px-3 py-2 text-xs text-neutral-400">No cities found</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-
-          {/* Selected city display */}
-          {cityId && (
-            <div className="flex items-center gap-2 bg-[#FF3C3C]/5 border border-[#FF3C3C]/20 rounded-[10px] px-3 py-2">
-              <span className="material-symbols-outlined text-[15px] text-[#FF3C3C]">location_on</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-black text-[#FF3C3C] truncate">{cities.find(c => String(c.id) === cityId)?.name}</p>
-                <p className="text-[10px] text-neutral-400">{states.find(s => String(s.id) === stateId)?.name} · {countries.find(c => String(c.id) === countryId)?.name}</p>
-              </div>
-              <button type="button" onClick={() => { setCityId(""); setStateId(""); setCountryId(""); setCitySearch(""); applyFilters({ city_id: "", state_id: "", country_id: "" }); }}>
-                <span className="material-symbols-outlined text-[16px] text-neutral-400 hover:text-[#FF3C3C]">close</span>
-              </button>
-            </div>
-          )}
-        </div>
 
         {/* Course Name */}
         <div>
           <label className="text-xs font-bold text-neutral-600 block">Course name</label>
           <div className="relative">
-            <select
-              value={degree}
-              onChange={(e) => handleDegree(e.target.value)}
-              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
-            >
+            <select value={degree} onChange={(e) => handleDegree(e.target.value)}
+              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer">
               <option value="">Search according to the course...</option>
-              {degrees.map((d) => (
-                <option key={d.id} value={d.slug || String(d.id)}>{d.name}</option>
-              ))}
+              {degrees.map((d) => <option key={d.id} value={d.slug || String(d.id)}>{d.name}</option>)}
             </select>
             <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[20px] text-neutral-400 pointer-events-none">expand_more</span>
           </div>
@@ -466,15 +339,10 @@ export default function SearchFilters({
         <div>
           <label className="text-xs font-bold text-neutral-600 block">Stream</label>
           <div className="relative">
-            <select
-              value={stream}
-              onChange={(e) => handleStream(e.target.value)}
-              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
-            >
+            <select value={stream} onChange={(e) => handleStream(e.target.value)}
+              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer">
               <option value="">Select Stream...</option>
-              {streams.map((s) => (
-                <option key={s.id} value={s.slug || String(s.id)}>{s.name}</option>
-              ))}
+              {streams.map((s) => <option key={s.id} value={s.slug || String(s.id)}>{s.name}</option>)}
             </select>
             <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[20px] text-neutral-400 pointer-events-none">expand_more</span>
           </div>
@@ -484,42 +352,31 @@ export default function SearchFilters({
         <div>
           <label className="text-xs font-bold text-neutral-600 block">Tuition fee</label>
           <div className="relative">
-            <select
-              value={feesMax}
-              onChange={(e) => handleFees(e.target.value)}
-              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
-            >
+            <select value={feesMax} onChange={(e) => handleFees(e.target.value)}
+              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer">
               <option value="">Select Fees Range...</option>
-              {FEES_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
+              {FEES_OPTIONS.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
             </select>
             <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[20px] text-neutral-400 pointer-events-none">expand_more</span>
           </div>
         </div>
 
-        {/* Ranking Checkboxes */}
+        {/* Ranking */}
         <div>
           <label className="text-xs font-bold text-neutral-600 block">Ranking</label>
           <div className="space-y-1 px-1">
             {RANKING_OPTIONS.map((opt) => (
               <label key={opt.id} className="flex items-center gap-3 cursor-pointer group">
                 <div className="relative flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={ranking === opt.id}
-                    onChange={() => {
-                        const newVal = ranking === opt.id ? "" : opt.id;
-                        setRanking(newVal); 
-                        applyFilters({ ranking: newVal });
-                    }}
+                  <input type="checkbox" checked={ranking === opt.id}
+                    onChange={() => { const v = ranking === opt.id ? "" : opt.id; setRanking(v); applyFilters({ ranking: v }); }}
                     className="w-5 h-5 border-2 border-neutral-200 rounded bg-white checked:bg-[#FF3C3C] checked:border-[#FF3C3C] appearance-none transition-all cursor-pointer"
                   />
                   {ranking === opt.id && (
                     <span className="material-symbols-outlined absolute inset-0 text-white text-[16px] flex items-center justify-center pointer-events-none">check</span>
                   )}
                 </div>
-                <span className={`text-sm font-medium transition-colors ${ranking === opt.id ? 'text-[#FF3C3C]' : 'text-neutral-500 group-hover:text-neutral-800'}`}>
+                <span className={`text-sm font-medium transition-colors ${ranking === opt.id ? "text-[#FF3C3C]" : "text-neutral-500 group-hover:text-neutral-800"}`}>
                   {opt.name}
                 </span>
               </label>
@@ -527,20 +384,14 @@ export default function SearchFilters({
           </div>
         </div>
 
-        {/* Sidebar Actions */}
+        {/* Actions */}
         <div className="pt-0 grid grid-cols-2 items-stretch gap-2">
-          <button
-            type="button"
-            onClick={() => setMobileOpen(false)}
-            className="w-full whitespace-nowrap bg-[#FF3C3C] hover:bg-[#E63636] text-white text-xs font-black py-2 rounded-[5px] shadow-lg shadow-[#FF3C3C]/20 transition-all active:scale-[0.98]"
-          >
+          <button type="button" onClick={() => setMobileOpen(false)}
+            className="w-full whitespace-nowrap bg-[#FF3C3C] hover:bg-[#E63636] text-white text-xs font-black py-2 rounded-[5px] shadow-lg shadow-[#FF3C3C]/20 transition-all active:scale-[0.98]">
             Apply filter
           </button>
-          <button
-            type="button"
-            onClick={resetAll}
-            className="w-full whitespace-nowrap bg-white border border-neutral-200 text-neutral-400 hover:text-neutral-600 hover:border-neutral-400 text-xs font-black py-2 rounded-[5px] transition-all"
-          >
+          <button type="button" onClick={resetAll}
+            className="w-full whitespace-nowrap bg-white border border-neutral-200 text-neutral-400 hover:text-neutral-600 hover:border-neutral-400 text-xs font-black py-2 rounded-[5px] transition-all">
             Reset
           </button>
         </div>
@@ -556,19 +407,14 @@ export default function SearchFilters({
         </div>
       </aside>
 
-      {/* Mobile: floating filter button */}
+      {/* Mobile trigger */}
       <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
-        <button
-          type="button"
-          onClick={() => setMobileOpen(true)}
-          className="flex items-center gap-2 bg-neutral-900 text-white font-bold text-sm px-6 py-3.5 rounded-[5px] shadow-2xl shadow-black/20 hover:bg-[#FF3C3C] transition-all duration-300"
-        >
+        <button type="button" onClick={() => setMobileOpen(true)}
+          className="flex items-center gap-2 bg-neutral-900 text-white font-bold text-sm px-6 py-3.5 rounded-[5px] shadow-2xl shadow-black/20 hover:bg-[#FF3C3C] transition-all duration-300">
           <span className="material-symbols-outlined text-[18px]">filter_list</span>
           Filters
           {activeCount > 0 && (
-            <span className="w-5 h-5 rounded-full bg-[#FF3C3C] text-white text-[10px] font-black flex items-center justify-center">
-              {activeCount}
-            </span>
+            <span className="w-5 h-5 rounded-full bg-[#FF3C3C] text-white text-[10px] font-black flex items-center justify-center">{activeCount}</span>
           )}
         </button>
       </div>
@@ -580,21 +426,15 @@ export default function SearchFilters({
           <div className="relative ml-auto w-[85%] max-w-[400px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
             <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
               <h2 className="text-base font-black text-neutral-800">Filters</h2>
-              <button
-                type="button"
-                onClick={() => setMobileOpen(false)}
-                className="w-8 h-8 rounded-[5px] bg-neutral-100 flex items-center justify-center hover:bg-neutral-200 transition-colors"
-              >
+              <button type="button" onClick={() => setMobileOpen(false)}
+                className="w-8 h-8 rounded-[5px] bg-neutral-100 flex items-center justify-center hover:bg-neutral-200 transition-colors">
                 <span className="material-symbols-outlined text-[18px] text-neutral-600">close</span>
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-5">{panel}</div>
             <div className="px-5 py-4 border-t border-neutral-100">
-              <button
-                type="button"
-                onClick={() => setMobileOpen(false)}
-                className="w-full bg-[#FF3C3C] text-white font-bold py-3.5 rounded-[5px] hover:bg-[#E63636] transition-colors text-sm"
-              >
+              <button type="button" onClick={() => setMobileOpen(false)}
+                className="w-full bg-[#FF3C3C] text-white font-bold py-3.5 rounded-[5px] hover:bg-[#E63636] transition-colors text-sm">
                 Show {totalResults?.toLocaleString() ?? ""} {entityNamePlural}
               </button>
             </div>
@@ -604,7 +444,3 @@ export default function SearchFilters({
     </>
   );
 }
-
-
-
-
