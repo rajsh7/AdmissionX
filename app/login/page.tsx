@@ -38,7 +38,7 @@ function AdminLoginForm() {
     <div className="min-h-screen flex flex-col font-display relative">
       <AuthBackgroundSlider />
       <Header />
-      <main className="relative flex-1 flex items-center justify-center px-6 py-48 z-10">
+      <main className="relative flex-1 flex items-center justify-center px-6 py-72 z-10">
         <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-8 py-8">
 
           <div className="flex items-center gap-3 mb-6">

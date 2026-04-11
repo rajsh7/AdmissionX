@@ -170,8 +170,6 @@ export default function CollegeCard({
               Apply Now
             </div>
           </div>
-            </div>
-          </div>
         </div>
       </Link>
     </motion.div>

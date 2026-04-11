@@ -1,4 +1,5 @@
 import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
@@ -147,37 +148,71 @@ export default async function MembersUsersPage({
                 sort === "name"   ? "u.firstname ASC, u.lastname ASC" : 
                                    "u.created_at DESC";
 
-  const [users, countRows, statsRows, roles, statuses] = await Promise.all([
-    safeQuery<UserRow>(
-      `SELECT u.id, u.firstname, u.lastname, u.email, u.phone, u.type_of_user, u.created_at, u.userstatus_id, u.userrole_id, 
-              us.name as status_name, ur.name as role_name
-       FROM users u
-       LEFT JOIN userstatus us ON u.userstatus_id = us.id
-       LEFT JOIN userrole ur ON u.userrole_id = ur.id
-       ${where}
-       ORDER BY ${sortSql}
-       LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset]
-    ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total FROM users u ${where}`,
-      params
-    ),
-    safeQuery<StatsRow>(`
-      SELECT 
-        COUNT(*) AS total,
-        SUM(userstatus_id = 1) AS active,
-        SUM(userstatus_id != 1) AS inactive,
-        SUM(created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) AS new_last_7d
-      FROM users
-    `),
+  const [roles, statuses] = await Promise.all([
     safeQuery<{ id: number; name: string }>("SELECT id, name FROM userrole"),
     safeQuery<{ id: number; name: string }>("SELECT id, name FROM userstatus"),
   ]);
 
-  const total = Number(countRows[0]?.total ?? 0);
+  // Fetch from MongoDB
+  const db = await getDb();
+  const [mongoStudents, mongoColleges] = await Promise.all([
+    db.collection("next_student_signups").find({}, { projection: { _id: 1, name: 1, email: 1, phone: 1, is_active: 1, created_at: 1 } }).sort({ created_at: -1 }).toArray(),
+    db.collection("next_college_signups").find({}, { projection: { _id: 1, college_name: 1, email: 1, phone: 1, status: 1, created_at: 1 } }).sort({ created_at: -1 }).toArray(),
+  ]);
+
+  const studentRows: UserRow[] = mongoStudents.map((s: any) => ({
+    id: s._id.toString(),
+    firstname: s.name || "",
+    lastname: "",
+    email: s.email || "",
+    phone: s.phone || "",
+    type_of_user: "Student",
+    created_at: s.created_at ? new Date(s.created_at).toISOString() : "",
+    userstatus_id: s.is_active ? 1 : 0,
+    userrole_id: 0,
+    status_name: s.is_active ? "Active" : "Inactive",
+    role_name: "Student",
+  }));
+
+  const collegeRows: UserRow[] = mongoColleges.map((c: any) => ({
+    id: c._id.toString(),
+    firstname: c.college_name || "",
+    lastname: "",
+    email: c.email || "",
+    phone: c.phone || "",
+    type_of_user: "College",
+    created_at: c.created_at ? new Date(c.created_at).toISOString() : "",
+    userstatus_id: c.status === "approved" ? 1 : 0,
+    userrole_id: 0,
+    status_name: c.status === "approved" ? "Active" : "Pending",
+    role_name: "College",
+  }));
+
+  let allUsers: UserRow[] = [...studentRows, ...collegeRows];
+
+  if (q) {
+    const ql = q.toLowerCase();
+    allUsers = allUsers.filter(u =>
+      u.firstname.toLowerCase().includes(ql) ||
+      u.email.toLowerCase().includes(ql) ||
+      (u.phone || "").includes(ql)
+    );
+  }
+
+  if (sort === "name") allUsers.sort((a, b) => a.firstname.localeCompare(b.firstname));
+  else if (sort === "oldest") allUsers.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  else allUsers.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+  const total = allUsers.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const stats = statsRows[0];
+  const users = allUsers.slice(offset, offset + PAGE_SIZE);
+
+  const stats = {
+    total,
+    active: allUsers.filter(u => u.status_name === "Active").length,
+    inactive: allUsers.filter(u => u.status_name !== "Active").length,
+    new_last_7d: allUsers.filter(u => u.created_at && new Date(u.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length,
+  };
 
   function buildUrl(overrides: Record<string, string | number>) {
     const merged = { q, page: "1", sort, ...overrides };

@@ -345,7 +345,6 @@ export default function TopUniversities({
                         <div className="text-[18px] font-medium text-[#6C6C6C]">
                           Avg. Package: <span className="font-bold text-primary">{uni.avgPackage}</span>
                         </div>
-                        </div>
                         <Link
                           href={uni.href}
                           className="px-4 py-2 rounded-[10px] bg-slate-900 text-white text-xs font-normal hover:bg-primary transition-all active:scale-95"

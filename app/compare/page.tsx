@@ -156,19 +156,12 @@ function ComparePageInner() {
           <div className="absolute inset-0 bg-white/10" />
           
           <div className="relative z-30 max-w-7xl">
-            {/* Page Title */}
             <div className="mb-8">
               <h1 className="text-[48px] font-semibold text-slate-800 leading-tight">Compare College</h1>
               <p className="text-slate-500 mt-2 text-[20px] font-medium max-w-4xl">
                 Evaluate multiple institution side by side to find your perfect match based on fees, placement, and academic quality.
               </p>
             </div>
-
-          {/* Page Title */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-black text-slate-900">Compare College</h1>
-            <p className="text-slate-500 mt-2">Evaluate multiple institutions side by side to find your perfect match based on fees, placement, and academic quality.</p>
-          </div>
 
           {/* Search Bar */}
           <div ref={searchRef} className="relative mb-8 max-w-xl">
@@ -191,30 +184,7 @@ function ComparePageInner() {
               >
                 Add College
               </button>
-              {/* Suggestions dropdown */}
-              {suggestions.length > 0 && (
-                <div className="absolute top-full left-0 w-full md:w-[calc(100%-140px)] mt-2 bg-white rounded-[5px] shadow-xl border border-slate-100 z-50 overflow-hidden">
-                  {suggestions.map((s) => (
-                    <button
-                      key={s.slug}
-                      onClick={() => {
-                        const slot = addingSlot !== null ? addingSlot : colleges.findIndex((c) => !c);
-                        if (slot !== -1) addCollege(s.slug, slot);
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-left border-b border-slate-50 last:border-0 transition-colors"
-                    >
-                      <span className="material-symbols-outlined text-slate-400 text-[18px]">account_balance</span>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-800">{s.name}</p>
-                        <p className="text-xs text-slate-400">{s.location}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
-
-            {/* Suggestions dropdown */}
             {suggestions.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden">
                 {suggestions.map((s) => (
@@ -235,6 +205,7 @@ function ComparePageInner() {
                 ))}
               </div>
             )}
+          </div>
           </div>
 
           {/* Comparison Table */}

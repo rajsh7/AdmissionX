@@ -126,8 +126,12 @@ export default function UserListClient({
                       </div>
                     </td>
                     <td className="px-4 py-3.5">
-                      <span className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase border border-emerald-100/50">
-                        {user.role_name?.replace('ROLE_', '') || "MEMBER"}
+                      <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase border ${
+                        user.role_name === 'Student' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                        user.role_name === 'College' ? 'bg-violet-50 text-violet-700 border-violet-100' :
+                        'bg-emerald-50 text-emerald-700 border-emerald-100'
+                      }`}>
+                        {user.role_name || "Member"}
                       </span>
                     </td>
                     <td className="px-4 py-3.5 hidden md:table-cell">
