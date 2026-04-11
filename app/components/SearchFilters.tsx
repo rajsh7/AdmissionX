@@ -172,11 +172,7 @@ export default function SearchFilters({
     applyFilters({ city_id: cId, state_id: sId, country_id: coId });
   };
 
-  const filteredCities = citySearch.length >= 1
-    ? cities.filter(c => c.name.toLowerCase().includes(citySearch.toLowerCase())).slice(0, 50)
-    : cities.slice(0, 50);
 
-  const selectedCity = cities.find(c => String(c.id) === cityId);
 
   if (!mounted) return null;
 
@@ -212,50 +208,238 @@ export default function SearchFilters({
           </div>
         </div>
 
-        {/* Location — searchable city dropdown */}
-        <div className="relative h-[62px]">
-          <label className="text-xs font-bold text-neutral-600 block">Location</label>
-          <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-neutral-400 pointer-events-none">location_on</span>
-            <input
-              type="text"
-              placeholder={selectedCity ? selectedCity.name : "Search city..."}
-              value={citySearch}
-              onChange={(e) => { setCitySearch(e.target.value); setCityDropOpen(true); }}
-              onFocus={() => setCityDropOpen(true)}
-              onBlur={() => setTimeout(() => setCityDropOpen(false), 150)}
-              className="w-full pl-9 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-500"
-            />
-            {cityId && (
-              <button type="button" onMouseDown={() => { setCityId(""); setStateId(""); setCountryId(""); setCitySearch(""); applyFilters({ city_id: "", state_id: "", country_id: "" }); }} className="absolute right-3 top-1/2 -translate-y-1/2">
-                <span className="material-symbols-outlined text-[16px] text-neutral-400 hover:text-[#FF3C3C]">close</span>
+        {/* Location — Nested Country → State → City */}
+        <div>
+          <label className="text-xs font-bold text-neutral-600 block mb-1">Location</label>
+
+          {/* Step indicator */}
+          <div className="flex items-center gap-1 mb-2">
+            {["Country", "State", "City"].map((step, i) => {
+              const done = i === 0 ? !!countryId : i === 1 ? !!stateId : !!cityId;
+              const active = i === 0 ? !countryId : i === 1 ? !!countryId && !stateId : !!stateId && !cityId;
+              return (
+                <span key={step} className="inline-flex items-center gap-1">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    done ? "bg-[#FF3C3C] text-white" : active ? "bg-neutral-200 text-neutral-700" : "bg-neutral-100 text-neutral-400"
+                  }`}>{step}</span>
+                  {i < 2 && <span className="material-symbols-outlined text-[12px] text-neutral-300">chevron_right</span>}
+                </span>
+              );
+            })}
+            {(countryId || stateId || cityId) && (
+              <button type="button" onClick={() => { setCityId(""); setStateId(""); setCountryId(""); setCitySearch(""); applyFilters({ city_id: "", state_id: "", country_id: "" }); }} className="ml-auto">
+                <span className="material-symbols-outlined text-[15px] text-neutral-400 hover:text-[#FF3C3C]">close</span>
               </button>
             )}
           </div>
-          {cityDropOpen && filteredCities.length > 0 && (
-            <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-[5px] shadow-xl max-h-48 overflow-y-auto">
-              {filteredCities.map((city) => {
-                const state = states.find(s => String(s.id) === String(city.slug));
-                return (
-                  <button
-                    key={city.id}
-                    type="button"
-                    onMouseDown={() => {
-                      const sId = city.slug ?? "";
-                      const coId = state ? String(state.slug ?? "") : "";
-                      setCitySearch("");
-                      setCityDropOpen(false);
-                      handleCityClick(String(city.id), sId, coId);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-[#FF3C3C]/5 ${
-                      cityId === String(city.id) ? "text-[#FF3C3C] font-bold bg-[#FF3C3C]/5" : "text-neutral-700"
-                    }`}
-                  >
-                    <span className="font-medium">{city.name}</span>
-                    {state && <span className="text-xs text-neutral-400 ml-1">{state.name}</span>}
+
+          {/* Country selector */}
+          {!countryId && (
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-neutral-400 pointer-events-none">public</span>
+              <input type="text" placeholder="Search country..."
+                value={citySearch}
+                onChange={(e) => { setCitySearch(e.target.value); setCityDropOpen(true); }}
+                onFocus={() => setCityDropOpen(true)}
+                onBlur={() => setTimeout(() => setCityDropOpen(false), 150)}
+                className="w-full pl-9 pr-3 py-2.5 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-400"
+              />
+              {cityDropOpen && (
+                <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-[5px] shadow-xl max-h-48 overflow-y-auto">
+                  {countries.filter(c => !citySearch || c.name.toLowerCase().includes(citySearch.toLowerCase())).map((country) => (
+                    <button key={country.id} type="button"
+                      onMouseDown={() => { setCountryId(String(country.id)); setCitySearch(""); setCityDropOpen(false); }}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-[#FF3C3C]/5 text-neutral-700 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-[14px] text-neutral-400">public</span>
+                      {country.name}
+                    </button>
+                  ))}
+                  {countries.filter(c => !citySearch || c.name.toLowerCase().includes(citySearch.toLowerCase())).length === 0 && (
+                    <p className="px-3 py-2 text-xs text-neutral-400">No countries found</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* State selector */}
+          {countryId && !stateId && (() => {
+            const countryStates = states.filter(s => String(s.slug) === countryId);
+            return (
+              <div className="relative">
+                <div className="flex items-center gap-1 mb-1.5">
+                  <span className="text-[11px] font-bold text-[#FF3C3C]">{countries.find(c => String(c.id) === countryId)?.name}</span>
+                  <button type="button" onClick={() => { setCountryId(""); setCitySearch(""); }} className="text-neutral-400 hover:text-[#FF3C3C]">
+                    <span className="material-symbols-outlined text-[13px]">close</span>
                   </button>
-                );
-              })}
+                </div>
+                <span className="material-symbols-outlined absolute left-3 top-[calc(50%+10px)] -translate-y-1/2 text-[16px] text-neutral-400 pointer-events-none">map</span>
+                <input type="text" placeholder="Search state..."
+                  value={citySearch}
+                  onChange={(e) => { setCitySearch(e.target.value); setCityDropOpen(true); }}
+                  onFocus={() => setCityDropOpen(true)}
+                  onBlur={() => setTimeout(() => setCityDropOpen(false), 150)}
+                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-400"
+                />
+                {cityDropOpen && (
+                  <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-[5px] shadow-xl max-h-48 overflow-y-auto">
+                    {countryStates.filter(s => !citySearch || s.name.toLowerCase().includes(citySearch.toLowerCase())).map((state) => (
+                      <button key={state.id} type="button"
+                        onMouseDown={() => { setStateId(String(state.id)); setCitySearch(""); setCityDropOpen(false); }}
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-[#FF3C3C]/5 text-neutral-700 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[14px] text-neutral-400">map</span>
+                        {state.name}
+                      </button>
+                    ))}
+                    {countryStates.filter(s => !citySearch || s.name.toLowerCase().includes(citySearch.toLowerCase())).length === 0 && (
+                      <p className="px-3 py-2 text-xs text-neutral-400">No states found</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* City selector */}
+          {stateId && !cityId && (() => {
+            const stateCities = cities.filter(c => String(c.slug) === stateId);
+            return (
+              <div className="relative">
+                <div className="flex items-center gap-1 mb-1.5">
+                  <span className="text-[11px] font-bold text-[#FF3C3C]">{countries.find(c => String(c.id) === countryId)?.name}</span>
+                  <span className="material-symbols-outlined text-[11px] text-neutral-400">chevron_right</span>
+                  <span className="text-[11px] font-bold text-[#FF3C3C]">{states.find(s => String(s.id) === stateId)?.name}</span>
+                  <button type="button" onClick={() => { setStateId(""); setCitySearch(""); }} className="text-neutral-400 hover:text-[#FF3C3C]">
+                    <span className="material-symbols-outlined text-[13px]">close</span>
+                  </button>
+                </div>
+                <span className="material-symbols-outlined absolute left-3 top-[calc(50%+10px)] -translate-y-1/2 text-[16px] text-neutral-400 pointer-events-none">location_city</span>
+                <input type="text" placeholder="Search city..."
+                  value={citySearch}
+                  onChange={(e) => { setCitySearch(e.target.value); setCityDropOpen(true); }}
+                  onFocus={() => setCityDropOpen(true)}
+                  onBlur={() => setTimeout(() => setCityDropOpen(false), 150)}
+                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-400"
+                />
+                {cityDropOpen && (
+                  <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-[5px] shadow-xl max-h-48 overflow-y-auto">
+                    {stateCities.filter(c => !citySearch || c.name.toLowerCase().includes(citySearch.toLowerCase())).map((city) => (
+                      <button key={city.id} type="button"
+                        onMouseDown={() => { setCitySearch(""); setCityDropOpen(false); handleCityClick(String(city.id), stateId, countryId); }}
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-[#FF3C3C]/5 text-neutral-700 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[14px] text-neutral-400">location_on</span>
+                        {city.name}
+                      </button>
+                    ))}
+                    {stateCities.filter(c => !citySearch || c.name.toLowerCase().includes(citySearch.toLowerCase())).length === 0 && (
+                      <p className="px-3 py-2 text-xs text-neutral-400">No cities found</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Selected city display */}
+          {cityId && (
+            <div className="flex items-center gap-2 bg-[#FF3C3C]/5 border border-[#FF3C3C]/20 rounded-[5px] px-3 py-2">
+              <span className="material-symbols-outlined text-[15px] text-[#FF3C3C]">location_on</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-black text-[#FF3C3C] truncate">{cities.find(c => String(c.id) === cityId)?.name}</p>
+                <p className="text-[10px] text-neutral-400">{states.find(s => String(s.id) === stateId)?.name} · {countries.find(c => String(c.id) === countryId)?.name}</p>
+              </div>
+              <button type="button" onClick={() => { setCityId(""); setStateId(""); setCountryId(""); setCitySearch(""); applyFilters({ city_id: "", state_id: "", country_id: "" }); }}>
+                <span className="material-symbols-outlined text-[16px] text-neutral-400 hover:text-[#FF3C3C]">close</span>
+              </button>
+            </div>
+          )}
+        </div>
+                <span className="material-symbols-outlined absolute left-3 top-[calc(50%+10px)] -translate-y-1/2 text-[16px] text-neutral-400 pointer-events-none">map</span>
+                <input
+                  type="text"
+                  placeholder="Search state..."
+                  value={citySearch}
+                  onChange={(e) => { setCitySearch(e.target.value); setCityDropOpen(true); }}
+                  onFocus={() => setCityDropOpen(true)}
+                  onBlur={() => setTimeout(() => setCityDropOpen(false), 150)}
+                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-400"
+                />
+                {cityDropOpen && (
+                  <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-[10px] shadow-xl max-h-48 overflow-y-auto">
+                    {(countryStates.filter(s => !citySearch || s.name.toLowerCase().includes(citySearch.toLowerCase()))).map((state) => (
+                      <button key={state.id} type="button"
+                        onMouseDown={() => { setStateId(String(state.id)); setCitySearch(""); setCityDropOpen(false); }}
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-[#FF3C3C]/5 text-neutral-700 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[14px] text-neutral-400">map</span>
+                        {state.name}
+                      </button>
+                    ))}
+                    {countryStates.filter(s => !citySearch || s.name.toLowerCase().includes(citySearch.toLowerCase())).length === 0 && (
+                      <p className="px-3 py-2 text-xs text-neutral-400">No states found</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* City selector */}
+          {stateId && !cityId && (() => {
+            const stateCities = cities.filter(c => String(c.slug) === stateId);
+            return (
+              <div className="relative">
+                <div className="flex items-center gap-1 mb-1.5">
+                  <span className="text-[11px] font-bold text-[#FF3C3C]">{countries.find(c => String(c.id) === countryId)?.name}</span>
+                  <span className="material-symbols-outlined text-[11px] text-neutral-400">chevron_right</span>
+                  <span className="text-[11px] font-bold text-[#FF3C3C]">{states.find(s => String(s.id) === stateId)?.name}</span>
+                  <button type="button" onClick={() => { setStateId(""); setCitySearch(""); }} className="text-neutral-400 hover:text-[#FF3C3C]">
+                    <span className="material-symbols-outlined text-[13px]">close</span>
+                  </button>
+                </div>
+                <span className="material-symbols-outlined absolute left-3 top-[calc(50%+10px)] -translate-y-1/2 text-[16px] text-neutral-400 pointer-events-none">location_city</span>
+                <input
+                  type="text"
+                  placeholder="Search city..."
+                  value={citySearch}
+                  onChange={(e) => { setCitySearch(e.target.value); setCityDropOpen(true); }}
+                  onFocus={() => setCityDropOpen(true)}
+                  onBlur={() => setTimeout(() => setCityDropOpen(false), 150)}
+                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-400"
+                />
+                {cityDropOpen && (
+                  <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-[10px] shadow-xl max-h-48 overflow-y-auto">
+                    {(stateCities.filter(c => !citySearch || c.name.toLowerCase().includes(citySearch.toLowerCase()))).map((city) => (
+                      <button key={city.id} type="button"
+                        onMouseDown={() => {
+                          const coId = countryId;
+                          setCitySearch(""); setCityDropOpen(false);
+                          handleCityClick(String(city.id), stateId, coId);
+                        }}
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-[#FF3C3C]/5 text-neutral-700 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[14px] text-neutral-400">location_on</span>
+                        {city.name}
+                      </button>
+                    ))}
+                    {stateCities.filter(c => !citySearch || c.name.toLowerCase().includes(citySearch.toLowerCase())).length === 0 && (
+                      <p className="px-3 py-2 text-xs text-neutral-400">No cities found</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Selected city display */}
+          {cityId && (
+            <div className="flex items-center gap-2 bg-[#FF3C3C]/5 border border-[#FF3C3C]/20 rounded-[10px] px-3 py-2">
+              <span className="material-symbols-outlined text-[15px] text-[#FF3C3C]">location_on</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-black text-[#FF3C3C] truncate">{cities.find(c => String(c.id) === cityId)?.name}</p>
+                <p className="text-[10px] text-neutral-400">{states.find(s => String(s.id) === stateId)?.name} · {countries.find(c => String(c.id) === countryId)?.name}</p>
+              </div>
+              <button type="button" onClick={() => { setCityId(""); setStateId(""); setCountryId(""); setCitySearch(""); applyFilters({ city_id: "", state_id: "", country_id: "" }); }}>
+                <span className="material-symbols-outlined text-[16px] text-neutral-400 hover:text-[#FF3C3C]">close</span>
+              </button>
             </div>
           )}
         </div>

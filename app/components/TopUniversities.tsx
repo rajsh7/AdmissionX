@@ -167,6 +167,7 @@ export default function TopUniversities({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search your college, universities, courses..."
+              suppressHydrationWarning
               className="h-14 w-full rounded-[10px] bg-transparent pl-14 pr-4 text-base font-normal text-slate-800 placeholder:text-slate-400 focus:outline-none"
             />
           </div>
@@ -339,7 +340,6 @@ export default function TopUniversities({
 
                       <div className="mt-auto flex items-center justify-between border-t border-slate-200 pt-5">
                         <div className="text-[18px] font-medium text-[#6C6C6C]">
-                          Avg. Package: <span className="font-bold text-primary">{uni.avgPackage}</span>
                           Avg. Package:{" "}
                           <span className="font-bold text-primary">
                             {uni.avgPackage || "Rs 4.5 LPA"}

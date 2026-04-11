@@ -25,14 +25,23 @@ const PAGE_SIZE = 4;
 const SHOW_MORE_LIMIT = 12;
 const CATEGORIES = ["All Exams", "Engineering", "Medical", "Management", "Government", "Law"];
 
-export default function ExamListClient({ exams }: { exams: ExamItem[] }) {
+export default function ExamListClient({ exams, search = "" }: { exams: ExamItem[]; search?: string }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [page, setPage] = useState(1);
   const [activeFilter, setActiveFilter] = useState("All Exams");
 
-  const filtered = activeFilter === "All Exams"
-    ? exams
-    : exams.filter((e) => e.streamName?.toLowerCase().includes(activeFilter.toLowerCase()));
+  const filtered = exams.filter((e) => {
+    const query = search.toLowerCase().trim();
+    const searchMatch = !query || 
+      e.title.toLowerCase().includes(query) || 
+      (e.streamName?.toLowerCase() || "").includes(query) || 
+      (e.description?.toLowerCase() || "").includes(query);
+    
+    const catMatch = activeFilter === "All Exams" || 
+      (e.streamName?.toLowerCase() || "").includes(activeFilter.toLowerCase());
+      
+    return searchMatch && catMatch;
+  });
 
   const totalPages = Math.ceil(filtered.length / SHOW_MORE_LIMIT);
   const pageExams = filtered.slice((page - 1) * SHOW_MORE_LIMIT, page * SHOW_MORE_LIMIT);
