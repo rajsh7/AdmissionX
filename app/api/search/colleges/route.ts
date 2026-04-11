@@ -22,6 +22,7 @@ export interface CollegeResult {
   streams: string[];
   min_fees: number | null;
   max_fees: number | null;
+  avg_package: string | null;
 }
 
 function buildImageUrl(raw: string | null): string | null {
@@ -127,6 +128,8 @@ export async function GET(req: NextRequest) {
         { $limit: limit },
         { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "city" } },
         { $unwind: { path: "$city", preserveNullAndEmptyArrays: true } },
+        { $lookup: { from: "placement", localField: "id", foreignField: "collegeprofile_id", as: "placement" } },
+        { $unwind: { path: "$placement", preserveNullAndEmptyArrays: true } },
         // Inline stream/fees enrichment — avoids a separate round trip
         { $lookup: { from: "collegemaster", localField: "id", foreignField: "collegeprofile_id", as: "cm" } },
         { $lookup: { from: "functionalarea", localField: "cm.functionalarea_id", foreignField: "id", as: "fa" } },
@@ -140,6 +143,7 @@ export async function GET(req: NextRequest) {
             streams: { $setUnion: ["$fa.name", []] },
             min_fees: { $min: { $filter: { input: "$cm.fees", as: "f", cond: { $gt: ["$$f", 0] } } } },
             max_fees: { $max: { $filter: { input: "$cm.fees", as: "f", cond: { $gt: ["$$f", 0] } } } },
+            avg_package: "$placement.ctcaverage",
           },
         },
       ]).toArray(),
@@ -168,6 +172,7 @@ export async function GET(req: NextRequest) {
         streams: Array.isArray(row.streams) ? row.streams.filter(Boolean) : [],
         min_fees: row.min_fees ?? null,
         max_fees: row.max_fees ?? null,
+        avg_package: row.avg_package ? `₹ ${row.avg_package} LPA` : "₹ 4.5 LPA",
       };
     });
 

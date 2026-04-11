@@ -106,9 +106,9 @@ const getFilterData = unstable_cache(
 
 async function fetchTopColleges(opts: {
   q: string; stream: string; degree: string; cityId: string; stateId: string; countryId: string;
-  sort: string; page: number; limit: number;
+  feesMax: string; sort: string; page: number; limit: number;
 }): Promise<{ colleges: CollegeResult[]; total: number; totalPages: number }> {
-  const { q, stream, degree, cityId, stateId, countryId, sort, page, limit } = opts;
+  const { q, stream, degree, cityId, stateId, countryId, feesMax, sort, page, limit } = opts;
   const db = await getDb();
 
   const match: Record<string, unknown> = { isShowOnTop: 1 };
@@ -129,6 +129,14 @@ async function fetchTopColleges(opts: {
     match.registeredAddressCountryId = Number(countryId);
   }
 
+  if (feesMax && !isNaN(Number(feesMax))) {
+    const feeIds = await db.collection("collegemaster")
+      .find({ fees: { $gt: 0, $lte: Number(feesMax) } }, { projection: { collegeprofile_id: 1 } })
+      .limit(5000).toArray().then((r) => [...new Set(r.map((x) => x.collegeprofile_id))]);
+    const existing = (match.id as { $in: unknown[] } | undefined)?.$in;
+    match.id = { $in: existing ? existing.filter((id) => feeIds.includes(id)) : feeIds };
+  }
+
   // Resolve stream + degree filters in parallel
   const [faDoc, degDoc] = await Promise.all([
     stream ? db.collection("functionalarea").findOne({ pageslug: stream }, { projection: { _id: 1 } }) : null,
@@ -144,11 +152,11 @@ async function fetchTopColleges(opts: {
   ]);
 
   if (streamIds) {
-    match._id = { $in: streamIds };
+    match.id = { $in: streamIds };
   }
   if (degreeIds) {
-    const existing = (match._id as { $in: unknown[] } | undefined)?.$in;
-    match._id = { $in: existing ? existing.filter((id) => degreeIds.includes(id)) : degreeIds };
+    const existing = (match.id as { $in: unknown[] } | undefined)?.$in;
+    match.id = { $in: existing ? existing.filter((id) => degreeIds.includes(id)) : degreeIds };
   }
 
   const sortStage: Record<string, 1 | -1> =
@@ -230,6 +238,7 @@ async function fetchTopColleges(opts: {
     streams: Array.isArray(row.streams) ? row.streams.filter(Boolean) : [],
     min_fees: row.min_fees ?? null,
     max_fees: row.max_fees ?? null,
+    avg_package: null,
   }));
 
   return { colleges, total, totalPages: Math.ceil(total / limit) };
@@ -237,7 +246,7 @@ async function fetchTopColleges(opts: {
 
 const getCachedTopColleges = unstable_cache(
   fetchTopColleges,
-  ["top-colleges-mongo-v4"],
+  ["top-colleges-mongo-v5"],
   { revalidate: 300 },
 );
 
@@ -270,7 +279,7 @@ export default async function TopCollegesPage({ searchParams }: PageProps) {
 
   const [{ colleges, total, totalPages }, { streamRows, degreeRows, cityRows, stateRows, countryRows }] =
     await Promise.all([
-      getCachedTopColleges({ q, stream, degree, cityId, stateId, countryId, sort, page, limit }),
+      getCachedTopColleges({ q, stream, degree, cityId, stateId, countryId, feesMax, sort, page, limit }),
       getFilterData(),
     ]);
 

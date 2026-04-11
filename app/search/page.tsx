@@ -140,6 +140,7 @@ function buildColleges(rows: CollegeRow[]): CollegeResult[] {
       streams,
       min_fees: row.min_fees ? parseInt(String(row.min_fees)) : null,
       max_fees: row.max_fees ? parseInt(String(row.max_fees)) : null,
+      avg_package: null,
     };
   });
 }

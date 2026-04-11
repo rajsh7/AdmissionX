@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 export interface TickerAdItem {
   id: number;
@@ -12,60 +12,67 @@ export interface TickerAdItem {
   redirectto: string | null;
 }
 
-// Fallback placeholder banners shown when no ads are configured
-const FALLBACK_ITEMS: TickerAdItem[] = [
-  { id: -1, title: "Top MBA Colleges 2025", description: "Admissions Open — Apply Now", img: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=800&h=120", redirectto: "/search?stream=management" },
-  { id: -2, title: "Engineering Colleges", description: "Explore 200+ Institutes", img: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=800&h=120", redirectto: "/search?stream=engineering" },
-  { id: -3, title: "MBBS Admissions 2025", description: "Limited Seats Available", img: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=800&h=120", redirectto: "/search?stream=medicine" },
-  { id: -4, title: "Design & Fashion", description: "Top Creative Colleges", img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=800&h=120", redirectto: "/search?stream=design" },
-];
-
 interface HomeTickerProps {
   ads: TickerAdItem[];
 }
 
 function buildImgUrl(raw: string | null): string | null {
   if (!raw) return null;
-  const t = raw.trim();
-  if (!t || t.toUpperCase().includes("NULL")) return null;
-  if (t.startsWith("http") || t.startsWith("/")) return t;
-  return `/uploads/${t}`;
+  const value = raw.trim();
+  if (!value || value.toUpperCase().includes("NULL")) return null;
+  if (value.startsWith("http") || value.startsWith("/")) return value;
+  return `/uploads/${value}`;
+}
+
+function hasText(value: string | null | undefined): value is string {
+  return Boolean(value && !value.toUpperCase().includes("NULL"));
 }
 
 export default function HomeTicker({ ads }: HomeTickerProps) {
   const trackRef = useRef<HTMLDivElement>(null);
-  const rafRef   = useRef<number>(0);
+  const rafRef = useRef<number>(0);
 
-  const source = ads && ads.length > 0 ? ads : FALLBACK_ITEMS;
-  // Triple for seamless infinite scroll
-  const items = [...source, ...source, ...source];
+  const source = ads.map((ad, index) => ({
+    id: ad.id ?? -(index + 1),
+    title: ad.title ?? null,
+    description: ad.description ?? null,
+    img: ad.img ?? null,
+    redirectto: ad.redirectto ?? null,
+  }));
+
+  useEffect(() => {
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
 
   useEffect(() => {
     const track = trackRef.current;
-    if (!track) return;
+    if (!track || source.length === 0) return;
 
     let x = 0;
     const speed = 0.8;
 
-    function step() {
+    const step = () => {
       x -= speed;
-      const singleWidth = track!.scrollWidth / 3;
+      const singleWidth = track.scrollWidth / 3;
       if (Math.abs(x) >= singleWidth) x = 0;
-      track!.style.transform = `translateX(${x}px)`;
+      track.style.transform = `translateX(${x}px)`;
       rafRef.current = requestAnimationFrame(step);
-    }
+    };
 
     rafRef.current = requestAnimationFrame(step);
     return () => cancelAnimationFrame(rafRef.current);
   }, [source.length]);
 
+  if (source.length === 0) return null;
+
+  const items = [...source, ...source, ...source];
+
   return (
-    <div className="w-full flex justify-center py-6">
+    <div className="flex w-full justify-center py-6">
       <div
-        className="relative overflow-hidden rounded-2xl shadow-md border border-slate-100"
-        style={{ width: "70%", height: 110 }}
+        className="relative h-[110px] overflow-hidden rounded-2xl border border-slate-100 shadow-md"
+        style={{ width: "70%" }}
       >
-        {/* Scrolling image track */}
         <div
           ref={trackRef}
           className="flex h-full will-change-transform"
@@ -75,8 +82,7 @@ export default function HomeTicker({ ads }: HomeTickerProps) {
             const imgSrc = buildImgUrl(ad.img);
             const inner = (
               <div
-                className="relative flex-shrink-0 overflow-hidden group"
-                style={{ width: 320, height: 110 }}
+                className="group relative h-[110px] w-[320px] flex-shrink-0 overflow-hidden"
               >
                 {imgSrc ? (
                   <Image
@@ -88,37 +94,35 @@ export default function HomeTicker({ ads }: HomeTickerProps) {
                     sizes="320px"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-                    <span className="text-white/30 text-xs font-bold uppercase tracking-widest">Ad</span>
+                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
+                    <span className="text-xs font-bold uppercase tracking-widest text-white/30">
+                      Ad
+                    </span>
                   </div>
                 )}
 
-                {/* Dark overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                {/* Text */}
-                {(ad.title || ad.description) && (
+                {(hasText(ad.title) || hasText(ad.description)) && (
                   <div className="absolute bottom-0 left-0 right-0 px-4 pb-3">
-                    {ad.title && (
-                      <p className="text-white text-[13px] font-bold leading-tight truncate drop-shadow">
+                    {hasText(ad.title) && (
+                      <p className="truncate text-[13px] font-bold leading-tight text-white drop-shadow">
                         {ad.title}
                       </p>
                     )}
-                    {ad.description && (
-                      <p className="text-white/75 text-[11px] font-medium truncate mt-0.5">
+                    {hasText(ad.description) && (
+                      <p className="mt-0.5 truncate text-[11px] font-medium text-white/75">
                         {ad.description}
                       </p>
                     )}
                   </div>
                 )}
 
-                {/* Ad badge */}
-                <span className="absolute top-2 right-2 text-[9px] font-black uppercase tracking-widest bg-black/40 text-white/80 px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+                <span className="absolute right-2 top-2 rounded-full bg-black/40 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-white/80 backdrop-blur-sm">
                   Ad
                 </span>
 
-                {/* Divider */}
-                <div className="absolute right-0 top-0 bottom-0 w-px bg-white/10" />
+                <div className="absolute bottom-0 right-0 top-0 w-px bg-white/10" />
               </div>
             );
 
@@ -140,10 +144,8 @@ export default function HomeTicker({ ads }: HomeTickerProps) {
           })}
         </div>
 
-        {/* Left fade */}
-        <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white/20 to-transparent pointer-events-none z-10" />
-        {/* Right fade */}
-        <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white/20 to-transparent pointer-events-none z-10" />
+        <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-12 bg-gradient-to-r from-white/20 to-transparent" />
+        <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-12 bg-gradient-to-l from-white/20 to-transparent" />
       </div>
     </div>
   );

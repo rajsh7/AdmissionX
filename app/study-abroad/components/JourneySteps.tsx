@@ -51,7 +51,7 @@ export default function JourneySteps() {
               
               {/* Step 1 */}
               <div className="flex flex-col items-center text-center space-y-8">
-                <div className="w-[72px] h-[72px] bg-[#FF3C3C] rounded-xl flex items-center justify-center text-white text-[24px] font-bold shadow-xl shadow-red-500/20">
+                <div className="w-[72px] h-[72px] bg-[#FF3C3C] rounded-[5px] flex items-center justify-center text-white text-[24px] font-bold shadow-xl shadow-red-500/20">
                   1
                 </div>
                 <div className="space-y-4 px-4">
@@ -64,7 +64,7 @@ export default function JourneySteps() {
 
               {/* Step 2 */}
               <div className="flex flex-col items-center text-center space-y-8">
-                <div className="w-[72px] h-[72px] bg-white border border-slate-100 rounded-xl flex items-center justify-center text-slate-300 text-[24px] font-bold shadow-sm">
+                <div className="w-[72px] h-[72px] bg-white border border-slate-100 rounded-[5px] flex items-center justify-center text-slate-300 text-[24px] font-bold shadow-sm">
                   2
                 </div>
                 <div className="space-y-4 px-4">
@@ -77,7 +77,7 @@ export default function JourneySteps() {
 
               {/* Step 3 */}
               <div className="flex flex-col items-center text-center space-y-8">
-                <div className="w-[72px] h-[72px] bg-white border border-slate-100 rounded-xl flex items-center justify-center text-slate-300 text-[24px] font-bold shadow-sm">
+                <div className="w-[72px] h-[72px] bg-white border border-slate-100 rounded-[5px] flex items-center justify-center text-slate-300 text-[24px] font-bold shadow-sm">
                   3
                 </div>
                 <div className="space-y-4 px-4">
@@ -90,7 +90,7 @@ export default function JourneySteps() {
 
               {/* Step 4 */}
               <div className="flex flex-col items-center text-center space-y-8">
-                <div className="w-[72px] h-[72px] bg-white border border-slate-100 rounded-xl flex items-center justify-center text-slate-300 text-[24px] font-bold shadow-sm">
+                <div className="w-[72px] h-[72px] bg-white border border-slate-100 rounded-[5px] flex items-center justify-center text-slate-300 text-[24px] font-bold shadow-sm">
                   4
                 </div>
                 <div className="space-y-4 px-4">
@@ -107,7 +107,7 @@ export default function JourneySteps() {
         </div>
 
         {/* Large Placeholder Box */}
-        <div className="w-full h-[320px] bg-[#EAEAEA] rounded-[32px] border border-slate-100/50" />
+        <div className="w-full h-[320px] bg-[#EAEAEA] rounded-[5px] border border-slate-100/50" />
 
       </div>
     </section>

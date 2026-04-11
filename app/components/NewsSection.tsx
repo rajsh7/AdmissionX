@@ -45,7 +45,7 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
            </div>
            <Link 
              href="/education-blogs" 
-             className="inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-all shadow-sm hover:shadow-md group/btn"
+             className="inline-flex items-center justify-center px-8 py-4 rounded-[5px] bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-all shadow-sm hover:shadow-md group/btn"
            >
               Explore All Articles
               <span className="ml-2 material-symbols-rounded transition-transform group-hover/btn:translate-x-1">arrow_right_alt</span>
@@ -65,14 +65,14 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
                 <Link href={`/blogs/${blog.slug}`} className="group block">
-                  <div className="relative aspect-[16/10] rounded-[32px] overflow-hidden mb-6 shadow-lg shadow-black/5">
+                  <div className="relative aspect-[16/10] rounded-[5px] overflow-hidden mb-6 shadow-lg shadow-black/5">
                     <img
                       src={buildImageUrl(blog.featimage)}
                       alt={blog.topic}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute top-4 left-4">
-                      <span className="px-3 py-1.5 rounded-xl bg-white/90 backdrop-blur-md text-[10px] font-normal uppercase tracking-widest text-[#FF3C3C]">
+                      <span className="px-3 py-1.5 rounded-[5px] bg-white/90 backdrop-blur-md text-[10px] font-normal uppercase tracking-widest text-[#FF3C3C]">
                         Related Blogs
                       </span>
                     </div>

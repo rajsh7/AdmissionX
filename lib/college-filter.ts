@@ -1,6 +1,10 @@
 import { unstable_cache } from "next/cache";
 import { getDb } from "@/lib/db";
 
+function slugToName(slug: string): string {
+  return slug.replace(/-\d+$/, "").split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface FilterCollegeResult {
@@ -13,6 +17,8 @@ export interface FilterCollegeResult {
   tags: string[];
   tuition: string;
   href: string;
+  avgPackage?: string;
+  offeredCourses?: string[];
 }
 
 // ─── UI-label → DB pageslug map ───────────────────────────────────────────────
@@ -80,6 +86,31 @@ export async function fetchCollegesForSlug(
         },
         { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
         {
+          $lookup: {
+            from: "placement",
+            localField: "id",
+            foreignField: "collegeprofile_id",
+            as: "placement",
+          },
+        },
+        { $unwind: { path: "$placement", preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from: "collegemaster",
+            localField: "id",
+            foreignField: "collegeprofile_id",
+            as: "cm",
+          },
+        },
+        {
+          $lookup: {
+            from: "functionalarea",
+            localField: "cm.functionalarea_id",
+            foreignField: "id",
+            as: "fa",
+          },
+        },
+        {
           $project: {
             slug: 1,
             name: {
@@ -92,13 +123,16 @@ export async function fetchCollegesForSlug(
             location: "$registeredSortAddress",
             image: "$bannerimage",
             rating: 1,
+            avgPackage: "$placement.ctcaverage",
+            streams: { $setUnion: ["$fa.name", []] },
           },
         },
       ])
       .toArray();
 
     return dataRows.map((row) => {
-      const name = row.name || "University";
+      const rawName = (row.name || "").trim();
+      const name = rawName && rawName !== row.slug ? rawName : slugToName(row.slug || "university");
       const words = name.split(" ");
       const abbr =
         words.length > 1
@@ -111,19 +145,21 @@ export async function fetchCollegesForSlug(
       const image = isValid
         ? rawImage.startsWith("http") || rawImage.startsWith("/")
           ? rawImage
-          : `/uploads/${rawImage}`
+          : `https://admin.admissionx.in/uploads/${rawImage}`
         : FALLBACK;
 
       return {
         name,
-        location: row.location || "India",
+        location: (row.location || "India").trim(),
         image,
         rating: Math.round((Number(row.rating) || 4.5) * 10) / 10,
         abbr,
         abbrBg: "bg-primary",
         tags: ["Featured", "Top Ranked"],
         tuition: "View Fees",
-        href: `/university/${row.slug || ""}`,
+        href: `/college/${row.slug || ""}`,
+        avgPackage: row.avgPackage ? `₹ ${row.avgPackage} LPA` : "₹ 4.5 LPA",
+        offeredCourses: Array.isArray(row.streams) ? row.streams.filter(Boolean).slice(0, 4) : [],
       };
     });
   } catch (error) {
@@ -135,6 +171,6 @@ export async function fetchCollegesForSlug(
 // ─── Cached wrapper ───────────────────────────────────────────────────────────
 export const getCachedCollegesForSlug = unstable_cache(
   fetchCollegesForSlug,
-  ["home-filter-colleges-v3"],
+  ["home-filter-colleges-v4"],
   { revalidate: 300 },
 );

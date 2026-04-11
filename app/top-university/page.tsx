@@ -90,10 +90,10 @@ const getFilterData = unstable_cache(
 // ── Core fetch ────────────────────────────────────────────────────────────────
 
 async function fetchTopUniversities(opts: {
-  q: string; stream: string; degree: string; cityId: string;
-  sort: string; page: number; limit: number;
+  q: string; stream: string; degree: string; cityId: string; stateId: string;
+  feesMax: string; sort: string; page: number; limit: number;
 }) {
-  const { q, stream, degree, cityId, sort, page, limit } = opts;
+  const { q, stream, degree, cityId, stateId, feesMax, sort, page, limit } = opts;
   const db = await getDb();
 
   const match: Record<string, unknown> = { isTopUniversity: 1 };
@@ -106,6 +106,10 @@ async function fetchTopUniversities(opts: {
   }
 
   if (cityId) match.registeredAddressCityId = isNaN(Number(cityId)) ? cityId : Number(cityId);
+  else if (stateId) {
+    const stateCities = await db.collection("city").find({ state_id: Number(stateId) }, { projection: { _id: 0, id: 1 } }).toArray();
+    match.registeredAddressCityId = { $in: stateCities.map((c: any) => Number(c.id)) };
+  }
 
   // Resolve stream + degree filters in parallel
   const [faDoc, degDoc] = await Promise.all([
@@ -122,11 +126,19 @@ async function fetchTopUniversities(opts: {
   ]);
 
   if (streamIds) {
-    match._id = { $in: streamIds };
+    match.id = { $in: streamIds };
   }
   if (degreeIds) {
-    const existing = (match._id as { $in: unknown[] } | undefined)?.$in;
-    match._id = { $in: existing ? existing.filter((id) => degreeIds.includes(id)) : degreeIds };
+    const existing = (match.id as { $in: unknown[] } | undefined)?.$in;
+    match.id = { $in: existing ? existing.filter((id) => degreeIds.includes(id)) : degreeIds };
+  }
+
+  if (feesMax && !isNaN(Number(feesMax))) {
+    const feeIds = await db.collection("collegemaster")
+      .find({ fees: { $gt: 0, $lte: Number(feesMax) } }, { projection: { collegeprofile_id: 1 } })
+      .limit(5000).toArray().then((r) => [...new Set(r.map((x) => x.collegeprofile_id))]);
+    const existing = (match.id as { $in: unknown[] } | undefined)?.$in;
+    match.id = { $in: existing ? existing.filter((id) => feeIds.includes(id)) : feeIds };
   }
 
   const sortStage: Record<string, 1 | -1> =
@@ -208,6 +220,7 @@ async function fetchTopUniversities(opts: {
     streams: Array.isArray(row.streams) ? row.streams.filter(Boolean) : [],
     min_fees: row.min_fees ?? null,
     max_fees: row.max_fees ?? null,
+    avg_package: null,
   }));
 
   return { universities, total, totalPages: Math.ceil(total / limit) };
@@ -215,7 +228,7 @@ async function fetchTopUniversities(opts: {
 
 const getCachedTopUniversities = unstable_cache(
   fetchTopUniversities,
-  ["top-university-mongo-v1"],
+  ["top-university-mongo-v2"],
   { revalidate: 300 },
 );
 
@@ -247,7 +260,7 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
 
   const [{ universities, total, totalPages }, { streamRows, degreeRows, cityRows, stateRows, countryRows }] =
     await Promise.all([
-      getCachedTopUniversities({ q, stream, degree, cityId, sort, page, limit }),
+      getCachedTopUniversities({ q, stream, degree, cityId, stateId, feesMax, sort, page, limit }),
       getFilterData(),
     ]);
 

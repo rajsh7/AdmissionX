@@ -133,11 +133,12 @@ export default function PlacementsTab({
                   View All Companies
                 </button>
               </div>
-            </section>
+              </div>
+              </section>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
   );
 }

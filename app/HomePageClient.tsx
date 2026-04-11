@@ -12,23 +12,15 @@ import type { AdItem } from "./components/AdsSection";
 import HomeTicker from "./components/HomeTicker";
 import type { TickerAdItem } from "./components/HomeTicker";
 
-// Below-the-fold components loaded lazily – they won't block the first paint
-const EntranceExams = dynamic(() => import("./components/EntranceExams"), {
-  ssr: true,
-});
-const NewsSection = dynamic(() => import("./components/NewsSection"), {
-  ssr: true,
-});
+const EntranceExams = dynamic(() => import("./components/EntranceExams"), { ssr: true });
+const NewsSection = dynamic(() => import("./components/NewsSection"), { ssr: true });
 import ContactSection from "./components/ContactSection";
 import StatsBar from "./components/StatsBar";
 import CareerGuidance from "./components/CareerGuidance";
 import Testimonials from "./components/Testimonials";
 
 const Footer = dynamic(() => import("./components/Footer"), { ssr: true });
-
-const AuthModal = dynamic(() => import("./components/AuthModal"), {
-  ssr: false,
-});
+const AuthModal = dynamic(() => import("./components/AuthModal"), { ssr: false });
 
 import type { University } from "./components/TopUniversities";
 import type { DbBlog } from "./api/home/latest-blogs/route";
@@ -44,6 +36,7 @@ interface HomePageClientProps {
   initialStreamColleges: FilterCollegeResult[];
   ads: AdItem[];
   tickerAds: TickerAdItem[];
+  testimonials: any[];
 }
 
 export default function HomePageClient({
@@ -55,6 +48,7 @@ export default function HomePageClient({
   initialStreamColleges,
   ads,
   tickerAds,
+  testimonials,
 }: HomePageClientProps) {
   const [authModal, setAuthModal] = useState<"login" | "register" | null>(null);
 
@@ -63,16 +57,10 @@ export default function HomePageClient({
 
   return (
     <div className="min-h-screen bg-white text-slate-900 selection:bg-primary selection:text-white">
-      {/* Auth Modal – only rendered when user clicks login */}
       {authModal && (
-        <AuthModal
-          mode={authModal}
-          onClose={closeModal}
-          onSwitchMode={switchMode}
-        />
+        <AuthModal mode={authModal} onClose={closeModal} onSwitchMode={switchMode} />
       )}
 
-      {/* Floating Header */}
       <Header />
 
       <main>
@@ -84,15 +72,19 @@ export default function HomePageClient({
           <StatsBar />
         </div>
 
+        {/* Divider */}
+        <hr className="border-t border-slate-200" />
+
         {/* 3. Discover the Top Universities */}
         <div data-gsap="fade-up">
           <TopUniversities
             universities={universities}
             initialStreamColleges={initialStreamColleges}
+            ads={tickerAds}
           />
         </div>
 
-        {/* 3b. Ticker Ad Strip — controlled from Admin > Ads Management (position: home_ticker) */}
+        {/* 3b. Ticker Ad Strip */}
         <HomeTicker ads={tickerAds} />
 
         {/* 4. Discover the Top Course */}
@@ -100,24 +92,30 @@ export default function HomePageClient({
           <TopCourse />
         </div>
 
+        <hr className="border-t border-slate-200" />
+
         {/* 5. Career Guidance */}
         <div data-gsap="fade-up">
           <CareerGuidance />
         </div>
 
-        {/* 6. Article Grid (Updated FieldsOfStudy) */}
+        {/* 6. Article Grid */}
         <div data-gsap="fade-up">
           <FieldsOfStudy />
         </div>
+
+        <hr className="border-t border-slate-200" />
 
         {/* 7. Student Life & Beyond (Blogs) */}
         <div data-gsap="fade-up">
           <NewsSection dbBlogs={dbBlogs} />
         </div>
 
+        <hr className="border-t border-slate-200" />
+
         {/* 8. Unfiltered Student Voices */}
         <div data-gsap="fade-up">
-          <Testimonials />
+          <Testimonials testimonials={testimonials} />
         </div>
 
         {/* 9. Get in Touch */}
@@ -126,13 +124,7 @@ export default function HomePageClient({
         </div>
       </main>
 
-      {/* Footer */}
       <Footer />
-
     </div>
   );
 }
-
-
-
-

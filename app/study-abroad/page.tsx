@@ -10,7 +10,7 @@ import HeroSection from "./components/HeroSection";
 import TopDestinations from "./components/TopDestinations";
 import CostCalculator from "./components/CostCalculator";
 import JourneySteps from "./components/JourneySteps";
-import StudyAbroadFooter from "./components/StudyAbroadFooter";
+import Footer from "@/app/components/Footer";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -130,6 +130,7 @@ function buildColleges(rows: CollegeRow[]): CollegeResult[] {
       streams,
       min_fees: row.min_fees ? parseInt(String(row.min_fees)) : null,
       max_fees: row.max_fees ? parseInt(String(row.max_fees)) : null,
+      avg_package: null,
     };
   });
 }
@@ -353,7 +354,7 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
         <JourneySteps />
       </main>
 
-      <StudyAbroadFooter />
+      <Footer />
     </div>
   );
 }

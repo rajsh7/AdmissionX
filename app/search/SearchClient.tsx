@@ -239,6 +239,7 @@ export default function SearchClient({
 
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
+      <Header />
       <div className="relative w-full overflow-hidden" style={{ height: heroHeight }}>
         <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
           <Image
@@ -254,9 +255,8 @@ export default function SearchClient({
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
         </div>
         <div className="relative z-10 w-full h-full flex flex-col">
-          <Header />
           <div className="flex-1 flex items-center justify-start relative">
-            <div className="mx-auto max-w-[1920px] w-full px-4 md:px-8 lg:px-10 h-full relative">
+            <div className="mx-auto max-w-[1920px] w-full px-6 md:px-12 lg:px-24 h-full relative">
               <div className="flex flex-col justify-center h-full relative z-20">
                 <div className={`transition-opacity duration-300 mt-6 flex flex-col justify-center ${heroRightImage ? "lg:max-w-[55%] text-left" : "max-w-4xl text-left"} ${hasMounted ? "opacity-100" : "opacity-0"}`}>
                   <h1 className="font-poppins text-white leading-[1.05] tracking-[0.02em] mb-4 drop-shadow-2xl">
@@ -292,7 +292,7 @@ export default function SearchClient({
 
       <div className="relative z-10 flex-1 flex flex-col min-h-screen">
         {/* -- Main content -- */}
-        <div className="mx-auto max-w-[1920px] w-full px-4 md:px-8 lg:px-10 pt-8 pb-8">
+        <div className="mx-auto max-w-[1920px] w-full px-0 pt-8 pb-8">
           <div className="flex gap-5">
             {/* ── Filters sidebar ── */}
             <div className="hidden lg:flex flex-col gap-6 flex-shrink-0 lg:sticky lg:top-[72px] lg:self-start" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
@@ -317,7 +317,7 @@ export default function SearchClient({
             </div>
 
             {/* ── Results column ── */}
-            <div className="flex-1 min-w-0 pl-4">
+            <div className="flex-1 min-w-0 pl-10 pr-6">
               {/* ── Results Toolbar (Figma Redesign) ── */}
               <div className="flex flex-col gap-5 mb-8">
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-1 pb-4 border-b border-neutral-100">
@@ -392,13 +392,13 @@ export default function SearchClient({
                     <div className="flex items-center bg-white border border-neutral-200 rounded-[10px] p-1 shadow-sm">
                       <button
                         onClick={() => setViewMode("grid")}
-                        className={`p-1.5 rounded-[10px] transition-all ${viewMode === 'grid' ? 'bg-[#008080] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
+                        className={`p-1.5 rounded-[10px] transition-all ${viewMode === 'grid' ? 'bg-[#FF3C3C] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
                       >
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                       </button>
                       <button
                         onClick={() => setViewMode("list")}
-                        className={`p-1.5 rounded-[10px] transition-all ${viewMode === 'list' ? 'bg-[#008080] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
+                        className={`p-1.5 rounded-[10px] transition-all ${viewMode === 'list' ? 'bg-[#FF3C3C] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
                       >
                         <span className="material-symbols-outlined text-[20px]">view_headline</span>
                       </button>

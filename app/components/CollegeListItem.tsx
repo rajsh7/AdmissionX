@@ -61,6 +61,7 @@ export default function CollegeListItem({
     streams,
     min_fees,
     max_fees,
+    avg_package,
   } = college;
 
   const displayRank = topUniversityRank ?? ranking;
@@ -89,10 +90,10 @@ export default function CollegeListItem({
     >
       <Link
         href={`/college/${slug}`}
-        className="group flex items-start gap-4 bg-white rounded-[10px] border border-neutral-100 hover:border-[#FF3C3C]/20 hover:shadow-xl hover:shadow-[#FF3C3C]/5 transition-all duration-300 p-4 sm:p-5"
+        className="group flex items-start gap-4 bg-white rounded-[5px] border border-neutral-100 hover:border-[#FF3C3C]/20 hover:shadow-xl hover:shadow-[#FF3C3C]/5 transition-all duration-300 p-4 sm:p-5 pr-6 sm:pr-8"
       >
         {/* ── Thumbnail ── */}
-        <div className="relative w-24 h-20 sm:w-32 sm:h-24 flex-shrink-0 rounded-[10px] overflow-hidden bg-neutral-100 flex items-center justify-center">
+        <div className="relative w-24 h-20 sm:w-32 sm:h-24 flex-shrink-0 rounded-[5px] overflow-hidden bg-neutral-100 flex items-center justify-center">
           {image && image !== "" ? (
             <Image
               src={image}
@@ -164,7 +165,7 @@ export default function CollegeListItem({
             )}
 
             {verified ? (
-              <span className="inline-flex items-center gap-0.5 px-2 py-0.5 bg-green-50 text-green-700 border border-green-200 rounded-full text-[10px] font-bold uppercase tracking-wide">
+              <span className="inline-flex items-center gap-0.5 px-2 py-0.5 bg-slate-50 text-slate-600 border border-slate-200 rounded-full text-[10px] font-bold uppercase tracking-wide">
                 <span
                   className="material-symbols-outlined text-[11px]"
                   style={{ fontVariationSettings: "'FILL' 1" }}
@@ -206,6 +207,15 @@ export default function CollegeListItem({
                     +{streams.length - 4}
                   </span>
                 )}
+              </div>
+            )}
+
+            {/* Avg Package */}
+            {avg_package && (
+              <div className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[13px] text-neutral-400">workspace_premium</span>
+                <span className="text-xs font-black text-[#FF3C3C]">{avg_package}</span>
+                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tight">avg pkg</span>
               </div>
             )}
 

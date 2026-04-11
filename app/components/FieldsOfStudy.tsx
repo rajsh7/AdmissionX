@@ -60,7 +60,7 @@ export default function FieldsOfStudy() {
               transition={{ duration: 0.5, delay: i * 0.1 }}
             >
               <div 
-                className="group flex flex-col p-8 lg:p-10 rounded-[12px] bg-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.2)] transition-all hover:shadow-2xl hover:-translate-y-2 h-full border border-slate-100"
+                className="group flex flex-col p-8 lg:p-10 rounded-[5px] bg-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.2)] transition-all hover:shadow-2xl hover:-translate-y-2 h-full border border-slate-100"
               >
                 <h3 className="text-[24px] font-bold text-[#1F2937] mb-4 tracking-tight leading-tight">
                    {opt.title}

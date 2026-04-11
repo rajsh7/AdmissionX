@@ -2,66 +2,51 @@
 
 import { motion } from "framer-motion";
 
-const testimonials = [
-  {
-    name: "Aditi Sharma",
-    college: "IIT Delhi",
-    text: "AdmissionX made my college search so much easier. The unfiltered reviews helped me understand the ground reality of campus life.",
-    rating: 5,
-    avatar: "https://i.pravatar.cc/100?u=aditi"
-  },
-  {
-    name: "Rahul Verma",
-    college: "BITS Pilani",
-    text: "The exam guidance section is top-notch. I found all the mock tests and resources I needed for my BITSAT preparation in one place.",
-    rating: 5,
-    avatar: "https://i.pravatar.cc/100?u=rahul"
-  },
-  {
-    name: "Sneha Kapur",
-    college: "SRCC Delhi",
-    text: "I was confused between three different colleges, but the comparison tool and councillor support here helped me make the right choice.",
-    rating: 4,
-    avatar: "https://i.pravatar.cc/100?u=sneha"
-  },
-  {
-    name: "Priyanshu Jha",
-    college: "VIT Vellore",
-    text: "The scholarship alerts are a lifesaver! I managed to secure a 50% tuition waiver thanks to the information I found on AdmissionX.",
-    rating: 5,
-    avatar: "https://i.pravatar.cc/100?u=priyan"
-  },
-  {
-    name: "Ananya Iyer",
-    college: "NID Ahmedabad",
-    text: "As a design student, finding specific portfolio requirements was hard until I used this platform. Highly recommended for creative fields.",
-    rating: 5,
-    avatar: "https://i.pravatar.cc/100?u=ananya"
-  },
-  {
-    name: "Vikram Seth",
-    college: "IIM Bangalore",
-    text: "The placement data provided here is very accurate. It gave me a clear picture of my career prospects after my MBA journey.",
-    rating: 5,
-    avatar: "https://i.pravatar.cc/100?u=vikram"
-  },
-  {
-    name: "Karan Malhotra",
-    college: "SRM University",
-    text: "Getting admissions in a top-tier college seemed impossible until I found the right guidance here. The step-by-step process is excellent.",
-    rating: 5,
-    avatar: "https://i.pravatar.cc/100?u=karan"
-  },
-  {
-    name: "Meera Reddy",
-    college: "Osmania University",
-    text: "The interface is so intuitive! I could compare five different universities side-by-side and decide which one fits my budget best.",
-    rating: 4,
-    avatar: "https://i.pravatar.cc/100?u=meera"
-  }
-];
+interface Testimonial {
+  name: string;
+  college: string;
+  text: string;
+  rating: number;
+  avatar?: string;
+}
 
-export default function Testimonials() {
+interface TestimonialsProps {
+  testimonials?: Testimonial[];
+}
+
+const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=60&w=150&h=150";
+
+function TestimonialStars({ rating }: { rating: number }) {
+  const filledStars = Math.max(0, Math.min(5, Math.round(rating)));
+
+  return (
+    <div className="mt-auto flex gap-1.5 border-t border-slate-200 pt-5">
+      {Array.from({ length: 5 }, (_, starIdx) => {
+        const isFilled = starIdx < filledStars;
+
+        return (
+          <svg
+            key={starIdx}
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            className={`h-[22px] w-[22px] ${isFilled ? "text-amber-400" : "text-slate-300"}`}
+            fill="currentColor"
+          >
+            <path d="M12 2.75l2.76 5.59 6.17.9-4.46 4.35 1.05 6.15L12 16.84 6.48 19.74l1.05-6.15-4.46-4.35 6.17-.9L12 2.75z" />
+          </svg>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function Testimonials({ testimonials: dynamicTestimonials }: TestimonialsProps) {
+  const displayTestimonials = dynamicTestimonials && dynamicTestimonials.length > 0 
+    ? dynamicTestimonials 
+    : [];
+
+  if (displayTestimonials.length === 0) return null;
+
   return (
     <section className="w-full py-24 lg:py-32 bg-white overflow-hidden">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
@@ -72,7 +57,7 @@ export default function Testimonials() {
                   <span className="text-[#6C6C6C]">Unfiltered</span> <span className="text-primary">Student Voices</span>
                 </h2>
                 <p className="text-slate-500 font-normal text-lg">
-                  Get the real story about campus life, professors, and placements from people who've actually been there.
+                  Get the real story about campus life, professors, and placements from people who&apos;ve actually been there.
                 </p>
             </div>
             <button 
@@ -84,20 +69,19 @@ export default function Testimonials() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
-          {testimonials.map((t, i) => (
+          {displayTestimonials.map((t, i) => (
             <motion.div
-              key={t.name}
+              key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="p-8 rounded-[10px] bg-white border border-slate-100 shadow-[0_15px_40px_-20px_rgba(0,0,0,0.1)] flex flex-col h-full group transition-all hover:shadow-xl hover:border-slate-200"
             >
-              {/* Card Header: Profile Info & Quote */}
               <div className="flex items-start justify-between mb-8">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full border border-slate-100 overflow-hidden bg-slate-50 shrink-0">
-                    <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" />
+                    <img src={t.avatar || DEFAULT_AVATAR} alt={t.name} className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <h4 className="text-[16px] font-bold text-slate-900 leading-none mb-1">{t.name}</h4>
@@ -110,21 +94,13 @@ export default function Testimonials() {
                 </div>
               </div>
 
-              {/* Card Body: Testimonial Text with Red Accent Line */}
               <div className="border-l-2 border-primary pl-4 mb-8 flex-1">
-                <p className="text-slate-600 font-normal leading-relaxed text-[15px] italic">
-                  "{t.text}"
+                <p className="text-slate-600 font-normal leading-relaxed text-[15px] italic line-clamp-4">
+                  &ldquo;{t.text}&rdquo;
                 </p>
               </div>
 
-              {/* Card Footer: Star Ratings */}
-              <div className="flex gap-0.5 pt-6 border-t border-[#3D3D3D] text-yellow-400 mt-auto">
-                {[...Array(5)].map((_, i) => (
-                  <span key={i} className={`material-symbols-rounded text-[18px] ${i < t.rating ? 'fill-current' : 'text-slate-200'}`}>
-                    star
-                  </span>
-                ))}
-              </div>
+              <TestimonialStars rating={t.rating} />
             </motion.div>
           ))}
         </div>

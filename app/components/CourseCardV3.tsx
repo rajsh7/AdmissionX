@@ -23,7 +23,7 @@ export default function CourseCardV3({
 
   const duration = "4 Years";
   const degreeLevel = level_name || "Bachelor";
-  const avgPackage = "$120k";
+  const avgPackage = "₹ 6.5 LPA";
 
   return (
     <motion.div
@@ -35,7 +35,7 @@ export default function CourseCardV3({
         delay: Math.min(index * 0.04, 0.24),
       }}
     >
-      <div className="group flex flex-col bg-white rounded-[8px] border border-neutral-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden h-full">
+      <div className="group flex flex-col bg-white rounded-[5px] border border-neutral-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden h-full">
         {/* ── Image ── */}
         <div className="relative h-[140px] overflow-hidden bg-neutral-100 flex-shrink-0">
           {image ? (

@@ -38,7 +38,7 @@ export default function CollegeGrid({ colleges, total }: CollegeGridProps) {
             <Link
               key={college.id}
               href={`/college/${college.slug}`}
-              className="group flex flex-col bg-black/40 rounded-2xl border border-white/10 hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/10 transition-all duration-300 overflow-hidden"
+              className="group flex flex-col bg-black/40 rounded-[5px] border border-white/10 hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/10 transition-all duration-300 overflow-hidden"
             >
               {/* Image */}
               <div className="relative h-36 overflow-hidden bg-neutral-100">

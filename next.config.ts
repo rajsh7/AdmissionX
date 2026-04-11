@@ -16,7 +16,6 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),
   turbopack: {
     root: path.join(__dirname),
-    persistentCaching: false,
   },
 
   // Reduces JS bundle size by tree-shaking large packages to only import what's used.

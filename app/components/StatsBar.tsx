@@ -31,7 +31,7 @@ export default function StatsBar() {
                   prefix={stat.prefix} 
                 />
               </div>
-              <div className="text-[20px] font-semibold text-slate-400 uppercase tracking-[0.2em] antialiased">
+              <div className="text-[20px] font-semibold" style={{ color: "rgba(108, 108, 108, 1)" }}>
                 {stat.label}
               </div>
             </motion.div>

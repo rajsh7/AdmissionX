@@ -202,7 +202,7 @@ export default function SearchFilters({
             <input
               type="text"
               placeholder="Search your university..."
-              className="w-full pl-3 pr-3 py-3 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-400"
+              className="w-full pl-3 pr-3 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-400"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   applyFilters({ q: (e.target as HTMLInputElement).value });
@@ -224,7 +224,7 @@ export default function SearchFilters({
               onChange={(e) => { setCitySearch(e.target.value); setCityDropOpen(true); }}
               onFocus={() => setCityDropOpen(true)}
               onBlur={() => setTimeout(() => setCityDropOpen(false), 150)}
-              className="w-full pl-9 pr-8 py-3 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-500"
+              className="w-full pl-9 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-neutral-500"
             />
             {cityId && (
               <button type="button" onMouseDown={() => { setCityId(""); setStateId(""); setCountryId(""); setCitySearch(""); applyFilters({ city_id: "", state_id: "", country_id: "" }); }} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -233,7 +233,7 @@ export default function SearchFilters({
             )}
           </div>
           {cityDropOpen && filteredCities.length > 0 && (
-            <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-[10px] shadow-xl max-h-48 overflow-y-auto">
+            <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-[5px] shadow-xl max-h-48 overflow-y-auto">
               {filteredCities.map((city) => {
                 const state = states.find(s => String(s.id) === String(city.slug));
                 return (
@@ -267,7 +267,7 @@ export default function SearchFilters({
             <select
               value={degree}
               onChange={(e) => handleDegree(e.target.value)}
-              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
+              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
             >
               <option value="">Search according to the course...</option>
               {degrees.map((d) => (
@@ -285,7 +285,7 @@ export default function SearchFilters({
             <select
               value={stream}
               onChange={(e) => handleStream(e.target.value)}
-              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
+              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
             >
               <option value="">Select Stream...</option>
               {streams.map((s) => (
@@ -303,7 +303,7 @@ export default function SearchFilters({
             <select
               value={feesMax}
               onChange={(e) => handleFees(e.target.value)}
-              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[10px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
+              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
             >
               <option value="">Select Fees Range...</option>
               {FEES_OPTIONS.map((opt) => (
@@ -348,14 +348,14 @@ export default function SearchFilters({
           <button
             type="button"
             onClick={() => setMobileOpen(false)}
-            className="w-full whitespace-nowrap bg-[#FF3C3C] hover:bg-[#E63636] text-white text-xs font-black py-2 rounded-[10px] shadow-lg shadow-[#FF3C3C]/20 transition-all active:scale-[0.98]"
+            className="w-full whitespace-nowrap bg-[#FF3C3C] hover:bg-[#E63636] text-white text-xs font-black py-2 rounded-[5px] shadow-lg shadow-[#FF3C3C]/20 transition-all active:scale-[0.98]"
           >
             Apply filter
           </button>
           <button
             type="button"
             onClick={resetAll}
-            className="w-full whitespace-nowrap bg-white border border-neutral-200 text-neutral-400 hover:text-neutral-600 hover:border-neutral-400 text-xs font-black py-2 rounded-[10px] transition-all"
+            className="w-full whitespace-nowrap bg-white border border-neutral-200 text-neutral-400 hover:text-neutral-600 hover:border-neutral-400 text-xs font-black py-2 rounded-[5px] transition-all"
           >
             Reset
           </button>
@@ -367,7 +367,7 @@ export default function SearchFilters({
   return (
     <>
       <aside className="hidden lg:flex flex-col w-full flex-shrink-0 mr-6 ml-6">
-        <div className="sticky top-6 bg-white rounded-[10px] border border-neutral-100 shadow-xl p-4 flex flex-col">
+        <div className="sticky top-6 bg-white rounded-[5px] border border-neutral-100 shadow-xl p-4 flex flex-col">
           {panel}
         </div>
       </aside>
@@ -377,7 +377,7 @@ export default function SearchFilters({
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
-          className="flex items-center gap-2 bg-neutral-900 text-white font-bold text-sm px-6 py-3.5 rounded-[10px] shadow-2xl shadow-black/20 hover:bg-[#FF3C3C] transition-all duration-300"
+          className="flex items-center gap-2 bg-neutral-900 text-white font-bold text-sm px-6 py-3.5 rounded-[5px] shadow-2xl shadow-black/20 hover:bg-[#FF3C3C] transition-all duration-300"
         >
           <span className="material-symbols-outlined text-[18px]">filter_list</span>
           Filters
@@ -399,7 +399,7 @@ export default function SearchFilters({
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                className="w-8 h-8 rounded-[10px] bg-neutral-100 flex items-center justify-center hover:bg-neutral-200 transition-colors"
+                className="w-8 h-8 rounded-[5px] bg-neutral-100 flex items-center justify-center hover:bg-neutral-200 transition-colors"
               >
                 <span className="material-symbols-outlined text-[18px] text-neutral-600">close</span>
               </button>
@@ -409,7 +409,7 @@ export default function SearchFilters({
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                className="w-full bg-[#FF3C3C] text-white font-bold py-3.5 rounded-[10px] hover:bg-[#E63636] transition-colors text-sm"
+                className="w-full bg-[#FF3C3C] text-white font-bold py-3.5 rounded-[5px] hover:bg-[#E63636] transition-colors text-sm"
               >
                 Show {totalResults?.toLocaleString() ?? ""} {entityNamePlural}
               </button>

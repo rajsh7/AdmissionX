@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import type { FilterCollegeResult } from "@/lib/college-filter";
+import type { AdItem } from "./AdsSection";
+import AdCard from "./AdCard";
 import FadeIn from "./FadeIn";
 
 export interface University {
@@ -17,12 +19,14 @@ export interface University {
   tags: string[];
   tuition: string;
   href: string;
+  avgPackage?: string;
+  offeredCourses?: string[];
 }
 
 interface TopUniversitiesProps {
   universities: University[];
-  /** Pre-fetched colleges for the default "Engineering" tab (SSR warm-up). */
   initialStreamColleges?: FilterCollegeResult[];
+  ads?: AdItem[];
 }
 
 const categories = [
@@ -39,15 +43,12 @@ const categories = [
 export default function TopUniversities({
   universities: initialUniversities,
   initialStreamColleges = [],
+  ads = [],
 }: TopUniversitiesProps) {
   const [activeTab, setActiveTab] = useState("Engineering");
   const [searchQuery, setSearchQuery] = useState("");
-  // If the server pre-fetched Engineering colleges, show them immediately.
-  // Otherwise fall back to the generic featured colleges from the home query.
   const [currentUniversities, setCurrentUniversities] = useState<University[]>(
-    initialStreamColleges.length > 0
-      ? initialStreamColleges
-      : initialUniversities,
+    initialStreamColleges.length > 0 ? initialStreamColleges : initialUniversities,
   );
   const [isLoading, setIsLoading] = useState(false);
   const [sortBy, setSortBy] = useState<"rank" | "rating" | null>(null);
@@ -73,7 +74,6 @@ export default function TopUniversities({
   };
 
   const handleTabClick = (category: string) => {
-    // If clicking the already-active tab, don't re-fetch
     if (category === activeTab) return;
     setActiveTab(category);
     fetchColleges(category);
@@ -111,10 +111,10 @@ export default function TopUniversities({
     const map: Record<string, string> = {
       MBA: "management",
       Engineering: "engineering",
-      MBBS: "medicine", // Using medicine as slug
+      MBBS: "medicine",
       "B.Com": "commerce",
       Design: "design",
-      Fashion: "design", // Fashion often maps to design in functionalarea
+      Fashion: "design",
       Pharmacy: "pharmacy",
       Humanities: "arts",
     };
@@ -124,26 +124,29 @@ export default function TopUniversities({
   const activeTabSlug = categoryToSlug(activeTab);
 
   return (
-    <section className="w-full py-24 lg:py-32 bg-[#f8fafc]/30">
+    <section className="w-full bg-[#f8fafc]/30 py-24 lg:py-32">
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
         <FadeIn>
-          <div className="mb-12">
-            <h2 className="text-[40px] lg:text-[68px] font-semibold text-slate-900 tracking-tight leading-[1.1]">
-              Discover the Top <span className="text-primary">Universities</span>
-            </h2>
-            <p className="mt-6 text-[25px] text-slate-500 font-medium max-w-4xl leading-relaxed antialiased">
-              Filter through thousands of institutions worldwide based on your
-              specific academic preferences and career goals.
-            </p>
+          <div className="mb-16 grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
+            <div className="lg:col-span-8">
+              <h2 className="text-[40px] font-semibold leading-[1.1] tracking-tight text-slate-900 lg:text-[68px]">
+                Discover the Top <span className="text-primary">Universities</span>
+              </h2>
+              <p className="mt-6 max-w-3xl text-[22px] font-medium leading-relaxed text-slate-500 antialiased">
+                Filter through thousands of institutions worldwide based on your
+                specific academic preferences and career goals.
+              </p>
+            </div>
+
+            <div className="lg:col-span-4">
+              <AdCard ads={ads} className="mx-auto max-w-[440px] lg:ml-auto lg:mr-0" />
+            </div>
           </div>
         </FadeIn>
 
-        {/* Section Search & Filters - Separated into Blocks */}
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 mb-12">
-          
-          {/* Block 1: Search Input */}
-          <div className="flex-1 relative bg-white border border-slate-100 rounded-[10px] shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all hover:shadow-lg group">
-            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
+        <div className="mb-12 flex flex-col items-stretch gap-4 lg:flex-row lg:items-center">
+          <div className="group relative flex-1 rounded-[10px] border border-slate-100 bg-white shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all hover:shadow-lg">
+            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
@@ -164,19 +167,18 @@ export default function TopUniversities({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search your college, universities, courses..."
-              className="w-full h-14 pl-14 pr-4 bg-transparent text-slate-800 placeholder:text-slate-400 focus:outline-none text-base font-normal rounded-[10px]"
+              className="h-14 w-full rounded-[10px] bg-transparent pl-14 pr-4 text-base font-normal text-slate-800 placeholder:text-slate-400 focus:outline-none"
             />
           </div>
 
-          {/* Block 2: Filters */}
           <div className="relative h-full">
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className={`h-14 flex items-center justify-center gap-2 px-8 rounded-[10px] font-medium text-sm transition-all active:scale-95 border shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] hover:shadow-lg ${
+              className={`h-14 rounded-[10px] border px-8 text-sm font-medium shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all active:scale-95 hover:shadow-lg ${
                 selectedCity !== "All Cities"
-                  ? "bg-primary text-white border-primary"
-                  : "bg-white text-slate-600 border-slate-100"
-              }`}
+                  ? "border-primary bg-primary text-white"
+                  : "border-slate-100 bg-white text-slate-600"
+              } flex items-center justify-center gap-2`}
             >
               <span className="material-symbols-rounded text-[20px]">
                 tune
@@ -195,10 +197,10 @@ export default function TopUniversities({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 top-full mt-3 w-56 bg-white border border-slate-100 rounded-[10px] shadow-2xl z-50 overflow-hidden"
+                    className="absolute right-0 top-full z-50 mt-3 w-56 overflow-hidden rounded-[10px] border border-slate-100 bg-white shadow-2xl"
                   >
-                    <div className="p-2 max-h-60 overflow-y-auto hide-scrollbar">
-                      <div className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <div className="hide-scrollbar max-h-60 overflow-y-auto p-2">
+                      <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
                         Filter by City
                       </div>
                       {uniqueCities.map((city) => (
@@ -208,7 +210,7 @@ export default function TopUniversities({
                             setSelectedCity(city);
                             setIsFilterOpen(false);
                           }}
-                          className={`w-full text-left px-4 py-2.5 rounded-[10px] text-sm font-normal transition-colors ${
+                          className={`w-full rounded-[10px] px-4 py-2.5 text-left text-sm font-normal transition-colors ${
                             selectedCity === city
                               ? "bg-primary/10 text-primary"
                               : "text-slate-600 hover:bg-slate-50"
@@ -224,14 +226,13 @@ export default function TopUniversities({
             </AnimatePresence>
           </div>
 
-          {/* Block 3: Sort Button */}
           <button
             onClick={() => setSortBy(sortBy === "rank" ? null : "rank")}
-            className={`h-14 flex items-center justify-center gap-2 px-8 rounded-[10px] font-medium text-sm transition-all active:scale-95 border shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] hover:shadow-lg ${
+            className={`h-14 rounded-[10px] border px-8 text-sm font-medium shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all active:scale-95 hover:shadow-lg ${
               sortBy === "rank"
-                ? "bg-primary text-white border-primary"
-                : "bg-white text-slate-600 border-slate-100"
-            }`}
+                ? "border-primary bg-primary text-white"
+                : "border-slate-100 bg-white text-slate-600"
+            } flex items-center justify-center gap-2`}
           >
             <span className="material-symbols-rounded text-[20px]">
               swap_vert
@@ -240,16 +241,15 @@ export default function TopUniversities({
           </button>
         </div>
 
-        {/* Categories Tabs */}
-        <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-4 mb-8">
+        <div className="mb-8 flex gap-2 overflow-x-auto pb-4 hide-scrollbar">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => handleTabClick(cat)}
-              className={`px-6 py-2.5 rounded-[10px] text-sm font-normal whitespace-nowrap transition-all active:scale-95 ${
+              className={`whitespace-nowrap rounded-[10px] px-6 py-2.5 text-sm font-normal transition-all active:scale-95 ${
                 activeTab === cat
                   ? "bg-primary text-white shadow-lg shadow-primary/20"
-                  : "bg-white text-slate-600 border border-slate-200 hover:border-primary/50 hover:text-primary"
+                  : "border border-slate-200 bg-white text-slate-600 hover:border-primary/50 hover:text-primary"
               }`}
             >
               {cat}
@@ -257,31 +257,28 @@ export default function TopUniversities({
           ))}
         </div>
 
-        {/* Universities Section Heading */}
         <div className="mb-8 flex items-center gap-4">
-          <h3 className="text-[25px] font-bold text-slate-900 uppercase tracking-wider whitespace-nowrap">
+          <h3 className="whitespace-nowrap text-[25px] font-bold uppercase tracking-wider text-slate-900">
             Top rank universities !
           </h3>
-          <div className="h-px bg-slate-100 flex-1" />
+          <div className="h-px flex-1 bg-slate-100" />
         </div>
 
-        {/* Universities Grid */}
         <div
-          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8 transition-opacity duration-300 ${isLoading ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+          className={`grid grid-cols-1 gap-6 transition-opacity duration-300 sm:grid-cols-2 lg:grid-cols-4 xl:gap-8 ${isLoading ? "pointer-events-none opacity-50" : "opacity-100"}`}
         >
           <AnimatePresence mode="popLayout">
             {filteredUniversities.length > 0 ? (
               filteredUniversities.slice(0, 8).map((uni, i) => (
                 <motion.div
-                  key={uni.name}
+                  key={`${uni.href}-${i}`}
                   layout
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.4, delay: i * 0.05 }}
                 >
-                  <div className="group bg-white rounded-[10px] border border-slate-100 overflow-hidden shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 flex flex-col h-full">
-                    {/* Card Image */}
+                  <div className="group flex h-full flex-col overflow-hidden rounded-[10px] border border-slate-100 bg-white shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5">
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <Image
                         src={uni.image}
@@ -290,9 +287,8 @@ export default function TopUniversities({
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                       />
 
-                      {/* Rating Badge */}
-                      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur rounded-[10px] px-2.5 py-1 flex items-center gap-1 shadow-sm">
-                        <span className="material-symbols-rounded text-yellow-500 text-[18px]">
+                      <div className="absolute right-4 top-4 flex items-center gap-1 rounded-[10px] bg-white/90 px-2.5 py-1 shadow-sm backdrop-blur">
+                        <span className="material-symbols-rounded text-[18px] text-yellow-500">
                           star
                         </span>
                         <span className="text-sm font-normal text-slate-800">
@@ -300,57 +296,60 @@ export default function TopUniversities({
                         </span>
                       </div>
 
-                      {/* Tag Overlay (Dynamic Rank) */}
                       <div className="absolute bottom-4 left-4">
-                        <span className="px-3 py-1 rounded-[10px] bg-primary text-white text-[10px] font-normal uppercase tracking-wider shadow-lg">
+                        <span className="rounded-[10px] bg-primary px-3 py-1 text-[10px] font-normal uppercase tracking-wider text-white shadow-lg">
                           {sortBy === "rank" ? `#${i + 1} Ranked` : "Featured"}
                         </span>
                       </div>
                     </div>
 
-                    {/* Card Content */}
-                    <div className="p-8 flex flex-col flex-1">
-                      <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-[22px] font-bold text-[#6C6C6C] leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                    <div className="flex flex-1 flex-col p-8">
+                      <div className="mb-4 flex items-start justify-between">
+                        <h3 className="line-clamp-2 text-[22px] font-bold leading-snug text-[#6C6C6C] transition-colors group-hover:text-primary">
                           {uni.name}
                         </h3>
                       </div>
 
-                      <div className="flex items-center gap-1.5 text-[#6C6C6C] mb-4">
+                      <div className="mb-4 flex items-center gap-1.5 text-[#6C6C6C]">
                         <span className="material-symbols-rounded text-[20px]">
                           location_on
                         </span>
-                        <span className="text-[16px] font-medium truncate">
+                        <span className="truncate text-[16px] font-medium">
                           {uni.location}
                         </span>
                       </div>
 
                       <div className="mb-6 flex flex-wrap gap-3">
-                        {(uni.offeredCourses?.length ? uni.offeredCourses : [activeTab]).slice(0, 4).map((course) => (
-                          <span
-                            key={`${uni.name}-${course}`}
-                            className="inline-flex items-center rounded-[5px] border border-slate-400 px-4 py-2 text-[14px] font-semibold text-[#6C6C6C] leading-none"
-                          >
-                            {course}
-                          </span>
-                        ))}
+                        {(uni.offeredCourses?.length ? uni.offeredCourses : [activeTab])
+                          .slice(0, 4)
+                          .map((course) => (
+                            <span
+                              key={`${uni.name}-${course}`}
+                              className="inline-flex items-center rounded-[5px] border border-slate-400 px-4 py-2 text-[14px] font-semibold leading-none text-[#6C6C6C]"
+                            >
+                              {course}
+                            </span>
+                          ))}
                         {(uni.offeredCourses?.length ?? 0) > 4 && (
-                          <span className="inline-flex items-center rounded-[5px] border border-slate-400 px-4 py-2 text-[14px] font-semibold text-[#6C6C6C] leading-none">
+                          <span className="inline-flex items-center rounded-[5px] border border-slate-400 px-4 py-2 text-[14px] font-semibold leading-none text-[#6C6C6C]">
                             +{(uni.offeredCourses?.length ?? 0) - 4} More
                           </span>
                         )}
                       </div>
 
-                      <div className="mt-auto flex items-center justify-between pt-5 border-t border-slate-200">
+                      <div className="mt-auto flex items-center justify-between border-t border-slate-200 pt-5">
                         <div className="text-[18px] font-medium text-[#6C6C6C]">
-                          Avg. Package: <span className="font-bold text-primary">{uni.avgPackage}</span>
-                        </div>
+                          Avg. Package:{" "}
+                          <span className="font-bold text-primary">
+                            {uni.avgPackage || "Rs 4.5 LPA"}
+                          </span>
                         </div>
                         <Link
                           href={uni.href}
-                          className="px-4 py-2 rounded-[10px] bg-slate-900 text-white text-xs font-normal hover:bg-primary transition-all active:scale-95"
+                          className="inline-flex items-center gap-1 text-[#FF3C3C] font-bold text-[14px] group-hover:translate-x-1 transition-transform"
                         >
-                          Apply Now
+                          View Details
+                          <span className="material-symbols-rounded text-[18px]">arrow_forward</span>
                         </Link>
                       </div>
                     </div>
@@ -359,7 +358,7 @@ export default function TopUniversities({
               ))
             ) : (
               <div className="col-span-full py-20 text-center">
-                <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-400">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
                   <span className="material-symbols-rounded text-[32px]">
                     search_off
                   </span>
@@ -367,7 +366,7 @@ export default function TopUniversities({
                 <h3 className="text-xl font-normal text-slate-800">
                   No Universities Found
                 </h3>
-                <p className="text-slate-500 mt-2">
+                <p className="mt-2 text-slate-500">
                   Try searching for a different name or location.
                 </p>
               </div>
@@ -375,11 +374,10 @@ export default function TopUniversities({
           </AnimatePresence>
         </div>
 
-        {/* View All */}
         <div className="mt-12 text-center">
           <Link
             href={`/search?stream=${activeTabSlug}`}
-            className="group inline-flex items-center gap-2 text-sm font-normal text-slate-400 hover:text-primary transition-colors"
+            className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-primary border border-primary rounded-[5px] transition-all hover:bg-primary/5 active:scale-95"
           >
             Explore 120+ More {activeTab} Colleges
             <span className="material-symbols-rounded text-[20px] transition-transform group-hover:translate-x-1">
@@ -388,10 +386,7 @@ export default function TopUniversities({
           </Link>
         </div>
       </div>
+      <hr className="border-t border-slate-200 mt-12" />
     </section>
   );
 }
-
-
-
-
