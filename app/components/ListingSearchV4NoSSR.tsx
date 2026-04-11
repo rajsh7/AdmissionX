@@ -18,6 +18,7 @@ interface ListingSearchV4Props {
   streams: FilterOption[];
   initQ: string;
   initLevel: string;
+  initDegree: string;
   initStream: string;
   initPage: number;
   heroImage?: string;

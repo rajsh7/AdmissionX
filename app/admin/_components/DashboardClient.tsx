@@ -163,27 +163,6 @@ export default function DashboardClient({
 
   return (
     <div className="space-y-6">
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statCards.map((stat, i) => (
-          <div key={i} className="bg-white rounded-[5px] p-6 border border-slate-100 shadow-md relative overflow-hidden">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">{stat.title}</p>
-                <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-              </div>
-              <div className="bg-[#FF3C3C] p-2 rounded-lg text-white">
-                <span className="material-symbols-rounded text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>{stat.icon}</span>
-              </div>
-            </div>
-            
-            <div className="mt-4">
-              <span className="text-[13px] text-slate-400 font-medium">{stat.subtext}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
       {/* Main Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Student Registration */}

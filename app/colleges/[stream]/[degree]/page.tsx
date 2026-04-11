@@ -126,7 +126,7 @@ export default async function CollegesByStreamDegreePage({ params, searchParams 
       universityType: row.universityType || null, estyear: row.estyear || null,
       verified: row.verified ?? 0,
       totalStudent: row.totalStudent ? parseInt(String(row.totalStudent)) : null,
-      streams: [], min_fees: null, max_fees: null,
+      streams: [], min_fees: null, max_fees: null, avg_package: null,
     }));
   }
 

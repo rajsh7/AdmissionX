@@ -76,7 +76,7 @@ export default function ContactSection() {
             </div>
 
             {/* ── Right: Contact Form ─────────────────────────────── */}
-            <div className="bg-white rounded-[20px] p-10 lg:p-12 border border-slate-200/60 relative" style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
+            <div className="bg-white rounded-[5px] p-10 lg:p-12 border border-slate-200/60 relative" style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
               <h3 className="font-bold mb-10 tracking-tight" style={{ fontSize: '30px', fontWeight: '700', color: '#6C6C6C' }}>Send a message</h3>
               <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -87,7 +87,7 @@ export default function ContactSection() {
                       placeholder="Your name"
                       value={form.name}
                       onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                      className="w-full h-14 px-6 rounded-[10px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm"
+                      className="w-full h-14 px-6 rounded-[5px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm"
                     />
                   </div>
                   <div>
@@ -97,7 +97,7 @@ export default function ContactSection() {
                       placeholder="your.email@example.com"
                       value={form.email}
                       onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                      className="w-full h-14 px-6 rounded-[10px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm"
+                      className="w-full h-14 px-6 rounded-[5px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm"
                     />
                   </div>
                 </div>
@@ -109,7 +109,7 @@ export default function ContactSection() {
                     placeholder="How can we help you?"
                     value={form.subject}
                     onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
-                    className="w-full h-14 px-6 rounded-[10px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm"
+                    className="w-full h-14 px-6 rounded-[5px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm"
                   />
                 </div>
  
@@ -120,7 +120,7 @@ export default function ContactSection() {
                     placeholder="Tell us about your inquiry..."
                     value={form.message}
                     onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-                    className="w-full px-6 py-5 rounded-[10px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none font-medium shadow-sm"
+                    className="w-full px-6 py-5 rounded-[5px] border border-slate-200 bg-[#F9FAFB] text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none font-medium shadow-sm"
                   />
                 </div>
  
@@ -128,7 +128,7 @@ export default function ContactSection() {
                   <button
                     type="submit"
                     disabled={status === "loading"}
-                    className="h-14 rounded-[10px] bg-primary text-white tracking-wider hover:brightness-105 transition-all shadow-xl shadow-primary/20 disabled:opacity-60"
+                    className="h-14 rounded-[5px] bg-primary text-white tracking-wider hover:brightness-105 transition-all shadow-xl shadow-primary/20 disabled:opacity-60"
                     style={{ width: '317.86px', fontSize: '24px', fontWeight: '700' }}
                   >
                     {status === "loading" ? "Sending..." : "Send Message"}

@@ -33,6 +33,7 @@ export default async function CareerCoursesPage({ searchParams }: PageProps) {
 
   const q = getString("q");
   const level = getString("level");
+  const degree = getString("degree");
   const stream = getString("stream");
   const page = Math.max(1, parseInt(getString("page", "1")));
   const limit = 12;
@@ -42,8 +43,9 @@ export default async function CareerCoursesPage({ searchParams }: PageProps) {
 
   // Resolve level/stream slugs to integer ids
   let degreeId: number | null = null;
-  if (level) {
-    const d = await db.collection("degree").findOne({ pageslug: level }, { projection: { id: 1 } });
+  if (level || degree) {
+    const slug = level || degree;
+    const d = await db.collection("degree").findOne({ pageslug: slug }, { projection: { id: 1 } });
     degreeId = d?.id ?? null;
   }
   let faId: number | null = null;
@@ -121,6 +123,7 @@ export default async function CareerCoursesPage({ searchParams }: PageProps) {
       streams={streams}
       initQ={q}
       initLevel={level}
+      initDegree={degree}
       initStream={stream}
       initPage={page}
       heroImage="/Background-images/student-hero-bg.png"

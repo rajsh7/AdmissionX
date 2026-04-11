@@ -67,7 +67,7 @@ export default function ExamPageClient({ exams }: Props) {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-[17px] sm:text-[19px] font-black text-[#444]">Upcoming & Urgent</h2>
             </div>
-            <ExamListClient exams={exams} search={search} />
+            <ExamListClient exams={exams} />
           </div>
 
           {/* Right Sidebar */}

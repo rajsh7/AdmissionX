@@ -26,6 +26,7 @@ interface CourseSearchClientProps {
   streams: any[];
   initQ: string;
   initLevel: string;
+  initDegree: string;
   initStream: string;
   initPage: number;
   heroImage?: string;
@@ -43,6 +44,7 @@ export default function ListingSearchV4({
   streams,
   initQ,
   initLevel,
+  initDegree,
   initStream,
   initPage,
   heroImage = "/images/hero-student.png",
@@ -65,6 +67,7 @@ export default function ListingSearchV4({
   // Sync with URL params
   const q = searchParams.get("q") ?? initQ;
   const level = searchParams.get("level") ?? initLevel;
+  const degree = searchParams.get("degree") ?? initDegree;
   const stream = searchParams.get("stream") ?? initStream;
   const page = parseInt(searchParams.get("page") ?? String(initPage));
 
@@ -129,7 +132,7 @@ export default function ListingSearchV4({
         
         <div className="relative z-10 w-full h-full flex flex-col">
             <div className="flex-1 relative">
-              <div className="mx-auto max-w-[1920px] w-full px-8 lg:px-12 xl:px-20 h-full relative">
+              <div className="mx-auto max-w-[1920px] w-full px-6 md:px-12 lg:px-24 h-full relative">
                 <div className="flex flex-col justify-center h-full relative z-20">
                   <div className={`transition-opacity duration-700 mt-6 flex flex-col justify-center ${heroRightImage ? "lg:max-w-[55%] lg:text-left" : "lg:col-span-12 lg:max-w-4xl"}`} style={{ opacity: mounted ? 1 : 0 }}>
                     <h1 className="font-poppins text-white leading-[1.05] tracking-[0.02em] mb-4 drop-shadow-2xl">
@@ -164,23 +167,22 @@ export default function ListingSearchV4({
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col pt-0">
-        <div className="mx-auto max-w-[1920px] w-full px-8 lg:px-12 xl:px-20 pt-8 pb-16">
-          <div className="flex gap-8">
-            <div className="hidden lg:block basis-[370px] min-w-[370px] max-w-[370px] flex-shrink-0">
+        <div className="mx-auto max-w-[1920px] w-full px-0 pt-8 pb-16">
+          <div className="flex gap-0">
+            <div className="hidden lg:block basis-[370px] min-w-[370px] max-w-[370px] flex-shrink-0 pl-6">
                 <CourseFiltersV2
                   levels={levels}
                   streams={streams}
                   activeLevel={level}
+                  activeDegree={degree}
                   activeStream={stream}
                   totalResults={total}
                   onFilterChange={() => setLoading(true)}
                 />
             </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-2xl font-medium text-neutral-900 mb-2 tracking-tight">Active filters</h2>
-              {/* ── Active Filters + Sort bar ── */}
+            <div className="flex-1 min-w-0 pl-10 pr-6">
+              {/* Active Filters + Sort bar */}
               <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-                {/* Active Filters chips */}
                 <div className="flex flex-wrap items-center gap-2">
                   {(level || stream || q) ? (
                     <>

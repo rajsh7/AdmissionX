@@ -232,12 +232,7 @@ export default async function AdminDashboardPage() {
               <Users className="w-5 h-5" style={{ color: '#FFFFFF' }} />
             </div>
           </div>
-          <div className="mt-5 flex items-center gap-2 text-[13px] text-emerald-500 font-semibold">
-            <ArrowUpRight className="w-4 h-4" />
-            <span>+12.5% vs last month</span>
-          </div>
         </div>
-
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -248,41 +243,27 @@ export default async function AdminDashboardPage() {
               <Building2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
             </div>
           </div>
-          <div className="mt-5 flex items-center gap-2 text-[13px] text-emerald-500 font-semibold">
-            <ArrowUpRight className="w-4 h-4" />
-            <span>+3 new this month</span>
-          </div>
         </div>
-
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-[12px] uppercase tracking-[0.24em] text-slate-400 font-semibold">Total Admins</p>
+              <p className="text-[12px] uppercase tracking-[0.24em] text-slate-400 font-semibold">Admin Users</p>
               <p className="mt-4 text-[28px] font-semibold text-slate-900">{totalAdmins?.toLocaleString() || "0"}</p>
             </div>
             <div className="w-11 h-11 rounded-[5px] flex items-center justify-center" style={{ backgroundColor: '#FF3C3C' }}>
               <UserCog className="w-5 h-5" style={{ color: '#FFFFFF' }} />
             </div>
           </div>
-          <div className="mt-5 flex items-center gap-2 text-[13px] text-emerald-500 font-semibold">
-            <ArrowUpRight className="w-4 h-4" />
-            <span>+12.5% new this month</span>
-          </div>
         </div>
-
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-[12px] uppercase tracking-[0.24em] text-slate-400 font-semibold">Active Queries</p>
+              <p className="text-[12px] uppercase tracking-[0.24em] text-slate-400 font-semibold">Applications</p>
               <p className="mt-4 text-[28px] font-semibold text-slate-900">{activeQueries?.toLocaleString() || "0"}</p>
             </div>
             <div className="w-11 h-11 rounded-[5px] flex items-center justify-center" style={{ backgroundColor: '#FF3C3C' }}>
               <MessageSquare className="w-5 h-5" style={{ color: '#FFFFFF' }} />
             </div>
-          </div>
-          <div className="mt-5 flex items-center gap-2 text-[13px] text-emerald-500 font-semibold">
-            <ArrowUpRight className="w-4 h-4" />
-            <span>+12.5% new this month</span>
           </div>
         </div>
       </div>

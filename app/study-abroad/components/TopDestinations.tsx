@@ -22,7 +22,7 @@ const DestinationCard = ({
   visaSuccess,
   postStudyWork,
 }: Omit<DestinationCardProps, "feesProgress" | "visaProgress" | "workProgress">) => (
-  <div className="bg-white rounded-[24px] overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 group">
+  <div className="bg-white rounded-[5px] overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 group">
     <div className="relative h-[240px] overflow-hidden">
       <Image 
         src={image} 
@@ -66,7 +66,7 @@ const DestinationCard = ({
         </div>
       </div>
 
-      <button className="w-full mt-8 py-3.5 border border-[#FF3C3C] text-[#FF3C3C] hover:bg-[#FF3C3C] hover:text-white rounded-xl font-bold text-[15px] transition-all flex items-center justify-center active:scale-[0.98]">
+      <button className="w-full mt-8 py-3.5 border border-[#FF3C3C] text-[#FF3C3C] hover:bg-[#FF3C3C] hover:text-white rounded-[5px] font-bold text-[15px] transition-all flex items-center justify-center active:scale-[0.98]">
         Explore {country}
       </button>
     </div>
@@ -78,28 +78,28 @@ export default function TopDestinations() {
     {
       country: "United States",
       image: "https://images.unsplash.com/photo-1501446522555-304675543ec5?auto=format&fit=crop&q=80&w=800",
-      fees: "$25k - $45/yr",
+      fees: "₹20L - ₹40L/yr",
       visaSuccess: "95%",
       postStudyWork: "Up to 3 years",
     },
     {
       country: "United Kingdom",
       image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=800",
-      fees: "£15k - £35k/yr",
+      fees: "₹15L - ₹35L/yr",
       visaSuccess: "95%",
       postStudyWork: "Up to 2 years",
     },
     {
       country: "Canada",
       image: "https://images.unsplash.com/photo-1503614472666-60707c772ed2?auto=format&fit=crop&q=80&w=800",
-      fees: "CA$15k - $35k/yr",
+      fees: "₹12L - ₹28L/yr",
       visaSuccess: "95%",
       postStudyWork: "Up to 3 years",
     },
     {
       country: "Australia",
       image: "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?auto=format&fit=crop&q=80&w=800",
-      fees: "AU$20k - $45k/yr",
+      fees: "₹18L - ₹40L/yr",
       visaSuccess: "95%",
       postStudyWork: "Up to 4 years",
     },

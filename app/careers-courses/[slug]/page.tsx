@@ -1,6 +1,7 @@
 import { getDb } from "@/lib/db";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { Star, Download, ArrowRight } from "lucide-react";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
@@ -62,7 +63,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   const relatedCourses = await db.collection("course")
     .find({
       functionalarea_id: course.functionalarea_id,
-      pageslug: { $ne: slug, $exists: true, $ne: "" },
+      pageslug: { $nin: [slug, ""], $exists: true },
     })
     .limit(6)
     .project({ name: 1, pageslug: 1, logoimage: 1, bannerimage: 1 })
@@ -98,10 +99,9 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     {[degreeLevel, duration, streamName].filter(Boolean).map((tag, i, arr) => (
                       <span key={tag} className="flex items-center gap-5 text-[16px] font-semibold" style={{ color: "rgba(0, 81, 68, 0.75)" }}>
                         {tag}
-                        {i < arr.length - 1 && <span className="w-px h-5 bg-slate-300" />}
+                        <span className="w-px h-5 bg-slate-300" />
                       </span>
                     ))}
-                    <span className="w-px h-5 bg-slate-300" />
                     <div className="flex items-center gap-1.5">
                       {[1, 2, 3, 4, 5].map((s) => (
                         <Star key={s} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
@@ -204,7 +204,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {relatedCourses.map((c) => (
-                <div key={String(c._id)} className="group cursor-pointer h-full">
+                <Link key={String(c._id)} href={`/careers-courses/${c.pageslug}`} className="group h-full">
                   <div className="bg-white rounded-[5px] p-6 border border-slate-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden h-full flex flex-col" style={{ boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>
                     <div className="relative aspect-[16/10] rounded-[5px] overflow-hidden mb-6">
                       <Image
@@ -219,7 +219,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       {c.name}
                     </h3>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

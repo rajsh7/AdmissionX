@@ -102,7 +102,7 @@ export default function HeroSection() {
 
           {/* Right Image */}
           <div className="relative group animate-in fade-in slide-in-from-right duration-700 delay-200">
-            <div className="relative aspect-[16/9] lg:aspect-[1.6/1] rounded-2xl overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.15)] border border-slate-100">
+            <div className="relative aspect-[16/9] lg:aspect-[1.6/1] rounded-[5px] overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.15)] border border-slate-100">
               <Image
                 src="/images/72297360ccd8d493c15ef805130a31280431261f.png"
                 alt="Study Abroad Destination"
@@ -118,7 +118,7 @@ export default function HeroSection() {
 
       {/* ─── Floating Search Card ─────────────────────────────────────── */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[90%] max-w-[1300px] z-50 animate-in fade-in slide-in-from-bottom duration-700 delay-300">
-        <div className="bg-white rounded-[24px] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.2)] p-8 md:p-10 border border-slate-100/50">
+        <div className="bg-white rounded-[5px] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.2)] p-8 md:p-10 border border-slate-100/50">
           
           <div className="flex flex-col lg:flex-row items-center gap-4">
             {/* Search Input */}
@@ -131,7 +131,7 @@ export default function HeroSection() {
                 placeholder="Location, universities, courses..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 h-14 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all font-medium text-slate-700 placeholder:text-slate-300"
+                className="w-full pl-12 pr-4 h-14 bg-white border border-slate-200 rounded-[5px] focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all font-medium text-slate-700 placeholder:text-slate-300"
               />
             </div>
 
@@ -143,7 +143,7 @@ export default function HeroSection() {
               <button
                 type="button"
                 onClick={() => { setIsCountryOpen(!isCountryOpen); setCountrySearch(""); }}
-                className="w-full pl-12 pr-10 h-14 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all font-bold text-slate-600 text-left cursor-pointer"
+                className="w-full pl-12 pr-10 h-14 bg-white border border-slate-200 rounded-[5px] focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all font-bold text-slate-600 text-left cursor-pointer"
               >
                 {selectedCountry}
               </button>
@@ -152,7 +152,7 @@ export default function HeroSection() {
               </div>
 
               {isCountryOpen && (
-                <div className="absolute bottom-full left-0 w-full mb-2 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 overflow-hidden">
+                <div className="absolute bottom-full left-0 w-full mb-2 bg-white border border-slate-200 rounded-[5px] shadow-2xl z-50 overflow-hidden">
                   {/* Search inside dropdown */}
                   <div className="p-2 border-b border-slate-100">
                     <input
@@ -161,7 +161,7 @@ export default function HeroSection() {
                       placeholder="Search country..."
                       value={countrySearch}
                       onChange={(e) => setCountrySearch(e.target.value)}
-                      className="w-full px-3 py-2 text-sm text-slate-700 placeholder:text-slate-300 bg-slate-50 rounded-lg outline-none font-medium"
+                      className="w-full px-3 py-2 text-sm text-slate-700 placeholder:text-slate-300 bg-slate-50 rounded-[5px] outline-none font-medium"
                     />
                   </div>
                   <ul className="max-h-40 overflow-y-auto">
@@ -198,7 +198,7 @@ export default function HeroSection() {
             </div>
 
             {/* Main Search Button */}
-            <button className="w-full lg:w-auto px-12 h-14 bg-[#FF3C3C] hover:bg-[#E23434] text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-red-500/20 flex items-center justify-center">
+            <button className="w-full lg:w-auto px-12 h-14 bg-[#FF3C3C] hover:bg-[#E23434] text-white rounded-[5px] font-bold text-lg transition-all shadow-lg shadow-red-500/20 flex items-center justify-center">
               Search
             </button>
           </div>
@@ -209,7 +209,7 @@ export default function HeroSection() {
             {["Undergraduate", "Postgraduate", "Fall 2026"].map((filter) => (
               <button 
                 key={filter}
-                className="px-5 py-1.5 rounded-lg border border-slate-100 text-[13px] font-bold text-slate-400 hover:border-[#FF3C3C] hover:text-[#FF3C3C] transition-all bg-slate-50/30 hover:bg-white"
+                className="px-5 py-1.5 rounded-[5px] border border-slate-100 text-[13px] font-bold text-slate-400 hover:border-[#FF3C3C] hover:text-[#FF3C3C] transition-all bg-slate-50/30 hover:bg-white"
               >
                 {filter}
               </button>

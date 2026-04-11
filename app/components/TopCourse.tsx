@@ -15,7 +15,7 @@ const courses = [
     icon: "medical_services",
     slug: "medicine",
     description: "Prepare for a rewarding career in healthcare. From anatomy to clinical practice, learn from the best in the field.",
-    stats: { colleges: "850+", salary: "$85K+", growth: "12%+" },
+    stats: { colleges: "850+", salary: "₹ 8L-25L+", growth: "12%+" },
     image: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2680&auto=format&fit=crop"
   },
   {
@@ -25,7 +25,7 @@ const courses = [
     icon: "engineering",
     slug: "engineering",
     description: "From robotics to renewable energy, engineering shapes tomorrow. Dive into cutting-edge programs that turn ideas into reality.",
-    stats: { colleges: "850+", salary: "$85K+", growth: "12%+" },
+    stats: { colleges: "850+", salary: "₹ 6L-20L+", growth: "18%+" },
     image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=2670&auto=format&fit=crop"
   },
   {
@@ -35,7 +35,7 @@ const courses = [
     icon: "business_center",
     slug: "management",
     description: "Lead organizations and drive innovation. Our management courses provide the skills you need to excel in the global business landscape.",
-    stats: { colleges: "720+", salary: "$95K+", growth: "15%+" },
+    stats: { colleges: "720+", salary: "₹ 8L-45L+", growth: "15%+" },
     image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2670&auto=format&fit=crop"
   },
   {
@@ -45,7 +45,7 @@ const courses = [
     icon: "payments",
     slug: "commerce",
     description: "Master the fundamentals of trade and finance. Our business programs prepare you for the dynamic world of commerce.",
-    stats: { colleges: "450+", salary: "$75K+", growth: "10%+" },
+    stats: { colleges: "450+", salary: "₹ 5L-15L+", growth: "10%+" },
     image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2670&auto=format&fit=crop"
   },
   {
@@ -55,7 +55,7 @@ const courses = [
     icon: "gavel",
     slug: "law",
     description: "Uphold justice and the rule of law. Our legal studies programs offer deep insights into various legal systems and practices.",
-    stats: { colleges: "280+", salary: "$110K+", growth: "8%+" },
+    stats: { colleges: "280+", salary: "₹ 6L-20L+", growth: "8%+" },
     image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?q=80&w=2670&auto=format&fit=crop"
   },
   {
@@ -65,7 +65,47 @@ const courses = [
     icon: "architecture",
     slug: "design",
     description: "Design the spaces of the future. Our architecture programs blend creativity with technical expertise.",
-    stats: { colleges: "310+", salary: "$80K+", growth: "14%+" },
+    stats: { colleges: "310+", salary: "₹ 7L-18L+", growth: "14%+" },
+    image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?q=80&w=2664&auto=format&fit=crop"
+  },
+  {
+    id: 7,
+    name: "Humanities",
+    count: "10 universities +",
+    icon: "palette",
+    slug: "arts",
+    description: "Explore the vast world of literature, history, and social sciences to understand the human experience.",
+    stats: { colleges: "1.2k+", salary: "₹ 4L-12L+", growth: "9%+" },
+    image: "https://images.unsplash.com/photo-1491843351663-7c116e8148ad?q=80&w=2670&auto=format&fit=crop"
+  },
+  {
+    id: 8,
+    name: "Pharmacy",
+    count: "10 universities +",
+    icon: "medication",
+    slug: "pharmacy",
+    description: "Combine chemistry and biology to become an expert in medications and patient care.",
+    stats: { colleges: "560+", salary: "₹ 4L-10L+", growth: "11%+" },
+    image: "https://images.unsplash.com/photo-1583947215259-38e31be8751f?q=80&w=2670&auto=format&fit=crop"
+  },
+  {
+    id: 9,
+    name: "Agriculture",
+    count: "10 universities +",
+    icon: "agriculture",
+    slug: "agriculture",
+    description: "Learn sustainable farming, biotechnology, and agri-business to feed the future.",
+    stats: { colleges: "420+", salary: "₹ 3L-9L+", growth: "15%+" },
+    image: "https://images.unsplash.com/photo-1523348830342-d0187cf0c28d?q=80&w=2670&auto=format&fit=crop"
+  },
+  {
+    id: 10,
+    name: "Design",
+    count: "10 universities +",
+    icon: "brush",
+    slug: "design",
+    description: "Unleash your creativity through graphic design, fashion, interior design, and more. Build a career that blends art with innovation.",
+    stats: { colleges: "380+", salary: "₹ 4L-14L+", growth: "13%+" },
     image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?q=80&w=2664&auto=format&fit=crop"
   }
 ];
@@ -171,7 +211,7 @@ export default function TopCourse() {
                   />
                 </div>
              </div>
-             <div className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-2 max-h-[400px] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full">
+             <div className="flex-1 px-3 py-3 flex flex-col gap-2">
                {filteredCourses.map((course, idx) => {
                  const originalIdx = courses.findIndex(c => c.id === course.id);
                  return (

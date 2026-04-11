@@ -14,6 +14,7 @@ interface CourseFiltersProps {
   levels?: FilterOption[];
   streams?: FilterOption[];
   activeLevel?: string;
+  activeDegree?: string;
   activeStream?: string;
   totalResults?: number;
   onFilterChange?: (filters: any) => void;
@@ -23,6 +24,7 @@ export default function CourseFiltersV2({
   levels = [],
   streams = [],
   activeLevel = "",
+  activeDegree = "",
   activeStream = "",
   onFilterChange,
 }: CourseFiltersProps) {
@@ -31,16 +33,22 @@ export default function CourseFiltersV2({
   const searchParams = useSearchParams();
 
   const [level, setLevel] = useState(activeLevel);
+  const [degree, setDegree] = useState(activeDegree);
   const [stream, setStream] = useState(activeStream);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
-  useEffect(() => { setLevel(activeLevel); setStream(activeStream); }, [activeLevel, activeStream]);
+  useEffect(() => {
+    setLevel(activeLevel);
+    setDegree(activeDegree);
+    setStream(activeStream);
+  }, [activeLevel, activeDegree, activeStream]);
 
   const applyFilters = useCallback(
     (overrides: Record<string, string> = {}) => {
-      const next = {
+      const next: Record<string, string | undefined> = {
         level: overrides.level !== undefined ? overrides.level : level,
+        degree: overrides.degree !== undefined ? overrides.degree : degree,
         stream: overrides.stream !== undefined ? overrides.stream : stream,
         q: overrides.q !== undefined ? overrides.q : undefined,
       };
@@ -53,12 +61,13 @@ export default function CourseFiltersV2({
       router.push(`${pathname}?${params.toString()}`);
       if (onFilterChange) onFilterChange(next);
     },
-    [level, stream, searchParams, router, pathname, onFilterChange]
+    [level, degree, stream, searchParams, router, pathname, onFilterChange]
   );
 
   const resetAll = () => {
     router.push(`${pathname}`);
     setLevel("");
+    setDegree("");
     setStream("");
     if (onFilterChange) onFilterChange({});
   };
@@ -67,7 +76,7 @@ export default function CourseFiltersV2({
 
   return (
     <aside className="hidden lg:flex flex-col w-full flex-shrink-0">
-      <div className="sticky top-6 w-full bg-white rounded-[10px] border border-neutral-200 shadow-md overflow-hidden">
+      <div className="sticky top-6 w-full bg-white rounded-[5px] border border-neutral-200 shadow-md overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3.5 bg-[#1A1A1A]">
           <h2 className="text-[25px] font-bold text-white flex items-center gap-2">
@@ -79,7 +88,6 @@ export default function CourseFiltersV2({
           </button>
         </div>
 
-        {/* Filters body */}
         <div className="p-4 flex flex-col gap-4">
           {/* Course Name */}
           <div>
@@ -87,11 +95,9 @@ export default function CourseFiltersV2({
             <input
               type="text"
               placeholder="Search course name"
-              className="w-full px-3 py-2.5 text-xs border border-neutral-200 rounded-[6px] focus:outline-none focus:border-[#FF3C3C] bg-white placeholder:text-neutral-400 transition-all"
+              className="w-full px-3 py-2.5 text-xs border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white placeholder:text-neutral-400 transition-all"
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  applyFilters({ q: (e.target as HTMLInputElement).value });
-                }
+                if (e.key === "Enter") applyFilters({ q: (e.target as HTMLInputElement).value });
               }}
             />
           </div>
@@ -101,10 +107,14 @@ export default function CourseFiltersV2({
             <label className="text-xs font-semibold text-neutral-700 mb-1.5 block">Degree</label>
             <div className="relative">
               <select
-                disabled
-                className="w-full px-3 pr-8 py-2.5 text-xs border border-neutral-200 rounded-[6px] bg-white text-neutral-500 appearance-none cursor-not-allowed"
+                value={degree}
+                onChange={(e) => { const val = e.target.value; setDegree(val); applyFilters({ degree: val }); }}
+                className="w-full px-3 pr-8 py-2.5 text-xs border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all text-neutral-600"
               >
-                <option>Accounting and finance</option>
+                <option value="">Select Degree...</option>
+                {levels.map((l) => (
+                  <option key={l.id} value={l.slug || String(l.id)}>{l.name}</option>
+                ))}
               </select>
               <span className="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] text-neutral-400 pointer-events-none">expand_more</span>
             </div>
@@ -117,9 +127,9 @@ export default function CourseFiltersV2({
               <select
                 value={level}
                 onChange={(e) => { const val = e.target.value; setLevel(val); applyFilters({ level: val }); }}
-                className="w-full px-3 pr-8 py-2.5 text-xs border border-neutral-200 rounded-[6px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all text-neutral-600"
+                className="w-full px-3 pr-8 py-2.5 text-xs border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all text-neutral-600"
               >
-                <option value="">Accounting and finance</option>
+                <option value="">Select Education Level...</option>
                 {levels.map((l) => (
                   <option key={l.id} value={l.slug || String(l.id)}>{l.name}</option>
                 ))}
@@ -135,9 +145,9 @@ export default function CourseFiltersV2({
               <select
                 value={stream}
                 onChange={(e) => { const val = e.target.value; setStream(val); applyFilters({ stream: val }); }}
-                className="w-full px-3 pr-8 py-2.5 text-xs border border-neutral-200 rounded-[6px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all text-neutral-600"
+                className="w-full px-3 pr-8 py-2.5 text-xs border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all text-neutral-600"
               >
-                <option value="">Computer science</option>
+                <option value="">Select Stream...</option>
                 {streams.map((s) => (
                   <option key={s.id} value={s.slug || String(s.id)}>{s.name}</option>
                 ))}
@@ -151,14 +161,14 @@ export default function CourseFiltersV2({
             <button
               type="button"
               onClick={() => applyFilters()}
-              className="w-full bg-[#FF3C3C] hover:bg-[#E63636] text-white text-xs font-bold py-2.5 rounded-[6px] transition-all"
+              className="w-full bg-[#FF3C3C] hover:bg-[#E63636] text-white text-xs font-bold py-2.5 rounded-[5px] transition-all"
             >
               Apply filter
             </button>
             <button
               type="button"
               onClick={resetAll}
-              className="w-full bg-white border border-neutral-300 text-neutral-500 hover:text-neutral-700 text-xs font-bold py-2.5 rounded-[6px] transition-all"
+              className="w-full bg-white border border-neutral-300 text-neutral-500 hover:text-neutral-700 text-xs font-bold py-2.5 rounded-[5px] transition-all"
             >
               Reset
             </button>
@@ -168,7 +178,3 @@ export default function CourseFiltersV2({
     </aside>
   );
 }
-
-
-
-

@@ -38,6 +38,25 @@ interface CollegeRow {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function buildAdsFilter(positions: string[]) {
+  return {
+    ads_position: {
+      $regex: `^\\s*(?:${positions.map(escapeRegex).join("|")})\\s*$`,
+      $options: "i",
+    },
+    $or: [
+      { isactive: 1 },
+      { isactive: "1" },
+      { isactive: " 1" },
+      { isactive: /^\s*1\s*$/ },
+    ],
+  };
+}
+
 function slugToName(slug: string): string {
   return slug
     .replace(/-\d+$/, "")
@@ -90,91 +109,73 @@ const getHomePageData = unstable_cache(
   async () => {
     try {
       const db = await getDb();
-      const now = new Date();
 
-      const [collegeRows, blogRows, examRows, adRows, statCounts] = await Promise.all([
+      const [collegeRows, blogRows, examRows, adRows, collegeCount, studentCount, countryCount, courseCount] = await Promise.all([
         // 1. Featured colleges
         db.collection("collegeprofile").aggregate([
           { $match: { isShowOnHome: 1 } },
           { $limit: 8 },
           { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
           { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+          { $lookup: { from: "placement", localField: "id", foreignField: "collegeprofile_id", as: "placement", }, },
+          { $unwind: { path: "$placement", preserveNullAndEmptyArrays: true } },
           {
             $project: {
-              _id: 0,
-              slug: 1,
-              name: {
-                $cond: [
-                  { $and: [{ $ne: ["$user.firstname", null] }, { $ne: [{ $trim: { input: "$user.firstname" } }, ""] }] },
-                  { $trim: { input: "$user.firstname" } },
-                  "$slug",
-                ],
-              },
-              location: "$registeredSortAddress",
-              image: "$bannerimage",
-              rating: 1,
+              _id: 0, slug: 1, name: { $cond: [ { $and: [{ $ne: ["$user.firstname", null] }, { $ne: [{ $trim: { input: "$user.firstname" } }, ""] }] }, { $trim: { input: "$user.firstname" } }, "$slug", ], },
+              location: "$registeredSortAddress", image: "$bannerimage", rating: 1, avgPackage: "$placement.ctcaverage",
             },
           },
-        ]).toArray() as Promise<CollegeRow[]>,
+        ]).toArray() as Promise<(CollegeRow & { avgPackage?: string })[]>,
 
-        // 2. Latest 4 active blogs
-        db.collection("blogs")
-          .find({ isactive: 1 })
-          .sort({ created_at: -1 })
-          .limit(8)
-          .project({ _id: 0, id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 })
-          .toArray() as Promise<DbBlog[]>,
+        // 2. Latest 8 active blogs
+        db.collection("blogs").find({ isactive: 1 }).sort({ created_at: -1 }).limit(8).project({ _id: 0, id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 }).toArray() as Promise<DbBlog[]>,
 
-        // 3. Top 6 exams by views
-        db.collection("examination_details")
-          .find({})
-          .sort({ totalViews: -1, created_at: -1 })
-          .limit(8)
-          .project({ _id: 0, id: 1, title: 1, slug: 1, exminationDate: 1, image: 1, functionalarea_id: 1, courses_id: 1, totalViews: 1 })
-          .toArray() as Promise<DbExam[]>,
+        // 3. Top 8 exams
+        db.collection("examination_details").find({}).sort({ totalViews: -1, created_at: -1 }).limit(8).project({ _id: 0, id: 1, title: 1, slug: 1, exminationDate: 1, image: 1, functionalarea_id: 1, courses_id: 1, totalViews: 1 }).toArray() as Promise<DbExam[]>,
 
-        // 4. Active home-page ads
+        // 4. Ads
         db.collection("ads_managements")
-          .find({
-            $or: [
-              { ads_position: "home" },
-              { ads_position: " home" },
-            ],
-            $and: [{
-              $or: [{ isactive: 1 }, { isactive: "1" }, { isactive: " 1" }]
-            }],
-          })
+          .find(buildAdsFilter(["home", "default"]))
           .sort({ created_at: -1 })
           .limit(8)
           .project({ _id: 0, id: 1, title: 1, description: 1, img: 1, redirectto: 1 })
           .toArray() as Promise<AdItem[]>,
 
-        // 5. Stats — count documents in each collection
-        Promise.all([
-          db.collection("collegeprofile").estimatedDocumentCount(),
-          db.collection("next_student_signups").estimatedDocumentCount(),
-          db.collection("country").estimatedDocumentCount(),
-          db.collection("course").estimatedDocumentCount(),
-        ]),
+        // 6. Stats
+        db.collection("collegeprofile").estimatedDocumentCount(),
+        db.collection("next_student_signups").estimatedDocumentCount(),
+        db.collection("country").estimatedDocumentCount(),
+        db.collection("course").estimatedDocumentCount(),
       ]);
 
-      // 6. Ticker ads (home_ticker position)
-      const tickerAdRows = await db.collection("ads_managements")
-        .find({
-          $or: [
-            { ads_position: "home_ticker" },
-            { ads_position: " home_ticker" },
-          ],
-          $and: [{
-            $or: [{ isactive: 1 }, { isactive: "1" }, { isactive: " 1" }]
-          }],
-        })
-        .sort({ created_at: -1 })
-        .limit(20)
-        .project({ _id: 0, id: 1, title: 1, description: 1, img: 1, redirectto: 1 })
-        .toArray() as TickerAdItem[];
+      const statCounts = [collegeCount, studentCount, countryCount, courseCount];
 
-      return { collegeRows, blogRows, examRows, adRows, statCounts, tickerAdRows };
+      // 7. Reviews — fetched separately to avoid Turbopack parser issues
+      const rawReviews = await db.collection("college_reviews")
+        .find({ description: { $exists: true, $ne: "" } })
+        .sort({ created_at: -1 })
+        .limit(8)
+        .project({ _id: 0, description: 1, academic: 1, faculty: 1, placement: 1, infrastructure: 1, users_id: 1, collegeprofile_id: 1 })
+        .toArray();
+
+      const reviewRows = rawReviews.map((r: any) => {
+        const avg = [r.academic, r.faculty, r.placement, r.infrastructure]
+          .map((v: any) => parseFloat(String(v ?? "4").trim()) || 4)
+          .reduce((a: number, b: number) => a + b, 0) / 4;
+        return {
+          name: "Student",
+          college: "Verified College",
+          text: String(r.description ?? "").trim(),
+          rating: Math.min(5, Math.max(1, Math.round(avg))),
+        };
+      });
+
+      // Ticker ads...
+      const tickerAdRows = await db.collection("ads_managements")
+        .find(buildAdsFilter(["home_ticker"]))
+        .sort({ created_at: -1 }).limit(20).project({ _id: 0, id: 1, title: 1, description: 1, img: 1, redirectto: 1 }).toArray() as TickerAdItem[];
+
+      return { collegeRows, blogRows, examRows, adRows, statCounts, tickerAdRows, reviewRows };
     } catch (error) {
       console.error("[getHomePageData] Database error:", error);
       // Return empty data instead of crashing
@@ -188,7 +189,7 @@ const getHomePageData = unstable_cache(
       };
     }
   },
-  ["homepage-data-v10"],
+  ["homepage-data-v11"],
   { revalidate: 300 },
 );
 
@@ -201,6 +202,7 @@ export default async function Page() {
   let adRows: AdItem[] = [];
   let statCounts = [0, 0, 0, 0];
   let tickerAdRows: TickerAdItem[] = [];
+  let reviewRows: any[] = [];
 
   try {
     const data = await getHomePageData();
@@ -210,6 +212,7 @@ export default async function Page() {
     adRows        = data.adRows;
     statCounts    = data.statCounts;
     tickerAdRows  = data.tickerAdRows;
+    reviewRows    = (data as any).reviewRows || [];
   } catch (error) {
     console.error("[homepage] Failed to fetch data:", error);
   }
@@ -244,6 +247,7 @@ export default async function Page() {
       tags: ["Featured", "Top Ranked"],
       tuition: "View Fees",
       href: `/university/${row.slug || ""}`,
+      avgPackage: (row as any).avgPackage ? `₹ ${(row as any).avgPackage} LPA` : "₹ 4.5 LPA",
     };
   });
 
@@ -302,10 +306,8 @@ export default async function Page() {
       streamCounts={streamCounts}
       initialStreamColleges={initialStreamColleges}
       ads={adRows}
-      partnerAds={[]}
-      featuredAds={[]}
       tickerAds={tickerAdRows}
-      testimonials={[]}
+      testimonials={reviewRows}
     />
   );
 }

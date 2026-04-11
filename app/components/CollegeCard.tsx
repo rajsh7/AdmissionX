@@ -92,7 +92,7 @@ export default function CollegeCard({
     >
       <Link
         href={`/college/${slug}`}
-        className="group flex flex-col bg-white rounded-[10px] border border-slate-100 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300 overflow-hidden h-full"
+        className="group flex flex-col bg-white rounded-[5px] border border-slate-100 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300 overflow-hidden h-full"
       >
         {/* ── Image ── */}
         <div className="relative aspect-[4/3] overflow-hidden bg-neutral-50 flex-shrink-0">
@@ -159,16 +159,20 @@ export default function CollegeCard({
           <div className="mt-auto flex items-center justify-between pt-5 border-t border-slate-200">
             <div className="text-[16px] font-medium text-[#6C6C6C]">
               Avg. Package: <span className="font-bold text-[#FF3C3C]">
-                {min_fees
+                {college.avg_package || (min_fees
                   ? `₹${(min_fees / 100000).toFixed(1)} LPA`
                   : max_fees
                   ? `₹${(max_fees / 100000).toFixed(1)} LPA`
-                  : "N/A"}
+                  : "N/A")}
               </span>
             </div>
             <div className="px-5 py-2.5 rounded-[5px] bg-slate-900 text-white text-xs font-bold group-hover:bg-[#FF3C3C] transition-all active:scale-95">
               Apply Now
             </div>
+            <span className="inline-flex items-center gap-1 text-[#FF3C3C] font-bold text-[14px] group-hover:translate-x-1 transition-transform">
+              View Details
+              <span className="material-symbols-rounded text-[18px]">arrow_forward</span>
+            </span>
           </div>
         </div>
       </Link>

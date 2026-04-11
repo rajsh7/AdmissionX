@@ -77,6 +77,7 @@ export default async function CollegesPage({
         streams,
         min_fees: fees.length ? Math.min(...fees) : null,
         max_fees: fees.length ? Math.max(...fees) : null,
+        avg_package: null,
       };
     });
   } catch (err) {
