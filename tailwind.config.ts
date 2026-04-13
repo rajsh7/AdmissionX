@@ -20,6 +20,15 @@ const config: Config = {
         "admin-dark": "#313131",
         "admin-header": "#444444",
         "admin-stripe": "#EAF4FF",
+        maroon: {
+          DEFAULT: "#8B3D3D",
+          dark: "#6B2424",
+          light: "#A34F4F",
+        },
+        sidebar: {
+          dark: "#262626",
+          light: "#2b2b2b",
+        },
         teal: {
           DEFAULT: "#00b5ad",
           light: "#e6f8f7",

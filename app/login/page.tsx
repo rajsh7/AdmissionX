@@ -1,5 +1,6 @@
 "use client";
 
+<<<<<<< HEAD
 import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -92,11 +93,21 @@ function AdminLoginForm() {
         </div>
       </main>
       <Footer />
-    </div>
-  );
-}
+=======
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
 
-export default function AdminLoginPage() {
+const AdminLoginForm = dynamic(() => import("./AdminLoginForm"), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center bg-[#f3f4f6]">
+      <div className="w-6 h-6 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
+>>>>>>> 3f51f6a (College UI Fixes)
+    </div>
+  ),
+});
+
+export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-[#f3f4f6]">

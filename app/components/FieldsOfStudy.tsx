@@ -30,6 +30,7 @@ export default function FieldsOfStudy() {
       </div>
 
       <div className="relative mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24 z-10">
+<<<<<<< HEAD
         {/* Section Header */}
         <div className="text-center mb-12">
           <p className="text-primary text-[13px] font-bold uppercase tracking-[3px] mb-3">
@@ -64,6 +65,20 @@ export default function FieldsOfStudy() {
               <div
                 className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer group"
                 onClick={handlePlay}
+=======
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+          {searchOptions.map((opt, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+            >
+              <div 
+                className="group flex flex-col p-8 lg:p-10 rounded-[5px] bg-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.2)] transition-all hover:shadow-2xl hover:-translate-y-2 h-full border border-slate-100"
+>>>>>>> 3f51f6a (College UI Fixes)
               >
                 <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-2xl shadow-primary/50 group-hover:scale-110 transition-transform duration-300">
                   <span className="material-symbols-outlined text-white text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }}>

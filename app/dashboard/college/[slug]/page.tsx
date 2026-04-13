@@ -38,7 +38,7 @@ export default async function CollegeDashboardPage({ params }: PageProps) {
   );
 
   if (profile) {
-    collegeprofile_id = profile._id;
+    collegeprofile_id = profile._id.toString();
     collegeName = profile.college_name || payload.name;
     collegeSlug = profile.slug || slug;
     // If URL slug doesn't match their actual slug, redirect

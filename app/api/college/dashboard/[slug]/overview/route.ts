@@ -11,17 +11,26 @@ async function checkAuth(slug: string) {
   if (!payload) return null;
 
   const db = await getDb();
-  const cp = await db.collection("collegeprofile").aggregate([
+  const [cp] = await db.collection("collegeprofile").aggregate([
     { $match: { slug } },
+    // Try to match by users_id if it exists
     { $lookup: { from: "users", localField: "users_id", foreignField: "_id", as: "u" } },
     { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
-    { $match: { "u.email": { $regex: `^${payload.email}$`, $options: "i" } } },
-    { $project: { _id: 1, users_id: 1 } },
+    // Allow match if (joined user email matches) OR (document email field matches)
+    { 
+      $match: {
+        $or: [
+          { "u.email": { $regex: `^${payload.email}$`, $options: "i" } },
+          { "email": { $regex: `^${payload.email}$`, $options: "i" } }
+        ]
+      }
+    },
+    { $project: { _id: 1, users_id: 1, email: 1 } },
     { $limit: 1 },
   ]).toArray();
 
-  if (!cp.length) return null;
-  return { payload, collegeprofile_id: cp[0]._id, users_id: cp[0].users_id };
+  if (!cp) return null;
+  return { payload, collegeprofile_id: cp._id, users_id: cp.users_id };
 }
 
 export async function GET(

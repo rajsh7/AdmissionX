@@ -308,9 +308,14 @@ export default function Header({ theme }: HeaderProps) {
       )}
 
       <motion.header 
+<<<<<<< HEAD
         suppressHydrationWarning
         className={`site-header fixed top-0 left-0 right-0 z-50 w-full flex items-center transition-all duration-300 min-h-[58px] ${
           mounted && isScrolled
+=======
+        className={`site-header fixed top-0 left-0 right-0 z-[100] w-full flex items-center transition-all duration-300 min-h-[58px] ${
+          isScrolled
+>>>>>>> 3f51f6a (College UI Fixes)
             ? "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.08)] py-2 border-b border-neutral-100"
             : "bg-white/95 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.05)] py-3"
         }`}
@@ -319,7 +324,11 @@ export default function Header({ theme }: HeaderProps) {
           {/* Logo Area */}
           <div className="shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
+<<<<<<< HEAD
               <img src="/logo.jpg" alt="AdmissionX" className="h-10 w-auto object-contain" />
+=======
+              <img src="/logo.jpg" alt="AdmissionX" className="h-10 sm:h-12 w-auto object-contain" />
+>>>>>>> 3f51f6a (College UI Fixes)
             </Link>
           </div>
 

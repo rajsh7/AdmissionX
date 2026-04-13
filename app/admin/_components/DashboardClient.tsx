@@ -3,21 +3,48 @@
 
 import Link from "next/link";
 import { useMemo, useState, useEffect, useRef } from "react";
-import { 
-  AreaChart, 
-  Area, 
+<<<<<<< HEAD
+import {
+  AreaChart,
+  Area,
   BarChart,
   Bar,
   PieChart,
   Pie,
   Cell,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer
 } from "recharts";
 
+=======
+import dynamic from "next/dynamic";
+import {
+  Users,
+  Building2,
+  UserCog,
+  MessageSquare,
+  ChevronDown
+} from "lucide-react";
+
+// Dynamically import charts with SSR disabled to prevent 'module factory not available' errors
+const StudentRegistrationChart = dynamic(
+  () => import("./StudentRegistrationChart"),
+  { ssr: false, loading: () => <div className="h-full w-full bg-slate-50 animate-pulse rounded-[5px]" /> }
+);
+
+const CollegeRegistrationChart = dynamic(
+  () => import("./CollegeRegistrationChart"),
+  { ssr: false, loading: () => <div className="h-full w-full bg-slate-50 animate-pulse rounded-[5px]" /> }
+);
+
+const TransactionsPieChart = dynamic(
+  () => import("./TransactionsPieChart"),
+  { ssr: false, loading: () => <div className="h-full w-full bg-slate-50 animate-pulse rounded-[5px]" /> }
+);
+>>>>>>> 3f51f6a (College UI Fixes)
 
 type GraphPoint = {
   key: string;
@@ -200,6 +227,22 @@ export default function DashboardClient({
                   </ul>
                 </div>
               )}
+              {/* KPI Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {statCards.map((stat, i) => (
+          <div key={i} className="bg-white rounded-[5px] p-6 border border-slate-100 shadow-md relative overflow-hidden">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">{stat.title}</p>
+                <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+              </div>
+              <div className="bg-[#FF3C3C] p-2 rounded-lg text-white">
+                <span className="material-symbols-rounded text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>{stat.icon}</span>
+              </div>
+            </div>
+            
+            <div className="mt-4">
+              <span className="text-[13px] text-slate-400 font-medium">{stat.subtext}</span>
             </div>
           </div>
 
@@ -269,6 +312,66 @@ export default function DashboardClient({
                   />
                 </AreaChart>
               </ResponsiveContainer>
+      {/* Transactions Pie */}
+      <div className="bg-white rounded-[5px] border border-slate-100 shadow-sm p-6 w-full lg:w-1/2">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-[20px] font-bold text-slate-800">Transactions Overview</h2>
+        </div>
+        <div className="h-[260px] w-full">
+          {isMounted ? (
+            <TransactionsPieChart data={transactionPie} />
+          ) : (
+            <div className="h-full w-full bg-slate-50 animate-pulse rounded-[5px]" />
+          )}
+        </div>
+      </div>
+      {/* Main Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Student Registration */}
+        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6 relative min-h-[520px]">
+          <div className="flex justify-between items-center mb-10 overflow-visible">
+            <h2 className="text-[25px] font-semibold text-slate-800">Student Registration</h2>
+            <div className="relative" ref={studentMonthRef}>
+              <button
+                type="button"
+                onClick={() => setOpenMenu((v) => (v === "student" ? null : "student"))}
+                className="text-[13px] font-semibold text-slate-500 flex items-center gap-2 border border-slate-100 px-4 py-1.5 rounded-md hover:bg-slate-50 transition-all"
+              >
+                {monthFilter}
+                <span className="material-symbols-rounded text-[16px] text-slate-400">expand_more</span>
+              </button>
+              {openMenu === "student" && (
+                <div className="absolute right-0 mt-2 w-40 bg-white border border-slate-100 rounded-md shadow-lg z-20">
+                  <ul className="py-1 max-h-80 overflow-auto">
+                    {monthOptions.map((m) => (
+                      <li key={m}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMonthFilter(m);
+                            setOpenMenu(null);
+                          }}
+                          className={`w-full text-left px-3 py-2 text-xs font-semibold transition-colors ${monthFilter === m ? "bg-slate-100 text-slate-700" : "text-slate-500 hover:bg-slate-50"}`}
+                        >
+                          {m}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="h-[380px] w-full px-4 overflow-hidden">
+            {isMounted ? (
+              <StudentRegistrationChart 
+                data={filteredGraphData} 
+                ticks={yearTicks}
+                keyMap={keyMap}
+                firstKeyByYear={firstKeyByYear}
+                monthFilter={monthFilter}
+              />
             ) : (
               <div className="h-full w-full bg-slate-50 animate-pulse rounded-[5px]" />
             )}
@@ -293,6 +396,7 @@ export default function DashboardClient({
               {openMenu === "college" && (
                 <div className="absolute right-0 mt-2 w-40 bg-white border border-slate-100 rounded-md shadow-lg z-20">
                   <ul className="py-1 max-h-80 overflow-auto" role="listbox">
+                  <ul className="py-1 max-h-80 overflow-auto">
                     {monthOptions.map((m) => (
                       <li key={m}>
                         <button
@@ -367,6 +471,13 @@ export default function DashboardClient({
                   />
                 </BarChart>
               </ResponsiveContainer>
+              <CollegeRegistrationChart 
+                data={filteredCollegeGraphData} 
+                ticks={collegeYearTicks}
+                keyMap={collegeKeyMap}
+                firstKeyByYear={collegeFirstKeyByYear}
+                monthFilter={monthFilter}
+              />
             ) : (
               <div className="h-full w-full bg-slate-50 animate-pulse rounded-[5px]" />
             )}
@@ -376,11 +487,11 @@ export default function DashboardClient({
 
       {/* Bottom Tables Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
         {/* Student Registration Table */}
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md lg:col-span-2 overflow-hidden flex flex-col pt-6 px-6 pb-2">
           <div className="flex justify-between items-center mb-6">
           <h2 className="text-[25px] font-semibold text-slate-800">Student Registration</h2>
+            <h2 className="text-[25px] font-semibold text-slate-800">Student Registration</h2>
             <Link href="/admin/students/profile" className="text-[13px] font-bold text-slate-400 hover:text-slate-600">
               View All
             </Link>
@@ -442,8 +553,7 @@ export default function DashboardClient({
             </div>
           </div>
         </div>
-        
       </div>
     </div>
-  );
+                );
 }

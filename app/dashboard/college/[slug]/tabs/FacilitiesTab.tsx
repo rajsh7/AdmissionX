@@ -16,121 +16,52 @@ interface Facility {
   description: string | null;
 }
 
-// Common Material Symbols icon name map for facilities
-function FacilityIcon({ iconname, name }: { iconname: string | null; name: string }) {
-  const icon = iconname?.trim() || guessIcon(name);
-  return (
-    <span
-      className="material-symbols-rounded text-[28px] leading-none select-none"
-      style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}
-    >
-      {icon}
-    </span>
-  );
-}
+// ── Components ───────────────────────────────────────────────────────────────
 
-function guessIcon(name: string): string {
-  const n = name.toLowerCase();
-  if (n.includes("wifi") || n.includes("internet"))  return "wifi";
-  if (n.includes("library"))                          return "local_library";
-  if (n.includes("lab") || n.includes("laboratory"))  return "science";
-  if (n.includes("hostel") || n.includes("dormitory")) return "hotel";
-  if (n.includes("canteen") || n.includes("cafeteria")) return "restaurant";
-  if (n.includes("gym") || n.includes("fitness"))     return "fitness_center";
-  if (n.includes("sport") || n.includes("ground"))    return "sports";
-  if (n.includes("park") || n.includes("transport"))  return "directions_bus";
-  if (n.includes("medical") || n.includes("health"))  return "local_hospital";
-  if (n.includes("auditorium") || n.includes("hall")) return "theater_comedy";
-  if (n.includes("seminar") || n.includes("conference")) return "meeting_room";
-  if (n.includes("pool") || n.includes("swimming"))   return "pool";
-  if (n.includes("bank") || n.includes("atm"))        return "account_balance";
-  if (n.includes("store") || n.includes("shop"))      return "shopping_bag";
-  if (n.includes("power") || n.includes("generator")) return "bolt";
-  if (n.includes("security"))                         return "security";
-  if (n.includes("camera") || n.includes("cctv"))     return "videocam";
-  if (n.includes("court") || n.includes("basket"))    return "sports_basketball";
-  if (n.includes("garden") || n.includes("park"))     return "park";
-  if (n.includes("ac") || n.includes("air"))          return "ac_unit";
-  return "domain";
-}
-
-function SkeletonCard() {
+function LegendInput({
+  label,
+  children,
+  hint,
+  className = "mb-8",
+}: {
+  label: string;
+  children: React.ReactNode;
+  hint?: string;
+  className?: string;
+}) {
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-4 animate-pulse">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-700 flex-shrink-0" />
-        <div className="flex-1 space-y-1.5">
-          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
-          <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
-        </div>
-        <div className="w-11 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex-shrink-0" />
+    <div className={`w-full ${className}`}>
+      <div className="relative border border-slate-200 rounded-[5px] px-4 pt-5 pb-2 focus-within:border-red-300 transition-colors">
+        <label className="absolute -top-[12px] left-3 bg-white px-2 text-[13px] font-semibold text-slate-500 z-10">
+          {label}
+        </label>
+        {children}
       </div>
+      {hint && <p className="text-[12px] text-slate-400 mt-1 italic pl-1">{hint}</p>}
     </div>
   );
 }
 
-function Toggle({
-  checked,
-  onChange,
-  disabled,
-}: {
-  checked: boolean;
-  onChange: (v: boolean) => void;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      disabled={disabled}
-      onClick={() => onChange(!checked)}
-      className={`
-        relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent
-        transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50
-        ${checked ? "bg-primary" : "bg-slate-200 dark:bg-slate-600"}
-        ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-      `}
-    >
-      <span
-        className={`
-          pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-md
-          transform transition-transform duration-200 ease-in-out
-          ${checked ? "translate-x-5" : "translate-x-0"}
-        `}
-      />
-    </button>
-  );
-}
-
 export default function FacilitiesTab({ college }: Props) {
+  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  
+  // Form state
+  const [selectedFacilityId, setSelectedFacilityId] = useState("");
+  const [description, setDescription] = useState("");
+
   const slug = college.slug;
-
-  const [facilities, setFacilities]   = useState<Facility[]>([]);
-  const [pending, setPending]         = useState<Map<number, boolean>>(new Map()); // id → new enabled state
-  const [loading, setLoading]         = useState(true);
-  const [saving, setSaving]           = useState(false);
-  const [error, setError]             = useState<string | null>(null);
-  const [toast, setToast]             = useState<{ msg: string; ok: boolean } | null>(null);
-  const [search, setSearch]           = useState("");
-  const [filter, setFilter]           = useState<"all" | "enabled" | "disabled">("all");
-
-  const showToast = (msg: string, ok = true) => {
-    setToast({ msg, ok });
-    setTimeout(() => setToast(null), 3500);
-  };
 
   const load = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
-      const res  = await fetch(`/api/college/dashboard/${slug}/facilities`);
+      const res = await fetch(`/api/college/dashboard/${slug}/facilities`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to load facilities.");
       setFacilities(data.facilities ?? []);
-      setPending(new Map());
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unknown error.");
+      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -138,316 +69,136 @@ export default function FacilitiesTab({ college }: Props) {
 
   useEffect(() => { load(); }, [load]);
 
-  // Effective enabled state: pending overrides server state
-  function isEnabled(f: Facility): boolean {
-    return pending.has(f.id) ? pending.get(f.id)! : f.enabled;
-  }
-
-  function handleToggle(f: Facility) {
-    const next = !isEnabled(f);
-    // If reverting to original state, remove from pending
-    if (next === f.enabled) {
-      setPending((prev) => {
-        const m = new Map(prev);
-        m.delete(f.id);
-        return m;
-      });
-    } else {
-      setPending((prev) => new Map(prev).set(f.id, next));
+  const handleSave = async () => {
+    if (!selectedFacilityId) {
+      alert("Please select a facility type.");
+      return;
     }
-  }
-
-  const hasPending = pending.size > 0;
-
-  async function handleSave() {
-    if (!hasPending) return;
     setSaving(true);
     try {
-      const updates = Array.from(pending.entries()).map(([facilities_id, enabled]) => ({
-        facilities_id,
-        enabled,
-      }));
+      // Logic: Update the specific facility's description and marked as enabled
+      const updates = [{
+        facilities_id: Number(selectedFacilityId),
+        enabled: true,
+        description: description,
+      }];
 
-      const res  = await fetch(`/api/college/dashboard/${slug}/facilities`, {
-        method:  "POST",
+      const res = await fetch(`/api/college/dashboard/${slug}/facilities`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ updates }),
+        body: JSON.stringify({ updates }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Save failed.");
-
-      // Commit pending into facilities list
-      setFacilities((prev) =>
-        prev.map((f) =>
-          pending.has(f.id) ? { ...f, enabled: pending.get(f.id)! } : f
-        )
-      );
-      setPending(new Map());
-      showToast(`${updates.length} facility update(s) saved!`, true);
+      if (!res.ok) throw new Error("Save failed.");
+      
+      alert("Facility updated successfully!");
+      setSelectedFacilityId("");
+      setDescription("");
+      load();
     } catch (e) {
-      showToast(e instanceof Error ? e.message : "Save failed.", false);
+      alert("Save failed.");
     } finally {
       setSaving(false);
     }
-  }
+  };
 
-  function handleDiscard() {
-    setPending(new Map());
-  }
-
-  // Filtered + searched list
-  const visible = facilities.filter((f) => {
-    if (search && !f.name.toLowerCase().includes(search.toLowerCase())) return false;
-    if (filter === "enabled"  && !isEnabled(f)) return false;
-    if (filter === "disabled" &&  isEnabled(f)) return false;
-    return true;
-  });
-
-  const enabledCount = facilities.filter((f) => isEnabled(f)).length;
-  const pendingCount = pending.size;
+  const tabs = [
+    { id: "address", label: "Address", icon: "location_on" },
+    { id: "gallery", label: "Gallery", icon: "image" },
+    { id: "achievements", label: "Achievements", icon: "emoji_events" },
+    { id: "courses", label: "Courses", icon: "menu_book" },
+    { id: "facilities", label: "Facilities", icon: "apartment" },
+    { id: "events", label: "Events", icon: "event" },
+    { id: "scholarships", label: "Scholarships", icon: "payments" },
+    { id: "placement", label: "Placements", icon: "work" },
+    { id: "letters", label: "Letters", icon: "description" },
+    { id: "sports", label: "Sports", icon: "sports_soccer" },
+    { id: "cutoffs", label: "Cut Offs", icon: "assignment" },
+    { id: "faculty", label: "Faculties", icon: "groups" },
+  ];
 
   return (
-    <div className="space-y-6">
-
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">
-            Facilities
-          </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            Toggle the facilities available at your campus
-          </p>
-        </div>
-
-        {/* Stats pill */}
-        <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-bold">
-          <span
-            className="material-symbols-rounded text-base"
-            style={{ fontVariationSettings: "'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 20" }}
-          >
-            check_circle
-          </span>
-          {enabledCount} / {facilities.length} enabled
-        </div>
-      </div>
-
-      {/* ── Error ──────────────────────────────────────────────────────────── */}
-      {error && (
-        <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl px-5 py-4 text-red-700 dark:text-red-400">
-          <span className="material-symbols-rounded text-xl">error</span>
-          <span className="text-sm font-medium">{error}</span>
-          <button
-            onClick={load}
-            className="ml-auto text-xs font-bold underline"
-          >
-            Retry
-          </button>
-        </div>
-      )}
-
-      {/* ── Pending-changes banner ──────────────────────────────────────────── */}
-      {hasPending && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl px-5 py-4">
-          <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
-            <span className="material-symbols-rounded text-xl">pending</span>
-            <span className="text-sm font-semibold">
-              {pendingCount} unsaved change{pendingCount !== 1 ? "s" : ""}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleDiscard}
-              disabled={saving}
-              className="px-4 py-1.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
-            >
-              Discard
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="flex items-center gap-1.5 px-5 py-1.5 bg-primary text-white rounded-xl text-sm font-bold hover:bg-primary/90 transition-colors disabled:opacity-60"
-            >
-              {saving ? (
-                <>
-                  <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  Saving…
-                </>
-              ) : (
-                <>
-                  <span className="material-symbols-rounded text-base" style={{ fontVariationSettings: "'FILL' 1" }}>save</span>
-                  Save Changes
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── Search + Filter ─────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-xl pointer-events-none">
-            search
-          </span>
-          <input
-            type="text"
-            placeholder="Search facilities…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-          />
-          {search && (
-            <button
-              onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-            >
-              <span className="material-symbols-rounded text-lg">close</span>
-            </button>
-          )}
-        </div>
-
-        <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-          {(["all", "enabled", "disabled"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold capitalize transition-all ${
-                filter === f
-                  ? "bg-white dark:bg-slate-700 text-primary shadow-sm"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+    <div className="pb-24 font-poppins bg-[#fcfcfc] min-h-[600px] border border-slate-200 rounded-[10px] overflow-hidden shadow-sm">
+      {/* ── Sub-navigation ────────────────────────────────────────────────── */}
+      <div className="flex bg-white border-b border-slate-200 overflow-x-auto hide-scrollbar scroll-smooth">
+        {tabs.map((tab) => {
+          const isActive = tab.id === "facilities";
+          return (
+            <div
+              key={tab.id}
+              className={`flex items-center justify-center gap-2 py-3 px-6 text-[13px] font-bold transition-all cursor-pointer border-r border-slate-100 flex-1 min-w-[140px] ${
+                isActive ? "bg-[#FF3C3C] text-white" : "text-slate-500 hover:bg-slate-50"
               }`}
             >
-              {f}
-            </button>
-          ))}
-        </div>
+              <span className="whitespace-nowrap">{tab.label}</span>
+              <span className={`material-symbols-outlined text-[18px] ${isActive ? "text-white" : "text-slate-400"}`}>
+                {tab.icon}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
-      {/* ── Grid ───────────────────────────────────────────────────────────── */}
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
+      {/* ── Content Area ─────────────────────────────────────────────────── */}
+      <div className="p-8 md:p-12">
+        
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2">
+           <h2 className="text-[22px] font-bold text-[#333]">Manage Your College Facilities</h2>
+           <button className="bg-[#9DA6B7] hover:bg-[#8e99ac] text-white px-6 py-2.5 rounded-[5px] font-bold text-[14px] transition-all shadow-sm">
+             + Add New College Facility Details
+           </button>
         </div>
-      ) : visible.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <span className="material-symbols-rounded text-6xl text-slate-300 dark:text-slate-600 mb-4"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            apartment
-          </span>
-          <p className="text-slate-500 dark:text-slate-400 font-medium">
-            {search || filter !== "all" ? "No facilities match your filter." : "No facilities found."}
-          </p>
-          {(search || filter !== "all") && (
-            <button
-              onClick={() => { setSearch(""); setFilter("all"); }}
-              className="mt-3 text-sm text-primary font-semibold hover:underline"
+
+        {/* Status Banner */}
+        <div className="bg-[#f2f2f2] border border-slate-200 rounded-[3px] px-4 py-1.5 mb-8">
+           <p className="text-[12px] text-[#FF3C3C] font-semibold italic">
+             {loading ? "Loading facilities..." : facilities.some(f => f.enabled) ? "College facilities updated" : "No college facilities listed"}
+           </p>
+        </div>
+
+        <p className="text-[14px] text-slate-600 font-bold mb-10">
+          College Name : <span className="text-slate-800 font-black">{college.name}</span>
+        </p>
+
+        {/* Form Grid */}
+        <div className="max-w-4xl">
+          
+          <LegendInput label="Facility Type">
+            <select 
+              value={selectedFacilityId}
+              onChange={(e) => setSelectedFacilityId(e.target.value)}
+              className="w-full bg-transparent outline-none text-[14px] text-slate-600 appearance-none cursor-pointer py-1"
             >
-              Clear filters
-            </button>
-          )}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {visible.map((f) => {
-            const on      = isEnabled(f);
-            const changed = pending.has(f.id);
-            return (
-              <div
-                key={f.id}
-                onClick={() => handleToggle(f)}
-                className={`
-                  group relative bg-white dark:bg-slate-800 rounded-2xl border-2 p-4
-                  cursor-pointer transition-all duration-200 select-none
-                  ${on
-                    ? "border-primary/30 bg-primary/5 dark:bg-primary/10 shadow-sm shadow-primary/10"
-                    : "border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600"
-                  }
-                  ${changed ? "ring-2 ring-amber-400/50" : ""}
-                `}
-              >
-                {/* Changed indicator dot */}
-                {changed && (
-                  <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-400" />
-                )}
+              <option value="">Select Facilities type</option>
+              {facilities.map(f => (
+                <option key={f.id} value={f.id}>{f.name}</option>
+              ))}
+            </select>
+            <span className="material-symbols-outlined absolute right-3 top-[18px] text-slate-400 pointer-events-none">expand_more</span>
+          </LegendInput>
 
-                <div className="flex items-center gap-3">
-                  {/* Icon */}
-                  <div
-                    className={`
-                      flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-colors
-                      ${on
-                        ? "bg-primary/15 text-primary"
-                        : "bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500"
-                      }
-                    `}
-                  >
-                    <FacilityIcon iconname={f.iconname} name={f.name} />
-                  </div>
+          <LegendInput label="Description">
+            <textarea 
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter Description"
+              rows={8}
+              className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1 resize-none overflow-hidden"
+            />
+          </LegendInput>
 
-                  {/* Name */}
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-bold truncate transition-colors ${
-                      on ? "text-slate-800 dark:text-white" : "text-slate-500 dark:text-slate-400"
-                    }`}>
-                      {f.name}
-                    </p>
-                    {on && (
-                      <p className="text-xs text-primary font-semibold mt-0.5">Active</p>
-                    )}
-                  </div>
-
-                  {/* Toggle */}
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <Toggle checked={on} onChange={() => handleToggle(f)} disabled={saving} />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* ── Summary footer ─────────────────────────────────────────────────── */}
-      {!loading && facilities.length > 0 && (
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-700">
-          <p className="text-xs text-slate-400 dark:text-slate-500">
-            Showing {visible.length} of {facilities.length} facilities
-          </p>
-          {hasPending && (
-            <button
+          <div className="flex justify-center pt-12">
+            <button 
               onClick={handleSave}
               disabled={saving}
-              className="text-xs font-bold text-primary hover:underline disabled:opacity-50"
+              className="bg-[#FF3C3C] hover:bg-[#e63535] text-white px-24 py-3.5 rounded-[6px] font-bold text-[18px] transition-all shadow-md active:scale-95 disabled:opacity-50 min-w-[240px]"
             >
-              Save {pendingCount} change{pendingCount !== 1 ? "s" : ""}
+              {saving ? "Submitting..." : "Submit"}
             </button>
-          )}
-        </div>
-      )}
+          </div>
 
-      {/* ── Toast ──────────────────────────────────────────────────────────── */}
-      {toast && (
-        <div
-          className={`
-            fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50
-            flex items-center gap-2 px-5 py-3 rounded-2xl shadow-xl text-sm font-semibold
-            transition-all animate-in fade-in slide-in-from-bottom-4 duration-300
-            ${toast.ok
-              ? "bg-emerald-600 text-white"
-              : "bg-red-600 text-white"
-            }
-          `}
-        >
-          <span className="material-symbols-rounded text-base"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            {toast.ok ? "check_circle" : "error"}
-          </span>
-          {toast.msg}
         </div>
-      )}
+      </div>
     </div>
   );
 }

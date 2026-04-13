@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { CollegeUser } from "../CollegeDashboardClient";
 
 interface Props {
@@ -15,672 +15,213 @@ interface Activity {
   updated_at: string;
 }
 
-type Grouped = Record<string, Activity[]>;
+// ── Components ───────────────────────────────────────────────────────────────
 
-const ACTIVITY_TYPES = ["Sports", "Cultural", "Technical", "Other"] as const;
-type ActivityType = (typeof ACTIVITY_TYPES)[number];
-
-const TYPE_META: Record<
-  ActivityType,
-  { icon: string; accent: string; bg: string; border: string; chip: string }
-> = {
-  Sports: {
-    icon: "sports",
-    accent: "text-emerald-600 dark:text-emerald-400",
-    bg: "bg-emerald-50 dark:bg-emerald-900/20",
-    border: "border-emerald-200 dark:border-emerald-800/50",
-    chip: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
-  },
-  Cultural: {
-    icon: "theater_comedy",
-    accent: "text-violet-600 dark:text-violet-400",
-    bg: "bg-violet-50 dark:bg-violet-900/20",
-    border: "border-violet-200 dark:border-violet-800/50",
-    chip: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 border-violet-200 dark:border-violet-800",
-  },
-  Technical: {
-    icon: "precision_manufacturing",
-    accent: "text-blue-600 dark:text-blue-400",
-    bg: "bg-blue-50 dark:bg-blue-900/20",
-    border: "border-blue-200 dark:border-blue-800/50",
-    chip: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border-blue-200 dark:border-blue-800",
-  },
-  Other: {
-    icon: "category",
-    accent: "text-amber-600 dark:text-amber-400",
-    bg: "bg-amber-50 dark:bg-amber-900/20",
-    border: "border-amber-200 dark:border-amber-800/50",
-    chip: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 border-amber-200 dark:border-amber-800",
-  },
-};
-
-// ── Delete Confirm ─────────────────────────────────────────────────────────────
-function DeleteConfirm({
-  activity,
-  slug,
-  onClose,
-  onDeleted,
+function LegendInput({
+  label,
+  children,
+  hint,
+  className = "mb-8",
 }: {
-  activity: Activity;
-  slug: string;
-  onClose: () => void;
-  onDeleted: (id: number) => void;
+  label: string;
+  children: React.ReactNode;
+  hint?: string;
+  className?: string;
 }) {
-  const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState("");
-
-  async function handleDelete() {
-    setDeleting(true);
-    setError("");
-    try {
-      const res = await fetch(
-        `/api/college/dashboard/${slug}/sports?activityId=${activity.id}`,
-        { method: "DELETE" },
-      );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Delete failed.");
-      onDeleted(activity.id);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Delete failed.");
-      setDeleting(false);
-    }
-  }
-
-  const meta = TYPE_META[activity.typeOfActivity as ActivityType] ?? TYPE_META.Other;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-6 space-y-4">
-        <div className="w-14 h-14 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto">
-          <span
-            className="material-symbols-rounded text-3xl text-red-500"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            delete
-          </span>
-        </div>
-        <div className="text-center">
-          <h3 className="font-bold text-slate-800 dark:text-white text-lg">
-            Remove Activity?
-          </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            <span className="font-semibold text-slate-700 dark:text-slate-200">
-              &ldquo;{activity.name}&rdquo;
-            </span>{" "}
-            will be permanently removed from{" "}
-            <span className={`font-semibold ${meta.accent}`}>
-              {activity.typeOfActivity}
-            </span>
-            .
-          </p>
-        </div>
-        {error && (
-          <p className="text-sm text-red-500 text-center">{error}</p>
-        )}
-        <div className="flex gap-3">
-          <button
-            onClick={onClose}
-            disabled={deleting}
-            className="flex-1 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="flex-1 py-3 rounded-2xl bg-red-500 text-white text-sm font-bold hover:bg-red-600 disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-          >
-            {deleting ? (
-              <>
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Removing…
-              </>
-            ) : (
-              "Remove"
-            )}
-          </button>
-        </div>
+    <div className={`w-full ${className}`}>
+      <div className="relative border border-slate-200 rounded-[5px] px-4 pt-5 pb-2 focus-within:border-red-300 transition-colors">
+        <label className="absolute -top-[12px] left-3 bg-white px-2 text-[13px] font-semibold text-slate-500 z-10">
+          {label}
+        </label>
+        {children}
       </div>
+      {hint && <p className="text-[12px] text-slate-400 mt-1 italic pl-1">{hint}</p>}
     </div>
   );
 }
 
-// ── Inline add input ───────────────────────────────────────────────────────────
-function AddActivityInput({
-  type,
-  slug,
-  onAdded,
-  onCancel,
-}: {
-  type: ActivityType;
-  slug: string;
-  onAdded: (a: Activity) => void;
-  onCancel: () => void;
-}) {
-  const [name, setName] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const n = name.trim();
-    if (!n) {
-      setError("Activity name is required.");
-      return;
-    }
-    setSaving(true);
-    setError("");
-    try {
-      const res = await fetch(`/api/college/dashboard/${slug}/sports`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: n, typeOfActivity: type }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed to add.");
-      onAdded(data.activity as Activity);
-      setName("");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to add.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Escape") onCancel();
-  }
-
-  const meta = TYPE_META[type];
-
-  return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-2 mt-3">
-      <div className="relative flex-1">
-        <input
-          ref={inputRef}
-          type="text"
-          value={name}
-          onChange={(e) => {
-            setName(e.target.value);
-            setError("");
-          }}
-          onKeyDown={handleKeyDown}
-          placeholder={`New ${type} activity…`}
-          maxLength={100}
-          className={`
-            w-full px-4 py-2 rounded-xl border-2 text-sm font-medium
-            bg-white dark:bg-slate-900/60
-            text-slate-800 dark:text-white placeholder-slate-400
-            focus:outline-none transition-all
-            ${error
-              ? "border-red-400 focus:border-red-500"
-              : `border-slate-200 dark:border-slate-700 focus:${meta.border}`
-            }
-          `}
-        />
-        {error && (
-          <p className="absolute top-full left-0 mt-1 text-xs text-red-500 whitespace-nowrap font-medium">
-            {error}
-          </p>
-        )}
-      </div>
-      <button
-        type="submit"
-        disabled={saving || !name.trim()}
-        className={`
-          flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition-all
-          disabled:opacity-50 disabled:cursor-not-allowed shrink-0
-          ${meta.chip} border
-        `}
-      >
-        {saving ? (
-          <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
-        ) : (
-          <span
-            className="material-symbols-rounded text-base"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            add
-          </span>
-        )}
-        Add
-      </button>
-      <button
-        type="button"
-        onClick={onCancel}
-        className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors shrink-0"
-      >
-        <span
-          className="material-symbols-rounded text-slate-500 text-lg"
-          style={{ fontVariationSettings: "'FILL' 0" }}
-        >
-          close
-        </span>
-      </button>
-    </form>
-  );
-}
-
-// ── Activity chip ──────────────────────────────────────────────────────────────
-function ActivityChip({
-  activity,
-  chipCls,
-  onDelete,
-}: {
-  activity: Activity;
-  chipCls: string;
-  onDelete: () => void;
-}) {
-  return (
-    <span
-      className={`
-        group/chip inline-flex items-center gap-1.5 pl-3 pr-1.5 py-1.5
-        rounded-xl border text-sm font-semibold transition-all
-        ${chipCls}
-      `}
-    >
-      {activity.name}
-      <button
-        onClick={onDelete}
-        title="Remove"
-        className="w-5 h-5 rounded-lg bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 flex items-center justify-center transition-colors shrink-0 ml-0.5"
-      >
-        <span
-          className="material-symbols-rounded text-[13px]"
-          style={{ fontVariationSettings: "'FILL' 1" }}
-        >
-          close
-        </span>
-      </button>
-    </span>
-  );
-}
-
-// ── Section skeleton ───────────────────────────────────────────────────────────
-function SectionSkeleton() {
-  return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 space-y-4 animate-pulse">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-700" />
-          <div className="space-y-1.5">
-            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-28" />
-            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-16" />
-          </div>
-        </div>
-        <div className="h-8 w-24 bg-slate-200 dark:bg-slate-700 rounded-xl" />
-      </div>
-      <div className="flex flex-wrap gap-2 pt-1">
-        {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className="h-8 bg-slate-200 dark:bg-slate-700 rounded-xl"
-            style={{ width: `${60 + i * 20}px` }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Type section ───────────────────────────────────────────────────────────────
-function TypeSection({
-  type,
-  activities,
-  slug,
-  onAdded,
-  onDeleteRequest,
-}: {
-  type: ActivityType;
-  activities: Activity[];
-  slug: string;
-  onAdded: (a: Activity) => void;
-  onDeleteRequest: (a: Activity) => void;
-}) {
-  const [showInput, setShowInput] = useState(false);
-  const meta = TYPE_META[type];
-
-  function handleAdded(a: Activity) {
-    onAdded(a);
-    setShowInput(false);
-  }
-
-  return (
-    <div
-      className={`rounded-2xl border p-5 space-y-4 transition-all ${meta.bg} ${meta.border}`}
-    >
-      {/* Section header */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div
-            className={`w-10 h-10 rounded-xl bg-white/70 dark:bg-black/20 flex items-center justify-center shadow-sm`}
-          >
-            <span
-              className={`material-symbols-rounded text-xl ${meta.accent}`}
-              style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}
-            >
-              {meta.icon}
-            </span>
-          </div>
-          <div>
-            <h3 className="font-black text-slate-800 dark:text-white text-base leading-tight">
-              {type}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-              {activities.length} activit{activities.length !== 1 ? "ies" : "y"}
-            </p>
-          </div>
-        </div>
-
-        {!showInput && (
-          <button
-            onClick={() => setShowInput(true)}
-            className={`
-              flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold
-              border transition-all active:scale-95
-              ${meta.chip}
-            `}
-          >
-            <span
-              className="material-symbols-rounded text-sm"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              add
-            </span>
-            Add
-          </button>
-        )}
-      </div>
-
-      {/* Activity chips */}
-      {activities.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {activities.map((a) => (
-            <ActivityChip
-              key={a.id}
-              activity={a}
-              chipCls={meta.chip}
-              onDelete={() => onDeleteRequest(a)}
-            />
-          ))}
-        </div>
-      ) : (
-        !showInput && (
-          <div className="flex items-center gap-2 py-2">
-            <span
-              className={`material-symbols-rounded text-base opacity-40 ${meta.accent}`}
-              style={{ fontVariationSettings: "'FILL' 0" }}
-            >
-              add_circle
-            </span>
-            <p className="text-sm text-slate-400 dark:text-slate-500 italic">
-              No {type.toLowerCase()} activities added yet
-            </p>
-          </div>
-        )
-      )}
-
-      {/* Inline add input */}
-      {showInput && (
-        <AddActivityInput
-          type={type}
-          slug={slug}
-          onAdded={handleAdded}
-          onCancel={() => setShowInput(false)}
-        />
-      )}
-    </div>
-  );
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
 export default function SportsTab({ college }: Props) {
-  const slug = college.slug;
-
-  const [grouped, setGrouped] = useState<Grouped>({
-    Sports: [],
-    Cultural: [],
-    Technical: [],
-    Other: [],
-  });
-  const [total, setTotal] = useState(0);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [deleteTarget, setDeleteTarget] = useState<Activity | null>(null);
-  const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
+  const [saving, setSaving] = useState(false);
+  
+  // Form state
+  const [type, setType] = useState("");
+  const [name, setName] = useState("");
 
-  function showToast(msg: string, ok = true) {
-    setToast({ msg, ok });
-    setTimeout(() => setToast(null), 3500);
-  }
+  const slug = college.slug;
 
   const load = useCallback(async () => {
     setLoading(true);
-    setError("");
     try {
       const res = await fetch(`/api/college/dashboard/${slug}/sports`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to load.");
-      setGrouped(
-        data.grouped ?? {
-          Sports: [],
-          Cultural: [],
-          Technical: [],
-          Other: [],
-        },
-      );
-      setTotal(data.total ?? 0);
+      
+      // Flatten grouped data if nested from API
+      let list: Activity[] = [];
+      if (data.grouped) {
+        list = Object.values(data.grouped).flat() as Activity[];
+      } else if (Array.isArray(data.activities)) {
+        list = data.activities;
+      }
+      setActivities(list);
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Failed to load sports & activities.",
-      );
+      console.error(e);
     } finally {
       setLoading(false);
     }
   }, [slug]);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  useEffect(() => { load(); }, [load]);
 
-  function handleAdded(a: Activity) {
-    const type = a.typeOfActivity as ActivityType;
-    setGrouped((prev) => ({
-      ...prev,
-      [type]: [...(prev[type] ?? []), a].sort((x, y) =>
-        x.name.localeCompare(y.name),
-      ),
-    }));
-    setTotal((t) => t + 1);
-    showToast(`"${a.name}" added to ${type}!`);
-  }
+  const handleSubmit = async () => {
+    if (!type) {
+      alert("Please select a type of activity.");
+      return;
+    }
+    if (!name.trim()) {
+      alert("Please enter an activity name.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/college/dashboard/${slug}/sports`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), typeOfActivity: type }),
+      });
+      if (!res.ok) throw new Error("Save failed.");
+      
+      alert("Activity added successfully!");
+      setName("");
+      load();
+    } catch (e) {
+      alert("Save failed.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
-  function handleDeleteRequest(a: Activity) {
-    setDeleteTarget(a);
-  }
-
-  function handleDeleted(id: number) {
-    let deletedType = "";
-    setGrouped((prev) => {
-      const next = { ...prev };
-      for (const type of ACTIVITY_TYPES) {
-        const before = next[type] ?? [];
-        const after = before.filter((a) => a.id !== id);
-        if (after.length !== before.length) {
-          deletedType = type;
-          next[type] = after;
-        }
-      }
-      return next;
-    });
-    setTotal((t) => Math.max(0, t - 1));
-    setDeleteTarget(null);
-    showToast(
-      `Activity removed from ${deletedType || "the list"}.`,
-      true,
-    );
-  }
-
-  // ── Summary stats for header ───────────────────────────────────────────────
-  const groupCounts = ACTIVITY_TYPES.map((t) => ({
-    type: t,
-    count: (grouped[t] ?? []).length,
-  }));
+  const tabs = [
+    { id: "address", label: "Address", icon: "location_on" },
+    { id: "gallery", label: "Gallery", icon: "image" },
+    { id: "achievements", label: "Achievements", icon: "emoji_events" },
+    { id: "courses", label: "Courses", icon: "menu_book" },
+    { id: "facilities", label: "Facilities", icon: "apartment" },
+    { id: "events", label: "Events", icon: "event" },
+    { id: "scholarships", label: "Scholarships", icon: "payments" },
+    { id: "placement", label: "Placements", icon: "work" },
+    { id: "letters", label: "Letters", icon: "description" },
+    { id: "sports", label: "Sports", icon: "sports_soccer" },
+    { id: "cutoffs", label: "Cut Offs", icon: "assignment" },
+    { id: "faculty", label: "Faculties", icon: "groups" },
+  ];
 
   return (
-    <div className="space-y-6">
-      {/* ── Toast ──────────────────────────────────────────────────────────── */}
-      {toast && (
-        <div
-          className={`
-            fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50
-            flex items-center gap-2 px-5 py-3 rounded-2xl shadow-xl text-sm font-semibold
-            transition-all animate-in fade-in slide-in-from-bottom-4 duration-300
-            ${toast.ok ? "bg-emerald-600 text-white" : "bg-red-600 text-white"}
-          `}
-        >
-          <span
-            className="material-symbols-rounded text-base"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            {toast.ok ? "check_circle" : "error"}
-          </span>
-          {toast.msg}
-        </div>
-      )}
-
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">
-            Sports &amp; Activities
-          </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            {total} activit{total !== 1 ? "ies" : "y"} across{" "}
-            {groupCounts.filter((g) => g.count > 0).length} categor
-            {groupCounts.filter((g) => g.count > 0).length !== 1
-              ? "ies"
-              : "y"}
-          </p>
-        </div>
-
-        {/* Summary pills */}
-        {!loading && total > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {groupCounts
-              .filter((g) => g.count > 0)
-              .map(({ type, count }) => {
-                const meta = TYPE_META[type];
-                return (
-                  <span
-                    key={type}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border ${meta.chip}`}
-                  >
-                    <span
-                      className="material-symbols-rounded text-sm"
-                      style={{ fontVariationSettings: "'FILL' 1" }}
-                    >
-                      {meta.icon}
-                    </span>
-                    {type}: {count}
-                  </span>
-                );
-              })}
-          </div>
-        )}
+    <div className="pb-24 font-poppins bg-[#fcfcfc] min-h-[600px] border border-slate-200 rounded-[10px] overflow-hidden shadow-sm">
+      {/* ── Sub-navigation ────────────────────────────────────────────────── */}
+      <div className="flex bg-white border-b border-slate-200 overflow-x-auto hide-scrollbar scroll-smooth">
+        {tabs.map((tab) => {
+          const isActive = tab.id === "sports";
+          return (
+            <div
+              key={tab.id}
+              className={`flex items-center justify-center gap-2 py-3 px-6 text-[13px] font-bold transition-all cursor-pointer border-r border-slate-100 flex-1 min-w-[140px] ${
+                isActive ? "bg-[#FF3C3C] text-white" : "text-slate-500 hover:bg-slate-50"
+              }`}
+            >
+              <span className="whitespace-nowrap">{tab.label}</span>
+              <span className={`material-symbols-outlined text-[18px] ${isActive ? "text-white" : "text-slate-400"}`}>
+                {tab.icon}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
-      {/* ── Error ──────────────────────────────────────────────────────────── */}
-      {error && (
-        <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl px-5 py-4 text-red-700 dark:text-red-400">
-          <span className="material-symbols-rounded text-xl">error</span>
-          <span className="text-sm font-medium">{error}</span>
-          <button
-            onClick={load}
-            className="ml-auto text-xs font-bold underline"
-          >
-            Retry
-          </button>
+      {/* ── Content Area ─────────────────────────────────────────────────── */}
+      <div className="p-8 md:p-12">
+        
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2">
+           <h2 className="text-[22px] font-bold text-[#333]">Manage Your College Sports & Activity</h2>
+           <button className="bg-[#9DA6B7] hover:bg-[#8e99ac] text-white px-6 py-2.5 rounded-[5px] font-bold text-[14px] transition-all shadow-sm">
+             + Add New College Sports & Activity
+           </button>
         </div>
-      )}
 
-      {/* ── Sections ───────────────────────────────────────────────────────── */}
-      {loading ? (
-        <div className="space-y-4">
-          {ACTIVITY_TYPES.map((t) => (
-            <SectionSkeleton key={t} />
-          ))}
+        {/* Status Banner */}
+        <div className="bg-[#f2f2f2] border border-slate-200 rounded-[3px] px-4 py-1.5 mb-12">
+           <p className="text-[12px] text-[#FF3C3C] font-semibold italic">
+             {loading ? "Loading activities..." : activities.length > 0 ? `${activities.length} activity listed` : "No college sports & activity listed"}
+           </p>
         </div>
-      ) : (
-        <div className="space-y-4">
-          {ACTIVITY_TYPES.map((type) => (
-            <TypeSection
-              key={type}
-              type={type}
-              activities={grouped[type] ?? []}
-              slug={slug}
-              onAdded={handleAdded}
-              onDeleteRequest={handleDeleteRequest}
-            />
-          ))}
-        </div>
-      )}
 
-      {/* ── Tips ───────────────────────────────────────────────────────────── */}
-      {!loading && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 rounded-2xl p-5">
-          <div className="flex items-start gap-3">
-            <span
-              className="material-symbols-rounded text-xl text-blue-500 dark:text-blue-400 mt-0.5 shrink-0"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              lightbulb
-            </span>
-            <div>
-              <p className="text-sm font-bold text-blue-700 dark:text-blue-300 mb-1">
-                Tips
-              </p>
-              <ul className="text-xs text-blue-600 dark:text-blue-400 space-y-1 list-disc list-inside">
-                <li>
-                  <strong>Sports</strong> — inter-college games, tournaments,
-                  fitness programs
-                </li>
-                <li>
-                  <strong>Cultural</strong> — fests, drama, music, dance, art
-                  events
-                </li>
-                <li>
-                  <strong>Technical</strong> — hackathons, coding contests,
-                  robotics, tech-fests
-                </li>
-                <li>
-                  <strong>Other</strong> — anything that doesn&apos;t fit above
-                  (NSS, NCC, social clubs…)
-                </li>
-              </ul>
+        {/* Form Grid */}
+        <div className="max-w-4xl">
+          
+          <LegendInput label="Type of Activity">
+            <div className="relative">
+              <select 
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                className="w-full bg-transparent outline-none text-[14px] text-slate-400 font-medium py-1 appearance-none cursor-pointer"
+              >
+                <option value="">Select type of activity</option>
+                <option value="Sports">Sports</option>
+                <option value="Cultural">Cultural</option>
+                <option value="Technical">Technical</option>
+                <option value="Academic">Academic</option>
+                <option value="Other">Other</option>
+              </select>
+              <span className="absolute right-0 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 pointer-events-none">
+                expand_more
+              </span>
             </div>
-          </div>
-        </div>
-      )}
+          </LegendInput>
 
-      {/* ── Delete confirm ──────────────────────────────────────────────────── */}
-      {deleteTarget && (
-        <DeleteConfirm
-          activity={deleteTarget}
-          slug={slug}
-          onClose={() => setDeleteTarget(null)}
-          onDeleted={handleDeleted}
-        />
-      )}
+          <LegendInput label="Activity Name">
+            <input 
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter activity name"
+              className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1"
+            />
+          </LegendInput>
+
+          <div className="flex justify-center pt-8">
+            <button 
+              onClick={handleSubmit}
+              disabled={saving}
+              className="bg-[#FF3C3C] hover:bg-[#e63535] text-white px-24 py-3.5 rounded-[6px] font-bold text-[18px] transition-all shadow-md active:scale-95 disabled:opacity-50 min-w-[240px]"
+            >
+              {saving ? "Submitting..." : "Submit"}
+            </button>
+          </div>
+
+        </div>
+
+        {/* Existing Activities List */}
+        {activities.length > 0 && (
+           <div className="mt-16 border-t border-slate-200 pt-12">
+              <h3 className="text-[18px] font-bold text-slate-700 mb-6">Current List</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 {activities.map((act) => (
+                   <div key={act.id} className="bg-white border border-slate-200 p-4 rounded-[5px] flex items-center justify-between shadow-sm">
+                      <div>
+                        <p className="text-[12px] font-black text-primary/60 uppercase tracking-tighter">{act.typeOfActivity}</p>
+                        <p className="text-[14px] font-bold text-slate-800">{act.name}</p>
+                      </div>
+                      <span className="material-symbols-outlined text-slate-300 text-[18px]">verified</span>
+                   </div>
+                 ))}
+              </div>
+           </div>
+        )}
+      </div>
     </div>
   );
 }

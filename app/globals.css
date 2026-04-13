@@ -849,6 +849,17 @@ a, button, [role="button"] {
 
 /* ─── Hide scrollbar globally ───────────────────────────────── */
 body:not(.admin-layout) { scrollbar-width: none; -ms-overflow-style: none; }
+<<<<<<< HEAD
+=======
+.hide-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+}
+.hide-scrollbar {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+>>>>>>> 3f51f6a (College UI Fixes)
 
 /* ─── Chatbot scroll containment ────────────────────────────── */
 .chatbot-scroll {
