@@ -18,6 +18,7 @@ import ContactSection from "./components/ContactSection";
 import StatsBar from "./components/StatsBar";
 import CareerGuidance from "./components/CareerGuidance";
 import Testimonials from "./components/Testimonials";
+import LatestNews from "./components/LatestNews";
 
 const Footer = dynamic(() => import("./components/Footer"), { ssr: true });
 const AuthModal = dynamic(() => import("./components/AuthModal"), { ssr: false });
@@ -118,7 +119,14 @@ export default function HomePageClient({
           <Testimonials testimonials={testimonials} />
         </div>
 
-        {/* 9. Get in Touch */}
+        {/* 9. Latest News */}
+        <div data-gsap="fade-up">
+          <LatestNews />
+        </div>
+
+        <hr className="border-t border-slate-200" />
+
+        {/* 10. Get in Touch */}
         <div data-gsap="fade-up">
           <ContactSection />
         </div>
