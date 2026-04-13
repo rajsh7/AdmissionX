@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ExploreCards from "@/app/components/ExploreCards";
 
 interface PlacementsTabProps {
   collegeName: string;
@@ -138,6 +139,11 @@ export default function PlacementsTab({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Explore Cards */}
+      <div className="w-full px-4 md:px-10 lg:px-12 mx-auto max-w-[1920px] pb-10">
+        <ExploreCards />
       </div>
     </div>
   );

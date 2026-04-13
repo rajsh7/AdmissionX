@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ExploreCards from "@/app/components/ExploreCards";
 
 interface Stat { label: string; value: string; }
 
@@ -158,6 +159,11 @@ export default function AboutTab({
           </div>
 
         </div>
+      </section>
+
+      {/* Explore Cards */}
+      <section className="w-full px-4 md:px-10 lg:px-12 mx-auto max-w-[1920px] pb-10">
+        <ExploreCards />
       </section>
 
     </div>

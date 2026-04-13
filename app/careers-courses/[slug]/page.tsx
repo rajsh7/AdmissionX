@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Star, Download, ArrowRight } from "lucide-react";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import ExploreCards from "@/app/components/ExploreCards";
 
 const DEFAULT_BANNER = "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2532&auto=format&fit=crop";
 const STUDENT_IMAGE = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2670&auto=format&fit=crop";
@@ -225,6 +226,13 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
           </div>
         </section>
       )}
+
+      {/* Explore Cards */}
+      <section className="pb-16 px-6 sm:px-12 lg:px-24">
+        <div className="max-w-[1920px] mx-auto">
+          <ExploreCards />
+        </div>
+      </section>
 
       <Footer />
     </main>

@@ -12,6 +12,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import ExploreCards from "@/app/components/ExploreCards";
 import CourseCardV3 from "./CourseCardV3";
 import SearchBar from "./SearchBar";
 import CourseFiltersV2 from "./CourseFiltersV2";
@@ -184,36 +185,33 @@ export default function ListingSearchV4({
               {/* Active Filters + Sort bar */}
               <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
                 <div className="flex flex-wrap items-center gap-2">
-                  {(level || stream || q) ? (
-                    <>
-                      <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap uppercase tracking-wider mr-1">Active Filters:</span>
-                      {q && (
-                        <div className="flex items-center gap-1.5 bg-white border border-neutral-200 px-3 py-1 rounded-[6px] text-[11px] font-semibold text-neutral-700 shadow-sm">
-                          {q}
-                          <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("q"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors ml-0.5">
-                            <span className="material-symbols-outlined text-[13px]">close</span>
-                          </button>
-                        </div>
-                      )}
-                      {level && (
-                        <div className="flex items-center gap-1.5 bg-white border border-neutral-200 px-3 py-1 rounded-[6px] text-[11px] font-semibold text-neutral-700 shadow-sm">
-                          {levels.find((l) => l.slug === level)?.name || level}
-                          <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("level"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors ml-0.5">
-                            <span className="material-symbols-outlined text-[13px]">close</span>
-                          </button>
-                        </div>
-                      )}
-                      {stream && (
-                        <div className="flex items-center gap-1.5 bg-white border border-neutral-200 px-3 py-1 rounded-[6px] text-[11px] font-semibold text-neutral-700 shadow-sm">
-                          {streams.find((s) => s.slug === stream)?.name || stream}
-                          <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("stream"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors ml-0.5">
-                            <span className="material-symbols-outlined text-[13px]">close</span>
-                          </button>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <span className="text-xs font-medium text-neutral-400">{showingText}</span>
+                  <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap uppercase tracking-wider mr-1">Active Filters:</span>
+                  {q && (
+                    <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                      {q}
+                      <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("q"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                    </div>
+                  )}
+                  {degree && (
+                    <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                      {levels.find((l) => l.slug === degree)?.name || degree}
+                      <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("degree"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                    </div>
+                  )}
+                  {level && (
+                    <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                      {levels.find((l) => l.slug === level)?.name || level}
+                      <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("level"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                    </div>
+                  )}
+                  {stream && (
+                    <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                      {streams.find((s) => s.slug === stream)?.name || stream}
+                      <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("stream"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                    </div>
+                  )}
+                  {!q && !degree && !level && !stream && (
+                    <span className="text-xs text-neutral-400 bg-neutral-50 px-3 py-1.5 rounded-[10px] border border-neutral-100 border-dashed">No filters applied</span>
                   )}
                 </div>
                 {/* Sort By */}
@@ -251,37 +249,12 @@ export default function ListingSearchV4({
           </div>
         </div>
       </div>
-      {/* Quick Navigation Cards */}
+
+      {/* Explore Cards */}
       <div className="mx-auto max-w-[1920px] w-full px-8 lg:px-12 xl:px-20 pb-12">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { href: "/colleges", icon: "apartment", label: "Top Colleges", desc: "Browse best colleges across India", iconBg: "bg-blue-50", iconColor: "text-blue-600", border: "hover:border-blue-200", arrow: "group-hover:text-blue-600" },
-            { href: "/top-university", icon: "school", label: "Top Universities", desc: "Discover top ranked universities", iconBg: "bg-purple-50", iconColor: "text-purple-600", border: "hover:border-purple-200", arrow: "group-hover:text-purple-600" },
-            { href: "/examination", icon: "quiz", label: "Examinations", desc: "Browse entrance exams & dates", iconBg: "bg-red-50", iconColor: "text-red-600", border: "hover:border-red-200", arrow: "group-hover:text-red-600" },
-            { href: "/stream", icon: "category", label: "Streams", desc: "Find your stream & specialisation", iconBg: "bg-emerald-50", iconColor: "text-emerald-600", border: "hover:border-emerald-200", arrow: "group-hover:text-emerald-600" },
-          ].map((card) => (
-            <a
-              key={card.href}
-              href={card.href}
-              className={`group bg-white border border-neutral-200 ${card.border} rounded-2xl p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-all duration-200`}
-            >
-              <div className={`w-11 h-11 rounded-xl ${card.iconBg} flex items-center justify-center`}>
-                <span className={`material-symbols-outlined text-[22px] ${card.iconColor}`} style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {card.icon}
-                </span>
-              </div>
-              <div className="flex-1">
-                <p className="font-black text-[15px] text-neutral-800">{card.label}</p>
-                <p className="text-[12px] text-neutral-500 font-medium mt-0.5 leading-snug">{card.desc}</p>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className={`text-[12px] font-bold text-neutral-400 ${card.arrow} transition-colors`}>Explore</span>
-                <span className={`material-symbols-outlined text-[15px] text-neutral-400 ${card.arrow} transition-colors`}>arrow_forward</span>
-              </div>
-            </a>
-          ))}
-        </div>
+        <ExploreCards />
       </div>
+
       <Footer />
     </div>
   );

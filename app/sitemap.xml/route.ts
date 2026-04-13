@@ -39,7 +39,7 @@ const STATIC_PAGES = [
   { loc: "/top-university", changefreq: "daily", priority: "0.9" },
   { loc: "/stream", changefreq: "weekly", priority: "0.8" },
   { loc: "/examination", changefreq: "daily", priority: "0.9" },
-  { loc: "/education-blogs", changefreq: "daily", priority: "0.8" },
+  { loc: "/blogs", changefreq: "daily", priority: "0.8" },
   { loc: "/news", changefreq: "hourly", priority: "0.9" },
   { loc: "/study-abroad", changefreq: "weekly", priority: "0.8" },
   { loc: "/search", changefreq: "daily", priority: "0.8" },

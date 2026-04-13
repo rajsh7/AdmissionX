@@ -11,6 +11,7 @@ import {
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import ExploreCards from "@/app/components/ExploreCards";
 import CollegeCard from "@/app/components/CollegeCard";
 import CollegeListItem from "@/app/components/CollegeListItem";
 import SearchFilters from "@/app/components/SearchFilters";
@@ -351,7 +352,25 @@ export default function SearchClient({
                           </button>
                         </div>
                       )}
-                      {!stream && !degree && !cityId && !stateId && (
+                                            {cityId && (
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                          {cities.find(c => String(c.id) === cityId)?.name || cityId}
+                          <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("city_id"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                        </div>
+                      )}
+                      {stateId && (
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                          {states.find(s => String(s.id) === stateId)?.name || stateId}
+                          <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("state_id"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                        </div>
+                      )}
+                      {feesMax && (
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                          Up to ₹{(Number(feesMax)/100000).toFixed(0)}L fees
+                          <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("fees_max"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                        </div>
+                      )}
+{!stream && !degree && !cityId && !stateId && !feesMax && (
                         <span className="text-xs text-neutral-400 bg-neutral-50 px-3 py-1.5 rounded-[10px] border border-neutral-100 border-dashed">No filters applied</span>
                       )}
                     </div>
@@ -521,36 +540,9 @@ export default function SearchClient({
         </div>
       </div>
 
-      {/* Quick Navigation Cards */}
+      {/* Explore Cards */}
       <div className="mx-auto max-w-[1920px] w-full px-8 lg:px-12 xl:px-20 pb-12">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { href: "/colleges", icon: "apartment", label: "Top Colleges", desc: "Browse best colleges across India", iconBg: "bg-blue-50", iconColor: "text-blue-600", border: "hover:border-blue-200", arrow: "group-hover:text-blue-600" },
-            { href: "/careers-courses", icon: "menu_book", label: "Top Courses", desc: "Explore popular courses & careers", iconBg: "bg-emerald-50", iconColor: "text-emerald-600", border: "hover:border-emerald-200", arrow: "group-hover:text-emerald-600" },
-            { href: "/examination", icon: "quiz", label: "Examinations", desc: "Browse entrance exams & dates", iconBg: "bg-red-50", iconColor: "text-red-600", border: "hover:border-red-200", arrow: "group-hover:text-red-600" },
-            { href: "/stream", icon: "category", label: "Streams", desc: "Find your stream & specialisation", iconBg: "bg-amber-50", iconColor: "text-amber-600", border: "hover:border-amber-200", arrow: "group-hover:text-amber-600" },
-          ].map((card) => (
-            <a
-              key={card.href}
-              href={card.href}
-              className={`group bg-white border border-neutral-200 ${card.border} rounded-2xl p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-all duration-200`}
-            >
-              <div className={`w-11 h-11 rounded-xl ${card.iconBg} flex items-center justify-center`}>
-                <span className={`material-symbols-outlined text-[22px] ${card.iconColor}`} style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {card.icon}
-                </span>
-              </div>
-              <div className="flex-1">
-                <p className="font-black text-[15px] text-neutral-800">{card.label}</p>
-                <p className="text-[12px] text-neutral-500 font-medium mt-0.5 leading-snug">{card.desc}</p>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className={`text-[12px] font-bold text-neutral-400 ${card.arrow} transition-colors`}>Explore</span>
-                <span className={`material-symbols-outlined text-[15px] text-neutral-400 ${card.arrow} transition-colors`}>arrow_forward</span>
-              </div>
-            </a>
-          ))}
-        </div>
+        <ExploreCards />
       </div>
 
       <Footer />

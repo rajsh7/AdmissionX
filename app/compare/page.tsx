@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import ExploreCards from "@/app/components/ExploreCards";
 import Link from "next/link";
 
 interface CollegeData {
@@ -184,14 +185,8 @@ function ComparePageInner() {
             backgroundPosition: "center",
           }}
         >
-          {/* Subtle overlay for better text readability if image is too bright */}
           <div className="absolute inset-0 bg-white/10" />
-          
-          <div className="relative z-30 max-w-7xl">
-            <div className="mb-8">
-              <h1 className="text-[48px] font-semibold text-slate-800 leading-tight">Compare College</h1>
-              <p className="text-slate-500 mt-2 text-[20px] font-medium max-w-4xl">
-          <div className="max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-24 relative z-10">
+          <div className="relative z-30 max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-24">
             <div className="max-w-4xl">
               <h1 className="text-[48px] font-bold text-slate-900 leading-[1.1] tracking-tight mb-4">
                 Compare College
@@ -200,50 +195,6 @@ function ComparePageInner() {
                 Evaluate multiple institution side by side to find your perfect match based on fees, placement, and academic quality.
               </p>
 
-          {/* Search Bar */}
-          <div ref={searchRef} className="relative mb-8 max-w-xl">
-            <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition-all">
-              <span className="text-primary font-bold text-lg">+</span>
-              <input
-                value={searchQ}
-                onChange={(e) => { setSearchQ(e.target.value); setAddingSlot(colleges.findIndex((c) => !c)); }}
-                placeholder="Location, universities, courses..."
-                className="flex-1 text-sm text-slate-700 placeholder:text-slate-400 bg-transparent outline-none"
-              />
-              <button
-                onClick={() => {
-                  if (searchQ.trim()) {
-                    const slot = colleges.findIndex((c) => !c);
-                    if (slot !== -1) addCollege(searchQ.trim(), slot);
-                  }
-                }}
-                className="bg-primary text-white text-sm font-bold px-5 py-2 rounded-lg hover:bg-red-700 transition-colors"
-              >
-                Add College
-              </button>
-            </div>
-            {suggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden">
-                {suggestions.map((s) => (
-                  <button
-                    key={s.slug}
-                    onClick={() => {
-                      const slot = addingSlot !== null ? addingSlot : colleges.findIndex((c) => !c);
-                      if (slot !== -1) addCollege(s.slug, slot);
-                    }}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-left border-b border-slate-50 last:border-0 transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-slate-400 text-[18px]">account_balance</span>
-                    <div>
-                      <p className="text-sm font-semibold text-slate-800">{s.name}</p>
-                      <p className="text-xs text-slate-400">{s.location}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          </div>
               {/* Search Layout */}
               <div ref={searchRef} className="flex flex-col sm:flex-row gap-4 max-w-2xl relative">
                 <div className="flex-1 flex items-center gap-3 bg-white border border-slate-200 rounded-[5px] px-4 py-3.5 shadow-sm focus-within:border-[#FF3C3C] focus-within:ring-2 focus-within:ring-[#FF3C3C]/10 transition-all">
@@ -270,7 +221,6 @@ function ComparePageInner() {
                   Add College
                 </button>
 
-                {/* Suggestions dropdown via portal */}
                 {suggestions.length > 0 && dropdownStyle && createPortal(
                   <div
                     style={{ position: "absolute", top: dropdownStyle.top, left: dropdownStyle.left, width: dropdownStyle.width, zIndex: 9999 }}
@@ -410,28 +360,10 @@ function ComparePageInner() {
               </div>
             )}
           </div>
-          {/* Quick Navigation Cards */}
-          <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { href: "/colleges", icon: "apartment", label: "Browse Colleges", desc: "Search all colleges across India", iconBg: "bg-blue-50", iconColor: "text-blue-600", border: "hover:border-blue-200", arrow: "group-hover:text-blue-600" },
-              { href: "/top-university", icon: "school", label: "Top Universities", desc: "Discover top ranked universities", iconBg: "bg-purple-50", iconColor: "text-purple-600", border: "hover:border-purple-200", arrow: "group-hover:text-purple-600" },
-              { href: "/careers-courses", icon: "menu_book", label: "Top Courses", desc: "Find the right course for you", iconBg: "bg-emerald-50", iconColor: "text-emerald-600", border: "hover:border-emerald-200", arrow: "group-hover:text-emerald-600" },
-              { href: "/counselling", icon: "support_agent", label: "Free Counselling", desc: "Get expert admission guidance", iconBg: "bg-teal-50", iconColor: "text-teal-600", border: "hover:border-teal-200", arrow: "group-hover:text-teal-600" },
-            ].map((card) => (
-              <a key={card.href} href={card.href} className={`group bg-white border border-neutral-200 ${card.border} rounded-2xl p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-all duration-200`}>
-                <div className={`w-11 h-11 rounded-xl ${card.iconBg} flex items-center justify-center`}>
-                  <span className={`material-symbols-outlined text-[22px] ${card.iconColor}`} style={{ fontVariationSettings: "'FILL' 1" }}>{card.icon}</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-black text-[15px] text-neutral-800">{card.label}</p>
-                  <p className="text-[12px] text-neutral-500 font-medium mt-0.5 leading-snug">{card.desc}</p>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className={`text-[12px] font-bold text-neutral-400 ${card.arrow} transition-colors`}>Explore</span>
-                  <span className={`material-symbols-outlined text-[15px] text-neutral-400 ${card.arrow} transition-colors`}>arrow_forward</span>
-                </div>
-              </a>
-            ))}
+
+          {/* Explore Cards */}
+          <div className="mt-16">
+            <ExploreCards />
           </div>
         </div>
       </main>

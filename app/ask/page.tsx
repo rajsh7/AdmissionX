@@ -488,7 +488,7 @@ export default async function AskPage({
                   Explore education blogs, news, and career guides on AdmissionX.
                 </p>
                 <div className="flex flex-col gap-3 relative z-10">
-                  <Link href="/education-blogs" className="flex items-center gap-2.5 text-xs font-bold text-white hover:translate-x-1 transition-all">
+                  <Link href="/blogs" className="flex items-center gap-2.5 text-xs font-bold text-white hover:translate-x-1 transition-all">
                     <div className="w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center">
                       <span className="material-symbols-outlined text-[14px]">article</span>
                     </div>

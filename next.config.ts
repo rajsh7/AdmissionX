@@ -77,6 +77,10 @@ const nextConfig: NextConfig = {
   // These are content-addressed (hash in filename) so they are safe to cache
   // for a year.  The browser will always fetch a fresh HTML document, which
   // references the new hashed assets after each deploy.
+  async redirects() {
+    return [{ source: "/education-blogs", destination: "/blogs", permanent: true }];
+  },
+
   async headers() {
     return [
       {

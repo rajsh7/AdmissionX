@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ExploreCards from "@/app/components/ExploreCards";
 
 interface CourseRow {
   course_name: string;
@@ -168,6 +169,11 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Explore Cards */}
+      <div className="max-w-[1920px] mx-auto px-4 md:px-10 lg:px-12 pb-10">
+        <ExploreCards />
       </div>
     </div>
   );

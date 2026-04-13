@@ -4,6 +4,7 @@ import SearchClient from "@/app/search/SearchClient";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
 import { Suspense } from "react";
 import { unstable_cache } from "next/cache";
+import ExploreCards from "@/app/components/ExploreCards";
 
 // Premium Components
 import HeroSection from "./components/HeroSection";
@@ -353,30 +354,9 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
         
         <JourneySteps />
 
-        {/* Quick Navigation Cards */}
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 pb-16">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { href: "/top-university", icon: "school", label: "Top Universities", desc: "Discover top ranked universities", iconBg: "bg-purple-50", iconColor: "text-purple-600", border: "hover:border-purple-200", arrow: "group-hover:text-purple-600" },
-              { href: "/counselling", icon: "support_agent", label: "Free Counselling", desc: "Get expert abroad admission help", iconBg: "bg-teal-50", iconColor: "text-teal-600", border: "hover:border-teal-200", arrow: "group-hover:text-teal-600" },
-              { href: "/careers-courses", icon: "menu_book", label: "Top Courses", desc: "Find the right course abroad", iconBg: "bg-emerald-50", iconColor: "text-emerald-600", border: "hover:border-emerald-200", arrow: "group-hover:text-emerald-600" },
-              { href: "/examination", icon: "quiz", label: "Entrance Exams", desc: "IELTS, TOEFL, GRE & more", iconBg: "bg-blue-50", iconColor: "text-blue-600", border: "hover:border-blue-200", arrow: "group-hover:text-blue-600" },
-            ].map((card) => (
-              <a key={card.href} href={card.href} className={`group bg-white border border-neutral-200 ${card.border} rounded-2xl p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-all duration-200`}>
-                <div className={`w-11 h-11 rounded-xl ${card.iconBg} flex items-center justify-center`}>
-                  <span className={`material-symbols-outlined text-[22px] ${card.iconColor}`} style={{ fontVariationSettings: "'FILL' 1" }}>{card.icon}</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-black text-[15px] text-neutral-800">{card.label}</p>
-                  <p className="text-[12px] text-neutral-500 font-medium mt-0.5 leading-snug">{card.desc}</p>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className={`text-[12px] font-bold text-neutral-400 ${card.arrow} transition-colors`}>Explore</span>
-                  <span className={`material-symbols-outlined text-[15px] text-neutral-400 ${card.arrow} transition-colors`}>arrow_forward</span>
-                </div>
-              </a>
-            ))}
-          </div>
+        {/* Explore Cards */}
+        <div className="w-full px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10 pb-16">
+          <ExploreCards />
         </div>
       </main>
 

@@ -44,7 +44,7 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
               </p>
            </div>
            <Link 
-             href="/education-blogs" 
+             href="/blogs" 
              className="inline-flex items-center justify-center px-8 py-4 rounded-[5px] bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-all shadow-sm hover:shadow-md group/btn"
            >
               Explore All Articles

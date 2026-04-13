@@ -33,7 +33,7 @@ const navLinks = [
       { label: "Examination", href: "/examination", icon: "engineering" },
       { label: "Streams", href: "/stream", icon: "grid_view" },
       { label: "News & Articles", href: "/news", icon: "newspaper" },
-      { label: "Latest Blogs", href: "/education-blogs", icon: "article" },
+      { label: "Latest Blogs", href: "/blogs", icon: "article" },
     ]
   },
 ];
@@ -318,7 +318,7 @@ export default function Header({ theme }: HeaderProps) {
           {/* Logo Area */}
           <div className="shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
-              <img src="/logo.jpg" alt="AdmissionX" className="h-10 sm:h-12 w-auto object-contain" />
+              <img src="/logo.jpg" alt="AdmissionX" className="h-10 sm:h-12 w-auto object-contain bg-transparent mix-blend-multiply" />
             </Link>
           </div>
 

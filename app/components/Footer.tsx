@@ -94,7 +94,7 @@ const footerLinks = {
   ],
   "Other": [
     { label: "Study Abroad", href: "/study-abroad" },
-    { label: "Education Blogs", href: "/education-blogs" },
+    { label: "Education Blogs", href: "/blogs" },
     { label: "News & Articles", href: "/news" },
     { label: "Careers", href: "/careers" },
     { label: "Contact Us", href: "/contact-us" },
