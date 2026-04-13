@@ -373,6 +373,32 @@ export default async function NewsPage({
           </div>
         </div>
 
+        {/* Quick Navigation Cards */}
+        <div className="w-full px-4 lg:px-8 xl:px-12 pb-12">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { href: "/education-blogs", icon: "article", label: "Education Blogs", desc: "Expert articles & admission guides", iconBg: "bg-indigo-50", iconColor: "text-indigo-600", border: "hover:border-indigo-200", arrow: "group-hover:text-indigo-600" },
+              { href: "/popular-careers", icon: "work", label: "Popular Careers", desc: "Explore in-demand career paths", iconBg: "bg-amber-50", iconColor: "text-amber-600", border: "hover:border-amber-200", arrow: "group-hover:text-amber-600" },
+              { href: "/examination", icon: "quiz", label: "Examinations", desc: "Browse entrance exams & dates", iconBg: "bg-red-50", iconColor: "text-red-600", border: "hover:border-red-200", arrow: "group-hover:text-red-600" },
+              { href: "/ask", icon: "forum", label: "Ask Q&A", desc: "Get answers from the community", iconBg: "bg-emerald-50", iconColor: "text-emerald-600", border: "hover:border-emerald-200", arrow: "group-hover:text-emerald-600" },
+            ].map((card) => (
+              <a key={card.href} href={card.href} className={`group bg-white border border-neutral-200 ${card.border} rounded-2xl p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-all duration-200`}>
+                <div className={`w-11 h-11 rounded-xl ${card.iconBg} flex items-center justify-center`}>
+                  <span className={`material-symbols-outlined text-[22px] ${card.iconColor}`} style={{ fontVariationSettings: "'FILL' 1" }}>{card.icon}</span>
+                </div>
+                <div className="flex-1">
+                  <p className="font-black text-[15px] text-neutral-800">{card.label}</p>
+                  <p className="text-[12px] text-neutral-500 font-medium mt-0.5 leading-snug">{card.desc}</p>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className={`text-[12px] font-bold text-neutral-400 ${card.arrow} transition-colors`}>Explore</span>
+                  <span className={`material-symbols-outlined text-[15px] text-neutral-400 ${card.arrow} transition-colors`}>arrow_forward</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+
         <Footer />
       </div>
     </div>

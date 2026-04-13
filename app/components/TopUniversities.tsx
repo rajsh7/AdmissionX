@@ -175,6 +175,7 @@ export default function TopUniversities({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search your college, universities, courses..."
+              suppressHydrationWarning
               className="h-14 w-full rounded-[10px] bg-transparent pl-14 pr-4 text-base font-normal text-slate-800 placeholder:text-slate-400 focus:outline-none"
             />
           </div>

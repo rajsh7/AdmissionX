@@ -105,11 +105,13 @@ export default function SearchBar({
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => searchQuery.length >= 2 && setShowDropdown(true)}
             placeholder={placeholder}
+            suppressHydrationWarning
             className="flex-1 h-full text-sm sm:text-base text-white placeholder:text-white/80 bg-transparent outline-none min-w-0 font-medium"
           />
         </div>
         <button
           type="submit"
+          suppressHydrationWarning
           className="flex-shrink-0 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-base font-bold px-10 h-14 rounded-[10px] transition-all active:scale-[0.98] shadow-xl shadow-[#FF3C3C]/30 min-w-max"
         >
           {isLoading ? "Searching..." : "Search Now"}

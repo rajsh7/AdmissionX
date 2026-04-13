@@ -276,6 +276,38 @@ export default async function StreamPage() {
             </div>
           )}
         </div>
+
+        {/* Quick Navigation Cards */}
+        <div className="w-full px-4 lg:px-8 xl:px-12 pb-12">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { href: "/colleges", icon: "apartment", label: "Top Colleges", desc: "Browse best colleges across India", iconBg: "bg-blue-50", iconColor: "text-blue-600", border: "hover:border-blue-200", arrow: "group-hover:text-blue-600" },
+              { href: "/careers-courses", icon: "menu_book", label: "Top Courses", desc: "Explore popular courses & careers", iconBg: "bg-emerald-50", iconColor: "text-emerald-600", border: "hover:border-emerald-200", arrow: "group-hover:text-emerald-600" },
+              { href: "/top-university", icon: "school", label: "Top Universities", desc: "Discover top ranked universities", iconBg: "bg-purple-50", iconColor: "text-purple-600", border: "hover:border-purple-200", arrow: "group-hover:text-purple-600" },
+              { href: "/examination", icon: "quiz", label: "Examinations", desc: "Browse entrance exams & dates", iconBg: "bg-red-50", iconColor: "text-red-600", border: "hover:border-red-200", arrow: "group-hover:text-red-600" },
+            ].map((card) => (
+              <a
+                key={card.href}
+                href={card.href}
+                className={`group bg-white border border-neutral-200 ${card.border} rounded-2xl p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-all duration-200`}
+              >
+                <div className={`w-11 h-11 rounded-xl ${card.iconBg} flex items-center justify-center`}>
+                  <span className={`material-symbols-outlined text-[22px] ${card.iconColor}`} style={{ fontVariationSettings: "'FILL' 1" }}>
+                    {card.icon}
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <p className="font-black text-[15px] text-neutral-800">{card.label}</p>
+                  <p className="text-[12px] text-neutral-500 font-medium mt-0.5 leading-snug">{card.desc}</p>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className={`text-[12px] font-bold text-neutral-400 ${card.arrow} transition-colors`}>Explore</span>
+                  <span className={`material-symbols-outlined text-[15px] text-neutral-400 ${card.arrow} transition-colors`}>arrow_forward</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
       <Footer />
     </div>
