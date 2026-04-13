@@ -135,7 +135,8 @@ export default function SearchFilters({
 
       const params = new URLSearchParams(searchParams.toString());
       Object.entries(next).forEach(([key, val]) => {
-        if (val) params.set(key, val);
+        const isDefaultSort = key === "sort" && (val === "rating" || val === activeSort);
+        if (val && !isDefaultSort) params.set(key, val);
         else params.delete(key);
       });
       params.delete("page");
@@ -146,9 +147,7 @@ export default function SearchFilters({
   );
 
   const resetAll = () => {
-    const params = new URLSearchParams();
-    params.set("sort", "rating");
-    router.push(`${pathname}?${params.toString()}`);
+    router.push(pathname);
     setStream("");
     setDegree("");
     setCityId("");

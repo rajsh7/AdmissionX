@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import ListingSearchV4NoSSR from "@/app/components/ListingSearchV4NoSSR";
 import type { CourseResult } from "@/app/api/search/courses/route";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Career Courses — Find the Right Course for Your Future | AdmissionX",
   description:

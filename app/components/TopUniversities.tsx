@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -54,6 +54,14 @@ export default function TopUniversities({
   const [sortBy, setSortBy] = useState<"rank" | "rating" | null>(null);
   const [selectedCity, setSelectedCity] = useState("All Cities");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  // On mount, if no SSR data was provided, fetch Engineering colleges
+  useEffect(() => {
+    if (currentUniversities.length === 0) {
+      fetchColleges("Engineering");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchColleges = async (category: string) => {
     setIsLoading(true);
@@ -267,17 +275,9 @@ export default function TopUniversities({
         <div
           className={`grid grid-cols-1 gap-6 transition-opacity duration-300 sm:grid-cols-2 lg:grid-cols-4 xl:gap-8 ${isLoading ? "pointer-events-none opacity-50" : "opacity-100"}`}
         >
-          <AnimatePresence mode="popLayout">
-            {filteredUniversities.length > 0 ? (
-              filteredUniversities.slice(0, 8).map((uni, i) => (
-                <motion.div
-                  key={`${uni.href}-${i}`}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.4, delay: i * 0.05 }}
-                >
+          {filteredUniversities.length > 0 ? (
+            filteredUniversities.slice(0, 8).map((uni, i) => (
+              <div key={`${uni.href}-${i}`}>
                   <div className="group flex h-full flex-col overflow-hidden rounded-[10px] border border-slate-100 bg-white shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5">
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <Image
@@ -339,7 +339,6 @@ export default function TopUniversities({
 
                       <div className="mt-auto flex items-center justify-between border-t border-slate-200 pt-5">
                         <div className="text-[18px] font-medium text-[#6C6C6C]">
-                          Avg. Package: <span className="font-bold text-primary">{uni.avgPackage}</span>
                           Avg. Package:{" "}
                           <span className="font-bold text-primary">
                             {uni.avgPackage || "Rs 4.5 LPA"}
@@ -355,9 +354,9 @@ export default function TopUniversities({
                       </div>
                     </div>
                   </div>
-                </motion.div>
-              ))
-            ) : (
+                </div>
+            ))
+          ) : (
               <div className="col-span-full py-20 text-center">
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
                   <span className="material-symbols-rounded text-[32px]">
@@ -372,8 +371,7 @@ export default function TopUniversities({
                 </p>
               </div>
             )}
-          </AnimatePresence>
-        </div>
+          </div>
 
         <div className="mt-12 text-center">
           <Link

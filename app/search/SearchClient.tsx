@@ -176,6 +176,7 @@ export default function SearchClient({
     setTotalPages(initialTotalPages);
     setCurrentPage(initPage);
     setVisibleCount(12);
+    setLoading(false);
   }, [initialColleges, initialTotal, initialTotalPages, initPage]);
 
   const handleLoadMore = useCallback(async () => {
@@ -311,7 +312,6 @@ export default function SearchClient({
                 totalResults={total}
                 entityName={entityName}
                 entityNamePlural={entityNamePlural}
-                onFilterChange={() => setLoading(true)}
               />
 
             </div>

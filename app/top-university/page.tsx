@@ -113,15 +113,15 @@ async function fetchTopUniversities(opts: {
 
   // Resolve stream + degree filters in parallel
   const [faDoc, degDoc] = await Promise.all([
-    stream ? db.collection("functionalarea").findOne({ pageslug: stream }, { projection: { _id: 1 } }) : null,
-    degree ? db.collection("degree").findOne({ pageslug: degree }, { projection: { _id: 1 } }) : null,
+    stream ? db.collection("functionalarea").findOne({ pageslug: stream }, { projection: { _id: 1, id: 1 } }) : null,
+    degree ? db.collection("degree").findOne({ pageslug: degree }, { projection: { _id: 1, id: 1 } }) : null,
   ]);
 
   // Resolve collegemaster IDs in parallel
   const [streamIds, degreeIds] = await Promise.all([
-    faDoc ? db.collection("collegemaster").find({ functionalarea_id: faDoc._id }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
+    faDoc ? db.collection("collegemaster").find({ functionalarea_id: faDoc.id }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
       .then((r) => [...new Set(r.map((x) => x.collegeprofile_id))]) : null,
-    degDoc ? db.collection("collegemaster").find({ degree_id: degDoc._id }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
+    degDoc ? db.collection("collegemaster").find({ degree_id: degDoc.id }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
       .then((r) => [...new Set(r.map((x) => x.collegeprofile_id))]) : null,
   ]);
 
@@ -228,7 +228,7 @@ async function fetchTopUniversities(opts: {
 
 const getCachedTopUniversities = unstable_cache(
   fetchTopUniversities,
-  ["top-university-mongo-v2"],
+  ["top-university-mongo-v3"],
   { revalidate: 300 },
 );
 
@@ -260,7 +260,7 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
 
   const [{ universities, total, totalPages }, { streamRows, degreeRows, cityRows, stateRows, countryRows }] =
     await Promise.all([
-      getCachedTopUniversities({ q, stream, degree, cityId, stateId, feesMax, sort, page, limit }),
+      fetchTopUniversities({ q, stream, degree, cityId, stateId, feesMax, sort, page, limit }),
       getFilterData(),
     ]);
 

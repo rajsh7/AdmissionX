@@ -75,6 +75,7 @@ export default function ListingSearchV4({
     setCourses(initialCourses);
     setTotal(initialTotal);
     setTotalPages(initialTotalPages);
+    setLoading(false);
   }, [initialCourses, initialTotal, initialTotalPages]);
 
   useEffect(() => {
@@ -177,7 +178,6 @@ export default function ListingSearchV4({
                   activeDegree={degree}
                   activeStream={stream}
                   totalResults={total}
-                  onFilterChange={() => setLoading(true)}
                 />
             </div>
             <div className="flex-1 min-w-0 pl-10 pr-6">
