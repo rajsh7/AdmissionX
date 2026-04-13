@@ -3,7 +3,6 @@
 
 import Link from "next/link";
 import { useMemo, useState, useEffect, useRef } from "react";
-<<<<<<< HEAD
 import {
   AreaChart,
   Area,
@@ -19,7 +18,6 @@ import {
   ResponsiveContainer
 } from "recharts";
 
-=======
 import dynamic from "next/dynamic";
 import {
   Users,
@@ -44,7 +42,6 @@ const TransactionsPieChart = dynamic(
   () => import("./TransactionsPieChart"),
   { ssr: false, loading: () => <div className="h-full w-full bg-slate-50 animate-pulse rounded-[5px]" /> }
 );
->>>>>>> 3f51f6a (College UI Fixes)
 
 type GraphPoint = {
   key: string;
@@ -82,6 +79,7 @@ export default function DashboardClient({
   const collegeMonthRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+
     setIsMounted(true);
   }, []);
 
@@ -396,7 +394,6 @@ export default function DashboardClient({
               {openMenu === "college" && (
                 <div className="absolute right-0 mt-2 w-40 bg-white border border-slate-100 rounded-md shadow-lg z-20">
                   <ul className="py-1 max-h-80 overflow-auto" role="listbox">
-                  <ul className="py-1 max-h-80 overflow-auto">
                     {monthOptions.map((m) => (
                       <li key={m}>
                         <button
@@ -490,7 +487,6 @@ export default function DashboardClient({
         {/* Student Registration Table */}
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md lg:col-span-2 overflow-hidden flex flex-col pt-6 px-6 pb-2">
           <div className="flex justify-between items-center mb-6">
-          <h2 className="text-[25px] font-semibold text-slate-800">Student Registration</h2>
             <h2 className="text-[25px] font-semibold text-slate-800">Student Registration</h2>
             <Link href="/admin/students/profile" className="text-[13px] font-bold text-slate-400 hover:text-slate-600">
               View All
