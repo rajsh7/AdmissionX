@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Props {
@@ -172,27 +173,33 @@ export default function OverviewTab({ user }: Props) {
             </div>
           </div>
 
-          {/* Additional details could go here */}
+          {/* Recent Activity - real applications */}
           <div className="bg-white rounded-[10px] p-8 shadow-sm border border-gray-100">
              <div className="flex items-center justify-between mb-8">
-                <h4 className="text-[18px] font-bold text-[#222]">Recent Activity</h4>
-                <button className="text-[12px] font-semibold text-[#e31e24] uppercase tracking-wider">View All</button>
+                <h4 className="text-[18px] font-bold text-[#222]">Recent Applications</h4>
+                <button onClick={() => {}} className="text-[12px] font-semibold text-[#e31e24] uppercase tracking-wider">View All</button>
              </div>
-             
-             <div className="space-y-6">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100 group">
-                    <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center shrink-0">
-                      <span className="material-symbols-outlined text-[#e31e24]">notifications</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-[14px] font-semibold text-[#333]">Application status updated for Computer Science</p>
-                      <p className="text-[12px] font-medium text-gray-400">2 hours ago · Ref #ADX-12345</p>
-                    </div>
-                    <span className="material-symbols-outlined text-gray-300 group-hover:text-[#e31e24] transition-colors">chevron_right</span>
-                  </div>
-                ))}
-             </div>
+             {stats?.total === 0 ? (
+               <div className="flex flex-col items-center justify-center py-12 text-center">
+                 <span className="material-symbols-outlined text-[48px] text-gray-200 mb-3">description</span>
+                 <p className="text-[14px] font-medium text-gray-400">No applications yet. Start exploring colleges!</p>
+                 <Link href="/top-colleges" className="mt-4 px-6 py-2.5 bg-[#e31e24] text-white text-[13px] font-medium rounded-lg hover:bg-[#c0191e] transition-all">
+                   Explore Colleges
+                 </Link>
+               </div>
+             ) : (
+               <div className="space-y-4">
+                 <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                   <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center shrink-0">
+                     <span className="material-symbols-outlined text-blue-500">description</span>
+                   </div>
+                   <div className="flex-1">
+                     <p className="text-[14px] font-semibold text-[#333]">{stats?.submitted ?? 0} application(s) submitted</p>
+                     <p className="text-[12px] font-medium text-gray-400">{stats?.under_review ?? 0} under review · {stats?.verified ?? 0} verified</p>
+                   </div>
+                 </div>
+               </div>
+             )}
           </div>
         </div>
 

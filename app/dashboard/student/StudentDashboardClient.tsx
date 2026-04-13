@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import OverviewTab from "./tabs/OverviewTab";
 import ProfileTab from "./tabs/ProfileTab";
@@ -41,6 +42,13 @@ export default function StudentDashboardClient({ user, activated }: Props) {
   const [activeTab, setActiveTab]     = useState<TabId>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showActivatedBanner, setShowActivatedBanner] = useState(!!activated);
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const router = useRouter();
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/");
+  }
 
   function navigate(id: TabId) {
     setActiveTab(id);
@@ -175,14 +183,39 @@ export default function StudentDashboardClient({ user, activated }: Props) {
             ))}
           </nav>
 
-          <div className="flex items-center">
-            <button className="flex items-center gap-2 px-6 py-2.5 rounded-[10px] bg-primary text-white hover:bg-primary-dark transition-all shadow-lg shadow-primary/10 active:scale-95">
+          <div className="flex items-center relative">
+            <button
+              onClick={() => setShowAccountMenu(p => !p)}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-[10px] bg-primary text-white hover:bg-primary-dark transition-all shadow-lg shadow-primary/10 active:scale-95"
+            >
               <span className="material-symbols-outlined text-[18px]">account_circle</span>
-              <span className="text-[14px] font-normal">Account</span>
-              <span className="material-symbols-outlined text-[16px] text-white/70">
-                expand_more
-              </span>
+              <span className="text-[14px] font-normal">{user?.name?.split(" ")[0] ?? "Account"}</span>
+              <span className="material-symbols-outlined text-[16px] text-white/70">expand_more</span>
             </button>
+            {showAccountMenu && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowAccountMenu(false)} />
+                <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-gray-50">
+                    <p className="text-[13px] font-bold text-[#222] truncate">{user?.name}</p>
+                    <p className="text-[11px] text-gray-400 truncate">{user?.email}</p>
+                  </div>
+                  <button onClick={() => { navigate("account-details"); setShowAccountMenu(false); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-gray-600 hover:bg-gray-50 transition-colors">
+                    <span className="material-symbols-outlined text-[18px]">manage_accounts</span>My Profile
+                  </button>
+                  <button onClick={() => { navigate("account-settings"); setShowAccountMenu(false); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-gray-600 hover:bg-gray-50 transition-colors">
+                    <span className="material-symbols-outlined text-[18px]">settings</span>Settings
+                  </button>
+                  <div className="border-t border-gray-50" />
+                  <button onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 transition-colors">
+                    <span className="material-symbols-outlined text-[18px]">logout</span>Sign Out
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </header>

@@ -27,169 +27,39 @@ const EMPTY: PlacementData = {
   placementinfo: "",
 };
 
-// ── Completeness ring ─────────────────────────────────────────────────────────
-function CompletenessRing({ pct }: { pct: number }) {
-  const r = 36;
-  const circ = 2 * Math.PI * r;
-  const offset = circ - (pct / 100) * circ;
-  const color = pct >= 80 ? "#22c55e" : pct >= 40 ? "#f59e0b" : "#ef4444";
+// ── Components ───────────────────────────────────────────────────────────────
 
-  return (
-    <div className="relative flex items-center justify-center w-24 h-24">
-      <svg width="96" height="96" className="-rotate-90">
-        <circle
-          cx="48"
-          cy="48"
-          r={r}
-          fill="none"
-          stroke="#e2e8f0"
-          strokeWidth="7"
-        />
-        <circle
-          cx="48"
-          cy="48"
-          r={r}
-          fill="none"
-          stroke={color}
-          strokeWidth="7"
-          strokeDasharray={circ}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          style={{ transition: "stroke-dashoffset 0.6s ease" }}
-        />
-      </svg>
-      <div className="absolute flex flex-col items-center">
-        <span className="text-lg font-black text-slate-800 dark:text-white leading-none">
-          {pct}%
-        </span>
-        <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
-          filled
-        </span>
-      </div>
-    </div>
-  );
-}
-
-// ── Field component ───────────────────────────────────────────────────────────
-function Field({
+function LegendInput({
   label,
+  children,
   hint,
-  icon,
-  value,
-  onChange,
-  type = "text",
-  placeholder,
-  multiline,
-  rows,
+  className = "mb-8",
 }: {
   label: string;
+  children: React.ReactNode;
   hint?: string;
-  icon: string;
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-  placeholder?: string;
-  multiline?: boolean;
-  rows?: number;
+  className?: string;
 }) {
-  const base =
-    "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all";
-
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-        <span
-          className="material-symbols-rounded text-sm text-slate-400"
-          style={{
-            fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20",
-          }}
-        >
-          {icon}
-        </span>
-        {label}
-      </label>
-      {hint && (
-        <p className="text-[11px] text-slate-400 dark:text-slate-500 -mt-0.5">
-          {hint}
-        </p>
-      )}
-      {multiline ? (
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          rows={rows ?? 4}
-          className={`${base} resize-none`}
-        />
-      ) : (
-        <input
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          className={base}
-        />
-      )}
-    </div>
-  );
-}
-
-// ── Stat card (read-only display when saved) ──────────────────────────────────
-function StatCard({
-  icon,
-  label,
-  value,
-  accent,
-}: {
-  icon: string;
-  label: string;
-  value: string;
-  accent: string;
-}) {
-  const isEmpty = !value;
-  return (
-    <div className="flex items-center gap-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-4">
-      <div
-        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${accent}`}
-      >
-        <span
-          className="material-symbols-rounded text-xl"
-          style={{
-            fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24",
-          }}
-        >
-          {icon}
-        </span>
-      </div>
-      <div className="min-w-0">
-        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+    <div className={`w-full ${className}`}>
+      <div className="relative border border-slate-200 rounded-[5px] px-4 pt-5 pb-2 focus-within:border-red-300 transition-colors">
+        <label className="absolute -top-[12px] left-3 bg-white px-2 text-[13px] font-semibold text-slate-500 z-10">
           {label}
-        </p>
-        <p
-          className={`text-base font-black truncate ${isEmpty ? "text-slate-300 dark:text-slate-600" : "text-slate-800 dark:text-white"}`}
-        >
-          {isEmpty ? "—" : value}
-        </p>
+        </label>
+        {children}
       </div>
+      {hint && <p className="text-[12px] text-slate-400 mt-1 italic pl-1">{hint}</p>}
     </div>
   );
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
 export default function PlacementTab({ college }: Props) {
   const [form, setForm] = useState<PlacementData>(EMPTY);
-  const [completeness, setCompleteness] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState<{
-    type: "success" | "error";
-    msg: string;
-  } | null>(null);
-  const [dirty, setDirty] = useState(false);
 
   const slug = college.slug;
 
-  // ── Fetch ─────────────────────────────────────────────────────────────────
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -197,36 +67,21 @@ export default function PlacementTab({ college }: Props) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to load");
       setForm(data.placement as PlacementData);
-      setCompleteness(data.placementComplete ?? 0);
     } catch (e) {
-      showToast(
-        "error",
-        e instanceof Error ? e.message : "Failed to load placement data",
-      );
+      console.error(e);
     } finally {
       setLoading(false);
     }
   }, [slug]);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  useEffect(() => { load(); }, [load]);
 
-  // ── Toast ─────────────────────────────────────────────────────────────────
-  function showToast(type: "success" | "error", msg: string) {
-    setToast({ type, msg });
-    setTimeout(() => setToast(null), 4000);
-  }
-
-  // ── Field updater ─────────────────────────────────────────────────────────
-  function update(field: keyof PlacementData, value: string) {
+  const update = (field: keyof PlacementData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
-    setDirty(true);
-  }
+  };
 
-  // ── Save ──────────────────────────────────────────────────────────────────
-  async function handleSave(e: React.FormEvent) {
-    e.preventDefault();
+  const handleSave = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setSaving(true);
     try {
       const body = {
@@ -243,294 +98,193 @@ export default function PlacementTab({ college }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Save failed");
-
-      showToast("success", data.message ?? "Placement data saved.");
-      setDirty(false);
-      // Recompute completeness locally
-      const statFields = [
-        form.numberofrecruitingcompany,
-        form.numberofplacementlastyear,
-        form.ctchighest,
-        form.ctclowest,
-        form.ctcaverage,
-      ];
-      const filled = statFields.filter((v) => v.trim() !== "").length;
-      setCompleteness(Math.round((filled / 5) * 100));
+      if (!res.ok) throw new Error("Save failed");
+      alert("Placement details saved successfully!");
+      load();
     } catch (e) {
-      showToast("error", e instanceof Error ? e.message : "Save failed");
+      alert("Save failed.");
     } finally {
       setSaving(false);
     }
-  }
+  };
 
-  // ── Skeleton ──────────────────────────────────────────────────────────────
-  if (loading) {
-    return (
-      <div className="max-w-3xl mx-auto space-y-6 animate-pulse">
-        <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded-xl w-64" />
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="h-20 bg-slate-200 dark:bg-slate-700 rounded-2xl"
-            />
-          ))}
-        </div>
-        <div className="h-48 bg-slate-200 dark:bg-slate-700 rounded-2xl" />
-        <div className="h-10 bg-slate-200 dark:bg-slate-700 rounded-xl w-32" />
-      </div>
-    );
-  }
+  const handleRemove = async () => {
+    if (!window.confirm("Are you sure you want to remove these placement details?")) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/college/dashboard/${slug}/placement`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(EMPTY), // Send empty values to clear
+      });
+      if (!res.ok) throw new Error("Remove failed");
+      alert("Placement details removed.");
+      setForm(EMPTY);
+      load();
+    } catch (e) {
+      alert("Remove failed.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const tabs = [
+    { id: "address", label: "Address", icon: "location_on" },
+    { id: "gallery", label: "Gallery", icon: "image" },
+    { id: "achievements", label: "Achievements", icon: "emoji_events" },
+    { id: "courses", label: "Courses", icon: "menu_book" },
+    { id: "facilities", label: "Facilities", icon: "apartment" },
+    { id: "events", label: "Events", icon: "event" },
+    { id: "scholarships", label: "Scholarships", icon: "payments" },
+    { id: "placement", label: "Placements", icon: "work" },
+    { id: "letters", label: "Letters", icon: "description" },
+    { id: "sports", label: "Sports", icon: "sports_soccer" },
+    { id: "cutoffs", label: "Cut Offs", icon: "assignment" },
+    { id: "faculty", label: "Faculties", icon: "groups" },
+  ];
+
+  const hasData = form.numberofrecruitingcompany || form.placementinfo;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
-      {/* ── Toast ── */}
-      {toast && (
-        <div
-          className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl text-sm font-semibold transition-all
-            ${
-              toast.type === "success"
-                ? "bg-emerald-500 text-white"
-                : "bg-red-500 text-white"
-            }`}
-        >
-          <span
-            className="material-symbols-rounded text-lg"
-            style={{
-              fontVariationSettings:
-                "'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24",
-            }}
-          >
-            {toast.type === "success" ? "check_circle" : "error"}
-          </span>
-          {toast.msg}
-        </div>
-      )}
-
-      {/* ── Header + ring ── */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6">
-        <CompletenessRing pct={completeness} />
-        <div className="flex-1 min-w-0">
-          <h2 className="text-xl font-black text-slate-800 dark:text-white">
-            Placement Statistics
-          </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Keep your placement record up to date. Complete all 5 stat fields
-            for maximum visibility.
-          </p>
-          <div className="mt-3 h-2 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+    <div className="pb-24 font-poppins bg-[#fcfcfc] min-h-[600px] border border-slate-200 rounded-[10px] overflow-hidden shadow-sm">
+      {/* ── Sub-navigation ────────────────────────────────────────────────── */}
+      <div className="flex bg-white border-b border-slate-200 overflow-x-auto hide-scrollbar scroll-smooth">
+        {tabs.map((tab) => {
+          const isActive = tab.id === "placement";
+          return (
             <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{
-                width: `${completeness}%`,
-                background:
-                  completeness >= 80
-                    ? "#22c55e"
-                    : completeness >= 40
-                      ? "#f59e0b"
-                      : "#ef4444",
-              }}
-            />
+              key={tab.id}
+              className={`flex items-center justify-center gap-2 py-3 px-6 text-[13px] font-bold transition-all cursor-pointer border-r border-slate-100 flex-1 min-w-[140px] ${isActive ? "bg-[#FF3C3C] text-white" : "text-slate-500 hover:bg-slate-50"
+                }`}
+            >
+              <span className="whitespace-nowrap">{tab.label}</span>
+              <span className={`material-symbols-outlined text-[18px] ${isActive ? "text-white" : "text-slate-400"}`}>
+                {tab.icon}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── Content Area ─────────────────────────────────────────────────── */}
+      <div className="p-8 md:p-12">
+
+        {/* Section 1: Placement Records */}
+        <div className="mb-16">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <h2 className="text-[22px] font-bold text-[#333]">Placement Records</h2>
+            <button className="bg-[#9DA6B7] hover:bg-[#8e99ac] text-white px-6 py-2.5 rounded-[5px] font-bold text-[14px] transition-all shadow-sm">
+              + Add New Placement Record
+            </button>
           </div>
-          <p className="text-xs text-slate-400 dark:text-slate-500 mt-1.5">
-            {completeness}% of placement stats filled
-          </p>
-        </div>
-      </div>
 
-      {/* ── Snapshot cards ── */}
-      <div>
-        <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
-          Current Snapshot
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <StatCard
-            icon="business"
-            label="Recruiting Companies"
-            value={form.numberofrecruitingcompany}
-            accent="bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400"
-          />
-          <StatCard
-            icon="groups"
-            label="Placed Last Year"
-            value={form.numberofplacementlastyear}
-            accent="bg-violet-100 text-violet-600 dark:bg-violet-900/40 dark:text-violet-400"
-          />
-          <StatCard
-            icon="arrow_upward"
-            label="Highest CTC"
-            value={form.ctchighest}
-            accent="bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400"
-          />
-          <StatCard
-            icon="arrow_downward"
-            label="Lowest CTC"
-            value={form.ctclowest}
-            accent="bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400"
-          />
-          <StatCard
-            icon="bar_chart"
-            label="Average CTC"
-            value={form.ctcaverage}
-            accent="bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400"
-          />
-        </div>
-      </div>
+          {hasData && (
+            <div className="bg-white border border-slate-200 rounded-[10px] p-8 shadow-sm">
+              <div className="space-y-3 text-[14px] text-slate-700 font-medium">
+                <p>Number Of Recruiting Companies : <span className="font-bold">{form.numberofrecruitingcompany || "—"}</span></p>
+                <p>Number Of placements & Year : <span className="font-bold">{form.numberofplacementlastyear || "—"}</span></p>
+                <p>Placement Information : <span className="font-bold">{form.placementinfo || "—"}</span></p>
+                <p>CTC Highest : <span className="font-bold">{form.ctchighest || "—"}</span></p>
+                <p>CTC Lowest : <span className="font-bold">{form.ctclowest || "—"}</span></p>
+                <p>CTC Average : <span className="font-bold">{form.ctcaverage || "—"}</span></p>
+              </div>
 
-      {/* ── Form ── */}
-      <form
-        onSubmit={handleSave}
-        className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-5"
-      >
-        <h3 className="text-sm font-black text-slate-800 dark:text-white">
-          Edit Placement Details
-        </h3>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <Field
-            label="Recruiting Companies"
-            icon="business"
-            hint="Number of companies that visited for placements"
-            value={form.numberofrecruitingcompany}
-            onChange={(v) => update("numberofrecruitingcompany", v)}
-            placeholder="e.g. 120"
-          />
-          <Field
-            label="Students Placed"
-            icon="groups"
-            hint="Total students placed in the last academic year"
-            value={form.numberofplacementlastyear}
-            onChange={(v) => update("numberofplacementlastyear", v)}
-            placeholder="e.g. 450"
-          />
-          <Field
-            label="Highest CTC"
-            icon="arrow_upward"
-            hint="Highest salary package offered (e.g. 42 LPA)"
-            value={form.ctchighest}
-            onChange={(v) => update("ctchighest", v)}
-            placeholder="e.g. 42 LPA"
-          />
-          <Field
-            label="Lowest CTC"
-            icon="arrow_downward"
-            hint="Lowest salary package offered"
-            value={form.ctclowest}
-            onChange={(v) => update("ctclowest", v)}
-            placeholder="e.g. 3.5 LPA"
-          />
-          <Field
-            label="Average CTC"
-            icon="bar_chart"
-            hint="Average salary package (e.g. 8.2 LPA)"
-            value={form.ctcaverage}
-            onChange={(v) => update("ctcaverage", v)}
-            placeholder="e.g. 8.2 LPA"
-          />
-        </div>
-
-        {/* Placement info — full width */}
-        <Field
-          label="Placement Info"
-          icon="info"
-          hint="Additional context, notable recruiters, or placement highlights"
-          value={form.placementinfo}
-          onChange={(v) => update("placementinfo", v)}
-          placeholder="Describe your college's placement achievements, top recruiters, initiatives..."
-          multiline
-          rows={5}
-        />
-
-        {/* Action row */}
-        <div className="flex items-center gap-3 pt-2 border-t border-slate-100 dark:border-slate-700">
-          <button
-            type="submit"
-            disabled={saving || !dirty}
-            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 active:scale-95 transition-all"
-          >
-            {saving ? (
-              <>
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Saving…
-              </>
-            ) : (
-              <>
-                <span
-                  className="material-symbols-rounded text-base"
-                  style={{
-                    fontVariationSettings:
-                      "'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 20",
-                  }}
+              <div className="flex items-center gap-4 mt-10">
+                <button
+                  onClick={() => window.scrollTo({ top: 1000, behavior: "smooth" })}
+                  className="bg-[#00A3FF] hover:bg-[#0092e6] text-white px-10 py-2.5 rounded-[6px] font-bold text-[14px] shadow-sm transition-all"
                 >
-                  save
-                </span>
-                Save Changes
-              </>
-            )}
-          </button>
-
-          {!dirty && !saving && (
-            <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
-              <span
-                className="material-symbols-rounded text-sm"
-                style={{
-                  fontVariationSettings:
-                    "'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 20",
-                }}
-              >
-                check_circle
-              </span>
-              Up to date
-            </span>
-          )}
-          {dirty && (
-            <span className="text-xs text-amber-500 dark:text-amber-400 font-semibold flex items-center gap-1">
-              <span
-                className="material-symbols-rounded text-sm"
-                style={{
-                  fontVariationSettings:
-                    "'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 20",
-                }}
-              >
-                edit
-              </span>
-              Unsaved changes
-            </span>
+                  Update
+                </button>
+                <button
+                  onClick={handleRemove}
+                  className="bg-[#FF3C3C] hover:bg-[#e63535] text-white px-10 py-2.5 rounded-[6px] font-bold text-[14px] shadow-sm transition-all"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
           )}
         </div>
-      </form>
 
-      {/* ── Tips ── */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 rounded-2xl p-5">
-        <div className="flex items-start gap-3">
-          <span
-            className="material-symbols-rounded text-xl text-blue-500 dark:text-blue-400 mt-0.5 shrink-0"
-            style={{
-              fontVariationSettings:
-                "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24",
-            }}
-          >
-            lightbulb
-          </span>
-          <div>
-            <p className="text-sm font-bold text-blue-700 dark:text-blue-300 mb-1">
-              Tips
-            </p>
-            <ul className="text-xs text-blue-600 dark:text-blue-400 space-y-1 list-disc list-inside">
-              <li>
-                Use common formats for CTC — e.g. <strong>12 LPA</strong> or{" "}
-                <strong>12,00,000</strong>
-              </li>
-              <li>
-                Accurate placement stats increase your profile&apos;s
-                credibility with students
-              </li>
-              <li>Update figures every academic year to stay relevant</li>
-            </ul>
+        {/* Section 2: Placement Information */}
+        <div>
+          <h2 className="text-[22px] font-bold text-[#333] mb-10">Placement Information</h2>
+
+          <div className="max-w-4xl">
+            <LegendInput label="Placement Description">
+              <textarea
+                value={form.placementinfo}
+                onChange={(e) => update("placementinfo", e.target.value)}
+                placeholder="Please enter placement info here"
+                rows={8}
+                className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1 resize-none"
+              />
+            </LegendInput>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+              <LegendInput label="Number od recruiting Companies">
+                <input
+                  type="text"
+                  value={form.numberofrecruitingcompany}
+                  onChange={(e) => update("numberofrecruitingcompany", e.target.value)}
+                  placeholder="Please enter number of recruiting companies here"
+                  className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1"
+                />
+              </LegendInput>
+              <LegendInput label="Number of Placement & year">
+                <input
+                  type="text"
+                  value={form.numberofplacementlastyear}
+                  onChange={(e) => update("numberofplacementlastyear", e.target.value)}
+                  placeholder="Please enter number of placement & year here"
+                  className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1"
+                />
+              </LegendInput>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6">
+              <LegendInput label="CTC Highest">
+                <input
+                  type="text"
+                  value={form.ctchighest}
+                  onChange={(e) => update("ctchighest", e.target.value)}
+                  placeholder="Please enter CTC highest here"
+                  className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1"
+                />
+              </LegendInput>
+              <LegendInput label="CTC Lowest">
+                <input
+                  type="text"
+                  value={form.ctclowest}
+                  onChange={(e) => update("ctclowest", e.target.value)}
+                  placeholder="Please enter CTC lowest here"
+                  className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1"
+                />
+              </LegendInput>
+              <LegendInput label="CTC Average">
+                <input
+                  type="text"
+                  value={form.ctcaverage}
+                  onChange={(e) => update("ctcaverage", e.target.value)}
+                  placeholder="Please enter CTC average here"
+                  className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1"
+                />
+              </LegendInput>
+            </div>
+
+            <div className="flex justify-center pt-8">
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="bg-[#FF3C3C] hover:bg-[#e63535] text-white px-24 py-3.5 rounded-[6px] font-bold text-[18px] transition-all shadow-md active:scale-95 disabled:opacity-50 min-w-[240px]"
+              >
+                {saving ? "Submitting..." : "Submit"}
+              </button>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -82,9 +82,35 @@ export async function PUT(
     return NextResponse.json({ success: true, message: "Password changed successfully." });
   }
 
+  // ── Action: update_account ───────────────────────────────────────────────
+  if (action === "update_account") {
+    const { name, email, phone } = body as any;
+    if (!name || !email) {
+      return NextResponse.json({ error: "Name and email are required." }, { status: 400 });
+    }
+
+    const db = await getDb();
+    const oldEmail = auth.payload.email.toLowerCase();
+    const newEmail = email.toLowerCase();
+
+    // 1. Update next_college_signups
+    await db.collection("next_college_signups").updateOne(
+      { email: oldEmail },
+      { $set: { college_name: name, email: newEmail, updated_at: new Date() } }
+    );
+
+    // 2. Update collegeprofile
+    await db.collection("collegeprofile").updateOne(
+      { slug: auth.slug },
+      { $set: { college_name: name, email: newEmail, contactPhone: phone, updated_at: new Date() } }
+    );
+
+    return NextResponse.json({ success: true, message: "Account details updated successfully." });
+  }
+
   // ── Unknown action ────────────────────────────────────────────────────────
   return NextResponse.json(
-    { error: `Unknown action: "${action}". Supported: change_password` },
+    { error: `Unknown action: "${action}". Supported: change_password, update_account` },
     { status: 400 },
   );
 }
