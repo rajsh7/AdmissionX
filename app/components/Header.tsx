@@ -31,7 +31,6 @@ const navLinks = [
       { label: "Compare Colleges", href: "/compare", icon: "compare_arrows" },
       { label: "Counselling", href: "/counselling", icon: "support_agent" },
       { label: "Examination", href: "/examination", icon: "engineering" },
-      { label: "Streams", href: "/stream", icon: "grid_view" },
       { label: "News & Articles", href: "/news", icon: "newspaper" },
       { label: "Latest Blogs", href: "/blogs", icon: "article" },
     ]
@@ -314,11 +313,11 @@ export default function Header({ theme }: HeaderProps) {
             : "bg-white/95 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.05)] py-3"
         }`}
       >
-        <div className="flex items-center justify-between px-6 sm:px-12 w-full max-w-[1920px] mx-auto">
+        <div className="flex items-center justify-between px-4 sm:px-8 w-full max-w-[1920px] mx-auto">
           {/* Logo Area */}
           <div className="shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
-              <img src="/logo.jpg" alt="AdmissionX" className="h-10 sm:h-12 w-auto object-contain bg-transparent mix-blend-multiply" />
+              <img src="/admissionx-logo.png" alt="AdmissionX" className="h-9 sm:h-10 w-auto object-contain bg-transparent mix-blend-multiply" />
             </Link>
           </div>
 

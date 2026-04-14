@@ -1,10 +1,6 @@
 "use client";
 
-<<<<<<< HEAD
-import { useState } from "react";
-=======
 import { useState, useEffect } from "react";
->>>>>>> 3f51f6a (College UI Fixes)
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "../../../components/Header";
@@ -66,6 +62,7 @@ export type TabId =
   | "qa"
   | "helpdesk"
   | "public_view"
+  | "agreement"
   | "terms"
   | "logout"
   | "settings";
@@ -130,28 +127,17 @@ export default function CollegeDashboardClient({
   const slug = college.slug;
   const router = useRouter();
 
-  async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
-  }
-<<<<<<< HEAD
-=======
-
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   async function handleLogout() {
-    const confirmLogout = window.confirm("Are you sure you want to logout?");
-    if (confirmLogout) {
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = "/api/auth/logout";
-      document.body.appendChild(form);
-      form.submit();
+    if (window.confirm("Are you sure you want to logout?")) {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/");
+      router.refresh();
     }
   }
->>>>>>> 3f51f6a (College UI Fixes)
 
   function handleTabChange(tab: TabId) {
     if (tab === "logout") {
@@ -215,21 +201,12 @@ export default function CollegeDashboardClient({
     }
   }
 
-  const initials = college.name
-    .split(" ")
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
-
   return (
     <div className="min-h-screen bg-[#f8f6f6] dark:bg-[#0f1623] font-poppins">
-      {/* ── Top header ────────────────────────────────────────────────────── */}
       <Header theme="light" />
 
-      {/* ── Dashboard Layout ───────────────────────────────────────────── */}
       <div className="flex pt-[80px]">
-        {/* ── Sidebar (Desktop) ────────────────────────────────────────── */}
+        {/* Sidebar (Desktop) */}
         <aside
           suppressHydrationWarning
           style={{
@@ -239,14 +216,12 @@ export default function CollegeDashboardClient({
           }}
           className="hidden md:flex flex-col w-[350px] fixed left-0 text-white z-30 border-r border-[#E5E7EB]"
         >
-          {/* College Branding / Logo Slot (Fixed at top) */}
           <div className="p-4 flex flex-col items-center border-b border-[#E5E7EB] shrink-0 bg-white">
             <div className="w-[110px] h-[110px] bg-white border border-[#4a90e2] rounded-sm mb-4 flex flex-col items-center justify-center shadow-sm relative group overflow-hidden">
               <div className="w-[50px] h-[50px] bg-slate-100 rounded-full flex items-center justify-center mb-1">
                 <span className="material-symbols-outlined text-slate-300 text-3xl">photo_camera</span>
               </div>
               <span className="text-[8px] font-bold text-slate-400 whitespace-nowrap">IMAGE NOT AVAILABLE</span>
-              {/* Overlay for upload */}
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                 <span className="material-symbols-outlined text-white text-3xl">upload</span>
               </div>
@@ -256,7 +231,6 @@ export default function CollegeDashboardClient({
             </button>
           </div>
 
-          {/* Navigation Menu (Scrollable) */}
           <div
             data-lenis-prevent
             className="flex-1 overflow-y-auto overflow-x-hidden py-4 pb-20 hide-scrollbar"
@@ -265,7 +239,6 @@ export default function CollegeDashboardClient({
             <nav className="space-y-0">
               {isMounted ? (
                 <>
-                  {/* 1. Overview Tab (Always First) */}
                   {TABS.filter(t => t.id === "overview").map((tab) => {
                     const isActive = activeTab === tab.id;
                     return (
@@ -294,90 +267,10 @@ export default function CollegeDashboardClient({
                     );
                   })}
 
-<<<<<<< HEAD
-          {/* Dashboard label */}
-          <div className="hidden md:flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
-            <span className="material-symbols-outlined text-[14px] text-primary">
-              domain
-            </span>
-            College Dashboard
-          </div>
-
-          {/* Right side */}
-          <div className="flex items-center gap-3 shrink-0">
-            {/* View public profile */}
-            {college.slug && (
-              <Link
-                href={`/college/${college.slug}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-primary transition-colors"
-              >
-                <span className="material-symbols-outlined text-[16px]">
-                  open_in_new
-                </span>
-                View Profile
-              </Link>
-            )}
-
-            {/* College identity */}
-            <div className="hidden sm:flex flex-col items-end">
-              <span className="text-sm font-bold text-slate-800 dark:text-white truncate max-w-[180px]">
-                {college.name}
-              </span>
-              <span className="text-[10px] text-slate-400 truncate max-w-[180px]">
-                {college.email}
-              </span>
-            </div>
-
-            {/* Avatar */}
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-red-600 flex items-center justify-center text-white font-black text-sm shrink-0 shadow-md shadow-primary/20">
-              {initials}
-            </div>
-
-            {/* Sign out */}
-            <button
-              onClick={handleLogout}
-              title="Sign out"
-              className="flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-red-500 transition-colors"
-            >
-              <span className="material-symbols-outlined text-[20px]">logout</span>
-              <span className="hidden sm:inline text-xs">Sign out</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* ── Content below header ───────────────────────────────────────────── */}
-      <div className="pt-16">
-        {/* ── Sticky desktop tab bar ─────────────────────────────────────── */}
-        <div className="sticky top-16 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-            <div className="flex items-center overflow-x-auto hide-scrollbar gap-0.5">
-              {TABS.map((tab) => {
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => handleTabChange(tab.id)}
-                    className={`flex items-center gap-2 px-3.5 py-3.5 text-[13px] font-bold whitespace-nowrap border-b-2 transition-all duration-200 ${
-                      isActive
-                        ? "border-primary text-primary"
-                        : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600"
-                    }`}
-                  >
-                    <span
-                      className="material-symbols-outlined text-[17px]"
-                      style={
-                        isActive ? { fontVariationSettings: "'FILL' 1" } : {}
-                      }
-=======
-                  {/* 2. Special Accordion: College Information (Second) */}
                   <div className="mt-0">
                     <button
                       onClick={() => setInfoExpanded(!infoExpanded)}
                       className={`w-full flex items-center justify-between px-6 py-2 text-[14px] font-bold transition-all group relative ${infoExpanded || TABS.filter(t => t.group === "info").some(t => t.id === activeTab) ? "bg-[#8B3D3D] text-white" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}
->>>>>>> 3f51f6a (College UI Fixes)
                     >
                       <div className="flex items-center gap-3">
                         <span className="material-symbols-outlined text-[20px] text-white">
@@ -410,7 +303,6 @@ export default function CollegeDashboardClient({
                     )}
                   </div>
 
-                  {/* 3. Other Navigation Tabs (Remaining) */}
                   <div className="mt-0 text-white">
                     {TABS.filter(tab => !tab.group && tab.id !== "overview").map((tab) => {
                       const isActive = activeTab === tab.id;
@@ -452,7 +344,6 @@ export default function CollegeDashboardClient({
           </div>
         </aside>
 
-        {/* ── Main content area ─────────────────────────────────────────── */}
         <main className="flex-1 md:ml-[350px] min-h-[calc(100vh-80px)] bg-[#ffffff] text-slate-800 p-4 sm:p-6 pb-28 md:pb-10 transition-all duration-300">
           <div className="w-full">
             {renderTab()}
@@ -460,7 +351,6 @@ export default function CollegeDashboardClient({
         </main>
       </div>
 
-      {/* ── Mobile bottom navigation ───────────────────────────────────────── */}
       <MobileBottomNav
         activeTab={activeTab}
         onTabChange={handleTabChange}
@@ -471,7 +361,6 @@ export default function CollegeDashboardClient({
   );
 }
 
-// ── Mobile Bottom Nav ─────────────────────────────────────────────────────────
 function MobileBottomNav({
   activeTab,
   onTabChange,
@@ -487,7 +376,6 @@ function MobileBottomNav({
 
   return (
     <>
-      {/* Bottom bar */}
       <div className="fixed bottom-0 left-0 right-0 md:hidden z-50">
         <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 shadow-2xl">
           <div className="flex items-center justify-around px-1 py-2">
@@ -507,14 +395,7 @@ function MobileBottomNav({
                 >
                   <span
                     className="material-symbols-outlined text-[22px]"
-                    style={
-                      isActive
-                        ? {
-                          fontVariationSettings: "'FILL' 1",
-                          transform: "scale(1.1)",
-                        }
-                        : {}
-                    }
+                    style={isActive ? { fontVariationSettings: "'FILL' 1", transform: "scale(1.1)" } : {}}
                   >
                     {tab.icon}
                   </span>
@@ -528,7 +409,6 @@ function MobileBottomNav({
               );
             })}
 
-            {/* More button */}
             <button
               onClick={() => setShowMore((s) => !s)}
               className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all min-w-[52px] ${showMore || overflowTabs.some((t) => t.id === activeTab)
@@ -538,11 +418,7 @@ function MobileBottomNav({
             >
               <span
                 className="material-symbols-outlined text-[22px]"
-                style={
-                  showMore || overflowTabs.some((t) => t.id === activeTab)
-                    ? { fontVariationSettings: "'FILL' 1" }
-                    : {}
-                }
+                style={showMore || overflowTabs.some((t) => t.id === activeTab) ? { fontVariationSettings: "'FILL' 1" } : {}}
               >
                 {showMore ? "close" : "more_horiz"}
               </span>
@@ -552,7 +428,6 @@ function MobileBottomNav({
         </div>
       </div>
 
-      {/* Overflow drawer */}
       {showMore && (
         <>
           <div
@@ -577,9 +452,7 @@ function MobileBottomNav({
                   >
                     <span
                       className="material-symbols-outlined text-[20px]"
-                      style={
-                        isActive ? { fontVariationSettings: "'FILL' 1" } : {}
-                      }
+                      style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
                     >
                       {tab.icon}
                     </span>
@@ -597,8 +470,6 @@ function MobileBottomNav({
   );
 }
 
-// ── Pending profile state ─────────────────────────────────────────────────────
-// Shown when the college account hasn't been linked to a collegeprofile yet
 function PendingProfileState({ college }: { college: CollegeUser }) {
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center text-center py-24 px-4">
@@ -614,34 +485,8 @@ function PendingProfileState({ college }: { college: CollegeUser }) {
         Profile Pending Setup
       </h1>
       <p className="text-slate-500 dark:text-slate-400 text-base max-w-md mb-2">
-        Your college account ({college.email}) is active, but hasn&apos;t been
-        linked to a college profile yet.
+        Your college account ({college.email}) is active, but hasn&apos;t been linked to a college profile yet.
       </p>
-      <p className="text-slate-400 text-sm max-w-sm mb-8">
-        Our team will link your profile shortly. If you believe this is a
-        mistake, please contact support.
-      </p>
-
-      {/* Info card */}
-      <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl px-6 py-4 max-w-md text-left">
-        <span
-          className="material-symbols-outlined text-amber-500 text-[22px] shrink-0 mt-0.5"
-          style={{ fontVariationSettings: "'FILL' 1" }}
-        >
-          info
-        </span>
-        <div>
-          <p className="font-bold text-amber-800 dark:text-amber-300 text-sm mb-1">
-            What happens next?
-          </p>
-          <ul className="text-xs text-amber-700 dark:text-amber-400 space-y-1">
-            <li>• Our admin team reviews your college account</li>
-            <li>• Your profile gets linked to our database</li>
-            <li>• You&apos;ll receive an email when it&apos;s ready</li>
-          </ul>
-        </div>
-      </div>
-
       <div className="mt-8 flex gap-3">
         <Link
           href="/"

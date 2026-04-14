@@ -52,12 +52,12 @@ export async function GET(req: NextRequest) {
   try {
     const buffer = await new Promise<Buffer>((resolve, reject) => {
       const chunks: Buffer[] = [];
-      const agent = new https.Agent({
-        rejectUnauthorized: false, // Bypass SSL certificate validation
-        timeout: 10000, // 10 second timeout
-      });
+      
+      // Force HTTP internally to bypass fatal SSL/TLS handshake failures
+      const fetchUrl = url.replace("https://", "http://");
+      const http = require("http");
 
-      https.get(url, { agent }, (res) => {
+      http.get(fetchUrl, { timeout: 10000 }, (res: any) => {
         if (res.statusCode !== 200) {
           reject(new Error(`Status ${res.statusCode}`));
           res.resume();
@@ -66,8 +66,8 @@ export async function GET(req: NextRequest) {
         res.on("data", (chunk: Buffer) => chunks.push(chunk));
         res.on("end", () => resolve(Buffer.concat(chunks)));
         res.on("error", reject);
-      }).on("error", (error) => {
-        console.error("HTTPS request error:", error);
+      }).on("error", (error: any) => {
+        console.error("HTTP request error:", error);
         reject(error);
       });
     });

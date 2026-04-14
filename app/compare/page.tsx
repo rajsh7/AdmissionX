@@ -119,7 +119,11 @@ function ComparePageInner() {
   // Close suggestions on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+      if (
+        searchRef.current && 
+        !searchRef.current.contains(e.target as Node) &&
+        !(e.target as HTMLElement).closest(".compare-suggestions-dropdown")
+      ) {
         setSuggestions([]);
         setAddingSlot(null);
       }
@@ -130,7 +134,12 @@ function ComparePageInner() {
 
   function addCollege(slug: string, slot: number) {
     const newColleges = [...colleges];
-    if (newColleges.some((c) => c?.slug === slug)) return;
+    if (newColleges.some((c) => c?.slug === slug)) {
+      setSearchQ("");
+      setSuggestions([]);
+      setAddingSlot(null);
+      return;
+    }
     setLoading(true);
     fetch(`/api/compare?slugs=${slug}`)
       .then((r) => r.json())
@@ -142,7 +151,13 @@ function ComparePageInner() {
           router.replace(`/compare?colleges=${slugs.join(",")}`, { scroll: false });
         }
       })
-      .finally(() => { setLoading(false); setSearchQ(""); setSuggestions([]); setAddingSlot(null); });
+      .catch(err => console.error("Add college error:", err))
+      .finally(() => { 
+        setLoading(false); 
+        setSearchQ(""); 
+        setSuggestions([]); 
+        setAddingSlot(null); 
+      });
   }
 
   function removeCollege(slot: number) {
@@ -154,18 +169,21 @@ function ComparePageInner() {
   }
 
   function handleAddButton() {
-    if (!searchQ.trim()) return;
+    if (!searchQ.trim() || loading) return;
     const slot = addingSlot !== null ? addingSlot : colleges.findIndex((c) => !c);
     if (slot === -1) return;
     if (suggestions.length > 0) {
       addCollege(suggestions[0].slug, slot);
     } else {
+      setLoading(true);
       fetch(`/api/search?q=${encodeURIComponent(searchQ.trim())}`)
         .then((r) => r.json())
         .then((d) => {
           const first = (d.suggestions ?? []).find((s: Suggestion) => s.type === "college");
           if (first) addCollege(first.slug, slot);
-        });
+          else setLoading(false);
+        })
+        .catch(() => setLoading(false));
     }
   }
 
@@ -197,8 +215,8 @@ function ComparePageInner() {
 
               {/* Search Layout */}
               <div ref={searchRef} className="flex flex-col sm:flex-row gap-4 max-w-2xl relative">
-                <div className="flex-1 flex items-center gap-3 bg-white border border-slate-200 rounded-[5px] px-4 py-3.5 shadow-sm focus-within:border-[#FF3C3C] focus-within:ring-2 focus-within:ring-[#FF3C3C]/10 transition-all">
-                  <span className="text-[#FF3C3C] font-bold text-xl">+</span>
+                <div className="flex-1 flex items-center gap-3 bg-white border border-slate-200 rounded-[5px] px-5 py-3.5 shadow-sm focus-within:border-[#FF3C3C] focus-within:ring-4 focus-within:ring-[#FF3C3C]/10 transition-all duration-300">
+                  <span className="material-symbols-outlined text-[#FF3C3C] text-[24px]">school</span>
                   <input
                     ref={inputRef}
                     value={searchQ}
@@ -206,42 +224,51 @@ function ComparePageInner() {
                       setSearchQ(e.target.value);
                       if (addingSlot === null) {
                         const slot = colleges.findIndex((c) => !c);
-                        setAddingSlot(slot !== -1 ? slot : null);
+                        setAddingSlot(slot !== -1 ? slot : 0); // Default to first slot if full
                       }
                     }}
                     onKeyDown={(e) => { if (e.key === "Enter") handleAddButton(); }}
                     placeholder="Search universities, colleges..."
-                    className="flex-1 text-[16px] text-slate-700 placeholder:text-slate-400 bg-transparent outline-none font-medium"
+                    className="flex-1 text-[16px] text-slate-700 placeholder:text-slate-400 bg-transparent outline-none font-semibold"
                   />
                 </div>
                 <button
                   onClick={handleAddButton}
-                  className="bg-[#FF3C3C] text-white text-[16px] font-bold px-8 py-3.5 rounded-[5px] hover:bg-red-600 transition-all active:scale-95 shadow-lg shadow-red-200 whitespace-nowrap"
+                  disabled={loading}
+                  className="bg-[#FF3C3C] text-white text-[16px] font-bold px-8 py-3.5 rounded-[5px] hover:bg-red-600 transition-all active:scale-95 shadow-lg shadow-red-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[150px]"
                 >
-                  Add College
+                  {loading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                  {loading ? "Adding..." : "Add College"}
                 </button>
 
                 {suggestions.length > 0 && dropdownStyle && createPortal(
                   <div
                     style={{ position: "absolute", top: dropdownStyle.top, left: dropdownStyle.left, width: dropdownStyle.width, zIndex: 9999 }}
-                    className="bg-white rounded-[5px] shadow-2xl border border-slate-100 overflow-hidden"
+                    className="compare-suggestions-dropdown bg-white rounded-[5px] shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
                   >
-                    {suggestions.map((s) => (
-                      <button
-                        key={s.slug}
-                        onClick={() => {
-                          const slot = addingSlot !== null ? addingSlot : colleges.findIndex((c) => !c);
-                          if (slot !== -1) addCollege(s.slug, slot);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-slate-50 text-left border-b border-slate-50 last:border-0 transition-colors"
-                      >
-                        <span className="material-symbols-outlined text-slate-400 text-[20px]">account_balance</span>
-                        <div>
-                          <p className="text-[15px] font-bold text-slate-800">{s.name}</p>
-                          <p className="text-[13px] text-slate-400 font-medium">{s.location}</p>
-                        </div>
-                      </button>
-                    ))}
+                    <div className="py-1">
+                      {suggestions.map((s) => (
+                        <button
+                          key={s.slug}
+                          onClick={() => {
+                            const slot = addingSlot !== null ? addingSlot : colleges.findIndex((c) => !c);
+                            if (slot !== -1) addCollege(s.slug, slot);
+                          }}
+                          className="w-full flex items-center gap-4 px-5 py-4 hover:bg-rose-50 text-left border-b border-slate-50 last:border-0 transition-colors group"
+                        >
+                          <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center shrink-0 group-hover:bg-white transition-colors">
+                            <span className="material-symbols-outlined text-slate-400 text-[22px] group-hover:text-primary">school</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[15px] font-bold text-slate-800 line-clamp-1">{s.name}</p>
+                            <p className="text-[12px] text-slate-500 font-medium flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">location_on</span>
+                              {s.location}
+                            </p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
                   </div>,
                   document.body
                 )}
@@ -305,12 +332,22 @@ function ComparePageInner() {
                                 setSearchQ("");
                                 setTimeout(() => inputRef.current?.focus(), 50);
                               }}
-                              className="w-full h-full min-h-[160px] flex flex-col items-center justify-center gap-3 border-2 border-dashed border-slate-100 rounded-[5px] hover:border-[#FF3C3C] hover:bg-[#FF3C3C]/5 transition-all group"
+                              className={`w-full h-full min-h-[160px] flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-[5px] transition-all group ${
+                                addingSlot === i 
+                                  ? "border-[#FF3C3C] bg-[#FF3C3C]/5 ring-4 ring-[#FF3C3C]/10" 
+                                  : "border-slate-100 hover:border-[#FF3C3C] hover:bg-[#FF3C3C]/5"
+                              }`}
                             >
-                              <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-white transition-colors">
-                                <span className="material-symbols-outlined text-slate-400 group-hover:text-[#FF3C3C] text-[24px]">add</span>
+                              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+                                addingSlot === i ? "bg-white text-[#FF3C3C]" : "bg-slate-50 group-hover:bg-white text-slate-400 group-hover:text-[#FF3C3C]"
+                              }`}>
+                                <span className="material-symbols-outlined text-[24px]">{addingSlot === i ? "edit" : "add"}</span>
                               </div>
-                              <span className="text-[15px] font-bold text-slate-400 group-hover:text-[#FF3C3C] transition-colors">Add College</span>
+                              <span className={`text-[15px] font-bold transition-colors ${
+                                addingSlot === i ? "text-[#FF3C3C]" : "text-slate-400 group-hover:text-[#FF3C3C]"
+                              }`}>
+                                {addingSlot === i ? "Selecting..." : "Add College"}
+                              </span>
                             </button>
                           </div>
                         )}

@@ -126,7 +126,7 @@ export default async function ExaminationHubPage({
         {/* Hero section */}
         <div className="pt-[6.5rem] sm:pt-28 pb-8 w-full px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10">
           <div
-            className="relative bg-white rounded-[5px] shadow-lg border border-neutral-200 overflow-hidden flex flex-col md:flex-row bg-cover bg-center bg-no-repeat"
+            className="relative bg-white rounded-[5px] shadow-lg border border-neutral-200 overflow-hidden flex flex-col md:flex-row bg-cover bg-right bg-no-repeat"
             style={{ minHeight: "360px", backgroundImage: `url("${HERO_BG}")` }}
           >
 
@@ -164,8 +164,8 @@ export default async function ExaminationHubPage({
               </form>
             </div>
 
-            <div className="relative w-[40%] min-h-[250px] md:min-h-full flex-shrink-0 pt-4 pr-4 pb-4">
-              <div className="relative w-full h-full min-h-[220px] rounded-[5px] overflow-hidden">
+            <div className="relative w-[40%] min-h-[250px] md:min-h-full flex-shrink-0">
+              <div className="relative w-full h-full min-h-[220px] rounded-none overflow-hidden">
                 <Image
                   src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&q=80&w=1200"
                   alt="Competitive Exam"

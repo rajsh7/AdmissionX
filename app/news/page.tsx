@@ -218,11 +218,11 @@ export default async function NewsPage({
           {/* Featured */}
           {featured && (
             <article className="mb-10 rounded-[5px] border border-neutral-200/80 bg-neutral-100 shadow-[0_1px_4px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col md:flex-row"
-              style={{ backgroundImage: `url("${encodeURI("/Background-images/f0b10acfd1d98e25c40741fa92c81454f3557e55 (1).png")}")`, backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}
+              style={{ backgroundImage: `url("${encodeURI("/Background-images/f0b10acfd1d98e25c40741fa92c81454f3557e55 (1).png")}")`, backgroundSize: "cover", backgroundPosition: "right", backgroundRepeat: "no-repeat" }}
             >
               <Link
                 href={`/news/${featured.slug}`}
-                className="relative w-full md:w-[32%] min-h-[220px] md:min-h-[340px] bg-neutral-100 shrink-0 group md:my-4 md:mx-4 md:rounded-[5px] overflow-hidden"
+                className="relative w-full md:w-[32%] min-h-[220px] md:min-h-[340px] bg-neutral-100 shrink-0 group md:m-0 md:rounded-none overflow-hidden"
               >
                 <Image
                   src={buildImageUrl(featured.featimage)}
@@ -232,14 +232,7 @@ export default async function NewsPage({
                   sizes="(max-width: 768px) 100vw, 42vw"
                   priority
                 />
-                <div className="absolute inset-0 bg-black/10" />
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-20 h-20 rounded-full bg-[#0d9488] border-4 border-white/90 shadow-lg flex items-center justify-center">
-                    <span className="material-symbols-outlined text-white text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      school
-                    </span>
-                  </div>
-                </div>
+                <div className="absolute inset-0 bg-black/10 transition-opacity flex items-center justify-center pointer-events-none" />
               </Link>
               <div className="flex-1 p-6 sm:p-8 flex flex-col justify-center">
                 <h2 className="text-xl sm:text-2xl font-bold text-neutral-800 leading-snug mb-3">{featured.topic}</h2>
@@ -272,11 +265,10 @@ export default async function NewsPage({
             <div className="flex items-center gap-0 min-w-0 overflow-x-auto hide-scrollbar border border-neutral-200 rounded-[5px] bg-white shadow-[0_2px_6px_rgba(0,0,0,0.08)]">
               <Link
                 href={buildUrl({ type: undefined, tag: undefined, page: "1" })}
-                className={`flex-1 text-center py-3 text-sm font-semibold whitespace-nowrap transition-colors ${
-                  !activeType && !activeTag
+                className={`flex-1 text-center py-3 text-sm font-semibold whitespace-nowrap transition-colors ${!activeType && !activeTag
                     ? "text-[#FF3B30] border-b-2 border-b-[#FF3B30]"
                     : "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50 border-r border-neutral-200"
-                }`}
+                  }`}
                 style={{ fontWeight: 600, fontSize: "20px", color: "rgba(62, 62, 62, 0.71)" }}
               >
                 All News
@@ -288,9 +280,8 @@ export default async function NewsPage({
                   <Link
                     key={t.id}
                     href={buildUrl({ type: t.slug, tag: undefined, page: "1" })}
-                    className={`flex-1 text-center py-3 text-sm font-semibold whitespace-nowrap transition-colors ${
-                      on ? "text-[#FF3B30] border-b-2 border-b-[#FF3B30]" : `text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50${i < allTypesTyped.length - 1 ? " border-r border-neutral-200" : ""}`
-                    }`}
+                    className={`flex-1 text-center py-3 text-sm font-semibold whitespace-nowrap transition-colors ${on ? "text-[#FF3B30] border-b-2 border-b-[#FF3B30]" : `text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50${i < allTypesTyped.length - 1 ? " border-r border-neutral-200" : ""}`
+                      }`}
                     style={{ fontWeight: 600, fontSize: "20px", color: "rgba(62, 62, 62, 0.71)" }}
                   >
                     {t.name}
@@ -475,11 +466,10 @@ export default async function NewsPage({
                             <Link
                               key={p}
                               href={buildUrl({ page: String(p) })}
-                              className={`w-9 h-9 rounded-[5px] text-sm font-bold flex items-center justify-center transition-colors ${
-                                p === page
+                              className={`w-9 h-9 rounded-[5px] text-sm font-bold flex items-center justify-center transition-colors ${p === page
                                   ? "text-white"
                                   : "border border-neutral-200 text-neutral-700 hover:bg-neutral-50"
-                              }`}
+                                }`}
                               style={p === page ? { backgroundColor: ACCENT } : undefined}
                             >
                               {p}
@@ -544,11 +534,10 @@ export default async function NewsPage({
                       <Link
                         key={String(tag._id)}
                         href={buildUrl({ tag: tag.slug, page: "1", type: undefined })}
-                        className={`text-xs font-semibold px-3 py-1.5 rounded-[5px] border transition-colors ${
-                          activeTag === tag.slug?.toLowerCase()
+                        className={`text-xs font-semibold px-3 py-1.5 rounded-[5px] border transition-colors ${activeTag === tag.slug?.toLowerCase()
                             ? "border-[#FF3B30] bg-red-50 text-[#FF3B30]"
                             : "border-neutral-200 text-neutral-600 hover:border-neutral-300"
-                        }`}
+                          }`}
                       >
                         {tag.name}
                       </Link>

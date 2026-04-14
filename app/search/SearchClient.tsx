@@ -242,7 +242,7 @@ export default function SearchClient({
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
       <Header />
-      <div className="relative w-full overflow-hidden" style={{ height: heroHeight }}>
+      <div className="relative w-full z-20" style={{ height: heroHeight }}>
         <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
           <Image
             src={heroImage}

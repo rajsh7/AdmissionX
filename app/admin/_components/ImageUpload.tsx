@@ -46,7 +46,7 @@ export default function ImageUpload({
       
       <div className="relative group">
         <div 
-          className={`w-full h-40 rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center gap-2 overflow-hidden bg-slate-50/50 ${
+          className={`w-full h-40 rounded-[5px] border-2 border-dashed transition-all flex flex-col items-center justify-center gap-2 overflow-hidden bg-slate-50/50 ${
             preview ? "border-blue-200 bg-white" : "border-slate-200 hover:border-blue-400 hover:bg-blue-50/30"
           }`}
         >
@@ -61,7 +61,7 @@ export default function ImageUpload({
               <button
                 type="button"
                 onClick={handleClear}
-                className="absolute top-2 right-2 p-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors shadow-sm opacity-0 group-hover:opacity-100"
+                className="absolute top-2 right-2 p-1.5 bg-red-100 text-red-600 rounded-[5px] hover:bg-red-200 transition-colors shadow-sm opacity-0 group-hover:opacity-100"
               >
                 <span className="material-symbols-rounded text-[18px]">close</span>
               </button>
@@ -97,7 +97,7 @@ export default function ImageUpload({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute bottom-2 right-2 px-3 py-1.5 bg-blue-600 text-white text-[10px] font-bold rounded-lg hover:bg-blue-700 transition-all shadow-lg opacity-0 group-hover:opacity-100"
+            className="absolute bottom-2 right-2 px-3 py-1.5 bg-blue-600 text-white text-[10px] font-bold rounded-[5px] hover:bg-blue-700 transition-all shadow-lg opacity-0 group-hover:opacity-100"
           >
             Change Image
           </button>

@@ -171,13 +171,16 @@ export default async function BlogsListingPage({
           {featured && (
             <section
               className="mb-10 rounded-[5px] border border-neutral-200/90 overflow-hidden bg-neutral-100 relative"
-              style={{ backgroundImage: `url("${encodeURI("/Background-images/f0b10acfd1d98e25c40741fa92c81454f3557e55 (1).png")}")`, backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}
+              style={{ backgroundImage: `url("${encodeURI("/Background-images/f0b10acfd1d98e25c40741fa92c81454f3557e55 (1).png")}")`, backgroundSize: "cover", backgroundPosition: "right", backgroundRepeat: "no-repeat" }}
             >
               <div className="relative flex flex-col lg:flex-row lg:items-stretch">
                 <div className="flex-1 p-6 sm:p-8 lg:p-10 flex flex-col justify-center order-2 lg:order-1">
-                  <Link href={`/blogs/${featured.slug}`} className="group">
-                    <h1 className="text-xl sm:text-2xl lg:text-[1.65rem] font-bold text-blue-600 underline decoration-2 underline-offset-4 decoration-blue-600/80 group-hover:text-blue-700 mb-4 leading-snug">
-                      {featured.topic}
+                  <Link href={`/blogs/${featured.slug}`} className="group mb-4 block">
+                    <h1 
+                      style={{ fontWeight: 700, fontSize: "32px", color: "#3E3E3E" }}
+                      className="leading-tight group-hover:opacity-80 transition-opacity"
+                    >
+                      Advanced Global Analysis & Exam Intelligence Report | Admission X
                     </h1>
                   </Link>
                   <p className="text-sm text-neutral-600 leading-relaxed line-clamp-3 mb-5">
@@ -205,12 +208,12 @@ export default async function BlogsListingPage({
                 </div>
                 <Link
                   href={`/blogs/${featured.slug}`}
-                  className="relative w-full lg:w-[35%] min-h-[220px] lg:min-h-[280px] shrink-0 order-1 lg:order-2 bg-neutral-200 lg:my-4 lg:mr-4 lg:rounded-[5px] overflow-hidden"
+                  className="relative w-full lg:w-[35%] min-h-[220px] lg:min-h-[280px] shrink-0 order-1 lg:order-2 bg-neutral-200 lg:m-0 lg:rounded-none overflow-hidden"
                 >
                   <BlogImage
                     src={buildImageUrl(featured.featimage)}
                     alt={featured.topic}
-                    className="w-full h-full min-h-[220px] lg:min-h-full object-cover rounded-[5px]"
+                    className="w-full h-full min-h-[220px] lg:min-h-full object-cover rounded-none"
                   />
                 </Link>
               </div>

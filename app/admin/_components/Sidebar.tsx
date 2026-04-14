@@ -88,7 +88,7 @@ export function AdminSidebarContentV2({
       {/* Logo Area */}
       <div className="p-4 flex-shrink-0 ">
         <Link href="/admin/dashboard" className="flex  items-center justify-center px-3 py-2">
-          <img src="/logo.jpg" alt="AdmissionX" className="h-9 w-auto object-contain" />
+          <img src="/admissionx-logo.png" alt="AdmissionX" className="h-9 w-auto object-contain" />
         </Link>
       </div>
 

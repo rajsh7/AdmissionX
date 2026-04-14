@@ -54,9 +54,9 @@ export const revalidate = 300;
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_BANNER = "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=1200";
 
-function buildImageUrl(raw: string | null): string {
-  if (!raw) return DEFAULT_BANNER;
-  if (raw.startsWith("http")) return raw;
+function buildImageUrl(raw: string | null | undefined): string {
+  if (!raw || String(raw).toLowerCase() === "null") return DEFAULT_BANNER;
+  if (typeof raw === "string" && (raw.startsWith("http") || raw.startsWith("/"))) return raw;
   return `${IMAGE_BASE}${raw}`;
 }
 
@@ -132,7 +132,7 @@ async function fetchTabCounts(slug: string) {
 const getCachedCollegeBase = unstable_cache(
   (slug: string) => fetchCollegeBase(slug),
   ["college-base-mongo"],
-  { revalidate: 300 }
+  { revalidate: 60 }
 );
 
 const getCachedTabCounts = unstable_cache(

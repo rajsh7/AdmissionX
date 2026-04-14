@@ -57,7 +57,7 @@ export default async function CollegeOverviewPage({
   // Step 1: Get college profile (fast — indexed slug)
   const cp = await db.collection("collegeprofile").findOne(
     { slug },
-    { projection: { _id: 1, users_id: 1, description: 1, totalStudent: 1, registeredSortAddress: 1, registeredAddressCityId: 1, bannerimage: 1, city_name: 1 } }
+    { projection: { _id: 1, users_id: 1, description: 1, totalStudent: 1, registeredSortAddress: 1, registeredAddressCityId: 1, bannerimage: 1, city_name: 1, mosaic1: 1, mosaic2: 1, mosaic3: 1, mosaic4: 1 } }
   );
 
   if (!cp) notFound();
@@ -138,6 +138,11 @@ export default async function CollegeOverviewPage({
       location={location}
       stats={stats}
       mosaicImages={mosaicImages}
+      mosaic1={cp.mosaic1}
+      mosaic2={cp.mosaic2}
+      mosaic3={cp.mosaic3}
+      mosaic4={cp.mosaic4}
+      bannerimage={cp.bannerimage}
       aboutPara1={aboutPara1}
       aboutPara2={paragraphs[1] || "The institution provides a vibrant campus environment with state-of-the-art facilities, experienced faculty, and strong industry connections."}
       missionText={missionText}

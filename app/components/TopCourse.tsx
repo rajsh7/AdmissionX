@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search } from "lucide-react";
@@ -111,6 +112,7 @@ const courses = [
 ];
 
 export default function TopCourse() {
+  const router = useRouter();
   const [active, setActive] = useState(0); // Start with Medical as per Figma
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -157,7 +159,7 @@ export default function TopCourse() {
                     src={current.image}
                     alt={current.name}
                     fill
-                    className="object-cover"
+                    className="object-cover object-[center_10%]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 </motion.div>
@@ -218,6 +220,7 @@ export default function TopCourse() {
                   <button
                     key={course.id}
                     onMouseEnter={() => setActive(originalIdx)}
+                    onClick={() => router.push(`/careers-courses?stream=${course.slug}`)}
                     className={`flex items-center gap-4 p-3 rounded-[10px] transition-all duration-300 text-left ${
                       active === originalIdx 
                         ? 'text-white translate-x-2' 
@@ -228,10 +231,10 @@ export default function TopCourse() {
                       boxShadow: active === originalIdx ? '0 10px 25px -5px rgba(221, 141, 143, 0.4)' : 'none'
                     }}
                   >
-                    <div className={`w-12 h-12 rounded-[10px] flex items-center justify-center shrink-0 transition-colors ${
+                    <div className={`w-10 h-10 rounded-[8px] flex items-center justify-center shrink-0 transition-colors ${
                       active === originalIdx ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'
                     }`}>
-                      <span className="material-symbols-outlined text-[24px]">{course.icon}</span>
+                      <span className="material-symbols-outlined text-[20px]">{course.icon}</span>
                     </div>
                     <div className="flex-1">
                        <div className={`text-[16px] font-bold leading-none ${active === originalIdx ? 'text-white' : 'text-slate-800'}`}>

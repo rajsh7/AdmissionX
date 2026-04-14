@@ -42,9 +42,33 @@ async function updateCollegeProfile(formData: FormData) {
   if (logoFile && logoFile.size > 0)
     logoimage = await saveUpload(logoFile, `college/${slug}`, "logo");
 
+  // Multi-image mosaic
+  const mosaic1File = formData.get("mosaic1_file") as File | null;
+  const mosaic2File = formData.get("mosaic2_file") as File | null;
+  const mosaic3File = formData.get("mosaic3_file") as File | null;
+  const mosaic4File = formData.get("mosaic4_file") as File | null;
+
+  let mosaic1 = (formData.get("mosaic1_existing") as string) || "";
+  let mosaic2 = (formData.get("mosaic2_existing") as string) || "";
+  let mosaic3 = (formData.get("mosaic3_existing") as string) || "";
+  let mosaic4 = (formData.get("mosaic4_existing") as string) || "";
+
+  if (mosaic1File && mosaic1File.size > 0)
+    mosaic1 = await saveUpload(mosaic1File, `college/${slug}/mosaic`, "m1");
+  if (mosaic2File && mosaic2File.size > 0)
+    mosaic2 = await saveUpload(mosaic2File, `college/${slug}/mosaic`, "m2");
+  if (mosaic3File && mosaic3File.size > 0)
+    mosaic3 = await saveUpload(mosaic3File, `college/${slug}/mosaic`, "m3");
+  if (mosaic4File && mosaic4File.size > 0)
+    mosaic4 = await saveUpload(mosaic4File, `college/${slug}/mosaic`, "m4");
+
   const $set: Record<string, unknown> = {
     ...(bannerimage ? { bannerimage } : {}),
     ...(logoimage   ? { logoimage }   : {}),
+    ...(mosaic1     ? { mosaic1 }     : {}),
+    ...(mosaic2     ? { mosaic2 }     : {}),
+    ...(mosaic3     ? { mosaic3 }     : {}),
+    ...(mosaic4     ? { mosaic4 }     : {}),
     description:            str("description"),
     estyear:                str("estyear"),
     website:                str("website"),
@@ -83,8 +107,8 @@ async function updateCollegeProfile(formData: FormData) {
   }
 
   revalidatePath("/admin/colleges/profile");
-  revalidatePath(`/college/${slug}`, "page");
-  revalidatePath("/top-colleges", "page");
+  revalidatePath(`/college/${slug}`);
+  revalidatePath("/top-colleges");
   revalidatePath("/top-university", "page");
   redirect("/admin/colleges/profile");
 }
@@ -92,17 +116,16 @@ async function updateCollegeProfile(formData: FormData) {
 // ─── Style helpers ─────────────────────────────────────────────────────────────
 
 const inputCls =
-  "w-full h-10 px-4 border border-slate-200 rounded-xl text-sm font-medium bg-white " +
-  "focus:outline-none focus:border-[#008080] focus:ring-2 focus:ring-[#008080]/10 transition-all " +
+  "w-full h-10 px-4 border border-slate-200 rounded-[5px] text-sm font-medium bg-white " +
+  "focus:outline-none focus:border-[#FF3C3C] focus:ring-2 focus:ring-[#FF3C3C]/10 transition-all " +
   "placeholder:text-slate-300 text-slate-700";
 
 const textareaCls =
-  "w-full min-h-[120px] px-4 py-3 border border-slate-200 rounded-xl text-sm font-medium bg-white " +
-  "focus:outline-none focus:border-[#008080] focus:ring-2 focus:ring-[#008080]/10 transition-all " +
+  "w-full min-h-[120px] px-4 py-3 border border-slate-200 rounded-[5px] text-sm font-medium bg-white " +
+  "focus:outline-none focus:border-[#FF3C3C] focus:ring-2 focus:ring-[#FF3C3C]/10 transition-all " +
   "resize-none placeholder:text-slate-300 text-slate-700";
 
-const labelCls =
-  "text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block";
+const labelCls = "block text-[11px] font-black text-[#4B5E7E] uppercase tracking-wider mb-2";
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
 
@@ -115,7 +138,7 @@ function buildImageUrl(raw: string | null | undefined): string {
 
 function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`bg-white rounded-2xl border border-slate-100 shadow-sm p-6 ${className}`}>
+    <div className={`bg-white rounded-[5px] shadow-sm border border-slate-200 p-6 ${className}`}>
       {children}
     </div>
   );
@@ -124,9 +147,9 @@ function Card({ children, className = "" }: { children: ReactNode; className?: s
 function SectionHeading({ icon, title }: { icon: string; title: string }) {
   return (
     <div className="flex items-center gap-2 mb-5">
-      <span className="w-1 h-4 bg-[#008080] rounded-full block flex-shrink-0" />
+      <span className="w-1 h-4 bg-[#FF3C3C] rounded-full block flex-shrink-0" />
       <span
-        className="material-symbols-outlined text-[18px] text-[#008080]"
+        className="material-symbols-outlined text-[18px] text-[#FF3C3C]"
         style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20" }}
       >
         {icon}
@@ -155,7 +178,7 @@ function ToggleRow({
           defaultChecked={checked}
           className="sr-only peer"
         />
-        <div className="w-10 h-5 bg-slate-200 rounded-full peer-checked:bg-[#008080] transition-colors duration-200" />
+        <div className="w-10 h-5 bg-slate-200 rounded-full peer-checked:bg-[#FF3C3C] transition-colors duration-200" />
         <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5" />
       </div>
     </label>
@@ -249,6 +272,10 @@ export default async function EditCollegeProfilePage({
     totalStudent:           n(cp.totalStudent),
     facebookurl:            s(cp.facebookurl) || null,
     twitterurl:             s(cp.twitterurl) || null,
+    mosaic1:                s(cp.mosaic1) || null,
+    mosaic2:                s(cp.mosaic2) || null,
+    mosaic3:                s(cp.mosaic3) || null,
+    mosaic4:                s(cp.mosaic4) || null,
     city_name:              cityName,
   };
 
@@ -260,38 +287,25 @@ export default async function EditCollegeProfilePage({
         <input type="hidden" name="slug" value={college.slug} />
 
         {/* ── Header ── */}
-        <div className="flex items-center gap-3 mb-8">
-          <Link
-            href="/admin/colleges/profile"
-            className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-all text-slate-500 hover:text-slate-700 flex-shrink-0"
-          >
-            <span
-              className="material-symbols-outlined text-[22px]"
-              style={{ fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/admin/colleges/profile"
+              className="flex items-center gap-2 bg-white text-slate-900 border border-slate-200 px-4 py-2 rounded-[5px] text-sm font-semibold hover:bg-slate-50 transition-colors"
             >
-              chevron_left
-            </span>
-          </Link>
-
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-black text-slate-800 leading-tight tracking-tight">
-              Edit College Profile
-            </h1>
-            <p className="text-sm text-slate-400 font-medium mt-0.5 truncate">
-              {college.college_name}
-            </p>
+              <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+            </Link>
+            <div>
+              <h1 className="text-xl font-black text-slate-900 leading-none">Edit College Profile</h1>
+              <p className="text-sm text-slate-500 mt-1 font-medium">{college.college_name}</p>
+            </div>
           </div>
 
           <button
             type="submit"
-            className="h-10 px-6 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-black hover:bg-slate-100 transition-colors shadow-sm flex items-center gap-2 flex-shrink-0"
+            className="flex items-center gap-2 bg-[#0F172A] text-white px-6 py-2.5 rounded-[5px] text-sm font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200"
           >
-            <span
-              className="material-symbols-outlined text-[17px]"
-              style={{ fontVariationSettings: "'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 20" }}
-            >
-              save
-            </span>
+            <span className="material-symbols-outlined text-[18px]">save</span>
             Save Changes
           </button>
         </div>
@@ -574,14 +588,51 @@ export default async function EditCollegeProfilePage({
             <Card>
               <SectionHeading icon="tune" title="Profile Settings" />
 
-              {/* Banner image upload */}
+              {/* Hero Banner Section */}
               <div className="mb-4">
                 <ImageUpload
                   name="bannerimage_file"
-                  label="Banner / Background Image"
+                  label="Hero Banner Image"
                   initialImage={bannerUrl || null}
                   existingName="bannerimage_existing"
                 />
+              </div>
+
+              {/* Stats Section Background */}
+              <div className="mb-4">
+                <ImageUpload
+                  name="mosaic1_file"
+                  label="Stats Section Background"
+                  initialImage={college.mosaic1 ? buildImageUrl(college.mosaic1) : null}
+                  existingName="mosaic1_existing"
+                />
+              </div>
+
+              {/* About Us Mosaic Section */}
+              <div className="pt-2 border-t border-white/5 space-y-3 mb-4">
+                <p className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">About Us Images (3 Units)</p>
+                <div className="space-y-3">
+                  <ImageUpload
+                    name="mosaic2_file"
+                    label="About Image 1 (Large - Vertical)"
+                    initialImage={college.mosaic2 ? buildImageUrl(college.mosaic2) : null}
+                    existingName="mosaic2_existing"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <ImageUpload
+                      name="mosaic3_file"
+                      label="About Image 2"
+                      initialImage={college.mosaic3 ? buildImageUrl(college.mosaic3) : null}
+                      existingName="mosaic3_existing"
+                    />
+                    <ImageUpload
+                      name="mosaic4_file"
+                      label="About Image 3"
+                      initialImage={college.mosaic4 ? buildImageUrl(college.mosaic4) : null}
+                      existingName="mosaic4_existing"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Logo image upload */}

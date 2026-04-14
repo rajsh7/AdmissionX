@@ -42,17 +42,32 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
   const initial = college_name.trim().charAt(0).toUpperCase();
 
   return (
-    <div className="relative w-full overflow-hidden bg-neutral-900" style={{ height: 550 }}>
-      <Image src={image} alt={college_name} fill priority sizes="100vw" className="object-cover" unoptimized />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
-      <div className="absolute bottom-12 left-0 px-6 md:px-16 lg:px-24 z-10 flex flex-col items-start gap-4">
-        <div className="flex items-center gap-4 md:gap-6 bg-white/10 border border-white/20 backdrop-blur-md px-6 py-4 md:px-8 md:py-6 rounded-xl shadow-2xl max-w-2xl lg:max-w-5xl">
-          <div className="flex-shrink-0 w-14 h-14 md:w-20 md:h-20 rounded-full bg-white flex items-center justify-center shadow-lg">
+    <div className="relative w-full overflow-hidden bg-[#1e293b] flex items-center justify-center" style={{ height: 700 }}>
+      {/* Background Image Layer */}
+      {image && (
+        <div className="absolute inset-0 z-0 h-full w-full">
+          <Image 
+            src={image} 
+            alt={college_name} 
+            fill 
+            priority 
+            className="object-cover transition-opacity duration-500 z-10 w-full" 
+            unoptimized 
+          />
+        </div>
+      )}
+      
+      
+      <div className="absolute bottom-12 left-0 w-full z-10">
+        <div className="mx-auto max-w-[1920px] px-4 md:px-10 lg:px-12 flex flex-col items-start gap-4">
+          <div className="flex items-center gap-4 md:gap-6 border border-white/20 backdrop-blur-md px-6 py-2 md:px-8 md:py-3 rounded-[5px] shadow-2xl w-fit max-w-full" style={{ backgroundColor: "rgba(212, 12, 17, 0.35)" }}>
+          <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 rounded-full bg-white flex items-center justify-center shadow-lg">
             <span className="text-2xl md:text-[40px] font-bold" style={{ color: "#FF3C3C" }}>{initial}</span>
           </div>
-          <h1 className="text-[36px] md:text-[48px] font-bold leading-tight tracking-tight text-white">{college_name}</h1>
+          <h1 className="text-[32px] md:text-[48px] font-bold leading-none tracking-tight text-white mb-0">{college_name}</h1>
         </div>
-        <Link href={`/college/${slug}`} className="mt-2 bg-transparent border border-white/40 text-white hover:bg-white/10 flex items-center justify-between gap-2 px-5 py-2.5 rounded-[5px] text-sm font-black transition-all w-fit ml-1 uppercase tracking-tight">
+        
+        <Link href={`/college/${slug}`} className="mt-2 flex items-center justify-between gap-4 px-10 py-2 rounded-[5px] text-[24px] font-bold transition-all w-fit ml-1 tracking-wider shadow-xl shadow-black/20 hover:bg-red-600/10 hover:scale-105 active:scale-95 border-2" style={{ backgroundColor: "transparent", borderColor: "rgba(212, 12, 17, 0.6)", color: "white" }}>
           Take a look
           <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -60,5 +75,6 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
         </Link>
       </div>
     </div>
+  </div>
   );
 }
