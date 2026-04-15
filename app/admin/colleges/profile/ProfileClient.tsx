@@ -108,6 +108,9 @@ export default function ProfileClient({
 }: ProfileClientProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const [showFilters, setShowFilters] = useState(
+    !!(q || filters.verified || filters.universityType || filters.showOnHome || filters.showOnTop)
+  );
 
   // ── Filter state — one entry per form field ─────────────────────────────────
   const [f, setF] = useState({
@@ -189,17 +192,29 @@ export default function ProfileClient({
             Manage and monitor all college/university profiles
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-[#008080]/10 px-4 py-2 rounded-xl">
-          <span className="material-symbols-outlined text-[18px] text-[#008080]">
-            account_balance
-          </span>
-          <span className="text-sm font-black text-[#008080]">
-            {total.toLocaleString()} Total
-          </span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-[#008080]/10 px-4 py-2 rounded-xl">
+            <span className="material-symbols-outlined text-[18px] text-[#008080]">account_balance</span>
+            <span className="text-sm font-black text-[#008080]">{total.toLocaleString()} Total</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowFilters(p => !p)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-bold transition-all ${
+              showFilters ? "bg-[#008080] text-white border-[#008080]" : "bg-white text-slate-600 border-slate-200 hover:border-[#008080] hover:text-[#008080]"
+            }`}
+          >
+            <span className="material-symbols-outlined text-[18px]">filter_alt</span>
+            Filters
+            {(q || filters.verified || filters.universityType || filters.showOnHome || filters.showOnTop) && (
+              <span className="w-2 h-2 rounded-full bg-red-500 ml-1" />
+            )}
+          </button>
         </div>
       </div>
 
       {/* ── Search & Filters ── */}
+      {showFilters && (
       <div className="bg-white border-b border-slate-100">
         {/* Section heading */}
         <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
@@ -364,6 +379,7 @@ export default function ProfileClient({
 
         </form>
       </div>
+      )}
 
       {/* ── Results Table ── */}
       <div className="bg-white">

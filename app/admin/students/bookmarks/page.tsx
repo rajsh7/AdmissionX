@@ -1,6 +1,9 @@
+import { getDb } from "@/lib/db";
 import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import BookmarkClient from "./BookmarkClient";
+
+export const dynamic = 'force-dynamic';
 
 const PAGE_SIZE = 25;
 
@@ -148,11 +151,10 @@ export default async function StudentBookmarksPage({
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  const [bookmarks, countRows, users, types] = await Promise.all([
+  const [bookmarks, countRows, types] = await Promise.all([
     safeQuery<BookmarkRow>(
-      `SELECT b.*, s.name as student_name, s.email as student_email, bt.name as type_name
+      `SELECT b.*, bt.name as type_name
        FROM bookmarks b
-       LEFT JOIN next_student_signups s ON b.student_id = s.id
        LEFT JOIN bookmarktypeinfos bt ON b.bookmarktypeinfo_id = bt.id
        ${where}
        ORDER BY b.created_at DESC
@@ -160,15 +162,29 @@ export default async function StudentBookmarksPage({
       [...params, PAGE_SIZE, offset]
     ),
     safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total 
-       FROM bookmarks b
-       LEFT JOIN next_student_signups s ON b.student_id = s.id
-       ${where}`,
+      `SELECT COUNT(*) AS total FROM bookmarks b ${where}`,
       params
     ),
-    safeQuery<UserRow>(`SELECT id, name, email FROM next_student_signups ORDER BY name ASC LIMIT 1000`),
     safeQuery<TypeRow>(`SELECT id, name FROM bookmarktypeinfos ORDER BY name ASC`)
   ]);
+
+  // Fetch user names from MongoDB users collection
+  const db = await getDb();
+  const studentIds = [...new Set(bookmarks.map((b: any) => Number(b.student_id)).filter(Boolean))];
+  const userRows = studentIds.length > 0
+    ? await db.collection("users").find({ id: { $in: studentIds } }, { projection: { id: 1, firstname: 1, email: 1 } }).toArray()
+    : [];
+  const userMap = new Map(userRows.map((u: any) => [Number(u.id), u]));
+
+  // Enrich bookmarks with student names
+  const enrichedBookmarks = bookmarks.map((b: any) => ({
+    ...b,
+    student_name: userMap.get(Number(b.student_id))?.firstname?.trim() || "Unknown",
+    student_email: userMap.get(Number(b.student_id))?.email?.trim() || "-",
+  }));
+
+  // Users list for filter dropdown
+  const users = userRows.map((u: any) => ({ id: u.id, name: (u.firstname || "").trim(), email: (u.email || "").trim() }));
 
   const total = Number(countRows[0]?.total ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -176,7 +192,7 @@ export default async function StudentBookmarksPage({
   return (
     <div className="p-6 space-y-6 w-full">
       <BookmarkClient 
-        bookmarks={JSON.parse(JSON.stringify(bookmarks))}
+        bookmarks={JSON.parse(JSON.stringify(enrichedBookmarks))}
         users={JSON.parse(JSON.stringify(users))}
         types={JSON.parse(JSON.stringify(types))}
         offset={offset}

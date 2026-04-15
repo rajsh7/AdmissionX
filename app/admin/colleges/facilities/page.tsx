@@ -21,22 +21,15 @@ async function deleteFacilityRow(id: string) {
 async function createFacility(formData: FormData) {
   "use server";
   const db = await getDb();
-  const collegeprofile_id = formData.get("collegeprofile_id") as string;
-  const facilities_id = formData.get("facilities_id") as string || null;
-  const name = formData.get("name") as string || null;
-  const description = formData.get("description") as string || null;
-
+  const collegeprofile_id = Number(formData.get("collegeprofile_id"));
+  const facilities_id = Number(formData.get("facilities_id")) || null;
+  const name = String(formData.get("name") || "") || null;
+  const description = String(formData.get("description") || "") || null;
   try {
-    await db.collection("collegefacilities").insertOne({
-      collegeprofile_id: new ObjectId(collegeprofile_id),
-      facilities_id: facilities_id ? new ObjectId(facilities_id) : null,
-      name,
-      description,
-      created_at: new Date()
-    });
-  } catch (e) {
-    console.error("[admin/colleges/facilities createAction]", e);
-  }
+    const last = await db.collection("collegefacilities").find({}, { projection: { id: 1 } }).sort({ id: -1 }).limit(1).toArray();
+    const nextId = ((last[0]?.id as number) ?? 0) + 1;
+    await db.collection("collegefacilities").insertOne({ id: nextId, collegeprofile_id, facilities_id, name, description, created_at: new Date() });
+  } catch (e) { console.error("[admin/colleges/facilities createAction]", e); }
   revalidatePath("/admin/colleges/facilities");
   revalidatePath("/", "layout");
 }
@@ -44,27 +37,17 @@ async function createFacility(formData: FormData) {
 async function updateFacility(formData: FormData) {
   "use server";
   const db = await getDb();
-  const id = formData.get("id") as string;
-  const collegeprofile_id = formData.get("collegeprofile_id") as string;
-  const facilities_id = formData.get("facilities_id") as string || null;
-  const name = formData.get("name") as string || null;
-  const description = formData.get("description") as string || null;
-
+  const id = String(formData.get("id") || "");
+  const collegeprofile_id = Number(formData.get("collegeprofile_id"));
+  const facilities_id = Number(formData.get("facilities_id")) || null;
+  const name = String(formData.get("name") || "") || null;
+  const description = String(formData.get("description") || "") || null;
   try {
     await db.collection("collegefacilities").updateOne(
       { _id: new ObjectId(id) },
-      {
-        $set: {
-          collegeprofile_id: new ObjectId(collegeprofile_id),
-          facilities_id: facilities_id ? new ObjectId(facilities_id) : null,
-          name,
-          description
-        }
-      }
+      { $set: { collegeprofile_id, facilities_id, name, description } }
     );
-  } catch (e) {
-    console.error("[admin/colleges/facilities updateAction]", e);
-  }
+  } catch (e) { console.error("[admin/colleges/facilities updateAction]", e); }
   revalidatePath("/admin/colleges/facilities");
   revalidatePath("/", "layout");
 }
@@ -112,133 +95,67 @@ export default async function CollegeFacilitiesPage({
 
   const db = await getDb();
 
-  // Build match for aggregation
-  const matchClauses: Record<string, unknown>[] = [];
-  if (q) {
-    matchClauses.push({
-      $or: [
-      { "user.firstname": { $regex: q, $options: "i" } },
-      { name: { $regex: q, $options: "i" } },
-      { "facility.name": { $regex: q, $options: "i" } }
-      ],
-    });
-  }
-  if (collegeId) {
-    matchClauses.push({ collegeprofile_id: new ObjectId(collegeId) });
-  }
-  if (facilityTypeId === "custom") {
-    matchClauses.push({ facilities_id: null });
-  } else if (facilityTypeId) {
-    matchClauses.push({ facilities_id: new ObjectId(facilityTypeId) });
-  }
-  if (displayName) {
-    matchClauses.push({ name: { $regex: displayName, $options: "i" } });
-  }
-  if (description) {
-    matchClauses.push({ description: { $regex: description, $options: "i" } });
-  }
-  const match = matchClauses.length > 0 ? { $and: matchClauses } : {};
-
-  // Aggregation for facilities
-  const facilitiesAggregation = [
-    {
-      $lookup: {
-        from: "collegeprofile",
-        localField: "collegeprofile_id",
-        foreignField: "_id",
-        as: "college"
-      }
-    },
-    { $unwind: "$college" },
-    {
-      $lookup: {
-        from: "users",
-        localField: "college.users_id",
-        foreignField: "_id",
-        as: "user"
-      }
-    },
-    { $unwind: "$user" },
-    {
-      $lookup: {
-        from: "facilities",
-        localField: "facilities_id",
-        foreignField: "_id",
-        as: "facility"
-      }
-    },
-    {
-      $unwind: {
-        path: "$facility",
-        preserveNullAndEmptyArrays: true
-      }
-    },
-    { $match: match },
-    {
-      $project: {
-        id: { $toString: "$_id" },
-        collegeprofile_id: { $toString: "$collegeprofile_id" },
-        facilities_id: { $toString: "$facilities_id" },
-        name: 1,
-        facility_name_raw: "$name",
-        college_name: { $ifNull: ["$user.firstname", "Unnamed College"] },
-        facility_name: { $ifNull: ["$name", "$facility.name"] },
-        description: 1,
-        created_at: 1,
-        icon: "$facility.iconname"
-      }
-    },
-    { $sort: { created_at: -1 } },
-    {
-      $facet: {
-        data: [{ $skip: offset }, { $limit: PAGE_SIZE }],
-        total: [{ $count: "count" }]
-      }
-    }
+  // Build direct match on collegefacilities
+  const facMatch: Record<string, unknown> = {};
+  if (collegeId) facMatch.collegeprofile_id = Number(collegeId);
+  if (displayName) facMatch.name = { $regex: displayName, $options: "i" };
+  if (description) facMatch.description = { $regex: description, $options: "i" };
+  if (q) facMatch.$or = [
+    { name: { $regex: q, $options: "i" } },
+    { description: { $regex: q, $options: "i" } },
   ];
 
-  // Aggregation for colleges
-  const collegesAggregation = [
-    {
-      $lookup: {
-        from: "users",
-        localField: "users_id",
-        foreignField: "_id",
-        as: "user"
-      }
-    },
-    { $unwind: "$user" },
-    {
-      $project: {
-        id: { $toString: "$_id" },
-        name: "$user.firstname"
-      }
-    },
-    { $sort: { name: 1 } }
-  ];
-
-  // Aggregation for facility types
-  const facilityTypesAggregation = [
-    {
-      $project: {
-        id: { $toString: "$_id" },
-        name: 1
-      }
-    },
-    { $sort: { name: 1 } }
-  ];
-
-  const [facilitiesResult, collegesResult, facilityTypesResult] = await Promise.all([
-    db.collection("collegefacilities").aggregate(facilitiesAggregation).toArray(),
-    db.collection("collegeprofile").aggregate(collegesAggregation).toArray(),
-    db.collection("facilities").aggregate(facilityTypesAggregation).toArray()
+  const [total, facRows] = await Promise.all([
+    db.collection("collegefacilities").countDocuments(facMatch),
+    db.collection("collegefacilities").find(facMatch).sort({ created_at: -1 }).skip(offset).limit(PAGE_SIZE).toArray(),
   ]);
 
-  const facilitiesList = facilitiesResult[0]?.data || [];
-  const total = facilitiesResult[0]?.total[0]?.count || 0;
+  // Batch lookup college names
+  const cpIds = [...new Set(facRows.map((f: any) => Number(f.collegeprofile_id)).filter(Boolean))];
+  const cpRows = cpIds.length > 0
+    ? await db.collection("collegeprofile").aggregate([
+        { $match: { id: { $in: cpIds } } },
+        { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        { $project: { _id: 0, id: 1, name: { $ifNull: ["$user.firstname", "$slug"] } } },
+      ]).toArray()
+    : [];
+  const cpMap = new Map(cpRows.map((c: any) => [Number(c.id), String(c.name || "").trim()]));
+
+  // Batch lookup facility type names
+  const facTypeIds = [...new Set(facRows.map((f: any) => Number(f.facilities_id)).filter(Boolean))];
+  const facTypeRows = facTypeIds.length > 0
+    ? await db.collection("facilities").find({ id: { $in: facTypeIds } }, { projection: { id: 1, name: 1, iconname: 1 } }).toArray()
+    : [];
+  const facTypeMap = new Map(facTypeRows.map((f: any) => [Number(f.id), f]));
+
+  const facilitiesList = facRows.map((f: any) => ({
+    id: String(f._id),
+    collegeprofile_id: String(f.collegeprofile_id),
+    facilities_id: f.facilities_id ? String(f.facilities_id) : null,
+    name: String(f.name || "").trim(),
+    facility_name_raw: String(f.name || "").trim() || null,
+    college_name: cpMap.get(Number(f.collegeprofile_id)) || "Unknown College",
+    facility_name: String(f.name || facTypeMap.get(Number(f.facilities_id))?.name || "").trim(),
+    description: String(f.description || "").trim(),
+    icon: facTypeMap.get(Number(f.facilities_id))?.iconname || null,
+    created_at: f.created_at ? String(f.created_at) : null,
+  }));
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const colleges = collegesResult as { id: string; name: string }[];
-  const facilityTypes = facilityTypesResult as { id: string; name: string }[];
+
+  // College options
+  const collegeOptions = await db.collection("collegeprofile").aggregate([
+    { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    { $project: { _id: 0, id: 1, name: { $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"] } } },
+    { $sort: { name: 1 } }, { $limit: 500 },
+  ]).toArray();
+  const colleges = collegeOptions.map((c: any) => ({ id: String(c.id), name: String(c.name || "").trim() }));
+
+  // Facility type options
+  const facilityTypes = await db.collection("facilities").find({}, { projection: { id: 1, name: 1 } }).sort({ name: 1 }).toArray();
+  const facilityTypeOptions = facilityTypes.map((f: any) => ({ id: String(f.id || f._id), name: String(f.name || "").trim() }));
   const buildPageHref = (targetPage: number) => {
     const query = new URLSearchParams({ page: String(targetPage) });
     if (q) query.set("q", q);
@@ -266,7 +183,7 @@ export default async function CollegeFacilitiesPage({
       <FacilitiesClient 
          facilitiesList={facilitiesList}
          colleges={colleges}
-         facilityTypes={facilityTypes}
+         facilityTypes={facilityTypeOptions}
          offset={offset}
          total={total}
          pageSize={PAGE_SIZE}

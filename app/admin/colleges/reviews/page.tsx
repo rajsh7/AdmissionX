@@ -152,7 +152,7 @@ export default async function CollegeReviewsPage({
       $lookup: {
         from: "collegeprofile",
         localField: "collegeprofile_id",
-        foreignField: "_id",
+        foreignField: "id",
         as: "cp",
       },
     },
@@ -161,7 +161,7 @@ export default async function CollegeReviewsPage({
       $lookup: {
         from: "users",
         localField: "cp.users_id",
-        foreignField: "_id",
+        foreignField: "id",
         as: "cpUser",
       },
     },
@@ -169,7 +169,7 @@ export default async function CollegeReviewsPage({
       $lookup: {
         from: "users",
         localField: "users_id",
-        foreignField: "_id",
+        foreignField: "id",
         as: "studentUser",
       },
     },
@@ -255,18 +255,16 @@ export default async function CollegeReviewsPage({
 
   const userIds = [
     ...new Set(
-      collegeDocs
-        .map((doc) => doc.users_id)
-        .filter((id) => id !== null && id !== undefined),
+      collegeDocs.map((doc) => doc.users_id).filter((id) => id !== null && id !== undefined),
     ),
   ];
 
   const userDocs = userIds.length
-    ? await db.collection("users").find({ _id: { $in: userIds } }, { projection: { _id: 1, firstname: 1 } }).toArray()
+    ? await db.collection("users").find({ id: { $in: userIds } }, { projection: { id: 1, firstname: 1 } }).toArray()
     : [];
 
   const userMap: Record<string, string> = Object.fromEntries(
-    userDocs.map((u) => [String(u._id), String(u.firstname ?? "")]),
+    userDocs.map((u) => [String(u.id), String(u.firstname ?? "")]),
   );
 
   const colleges = collegeDocs.map((cp) => ({

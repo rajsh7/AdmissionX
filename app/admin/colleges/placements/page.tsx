@@ -1,86 +1,63 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import PlacementListClient from "./PlacementListClient";
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+export const dynamic = "force-dynamic";
 
 async function createPlacement(formData: FormData) {
   "use server";
-  const collegeprofile_id          = formData.get("collegeprofile_id");
-  const numberofrecruitingcompany  = formData.get("numberofrecruitingcompany") || null;
-  const ctchighest                 = formData.get("ctchighest")                || null;
-  const ctclowest                  = formData.get("ctclowest")                 || null;
-  const ctcaverage                 = formData.get("ctcaverage")                || null;
-  const placementinfo              = formData.get("placementinfo")             || null;
-
+  const db = await getDb();
+  const collegeprofile_id = Number(formData.get("collegeprofile_id"));
   try {
-    await pool.query(
-      `INSERT INTO placement 
-        (collegeprofile_id, numberofrecruitingcompany, ctchighest, ctclowest, ctcaverage, placementinfo, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      [collegeprofile_id, numberofrecruitingcompany, ctchighest, ctclowest, ctcaverage, placementinfo],
-    );
-  } catch (e) {
-    console.error("[admin/colleges/placements createAction]", e);
-  }
+    const last = await db.collection("placement").find({}, { projection: { id: 1 } }).sort({ id: -1 }).limit(1).toArray();
+    const nextId = ((last[0]?.id as number) ?? 0) + 1;
+    await db.collection("placement").insertOne({
+      id: nextId, collegeprofile_id,
+      numberofrecruitingcompany: String(formData.get("numberofrecruitingcompany") || "") || null,
+      ctchighest: String(formData.get("ctchighest") || "") || null,
+      ctclowest: String(formData.get("ctclowest") || "") || null,
+      ctcaverage: String(formData.get("ctcaverage") || "") || null,
+      placementinfo: String(formData.get("placementinfo") || "") || null,
+      created_at: new Date(), updated_at: new Date(),
+    });
+  } catch (e) { console.error("[admin/colleges/placements createAction]", e); }
   revalidatePath("/admin/colleges/placements");
 }
 
 async function updatePlacement(formData: FormData) {
   "use server";
-  const id                         = formData.get("id");
-  const collegeprofile_id          = formData.get("collegeprofile_id");
-  const numberofrecruitingcompany  = formData.get("numberofrecruitingcompany") || null;
-  const ctchighest                 = formData.get("ctchighest")                || null;
-  const ctclowest                  = formData.get("ctclowest")                 || null;
-  const ctcaverage                 = formData.get("ctcaverage")                || null;
-  const placementinfo              = formData.get("placementinfo")             || null;
-
+  const db = await getDb();
+  const id = Number(formData.get("id"));
+  const collegeprofile_id = Number(formData.get("collegeprofile_id"));
   try {
-    await pool.query(
-      `UPDATE placement 
-          SET collegeprofile_id = ?, numberofrecruitingcompany = ?, ctchighest = ?, 
-              ctclowest = ?, ctcaverage = ?, placementinfo = ?, updated_at = NOW()
-        WHERE id = ?`,
-      [collegeprofile_id, numberofrecruitingcompany, ctchighest, ctclowest, ctcaverage, placementinfo, id],
-    );
-  } catch (e) {
-    console.error("[admin/colleges/placements updateAction]", e);
-  }
+    await db.collection("placement").updateOne({ id }, {
+      $set: {
+        collegeprofile_id,
+        numberofrecruitingcompany: String(formData.get("numberofrecruitingcompany") || "") || null,
+        ctchighest: String(formData.get("ctchighest") || "") || null,
+        ctclowest: String(formData.get("ctclowest") || "") || null,
+        ctcaverage: String(formData.get("ctcaverage") || "") || null,
+        placementinfo: String(formData.get("placementinfo") || "") || null,
+        updated_at: new Date(),
+      }
+    });
+  } catch (e) { console.error("[admin/colleges/placements updateAction]", e); }
   revalidatePath("/admin/colleges/placements");
 }
 
 async function deletePlacementRow(id: number) {
   "use server";
   try {
-    await pool.query("DELETE FROM placement WHERE id = ?", [id]);
-  } catch (e) {
-    console.error("[admin/colleges/placements deleteAction]", e);
-  }
+    const db = await getDb();
+    await db.collection("placement").deleteOne({ id });
+  } catch (e) { console.error("[admin/colleges/placements deleteAction]", e); }
   revalidatePath("/admin/colleges/placements");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const PAGE_SIZE = 25;
 
-async function safeQuery<T >(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/colleges/placements safeQuery]", err);
-    return [];
-  }
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface PlacementRow  {
+interface PlacementRow {
   id: number;
   collegeprofile_id: number;
   college_name: string;
@@ -91,27 +68,21 @@ interface PlacementRow  {
   placement_info: string;
 }
 
-interface CountRow  {
-  total: number;
-}
-
-interface OptionRow  {
+interface OptionRow {
   id: number;
   name: string;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
-const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
+const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
 export default async function CollegePlacementsPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
-  const sp   = await searchParams;
-  const q    = (sp.q ?? "").trim();
+  const sp = await searchParams;
+  const q = (sp.q ?? "").trim();
   const collegeId = (sp.collegeId ?? "").trim();
   const highestCtc = (sp.highestCtc ?? "").trim();
   const lowestCtc = (sp.lowestCtc ?? "").trim();
@@ -121,84 +92,60 @@ export default async function CollegePlacementsPage({
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Build WHERE clause ─────────────────────────────────────────────────────
-  const conditions: string[] = [];
-  const params: (string | number)[] = [];
+  const db = await getDb();
 
-  if (q) {
-    conditions.push(
-      "(u.firstname LIKE ? OR pl.placementinfo LIKE ?)",
-    );
-    params.push(`%${q}%`, `%${q}%`);
-  }
+  // Build filter
+  const match: Record<string, unknown> = {};
+  if (collegeId) match.collegeprofile_id = Number(collegeId);
+  if (highestCtc) match.ctchighest = { $regex: highestCtc, $options: "i" };
+  if (lowestCtc) match.ctclowest = { $regex: lowestCtc, $options: "i" };
+  if (averageCtc) match.ctcaverage = { $regex: averageCtc, $options: "i" };
+  if (recruitingCompanies) match.numberofrecruitingcompany = { $regex: recruitingCompanies, $options: "i" };
+  if (placementInfo) match.placementinfo = { $regex: placementInfo, $options: "i" };
+  if (q) match.$or = [
+    { placementinfo: { $regex: q, $options: "i" } },
+    { ctchighest: { $regex: q, $options: "i" } },
+  ];
 
-  if (collegeId) {
-    conditions.push("pl.collegeprofile_id = ?");
-    params.push(collegeId);
-  }
-
-  if (highestCtc) {
-    conditions.push("pl.ctchighest LIKE ?");
-    params.push(`%${highestCtc}%`);
-  }
-
-  if (lowestCtc) {
-    conditions.push("pl.ctclowest LIKE ?");
-    params.push(`%${lowestCtc}%`);
-  }
-
-  if (averageCtc) {
-    conditions.push("pl.ctcaverage LIKE ?");
-    params.push(`%${averageCtc}%`);
-  }
-
-  if (recruitingCompanies) {
-    conditions.push("pl.numberofrecruitingcompany LIKE ?");
-    params.push(`%${recruitingCompanies}%`);
-  }
-
-  if (placementInfo) {
-    conditions.push("pl.placementinfo LIKE ?");
-    params.push(`%${placementInfo}%`);
-  }
-
-  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-
-  // ── Fetch metadata + data ──────────────────────────────────────────────────
-  const [placements, countRows, colleges] = await Promise.all([
-    safeQuery<PlacementRow>(
-      `SELECT 
-        pl.id,
-        pl.collegeprofile_id,
-        COALESCE(u.firstname, 'Unnamed College') as college_name,
-        pl.numberofrecruitingcompany as recruiting_companies,
-        pl.ctchighest as highest_ctc,
-        pl.ctclowest as lowest_ctc,
-        pl.ctcaverage as average_ctc,
-        pl.placementinfo as placement_info
-       FROM placement pl
-       JOIN collegeprofile cp ON cp.id = pl.collegeprofile_id
-       JOIN users u ON u.id = cp.users_id
-       ${where}
-       ORDER BY pl.created_at DESC
-       LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
-    ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total 
-       FROM placement pl 
-       JOIN collegeprofile cp ON cp.id = pl.collegeprofile_id
-       JOIN users u ON u.id = cp.users_id
-       ${where}`,
-      params,
-    ),
-    safeQuery<OptionRow>(
-      "SELECT cp.id, u.firstname AS name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
-    )
+  const [total, placementRows] = await Promise.all([
+    db.collection("placement").countDocuments(match),
+    db.collection("placement").find(match).sort({ created_at: -1 }).skip(offset).limit(PAGE_SIZE).toArray(),
   ]);
 
-  const total = Number(countRows[0]?.total ?? 0);
+  // Batch lookup college names
+  const cpIds = [...new Set(placementRows.map((p: any) => Number(p.collegeprofile_id)).filter(Boolean))];
+  const cpRows = cpIds.length > 0
+    ? await db.collection("collegeprofile").aggregate([
+        { $match: { id: { $in: cpIds } } },
+        { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        { $project: { _id: 0, id: 1, name: { $ifNull: ["$user.firstname", "$slug"] } } },
+      ]).toArray()
+    : [];
+  const cpMap = new Map(cpRows.map((c: any) => [Number(c.id), String(c.name || "").trim()]));
+
+  const placements: PlacementRow[] = placementRows.map((p: any) => ({
+    id: Number(p.id),
+    collegeprofile_id: Number(p.collegeprofile_id),
+    college_name: cpMap.get(Number(p.collegeprofile_id)) || "Unknown College",
+    recruiting_companies: String(p.numberofrecruitingcompany || "").trim(),
+    highest_ctc: String(p.ctchighest || "").trim(),
+    lowest_ctc: String(p.ctclowest || "").trim(),
+    average_ctc: String(p.ctcaverage || "").trim(),
+    placement_info: String(p.placementinfo || "").trim(),
+  }));
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
+
+  // College options
+  const collegeOptions = await db.collection("collegeprofile").aggregate([
+    { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    { $project: { _id: 0, id: 1, name: { $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"] } } },
+    { $sort: { name: 1 } }, { $limit: 500 },
+  ]).toArray();
+  const colleges: OptionRow[] = collegeOptions.map((c: any) => ({ id: Number(c.id), name: String(c.name || "").trim() }));
+
   const buildPageHref = (targetPage: number) => {
     const query = new URLSearchParams({ page: String(targetPage) });
     if (q) query.set("q", q);
@@ -213,8 +160,6 @@ export default async function CollegePlacementsPage({
 
   return (
     <div className="p-6 space-y-6 w-full">
-      
-      {/* ── Header ───────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -223,31 +168,18 @@ export default async function CollegePlacementsPage({
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">Track and manage college placement records and CTC data.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <form method="GET" action="/admin/colleges/placements" className="w-full sm:w-80">
-            {collegeId ? <input type="hidden" name="collegeId" value={collegeId} /> : null}
-            {highestCtc ? <input type="hidden" name="highestCtc" value={highestCtc} /> : null}
-            {lowestCtc ? <input type="hidden" name="lowestCtc" value={lowestCtc} /> : null}
-            {averageCtc ? <input type="hidden" name="averageCtc" value={averageCtc} /> : null}
-            {recruitingCompanies ? <input type="hidden" name="recruitingCompanies" value={recruitingCompanies} /> : null}
-            {placementInfo ? <input type="hidden" name="placementInfo" value={placementInfo} /> : null}
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
-              <input 
-                type="text" 
-                name="q" 
-                defaultValue={q}
-                placeholder="Search colleges, placement info..." 
-                className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
-              />
-            </div>
-          </form>
-        </div>
+        <form method="GET" action="/admin/colleges/placements" className="w-full sm:w-80">
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
+            <input type="text" name="q" defaultValue={q} placeholder="Search colleges, placement info..."
+              className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all" />
+          </div>
+        </form>
       </div>
 
-      <PlacementListClient 
-        placements={placements}
-        colleges={colleges}
+      <PlacementListClient
+        placements={JSON.parse(JSON.stringify(placements))}
+        colleges={JSON.parse(JSON.stringify(colleges))}
         offset={offset}
         total={total}
         pageSize={PAGE_SIZE}
@@ -262,7 +194,6 @@ export default async function CollegePlacementsPage({
         onDelete={deletePlacementRow}
       />
 
-      {/* ── Pagination ───────────────────────────────────────────────────── */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
           <p className="text-xs text-slate-500">
@@ -270,15 +201,13 @@ export default async function CollegePlacementsPage({
           </p>
           <div className="flex items-center gap-1">
             {page > 1 ? (
-              <Link href={buildPageHref(page - 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
+              <Link href={buildPageHref(page - 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">← Prev</Link>
             ) : (
               <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
             )}
-            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">
-              {page} / {totalPages}
-            </span>
+            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">{page} / {totalPages}</span>
             {page < totalPages ? (
-              <Link href={buildPageHref(page + 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
+              <Link href={buildPageHref(page + 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Next →</Link>
             ) : (
               <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
             )}
@@ -288,7 +217,3 @@ export default async function CollegePlacementsPage({
     </div>
   );
 }
-
-
-
-

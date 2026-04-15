@@ -7,10 +7,11 @@ import { formatDate } from "@/lib/utils";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 
 interface StudentProfileRow {
-  id: number;
-  users_id: number;
+  id: number | string;
+  users_id: number | string;
   student_name: string;
   student_email: string;
+  phone?: string;
   gender: string;
   dateofbirth: string;
   parentsname: string;
@@ -270,7 +271,7 @@ export default function StudentProfileClient({
                   </td>
                   <td className="px-3 py-2.5">
                     <span className="text-slate-600 text-sm font-medium">
-                      {formatPhone(profile.parentsnumber)}
+                      {profile.phone ? `+91 ${profile.phone}` : formatPhone(profile.parentsnumber)}
                     </span>
                   </td>
                   <td className="px-3 py-2.5">

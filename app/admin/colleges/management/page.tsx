@@ -93,7 +93,7 @@ export default async function CollegeManagementPage({
   const offset = (page - 1) * PAGE_SIZE;
 
   const db = await getDb();
-  const mgmtCollection = db.collection("college_management_details");
+  const mgmtCollection = db.collection("faculty");
 
   // Build base match conditions
   const match: any = {};
@@ -161,10 +161,10 @@ export default async function CollegeManagementPage({
     collegeprofile_id: Number(member.collegeprofile_id) || 0,
     name: toStringOrNull(member.name) || "",
     suffix: toStringOrNull(member.suffix) || "",
-    designation: toStringOrNull(member.designation) || "",
-    emailaddress: toStringOrNull(member.emailaddress) || "",
-    phoneno: toStringOrNull(member.phoneno) || "",
-    picture: toStringOrNull(member.picture) || "",
+    designation: toStringOrNull(member.designation) || toStringOrNull(member.description) || "",
+    emailaddress: toStringOrNull(member.emailaddress) || toStringOrNull(member.email) || "",
+    phoneno: toStringOrNull(member.phoneno) || toStringOrNull(member.phone) || "",
+    picture: toStringOrNull(member.picture) || toStringOrNull(member.imagename) || "",
     college_name: collegeMap.get(member.collegeprofile_id) ?? "Unnamed College",
   }));
 
@@ -224,10 +224,10 @@ export default async function CollegeManagementPage({
         collegeprofile_id: Number(member.collegeprofile_id) || 0,
         name: toStringOrNull(member.name) || "",
         suffix: toStringOrNull(member.suffix) || "",
-        designation: toStringOrNull(member.designation) || "",
-        emailaddress: toStringOrNull(member.emailaddress) || "",
-        phoneno: toStringOrNull(member.phoneno) || "",
-        picture: toStringOrNull(member.picture) || "",
+        designation: toStringOrNull(member.designation) || toStringOrNull(member.description) || "",
+        emailaddress: toStringOrNull(member.emailaddress) || toStringOrNull(member.email) || "",
+        phoneno: toStringOrNull(member.phoneno) || toStringOrNull(member.phone) || "",
+        picture: toStringOrNull(member.picture) || toStringOrNull(member.imagename) || "",
         college_name: allCollegeMap.get(member.collegeprofile_id) ?? "Unnamed College",
       }));
 

@@ -145,6 +145,8 @@ function buildColleges(rows: CollegeRow[]): CollegeResult[] {
   });
 }
 
+export const dynamic = 'force-dynamic';
+
 // ─── Core DB fetch ────────────────────────────────────────────────────────────
 
 async function fetchColleges(opts: {
@@ -160,143 +162,117 @@ async function fetchColleges(opts: {
   page: number;
   limit: number;
 }): Promise<{ colleges: CollegeResult[]; total: number; totalPages: number }> {
-  const {
-    q,
-    stream,
-    degree,
-    cityId,
-    stateId,
-    countryId,
-    feesMax,
-    sort,
-    type,
-    page,
-    limit,
-  } = opts;
-  const offset = (page - 1) * limit;
+  const { q, stream, degree, cityId, stateId, countryId, feesMax, sort, type, page, limit } = opts;
+  const db = await getDb();
 
-  const conditions: string[] = ["1=1"];
-  const params: (string | number)[] = [];
+  const match: Record<string, unknown> = {};
 
   if (q.length >= 2) {
-    conditions.push(
-      "(u.firstname LIKE ? OR cp.registeredSortAddress LIKE ? OR cp.slug LIKE ?)",
-    );
-    const like = `%${q}%`;
-    params.push(like, like, like);
+    match.$or = [
+      { slug: { $regex: q, $options: "i" } },
+      { registeredSortAddress: { $regex: q, $options: "i" } },
+    ];
   }
-  if (stream) {
-    conditions.push("fa.pageslug = ?");
-    params.push(stream);
-  }
-  if (degree) {
-    conditions.push("d.pageslug = ?");
-    params.push(degree);
-  }
-  if (feesMax && !isNaN(parseInt(feesMax))) {
-    conditions.push("cm.fees <= ?");
-    params.push(parseInt(feesMax));
-  }
-  if (cityId && !isNaN(parseInt(cityId))) {
-    conditions.push("cp.registeredAddressCityId = ?");
-    params.push(parseInt(cityId));
-  }
-  if (stateId && !isNaN(parseInt(stateId))) {
-    conditions.push("c.state_id = ?");
-    params.push(parseInt(stateId));
-  }
-  if (countryId && !isNaN(parseInt(countryId))) {
-    conditions.push("cp.registeredAddressCountryId = ?");
-    params.push(parseInt(countryId));
-  }
-  if (type === "top") {
-    conditions.push("cp.isShowOnTop = 1");
-  } else if (type === "university") {
-    conditions.push("cp.isTopUniversity = 1");
-  } else if (type === "abroad") {
-    conditions.push("cp.registeredAddressCountryId != 1");
+  if (type === "top") match.isShowOnTop = 1;
+  else if (type === "university") match.isTopUniversity = 1;
+  else if (type === "abroad") match.registeredAddressCountryId = { $ne: 1 };
+
+  if (cityId) match.registeredAddressCityId = Number(cityId);
+  else if (stateId) {
+    const stateCities = await db.collection("city").find({ state_id: Number(stateId) }, { projection: { _id: 0, id: 1 } }).toArray();
+    match.registeredAddressCityId = { $in: stateCities.map((c: any) => Number(c.id)) };
+  } else if (countryId) {
+    match.registeredAddressCountryId = Number(countryId);
   }
 
-  const whereClause = conditions.join(" AND ");
+  // Resolve stream + degree to numeric ids
+  const [faDoc, degDoc] = await Promise.all([
+    stream ? db.collection("functionalarea").findOne({ pageslug: stream }, { projection: { _id: 1, id: 1 } }) : null,
+    degree ? db.collection("degree").findOne({ pageslug: degree }, { projection: { _id: 1, id: 1 } }) : null,
+  ]);
 
-  let orderBy = "cp.rating DESC, cp.totalRatingUser DESC";
-  if (sort === "ranking") {
-    orderBy =
-      "CASE WHEN cp.ranking IS NULL OR cp.ranking = 0 THEN 1 ELSE 0 END, cp.ranking ASC";
-  } else if (sort === "fees") {
-    orderBy = "MIN(NULLIF(cm.fees, 0)) ASC";
-  } else if (sort === "newest") {
-    orderBy = "cp.created_at DESC";
+  const [streamIds, degreeIds] = await Promise.all([
+    faDoc ? db.collection("collegemaster").find({ functionalarea_id: faDoc.id }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
+      .then((r) => [...new Set(r.map((x: any) => x.collegeprofile_id))]) : null,
+    degDoc ? db.collection("collegemaster").find({ degree_id: degDoc.id }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
+      .then((r) => [...new Set(r.map((x: any) => x.collegeprofile_id))]) : null,
+  ]);
+
+  if (streamIds) match.id = { $in: streamIds };
+  if (degreeIds) {
+    const existing = (match.id as { $in: unknown[] } | undefined)?.$in;
+    match.id = { $in: existing ? existing.filter((id) => (degreeIds as unknown[]).some(d => String(d) === String(id))) : degreeIds };
   }
 
-  const dataSql = `
-    SELECT
-      cp.id,
-      cp.slug,
-      COALESCE(
-        NULLIF(TRIM(u.firstname), ''),
-        NULLIF(TRIM(cp.slug), ''),
-        'College'
-      )                                                 AS name,
-      COALESCE(cp.registeredSortAddress, '')            AS location,
-      c.name                                            AS city_name,
-      c.state_id,
-      cp.bannerimage                                    AS image,
-      COALESCE(cp.rating, 0)                            AS rating,
-      COALESCE(cp.totalRatingUser, 0)                   AS totalRatingUser,
-      cp.ranking,
-      cp.isTopUniversity,
-      cp.topUniversityRank,
-      cp.universityType,
-      cp.estyear,
-      cp.verified,
-      cp.totalStudent,
-      GROUP_CONCAT(DISTINCT fa.name ORDER BY fa.name SEPARATOR '|') AS streams_raw,
-      MIN(NULLIF(cm.fees, 0))  AS min_fees,
-      MAX(NULLIF(cm.fees, 0))  AS max_fees
-    FROM collegeprofile cp
-    LEFT JOIN users u           ON u.id  = cp.users_id
-    LEFT JOIN city c            ON c.id  = cp.registeredAddressCityId
-    LEFT JOIN collegemaster cm  ON cm.collegeprofile_id = cp.id
-    LEFT JOIN functionalarea fa ON fa.id = cm.functionalarea_id
-    LEFT JOIN degree d          ON d.id  = cm.degree_id
-    WHERE ${whereClause}
-    GROUP BY
-      cp.id, cp.slug, u.firstname, cp.registeredSortAddress,
-      c.name, c.state_id, cp.bannerimage, cp.rating, cp.totalRatingUser,
-      cp.ranking, cp.isTopUniversity, cp.topUniversityRank, cp.universityType,
-      cp.estyear, cp.verified, cp.totalStudent
-    ORDER BY ${orderBy}
-    LIMIT ${limit} OFFSET ${offset}
-  `;
-
-  // Count query — uses LEFT JOINs (same as data query) so all filter conditions work correctly
-  const countSql = `
-    SELECT COUNT(DISTINCT cp.id) AS total
-    FROM collegeprofile cp
-    LEFT JOIN users u           ON u.id  = cp.users_id
-    LEFT JOIN city c            ON c.id  = cp.registeredAddressCityId
-    LEFT JOIN collegemaster cm  ON cm.collegeprofile_id = cp.id
-    LEFT JOIN functionalarea fa ON fa.id = cm.functionalarea_id
-    LEFT JOIN degree d          ON d.id  = cm.degree_id
-    WHERE ${whereClause}
-  `;
-
-  try {
-    const [[dataRows], [countRows]] = await Promise.all([
-      pool.query(dataSql, params) as Promise<[CollegeRow[], unknown]>,
-      pool.query(countSql, params) as Promise<[CountRow[], unknown]>,
-    ]);
-    const total = countRows[0]?.total ?? 0;
-    return {
-      colleges: buildColleges(dataRows),
-      total,
-      totalPages: Math.ceil(total / limit),
-    };
-  } catch (err) {
-    console.error("[search/page.tsx fetchColleges]", err);
-    return { colleges: [], total: 0, totalPages: 0 };
+  if (feesMax && !isNaN(Number(feesMax))) {
+    const feeIds = await db.collection("collegemaster")
+      .find({ fees: { $gt: 0, $lte: Number(feesMax) } }, { projection: { collegeprofile_id: 1 } })
+      .limit(5000).toArray().then((r) => [...new Set(r.map((x: any) => x.collegeprofile_id))]);
+    const existing = (match.id as { $in: unknown[] } | undefined)?.$in;
+    match.id = { $in: existing ? existing.filter((id) => feeIds.some((f: unknown) => String(f) === String(id))) : feeIds };
   }
+
+  const sortStage: Record<string, 1 | -1> =
+    sort === "ranking" ? { ranking: 1, rating: -1 }
+    : sort === "newest" ? { created_at: -1 }
+    : { rating: -1, totalRatingUser: -1 };
+
+  const [total, idRows] = await Promise.all([
+    db.collection("collegeprofile").countDocuments(match),
+    db.collection("collegeprofile").find(match).sort(sortStage).skip((page - 1) * limit).limit(limit).project({ _id: 1 }).toArray(),
+  ]);
+
+  if (!idRows.length) return { colleges: [], total, totalPages: Math.ceil(total / limit) };
+
+  const topIds = idRows.map((r: any) => r._id);
+  const dataRows = await db.collection("collegeprofile").aggregate([
+    { $match: { _id: { $in: topIds } } },
+    { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "city" } },
+    { $unwind: { path: "$city", preserveNullAndEmptyArrays: true } },
+    { $lookup: { from: "collegemaster", localField: "id", foreignField: "collegeprofile_id", as: "cm" } },
+    { $lookup: { from: "functionalarea", localField: "cm.functionalarea_id", foreignField: "id", as: "fa" } },
+    { $project: {
+      slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, ranking: 1,
+      isTopUniversity: 1, topUniversityRank: 1, universityType: 1, estyear: 1, verified: 1, totalStudent: 1,
+      registeredSortAddress: 1,
+      name: { $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"] },
+      city_name: "$city.name",
+      state_id: "$city.state_id",
+      streams: { $setUnion: ["$fa.name", []] },
+      min_fees: { $min: { $filter: { input: "$cm.fees", as: "f", cond: { $gt: ["$$f", 0] } } } },
+      max_fees: { $max: { $filter: { input: "$cm.fees", as: "f", cond: { $gt: ["$$f", 0] } } } },
+    }},
+  ]).toArray();
+
+  const orderMap = new Map(topIds.map((id: any, i: number) => [String(id), i]));
+  dataRows.sort((a: any, b: any) => (orderMap.get(String(a._id)) ?? 0) - (orderMap.get(String(b._id)) ?? 0));
+
+  const colleges: CollegeResult[] = dataRows.map((row: any) => ({
+    id: String(row._id),
+    slug: row.slug,
+    name: row.name && row.name !== row.slug ? row.name : slugToName(row.slug || "college"),
+    location: row.registeredSortAddress || row.city_name || "India",
+    city_name: row.city_name ?? null,
+    state_id: row.state_id ?? null,
+    image: buildImageUrl(row.bannerimage),
+    rating: parseFloat(String(row.rating)) || 0,
+    totalRatingUser: parseInt(String(row.totalRatingUser)) || 0,
+    ranking: row.ranking ? parseInt(String(row.ranking)) : null,
+    isTopUniversity: row.isTopUniversity ?? 0,
+    topUniversityRank: row.topUniversityRank ? parseInt(String(row.topUniversityRank)) : null,
+    universityType: row.universityType ?? null,
+    estyear: row.estyear ?? null,
+    verified: row.verified ?? 0,
+    totalStudent: row.totalStudent ? parseInt(String(row.totalStudent)) : null,
+    streams: Array.isArray(row.streams) ? row.streams.filter(Boolean) : [],
+    min_fees: row.min_fees ?? null,
+    max_fees: row.max_fees ?? null,
+    avg_package: null,
+  }));
+
+  return { colleges, total, totalPages: Math.ceil(total / limit) };
 }
 
 // ─── Page component ───────────────────────────────────────────────────────────
@@ -342,28 +318,30 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       }),
 
       // 2. Streams with college counts
-      safeQuery<StreamRow>(`
-      SELECT
-        f.id,
-        f.name,
-        f.pageslug,
-        COUNT(DISTINCT cm.collegeprofile_id) AS college_count
-      FROM functionalarea f
-      LEFT JOIN collegemaster cm ON cm.functionalarea_id = f.id
-      WHERE f.name IS NOT NULL AND f.name != ''
-      GROUP BY f.id, f.name, f.pageslug
-      ORDER BY college_count DESC
-      LIMIT 20
-    `),
+      (async (): Promise<StreamRow[]> => {
+        try {
+          const db = await getDb();
+          const rows = await db.collection("functionalarea")
+            .find({ name: { $exists: true, $ne: "" } })
+            .sort({ name: 1 }).limit(30)
+            .project({ _id: 0, id: 1, name: 1, pageslug: 1 })
+            .toArray();
+          return rows.map((r: any) => ({ id: r.id, name: r.name, pageslug: r.pageslug, college_count: 0 }));
+        } catch { return []; }
+      })(),
 
       // 3. Popular degrees
-      safeQuery<DegreeRow>(`
-      SELECT d.id, d.name, d.pageslug
-      FROM degree d
-      WHERE d.name IS NOT NULL AND d.name != '' AND d.isShowOnTop = 1
-      ORDER BY d.name
-      LIMIT 50
-    `),
+      (async (): Promise<DegreeRow[]> => {
+        try {
+          const db = await getDb();
+          const rows = await db.collection("degree")
+            .find({ name: { $exists: true, $ne: "" }, isShowOnTop: 1 })
+            .sort({ name: 1 }).limit(50)
+            .project({ _id: 0, id: 1, name: 1, pageslug: 1 })
+            .toArray();
+          return rows.map((r: any) => ({ id: r.id, name: r.name, pageslug: r.pageslug }));
+        } catch { return []; }
+      })(),
 
       // 4. Cities that have colleges — direct MongoDB
       (async (): Promise<CityRow[]> => {

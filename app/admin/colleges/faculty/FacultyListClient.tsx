@@ -82,6 +82,9 @@ export default function FacultyListClient({
 }: FacultyListClientProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
+  const [showFilters, setShowFilters] = useState(
+    !!(q || collegeId || facultyName || email || phone || collegeName)
+  );
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -111,16 +114,30 @@ export default function FacultyListClient({
   return (
     <>
       {/* Header Button */}
-      <div className="mb-6">
+      <div className="mb-6 flex items-center gap-3">
         <button
           onClick={openAdd}
           className="bg-[#3F434A] hover:bg-slate-700 text-white font-semibold text-[13px] px-5 py-2.5 rounded-sm transition-colors flex items-center tracking-wide"
         >
           Add new college course +
         </button>
+        <button
+          type="button"
+          onClick={() => setShowFilters(p => !p)}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-sm border text-[13px] font-semibold transition-all ${
+            showFilters ? "bg-[#008080] text-white border-[#008080]" : "bg-white text-slate-600 border-slate-200 hover:border-[#008080] hover:text-[#008080]"
+          }`}
+        >
+          <span className="material-symbols-outlined text-[18px]">filter_alt</span>
+          Filters
+          {(q || collegeId || facultyName || email || phone || collegeName) && (
+            <span className="w-2 h-2 rounded-full bg-red-500 ml-1" />
+          )}
+        </button>
       </div>
 
       {/* ── Search Box Match Design ───────────────────── */}
+      {showFilters && (
       <div className="bg-white border border-slate-100/60 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] p-6 mb-6">
         <h1 className="text-[22px] font-medium text-slate-500 mb-8 border-b border-slate-100 pb-4">
           Search College Faculty
@@ -187,6 +204,7 @@ export default function FacultyListClient({
           </div>
         </form>
       </div>
+      )}
 
       {/* Cards List */}
       <div className="flex flex-col gap-6 w-full">

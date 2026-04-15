@@ -9,59 +9,36 @@ import EventListClient from "./EventListClient";
 async function createEvent(formData: FormData) {
   "use server";
   const db = await getDb();
-  const collegeprofile_id = formData.get("collegeprofile_id") as string;
-  const name              = formData.get("name") as string;
-  const datetime          = formData.get("datetime") as string || null;
-  const venue             = formData.get("venue") as string || null;
-  const description       = formData.get("description") as string || null;
-  const link              = formData.get("link") as string || null;
-
+  const collegeprofile_id = Number(formData.get("collegeprofile_id"));
+  const name              = String(formData.get("name") || "");
+  const datetime          = String(formData.get("datetime") || "") || null;
+  const venue             = String(formData.get("venue") || "") || null;
+  const description       = String(formData.get("description") || "") || null;
+  const link              = String(formData.get("link") || "") || null;
   try {
-    await db.collection("event").insertOne({
-      collegeprofile_id: new ObjectId(collegeprofile_id),
-      name,
-      datetime,
-      venue,
-      description,
-      link,
-      created_at: new Date(),
-      updated_at: new Date()
-    });
-  } catch (e) {
-    console.error("[admin/colleges/events createAction]", e);
-  }
+    const last = await db.collection("event").find({}, { projection: { id: 1 } }).sort({ id: -1 }).limit(1).toArray();
+    const nextId = ((last[0]?.id as number) ?? 0) + 1;
+    await db.collection("event").insertOne({ id: nextId, collegeprofile_id, name, datetime, venue, description, link, created_at: new Date(), updated_at: new Date() });
+  } catch (e) { console.error("[admin/colleges/events createAction]", e); }
   revalidatePath("/admin/colleges/events");
 }
 
 async function updateEvent(formData: FormData) {
   "use server";
   const db = await getDb();
-  const id                = formData.get("id") as string;
-  const collegeprofile_id = formData.get("collegeprofile_id") as string;
-  const name              = formData.get("name") as string;
-  const datetime          = formData.get("datetime") as string || null;
-  const venue             = formData.get("venue") as string || null;
-  const description       = formData.get("description") as string || null;
-  const link              = formData.get("link") as string || null;
-
+  const id                = String(formData.get("id") || "");
+  const collegeprofile_id = Number(formData.get("collegeprofile_id"));
+  const name              = String(formData.get("name") || "");
+  const datetime          = String(formData.get("datetime") || "") || null;
+  const venue             = String(formData.get("venue") || "") || null;
+  const description       = String(formData.get("description") || "") || null;
+  const link              = String(formData.get("link") || "") || null;
   try {
     await db.collection("event").updateOne(
       { _id: new ObjectId(id) },
-      {
-        $set: {
-          collegeprofile_id: new ObjectId(collegeprofile_id),
-          name,
-          datetime,
-          venue,
-          description,
-          link,
-          updated_at: new Date()
-        }
-      }
+      { $set: { collegeprofile_id, name, datetime, venue, description, link, updated_at: new Date() } }
     );
-  } catch (e) {
-    console.error("[admin/colleges/events updateAction]", e);
-  }
+  } catch (e) { console.error("[admin/colleges/events updateAction]", e); }
   revalidatePath("/admin/colleges/events");
 }
 
@@ -123,102 +100,59 @@ export default async function CollegeEventsPage({
 
   const db = await getDb();
 
-  // Build match for aggregation
-  const match: any = {};
-  if (q) {
-    match.$or = [
-      { name: { $regex: q, $options: "i" } },
-      { venue: { $regex: q, $options: "i" } },
-      { "user.firstname": { $regex: q, $options: "i" } }
-    ];
-  }
-  if (eventName) {
-    match.name = { $regex: eventName, $options: "i" };
-  }
-  if (collegeId && ObjectId.isValid(collegeId)) {
-    match.collegeprofile_id = new ObjectId(collegeId);
-  }
+  // Build match directly on event collection fields
+  const eventMatch: any = {};
+  if (eventName) eventMatch.name = { $regex: eventName, $options: "i" };
+  if (collegeId) eventMatch.collegeprofile_id = Number(collegeId);
+  if (q) eventMatch.$or = [
+    { name: { $regex: q, $options: "i" } },
+    { venue: { $regex: q, $options: "i" } },
+  ];
   if (from || to) {
-    match.datetime = {};
-    if (from) {
-      match.datetime.$gte = `${from}T00:00:00`;
-    }
-    if (to) {
-      match.datetime.$lte = `${to}T23:59:59`;
-    }
+    eventMatch.datetime = {};
+    if (from) eventMatch.datetime.$gte = `${from}T00:00:00`;
+    if (to) eventMatch.datetime.$lte = `${to}T23:59:59`;
   }
 
-  // Aggregation for events
-  const eventsAggregation = [
-    {
-      $lookup: {
-        from: "collegeprofile",
-        localField: "collegeprofile_id",
-        foreignField: "_id",
-        as: "college"
-      }
-    },
-    { $unwind: "$college" },
-    {
-      $lookup: {
-        from: "users",
-        localField: "college.users_id",
-        foreignField: "_id",
-        as: "user"
-      }
-    },
-    { $unwind: "$user" },
-    { $match: match },
-    {
-      $project: {
-        id: { $toString: "$_id" },
-        collegeprofile_id: { $toString: "$collegeprofile_id" },
-        name: 1,
-        datetime: 1,
-        venue: 1,
-        description: 1,
-        link: 1,
-        college_name: { $ifNull: ["$user.firstname", "Unnamed College"] }
-      }
-    },
-    { $sort: { datetime: -1 } },
-    {
-      $facet: {
-        data: [{ $skip: offset }, { $limit: PAGE_SIZE }],
-        total: [{ $count: "count" }]
-      }
-    }
-  ];
-
-  // Aggregation for colleges
-  const collegesAggregation = [
-    {
-      $lookup: {
-        from: "users",
-        localField: "users_id",
-        foreignField: "_id",
-        as: "user"
-      }
-    },
-    { $unwind: "$user" },
-    {
-      $project: {
-        id: { $toString: "$_id" },
-        name: "$user.firstname"
-      }
-    },
-    { $sort: { name: 1 } }
-  ];
-
-  const [eventsResult, collegesResult] = await Promise.all([
-    db.collection("event").aggregate(eventsAggregation).toArray(),
-    db.collection("collegeprofile").aggregate(collegesAggregation).toArray()
+  const [total, eventRows] = await Promise.all([
+    db.collection("event").countDocuments(eventMatch),
+    db.collection("event").find(eventMatch).sort({ datetime: -1 }).skip(offset).limit(PAGE_SIZE).toArray(),
   ]);
 
-  const events = eventsResult[0]?.data || [];
-  const total = eventsResult[0]?.total[0]?.count || 0;
+  // Batch lookup college names
+  const cpIds = [...new Set(eventRows.map((e: any) => Number(e.collegeprofile_id)).filter(Boolean))];
+  const cpRows = cpIds.length > 0
+    ? await db.collection("collegeprofile").aggregate([
+        { $match: { id: { $in: cpIds } } },
+        { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        { $project: { _id: 0, id: 1, name: { $ifNull: ["$user.firstname", "$slug"] } } },
+      ]).toArray()
+    : [];
+  const cpMap = new Map(cpRows.map((c: any) => [Number(c.id), String(c.name || "").trim()]));
+
+  const events: EventRow[] = eventRows.map((e: any) => ({
+    id: String(e._id),
+    collegeprofile_id: String(e.collegeprofile_id),
+    name: String(e.name || "").trim(),
+    datetime: String(e.datetime || "").trim(),
+    venue: String(e.venue || "").trim(),
+    description: String(e.description || "").trim(),
+    link: String(e.link || "").trim(),
+    college_name: cpMap.get(Number(e.collegeprofile_id)) || "Unknown College",
+  }));
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const colleges = collegesResult as OptionRow[];
+
+  // College options for dropdown
+  const collegeOptions = await db.collection("collegeprofile").aggregate([
+    { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    { $project: { _id: 0, id: 1, name: { $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"] } } },
+    { $sort: { name: 1 } },
+    { $limit: 500 },
+  ]).toArray();
+  const colleges: OptionRow[] = collegeOptions.map((c: any) => ({ id: String(c.id), name: String(c.name || "").trim() }));
 
   return (
     <div className="p-6 space-y-6 w-full">

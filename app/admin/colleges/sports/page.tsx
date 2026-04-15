@@ -1,187 +1,110 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import SportsListClient from "./SportsListClient";
 
-// ─── Server Actions ───────────────────────────────────────────────────────────
+export const dynamic = "force-dynamic";
 
 async function createActivity(formData: FormData) {
   "use server";
-  const collegeprofile_id = formData.get("collegeprofile_id");
-  const name              = formData.get("name");
-  const type              = formData.get("typeOfActivity");
-
+  const db = await getDb();
   try {
-    await pool.query(
-      `INSERT INTO college_sports_activities (collegeprofile_id, name, typeOfActivity, created_at, updated_at)
-       VALUES (?, ?, ?, NOW(), NOW())`,
-      [collegeprofile_id, name, type],
-    );
-  } catch (e) {
-    console.error("[admin/colleges/sports createAction]", e);
-  }
+    const last = await db.collection("college_sports_activities").find({}, { projection: { id: 1 } }).sort({ id: -1 }).limit(1).toArray();
+    const nextId = ((last[0]?.id as number) ?? 0) + 1;
+    await db.collection("college_sports_activities").insertOne({
+      id: nextId,
+      collegeprofile_id: Number(formData.get("collegeprofile_id")),
+      name: String(formData.get("name") || ""),
+      typeOfActivity: Number(formData.get("typeOfActivity")) || null,
+      created_at: new Date(), updated_at: new Date(),
+    });
+  } catch (e) { console.error("[admin/colleges/sports createAction]", e); }
   revalidatePath("/admin/colleges/sports");
 }
 
 async function updateActivity(formData: FormData) {
   "use server";
-  const id                = formData.get("id");
-  const collegeprofile_id = formData.get("collegeprofile_id");
-  const name              = formData.get("name");
-  const type              = formData.get("typeOfActivity");
-
+  const db = await getDb();
   try {
-    await pool.query(
-      `UPDATE college_sports_activities 
-          SET collegeprofile_id = ?, name = ?, typeOfActivity = ?, updated_at = NOW()
-        WHERE id = ?`,
-      [collegeprofile_id, name, type, id],
-    );
-  } catch (e) {
-    console.error("[admin/colleges/sports updateAction]", e);
-  }
+    await db.collection("college_sports_activities").updateOne({ id: Number(formData.get("id")) }, {
+      $set: {
+        collegeprofile_id: Number(formData.get("collegeprofile_id")),
+        name: String(formData.get("name") || ""),
+        typeOfActivity: Number(formData.get("typeOfActivity")) || null,
+        updated_at: new Date(),
+      }
+    });
+  } catch (e) { console.error("[admin/colleges/sports updateAction]", e); }
   revalidatePath("/admin/colleges/sports");
 }
 
 async function deleteActivityRow(id: number) {
   "use server";
-  try {
-    await pool.query("DELETE FROM college_sports_activities WHERE id = ?", [id]);
-  } catch (e) {
-    console.error("[admin/colleges/sports deleteAction]", e);
-  }
+  try { const db = await getDb(); await db.collection("college_sports_activities").deleteOne({ id }); }
+  catch (e) { console.error("[admin/colleges/sports deleteAction]", e); }
   revalidatePath("/admin/colleges/sports");
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const PAGE_SIZE = 25;
-
-async function safeQuery<T >(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    console.log("[admin/colleges/sports] Executing SQL:", sql);
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/colleges/sports safeQuery ERROR]", err);
-    console.error("[admin/colleges/sports safeQuery SQL]", sql);
-    return [];
-  }
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface SportsRow  {
-  id: number;
-  collegeprofile_id: number;
-  college_name: string;
-  name: string;
-  typeOfActivity: number;
-}
-
-interface CountRow  {
-  total: number;
-}
-
-interface OptionRow  {
-  id: number;
-  name: string;
-}
-
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
-const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
+const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
-export default async function CollegeSportsPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string>>;
-}) {
-  const sp   = await searchParams;
-  const q    = (sp.q ?? "").trim();
+export default async function CollegeSportsPage({ searchParams }: { searchParams: Promise<Record<string, string>> }) {
+  const sp = await searchParams;
+  const q = (sp.q ?? "").trim();
   const collegeId = (sp.collegeId ?? "").trim();
   const activityName = (sp.activityName ?? "").trim();
   const activityType = (sp.activityType ?? "").trim();
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Build WHERE clause ─────────────────────────────────────────────────────
-  const conditions: string[] = [];
-  const filterParams: (string | number)[] = [];
+  const db = await getDb();
+  const match: Record<string, unknown> = {};
+  if (collegeId) match.collegeprofile_id = Number(collegeId);
+  if (activityName) match.name = { $regex: activityName, $options: "i" };
+  if (activityType) match.typeOfActivity = Number(activityType);
+  if (q) match.$or = [{ name: { $regex: q, $options: "i" } }];
 
-  if (q) {
-    conditions.push(
-      "(u.firstname LIKE ? OR s.name LIKE ?)",
-    );
-    filterParams.push(`%${q}%`, `%${q}%`);
-  }
-
-  if (collegeId) {
-    conditions.push("s.collegeprofile_id = ?");
-    filterParams.push(collegeId);
-  }
-
-  if (activityName) {
-    conditions.push("s.name LIKE ?");
-    filterParams.push(`%${activityName}%`);
-  }
-
-  if (activityType) {
-    conditions.push("s.typeOfActivity = ?");
-    filterParams.push(activityType);
-  }
-
-  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-
-  // ── Fetch metadata + data ──────────────────────────────────────────────────
-  const [activities, countRows, colleges] = await Promise.all([
-    safeQuery<SportsRow>(
-      `SELECT 
-        s.id,
-        s.collegeprofile_id,
-        COALESCE(u.firstname, 'Unnamed College') as college_name,
-        s.name,
-        s.typeOfActivity
-       FROM college_sports_activities s
-       JOIN collegeprofile cp ON cp.id = s.collegeprofile_id
-       JOIN users u ON u.id = cp.users_id
-       ${where}
-       ORDER BY s.created_at DESC
-       LIMIT ? OFFSET ?`,
-      [...filterParams, PAGE_SIZE, offset],
-    ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total 
-       FROM college_sports_activities s 
-       JOIN collegeprofile cp ON cp.id = s.collegeprofile_id
-       JOIN users u ON u.id = cp.users_id
-       ${where}`,
-      filterParams,
-    ),
-    safeQuery<OptionRow>(
-      "SELECT cp.id, u.firstname AS name FROM collegeprofile cp JOIN users u ON u.id = cp.users_id ORDER BY u.firstname ASC"
-    )
+  const [total, rows] = await Promise.all([
+    db.collection("college_sports_activities").countDocuments(match),
+    db.collection("college_sports_activities").find(match).sort({ created_at: -1 }).skip(offset).limit(PAGE_SIZE).toArray(),
   ]);
 
-  const total = Number(countRows[0]?.total ?? 0);
+  const cpIds = [...new Set(rows.map((r: any) => Number(r.collegeprofile_id)).filter(Boolean))];
+  const cpRows = cpIds.length > 0
+    ? await db.collection("collegeprofile").aggregate([
+        { $match: { id: { $in: cpIds } } },
+        { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        { $project: { _id: 0, id: 1, name: { $ifNull: ["$user.firstname", "$slug"] } } },
+      ]).toArray()
+    : [];
+  const cpMap = new Map(cpRows.map((c: any) => [Number(c.id), String(c.name || "").trim()]));
+
+  const activities = rows.map((r: any) => ({
+    id: Number(r.id), collegeprofile_id: Number(r.collegeprofile_id),
+    college_name: cpMap.get(Number(r.collegeprofile_id)) || "Unknown College",
+    name: String(r.name || ""), typeOfActivity: Number(r.typeOfActivity) || 0,
+  }));
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const buildPageHref = (targetPage: number) => {
-    const query = new URLSearchParams({ page: String(targetPage) });
-    if (q) query.set("q", q);
-    if (collegeId) query.set("collegeId", collegeId);
-    if (activityName) query.set("activityName", activityName);
-    if (activityType) query.set("activityType", activityType);
+  const collegeOptions = await db.collection("collegeprofile").aggregate([
+    { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    { $project: { _id: 0, id: 1, name: { $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"] } } },
+    { $sort: { name: 1 } }, { $limit: 500 },
+  ]).toArray();
+  const colleges = collegeOptions.map((c: any) => ({ id: Number(c.id), name: String(c.name || "").trim() }));
+
+  const buildPageHref = (p: number) => {
+    const query = new URLSearchParams({ page: String(p) });
+    if (q) query.set("q", q); if (collegeId) query.set("collegeId", collegeId);
+    if (activityName) query.set("activityName", activityName); if (activityType) query.set("activityType", activityType);
     return `/admin/colleges/sports?${query.toString()}`;
   };
 
   return (
     <div className="p-6 space-y-6 w-full">
-      
-      {/* ── Header ───────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -190,67 +113,31 @@ export default async function CollegeSportsPage({
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">Manage extra-curricular activities and campus facilities.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <form method="GET" action="/admin/colleges/sports" className="w-full sm:w-80">
-            {collegeId ? <input type="hidden" name="collegeId" value={collegeId} /> : null}
-            {activityName ? <input type="hidden" name="activityName" value={activityName} /> : null}
-            {activityType ? <input type="hidden" name="activityType" value={activityType} /> : null}
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
-              <input 
-                type="text" 
-                name="q" 
-                defaultValue={q}
-                placeholder="Search activities, colleges..." 
-                className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
-              />
-            </div>
-          </form>
-        </div>
+        <form method="GET" action="/admin/colleges/sports" className="w-full sm:w-80">
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
+            <input type="text" name="q" defaultValue={q} placeholder="Search activities..."
+              className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all" />
+          </div>
+        </form>
       </div>
-
       <SportsListClient
-        activities={activities}
-        colleges={colleges}
-        offset={offset}
-        total={total}
-        pageSize={PAGE_SIZE}
-        searchQuery={q}
-        selectedCollegeId={collegeId}
-        selectedActivityName={activityName}
-        selectedActivityType={activityType}
-        onAdd={createActivity}
-        onDelete={deleteActivityRow}
+        activities={JSON.parse(JSON.stringify(activities))}
+        colleges={JSON.parse(JSON.stringify(colleges))}
+        offset={offset} total={total} pageSize={PAGE_SIZE}
+        searchQuery={q} selectedCollegeId={collegeId} selectedActivityName={activityName} selectedActivityType={activityType}
+        onAdd={createActivity} onDelete={deleteActivityRow}
       />
-
-      {/* ── Pagination ───────────────────────────────────────────────────── */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-          <p className="text-xs text-slate-500">
-            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> records
-          </p>
+          <p className="text-xs text-slate-500">Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> records</p>
           <div className="flex items-center gap-1">
-            {page > 1 ? (
-              <Link href={buildPageHref(page - 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-            )}
-            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">
-              {page} / {totalPages}
-            </span>
-            {page < totalPages ? (
-              <Link href={buildPageHref(page + 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-            )}
+            {page > 1 ? <Link href={buildPageHref(page - 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">← Prev</Link> : <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 cursor-not-allowed">← Prev</span>}
+            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">{page} / {totalPages}</span>
+            {page < totalPages ? <Link href={buildPageHref(page + 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Next →</Link> : <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 cursor-not-allowed">Next →</span>}
           </div>
         </div>
       )}
     </div>
   );
 }
-/* FIXED VERSION 2.0 */
-
-
-
-

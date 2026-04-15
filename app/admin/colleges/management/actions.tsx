@@ -1,24 +1,25 @@
 "use server";
 
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 
 export async function createManagementMember(formData: FormData) {
-  const collegeprofile_id = formData.get("collegeprofile_id");
-  const name = formData.get("name");
-  const suffix = formData.get("suffix") || null;
-  const designation = formData.get("designation") || null;
-  const email = formData.get("emailaddress") || null;
-  const phone = formData.get("phoneno") || null;
-  const picture = formData.get("picture") || null;
+  const collegeprofile_id = Number(formData.get("collegeprofile_id"));
+  const name = String(formData.get("name") || "");
+  const suffix = String(formData.get("suffix") || "");
+  const designation = String(formData.get("designation") || "");
+  const emailaddress = String(formData.get("emailaddress") || "");
+  const phoneno = String(formData.get("phoneno") || "");
+  const picture = String(formData.get("picture") || "");
 
   try {
-    await pool.query(
-      `INSERT INTO college_management_details
-        (collegeprofile_id, name, suffix, designation, emailaddress, phoneno, picture, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      [collegeprofile_id, name, suffix, designation, email, phone, picture],
-    );
+    const db = await getDb();
+    const last = await db.collection("college_management_details").find({}, { projection: { id: 1 } }).sort({ id: -1 }).limit(1).toArray();
+    const nextId = ((last[0]?.id as number) ?? 0) + 1;
+    await db.collection("college_management_details").insertOne({
+      id: nextId, collegeprofile_id, name, suffix, designation,
+      emailaddress, phoneno, picture, created_at: new Date(), updated_at: new Date(),
+    });
   } catch (e) {
     console.error("[admin/colleges/management createAction]", e);
   }
@@ -26,22 +27,20 @@ export async function createManagementMember(formData: FormData) {
 }
 
 export async function updateManagementMember(formData: FormData) {
-  const id = formData.get("id");
-  const collegeprofile_id = formData.get("collegeprofile_id");
-  const name = formData.get("name");
-  const suffix = formData.get("suffix") || null;
-  const designation = formData.get("designation") || null;
-  const email = formData.get("emailaddress") || null;
-  const phone = formData.get("phoneno") || null;
-  const picture = formData.get("picture") || null;
+  const id = Number(formData.get("id"));
+  const collegeprofile_id = Number(formData.get("collegeprofile_id"));
+  const name = String(formData.get("name") || "");
+  const suffix = String(formData.get("suffix") || "");
+  const designation = String(formData.get("designation") || "");
+  const emailaddress = String(formData.get("emailaddress") || "");
+  const phoneno = String(formData.get("phoneno") || "");
+  const picture = String(formData.get("picture") || "");
 
   try {
-    await pool.query(
-      `UPDATE college_management_details
-          SET collegeprofile_id = ?, name = ?, suffix = ?, designation = ?,
-              emailaddress = ?, phoneno = ?, picture = ?, updated_at = NOW()
-        WHERE id = ?`,
-      [collegeprofile_id, name, suffix, designation, email, phone, picture, id],
+    const db = await getDb();
+    await db.collection("college_management_details").updateOne(
+      { id },
+      { $set: { collegeprofile_id, name, suffix, designation, emailaddress, phoneno, picture, updated_at: new Date() } }
     );
   } catch (e) {
     console.error("[admin/colleges/management updateAction]", e);
@@ -51,7 +50,8 @@ export async function updateManagementMember(formData: FormData) {
 
 export async function deleteManagementRow(id: number) {
   try {
-    await pool.query("DELETE FROM college_management_details WHERE id = ?", [id]);
+    const db = await getDb();
+    await db.collection("college_management_details").deleteOne({ id });
   } catch (e) {
     console.error("[admin/colleges/management deleteAction]", e);
   }
