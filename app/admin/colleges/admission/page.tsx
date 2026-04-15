@@ -56,6 +56,7 @@ async function deleteAdmissionRow(id: number) {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
+const FETCH_SIZE = 100;
 
 async function safeQuery<T >(
   sql: string,
@@ -105,7 +106,7 @@ export default async function CollegeAdmissionPage({
   const title = (sp.title ?? "").trim();
   const description = (sp.description ?? "").trim();
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
-  const offset = (page - 1) * PAGE_SIZE;
+  const offset = (page - 1) * FETCH_SIZE;
 
   // ── Build WHERE clause ─────────────────────────────────────────────────────
   const conditions: string[] = [];
@@ -150,7 +151,7 @@ export default async function CollegeAdmissionPage({
        ${where}
        ORDER BY ap.created_at DESC
        LIMIT ? OFFSET ?`,
-      [...filterParams, PAGE_SIZE, offset],
+      [...filterParams, FETCH_SIZE, offset],
     ),
     safeQuery<CountRow>(
       `SELECT COUNT(*) AS total 
@@ -166,7 +167,7 @@ export default async function CollegeAdmissionPage({
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(total / FETCH_SIZE));
   const buildPageHref = (targetPage: number) => {
     const query = new URLSearchParams({ page: String(targetPage) });
     if (q) query.set("q", q);
@@ -213,6 +214,8 @@ export default async function CollegeAdmissionPage({
         offset={offset}
         total={total}
         pageSize={PAGE_SIZE}
+        page={page}
+        totalPages={totalPages}
         searchQuery={q}
         selectedCollegeId={collegeId}
         selectedTitle={title}
@@ -220,30 +223,6 @@ export default async function CollegeAdmissionPage({
         onAdd={createAdmission}
         onDelete={deleteAdmissionRow}
       />
-
-      {/* ── Pagination ───────────────────────────────────────────────────── */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-          <p className="text-xs text-slate-500">
-            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> procedures
-          </p>
-          <div className="flex items-center gap-1">
-            {page > 1 ? (
-              <Link href={buildPageHref(page - 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-            )}
-            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">
-              {page} / {totalPages}
-            </span>
-            {page < totalPages ? (
-              <Link href={buildPageHref(page + 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

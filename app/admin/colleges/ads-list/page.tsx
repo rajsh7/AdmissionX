@@ -111,6 +111,7 @@ async function updateAdRow(formData: FormData) {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 25;
+const FETCH_SIZE = 100;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
@@ -166,7 +167,7 @@ export default async function AdsCollegesListPage({
   const sp     = await searchParams;
   const q      = (sp.q ?? "").trim();
   const page   = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
-  const offset = (page - 1) * PAGE_SIZE;
+  const offset = (page - 1) * FETCH_SIZE;
 
   // ── WHERE ──────────────────────────────────────────────────────────────────
   const conditions: string[] = [];
@@ -197,7 +198,7 @@ export default async function AdsCollegesListPage({
        ${where}
        ORDER BY a.created_at DESC
        LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
+      [...params, FETCH_SIZE, offset],
     ),
     safeQuery<CountRow>(
       `SELECT COUNT(*) AS total 
@@ -220,6 +221,7 @@ export default async function AdsCollegesListPage({
   ]);
 
   const total = Number(countRows[0]?.total ?? 0);
+  const totalPages = Math.max(1, Math.ceil(total / FETCH_SIZE));
   const stats      = statsRows[0];
 
   const STAT_CARDS = [
@@ -280,6 +282,8 @@ export default async function AdsCollegesListPage({
         total={total}
         offset={offset}
         pageSize={PAGE_SIZE}
+        page={page}
+        totalPages={totalPages}
         q={q}
         createAction={createAdRow}
         updateAction={updateAdRow}

@@ -15,7 +15,7 @@ export default async function AdminDashboardPage() {
     [totalStudents, totalColleges, totalAdmins, activeQueries],
     recentStudentsRaw,
     recentColleges,
-    [paymentStatuses, transactionAgg],
+    [paymentStatuses, studentTransactionAgg, collegeTransactionAgg],
     studentMonthlyAgg,
     collegeMonthlyAgg,
   ] = await Promise.all([
@@ -48,6 +48,7 @@ export default async function AdminDashboardPage() {
       .toArray(),
     Promise.all([
       db.collection("paymentstatus").find({}, { projection: { id: 1, name: 1 } }).toArray(),
+      // Student transactions — from transaction collection grouped by payment status
       db.collection("transaction").aggregate([
         {
           $lookup: {
@@ -57,31 +58,57 @@ export default async function AdminDashboardPage() {
             as: "app",
           },
         },
+        { $unwind: { path: "$app", preserveNullAndEmptyArrays: true } },
         {
           $addFields: {
             amount: {
               $convert: {
-                input: {
-                  $ifNull: [
-                    { $arrayElemAt: ["$app.amount_paid", 0] },
-                    {
-                      $ifNull: [
-                        { $arrayElemAt: ["$app.byafees", 0] },
-                        { $ifNull: ["$amount", 0] },
-                      ],
-                    },
-                  ],
-                },
-                to: "double",
-                onError: 0,
-                onNull: 0,
+                input: { $trim: { input: { $ifNull: ["$app.byafees", { $ifNull: ["$app.totalfees", "0"] }] } } },
+                to: "double", onError: 0, onNull: 0,
               },
+            },
+            status_key: {
+              $cond: [
+                { $or: [{ $eq: ["$paymentstatus_id", null] }, { $not: ["$paymentstatus_id"] }] },
+                "not_paid",
+                { $toString: "$paymentstatus_id" },
+              ],
             },
           },
         },
         {
           $group: {
-            _id: "$paymentstatus_id",
+            _id: "$status_key",
+            count: { $sum: 1 },
+            amount: { $sum: "$amount" },
+          },
+        },
+      ]).toArray(),
+      // College transactions — from application grouped by paymentstatus
+      db.collection("application").aggregate([
+        {
+          $match: { collegeprofile_id: { $exists: true, $ne: null } },
+        },
+        {
+          $addFields: {
+            amount: {
+              $convert: {
+                input: { $trim: { input: { $ifNull: ["$byafees", { $ifNull: ["$totalfees", "0"] }] } } },
+                to: "double", onError: 0, onNull: 0,
+              },
+            },
+            status_key: {
+              $cond: [
+                { $or: [{ $eq: ["$paymentstatus_id", null] }, { $not: ["$paymentstatus_id"] }] },
+                "not_paid",
+                { $toString: "$paymentstatus_id" },
+              ],
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$status_key",
             count: { $sum: 1 },
             amount: { $sum: "$amount" },
           },
@@ -141,9 +168,12 @@ export default async function AdminDashboardPage() {
   const processTransactionData = (data: any[]) => {
     const raw = data
       .map((t: any) => {
-        const id = t._id ? String(t._id) : "Unknown";
+        const id = t._id ? String(t._id) : "not_paid";
+        const name = id === "not_paid"
+          ? "Not Paid"
+          : (statusNameMap.get(id) ?? "Unknown");
         return {
-          name: statusNameMap.get(id) ?? "Unknown",
+          name,
           amount: Number(t.amount ?? 0),
           count: Number(t.count ?? 0),
         };
@@ -159,8 +189,8 @@ export default async function AdminDashboardPage() {
     }));
   };
 
-  const studentTransactionPie = processTransactionData(transactionAgg);
-  const collegeTransactionPie = processTransactionData(transactionAgg);
+  const studentTransactionPie = processTransactionData(studentTransactionAgg);
+  const collegeTransactionPie = processTransactionData(collegeTransactionAgg);
 
   const recentActivity = [
     ...recentStudentsRaw.map((s) => ({

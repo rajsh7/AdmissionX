@@ -6,6 +6,7 @@ import StudentProfileClient from "./StudentProfileClient";
 export const dynamic = 'force-dynamic';
 
 const PAGE_SIZE = 25;
+const FETCH_SIZE = 100; // fetch 100 so Show More works 3 times client-side
 
 export default async function StudentProfilePage({
   searchParams,
@@ -17,7 +18,7 @@ export default async function StudentProfilePage({
   const email = (sp.email ?? "").trim();
   const gender = (sp.gender ?? "").trim();
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
-  const offset = (page - 1) * PAGE_SIZE;
+  const offset = (page - 1) * FETCH_SIZE;
 
   const db = await getDb();
 
@@ -31,7 +32,7 @@ export default async function StudentProfilePage({
       .find(filter)
       .sort({ created_at: -1 })
       .skip(offset)
-      .limit(PAGE_SIZE)
+      .limit(FETCH_SIZE)
       .toArray(),
     db.collection("studentprofile").countDocuments(filter),
   ]);
@@ -54,7 +55,7 @@ export default async function StudentProfilePage({
   const newStudents = await db.collection("next_student_signups")
     .find(newSignupFilter)
     .sort({ created_at: -1 })
-    .limit(50)
+    .limit(FETCH_SIZE)
     .project({ _id: 1, name: 1, email: 1, phone: 1, created_at: 1, is_active: 1 })
     .toArray();
 
@@ -135,7 +136,7 @@ export default async function StudentProfilePage({
     created_at: String(p.created_at || ""),
   }));
   const total = newStudents.length + totalCount;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(total / FETCH_SIZE));
 
   const users = newStudents.map((s: any) => ({
     id: String(s._id),
