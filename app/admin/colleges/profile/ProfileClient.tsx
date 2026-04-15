@@ -168,13 +168,13 @@ export default function ProfileClient({
   const end   = Math.min(page * pageSize, total);
 
   const inputCls =
-    "w-full h-10 px-3 border border-slate-200 rounded-xl bg-white text-slate-700 text-sm " +
-    "font-medium placeholder:text-slate-300 focus:outline-none focus:border-[#008080] " +
-    "focus:ring-2 focus:ring-[#008080]/10 transition-all";
+    "w-full h-10 px-3 border border-slate-200 rounded-[5px] bg-white text-slate-700 text-sm " +
+    "font-medium placeholder:text-slate-300 focus:outline-none focus:border-[#FF3C3C] " +
+    "focus:ring-2 focus:ring-[#FF3C3C]/10 transition-all";
 
   const selectCls =
-    "w-full h-10 px-3 border border-slate-200 rounded-xl bg-white text-slate-700 text-sm " +
-    "font-medium focus:outline-none focus:border-[#008080] focus:ring-2 focus:ring-[#008080]/10 " +
+    "w-full h-10 px-3 border border-slate-200 rounded-[5px] bg-white text-slate-700 text-sm " +
+    "font-medium focus:outline-none focus:border-[#FF3C3C] focus:ring-2 focus:ring-[#FF3C3C]/10 " +
     "transition-all appearance-none cursor-pointer";
 
   const filterLabel =
@@ -210,6 +210,13 @@ export default function ProfileClient({
               <span className="w-2 h-2 rounded-full bg-red-500 ml-1" />
             )}
           </button>
+        <div className="flex items-center gap-2 bg-[#FF3C3C]/10 px-4 py-2 rounded-[5px]">
+          <span className="material-symbols-outlined text-[18px] text-[#FF3C3C]">
+            account_balance
+          </span>
+          <span className="text-sm font-black text-[#FF3C3C]">
+            {total.toLocaleString()} Total
+          </span>
         </div>
       </div>
 
@@ -219,7 +226,7 @@ export default function ProfileClient({
         {/* Section heading */}
         <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px] text-[#008080]">filter_list</span>
+            <span className="material-symbols-outlined text-[18px] text-[#FF3C3C]">filter_list</span>
             <h2 className="text-sm font-black text-slate-700">Search College Profile Details</h2>
           </div>
         </div>
@@ -363,14 +370,14 @@ export default function ProfileClient({
             <button
               type="button"
               onClick={handleClear}
-              className="w-44 h-11 rounded-xl font-black text-sm text-white uppercase tracking-wide transition-all active:scale-95"
+              className="w-44 h-11 rounded-[5px] font-black text-sm text-white uppercase tracking-wide transition-all active:scale-95"
               style={{ backgroundColor: "#8E97A4" }}
             >
               Clear
             </button>
             <button
               type="submit"
-              className="w-44 h-11 rounded-xl font-black text-sm text-white uppercase tracking-wide transition-all active:scale-95"
+              className="w-44 h-11 rounded-[5px] font-black text-sm text-white uppercase tracking-wide transition-all active:scale-95"
               style={{ backgroundColor: "#FF4242" }}
             >
               Submit
@@ -472,7 +479,7 @@ export default function ProfileClient({
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-2.5">
                       {/* Thumbnail */}
-                      <div className="w-11 h-8 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0 border border-slate-200">
+                      <div className="w-11 h-8 rounded-[5px] overflow-hidden bg-slate-100 flex-shrink-0 border border-slate-200">
                         {p.bannerimage ? (
                           <img
                             src={buildImageUrl(p.bannerimage)}
@@ -480,7 +487,7 @@ export default function ProfileClient({
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-[#008080]/10 text-[#008080] font-black text-sm">
+                          <div className="w-full h-full flex items-center justify-center bg-[#FF3C3C]/10 text-[#FF3C3C] font-black text-sm">
                             {(p.name || p.slug).charAt(0).toUpperCase()}
                           </div>
                         )}
@@ -550,7 +557,7 @@ export default function ProfileClient({
                       <span
                         className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${
                           p.verified
-                            ? "bg-emerald-100 text-emerald-700"
+                            ? "bg-[#FF3C3C]/10 text-[#FF3C3C]"
                             : "bg-slate-100 text-slate-500"
                         }`}
                       >
@@ -608,7 +615,7 @@ export default function ProfileClient({
                       <StatBadge
                         count={p.count_courses}
                         label="Courses"
-                        color="bg-[#008080]/10 text-[#008080]"
+                        color="bg-[#FF3C3C]/10 text-[#FF3C3C]"
                       />
                       <StatBadge
                         count={p.count_faculty}
@@ -623,7 +630,7 @@ export default function ProfileClient({
                       <StatBadge
                         count={p.count_placements}
                         label="Placements"
-                        color="bg-emerald-50 text-emerald-600"
+                        color="bg-[#FF3C3C]/10 text-[#FF3C3C]"
                       />
                       {p.count_courses === 0 &&
                         p.count_faculty === 0 &&
@@ -640,7 +647,7 @@ export default function ProfileClient({
                       {/* Edit → full edit page */}
                       <Link
                         href={`/admin/colleges/profile/${p.slug}`}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-[11px] font-bold hover:bg-slate-100 transition-colors shadow-sm"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-[5px] border border-slate-200 bg-white text-slate-700 text-[11px] font-bold hover:bg-slate-100 transition-colors shadow-sm"
                         title="Edit all college details"
                       >
                         <span className="material-symbols-outlined text-[13px]">
@@ -653,7 +660,7 @@ export default function ProfileClient({
                       <Link
                         href={`/college/${p.slug}`}
                         target="_blank"
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 text-[11px] font-bold hover:border-[#008080] hover:text-[#008080] transition-colors"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-[5px] border border-slate-200 text-slate-500 text-[11px] font-bold hover:border-[#FF3C3C] hover:text-[#FF3C3C] transition-colors"
                         title="View college page"
                       >
                         <span className="material-symbols-outlined text-[13px]">
@@ -694,7 +701,7 @@ export default function ProfileClient({
               {page > 1 && (
                 <Link
                   href={buildUrl({ page: page - 1 })}
-                  className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:border-[#008080] hover:text-[#008080] transition-colors bg-white"
+                  className="w-9 h-9 flex items-center justify-center rounded-[5px] border border-slate-200 text-slate-500 hover:border-[#FF3C3C] hover:text-[#FF3C3C] transition-colors bg-white"
                 >
                   <span className="material-symbols-outlined text-[18px]">
                     chevron_left
@@ -719,10 +726,10 @@ export default function ProfileClient({
                   <Link
                     key={p_num}
                     href={buildUrl({ page: p_num })}
-                    className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm font-bold transition-colors ${
+                    className={`w-9 h-9 flex items-center justify-center rounded-[5px] text-sm font-bold transition-colors ${
                       isActive
-                        ? "bg-[#008080] text-white shadow-sm shadow-[#008080]/20"
-                        : "border border-slate-200 text-slate-500 hover:border-[#008080] hover:text-[#008080] bg-white"
+                        ? "bg-[#FF3C3C] text-white shadow-sm shadow-[#FF3C3C]/20"
+                        : "border border-slate-200 text-slate-500 hover:border-[#FF3C3C] hover:text-[#FF3C3C] bg-white"
                     }`}
                   >
                     {p_num}
@@ -734,7 +741,7 @@ export default function ProfileClient({
               {page < totalPages && (
                 <Link
                   href={buildUrl({ page: page + 1 })}
-                  className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:border-[#008080] hover:text-[#008080] transition-colors bg-white"
+                  className="w-9 h-9 flex items-center justify-center rounded-[5px] border border-slate-200 text-slate-500 hover:border-[#FF3C3C] hover:text-[#FF3C3C] transition-colors bg-white"
                 >
                   <span className="material-symbols-outlined text-[18px]">
                     chevron_right

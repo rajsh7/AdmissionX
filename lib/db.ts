@@ -37,6 +37,7 @@ function createMockDb(): Db {
     aggregate: (..._args: unknown[]) => ({ toArray: async () => [] }),
     estimatedDocumentCount: async (..._args: unknown[]) => 0,
     countDocuments: async (..._args: unknown[]) => 0,
+    distinct: async (..._args: unknown[]) => [],
     insertOne: async (..._args: unknown[]) => ({ insertedId: null }),
     insertMany: async (..._args: unknown[]) => ({ insertedIds: [] }),
     updateOne: async (..._args: unknown[]) => ({ modifiedCount: 0 }),
@@ -73,8 +74,8 @@ export async function getDb(): Promise<Db> {
     console.log(`🔌 [db] Initializing new connection to: ${hostInfo}`);
     
     globalThis._mongoClient = new MongoClient(currentUri, {
-      connectTimeoutMS: 10000,
-      serverSelectionTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 15000, // Increased from 10s to 15s
+      connectTimeoutMS: 15000,
       retryWrites: true,
     });
     globalThis._mongoUri = currentUri;
@@ -84,19 +85,27 @@ export async function getDb(): Promise<Db> {
 
   if (!globalThis._mongoDb) {
     const failedAt = globalThis._connectionFailedAt;
-    if (failedAt && Date.now() - failedAt < 30_000) {
-      console.warn("⚠️ [db] Previous connection attempt failed. Using mock DB.");
+    // If we failed recently, don't keep trying and hanging the request
+    if (failedAt && Date.now() - failedAt < 60_000) {
+      console.warn("⚠️ [db] Previous connection attempt failed recently. Using mock DB.");
       return createMockDb();
     }
 
     try {
       console.log("⏳ [db] Connecting to MongoDB...");
       await globalThis._mongoClient.connect();
-      globalThis._mongoDb = globalThis._mongoClient.db(process.env.MONGODB_DB ?? "admissionx");
+      
+      const db = globalThis._mongoClient.db(process.env.MONGODB_DB ?? "admissionx");
+      
+      // VERIFICATION: Ping the database to ensure selection is successful
+      console.log("🔍 [db] Verifying connection with ping...");
+      await db.command({ ping: 1 });
+      
+      globalThis._mongoDb = db;
       globalThis._connectionFailedAt = null;
       console.log("✅ [db] Connected successfully.");
     } catch (error) {
-      console.error("❌ [db] Connection failed:", error);
+      console.error("❌ [db] Connection failed or timed out:", error);
       globalThis._connectionFailedAt = Date.now();
       return createMockDb();
     }

@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import ExploreCards from "@/app/components/ExploreCards";
 
 export const metadata: Metadata = {
   title: "About Us — AdmissionX | India's College Discovery Platform",
@@ -348,6 +349,11 @@ export default async function AboutPage() {
             </Link>
           </div>
         </div>
+      </div>
+
+      {/* Explore Cards */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 pb-16">
+        <ExploreCards />
       </div>
 
       <Footer />

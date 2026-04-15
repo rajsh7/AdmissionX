@@ -166,9 +166,6 @@ export default function CollegeCard({
                   : "N/A")}
               </span>
             </div>
-            <div className="px-5 py-2.5 rounded-[5px] bg-slate-900 text-white text-xs font-bold group-hover:bg-[#FF3C3C] transition-all active:scale-95">
-              Apply Now
-            </div>
             <span className="inline-flex items-center gap-1 text-[#FF3C3C] font-bold text-[14px] group-hover:translate-x-1 transition-transform">
               View Details
               <span className="material-symbols-rounded text-[18px]">arrow_forward</span>

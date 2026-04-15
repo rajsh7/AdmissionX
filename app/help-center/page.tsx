@@ -415,7 +415,7 @@ export default function HelpCenterPage() {
               { label: "Browse Exams",         href: "/examination",         icon: "quiz"             },
               { label: "Explore Streams",      href: "/stream",              icon: "category"         },
               { label: "Popular Careers",      href: "/popular-careers",     icon: "work"             },
-              { label: "Education Blogs",      href: "/education-blogs",     icon: "article"          },
+              { label: "Education Blogs",      href: "/blogs",     icon: "article"          },
               { label: "Latest News",          href: "/news",                icon: "newspaper"        },
               { label: "Student Signup",       href: "/signup/student",      icon: "person_add"       },
               { label: "College Signup",       href: "/signup/college",      icon: "apartment"        },

@@ -15,7 +15,7 @@ Platform links you can reference:
 - Courses: /careers-courses
 - Exams: /examination
 - Study Abroad: /study-abroad
-- Blogs: /education-blogs
+- Blogs: /blogs
 - News: /news
 - Q&A Community: /ask
 - Student Signup: /signup/student

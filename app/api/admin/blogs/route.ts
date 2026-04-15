@@ -60,6 +60,7 @@ export async function PUT(req: NextRequest) {
 
     revalidatePath("/admin/blogs");
     revalidatePath("/");
+    revalidatePath("/blogs");
     return NextResponse.json({ success: true });
   } catch (e) {
     console.error("[api/admin/blogs PUT]", e);

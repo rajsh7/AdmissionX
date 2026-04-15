@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Star, Download, ArrowRight } from "lucide-react";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import ExploreCards from "@/app/components/ExploreCards";
 
 const DEFAULT_BANNER = "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2532&auto=format&fit=crop";
 const STUDENT_IMAGE = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2670&auto=format&fit=crop";
@@ -73,21 +74,20 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
     <main className="min-h-screen bg-[#F8F9FB]">
       <Header />
       {/* --- Hero Section -------------------------------------------------------- */}
-      <section className="pt-24 pb-12 px-6 sm:px-12 lg:px-24">
+      <section className="pt-24 pb-12 px-4 sm:px-8 lg:px-12">
         <div className="max-w-[1920px] mx-auto">
           <div
-            className="rounded-[5px] p-8 lg:p-12 border border-slate-100 overflow-hidden relative"
             style={{
               backgroundImage: "url('/Background-images/f0b10acfd1d98e25c40741fa92c81454f3557e55.png')",
               backgroundSize: "cover",
-              backgroundPosition: "center",
-              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+              backgroundPosition: "right",
+              minHeight: "400px"
             }}
+            className="rounded-[5px] border border-slate-100 overflow-hidden relative flex flex-col lg:flex-row lg:items-stretch shadow-xl shadow-slate-200/60"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-
-              {/* Left Side Content */}
-              <div className="lg:col-span-5 flex flex-col gap-6">
+            {/* Left Side Content */}
+            <div className="flex-1 p-8 lg:p-12 xl:p-16 flex flex-col justify-center relative z-10">
+              <div className="flex flex-col gap-6">
                 <h1 className="text-[32px] font-bold text-slate-900 leading-[1.1] tracking-tight">
                   {title}
                 </h1>
@@ -95,7 +95,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                 {/* Metadata Badges + CTA — same width column */}
                 <div className="flex flex-col gap-4 w-fit">
                   {/* Metadata Badges */}
-                  <div className="flex items-center gap-5 px-6 py-3.5 rounded-[5px] bg-white/80 border border-slate-100">
+                  <div className="flex items-center gap-5 px-6 py-3.5 rounded-[5px] bg-white/80 border border-slate-100 shadow-xl shadow-slate-200/50">
                     {[degreeLevel, duration, streamName].filter(Boolean).map((tag, i, arr) => (
                       <span key={tag} className="flex items-center gap-5 text-[16px] font-semibold" style={{ color: "rgba(0, 81, 68, 0.75)" }}>
                         {tag}
@@ -121,29 +121,27 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Right Side Image */}
-              <div className="lg:col-span-7">
-                <div className="relative aspect-[16/9] rounded-[5px] overflow-hidden" style={{ boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>
-                  <Image
-                    src={heroImage}
-                    alt={title}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent" />
-                </div>
-              </div>
+            {/* Right Side Image */}
+            <div className="w-full lg:w-[45%] min-h-[300px] lg:min-h-full relative">
+              <Image
+                src={heroImage}
+                alt={title}
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent" />
+            </div>
 
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* ─── Stats Bar ────────────────────────────────────────────────────────── */}
-      <section className="pb-16 px-6 sm:px-12 lg:px-24">
+      <section className="pb-16 px-4 sm:px-8 lg:px-12">
         <div className="max-w-[1920px] mx-auto">
-          <div className="bg-white rounded-[5px] border border-slate-100 p-8 grid grid-cols-2 lg:grid-cols-4 gap-8 divide-x divide-slate-100" style={{ boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>
+          <div className="bg-white rounded-[5px] border border-slate-100 p-8 grid grid-cols-2 lg:grid-cols-4 gap-8 divide-x divide-slate-100 shadow-xl shadow-slate-200/60">
             <StatItem label="Duration" value={duration} />
             <StatItem label="Fees" value={avgFees ? formatFees(avgFees) : "—"} suffix={avgFees ? "/year" : undefined} />
             <StatItem label="Placement Rate" value="94%" />
@@ -154,9 +152,9 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
       {/* --- Course Overview ---------------------------------------------------- */}
       {description && (
-        <section className="pb-24 px-6 sm:px-12 lg:px-24">
+        <section className="pb-24 px-4 sm:px-8 lg:px-12">
           <div className="max-w-[1920px] mx-auto">
-            <div className="bg-white rounded-[5px] p-8 lg:p-12 border border-slate-100 overflow-hidden" style={{ boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>
+            <div className="bg-white rounded-[5px] p-4 lg:p-4 pb-4 lg:pb-6 border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/60">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
                 {/* Image */}
                 <div className="lg:col-span-5 relative">
@@ -169,7 +167,6 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
                   </div>
-                  <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#FF3C3C] opacity-10 blur-3xl animate-pulse" />
                 </div>
 
                 {/* Text Content */}
@@ -196,7 +193,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
       {/* --- Related Courses / Specializations ---------------------------------- */}
       {relatedCourses.length > 0 && (
-        <section className="pb-32 px-6 sm:px-12 lg:px-24">
+        <section className="pb-32 px-4 sm:px-8 lg:px-12">
           <div className="max-w-[1920px] mx-auto">
             <h2 className="text-[32px] font-bold text-slate-900 mb-12">
               Specializations in course
@@ -205,8 +202,8 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {relatedCourses.map((c) => (
                 <Link key={String(c._id)} href={`/careers-courses/${c.pageslug}`} className="group h-full">
-                  <div className="bg-white rounded-[5px] p-6 border border-slate-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden h-full flex flex-col" style={{ boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>
-                    <div className="relative aspect-[16/10] rounded-[5px] overflow-hidden mb-6">
+                  <div className="bg-white rounded-[5px] p-2 pb-3 border border-slate-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden h-full flex flex-col shadow-xl shadow-slate-200/60">
+                    <div className="relative aspect-[16/10] rounded-[5px] overflow-hidden mb-2">
                       <Image
                         src={buildImageUrl(c.bannerimage || c.logoimage)}
                         alt={c.name}
@@ -225,6 +222,13 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
           </div>
         </section>
       )}
+
+      {/* Explore Cards */}
+      <section className="pb-16 px-4 sm:px-8 lg:px-12">
+        <div className="max-w-[1920px] mx-auto">
+          <ExploreCards />
+        </div>
+      </section>
 
       <Footer />
     </main>

@@ -351,7 +351,7 @@ export default async function CollegeProfilePage({
     <Suspense
       fallback={
         <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-[#008080]/30 border-t-[#008080] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-[#FF3C3C]/30 border-t-[#FF3C3C] rounded-full animate-spin" />
         </div>
       }
     >

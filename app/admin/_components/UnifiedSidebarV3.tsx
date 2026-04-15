@@ -48,7 +48,7 @@ export function UnifiedSidebarV3({
       {/* Logo + Toggle */}
       <div className="flex-shrink-0 flex items-center justify-between px-3 py-3">
         <Link href="/admin/dashboard" className={`flex bg-white rounded-lg p-1 items-center justify-center ${collapsed ? "w-full" : "flex-1 px-3 py-1"}`}>
-          <img src="/logo.jpg" alt="AdmissionX" className={`object-contain ${collapsed ? "h-7 w-7" : "h-9 w-auto"}`} />
+          <img src="/admissionx-logo.png" alt="AdmissionX" className={`object-contain ${collapsed ? "h-7 w-7" : "h-9 w-auto"}`} />
         </Link>
       </div>
       <hr className="border-white/10" />

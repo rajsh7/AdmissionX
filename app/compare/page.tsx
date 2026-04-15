@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import ExploreCards from "@/app/components/ExploreCards";
 import Link from "next/link";
 
 interface CollegeData {
@@ -77,6 +78,7 @@ function ComparePageInner() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dropdownStyle, setDropdownStyle] = useState<{ top: number; left: number; width: number } | null>(null);
 
+  // Update dropdown position when suggestions change
   useEffect(() => {
     if (suggestions.length > 0 && searchRef.current) {
       const rect = searchRef.current.getBoundingClientRect();
@@ -88,6 +90,7 @@ function ComparePageInner() {
     }
   }, [suggestions]);
 
+  // Load from URL params
   useEffect(() => {
     const slugs = searchParams.get("colleges")?.split(",").filter(Boolean) ?? [];
     if (!slugs.length) return;
@@ -102,6 +105,7 @@ function ComparePageInner() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Search suggestions
   useEffect(() => {
     if (searchQ.length < 2) { setSuggestions([]); return; }
     const t = setTimeout(() => {
@@ -112,9 +116,14 @@ function ComparePageInner() {
     return () => clearTimeout(t);
   }, [searchQ]);
 
+  // Close suggestions on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+      if (
+        searchRef.current && 
+        !searchRef.current.contains(e.target as Node) &&
+        !(e.target as HTMLElement).closest(".compare-suggestions-dropdown")
+      ) {
         setSuggestions([]);
         setAddingSlot(null);
       }
@@ -125,7 +134,12 @@ function ComparePageInner() {
 
   function addCollege(slug: string, slot: number) {
     const newColleges = [...colleges];
-    if (newColleges.some((c) => c?.slug === slug)) return;
+    if (newColleges.some((c) => c?.slug === slug)) {
+      setSearchQ("");
+      setSuggestions([]);
+      setAddingSlot(null);
+      return;
+    }
     setLoading(true);
     fetch(`/api/compare?slugs=${slug}`)
       .then((r) => r.json())
@@ -137,7 +151,13 @@ function ComparePageInner() {
           router.replace(`/compare?colleges=${slugs.join(",")}`, { scroll: false });
         }
       })
-      .finally(() => { setLoading(false); setSearchQ(""); setSuggestions([]); setAddingSlot(null); });
+      .catch(err => console.error("Add college error:", err))
+      .finally(() => { 
+        setLoading(false); 
+        setSearchQ(""); 
+        setSuggestions([]); 
+        setAddingSlot(null); 
+      });
   }
 
   function removeCollege(slot: number) {
@@ -149,18 +169,21 @@ function ComparePageInner() {
   }
 
   function handleAddButton() {
-    if (!searchQ.trim()) return;
+    if (!searchQ.trim() || loading) return;
     const slot = addingSlot !== null ? addingSlot : colleges.findIndex((c) => !c);
     if (slot === -1) return;
     if (suggestions.length > 0) {
       addCollege(suggestions[0].slug, slot);
     } else {
+      setLoading(true);
       fetch(`/api/search?q=${encodeURIComponent(searchQ.trim())}`)
         .then((r) => r.json())
         .then((d) => {
           const first = (d.suggestions ?? []).find((s: Suggestion) => s.type === "college");
           if (first) addCollege(first.slug, slot);
-        });
+          else setLoading(false);
+        })
+        .catch(() => setLoading(false));
     }
   }
 
@@ -173,7 +196,7 @@ function ComparePageInner() {
       <main className="pt-20 pb-20">
         {/* Hero Section */}
         <section
-          className="w-full py-20 lg:py-28 pb-32 relative overflow-visible z-30"
+          className="w-full py-20 lg:py-28 pb-32 relative mb-0 overflow-visible z-30"
           style={{
             backgroundImage: "url('/Background-images/f0b10acfd1d98e25c40741fa92c81454f3557e55.png')",
             backgroundSize: "cover",
@@ -181,19 +204,19 @@ function ComparePageInner() {
           }}
         >
           <div className="absolute inset-0 bg-white/10" />
-          <div className="max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-24 relative z-10">
+          <div className="relative z-30 max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-24">
             <div className="max-w-4xl">
               <h1 className="text-[48px] font-bold text-slate-900 leading-[1.1] tracking-tight mb-4">
                 Compare College
               </h1>
               <p className="text-[20px] font-medium leading-relaxed mb-10 text-slate-600 max-w-2xl">
-                Evaluate multiple institutions side by side to find your perfect match based on fees, placement, and academic quality.
+                Evaluate multiple institution side by side to find your perfect match based on fees, placement, and academic quality.
               </p>
 
-              {/* Search Bar */}
+              {/* Search Layout */}
               <div ref={searchRef} className="flex flex-col sm:flex-row gap-4 max-w-2xl relative">
-                <div className="flex-1 flex items-center gap-3 bg-white border border-slate-200 rounded-[5px] px-4 py-3.5 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition-all">
-                  <span className="text-primary font-bold text-xl">+</span>
+                <div className="flex-1 flex items-center gap-3 bg-white border border-slate-200 rounded-[5px] px-5 py-3.5 shadow-sm focus-within:border-[#FF3C3C] focus-within:ring-4 focus-within:ring-[#FF3C3C]/10 transition-all duration-300">
+                  <span className="material-symbols-outlined text-[#FF3C3C] text-[24px]">school</span>
                   <input
                     ref={inputRef}
                     value={searchQ}
@@ -201,43 +224,51 @@ function ComparePageInner() {
                       setSearchQ(e.target.value);
                       if (addingSlot === null) {
                         const slot = colleges.findIndex((c) => !c);
-                        setAddingSlot(slot !== -1 ? slot : null);
+                        setAddingSlot(slot !== -1 ? slot : 0); // Default to first slot if full
                       }
                     }}
                     onKeyDown={(e) => { if (e.key === "Enter") handleAddButton(); }}
                     placeholder="Search universities, colleges..."
-                    className="flex-1 text-[16px] text-slate-700 placeholder:text-slate-400 bg-transparent outline-none font-medium"
+                    className="flex-1 text-[16px] text-slate-700 placeholder:text-slate-400 bg-transparent outline-none font-semibold"
                   />
                 </div>
                 <button
                   onClick={handleAddButton}
-                  className="bg-primary text-white text-[16px] font-bold px-8 py-3.5 rounded-[5px] hover:bg-red-700 transition-all active:scale-95 shadow-lg shadow-red-200 whitespace-nowrap"
+                  disabled={loading}
+                  className="bg-[#FF3C3C] text-white text-[16px] font-bold px-8 py-3.5 rounded-[5px] hover:bg-red-600 transition-all active:scale-95 shadow-lg shadow-red-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[150px]"
                 >
-                  Add College
+                  {loading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                  {loading ? "Adding..." : "Add College"}
                 </button>
 
-                {/* Suggestions dropdown via portal */}
                 {suggestions.length > 0 && dropdownStyle && createPortal(
                   <div
                     style={{ position: "absolute", top: dropdownStyle.top, left: dropdownStyle.left, width: dropdownStyle.width, zIndex: 9999 }}
-                    className="bg-white rounded-[5px] shadow-2xl border border-slate-100 overflow-hidden"
+                    className="compare-suggestions-dropdown bg-white rounded-[5px] shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
                   >
-                    {suggestions.map((s) => (
-                      <button
-                        key={s.slug}
-                        onClick={() => {
-                          const slot = addingSlot !== null ? addingSlot : colleges.findIndex((c) => !c);
-                          if (slot !== -1) addCollege(s.slug, slot);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-slate-50 text-left border-b border-slate-50 last:border-0 transition-colors"
-                      >
-                        <span className="material-symbols-outlined text-slate-400 text-[20px]">account_balance</span>
-                        <div>
-                          <p className="text-[15px] font-bold text-slate-800">{s.name}</p>
-                          <p className="text-[13px] text-slate-400 font-medium">{s.location}</p>
-                        </div>
-                      </button>
-                    ))}
+                    <div className="py-1">
+                      {suggestions.map((s) => (
+                        <button
+                          key={s.slug}
+                          onClick={() => {
+                            const slot = addingSlot !== null ? addingSlot : colleges.findIndex((c) => !c);
+                            if (slot !== -1) addCollege(s.slug, slot);
+                          }}
+                          className="w-full flex items-center gap-4 px-5 py-4 hover:bg-rose-50 text-left border-b border-slate-50 last:border-0 transition-colors group"
+                        >
+                          <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center shrink-0 group-hover:bg-white transition-colors">
+                            <span className="material-symbols-outlined text-slate-400 text-[22px] group-hover:text-primary">school</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[15px] font-bold text-slate-800 line-clamp-1">{s.name}</p>
+                            <p className="text-[12px] text-slate-500 font-medium flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">location_on</span>
+                              {s.location}
+                            </p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
                   </div>,
                   document.body
                 )}
@@ -246,18 +277,18 @@ function ComparePageInner() {
           </div>
         </section>
 
-        {/* Comparison Table */}
         <div className="max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-24 relative z-40 -mt-10">
-          <div className="bg-white rounded-[5px] border border-slate-100 overflow-hidden" style={{ boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)" }}>
+          <div className="bg-white rounded-[5px] border border-slate-100 overflow-hidden" style={{ boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
                     <th className="w-[300px] bg-[#F5F5F5] px-10 py-10 text-left border-b border-r border-slate-200 align-middle">
-                      <h2 className="text-[32px] font-bold text-slate-900 leading-[1.1]">Comparing<br />Metrics</h2>
+                      <h2 className="text-[32px] font-bold text-slate-900 leading-[1.1]">Comparing<br/>Metrics</h2>
                     </th>
+
                     {colleges.map((college, i) => (
-                      <th key={i} className="relative px-8 py-8 border-b border-r border-slate-100 last:border-r-0 min-w-[320px] align-top bg-white">
+                      <th key={i} className="relative px-8 py-8 border-b border-r border-slate-100 last:border-r-0 min-w-[320px] align-top bg-white group">
                         {college ? (
                           <div className="flex flex-col h-full">
                             <button
@@ -266,6 +297,7 @@ function ComparePageInner() {
                             >
                               <span className="material-symbols-outlined text-[18px]">close</span>
                             </button>
+
                             <div className="flex items-center gap-4 mb-8 pt-2">
                               <div className="w-14 h-14 rounded-[5px] overflow-hidden bg-white border border-slate-100 flex-shrink-0 flex items-center justify-center p-1.5 shadow-sm">
                                 {college.image ? (
@@ -284,9 +316,10 @@ function ComparePageInner() {
                                 </p>
                               </div>
                             </div>
+
                             <Link
                               href={`/college/${college.slug}`}
-                              className="w-full bg-[#424242] text-white text-[16px] font-bold py-3.5 rounded-[5px] hover:bg-black transition-all active:scale-95 text-center mt-auto shadow-lg shadow-black/10 block"
+                              className="w-full bg-[#424242] text-white text-[16px] font-bold py-3.5 rounded-[5px] hover:bg-black transition-all active:scale-95 text-center mt-auto shadow-lg shadow-black/10"
                             >
                               Apply
                             </Link>
@@ -299,12 +332,22 @@ function ComparePageInner() {
                                 setSearchQ("");
                                 setTimeout(() => inputRef.current?.focus(), 50);
                               }}
-                              className="w-full h-full min-h-[160px] flex flex-col items-center justify-center gap-3 border-2 border-dashed border-slate-100 rounded-[5px] hover:border-primary hover:bg-primary/5 transition-all group"
+                              className={`w-full h-full min-h-[160px] flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-[5px] transition-all group ${
+                                addingSlot === i 
+                                  ? "border-[#FF3C3C] bg-[#FF3C3C]/5 ring-4 ring-[#FF3C3C]/10" 
+                                  : "border-slate-100 hover:border-[#FF3C3C] hover:bg-[#FF3C3C]/5"
+                              }`}
                             >
-                              <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-white transition-colors">
-                                <span className="material-symbols-outlined text-slate-400 group-hover:text-primary text-[24px]">add</span>
+                              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+                                addingSlot === i ? "bg-white text-[#FF3C3C]" : "bg-slate-50 group-hover:bg-white text-slate-400 group-hover:text-[#FF3C3C]"
+                              }`}>
+                                <span className="material-symbols-outlined text-[24px]">{addingSlot === i ? "edit" : "add"}</span>
                               </div>
-                              <span className="text-[15px] font-bold text-slate-400 group-hover:text-primary transition-colors">Add College</span>
+                              <span className={`text-[15px] font-bold transition-colors ${
+                                addingSlot === i ? "text-[#FF3C3C]" : "text-slate-400 group-hover:text-[#FF3C3C]"
+                              }`}>
+                                {addingSlot === i ? "Selecting..." : "Add College"}
+                              </span>
                             </button>
                           </div>
                         )}
@@ -312,6 +355,7 @@ function ComparePageInner() {
                     ))}
                   </tr>
                 </thead>
+
                 <tbody>
                   {METRICS.map((metric) => (
                     <tr key={metric.key} className="hover:bg-slate-50/50 transition-colors">
@@ -344,38 +388,19 @@ function ComparePageInner() {
             </div>
 
             {filledCount === 0 && (
-              <div className="py-24 text-center">
+              <div className="py-24 text-center bg-white/50 backdrop-blur-sm">
                 <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
                   <span className="material-symbols-outlined text-[40px] text-slate-200">compare</span>
                 </div>
                 <h3 className="text-[20px] font-bold text-slate-900 mb-2">No colleges selected</h3>
-                <p className="text-slate-500 font-medium max-w-sm mx-auto">Search and add colleges above to see a detailed side-by-side comparison.</p>
+                <p className="text-slate-500 font-medium max-w-sm mx-auto px-6">Search and add colleges above to see a detailed side-by-side comparison.</p>
               </div>
             )}
           </div>
 
-          {/* Quick Navigation Cards */}
-          <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { href: "/colleges", icon: "apartment", label: "Browse Colleges", desc: "Search all colleges across India", iconBg: "bg-blue-50", iconColor: "text-blue-600", border: "hover:border-blue-200", arrow: "group-hover:text-blue-600" },
-              { href: "/top-university", icon: "school", label: "Top Universities", desc: "Discover top ranked universities", iconBg: "bg-purple-50", iconColor: "text-purple-600", border: "hover:border-purple-200", arrow: "group-hover:text-purple-600" },
-              { href: "/careers-courses", icon: "menu_book", label: "Top Courses", desc: "Find the right course for you", iconBg: "bg-emerald-50", iconColor: "text-emerald-600", border: "hover:border-emerald-200", arrow: "group-hover:text-emerald-600" },
-              { href: "/counselling", icon: "support_agent", label: "Free Counselling", desc: "Get expert admission guidance", iconBg: "bg-teal-50", iconColor: "text-teal-600", border: "hover:border-teal-200", arrow: "group-hover:text-teal-600" },
-            ].map((card) => (
-              <a key={card.href} href={card.href} className={`group bg-white border border-neutral-200 ${card.border} rounded-2xl p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-all`}>
-                <div className={`w-11 h-11 rounded-xl ${card.iconBg} flex items-center justify-center`}>
-                  <span className={`material-symbols-outlined text-[22px] ${card.iconColor}`} style={{ fontVariationSettings: "'FILL' 1" }}>{card.icon}</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-black text-[15px] text-neutral-800">{card.label}</p>
-                  <p className="text-[12px] text-neutral-500 font-medium mt-0.5 leading-snug">{card.desc}</p>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className={`text-[12px] font-bold text-neutral-400 ${card.arrow} transition-colors`}>Explore</span>
-                  <span className={`material-symbols-outlined text-[15px] text-neutral-400 ${card.arrow} transition-colors`}>arrow_forward</span>
-                </div>
-              </a>
-            ))}
+          {/* Explore Cards */}
+          <div className="mt-16">
+            <ExploreCards />
           </div>
         </div>
       </main>

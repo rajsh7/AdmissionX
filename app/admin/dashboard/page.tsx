@@ -1,7 +1,5 @@
 import { getDb } from "@/lib/db";
 import DashboardClient from "../_components/DashboardClient";
-import ChartsWrapper from "../_components/ChartsWrapper";
-import { Users, Building2, UserCog, MessageSquare, ArrowUpRight } from "lucide-react";
 
 // Cache dashboard data briefly to avoid expensive DB work on every request
 export const revalidate = 60;
@@ -15,7 +13,7 @@ export default async function AdminDashboardPage() {
 
   const [
     [totalStudents, totalColleges, totalAdmins, activeQueries],
-    recentStudents,
+    recentStudentsRaw,
     recentColleges,
     [paymentStatuses, transactionAgg],
     studentMonthlyAgg,
@@ -30,7 +28,7 @@ export default async function AdminDashboardPage() {
     db.collection("users")
       .find({}, {
         projection: {
-          id: 1,
+          _id: 1,
           firstname: 1,
           lastname: 1,
           email: 1,
@@ -164,21 +162,22 @@ export default async function AdminDashboardPage() {
   const studentTransactionPie = processTransactionData(transactionAgg);
   const collegeTransactionPie = processTransactionData(transactionAgg);
 
-  // Map to a common activity format
   const recentActivity = [
-    ...recentStudents.map((s) => ({
+    ...recentStudentsRaw.map((s) => ({
+      id: s._id.toString(),
       type: "student",
       message: `New student registered: ${s.firstname || "User"}`,
       time: s.created_at,
     })),
     ...recentColleges.map((c) => ({
+      id: c.id?.toString() || c._id?.toString() || Math.random().toString(),
       type: "college",
       message: `New college profile created: ${c.slug}`,
       time: c.created_at,
     })),
   ]
     .sort((a, b) => new Date(b.time || 0).getTime() - new Date(a.time || 0).getTime())
-    .slice(0, 5);
+    .slice(0, 10);
 
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -193,7 +192,7 @@ export default async function AdminDashboardPage() {
       if (!year) continue;
       monthlyMap.set(`${year}-${String(month).padStart(2, "0")}`, agg.count ?? 0);
     }
-    const series: { key: string; label: string; year: number; month: number; uv: number }[] = [];
+    const series = [];
     for (let i = 0; i < months; i++) {
       const d = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + i, 1));
       const y = d.getUTCFullYear();
@@ -212,68 +211,7 @@ export default async function AdminDashboardPage() {
   }
 
   return (
-    <div className="p-8 w-full space-y-6">
-      
-      {/* Title */}
-      <div>
-        <h1 className="text-[25px] font-semibold text-[#3E3E3E]">Analytics Dashboard</h1>
-        <p className="text-[18px] font-normal text-slate-500">Welcome back!</p>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-[12px] uppercase tracking-[0.24em] text-slate-400 font-semibold">Total Students</p>
-              <p className="mt-4 text-[28px] font-semibold text-slate-900">{totalStudents?.toLocaleString() || "0"}</p>
-            </div>
-            <div className="w-11 h-11 rounded-[5px] flex items-center justify-center" style={{ backgroundColor: '#FF3C3C' }}>
-              <Users className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-[12px] uppercase tracking-[0.24em] text-slate-400 font-semibold">Total Colleges</p>
-              <p className="mt-4 text-[28px] font-semibold text-slate-900">{totalColleges?.toLocaleString() || "0"}</p>
-            </div>
-            <div className="w-11 h-11 rounded-[5px] flex items-center justify-center" style={{ backgroundColor: '#FF3C3C' }}>
-              <Building2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-[12px] uppercase tracking-[0.24em] text-slate-400 font-semibold">Admin Users</p>
-              <p className="mt-4 text-[28px] font-semibold text-slate-900">{totalAdmins?.toLocaleString() || "0"}</p>
-            </div>
-            <div className="w-11 h-11 rounded-[5px] flex items-center justify-center" style={{ backgroundColor: '#FF3C3C' }}>
-              <UserCog className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-[12px] uppercase tracking-[0.24em] text-slate-400 font-semibold">Applications</p>
-              <p className="mt-4 text-[28px] font-semibold text-slate-900">{activeQueries?.toLocaleString() || "0"}</p>
-            </div>
-            <div className="w-11 h-11 rounded-[5px] flex items-center justify-center" style={{ backgroundColor: '#FF3C3C' }}>
-              <MessageSquare className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Transaction Charts */}
-      <ChartsWrapper 
-        studentTransactionPie={studentTransactionPie}
-        collegeTransactionPie={collegeTransactionPie}
-      />
-
+    <div className="p-8 w-full">
       <DashboardClient 
         stats={{
           totalStudents,
@@ -283,25 +221,20 @@ export default async function AdminDashboardPage() {
         }}
         graphData={studentGraphData}
         collegeGraphData={collegeGraphData}
-        transactionPie={[]} // Empty array since we're using separate charts above
-        recentStudents={recentStudents.map(s => ({
+        studentTransactionPie={studentTransactionPie}
+        collegeTransactionPie={collegeTransactionPie}
+        recentStudents={recentStudentsRaw.map(s => ({
           id: s._id.toString(),
           name: [s.firstname, s.lastname].filter(Boolean).join(" ") || s.email || "Unknown",
-          course: s.course || "B.Tech", // Fallback if missing
+          course: s.course || "B.Tech",
           college: s.college || "Pending Allocation",
           status: s.status === 1 ? "Active" : "Pending"
         }))}
-        recentActivity={recentActivity.map((a, i) => ({
-          id: `act-${i}`,
-          type: a.type,
-          message: a.message,
+        recentActivity={recentActivity.map(a => ({
+          ...a,
           time: new Date(a.time || Date.now()).toLocaleDateString()
         }))}
       />
     </div>
   );
 }
-
-
-
-

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import ExploreCards from "@/app/components/ExploreCards";
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
@@ -191,7 +192,7 @@ export default async function ContactUsPage({
                 { icon: "quiz",         label: "Browse Exams",      href: "/examination"     },
                 { icon: "school",       label: "Find Colleges",     href: "/top-colleges"    },
                 { icon: "help_center",  label: "Help Center",       href: "/help-center"     },
-                { icon: "article",      label: "Read Blogs",        href: "/education-blogs" },
+                { icon: "article",      label: "Read Blogs",        href: "/blogs" },
               ].map((link) => (
                 <Link
                   key={link.href}
@@ -423,6 +424,11 @@ export default async function ContactUsPage({
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Explore Cards */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 pb-16">
+        <ExploreCards />
       </div>
 
       <Footer />

@@ -345,7 +345,7 @@ export default async function AskDetailPage({ params }: { params: Promise<{ slug
                 <span className="material-symbols-rounded text-lg" style={icoFill}>help</span>
                 Browse Q&amp;A
               </Link>
-              <Link href="/education-blogs" className="inline-flex items-center gap-2 bg-violet-900/60 text-white font-semibold px-7 py-3 rounded-full hover:bg-violet-900/80 transition-colors shadow-md border border-violet-500/50">
+              <Link href="/blogs" className="inline-flex items-center gap-2 bg-violet-900/60 text-white font-semibold px-7 py-3 rounded-full hover:bg-violet-900/80 transition-colors shadow-md border border-violet-500/50">
                 <span className="material-symbols-rounded text-lg" style={icoFill}>library_books</span>
                 Education Blogs
               </Link>

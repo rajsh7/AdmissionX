@@ -131,7 +131,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
               <nav className="flex items-center justify-center flex-wrap gap-1 text-white/70 text-sm mb-6">
                 <Link href="/" className="hover:text-white transition-colors">Home</Link>
                 <span className="material-symbols-rounded text-base" style={ICO_STYLE}>chevron_right</span>
-                <Link href="/education-blogs" className="hover:text-white transition-colors">Education Blogs</Link>
+                <Link href="/blogs" className="hover:text-white transition-colors">Education Blogs</Link>
                 <span className="material-symbols-rounded text-base" style={ICO_STYLE}>chevron_right</span>
                 <span className="text-white/90 line-clamp-1">{blog.topic}</span>
               </nav>
@@ -167,7 +167,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
 
                 <div className="mt-6 flex items-center justify-between flex-wrap gap-4 bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/10">
                   <Link
-                    href="/education-blogs"
+                    href="/blogs"
                     className="inline-flex items-center gap-2 text-sm font-bold text-white hover:text-red-400 transition-colors"
                   >
                     <span className="material-symbols-rounded text-base" style={ICO_STYLE}>arrow_back</span>
@@ -191,7 +191,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                     entrance exams, career choices, and scholarships.
                   </p>
                   <Link
-                    href="/education-blogs"
+                    href="/blogs"
                     className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-red-600 hover:text-red-700 transition-colors"
                   >
                     Browse all articles
@@ -237,7 +237,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                     Stay updated with the latest education insights and career guidance.
                   </p>
                   <Link
-                    href="/education-blogs"
+                    href="/blogs"
                     className="inline-flex items-center gap-2 bg-red-600 text-white font-bold text-sm px-6 py-3 rounded-xl hover:bg-red-500 transition-all shadow-lg shadow-red-600/30"
                   >
                     Browse blogs
@@ -266,7 +266,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
-                  href="/education-blogs"
+                  href="/blogs"
                   className="inline-flex items-center gap-3 bg-red-600 text-white font-black px-10 py-5 rounded-2xl hover:bg-red-500 transition-all hover:scale-[1.02] shadow-xl shadow-red-600/20"
                 >
                   <span className="material-symbols-rounded text-xl" style={ICO_FILL_STYLE}>library_books</span>

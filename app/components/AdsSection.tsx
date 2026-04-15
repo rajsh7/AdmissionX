@@ -17,7 +17,7 @@ export default function AdsSection({ ads }: AdsSectionProps) {
   if (!ads || ads.length === 0) return null;
 
   return (
-    <section className="w-full py-8 px-4 sm:px-6 max-w-7xl mx-auto">
+    <section className="w-full py-8 px-6 lg:px-12 max-w-[1920px] mx-auto">
       <div className={`grid gap-4 ${ads.length === 1 ? "grid-cols-1" : ads.length === 2 ? "grid-cols-1 sm:grid-cols-2" : ads.length === 3 ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"}`}>
         {ads.map((ad) => {
           const imgSrc = ad.img
@@ -25,7 +25,7 @@ export default function AdsSection({ ads }: AdsSectionProps) {
             : null;
 
           const inner = (
-            <div className="relative w-full overflow-hidden rounded-2xl shadow-sm border border-slate-100 bg-slate-50 group cursor-pointer">
+            <div className="relative w-full overflow-hidden rounded-[5px] shadow-sm border border-slate-100 bg-slate-50 group cursor-pointer">
               {imgSrc ? (
                 <div className="relative w-full h-[120px] sm:h-[140px]">
                   <Image

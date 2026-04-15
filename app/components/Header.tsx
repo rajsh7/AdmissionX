@@ -31,9 +31,8 @@ const navLinks = [
       { label: "Compare Colleges", href: "/compare", icon: "compare_arrows" },
       { label: "Counselling", href: "/counselling", icon: "support_agent" },
       { label: "Examination", href: "/examination", icon: "engineering" },
-      { label: "Streams", href: "/stream", icon: "grid_view" },
       { label: "News & Articles", href: "/news", icon: "newspaper" },
-      { label: "Latest Blogs", href: "/education-blogs", icon: "article" },
+      { label: "Latest Blogs", href: "/blogs", icon: "article" },
     ]
   },
 ];
@@ -308,18 +307,17 @@ export default function Header({ theme }: HeaderProps) {
       )}
 
       <motion.header 
-        suppressHydrationWarning
-        className={`site-header fixed top-0 left-0 right-0 z-50 w-full flex items-center transition-all duration-300 min-h-[58px] ${
-          mounted && isScrolled
+        className={`site-header fixed top-0 left-0 right-0 z-[100] w-full flex items-center transition-all duration-300 min-h-[58px] ${
+          isScrolled
             ? "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.08)] py-2 border-b border-neutral-100"
             : "bg-white/95 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.05)] py-3"
         }`}
       >
-        <div className="flex items-center justify-between px-6 sm:px-12 w-full max-w-[1920px] mx-auto">
+        <div className="flex items-center justify-between px-4 sm:px-8 w-full max-w-[1920px] mx-auto">
           {/* Logo Area */}
           <div className="shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
-              <img src="/logo.jpg" alt="AdmissionX" className="h-10 w-auto object-contain" />
+              <img src="/admissionx-logo.png" alt="AdmissionX" className="h-9 sm:h-10 w-auto object-contain bg-transparent mix-blend-multiply" />
             </Link>
           </div>
 

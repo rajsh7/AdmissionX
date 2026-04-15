@@ -376,10 +376,10 @@ export default function TopUniversities({
 
         <div className="mt-12 text-center">
           <Link
-            href={`/search?stream=${activeTabSlug}`}
+            href="/top-university"
             className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-primary border border-primary rounded-[5px] transition-all hover:bg-primary/5 active:scale-95"
           >
-            Explore 120+ More {activeTab} Colleges
+            Explore All Universities
             <span className="material-symbols-rounded text-[20px] transition-transform group-hover:translate-x-1">
               arrow_forward
             </span>

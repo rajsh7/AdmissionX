@@ -282,7 +282,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
                   <span className="material-symbols-rounded text-xl" style={ICO_FILL_STYLE}>newspaper</span>
                   All Latest News
                 </Link>
-                <Link href="/education-blogs" className="inline-flex items-center gap-3 bg-white/10 text-white font-black px-10 py-5 rounded-2xl hover:bg-white/20 transition-all hover:scale-[1.02] shadow-xl border border-white/20">
+                <Link href="/blogs" className="inline-flex items-center gap-3 bg-white/10 text-white font-black px-10 py-5 rounded-2xl hover:bg-white/20 transition-all hover:scale-[1.02] shadow-xl border border-white/20">
                   <span className="material-symbols-rounded text-xl" style={ICO_FILL_STYLE}>library_books</span>
                   Education Blogs
                 </Link>

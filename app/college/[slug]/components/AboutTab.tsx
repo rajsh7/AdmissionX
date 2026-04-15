@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import ExploreCards from "@/app/components/ExploreCards";
 
 interface Stat { label: string; value: string; }
 
@@ -8,6 +10,11 @@ interface AboutTabProps {
   location: string;
   stats: Stat[];
   mosaicImages: string[];
+  mosaic1?: string | null;
+  mosaic2?: string | null;
+  mosaic3?: string | null;
+  mosaic4?: string | null;
+  bannerimage?: string | null;
   aboutPara1: string;
   aboutPara2: string;
   missionText: string;
@@ -16,25 +23,36 @@ interface AboutTabProps {
   paragraphs: string[];
 }
 
+function buildImageUrl(raw: string | null | undefined): string {
+  if (!raw) return "";
+  const base = "https://admin.admissionx.in/uploads/";
+  if (typeof raw === "string" && (raw.startsWith("http") || raw.startsWith("/")))
+    return raw;
+  return `${base}${raw}`;
+}
+
 export default function AboutTab({
   collegeName, slug, location, stats, mosaicImages,
-  aboutPara1, missionText, visionText, descriptionText, paragraphs,
+  mosaic1, mosaic2, mosaic3, mosaic4, bannerimage,
+  aboutPara1, aboutPara2, missionText, visionText, descriptionText, paragraphs,
 }: AboutTabProps) {
   return (
     <div className="w-full bg-white pt-4 pb-6">
       <div className="w-full px-4 md:px-10 lg:px-12 mx-auto max-w-[1920px]">
         {/* -- STATS BANNER — Card Style --------------------------------------- */}
-        <section className="relative w-full overflow-hidden rounded-[5px] shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)]" style={{ minHeight: 280 }}>
+        <section className="relative w-full overflow-hidden rounded-[5px] shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)]" style={{ minHeight: 489 }}>
           {/* Campus Image background */}
-          <div className="absolute inset-0 z-0 bg-[#2b2b2b]">
-            <Image src={mosaicImages[0]} alt={collegeName} fill className="object-cover" unoptimized />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
+          <div className="absolute inset-0 z-0 bg-[#0f172a]">
+            <Image src={mosaic1 ? buildImageUrl(mosaic1) : (bannerimage ? buildImageUrl(bannerimage) : mosaicImages[0])} alt={collegeName} fill className="object-cover opacity-80" unoptimized />
+            {/* Multi-layer overlay for maximum readability */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-black/10" />
+            <div className="absolute inset-0 bg-black/20" />
           </div>
 
-          <div className="relative z-10 w-full px-4 md:px-6 lg:px-8 py-8 md:py-10 flex flex-col justify-center min-h-[280px]">
-            <div className="max-w-2xl flex flex-col gap-5">
+          <div className="relative z-10 w-full px-4 md:px-6 lg:px-8 py-8 md:py-10 flex flex-col justify-center min-h-[489px]">
+            <div className="max-w-full flex flex-col gap-5">
               <div>
-                <h2 className="text-[24px] font-bold text-white leading-tight mb-2">
+                <h2 className="text-[42px] font-bold text-white leading-tight mb-2">
                   Indian&apos;s biggest university,<br />
                   <span className="text-white">{collegeName}</span>
                 </h2>
@@ -48,30 +66,33 @@ export default function AboutTab({
 
               <div className="flex flex-wrap gap-4 mt-2">
                 {stats.map((stat, idx) => (
-                  <div key={idx} className="bg-white rounded-[5px] px-5 py-4 flex flex-col w-[209px] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-white/20 transition-transform hover:-translate-y-1">
-                    <span className="text-[24px] font-semibold leading-none" style={{ color: 'rgba(62,62,62,1)' }}>{stat.value}</span>
-                    <span className="text-[18px] font-semibold mt-1.5 leading-tight" style={{ color: 'rgba(62,62,62,1)' }}>{stat.label}</span>
+                  <div key={idx} className="bg-white rounded-[5px] px-6 py-5 flex flex-col w-[280px] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-white/20 transition-transform hover:-translate-y-1">
+                    <span className="text-[28px] font-bold leading-none" style={{ color: 'rgba(62,62,62,1)' }}>{stat.value}</span>
+                    <span className="text-[20px] font-semibold mt-2 leading-tight" style={{ color: 'rgba(62,62,62,1)' }}>{stat.label}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="flex flex-wrap gap-3 mt-2">
+              <div className="flex flex-wrap gap-4 mt-2">
                 <a href={`/college/${slug}/admission-procedure`}
-                  className="px-10 py-3 bg-[#FF3C3C] text-white font-bold text-sm rounded-[5px] shadow-lg shadow-red-500/20 hover:bg-red-700 transition-colors">
+                  className="px-16 py-4 bg-[#FF3C3C] text-white font-bold text-base rounded-[5px] shadow-lg shadow-red-500/20 hover:bg-red-700 transition-colors text-center min-w-[220px]">
                   Apply Now
                 </a>
-                <button className="px-10 py-3 bg-[#8b4545]/60 hover:bg-[#8b4545]/80 backdrop-blur-md border border-white/20 text-white font-bold text-sm rounded-[5px] transition-colors flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button className="px-16 py-4 bg-[#8b4545]/60 hover:bg-[#8b4545]/80 backdrop-blur-md border border-white/20 text-white font-bold text-base rounded-[5px] transition-colors flex items-center justify-center gap-2 min-w-[220px]">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
                   Download Brochure
                 </button>
-                <button className="px-10 py-3 bg-[#8b4545]/60 hover:bg-[#8b4545]/80 backdrop-blur-md border border-white/20 text-white font-bold text-sm rounded-[5px] transition-colors flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <Link 
+                  href={`/compare?colleges=${slug}`}
+                  className="px-16 py-4 bg-[#8b4545]/60 hover:bg-[#8b4545]/80 backdrop-blur-md border border-white/20 text-white font-bold text-base rounded-[5px] transition-colors flex items-center justify-center gap-2 min-w-[220px]"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                   Compare
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -84,29 +105,24 @@ export default function AboutTab({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
             {/* Left: Image Mosaic */}
-            <div className="relative">
-              <div className="absolute -top-6 -left-6 z-0 hidden lg:block" aria-hidden="true">
-
+            <div className="relative pt-12">
+              {/* Green Sparkle Icon */}
+              <div className="absolute top-0 -left-1 z-20 w-32 h-32 pointer-events-none">
+                <Image src="/images/f21f0c4442ff56d9c6a16bbb7039cd521e7f02b5.png" alt="" fill className="object-contain" unoptimized />
               </div>
-              <div className="grid grid-cols-2 gap-3 relative z-10">
-                <div className="pt-16 relative">
-                  {/* Overlay badge image on top */}
-                  <div className="absolute -top-2 left-0 z-20 w-20 h-20 rounded-[5px] overflow-hidden shadow-2xl border-2 border-white">
-                    <Image src="/images/f21f0c4442ff56d9c6a16bbb7039cd521e7f02b5.png" alt="Badge" fill className="object-cover" unoptimized />
-                  </div>
-                  <div className="relative rounded-[5px] overflow-hidden shadow-xl" style={{ height: 600 }}>
-                    <Image src={mosaicImages[1]} alt="Campus Life" fill className="object-cover" unoptimized />
-                    <div className="absolute bottom-3 left-3 bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-[5px]">Academic Life</div>
+
+              <div className="grid grid-cols-2 gap-4 relative z-10">
+                <div className="relative">
+                  <div className="relative top-16 rounded-[5px] overflow-hidden" style={{ height: 516 }}>
+                    <Image src={mosaic2 ? buildImageUrl(mosaic2) : mosaicImages[1]} alt={collegeName} fill className="object-cover" unoptimized />
                   </div>
                 </div>
-                <div className="flex flex-col gap-3">
-                  <div className="relative rounded-[5px] overflow-hidden shadow-xl" style={{ height: 294 }}>
-                    <Image src={mosaicImages[0]} alt="Campus Building" fill className="object-cover" unoptimized />
-                    <div className="absolute bottom-3 left-3 bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-[5px]">Campus Building</div>
+                <div className="flex flex-col gap-4">
+                  <div className="relative rounded-[5px] overflow-hidden flex-1" style={{ height: 250 }}>
+                    <Image src={mosaic3 ? buildImageUrl(mosaic3) : mosaicImages[0]} alt="Campus Building" fill className="object-cover" unoptimized />
                   </div>
-                  <div className="relative rounded-[5px] overflow-hidden shadow-xl" style={{ height: 294 }}>
-                    <Image src={mosaicImages[2]} alt="Modern Library" fill className="object-cover" unoptimized />
-                    <div className="absolute bottom-3 left-3 bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-[5px]">Modern Library</div>
+                  <div className="relative rounded-[5px] overflow-hidden flex-1" style={{ height: 250 }}>
+                    <Image src={mosaic4 ? buildImageUrl(mosaic4) : mosaicImages[2]} alt="Modern Library" fill className="object-cover" unoptimized />
                   </div>
                 </div>
               </div>
@@ -133,7 +149,7 @@ export default function AboutTab({
               </div>
               <a href={`/college/${slug}/admission-procedure`}
                 className="inline-flex items-center gap-3 px-7 py-3 bg-[#FF3C3C] text-white rounded-[5px] font-bold text-sm uppercase tracking-widest hover:bg-red-700 transition-colors group">
-                Admission
+                Apply
                 <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -158,6 +174,11 @@ export default function AboutTab({
           </div>
 
         </div>
+      </section>
+
+      {/* Explore Cards */}
+      <section className="w-full px-4 md:px-10 lg:px-12 mx-auto max-w-[1920px] pb-10">
+        <ExploreCards />
       </section>
 
     </div>

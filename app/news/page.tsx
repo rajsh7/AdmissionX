@@ -4,15 +4,18 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import ExploreCards from "@/app/components/ExploreCards";
 
 const DEFAULT_NEWS_IMAGE =
   "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=800";
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const PAGE_SIZE = 12;
+const ACCENT = "#FF3B30";
 
 export const metadata: Metadata = {
   title: "Education News — Latest Updates | AdmissionX",
-  description: "Stay updated with the latest education news — admission alerts, exam notifications, scholarship announcements, and campus updates.",
+  description:
+    "Stay updated with the latest education news — admission alerts, exam notifications, scholarship announcements, and campus updates.",
 };
 
 function buildImageUrl(raw: string | null | undefined): string {
@@ -37,14 +40,31 @@ function timeAgo(dateStr: string | null | undefined): string {
   if (!dateStr) return "";
   try {
     const diff = Date.now() - new Date(dateStr).getTime();
+    const m = Math.floor(diff / 60_000);
+    const h = Math.floor(diff / 3_600_000);
     const d = Math.floor(diff / 86_400_000);
     const w = Math.floor(d / 7);
     const mo = Math.floor(d / 30);
     if (mo >= 1) return `${mo} month${mo > 1 ? "s" : ""} ago`;
     if (w >= 1) return `${w} week${w > 1 ? "s" : ""} ago`;
     if (d >= 1) return `${d} day${d > 1 ? "s" : ""} ago`;
-    return "Today";
-  } catch { return ""; }
+    if (h >= 1) return `${h} hour${h > 1 ? "s" : ""} ago`;
+    if (m >= 1) return `${m} min ago`;
+    return "Just now";
+  } catch {
+    return "";
+  }
+}
+
+function formatFullDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return "";
+  try {
+    return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" }).format(
+      new Date(dateStr),
+    );
+  } catch {
+    return "";
+  }
 }
 
 function estimateReadTime(html: string | null | undefined): string {
@@ -52,12 +72,40 @@ function estimateReadTime(html: string | null | undefined): string {
   return `${Math.max(1, Math.ceil(words / 200))} min read`;
 }
 
-const TAG_COLORS = [
-  "text-red-700 bg-red-50 border-red-200", "text-blue-700 bg-blue-50 border-blue-200",
-  "text-emerald-700 bg-emerald-50 border-emerald-200", "text-violet-700 bg-violet-50 border-violet-200",
-  "text-amber-700 bg-amber-50 border-amber-200", "text-cyan-700 bg-cyan-50 border-cyan-200",
-  "text-rose-700 bg-rose-50 border-rose-200", "text-indigo-700 bg-indigo-50 border-indigo-200",
-];
+function parseIds(csv: string | null | undefined): number[] {
+  if (!csv?.trim()) return [];
+  return csv.split(",").map((s) => parseInt(s.trim(), 10)).filter((n) => !Number.isNaN(n));
+}
+
+function firstTypeName(
+  newstypeids: string | null | undefined,
+  allTypes: { id: number; name: string }[],
+): string {
+  const ids = parseIds(newstypeids);
+  const t = allTypes.find((x) => ids.includes(x.id));
+  return t?.name ?? "AdmissionX News";
+}
+
+function padToSix<T>(items: T[], filler: (i: number) => T): T[] {
+  const out = [...items];
+  let i = 0;
+  while (out.length < 6) {
+    out.push(filler(i));
+    i += 1;
+  }
+  return out.slice(0, 6);
+}
+
+type NewsRow = {
+  _id: unknown;
+  id?: number;
+  topic: string;
+  slug: string;
+  featimage?: string | null;
+  description?: string | null;
+  newstypeids?: string | null;
+  created_at?: string | null;
+};
 
 export default async function NewsPage({
   searchParams,
@@ -78,7 +126,6 @@ export default async function NewsPage({
     db.collection("news_tags").find({}).sort({ name: 1 }).project({ id: 1, name: 1, slug: 1 }).toArray(),
   ]);
 
-  // Resolve type/tag slugs to integer ids
   let typeId: number | null = null;
   if (activeType) {
     const found = allTypes.find((t) => t.slug?.toLowerCase() === activeType);
@@ -95,12 +142,17 @@ export default async function NewsPage({
     slug: { $exists: true, $ne: "" },
   };
   if (q) filter.$or = [{ topic: { $regex: q, $options: "i" } }, { description: { $regex: q, $options: "i" } }];
-  // newstypeids/newstagsids are stored as comma-separated integer strings like "6" or "6,7"
   if (typeId !== null) filter.newstypeids = { $regex: `(^|,)\\s*${typeId}\\s*(,|$)` };
   if (tagId !== null) filter.newstagsids = { $regex: `(^|,)\\s*${tagId}\\s*(,|$)` };
 
-  const [news, total] = await Promise.all([
-    db.collection("news")
+  const baseSidebarFilter: Record<string, unknown> = {
+    isactive: 1,
+    slug: { $exists: true, $ne: "" },
+  };
+
+  const [news, total, spotlightRaw] = await Promise.all([
+    db
+      .collection("news")
       .find(filter)
       .sort({ created_at: -1 })
       .skip(offset)
@@ -108,12 +160,38 @@ export default async function NewsPage({
       .project({ id: 1, topic: 1, featimage: 1, description: 1, slug: 1, newstypeids: 1, newstagsids: 1, created_at: 1 })
       .toArray(),
     db.collection("news").countDocuments(filter),
+    db
+      .collection("news")
+      .find(baseSidebarFilter)
+      .sort({ created_at: -1 })
+      .limit(12)
+      .project({ id: 1, topic: 1, featimage: 1, description: 1, slug: 1, newstypeids: 1, created_at: 1 })
+      .toArray(),
   ]);
+
+  const newsList = news as unknown as NewsRow[];
+  const spotlight = spotlightRaw as unknown as NewsRow[];
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   const activeTypeName = allTypes.find((t) => t.slug?.toLowerCase() === activeType)?.name;
   const activeTagName = allTags.find((t) => t.slug?.toLowerCase() === activeTag)?.name;
+
+  const showFeatured = page === 1 && !q && !activeType && !activeTag && newsList.length > 0;
+  const featured = showFeatured ? newsList[0] : null;
+  const listNews = showFeatured ? newsList.slice(1) : newsList;
+
+  const mostRead =
+    spotlight.length > 0
+      ? padToSix(spotlight.slice(0, 6), (i) => spotlight[i % spotlight.length]!)
+      : [];
+  const trendingSource = spotlight.slice(6, 12);
+  const trendingItems =
+    spotlight.length > 0
+      ? padToSix(trendingSource.length ? trendingSource : spotlight, (i) => spotlight[i % spotlight.length]!)
+      : [];
+
+  const allTypesTyped = allTypes as { id: number; name: string; slug?: string }[];
 
   function buildUrl(overrides: Record<string, string | undefined>) {
     const merged: Record<string, string> = {};
@@ -131,174 +209,246 @@ export default async function NewsPage({
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 relative">
-      <div className="fixed inset-0 z-0 text-[0px] font-[0] leading-[0]">
-        <Image
-          src="https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=2000&auto=format&fit=crop"
-          alt="Campus Background" fill priority sizes="100vw" quality={80} className="object-cover"
-        />
-        <div className="absolute inset-0 bg-neutral-900/80 backdrop-blur-[2px]" />
-      </div>
+    <div className="min-h-screen bg-white font-poppins">
+      <Header />
 
-      <div className="relative z-10">
-        <Header />
-
-        <div className="pt-24 pb-12">
-          <div className="w-full px-4 lg:px-8 xl:px-12 flex flex-col items-center text-center">
-            <nav className="flex items-center justify-center gap-2 text-xs text-neutral-500 mb-6 font-medium">
-              <Link href="/" className="hover:text-white transition-colors">Home</Link>
-              <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-              <span className="text-neutral-300">News</span>
-            </nav>
-            <div className="flex flex-col items-center gap-6">
-              <div className="w-full max-w-2xl flex flex-col items-center">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="inline-flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-                    <span className="material-symbols-outlined text-[13px]">newspaper</span>
-                    Education News
-                  </span>
-                </div>
-                <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-3">
-                  Latest{" "}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Education News</span>
-                </h1>
-                <p className="text-neutral-400 text-sm leading-relaxed max-w-lg text-center">
-                  Stay informed with the latest admission alerts, exam notifications, scholarship announcements, and campus updates.
+      <main className="pt-[72px] sm:pt-20 pb-16 w-full">
+        <div className="w-full max-w-none mx-auto px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10">
+          <div className="pt-6 sm:pt-8 lg:pt-10" />
+          {/* Featured */}
+          {featured && (
+            <article className="mb-10 rounded-[5px] border border-neutral-200/80 bg-neutral-100 shadow-[0_1px_4px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col md:flex-row"
+              style={{ backgroundImage: `url("${encodeURI("/Background-images/f0b10acfd1d98e25c40741fa92c81454f3557e55 (1).png")}")`, backgroundSize: "cover", backgroundPosition: "right", backgroundRepeat: "no-repeat" }}
+            >
+              <Link
+                href={`/news/${featured.slug}`}
+                className="relative w-full md:w-[32%] min-h-[220px] md:min-h-[340px] bg-neutral-100 shrink-0 group md:m-0 md:rounded-none overflow-hidden"
+              >
+                <Image
+                  src={buildImageUrl(featured.featimage)}
+                  alt={featured.topic}
+                  fill
+                  className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                  sizes="(max-width: 768px) 100vw, 42vw"
+                  priority
+                />
+                <div className="absolute inset-0 bg-black/10 transition-opacity flex items-center justify-center pointer-events-none" />
+              </Link>
+              <div className="flex-1 p-6 sm:p-8 flex flex-col justify-center">
+                <h2 className="text-xl sm:text-2xl font-bold text-neutral-800 leading-snug mb-3">{featured.topic}</h2>
+                <p className="text-sm text-neutral-500 leading-relaxed line-clamp-3 mb-4">
+                  {excerpt(featured.description, 220) ||
+                    "Stay updated with the latest announcements, schedules, and guidance for students and parents."}
                 </p>
-              </div>
-              <div className="flex justify-center gap-3 flex-shrink-0">
-                <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-center min-w-[80px]">
-                  <p className="text-2xl font-black text-white">{total}</p>
-                  <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wide mt-0.5">Articles</p>
+                <div
+                  className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold mb-5"
+                  style={{ color: ACCENT }}
+                >
+                  {timeAgo(featured.created_at) && <span>{timeAgo(featured.created_at)}</span>}
+                  {formatFullDate(featured.created_at) && <span>{formatFullDate(featured.created_at)}</span>}
+                  <span>{estimateReadTime(featured.description)}</span>
                 </div>
-                <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-center min-w-[80px]">
-                  <p className="text-2xl font-black text-white">{allTypes.length}</p>
-                  <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wide mt-0.5">Topics</p>
-                </div>
+                <Link
+                  href={`/news/${featured.slug}`}
+                  className="inline-flex items-center gap-1 text-sm font-bold w-fit hover:opacity-80 transition-opacity"
+                  style={{ color: ACCENT }}
+                >
+                  Read Full Story
+                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </Link>
               </div>
-            </div>
-          </div>
-        </div>
+            </article>
+          )}
 
-        <div className="w-full px-4 lg:px-8 xl:px-12 py-4 mx-auto flex justify-center">
-          <form method="GET" action="/news" className="flex gap-3 max-w-xl">
-            <div className="flex-1 relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[18px] text-neutral-400">search</span>
-              <input type="text" name="q" defaultValue={q} placeholder="Search news…"
-                className="w-full pl-10 pr-4 py-2.5 text-sm border border-neutral-200 rounded-xl focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all" />
-              {activeType && <input type="hidden" name="type" value={activeType} />}
-              {activeTag && <input type="hidden" name="tag" value={activeTag} />}
-            </div>
-            <button type="submit" className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-colors whitespace-nowrap">Search</button>
-          </form>
-        </div>
-
-        {allTypes.length > 0 && (
-          <div className="w-full px-4 lg:px-8 xl:px-12 py-3 mx-auto">
-            <div className="flex items-center justify-center gap-2 overflow-x-auto scrollbar-hide">
-              <Link href={buildUrl({ type: undefined, page: "1" })}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition-colors ${!activeType ? "bg-blue-600 text-white border-blue-600" : "bg-white text-neutral-600 border-neutral-200 hover:border-blue-300 hover:text-blue-600"}`}>
-                <span className="material-symbols-outlined text-[13px]">newspaper</span>
+          {/* Category tabs */}
+          <div className="w-full mb-6">
+            <div className="flex items-center gap-0 min-w-0 overflow-x-auto hide-scrollbar border border-neutral-200 rounded-[5px] bg-white shadow-[0_2px_6px_rgba(0,0,0,0.08)]">
+              <Link
+                href={buildUrl({ type: undefined, tag: undefined, page: "1" })}
+                className={`flex-1 text-center py-3 text-sm font-semibold whitespace-nowrap transition-colors ${!activeType && !activeTag
+                    ? "text-[#FF3B30] border-b-2 border-b-[#FF3B30]"
+                    : "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50 border-r border-neutral-200"
+                  }`}
+                style={{ fontWeight: 600, fontSize: "20px", color: "rgba(62, 62, 62, 0.71)" }}
+              >
                 All News
               </Link>
-              {allTypes.map((t) => (
-                <Link key={t.id} href={buildUrl({ type: t.slug, page: "1" })}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition-colors ${activeType === t.slug?.toLowerCase() ? "bg-blue-600 text-white border-blue-600" : "bg-white text-neutral-600 border-neutral-200 hover:border-blue-300 hover:text-blue-600"}`}>
-                  {t.name}
-                </Link>
-              ))}
+              {allTypesTyped.map((t, i) => {
+                const slug = (t.slug ?? "").toLowerCase();
+                const on = activeType === slug;
+                return (
+                  <Link
+                    key={t.id}
+                    href={buildUrl({ type: t.slug, tag: undefined, page: "1" })}
+                    className={`flex-1 text-center py-3 text-sm font-semibold whitespace-nowrap transition-colors ${on ? "text-[#FF3B30] border-b-2 border-b-[#FF3B30]" : `text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50${i < allTypesTyped.length - 1 ? " border-r border-neutral-200" : ""}`
+                      }`}
+                    style={{ fontWeight: 600, fontSize: "20px", color: "rgba(62, 62, 62, 0.71)" }}
+                  >
+                    {t.name}
+                  </Link>
+                );
+              })}
             </div>
           </div>
-        )}
 
-        <div className="w-full px-4 lg:px-8 xl:px-12 py-10">
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
-            <div className="flex-1 min-w-0">
-              {(q || activeType || activeTag) && (
-                <div className="mb-5 flex flex-wrap items-center gap-2">
-                  <span className="text-sm text-white">
-                    {total} result{total !== 1 ? "s" : ""}
-                    {q && <> for &ldquo;<strong>{q}</strong>&rdquo;</>}
-                  </span>
-                  {activeTypeName && (
-                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">
-                      {activeTypeName}
-                      <Link href={buildUrl({ type: undefined, page: "1" })} className="hover:text-red-500 transition-colors ml-0.5">
-                        <span className="material-symbols-outlined text-[13px]">close</span>
-                      </Link>
-                    </span>
-                  )}
-                  {activeTagName && (
-                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-700 bg-neutral-100 border border-neutral-200 px-2.5 py-1 rounded-full">
-                      #{activeTagName}
-                      <Link href={buildUrl({ tag: undefined, page: "1" })} className="hover:text-red-500 transition-colors ml-0.5">
-                        <span className="material-symbols-outlined text-[13px]">close</span>
-                      </Link>
-                    </span>
-                  )}
-                  <Link href="/news" className="text-xs text-neutral-400 hover:text-red-600 transition-colors underline underline-offset-2">Clear all</Link>
-                </div>
+          {/* Search + filters */}
+          <form method="GET" action="/news" className="flex flex-row justify-between items-center gap-3 mb-10">
+            <div className="flex flex-row gap-3 min-w-0 w-1/2">
+              <div className="flex-1 relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[20px] text-neutral-400">
+                  search
+                </span>
+                <input
+                  type="text"
+                  name="q"
+                  defaultValue={q}
+                  placeholder="Location, universities, courses..."
+                  className="w-full pl-11 pr-4 py-3 text-sm border border-neutral-200 rounded-[5px] bg-white text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-100 focus:border-red-300 transition-shadow shadow-sm"
+                />
+                {activeType && <input type="hidden" name="type" value={activeType} />}
+                {activeTag && <input type="hidden" name="tag" value={activeTag} />}
+              </div>
+              <button
+                type="submit"
+                className="shrink-0 px-6 py-3 rounded-[5px] text-sm font-bold text-white shadow-sm hover:opacity-95 transition-opacity whitespace-nowrap"
+                style={{ backgroundColor: ACCENT }}
+              >
+                Search Now
+              </button>
+            </div>
+            <a
+              href="#news-tags"
+              className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-[5px] text-sm font-semibold border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 transition-colors whitespace-nowrap"
+            >
+              <span className="material-symbols-outlined text-[20px]">tune</span>
+              Filters
+            </a>
+          </form>
+
+          {(q || activeType || activeTag) && (
+            <div className="mb-6 flex flex-wrap items-center gap-2 text-sm">
+              <span className="text-neutral-600">
+                {total} result{total !== 1 ? "s" : ""}
+                {q && (
+                  <>
+                    {" "}
+                    for &ldquo;<strong>{q}</strong>&rdquo;
+                  </>
+                )}
+              </span>
+              {activeTypeName && (
+                <span className="inline-flex items-center gap-1 text-xs font-bold text-red-700 bg-red-50 border border-red-100 px-2.5 py-1 rounded-[5px]">
+                  {activeTypeName}
+                  <Link href={buildUrl({ type: undefined, page: "1" })} className="hover:opacity-70 ml-0.5">
+                    <span className="material-symbols-outlined text-[14px]">close</span>
+                  </Link>
+                </span>
               )}
+              {activeTagName && (
+                <span className="inline-flex items-center gap-1 text-xs font-bold text-neutral-700 bg-neutral-100 border border-neutral-200 px-2.5 py-1 rounded-[5px]">
+                  #{activeTagName}
+                  <Link href={buildUrl({ tag: undefined, page: "1" })} className="hover:opacity-70 ml-0.5">
+                    <span className="material-symbols-outlined text-[14px]">close</span>
+                  </Link>
+                </span>
+              )}
+              <Link href="/news" className="text-xs font-semibold text-[#FF3B30] hover:underline underline-offset-2">
+                Clear all
+              </Link>
+            </div>
+          )}
 
-              {news.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 text-center">
-                  <div className="w-20 h-20 rounded-3xl bg-blue-50 flex items-center justify-center mb-5">
-                    <span className="material-symbols-outlined text-[36px] text-blue-400" style={{ fontVariationSettings: "'FILL' 1" }}>newspaper</span>
-                  </div>
-                  <h3 className="text-lg font-black text-white mb-2">{(q || activeType || activeTag) ? "No matching news" : "No news yet"}</h3>
-                  <p className="text-sm text-neutral-300 max-w-xs leading-relaxed mb-6">
-                    {(q || activeType || activeTag) ? "Try adjusting your filters or search term." : "Check back soon for the latest education updates."}
+          <div className="flex flex-col lg:flex-row gap-10 lg:gap-12 items-start">
+            {/* Latest news */}
+            <div className="flex-1 min-w-0 w-full">
+              <h2 className="text-lg sm:text-xl font-bold text-neutral-800 mb-5">Latest news</h2>
+
+              {newsList.length === 0 ? (
+                <div className="rounded-[5px] border border-dashed border-neutral-200 py-16 text-center px-4">
+                  <span className="material-symbols-outlined text-[40px] text-neutral-300 mb-3 block">newspaper</span>
+                  <p className="font-bold text-neutral-800 mb-1">
+                    {(q || activeType || activeTag) ? "No matching news" : "No news yet"}
+                  </p>
+                  <p className="text-sm text-neutral-500 mb-6 max-w-sm mx-auto">
+                    {(q || activeType || activeTag)
+                      ? "Try adjusting your filters or search."
+                      : "Check back soon for updates."}
                   </p>
                   {(q || activeType || activeTag) && (
-                    <Link href="/news" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors">
-                      <span className="material-symbols-outlined text-[16px]">refresh</span>
+                    <Link
+                      href="/news"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[5px] text-sm font-bold text-white"
+                      style={{ backgroundColor: ACCENT }}
+                    >
                       Clear filters
                     </Link>
                   )}
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
-                    {news.map((item, idx) => {
+                  <div className="flex flex-col gap-4">
+                    {listNews.map((item) => {
                       const imgUrl = buildImageUrl(item.featimage);
-                      const desc = excerpt(item.description);
+                      const desc = excerpt(item.description, 140);
                       const ago = timeAgo(item.created_at);
-                      const readMin = estimateReadTime(item.description);
-                      const color = TAG_COLORS[idx % TAG_COLORS.length];
+                      const source = firstTypeName(item.newstypeids, allTypesTyped);
                       return (
-                        <Link key={String(item._id)} href={`/news/${item.slug}`}
-                          className="group flex flex-col bg-white rounded-2xl border border-neutral-100 overflow-hidden hover:shadow-lg hover:shadow-neutral-200/60 hover:border-neutral-200 transition-all duration-300">
-                          <div className="relative h-44 bg-neutral-100 overflow-hidden flex-shrink-0">
-                            <Image src={imgUrl} alt={item.topic} fill sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 350px"
-                              className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                            {ago && <span className="absolute bottom-3 left-3 text-[10px] font-bold text-white/90 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">{ago}</span>}
-                          </div>
-                          <div className="flex flex-col flex-1 p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full border ${color}`}>News</span>
-                              <span className="text-[10px] text-neutral-400">{readMin}</span>
-                            </div>
-                            <h2 className="text-sm font-black text-neutral-900 leading-snug mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">{item.topic}</h2>
-                            {desc && <p className="text-xs text-neutral-500 leading-relaxed line-clamp-3 flex-1 mb-3">{desc}</p>}
-                            <div className="flex items-center justify-between pt-3 border-t border-neutral-100 mt-auto">
-                              <span className="text-[11px] text-neutral-400 font-medium">AdmissionX News</span>
-                              <span className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 group-hover:gap-2 transition-all">
-                                Read <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                        <article
+                          key={String(item._id)}
+                          className="flex gap-4 p-4 rounded-[5px] border border-neutral-200/90 bg-white shadow-sm hover:shadow-md hover:border-neutral-300/80 transition-all"
+                        >
+                          <Link
+                            href={`/news/${item.slug}`}
+                            className="relative w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] shrink-0 rounded-[5px] overflow-hidden bg-neutral-100"
+                          >
+                            <Image src={imgUrl} alt="" fill className="object-cover" sizes="120px" />
+                          </Link>
+                          <div className="min-w-0 flex-1 flex flex-col">
+                            <Link href={`/news/${item.slug}`}>
+                              <h3
+                                className="leading-snug line-clamp-2 hover:text-[#FF3B30] transition-colors"
+                                style={{ fontWeight: 600, fontSize: "24px", color: "rgba(62, 62, 62, 1)" }}
+                              >
+                                {item.topic}
+                              </h3>
+                            </Link>
+                            {desc && <p className="text-xs sm:text-sm text-neutral-500 mt-2 line-clamp-2 leading-relaxed">{desc}</p>}
+                            <Link
+                              href={`/news/${item.slug}`}
+                              className="text-xs font-bold mt-2 w-fit"
+                              style={{ color: ACCENT }}
+                            >
+                              Read all
+                            </Link>
+                            <div className="mt-auto pt-3 flex items-center justify-between gap-2 border-t border-neutral-100">
+                              <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs text-neutral-600">
+                                <span className="material-symbols-outlined text-[16px] text-blue-600" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                  verified
+                                </span>
+                                <span className="font-medium">{source}</span>
                               </span>
+                              {ago && <span className="text-[11px] sm:text-xs text-neutral-400 shrink-0">{ago}</span>}
                             </div>
                           </div>
-                        </Link>
+                        </article>
                       );
                     })}
                   </div>
 
                   {totalPages > 1 && (
-                    <div className="mt-10 flex items-center justify-center gap-1.5 flex-wrap">
-                      {page > 1 && (
-                        <Link href={buildUrl({ page: String(page - 1) })} className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-semibold text-neutral-600 bg-white border border-neutral-200 hover:border-blue-300 hover:text-blue-600 transition-all">
-                          <span className="material-symbols-outlined text-[16px]">chevron_left</span>Prev
+                    <div className="mt-10 flex items-center justify-center gap-1 flex-wrap">
+                      {page > 1 ? (
+                        <Link
+                          href={buildUrl({ page: String(page - 1) })}
+                          className="w-9 h-9 flex items-center justify-center rounded-[5px] border border-neutral-200 text-neutral-600 hover:bg-neutral-50"
+                          aria-label="Previous page"
+                        >
+                          <span className="material-symbols-outlined text-[20px]">chevron_left</span>
                         </Link>
+                      ) : (
+                        <span className="w-9 h-9 flex items-center justify-center rounded-[5px] border border-neutral-100 text-neutral-300">
+                          <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+                        </span>
                       )}
                       {Array.from({ length: totalPages }, (_, i) => i + 1)
                         .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
@@ -309,18 +459,35 @@ export default async function NewsPage({
                         }, [])
                         .map((p, i) =>
                           p === "…" ? (
-                            <span key={`e${i}`} className="w-9 h-9 flex items-center justify-center text-neutral-400 text-sm select-none">…</span>
+                            <span key={`e${i}`} className="w-9 h-9 flex items-center justify-center text-neutral-400 text-sm">
+                              …
+                            </span>
                           ) : (
-                            <Link key={p} href={buildUrl({ page: String(p) })}
-                              className={`w-9 h-9 rounded-xl text-sm font-bold flex items-center justify-center transition-all ${p === page ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "bg-white border border-neutral-200 text-neutral-600 hover:border-blue-300 hover:text-blue-600"}`}>
+                            <Link
+                              key={p}
+                              href={buildUrl({ page: String(p) })}
+                              className={`w-9 h-9 rounded-[5px] text-sm font-bold flex items-center justify-center transition-colors ${p === page
+                                  ? "text-white"
+                                  : "border border-neutral-200 text-neutral-700 hover:bg-neutral-50"
+                                }`}
+                              style={p === page ? { backgroundColor: ACCENT } : undefined}
+                            >
                               {p}
                             </Link>
-                          )
+                          ),
                         )}
-                      {page < totalPages && (
-                        <Link href={buildUrl({ page: String(page + 1) })} className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-semibold text-neutral-600 bg-white border border-neutral-200 hover:border-blue-300 hover:text-blue-600 transition-all">
-                          Next <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                      {page < totalPages ? (
+                        <Link
+                          href={buildUrl({ page: String(page + 1) })}
+                          className="w-9 h-9 flex items-center justify-center rounded-[5px] border border-neutral-200 text-neutral-600 hover:bg-neutral-50"
+                          aria-label="Next page"
+                        >
+                          <span className="material-symbols-outlined text-[20px]">chevron_right</span>
                         </Link>
+                      ) : (
+                        <span className="w-9 h-9 flex items-center justify-center rounded-[5px] border border-neutral-100 text-neutral-300">
+                          <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                        </span>
                       )}
                     </div>
                   )}
@@ -328,83 +495,116 @@ export default async function NewsPage({
               )}
             </div>
 
-            <aside className="w-full lg:w-72 xl:w-80 flex-shrink-0 space-y-5">
+            {/* Sidebar */}
+            <aside className="w-full lg:w-[300px] shrink-0 space-y-8">
+              <div>
+                <h3 className="mb-4" style={{ fontWeight: 600, fontSize: "20px", color: "rgba(62, 62, 62, 0.71)" }}>
+                  Most Read This Week
+                </h3>
+                {mostRead.length === 0 ? (
+                  <p className="text-sm text-neutral-500">No articles yet.</p>
+                ) : (
+                  <ol className="space-y-5">
+                    {mostRead.map((item, idx) => (
+                      <li key={`${String(item._id)}-${idx}`} className="flex gap-3">
+                        <span className="text-2xl font-bold text-neutral-200 leading-none w-8 shrink-0 tabular-nums">
+                          {String(idx + 1).padStart(2, "0")}
+                        </span>
+                        <div className="min-w-0 pt-0.5">
+                          <Link
+                            href={`/news/${item.slug}`}
+                            className="leading-snug line-clamp-2 hover:text-[#FF3B30] transition-colors"
+                            style={{ fontWeight: 600, fontSize: "16px", color: "rgba(62, 62, 62, 0.71)" }}
+                          >
+                            {item.topic}
+                          </Link>
+                          <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{excerpt(item.description, 90)}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </div>
+
               {allTags.length > 0 && (
-                <div className="bg-white rounded-2xl border border-neutral-100 p-5">
-                  <h3 className="text-sm font-black text-neutral-800 mb-3 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[17px] text-blue-500" style={{ fontVariationSettings: "'FILL' 1" }}>sell</span>
-                    Browse by Tag
-                  </h3>
-                  <div className="flex flex-wrap gap-1.5">
-                    {allTags.map((tag, i) => (
-                      <Link key={String(tag._id)} href={buildUrl({ tag: tag.slug, page: "1" })}
-                        className={`inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full border transition-colors ${activeTag === tag.slug?.toLowerCase() ? TAG_COLORS[i % TAG_COLORS.length].split(" ").slice(0, 2).join(" ") + " border-current ring-1 ring-current" : TAG_COLORS[i % TAG_COLORS.length] + " hover:ring-1 hover:ring-current"}`}>
-                        #{tag.name}
+                <div id="news-tags">
+                  <h3 className="text-sm font-bold text-neutral-800 mb-3">Browse by tag</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {allTags.map((tag) => (
+                      <Link
+                        key={String(tag._id)}
+                        href={buildUrl({ tag: tag.slug, page: "1", type: undefined })}
+                        className={`text-xs font-semibold px-3 py-1.5 rounded-[5px] border transition-colors ${activeTag === tag.slug?.toLowerCase()
+                            ? "border-[#FF3B30] bg-red-50 text-[#FF3B30]"
+                            : "border-neutral-200 text-neutral-600 hover:border-neutral-300"
+                          }`}
+                      >
+                        {tag.name}
                       </Link>
                     ))}
                   </div>
                 </div>
               )}
-              <div className="bg-white rounded-2xl border border-neutral-100 overflow-hidden">
-                <div className="px-5 py-4 border-b border-neutral-100">
-                  <h3 className="text-sm font-black text-neutral-800">Explore More</h3>
-                </div>
-                <div className="divide-y divide-neutral-50">
-                  {[
-                    { href: "/education-blogs", icon: "article", label: "Education Blogs", sub: "In-depth articles & guides" },
-                    { href: "/examination", icon: "quiz", label: "Entrance Exams", sub: "Find exams by stream" },
-                    { href: "/popular-careers", icon: "work", label: "Career Profiles", sub: "Explore career paths" },
-                    { href: "/ask", icon: "forum", label: "Community Q&A", sub: "Ask & answer questions" },
-                  ].map(({ href, icon, label, sub }) => (
-                    <Link key={href} href={href} className="flex items-center gap-3 px-5 py-4 hover:bg-neutral-50 transition-colors group">
-                      <div className="w-9 h-9 rounded-xl bg-neutral-100 group-hover:bg-blue-50 flex items-center justify-center flex-shrink-0 transition-colors">
-                        <span className="material-symbols-outlined text-[17px] text-neutral-400 group-hover:text-blue-500 transition-colors">{icon}</span>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-black text-neutral-700 group-hover:text-blue-600 transition-colors">{label}</p>
-                        <p className="text-[10px] text-neutral-400">{sub}</p>
-                      </div>
-                      <span className="material-symbols-outlined text-[15px] text-neutral-300 group-hover:text-blue-400 transition-colors">arrow_forward_ios</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
             </aside>
           </div>
         </div>
 
-        {/* Quick Navigation Cards */}
-        <div className="w-full px-4 lg:px-8 xl:px-12 pb-12">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { href: "/education-blogs", icon: "article", label: "Education Blogs", desc: "Expert articles & admission guides", iconBg: "bg-indigo-50", iconColor: "text-indigo-600", border: "hover:border-indigo-200", arrow: "group-hover:text-indigo-600" },
-              { href: "/popular-careers", icon: "work", label: "Popular Careers", desc: "Explore in-demand career paths", iconBg: "bg-amber-50", iconColor: "text-amber-600", border: "hover:border-amber-200", arrow: "group-hover:text-amber-600" },
-              { href: "/examination", icon: "quiz", label: "Examinations", desc: "Browse entrance exams & dates", iconBg: "bg-red-50", iconColor: "text-red-600", border: "hover:border-red-200", arrow: "group-hover:text-red-600" },
-              { href: "/ask", icon: "forum", label: "Ask Q&A", desc: "Get answers from the community", iconBg: "bg-emerald-50", iconColor: "text-emerald-600", border: "hover:border-emerald-200", arrow: "group-hover:text-emerald-600" },
-            ].map((card) => (
-              <a key={card.href} href={card.href} className={`group bg-white border border-neutral-200 ${card.border} rounded-2xl p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-all duration-200`}>
-                <div className={`w-11 h-11 rounded-xl ${card.iconBg} flex items-center justify-center`}>
-                  <span className={`material-symbols-outlined text-[22px] ${card.iconColor}`} style={{ fontVariationSettings: "'FILL' 1" }}>{card.icon}</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-black text-[15px] text-neutral-800">{card.label}</p>
-                  <p className="text-[12px] text-neutral-500 font-medium mt-0.5 leading-snug">{card.desc}</p>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className={`text-[12px] font-bold text-neutral-400 ${card.arrow} transition-colors`}>Explore</span>
-                  <span className={`material-symbols-outlined text-[15px] text-neutral-400 ${card.arrow} transition-colors`}>arrow_forward</span>
-                </div>
-              </a>
-            ))}
+        {/* Ad placeholder */}
+        <div className="w-full max-w-none mx-auto px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10 mt-14 mb-14">
+          <div
+            className="w-full h-24 sm:h-28 rounded-[5px] flex items-center justify-center text-sm text-neutral-400 font-medium"
+            style={{ backgroundColor: "#E0E0E0" }}
+          >
+            Advertisement
           </div>
         </div>
 
-        <Footer />
-      </div>
+        {/* Trending */}
+        {trendingItems.length > 0 && (
+          <div className="w-full max-w-none mx-auto px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10">
+            <div className="flex items-center gap-2 mb-6">
+              <h2 className="text-lg sm:text-xl font-bold text-neutral-800">Trending Topics</h2>
+              <span className="material-symbols-outlined text-[#22c55e] text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                trending_up
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {trendingItems.map((item, idx) => {
+                const imgUrl = buildImageUrl(item.featimage);
+                const label = firstTypeName(item.newstypeids, allTypesTyped).toUpperCase().slice(0, 16);
+                const sub = excerpt(item.description, 70) || "Latest education update and analysis.";
+                return (
+                  <Link
+                    key={`trend-${String(item._id)}-${idx}`}
+                    href={`/news/${item.slug}`}
+                    className="group relative min-h-[280px] rounded-[5px] overflow-hidden border border-neutral-200/80 shadow-sm"
+                  >
+                    <Image src={imgUrl} alt="" fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width:640px) 100vw, 33vw" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+                    <div className="absolute top-3 left-3">
+                      <span className="inline-block text-[10px] font-bold tracking-wide text-neutral-900 bg-[#facc15] px-2 py-1 rounded-[5px] shadow-sm">
+                        {label}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                      <p className="text-base sm:text-lg font-bold leading-snug line-clamp-2 mb-1">{item.topic}</p>
+                      <p className="text-xs text-white/80 line-clamp-2 mb-2">{sub}</p>
+                      <p className="text-[10px] text-white/70">
+                        {firstTypeName(item.newstypeids, allTypesTyped)} · {formatFullDate(item.created_at) || "Recently"}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Explore Cards */}
+      <ExploreCards />
+
+      <Footer />
     </div>
   );
 }
-
-
-
-

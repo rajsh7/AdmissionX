@@ -67,7 +67,7 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
           <button
             key={cat}
             onClick={() => handleFilter(cat)}
-            className={`px-4 sm:px-5 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 border shadow-sm ${
+            className={`px-4 sm:px-5 py-2.5 text-sm font-bold rounded-[5px] transition-all duration-200 border shadow-sm ${
               activeFilter === cat
                 ? "bg-red-500 text-white border-[#d32f2f]"
                 : "bg-[#ffebee] text-black border-red-200 hover:bg-red-100"
@@ -79,15 +79,15 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-md p-8 text-center text-neutral-500 border border-neutral-200 shadow-sm">
+        <div className="bg-white rounded-[5px] p-8 text-center text-neutral-500 border border-neutral-200 shadow-md">
           No exams found for <span className="font-bold text-neutral-700">{activeFilter}</span>.
         </div>
       ) : (
         <div>
           <div className="space-y-4">
             {visible.map((exam) => (
-              <div key={exam.id} className="bg-white pt-4 flex flex-col gap-5 rounded-md border border-neutral-200 shadow-sm relative pt-7 pb-6 px-5 sm:px-7 hover:shadow-md transition-shadow">
-                <div className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-md z-10">
+              <div key={exam.id} className="bg-white pt-4 flex flex-col gap-5 rounded-[5px] border border-neutral-200 shadow-md relative pt-7 pb-6 px-5 sm:px-7 hover:shadow-lg transition-shadow">
+                <div className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-[5px] z-10">
                   Closing in 2 Days
                 </div>
                 <div className="flex justify-between items-start mb-6">
@@ -99,34 +99,37 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
                   </div>
                   <div className="text-center mt-3 sm:mt-1 min-w-[90px] flex-shrink-0">
                     <p className="text-[9px] text-neutral-400 font-medium mb-0.5 tracking-wide">Exam Date</p>
-                    <p className="text-neutral-800 font-bold text-[12px] sm:text-[13px] tracking-tight">
+                    <p
+                      className="tracking-tight"
+                      style={{ fontWeight: 600, fontSize: "20px", color: "rgba(62, 62, 62, 1)" }}
+                    >
                       {exam.exminationDate ? formatDate(exam.exminationDate) : "24 Jan 2026"}
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-col sm:flex-row justify-between items-start gap-5 sm:gap-0 mb-6 pr-0 sm:pr-8">
-                  <div className="flex items-start gap-2">
-                    <span className="material-symbols-outlined text-[18px] text-neutral-400 mt-0.5">calendar_month</span>
+                <div className="flex flex-row items-start gap-6 mb-6 pr-0 sm:pr-8">
+                  <div className="flex items-start gap-1.5">
+                    <span className="material-symbols-outlined text-[18px] text-neutral-500 mt-0.5">calendar_month</span>
                     <div>
-                      <p className="text-[10px] text-neutral-400 font-medium mb-0.5 tracking-wide">Application Deadline</p>
-                      <p className="text-[#f8312f] font-bold text-[14px]">
+                      <p className="text-[10px] text-neutral-500 font-semibold mb-0.5 tracking-wide">Application Deadline</p>
+                      <p className="text-neutral-800 font-semibold text-[16px] leading-tight">
                         {exam.applicationTo ? formatDate(exam.applicationTo) : "30 Nov 2026"}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-2 sm:mr-10">
-                    <span className="material-symbols-outlined text-[20px] text-neutral-600 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>person_check</span>
+                  <div className="flex items-start gap-1.5 shrink-0">
+                    <span className="material-symbols-outlined text-[18px] text-neutral-500 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>person_check</span>
                     <div>
-                      <p className="text-[10px] text-neutral-400 font-medium mb-0.5 tracking-wide text-left">Eligibility</p>
-                      <p className="text-[#107c41] font-bold text-[14px]">10+2 With PCM</p>
+                      <p className="text-[10px] text-neutral-500 font-semibold mb-0.5 tracking-wide text-left">Eligibility</p>
+                      <p className="text-neutral-800 font-semibold text-[15px] leading-tight">10+2 With PCM</p>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <Link href={`/examination/${exam.streamSlug}/${exam.slug}`} className="bg-red-500 hover:bg-[#b30000] text-white text-[12px] font-bold px-6 py-2 rounded-[4px] transition-colors flex items-center gap-2">
+                  <Link href={`/examination/${exam.streamSlug}/${exam.slug}`} className="bg-red-500 hover:bg-[#b30000] text-white text-[12px] font-bold px-8 py-2.5 min-w-[110px] justify-center rounded-[5px] transition-colors inline-flex items-center gap-2">
                     Apply Now <span className="material-symbols-outlined text-[13px] font-black">arrow_forward</span>
                   </Link>
-                  <Link href={`/examination/${exam.streamSlug}/${exam.slug}#syllabus`} className="border border-red-300 text-[#f8312f] hover:bg-red-50 text-[12px] font-bold px-7 py-2 rounded-[4px] transition-colors">
+                  <Link href={`/examination/${exam.streamSlug}/${exam.slug}#syllabus`} className="border border-red-300 text-[#f8312f] hover:bg-red-50 text-[12px] font-bold px-8 py-2.5 min-w-[120px] justify-center rounded-[5px] transition-colors inline-flex items-center">
                     View Syllabus
                   </Link>
                 </div>
@@ -144,7 +147,7 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
             </div>
           ) : totalPages > 1 ? (
             <div className="flex items-center justify-center gap-2 mt-8 mb-4 text-[13px] font-bold text-neutral-600">
-              <button onClick={() => goToPage(Math.max(1, page - 1))} disabled={page === 1} className="w-7 h-7 flex items-center justify-center hover:bg-neutral-200 bg-white rounded-sm transition-colors shadow-sm disabled:opacity-40">
+              <button onClick={() => goToPage(Math.max(1, page - 1))} disabled={page === 1} className="w-7 h-7 flex items-center justify-center hover:bg-neutral-200 bg-white rounded-[5px] transition-colors shadow-sm disabled:opacity-40">
                 <span className="material-symbols-outlined text-[16px]">chevron_left</span>
               </button>
               {(() => {
@@ -159,13 +162,13 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
                   typeof p === "string" ? (
                     <span key={p} className="px-1 text-neutral-400 tracking-widest">...</span>
                   ) : (
-                    <button key={`page-${p}`} onClick={() => goToPage(p)} className={`w-7 h-7 flex items-center justify-center rounded-sm transition-colors ${page === p ? "bg-red-500 text-white shadow-sm" : "border border-neutral-300 bg-white hover:bg-neutral-50"}`}>
+                    <button key={`page-${p}`} onClick={() => goToPage(p)} className={`w-7 h-7 flex items-center justify-center rounded-[5px] transition-colors ${page === p ? "bg-red-500 text-white shadow-sm" : "border border-neutral-300 bg-white hover:bg-neutral-50"}`}>
                       {p}
                     </button>
                   )
                 );
               })()}
-              <button onClick={() => goToPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} className="w-7 h-7 flex items-center justify-center hover:bg-neutral-200 bg-white rounded-sm transition-colors shadow-sm disabled:opacity-40">
+              <button onClick={() => goToPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} className="w-7 h-7 flex items-center justify-center hover:bg-neutral-200 bg-white rounded-[5px] transition-colors shadow-sm disabled:opacity-40">
                 <span className="material-symbols-outlined text-[16px]">chevron_right</span>
               </button>
             </div>

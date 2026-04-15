@@ -28,9 +28,10 @@ function TabsNavContent() {
                 scroll={false}
                 className={`px-8 py-4 text-[15px] font-bold whitespace-nowrap transition-all duration-300 border-b-4 ${
                   isActive
-                    ? "text-[#FF3C3C] border-[#FF3C3C] bg-red-50/50"
-                    : "text-slate-500 border-transparent hover:text-[#FF3C3C] hover:bg-slate-50"
+                    ? "border-[#FF3C3C] bg-red-50/50"
+                    : "border-transparent hover:bg-slate-50"
                 }`}
+                style={{ color: '#6C6C6C' }}
               >
                 {tab.label}
               </Link>
