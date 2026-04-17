@@ -53,11 +53,11 @@ export default async function CollegeContactPage({
   };
 
   const normalizeNewPipeline = [
-    { $project: { college_name: { $ifNull: ["$college_name", ""] }, contact_name: { $ifNull: ["$contact_name", ""] }, email: { $ifNull: ["$email", ""] }, phone: { $ifNull: ["$phone", ""] }, _source: { $literal: "new" } } },
+    { $project: { college_name: { $ifNull: ["$college_name", ""] }, contact_name: { $ifNull: ["$contact_name", ""] }, email: { $ifNull: ["$email", ""] }, phone: { $ifNull: ["$phone", ""] }, address: { $ifNull: ["$address", ""] }, city: { $ifNull: ["$city", ""] }, state: { $ifNull: ["$state", ""] }, pincode: { $ifNull: ["$pincode", ""] }, college_type: { $ifNull: ["$college_type", ""] }, _source: { $literal: "new" } } },
   ];
 
   const normalizeOldPipeline = [
-    { $project: { college_name: { $ifNull: ["$collegeName", "$college_name", ""] }, contact_name: { $ifNull: ["$contactPersonName", "$contact_name", ""] }, email: { $ifNull: ["$email", ""] }, phone: { $ifNull: ["$phone", ""] }, _source: { $literal: "old" } } },
+    { $project: { college_name: { $ifNull: ["$collegeName", "$college_name", ""] }, contact_name: { $ifNull: ["$contactPersonName", "$contact_name", ""] }, email: { $ifNull: ["$email", ""] }, phone: { $ifNull: ["$phone", ""] }, address: { $ifNull: ["$address", ""] }, city: { $ifNull: ["$city", ""] }, state: { $ifNull: ["$state", ""] }, pincode: { $ifNull: ["$pincode", ""] }, college_type: { $ifNull: ["$college_type", ""] }, _source: { $literal: "old" } } },
   ];
 
   const pipeline: Record<string, unknown>[] = [
@@ -76,6 +76,11 @@ export default async function CollegeContactPage({
     contact_name: String(c.contact_name ?? ""),
     email:        String(c.email        ?? ""),
     phone:        String(c.phone        ?? ""),
+    address:      String(c.address      ?? ""),
+    city:         String(c.city         ?? ""),
+    state:        String(c.state        ?? ""),
+    pincode:      String(c.pincode      ?? ""),
+    college_type: String(c.college_type ?? ""),
     _source:      c._source === "old" ? "old" : "new",
   }));
   const total      = Number(view.total?.[0]?.count ?? 0);

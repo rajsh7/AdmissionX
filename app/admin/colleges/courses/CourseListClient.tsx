@@ -170,7 +170,7 @@ export default function CourseListClient({
       </div>
 
       {showFilters && (
-        <form id="course-filter-form" method="GET" action="/admin/colleges/courses" className="bg-white border border-slate-200 rounded-2xl shadow-sm mb-4 p-4">
+        <form id="course-filter-form" method="GET" action="/admin/colleges/courses" className="bg-white border border-slate-200 rounded-sm shadow-sm mb-4 p-4">
           <div className="grid gap-4 lg:grid-cols-3">
             <div>
               <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Search</label>
@@ -179,7 +179,7 @@ export default function CourseListClient({
                 name="q"
                 defaultValue={searchQuery}
                 placeholder="Search course, college, degree, stream"
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="mt-2 w-full rounded-sm border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
             <div>
@@ -187,7 +187,7 @@ export default function CourseListClient({
               <select
                 name="collegeId"
                 defaultValue={selectedCollegeId}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="mt-2 w-full rounded-sm border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               >
                 <option value="">All colleges</option>
                 {collegeOptions.map((college, idx) => (
@@ -202,7 +202,7 @@ export default function CourseListClient({
               <select
                 name="courseId"
                 defaultValue={selectedCourseId}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="mt-2 w-full rounded-sm border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               >
                 <option value="">All courses</option>
                 {courseOptions.map((course, idx) => (
@@ -217,7 +217,7 @@ export default function CourseListClient({
               <select
                 name="degreeId"
                 defaultValue={selectedDegreeId}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="mt-2 w-full rounded-sm border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               >
                 <option value="">All degrees</option>
                 {degreeOptions.map((degree, idx) => (
@@ -232,7 +232,7 @@ export default function CourseListClient({
               <select
                 name="streamId"
                 defaultValue={selectedStreamId}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="mt-2 w-full rounded-sm border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               >
                 <option value="">All streams</option>
                 {streamOptions.map((stream, idx) => (
@@ -249,7 +249,7 @@ export default function CourseListClient({
                 name="fees"
                 defaultValue={selectedFees}
                 placeholder="e.g. 50000"
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="mt-2 w-full rounded-sm border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
             <div>
@@ -259,7 +259,7 @@ export default function CourseListClient({
                 name="seats"
                 defaultValue={selectedSeats}
                 placeholder="e.g. 60"
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="mt-2 w-full rounded-sm border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
             <div>
@@ -269,7 +269,7 @@ export default function CourseListClient({
                 name="duration"
                 defaultValue={selectedDuration}
                 placeholder="e.g. 2 Years"
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="mt-2 w-full rounded-sm border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
           </div>
@@ -293,7 +293,7 @@ export default function CourseListClient({
       )}
 
       <div className="bg-white">
-        <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
+        <div className="px-2  py-3 border-b border-slate-100 flex items-center justify-between">
           <p className="text-sm text-slate-500 font-medium">
             {total > 0 ? (
               <>
@@ -327,35 +327,35 @@ export default function CourseListClient({
               <col style={{ width: "10%" }} />
               <col style={{ width: "10%" }} />
             </colgroup>
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-center">
+            <thead >
+              <tr className="bg-slate-50 border-b bg-black  border-slate-100">
+                <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider text-center">
                   S.No
                 </th>
-                <th className="px-4 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                <th className="px-4 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
                   Course
                 </th>
-                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
                   College
                 </th>
-                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
                   Degree & Stream
                 </th>
-                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
                   Fees & Seats
                 </th>
-                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
                   Duration
                 </th>
-                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-right">
+                <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider text-right">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 ">
               {courses.slice(0, visibleCount).map((course, idx) => (
-                <tr key={course.id} className="hover:bg-slate-50/60 transition-colors group">
-                  <td className="px-3 py-2.5 text-center">
+                <tr key={course.id} className="hover:bg-slate-50/60 transition-colors  group">
+                  <td className="px-3 py-2.5 text-center ">
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
                       {offset + idx + 1}
                     </span>

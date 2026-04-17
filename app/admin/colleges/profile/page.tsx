@@ -203,6 +203,9 @@ export default async function CollegeProfilePage({
         projection: {
           id: 1,
           slug: 1,
+          name: 1,
+          college_name: 1,
+          collegeName: 1,
           bannerimage: 1,
           rating: 1,
           ranking: 1,
@@ -308,8 +311,14 @@ export default async function CollegeProfilePage({
     const cityId  = String(p.registeredAddressCityId ?? "");
     const docId   = String(p.id ?? p._id ?? "");
     const user    = usersMap[uid] ?? {};
-    const name    =
-      (user.firstname?.trim() || toStr(p.contactpersonname) || toStr(p.slug)) ?? "";
+    const name =
+      toStr(p.name) ||
+      toStr(p.college_name) ||
+      toStr(p.collegeName) ||
+      user.firstname?.trim() ||
+      toStr(p.contactpersonname) ||
+      toStr(p.slug) ||
+      "";
 
     return {
       id:               p.id ?? String(p._id),
