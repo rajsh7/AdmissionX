@@ -36,6 +36,14 @@ export async function POST(req: NextRequest) {
     fees?: number;
     notes?: string;
     documents?: { type: string; url: string }[];
+    personal_info?: {
+      name?: string;
+      phone?: string;
+      dob?: string;
+      gender?: string;
+      city?: string;
+      state?: string;
+    };
   };
 
   try {
@@ -44,7 +52,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { collegeprofile_id, collegemaster_id, college_name, course_name, degree_name, stream_name, fees, notes, documents } = body;
+  const { collegeprofile_id, collegemaster_id, college_name, course_name, degree_name, stream_name, fees, notes, documents, personal_info } = body;
 
   const REQUIRED_DOC_TYPES = ["10th Marksheet", "12th Marksheet", "ID Proof"];
   if (!documents || !Array.isArray(documents)) {
@@ -131,6 +139,28 @@ export async function POST(req: NextRequest) {
   if (documents.length > 0) {
     await db.collection("documents").insertMany(
       documents.map((d) => ({ applicationId: result.insertedId, type: d.type, fileUrl: d.url }))
+    );
+  }
+
+  // Save personal info back to profile so next application is pre-filled
+  if (personal_info && Object.keys(personal_info).length > 0) {
+    const pi = personal_info;
+    const baseUpdate: Record<string, unknown> = { updated_at: new Date() };
+    if (pi.name?.trim()) baseUpdate.name = pi.name.trim();
+    if (pi.phone !== undefined) baseUpdate.phone = pi.phone.trim();
+    await db.collection("next_student_signups").updateOne(
+      { email: payload.email },
+      { $set: baseUpdate }
+    );
+    const profUpdate: Record<string, unknown> = { student_id: String(studentId), updated_at: new Date() };
+    if (pi.dob)    profUpdate.dob    = pi.dob;
+    if (pi.gender) profUpdate.gender = pi.gender;
+    if (pi.city)   profUpdate.city   = pi.city.trim();
+    if (pi.state)  profUpdate.state  = pi.state;
+    await db.collection("next_student_profiles").updateOne(
+      { student_id: String(studentId) },
+      { $set: profUpdate, $setOnInsert: { created_at: new Date() } },
+      { upsert: true }
     );
   }
 
