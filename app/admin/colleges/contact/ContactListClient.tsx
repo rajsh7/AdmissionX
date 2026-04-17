@@ -69,18 +69,14 @@ export default function ContactListClient({
             {rows.slice(0, visibleCount).map((c, idx) => (
               <div
                 key={c._id}
-                className="bg-white rounded-[5px] border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"
+                className="bg-white rounded-[5px] border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="absolute top-4 right-4 z-10">
-                  <DeleteButton action={onDelete.bind(null, c._id, c._source)} size="sm" />
-                </div>
-
                 <div className="p-6">
                   <div className="flex gap-4 items-start mb-4">
                     <div className="w-[137px] h-[127px] bg-white rounded-[5px] shrink-0 flex items-center justify-center p-2 border border-slate-100">
                       <img src="/seglogo.webp" alt="Saroje Education Group" className="w-full h-full object-contain" />
                     </div>
-                    <div className="flex-1 min-w-0 pr-8">
+                    <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-[#6C6C6C] text-[20px] leading-tight uppercase truncate">
                         {c.college_name || "Unknown College"}
                         {idx % 2 === 0 && <span className="block text-[#6C6C6C]">Polytechnic College</span>}
@@ -113,6 +109,10 @@ export default function ContactListClient({
                   </div>
 
                   <ContactActions email={c.email} collegeName={c.college_name} contactName={c.contact_name} />
+
+                  <div className="mt-3 flex justify-center">
+                    <DeleteButton action={onDelete.bind(null, c._id, c._source)} size="sm" />
+                  </div>
                 </div>
               </div>
             ))}
