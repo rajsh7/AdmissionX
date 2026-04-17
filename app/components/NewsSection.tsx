@@ -11,10 +11,14 @@ interface NewsSectionProps {
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 
 function buildImageUrl(raw: string | null | undefined): string {
-  if (!raw || !raw.trim()) return "https://images.unsplash.com/photo-1523240715627-5d0b541f8d9c?q=80&w=800&auto=format&fit=crop";
+  if (!raw || !raw.trim()) return "";
   if (raw.startsWith("http")) return `/api/image-proxy?url=${encodeURIComponent(raw)}`;
   if (raw.startsWith("/")) return `/api/image-proxy?url=${encodeURIComponent(raw)}`;
   return `/api/image-proxy?url=${encodeURIComponent(IMAGE_BASE + raw)}`;
+}
+
+function getBlogImage(blog: DbBlog & { fullimage?: string | null; image?: string | null }): string {
+  return buildImageUrl(blog.featimage) || buildImageUrl(blog.fullimage) || buildImageUrl(blog.image) || "https://images.unsplash.com/photo-1523240715627-5d0b541f8d9c?q=80&w=800&auto=format&fit=crop";
 }
 
 function formatDate(dateStr: string): string {
@@ -43,13 +47,13 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
                 Explore our latest articles, guides, and student stories to stay ahead in your academic journey.
               </p>
            </div>
-           <Link 
-             href="/blogs" 
-             className="inline-flex items-center justify-center px-8 py-4 rounded-[5px] bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-all shadow-sm hover:shadow-md group/btn"
-           >
+<Link 
+              href="/blogs" 
+              className="inline-flex items-center justify-center px-8 py-4 rounded-[5px] bg-white border border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition-all shadow-sm hover:shadow-md group/btn"
+            >
               Explore All Articles
               <span className="ml-2 material-symbols-rounded transition-transform group-hover/btn:translate-x-1">arrow_right_alt</span>
-           </Link>
+            </Link>
         </div>
 
         {blogs.length === 0 ? (
@@ -67,7 +71,7 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
                 <Link href={`/blogs/${blog.slug}`} className="group block">
                   <div className="relative aspect-[16/10] rounded-[5px] overflow-hidden mb-6 shadow-lg shadow-black/5">
                     <img
-                      src={buildImageUrl(blog.featimage)}
+                      src={getBlogImage(blog)}
                       alt={blog.topic}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />

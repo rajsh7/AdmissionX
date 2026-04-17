@@ -25,7 +25,7 @@ export default function ContactSection() {
   return (
     <section className="w-full py-24 lg:py-32 overflow-hidden" style={{ backgroundColor: '#F8FAFC' }}>
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
-        <div className="bg-white p-2 sm:p-4 lg:p-8">
+        <div className="p-2 sm:p-4 lg:p-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
 
             {/* ── Left: Contact Info ────────────────────────────── */}
@@ -76,7 +76,7 @@ export default function ContactSection() {
             </div>
 
             {/* ── Right: Contact Form ─────────────────────────────── */}
-            <div className="bg-white rounded-[5px] p-10 lg:p-12 border border-slate-200/60 relative" style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
+            <div className="bg-white rounded-[5px] p-10 lg:p-12 border border-slate-200/60 relative" style={{ boxShadow: '0 6px 16px -8px rgba(0, 0, 0, 0.25)' }}>
               <h3 className="font-bold mb-10 tracking-tight" style={{ fontSize: '30px', fontWeight: '700', color: '#6C6C6C' }}>Send a message</h3>
               <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

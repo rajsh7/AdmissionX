@@ -101,7 +101,7 @@ export default function AboutTab({
 
       {/* -- ABOUT US MOSAIC — Card Style ----------------------------------- */}
       <section className="w-full px-4 md:px-10 lg:px-12 mx-auto max-w-[1920px] pt-6 md:pt-10 pb-10 md:pb-14">
-        <div className="bg-white shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] border border-gray-200 rounded-[5px] w-full p-6 md:p-8 lg:p-10">
+        <div className="bg-white shadow-[0_8px_20px_-16px_rgba(0,0,0,0.12)] border border-gray-200 rounded-[5px] w-full p-6 md:p-8 lg:p-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
             {/* Left: Image Mosaic */}

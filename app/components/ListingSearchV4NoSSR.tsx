@@ -20,6 +20,7 @@ interface ListingSearchV4Props {
   initLevel: string;
   initDegree: string;
   initStream: string;
+  initSort: string;
   initPage: number;
   heroImage?: string;
   heroRightImage?: string;

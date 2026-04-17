@@ -29,6 +29,7 @@ const navLinks = [
     href: "#",
     subItems: [
       { label: "Compare Colleges", href: "/compare", icon: "compare_arrows" },
+      { label: "Compare Courses", href: "/compare-course", icon: "menu_book" },
       { label: "Counselling", href: "/counselling", icon: "support_agent" },
       { label: "Examination", href: "/examination", icon: "engineering" },
       { label: "News & Articles", href: "/news", icon: "newspaper" },

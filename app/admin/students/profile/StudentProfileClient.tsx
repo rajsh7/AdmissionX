@@ -308,7 +308,7 @@ export default function StudentProfileClient({
                       </Link>
                       <DeleteButton
                         action={async () => {
-                          await deleteProfile(profile.id);
+                          await deleteProfile(Number(profile.id));
                         }}
                         label="Delete"
                         size="xs"

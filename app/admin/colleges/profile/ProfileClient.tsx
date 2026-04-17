@@ -210,13 +210,6 @@ export default function ProfileClient({
               <span className="w-2 h-2 rounded-full bg-red-500 ml-1" />
             )}
           </button>
-        <div className="flex items-center gap-2 bg-[#FF3C3C]/10 px-4 py-2 rounded-[5px]">
-          <span className="material-symbols-outlined text-[18px] text-[#FF3C3C]">
-            account_balance
-          </span>
-          <span className="text-sm font-black text-[#FF3C3C]">
-            {total.toLocaleString()} Total
-          </span>
         </div>
       </div>
 

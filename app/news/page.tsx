@@ -222,7 +222,7 @@ export default async function NewsPage({
             >
               <Link
                 href={`/news/${featured.slug}`}
-                className="relative w-full md:w-[32%] min-h-[220px] md:min-h-[340px] bg-neutral-100 shrink-0 group md:m-0 md:rounded-none overflow-hidden"
+                className="relative w-full md:w-[32%] min-h-[220px] md:min-h-[340px] shrink-0 group md:m-0 md:rounded-none overflow-hidden"
               >
                 <Image
                   src={buildImageUrl(featured.featimage)}
@@ -233,6 +233,7 @@ export default async function NewsPage({
                   priority
                 />
                 <div className="absolute inset-0 bg-black/10 transition-opacity flex items-center justify-center pointer-events-none" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-r from-transparent to-white/75" />
               </Link>
               <div className="flex-1 p-6 sm:p-8 flex flex-col justify-center">
                 <h2 className="text-xl sm:text-2xl font-bold text-neutral-800 leading-snug mb-3">{featured.topic}</h2>
@@ -292,8 +293,8 @@ export default async function NewsPage({
           </div>
 
           {/* Search + filters */}
-          <form method="GET" action="/news" className="flex flex-row justify-between items-center gap-3 mb-10">
-            <div className="flex flex-row gap-3 min-w-0 w-1/2">
+          <form method="GET" action="/news" className="flex flex-row items-center gap-3 mb-10">
+            <div className="flex flex-row gap-3 min-w-0 w-full lg:w-1/2">
               <div className="flex-1 relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[20px] text-neutral-400">
                   search
@@ -316,13 +317,6 @@ export default async function NewsPage({
                 Search Now
               </button>
             </div>
-            <a
-              href="#news-tags"
-              className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-[5px] text-sm font-semibold border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 transition-colors whitespace-nowrap"
-            >
-              <span className="material-symbols-outlined text-[20px]">tune</span>
-              Filters
-            </a>
           </form>
 
           {(q || activeType || activeTag) && (

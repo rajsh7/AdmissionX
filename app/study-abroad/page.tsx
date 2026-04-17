@@ -1,10 +1,10 @@
-import pool from "@/lib/db";
+import pool, { getDb } from "@/lib/db";
 import Header from "@/app/components/Header";
 import SearchClient from "@/app/search/SearchClient";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
-import { Suspense } from "react";
 import { unstable_cache } from "next/cache";
 import ExploreCards from "@/app/components/ExploreCards";
+import type { AdItem } from "@/app/components/AdsSection";
 
 // Premium Components
 import HeroSection from "./components/HeroSection";
@@ -56,6 +56,12 @@ interface DegreeRow {
   pageslug: string | null;
 }
 
+interface CountryRow {
+  id: number;
+  name: string;
+  college_count?: number;
+}
+
 interface CountRow {
   total: number;
 }
@@ -78,6 +84,25 @@ function slugToName(slug: string): string {
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
+}
+
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function buildAdsFilter(positions: string[]) {
+  return {
+    ads_position: {
+      $regex: `^\\s*(?:${positions.map(escapeRegex).join("|")})\\s*$`,
+      $options: "i",
+    },
+    $or: [
+      { isactive: 1 },
+      { isactive: "1" },
+      { isactive: " 1" },
+      { isactive: /^\s*1\s*$/ },
+    ],
+  };
 }
 
 async function safeQuery<T>(
@@ -139,14 +164,16 @@ function buildColleges(rows: CollegeRow[]): CollegeResult[] {
 // ─── Page-specific fetch (international colleges) ─────────────────────────────
 
 async function fetchAbroadCollegesBase(opts: {
+  q: string;
   stream: string;
   degree: string;
+  countryId: string;
   feesMax: string;
   sort: string;
   page: number;
   limit: number;
 }): Promise<{ colleges: CollegeResult[]; total: number; totalPages: number }> {
-  const { stream, degree, feesMax, sort, page, limit } = opts;
+  const { q, stream, degree, countryId, feesMax, sort, page, limit } = opts;
   const offset = (page - 1) * limit;
 
   const conditions: string[] = [
@@ -154,6 +181,20 @@ async function fetchAbroadCollegesBase(opts: {
     "(cp.registeredAddressCountryId IS NOT NULL OR cp.campusAddressCountryId IS NOT NULL)",
   ];
   const params: (string | number)[] = [];
+
+  if (q.trim()) {
+    const likeQuery = `%${q.trim()}%`;
+    conditions.push(`(
+      cp.slug LIKE ?
+      OR COALESCE(cp.registeredSortAddress, '') LIKE ?
+      OR EXISTS (
+        SELECT 1 FROM users u_q
+        WHERE u_q.id = cp.users_id
+          AND TRIM(COALESCE(u_q.firstname, '')) LIKE ?
+      )
+    )`);
+    params.push(likeQuery, likeQuery, likeQuery);
+  }
 
   if (stream) {
     conditions.push(`EXISTS (
@@ -171,6 +212,14 @@ async function fetchAbroadCollegesBase(opts: {
       WHERE cm_f2.collegeprofile_id = cp.id AND d_f2.pageslug = ?
     )`);
     params.push(degree);
+  }
+
+  if (countryId && !isNaN(parseInt(countryId))) {
+    conditions.push(`(
+      cp.registeredAddressCountryId = ?
+      OR cp.campusAddressCountryId = ?
+    )`);
+    params.push(parseInt(countryId), parseInt(countryId));
   }
 
   if (feesMax && !isNaN(parseInt(feesMax))) {
@@ -264,6 +313,26 @@ const fetchAbroadColleges = unstable_cache(
   { revalidate: 300 }
 );
 
+const fetchStudyAbroadAds = unstable_cache(
+  async (): Promise<AdItem[]> => {
+    try {
+      const db = await getDb();
+      return await db
+        .collection("ads_managements")
+        .find(buildAdsFilter(["study_abroad", "study-abroad", "study abroad"]))
+        .sort({ created_at: -1 })
+        .limit(8)
+        .project({ _id: 0, id: 1, title: 1, description: 1, img: 1, redirectto: 1 })
+        .toArray() as AdItem[];
+    } catch (error) {
+      console.error("[study-abroad/page.tsx fetchStudyAbroadAds]", error);
+      return [];
+    }
+  },
+  ["study-abroad-ads"],
+  { revalidate: 300 }
+);
+
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: import("next").Metadata = {
@@ -282,17 +351,20 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
   const getString = (key: string, fallback = "") =>
     typeof sp[key] === "string" ? (sp[key] as string) : fallback;
 
+  const q = getString("q");
   const stream = getString("stream");
   const degree = getString("degree");
+  const countryId = getString("country_id");
   const feesMax = getString("fees_max");
   const sort = getString("sort", "rating");
   const page = Math.max(1, parseInt(getString("page", "1")));
-  const showSearchResults = !!(stream || degree || feesMax || page > 1);
+  const view = getString("view");
+  const showSearchResults = !!(q || stream || degree || countryId || feesMax || page > 1 || view === "all");
 
   if (showSearchResults) {
-    const [{ colleges, total, totalPages }, streamRows, degreeRows] =
+    const [{ colleges, total, totalPages }, streamRows, degreeRows, countryRows] =
       await Promise.all([
-        fetchAbroadColleges({ stream, degree, feesMax, sort, page, limit: 12 }),
+        fetchAbroadColleges({ q, stream, degree, countryId, feesMax, sort, page, limit: 12 }),
         safeQuery<StreamRow>(`
           SELECT id, name, pageslug
           FROM functionalarea
@@ -303,6 +375,15 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
           FROM degree
           WHERE isShowOnTop = 1
           ORDER BY name LIMIT 50
+        `),
+        safeQuery<CountryRow>(`
+          SELECT DISTINCT c.id, c.name
+          FROM country c
+          INNER JOIN collegeprofile cp
+            ON cp.registeredAddressCountryId = c.id
+            OR cp.campusAddressCountryId = c.id
+          WHERE c.id != 1
+          ORDER BY c.name
         `),
       ]);
 
@@ -318,6 +399,18 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
       slug: r.pageslug ?? r.name.toLowerCase().replace(/\s+/g, "-"),
     }));
 
+    const countryOptions: FilterOption[] = countryRows.map((r) => ({
+      id: r.id,
+      name: r.name,
+    }));
+
+    const selectedCountryName =
+      countryOptions.find((country) => String(country.id) === countryId)?.name ?? "";
+
+    const pageSubtitle = selectedCountryName
+      ? `${total.toLocaleString()} international colleges and universities in ${selectedCountryName}`
+      : `${total.toLocaleString()} international colleges and universities`;
+
     return (
       <SearchClient
         initialColleges={colleges}
@@ -326,33 +419,71 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
         streams={streamOptions}
         degrees={degreeOptions}
         cities={[]}
-        initQ=""
+        countries={countryOptions}
+        initQ={q}
         initStream={stream}
         initDegree={degree}
         initCityId=""
         initStateId=""
+        initCountryId={countryId}
         initFeesMax={feesMax}
         initSort={sort}
         initPage={page}
         initType="abroad"
         pageTitle="Study Abroad Colleges"
-        pageSubtitle={`${total.toLocaleString()} international colleges and universities`}
+        pageSubtitle={pageSubtitle}
       />
     );
   }
+
+  const [countryRows, ads] = await Promise.all([
+    safeQuery<CountryRow>(`
+      SELECT c.id, c.name, COUNT(DISTINCT cp.id) AS college_count
+      FROM country c
+      INNER JOIN collegeprofile cp
+        ON cp.registeredAddressCountryId = c.id
+        OR cp.campusAddressCountryId = c.id
+      WHERE c.id != 1
+      GROUP BY c.id, c.name
+      ORDER BY college_count DESC, c.name ASC
+    `),
+    fetchStudyAbroadAds(),
+  ]);
+
+  const countries = countryRows
+    .map((country) => ({
+      id: country.id,
+      name: country.name,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const quickFilters = [...countryRows]
+    .sort(
+      (a, b) =>
+        (b.college_count ?? 0) - (a.college_count ?? 0) ||
+        a.name.localeCompare(b.name),
+    )
+    .slice(0, 3)
+    .map((country) => ({
+      id: country.id,
+      name: country.name,
+    }));
 
   return (
     <div className="min-h-screen bg-white flex flex-col relative font-[family-name:var(--font-outfit)]">
       <Header theme="dark" />
       
       <main className="flex-1">
-        <HeroSection />
+        <HeroSection
+          countries={countries}
+          quickFilters={quickFilters}
+        />
         
-        <TopDestinations />
+        <TopDestinations countries={countries} />
         
         <CostCalculator />
         
-        <JourneySteps />
+        <JourneySteps ads={ads} />
 
         {/* Explore Cards */}
         <div className="w-full px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10 pb-16">

@@ -123,7 +123,8 @@ export default function TopCourse() {
   const current = courses[active] || courses[0];
 
   return (
-    <section className="w-full py-24 lg:py-32 bg-[#fdfdfd] relative overflow-hidden">
+    <section className="w-full py-24 lg:py-32 bg-gradient-to-b from-white via-slate-50 to-white relative overflow-hidden">
+      
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24 relative z-10">
         <FadeIn>
           <div className="mb-16">
@@ -131,8 +132,8 @@ export default function TopCourse() {
               <h2 className="text-[40px] lg:text-[68px] font-semibold text-slate-900 tracking-tight leading-[1.1]">
                 Discover the Top <span style={{ color: '#FF3C3C' }}>Course</span>
               </h2>
-              <Link href="/careers-courses" className="px-8 py-3.5 rounded-[10px] bg-white border border-slate-100 shadow-sm text-slate-600 font-normal text-sm hover:bg-slate-50 transition-all active:scale-95 whitespace-nowrap">
-                View All Course
+              <Link href="/careers-courses" className="px-6 py-3 rounded-[5px] bg-white border border-slate-200 shadow-sm text-slate-600 font-medium text-base hover:bg-slate-50 transition-all active:scale-95 whitespace-nowrap">
+                View All Course <span className="material-symbols-outlined text-[18px] ml-1">arrow_forward</span>
               </Link>
             </div>
             <p className="text-slate-500 font-medium text-[25px] max-w-4xl leading-relaxed">
@@ -209,7 +210,7 @@ export default function TopCourse() {
                     placeholder="Search your course"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-12 pl-12 pr-6 bg-slate-50 border border-slate-100 focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none rounded-[10px] text-[14px] font-medium transition-all"
+                    className="w-full h-12 pl-12 pr-6 bg-slate-50 border border-slate-100 focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none rounded-[10px] text-[16px] font-semibold transition-all placeholder:text-[#6C6C6C]"
                   />
                 </div>
              </div>
@@ -223,29 +224,28 @@ export default function TopCourse() {
                     onClick={() => router.push(`/careers-courses?stream=${course.slug}`)}
                     className={`flex items-center gap-4 p-3 rounded-[10px] transition-all duration-300 text-left ${
                       active === originalIdx 
-                        ? 'text-white translate-x-2' 
-                        : 'bg-transparent text-slate-600 hover:bg-slate-100'
+                        ? 'translate-x-2 border border-[#ffd4d4] bg-[#fff5f5] text-slate-900'
+                        : 'border border-slate-200 bg-white text-slate-900 hover:bg-slate-50'
                     }`}
-                    style={{ 
-                      backgroundColor: active === originalIdx ? '#DD8D8F' : 'transparent',
-                      boxShadow: active === originalIdx ? '0 10px 25px -5px rgba(221, 141, 143, 0.4)' : 'none'
+                    style={{
+                      boxShadow: active === originalIdx ? '0 10px 24px -14px rgba(255, 60, 60, 0.35)' : 'none'
                     }}
                   >
                     <div className={`w-10 h-10 rounded-[8px] flex items-center justify-center shrink-0 transition-colors ${
-                      active === originalIdx ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'
+                      active === originalIdx ? 'border border-[#ffdcdc] bg-[#fff0f0] text-[#6C6C6C]' : 'border border-slate-200 bg-slate-50 text-[#6C6C6C]'
                     }`}>
                       <span className="material-symbols-outlined text-[20px]">{course.icon}</span>
                     </div>
                     <div className="flex-1">
-                       <div className={`text-[16px] font-bold leading-none ${active === originalIdx ? 'text-white' : 'text-slate-800'}`}>
-                         {course.name}
-                       </div>
-                       <div className={`text-[11px] mt-1 font-medium uppercase tracking-[0.1em] ${active === originalIdx ? 'text-white/80' : 'text-slate-400'}`}>
-                         {course.count}
-                       </div>
+                      <div className="text-[16px] font-semibold leading-none text-[#6C6C6C]">
+                        {course.name}
+                      </div>
+                      <div className="text-[11px] mt-1 font-medium uppercase tracking-[0.1em] text-[#6C6C6C]">
+                        {course.count}
+                      </div>
                     </div>
                     {active === originalIdx && (
-                       <span className="material-symbols-outlined text-white text-[20px]">arrow_forward</span>
+                       <span className="material-symbols-outlined text-[#6C6C6C] text-[20px]">arrow_forward</span>
                     )}
                   </button>
                  );

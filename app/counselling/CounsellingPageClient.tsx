@@ -188,9 +188,9 @@ const MATCH_CATALOG: Match[] = [
 
 export default function CounsellingPageClient() {
   const [step, setStep] = useState(1);
-  const [selectedFields, setSelectedFields] = useState<Set<string>>(() => new Set(["cs"]));
+  const [selectedFields, setSelectedFields] = useState<Set<string>>(() => new Set());
   const [academicLevel, setAcademicLevel] = useState<(typeof ACADEMIC_OPTIONS)[number] | "">("");
-  const [preferredLocations, setPreferredLocations] = useState<Set<string>>(() => new Set(["India"]));
+  const [preferredLocations, setPreferredLocations] = useState<Set<string>>(() => new Set());
   const [budgetRange, setBudgetRange] = useState<(typeof BUDGET_OPTIONS)[number] | "">("");
 
   const toggleField = useCallback((id: string) => {
@@ -230,21 +230,43 @@ export default function CounsellingPageClient() {
     [selectedFields],
   );
 
-  const personalizedMatches = useMemo(() => {
-    const scored = MATCH_CATALOG.map((m) => {
-      let score = 0;
-      if (selectedFields.size && m.fields.some((f) => selectedFields.has(f))) score += 4;
-      if (academicLevel && m.levels.includes(academicLevel)) score += 2;
-      if (preferredLocations.size && [...preferredLocations].some((loc) => m.regions.includes(loc))) score += 2;
-      if (budgetRange && m.budget === budgetRange) score += 2;
-      return { ...m, score };
-    })
-      .sort((a, b) => b.score - a.score)
-      .filter((m) => m.score > 0);
+  const hasPersonalizedAnswers = Boolean(
+    selectedFields.size || academicLevel || preferredLocations.size || budgetRange,
+  );
 
-    if (scored.length === 0) return MATCH_CATALOG.slice(0, 4);
-    return scored.slice(0, 8);
-  }, [selectedFields, academicLevel, preferredLocations, budgetRange]);
+  const personalizedMatches = useMemo(() => {
+    if (!hasPersonalizedAnswers) {
+      return MATCH_CATALOG.slice(0, 4);
+    }
+
+    const exactMatches = MATCH_CATALOG.filter((match) => {
+      if (selectedFields.size > 0 && !match.fields.some((field) => selectedFields.has(field))) {
+        return false;
+      }
+
+      if (academicLevel && !match.levels.includes(academicLevel)) {
+        return false;
+      }
+
+      if (preferredLocations.size > 0 && ![...preferredLocations].some((location) => match.regions.includes(location))) {
+        return false;
+      }
+
+      if (budgetRange && match.budget !== budgetRange) {
+        return false;
+      }
+
+      return true;
+    })
+      .sort((a, b) => {
+        const aFieldOverlap = a.fields.filter((field) => selectedFields.has(field)).length;
+        const bFieldOverlap = b.fields.filter((field) => selectedFields.has(field)).length;
+        if (bFieldOverlap !== aFieldOverlap) return bFieldOverlap - aFieldOverlap;
+        return parseFloat(b.rating) - parseFloat(a.rating);
+      });
+
+    return exactMatches.slice(0, 8);
+  }, [selectedFields, academicLevel, preferredLocations, budgetRange, hasPersonalizedAnswers]);
 
   const progressFill = Math.min(step, 6);
 
@@ -507,56 +529,70 @@ export default function CounsellingPageClient() {
           <div className="mb-6">
             <h2 className="text-lg sm:text-xl font-semibold text-neutral-800">Your Top Matches</h2>
             <p className="text-sm text-neutral-500 mt-1">
-              {step < 6
-                ? "Continue answering to refine your personalized recommendations."
-                : "Based on your answers, here are your best personalized fits."}
+              {!hasPersonalizedAnswers
+                ? "Start selecting your preferences to see personalized matches."
+                : personalizedMatches.length === 0
+                ? "No exact matches found for the answers selected so far. Try adjusting a choice to see relevant recommendations."
+                : "Showing matches that fit the personalized answers you selected so far."}
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {personalizedMatches.map((m, idx) => (
-              <article
-                key={`${m.name}-${idx}`}
-                className="bg-white rounded-[5px] border border-neutral-200/90 overflow-hidden shadow-[0_4px_24px_rgb(0,0,0,0.06)] flex flex-col"
-              >
-                <div className="relative aspect-[16/9] w-full">
-                  <Image src={m.image} alt={m.name} fill className="object-cover" sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw" />
-                  <div
-                    className="absolute top-2 right-2 flex items-center gap-0.5 rounded-[5px] px-2 py-0.5 text-[11px] font-semibold shadow-md"
-                    style={{ backgroundColor: "#FCD34D", color: "#78350F" }}
-                  >
-                    <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      star
+          {personalizedMatches.length === 0 && hasPersonalizedAnswers ? (
+            <div className="rounded-[5px] border border-dashed border-neutral-300 bg-white px-6 py-10 text-center shadow-[0_4px_24px_rgb(0,0,0,0.04)]">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
+                <span className="material-symbols-outlined text-[28px]">search_off</span>
+              </div>
+              <h3 className="text-base font-bold text-neutral-800">No exact match yet</h3>
+              <p className="mt-2 text-sm text-neutral-500">
+                The current answer combination is very specific. Try changing one of your selected fields, location, or budget range.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {personalizedMatches.map((m, idx) => (
+                <article
+                  key={`${m.name}-${idx}`}
+                  className="bg-white rounded-[5px] border border-neutral-200/90 overflow-hidden shadow-[0_4px_24px_rgb(0,0,0,0.06)] flex flex-col"
+                >
+                  <div className="relative aspect-[16/9] w-full">
+                    <Image src={m.image} alt={m.name} fill className="object-cover" sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw" />
+                    <div
+                      className="absolute top-2 right-2 flex items-center gap-0.5 rounded-[5px] px-2 py-0.5 text-[11px] font-semibold shadow-md"
+                      style={{ backgroundColor: "#FCD34D", color: "#78350F" }}
+                    >
+                      <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        star
+                      </span>
+                      {m.rating} ({m.reviews})
+                    </div>
+                  </div>
+                  <div className="p-3.5 flex flex-col flex-1 gap-2">
+                    <div className="flex flex-wrap items-start justify-between gap-1">
+                      <h3 className="text-sm font-bold text-neutral-900">{m.name}</h3>
+                      <span className="text-xs font-semibold text-neutral-600 whitespace-nowrap">Avg. Fees {m.fees}</span>
+                    </div>
+                    <p className="text-[11px] text-neutral-500 flex items-center gap-0.5">
+                      <span className="material-symbols-outlined text-[14px] text-neutral-400">location_on</span>
+                      {m.location}
+                    </p>
+                    <span className="text-[10px] font-semibold text-neutral-600 bg-neutral-100 border border-neutral-200/80 rounded-[5px] px-1.5 py-0.5 w-fit">
+                      {m.tag}
                     </span>
-                    {m.rating} ({m.reviews})
+                    <div>
+                      <p className="text-[11px] font-semibold text-neutral-700 mb-0.5">Why it fits you</p>
+                      <p className="text-xs text-neutral-600 leading-relaxed line-clamp-3">{m.blurb}</p>
+                    </div>
+                    <p className="text-xs font-semibold mt-auto" style={{ color: RED }}>
+                      Avg. Package: {m.package}
+                    </p>
+                    <Link href="/top-colleges" className="text-xs font-semibold inline-flex items-center gap-0.5" style={{ color: RED }}>
+                      View Details
+                      <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                    </Link>
                   </div>
-                </div>
-                <div className="p-3.5 flex flex-col flex-1 gap-2">
-                  <div className="flex flex-wrap items-start justify-between gap-1">
-                    <h3 className="text-sm font-bold text-neutral-900">{m.name}</h3>
-                    <span className="text-xs font-semibold text-neutral-600 whitespace-nowrap">Avg. Fees {m.fees}</span>
-                  </div>
-                  <p className="text-[11px] text-neutral-500 flex items-center gap-0.5">
-                    <span className="material-symbols-outlined text-[14px] text-neutral-400">location_on</span>
-                    {m.location}
-                  </p>
-                  <span className="text-[10px] font-semibold text-neutral-600 bg-neutral-100 border border-neutral-200/80 rounded-[5px] px-1.5 py-0.5 w-fit">
-                    {m.tag}
-                  </span>
-                  <div>
-                    <p className="text-[11px] font-semibold text-neutral-700 mb-0.5">Why it fits you</p>
-                    <p className="text-xs text-neutral-600 leading-relaxed line-clamp-3">{m.blurb}</p>
-                  </div>
-                  <p className="text-xs font-semibold mt-auto" style={{ color: RED }}>
-                    Avg. Package: {m.package}
-                  </p>
-                  <Link href="/top-colleges" className="text-xs font-semibold inline-flex items-center gap-0.5" style={{ color: RED }}>
-                    View Details
-                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

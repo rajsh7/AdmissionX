@@ -43,6 +43,7 @@ interface SearchClientProps {
   initDegree: string;
   initCityId: string;
   initStateId: string;
+  initCountryId?: string;
   initFeesMax: string;
   initSort: string;
   initPage: number;
@@ -69,6 +70,14 @@ const SORT_OPTIONS = [
   { value: "fees", label: "Lowest Fees" },
   { value: "newest", label: "Newest" },
 ];
+
+function getCollegeRenderKey(college: CollegeResult, index: number): string {
+  return [
+    college.id ?? "no-id",
+    college.slug || "no-slug",
+    index,
+  ].join("-");
+}
 
 // ─── Search bar with typeahead ────────────────────────────────────────────────
 
@@ -123,12 +132,10 @@ export default function SearchClient({
   initDegree,
   initCityId,
   initStateId,
+  initCountryId = "",
   initFeesMax,
   initSort,
   initPage,
-  initType,
-  pageTitle,
-  pageSubtitle,
   entityName = "College",
   entityNamePlural = "Colleges",
   gridCols = 3,
@@ -164,10 +171,10 @@ export default function SearchClient({
   const degree = searchParams.get("degree") ?? initDegree;
   const cityId = searchParams.get("city_id") ?? initCityId;
   const stateId = searchParams.get("state_id") ?? initStateId;
+  const countryId = searchParams.get("country_id") ?? initCountryId;
   const feesMax = searchParams.get("fees_max") ?? initFeesMax;
   const sort = searchParams.get("sort") ?? initSort;
   const page = parseInt(searchParams.get("page") ?? String(initPage));
-  const type = searchParams.get("type") ?? initType;
 
   // ── Sync state when the server delivers fresh initialColleges after a
   //    router.push() navigation (new SSR render completes) ───────────────────
@@ -233,7 +240,7 @@ export default function SearchClient({
     [searchParams, router, pathname],
   );
 
-  const isFiltered = !!(q || stream || degree || cityId || stateId || feesMax);
+  const isFiltered = !!(q || stream || degree || cityId || stateId || countryId || feesMax);
 
   const showingText = loading
     ? "Loading..."
@@ -299,6 +306,7 @@ export default function SearchClient({
             {/* ── Filters sidebar ── */}
             <div className="hidden lg:flex flex-col gap-6 flex-shrink-0 lg:sticky lg:top-[72px] lg:self-start" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
               <SearchFilters
+                key={`${stream}|${degree}|${cityId}|${stateId}|${countryId}|${feesMax}|${sort}`}
                 streams={streams}
                 degrees={degrees}
                 cities={cities}
@@ -308,10 +316,10 @@ export default function SearchClient({
                 activeDegree={degree}
                 activeCityId={cityId}
                 activeStateId={stateId}
+                activeCountryId={countryId}
                 activeFeesMax={feesMax}
                 activeSort={sort}
                 totalResults={total}
-                entityName={entityName}
                 entityNamePlural={entityNamePlural}
               />
 
@@ -364,13 +372,19 @@ export default function SearchClient({
                           <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("state_id"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
                         </div>
                       )}
+                      {countryId && !stateId && !cityId && (
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                          {countries.find(c => String(c.id) === countryId)?.name || countryId}
+                          <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("country_id"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                        </div>
+                      )}
                       {feesMax && (
                         <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
                           Up to ₹{(Number(feesMax)/100000).toFixed(0)}L fees
                           <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("fees_max"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
                         </div>
                       )}
-{!stream && !degree && !cityId && !stateId && !feesMax && (
+{!stream && !degree && !cityId && !stateId && !countryId && !feesMax && (
                         <span className="text-xs text-neutral-400 bg-neutral-50 px-3 py-1.5 rounded-[10px] border border-neutral-100 border-dashed">No filters applied</span>
                       )}
                     </div>
@@ -487,7 +501,7 @@ export default function SearchClient({
                 <div className={`grid grid-cols-1 sm:grid-cols-2 ${gridCols === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-y-5 gap-x-[10px]`}>
                   {colleges.slice(0, visibleCount).map((college, i) => (
                     <CollegeCard
-                      key={college.id}
+                      key={getCollegeRenderKey(college, i)}
                       college={college}
                       index={i}
                       entityName={entityName}
@@ -498,7 +512,7 @@ export default function SearchClient({
                 <div className="space-y-3">
                   {colleges.slice(0, visibleCount).map((college, i) => (
                     <CollegeListItem
-                      key={college.id}
+                      key={getCollegeRenderKey(college, i)}
                       college={college}
                       index={i}
                       entityName={entityName}

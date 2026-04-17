@@ -176,14 +176,14 @@ export default function TopUniversities({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search your college, universities, courses..."
               suppressHydrationWarning
-              className="h-14 w-full rounded-[10px] bg-transparent pl-14 pr-4 text-base font-normal text-slate-800 placeholder:text-slate-400 focus:outline-none"
+              className="h-14 w-full rounded-[10px] bg-transparent pl-14 pr-4 text-base font-semibold text-slate-800 placeholder:text-[#6C6C6C] focus:outline-none"
             />
           </div>
 
           <div className="relative h-full">
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className={`h-14 rounded-[10px] border px-8 text-sm font-medium shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all active:scale-95 hover:shadow-lg ${
+              className={`h-14 rounded-[10px] border px-8 text-sm font-semibold shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all active:scale-95 hover:shadow-lg ${
                 selectedCity !== "All Cities"
                   ? "border-primary bg-primary text-white"
                   : "border-slate-100 bg-white text-slate-600"
@@ -209,7 +209,7 @@ export default function TopUniversities({
                     className="absolute right-0 top-full z-50 mt-3 w-56 overflow-hidden rounded-[10px] border border-slate-100 bg-white shadow-2xl"
                   >
                     <div className="hide-scrollbar max-h-60 overflow-y-auto p-2">
-                      <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                      <div className="px-3 py-2 text-[12px] font-semibold uppercase tracking-widest text-[#6C6C6C]">
                         Filter by City
                       </div>
                       {uniqueCities.map((city) => (
@@ -292,13 +292,13 @@ export default function TopUniversities({
                         <span className="material-symbols-rounded text-[18px] text-yellow-500">
                           star
                         </span>
-                        <span className="text-sm font-normal text-slate-800">
+                        <span className="text-[16px] font-semibold text-[#6C6C6C]">
                           {uni.rating}
                         </span>
                       </div>
 
                       <div className="absolute bottom-4 left-4">
-                        <span className="rounded-[10px] bg-primary px-3 py-1 text-[10px] font-normal uppercase tracking-wider text-white shadow-lg">
+                        <span className="rounded-[10px] bg-primary px-3 py-1 text-[12px] font-semibold uppercase tracking-wider text-white shadow-lg">
                           {sortBy === "rank" ? `#${i + 1} Ranked` : "Featured"}
                         </span>
                       </div>
@@ -306,7 +306,7 @@ export default function TopUniversities({
 
                     <div className="flex flex-1 flex-col p-8">
                       <div className="mb-4 flex items-start justify-between">
-                        <h3 className="line-clamp-2 text-[22px] font-bold leading-snug text-[#6C6C6C] transition-colors group-hover:text-primary">
+                        <h3 className="line-clamp-2 text-[16px] font-semibold leading-snug text-[#6C6C6C] transition-colors group-hover:text-primary">
                           {uni.name}
                         </h3>
                       </div>
@@ -315,7 +315,7 @@ export default function TopUniversities({
                         <span className="material-symbols-rounded text-[20px]">
                           location_on
                         </span>
-                        <span className="truncate text-[16px] font-medium">
+                        <span className="truncate text-[16px] font-semibold">
                           {uni.location}
                         </span>
                       </div>
@@ -326,20 +326,20 @@ export default function TopUniversities({
                           .map((course) => (
                             <span
                               key={`${uni.name}-${course}`}
-                              className="inline-flex items-center rounded-[5px] border border-slate-400 px-4 py-2 text-[14px] font-semibold leading-none text-[#6C6C6C]"
+                              className="inline-flex items-center rounded-[5px] border border-slate-400 px-4 py-2 text-[16px] font-semibold leading-none text-[#6C6C6C]"
                             >
                               {course}
                             </span>
                           ))}
                         {(uni.offeredCourses?.length ?? 0) > 4 && (
-                          <span className="inline-flex items-center rounded-[5px] border border-slate-400 px-4 py-2 text-[14px] font-semibold leading-none text-[#6C6C6C]">
+                          <span className="inline-flex items-center rounded-[5px] border border-slate-400 px-4 py-2 text-[16px] font-semibold leading-none text-[#6C6C6C]">
                             +{(uni.offeredCourses?.length ?? 0) - 4} More
                           </span>
                         )}
                       </div>
 
                       <div className="mt-auto flex items-center justify-between border-t border-slate-200 pt-5">
-                        <div className="text-[18px] font-medium text-[#6C6C6C]">
+                        <div className="text-[16px] font-semibold text-[#6C6C6C]">
                           Avg. Package:{" "}
                           <span className="font-bold text-primary">
                             {uni.avgPackage || "Rs 4.5 LPA"}

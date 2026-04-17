@@ -90,7 +90,7 @@ export default async function ExaminationHubPage({
       .find(examFilter)
       .sort({ created_at: -1 })
       .limit(50)
-      .project({ id: 1, title: 1, slug: 1, image: 1, description: 1, applicationFrom: 1, applicationTo: 1, exminationDate: 1, functionalarea_id: 1 })
+      .project({ id: 1, title: 1, slug: 1, image: 1, description: 1, applicationFrom: 1, applicationTo: 1, exminationDate: 1, functionalarea_id: 1, getMoreInfoLink: 1, syllabus: 1 })
       .toArray(),
   ]);
 
@@ -174,7 +174,7 @@ export default async function ExaminationHubPage({
                   className="object-cover"
                 />
               </div>
-              <div className="absolute inset-y-4 left-0 w-32 bg-gradient-to-r from-white to-transparent hidden md:block pointer-events-none"></div>
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-l from-transparent to-white/75 hidden md:block" />
             </div>
           </div>
         </div>
@@ -202,6 +202,8 @@ export default async function ExaminationHubPage({
                     description: stripHtml(exam.description),
                     applicationTo: exam.applicationTo ?? null,
                     exminationDate: exam.exminationDate ?? null,
+                    getMoreInfoLink: exam.getMoreInfoLink ?? null,
+                    syllabus: exam.syllabus ?? null,
                   }))}
                 />
               )}

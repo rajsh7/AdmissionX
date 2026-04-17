@@ -61,10 +61,10 @@ export default function Testimonials({ testimonials: dynamicTestimonials }: Test
                 </p>
             </div>
             <button 
-              className="hidden sm:flex items-center justify-center px-10 h-[59px] bg-white shadow-[0_10px_30px_-5px_rgba(0,0,0,0.15),0_5px_15px_-5px_rgba(0,0,0,0.1)] border border-slate-200 whitespace-nowrap transition-all rounded-[10px]"
-              style={{ fontSize: '24px', fontWeight: 500, color: '#6C6C6C' }}
+              className="hidden sm:flex items-center justify-center px-6 h-12 bg-white shadow-sm border border-slate-200 whitespace-nowrap transition-all rounded-[5px]"
+              style={{ fontSize: '16px', fontWeight: 500, color: '#334155' }}
             >
-                Read all reviews
+                Read all reviews <span className="material-symbols-outlined text-[18px] ml-1">arrow_forward</span>
             </button>
         </div>
 

@@ -1,31 +1,13 @@
 "use client";
 
-import React from "react";
+import AdCard from "@/app/components/AdCard";
+import type { AdItem } from "@/app/components/AdsSection";
 
-const steps = [
-  {
-    number: "1",
-    title: "Profile Evaluation",
-    description: "We assess your academic background, test scores, and career goals to find the best match.",
-  },
-  {
-    number: "2",
-    title: "Shortlisting",
-    description: "Select from over 500+ universities and courses that align perfectly with your profile and budget.",
-  },
-  {
-    number: "3",
-    title: "Application & Visas",
-    description: "Expert assistance with SOPs, LORs, and navigating the visa process smoothly.",
-  },
-  {
-    number: "4",
-    title: "Pre-Departure",
-    description: "Help with accommodation, flights, forex, and networking with other students.",
-  },
-];
+interface JourneyStepsProps {
+  ads?: AdItem[];
+}
 
-export default function JourneySteps() {
+export default function JourneySteps({ ads = [] }: JourneyStepsProps) {
   return (
     <section className="py-24 bg-white">
       <div className="max-w-[1920px] mx-auto px-8 lg:px-12">
@@ -106,8 +88,14 @@ export default function JourneySteps() {
 
         </div>
 
-        {/* Large Placeholder Box */}
-        <div className="w-full h-[320px] bg-[#EAEAEA] rounded-[5px] border border-slate-100/50" />
+        <div className="rounded-[5px] border border-slate-100/50 bg-[#EAEAEA] p-4 sm:p-5">
+          <AdCard
+            ads={ads}
+            className="h-[320px] sm:h-[340px]"
+            emptyTitle="No active study abroad ads found"
+            emptyDescription="Add or activate ads with the position study_abroad, study-abroad, or study abroad to show them here."
+          />
+        </div>
 
       </div>
     </section>
