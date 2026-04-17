@@ -71,23 +71,21 @@ export default function PlacementListClient({
 
   return (
     <>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-end mb-4">
-        <div className="flex flex-col gap-2 sm:items-end">
-          <button
-            type="button"
-            onClick={() => setShowFilters((value) => !value)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-all"
-          >
-            <span className="material-symbols-outlined text-[18px]">filter_alt</span>
-            Filters
-          </button>
-          <button
-            onClick={openAdd}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
-          >
-            Add new placement +
-          </button>
-        </div>
+      <div className="flex items-center justify-end gap-3 mb-4">
+        <button
+          type="button"
+          onClick={() => setShowFilters((value) => !value)}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-all"
+        >
+          <span className="material-symbols-outlined text-[18px]">filter_alt</span>
+          Filters
+        </button>
+        <button
+          onClick={openAdd}
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
+        >
+          Add new placement +
+        </button>
       </div>
 
       {showFilters && (

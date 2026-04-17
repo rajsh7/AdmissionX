@@ -52,7 +52,7 @@ interface ProfileClientProps {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
+const IMAGE_BASE = "/uploads/";
 
 function buildImageUrl(raw: string | null): string {
   if (!raw) return "";
@@ -490,12 +490,19 @@ export default function ProfileClient({
                             src={buildImageUrl(p.bannerimage)}
                             alt=""
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                              const fb = e.currentTarget.nextElementSibling as HTMLElement;
+                              if (fb) fb.style.display = "flex";
+                            }}
                           />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-[#FF3C3C]/10 text-[#FF3C3C] font-black text-sm">
-                            {(p.name || p.slug).charAt(0).toUpperCase()}
-                          </div>
-                        )}
+                        ) : null}
+                        <div
+                          className="w-full h-full items-center justify-center bg-[#FF3C3C]/10 text-[#FF3C3C] font-black text-sm"
+                          style={{ display: p.bannerimage ? "none" : "flex" }}
+                        >
+                          {(p.name || p.slug).charAt(0).toUpperCase()}
+                        </div>
                       </div>
                       <div className="min-w-0">
                         <p

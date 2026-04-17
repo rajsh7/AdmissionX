@@ -3,7 +3,6 @@
 import { useState } from "react";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import ManagementFormModal from "./ManagementFormModal";
-import Image from "next/image";
 import { createManagementMember, updateManagementMember, deleteManagementRow } from "./actions";
 
 import PaginationFixed from "@/app/components/PaginationFixed";
@@ -110,16 +109,25 @@ export default function ManagementListClient({
                     <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-slate-100 relative overflow-hidden flex-shrink-0 border border-slate-100">
-                          <Image
-                            src={m.picture ? (m.picture.startsWith('http') ? m.picture : `https://admin.admissionx.in/uploads/${m.picture}`) : '/placeholder.png'}
-                            alt={m.name}
-                            fill
-                            sizes="40px"
-                            className="object-cover"
-                            loading="lazy"
-                            unoptimized={Boolean(m.picture)}
-                          />
+                        <div className="w-10 h-10 rounded-full bg-slate-100 relative overflow-hidden flex-shrink-0 border border-slate-100 flex items-center justify-center">
+                          {m.picture ? (
+                            <img
+                              src={m.picture.startsWith('http') ? m.picture : `/uploads/${m.picture}`}
+                              alt={m.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                                const fb = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (fb) fb.style.display = "flex";
+                              }}
+                            />
+                          ) : null}
+                          <div
+                            className="w-full h-full items-center justify-center bg-slate-200 text-slate-500 font-black text-sm rounded-full"
+                            style={{ display: m.picture ? "none" : "flex" }}
+                          >
+                            {(m.name || "?")[0].toUpperCase()}
+                          </div>
                         </div>
                         <div className="flex flex-col min-w-0">
                           <span className="font-bold text-slate-800 leading-none truncate">

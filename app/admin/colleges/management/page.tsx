@@ -41,43 +41,51 @@ const getCachedCollegeOptions = unstable_cache(
   async (): Promise<OptionRow[]> => {
     try {
       const db = await getDb();
-      const rows = await db
-        .collection("collegeprofile")
-        .aggregate([
-          {
-            $lookup: {
-              from: "users",
-              localField: "users_id",
-              foreignField: "id",
-              as: "user",
-            },
+      const rows = await db.collection("collegeprofile").aggregate([
+        {
+          $lookup: {
+            from: "users",
+            localField: "users_id",
+            foreignField: "id",
+            as: "user",
           },
-          { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-          {
-            $project: {
-              _id: 0,
-              id: { $toInt: "$id" },
-              name: {
-                $trim: {
-                  input: { $ifNull: ["$user.firstname", "Unnamed College"] },
-                },
-              },
-            },
+        },
+        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            _id: 0,
+            id: 1,
+            name: { $ifNull: ["$user.firstname", ""] },
           },
-          { $sort: { name: 1, id: 1 } },
-        ])
-        .toArray();
+        },
+        { 
+          $match: { 
+            name: { $ne: "" },
+            $expr: {
+              $not: {
+                $regexMatch: {
+                  input: { $toLower: "$name" },
+                  regex: "unnamed"
+                }
+              }
+            }
+          } 
+        },
+        { $sort: { name: 1 } },
+      ]).toArray();
 
-      return rows.map((row, idx) => ({
-        id: Number(row.id) || idx + 1,
-        name: String(row.name || "Unnamed College"),
-      }));
+      return rows
+        .map((row: any) => ({
+          id: Number(row.id),
+          name: String(row.name || "").trim(),
+        }))
+        .filter(r => r.name && !r.name.toLowerCase().includes('unnamed'));
     } catch (error) {
       console.error("[admin/colleges/management colleges]", error);
       return [];
     }
   },
-  ["admin-colleges-management-college-options-v1"],
+  ["admin-colleges-management-college-options-v4"],
   { revalidate: 300 },
 );
 
@@ -100,7 +108,7 @@ export default async function CollegeManagementPage({
   if (collegeId) {
     const collegeIdNumber = Number(collegeId);
     if (Number.isFinite(collegeIdNumber)) {
-      match.collegeprofile_id = collegeIdNumber;
+      match.collegeprofile_id = { $in: [collegeIdNumber, String(collegeIdNumber)] };
     }
   }
 
@@ -130,30 +138,28 @@ export default async function CollegeManagementPage({
   const collegeIds = [...new Set(managementRecords.map(m => m.collegeprofile_id).filter(Boolean))];
 
   // Batch lookup colleges with user data
-  const [colleges] = await Promise.all([
-    collegeIds.length > 0 ? db.collection("collegeprofile").aggregate([
-      { $match: { id: { $in: collegeIds } } },
-      {
-        $lookup: {
-          from: "users",
-          localField: "users_id",
-          foreignField: "id",
-          as: "user",
-        },
+  const colleges = collegeIds.length > 0 ? await db.collection("collegeprofile").aggregate([
+    { $match: { id: { $in: collegeIds } } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "users_id",
+        foreignField: "id",
+        as: "user",
       },
-      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-      {
-        $project: {
-          _id: 0,
-          id: 1,
-          name: { $ifNull: ["$user.firstname", "Unnamed College"] },
-        },
+    },
+    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    {
+      $project: {
+        _id: 0,
+        id: 1,
+        name: { $ifNull: ["$user.firstname", "Unnamed College"] },
       },
-    ]).toArray() : Promise.resolve([]),
-  ]);
+    },
+  ]).toArray() : [];
 
   // Create lookup map for fast access
-  const collegeMap = new Map(colleges.map(c => [c.id, c.name]));
+  const collegeMap = new Map(colleges.map((c: any) => [Number(c.id), String(c.name || "")]));
 
   // Enrich management records with college names
   const cleanMembers = managementRecords.map((member, idx) => ({
@@ -165,8 +171,8 @@ export default async function CollegeManagementPage({
     emailaddress: toStringOrNull(member.emailaddress) || toStringOrNull(member.email) || "",
     phoneno: toStringOrNull(member.phoneno) || toStringOrNull(member.phone) || "",
     picture: toStringOrNull(member.picture) || toStringOrNull(member.imagename) || "",
-    college_name: collegeMap.get(member.collegeprofile_id) ?? "Unnamed College",
-  }));
+    college_name: collegeMap.get(Number(member.collegeprofile_id)) || null,
+  })).filter(m => m.college_name !== null) as ManagementRow[];
 
   // Handle search query
   let finalMembers = cleanMembers;
@@ -217,7 +223,7 @@ export default async function CollegeManagementPage({
         ]).toArray() : Promise.resolve([]),
       ]);
 
-      const allCollegeMap = new Map(allColleges.map(c => [c.id, c.name]));
+      const allCollegeMap = new Map(allColleges.map((c: any) => [Number(c.id), String(c.name || "")]));
 
       const enrichedAllMembers = allRecords.map((member, idx) => ({
         id: Number(member.id) || idx + 1,
@@ -228,8 +234,8 @@ export default async function CollegeManagementPage({
         emailaddress: toStringOrNull(member.emailaddress) || toStringOrNull(member.email) || "",
         phoneno: toStringOrNull(member.phoneno) || toStringOrNull(member.phone) || "",
         picture: toStringOrNull(member.picture) || toStringOrNull(member.imagename) || "",
-        college_name: allCollegeMap.get(member.collegeprofile_id) ?? "Unnamed College",
-      }));
+        college_name: allCollegeMap.get(Number(member.collegeprofile_id)) || "",
+      })).filter(m => m.college_name !== "");
 
       const searchedMembers = enrichedAllMembers.filter(member =>
         searchRegex.test(member.name) ||
@@ -271,11 +277,13 @@ export default async function CollegeManagementPage({
               className="w-full border border-slate-200 rounded-md px-3 py-3 text-sm text-slate-600 bg-transparent focus:outline-none focus:border-red-500 appearance-none cursor-pointer"
             >
               <option value="">Select college</option>
-              {cleanColleges.map((college, idx) => (
-                <option key={`college-${college.id}-${idx}`} value={college.id}>
-                  {college.name}
-                </option>
-              ))}
+              {cleanColleges
+                .filter(college => college.name && !college.name.toLowerCase().includes('unnamed'))
+                .map((college, idx) => (
+                  <option key={`college-${college.id}-${idx}`} value={college.id}>
+                    {college.name}
+                  </option>
+                ))}
             </select>
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none material-symbols-rounded text-xl">
               keyboard_arrow_down
