@@ -20,7 +20,7 @@ export default function AnimatedCounter({
 }: AnimatedCounterProps) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-50px" });
+  const inView = useInView(ref, { once: true, margin: "-100px" });
 
   useEffect(() => {
     if (!inView) return;

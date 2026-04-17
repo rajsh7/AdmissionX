@@ -59,22 +59,11 @@ export default function StatsBar() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="group relative rounded-2xl bg-white/5 border border-white/10 p-5 py-6 backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+              className="relative rounded-[5px] bg-white/5 border border-white/10 p-5 py-6 backdrop-blur-sm"
             >
-              {/* Corner accents */}
-              <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-red-500/50 rounded-tl-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-red-500/50 rounded-br-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-              
               <div className="flex flex-col items-center text-center">
-                {/* Icon */}
-                <div className={`mb-3 w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center ${stat.color}`}>
-                  <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    {stat.icon}
-                  </span>
-                </div>
-                
                 {/* Counter */}
-                <div className="text-4xl lg:text-5xl font-black text-white tracking-tight mb-1">
+                <div className="text-4xl lg:text-5xl font-medium text-white tracking-tight mb-1">
                   <AnimatedCounter 
                     target={stat.target} 
                     suffix={stat.suffix} 

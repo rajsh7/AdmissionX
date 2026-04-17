@@ -428,7 +428,7 @@ function CompareCoursePageInner() {
                                 </span>
                               </div>
                               <span
-                                className={`text-[15px] font-bold transition-colors ${
+                                className={`text-[15px] font-medium transition-colors ${
                                   addingSlot === i
                                     ? "text-[#FF3C3C]"
                                     : "text-slate-400 group-hover:text-[#FF3C3C]"

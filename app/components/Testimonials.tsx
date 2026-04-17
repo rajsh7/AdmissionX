@@ -19,17 +19,17 @@ const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1494790108377-be9c29b2
 function TestimonialStars({ rating }: { rating: number }) {
   const filledStars = Math.max(0, Math.min(5, Math.round(rating)));
 
-  return (
-    <div className="mt-auto flex gap-1.5 border-t border-slate-200 pt-5">
+return (
+    <div className="mt-auto flex gap-1.5 border-t border-slate-200 pt-3">
       {Array.from({ length: 5 }, (_, starIdx) => {
         const isFilled = starIdx < filledStars;
 
         return (
-          <svg
+<svg
             key={starIdx}
             viewBox="0 0 24 24"
             aria-hidden="true"
-            className={`h-[22px] w-[22px] ${isFilled ? "text-amber-400" : "text-slate-300"}`}
+            className={`h-[28px] w-[28px] ${isFilled ? "text-amber-400" : "text-slate-300"}`}
             fill="currentColor"
           >
             <path d="M12 2.75l2.76 5.59 6.17.9-4.46 4.35 1.05 6.15L12 16.84 6.48 19.74l1.05-6.15-4.46-4.35 6.17-.9L12 2.75z" />
@@ -68,7 +68,7 @@ export default function Testimonials({ testimonials: dynamicTestimonials }: Test
             </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {displayTestimonials.map((t, i) => (
             <motion.div
               key={i}
@@ -76,9 +76,9 @@ export default function Testimonials({ testimonials: dynamicTestimonials }: Test
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="p-8 rounded-[10px] bg-white border border-slate-100 shadow-[0_15px_40px_-20px_rgba(0,0,0,0.1)] flex flex-col h-full group transition-all hover:shadow-xl hover:border-slate-200"
+              className="p-6 rounded-[10px] bg-white border border-slate-100 shadow-[0_15px_40px_-20px_rgba(0,0,0,0.1)] flex flex-col h-auto group transition-all hover:shadow-xl hover:border-slate-200"
             >
-              <div className="flex items-start justify-between mb-8">
+              <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full border border-slate-100 overflow-hidden bg-slate-50 shrink-0">
                     <img src={t.avatar || DEFAULT_AVATAR} alt={t.name} className="w-full h-full object-cover" />
@@ -94,7 +94,7 @@ export default function Testimonials({ testimonials: dynamicTestimonials }: Test
                 </div>
               </div>
 
-              <div className="border-l-2 border-primary pl-4 mb-8 flex-1">
+              <div className="border-l-2 border-primary pl-3 mb-4 flex-1">
                 <p className="text-slate-600 font-normal leading-relaxed text-[15px] italic line-clamp-4">
                   &ldquo;{t.text}&rdquo;
                 </p>

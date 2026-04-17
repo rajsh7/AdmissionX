@@ -9,6 +9,7 @@ interface NewsSectionProps {
 }
 
 const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
+const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100";
 
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || !raw.trim()) return "";
@@ -17,7 +18,15 @@ function buildImageUrl(raw: string | null | undefined): string {
   return `/api/image-proxy?url=${encodeURIComponent(IMAGE_BASE + raw)}`;
 }
 
-function getBlogImage(blog: DbBlog & { fullimage?: string | null; image?: string | null }): string {
+interface BlogWithAuthor extends DbBlog {
+  author_name?: string;
+  author_image?: string;
+  fullimage?: string | null;
+  image?: string | null;
+  read_time?: string;
+}
+
+function getBlogImage(blog: BlogWithAuthor): string {
   return buildImageUrl(blog.featimage) || buildImageUrl(blog.fullimage) || buildImageUrl(blog.image) || "https://images.unsplash.com/photo-1523240715627-5d0b541f8d9c?q=80&w=800&auto=format&fit=crop";
 }
 
@@ -67,9 +76,10 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="border border-slate-200 rounded-[5px] bg-white"
               >
                 <Link href={`/blogs/${blog.slug}`} className="group block">
-                  <div className="relative aspect-[16/10] rounded-[5px] overflow-hidden mb-6 shadow-lg shadow-black/5">
+                  <div className="relative aspect-[16/10] rounded-t-[5px] overflow-hidden">
                     <img
                       src={getBlogImage(blog)}
                       alt={blog.topic}
@@ -82,11 +92,10 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-[10px] font-normal text-slate-400 uppercase tracking-widest">
-                      <span>{formatDate(blog.created_at)}</span>
-                      <span className="w-1 h-1 rounded-full bg-slate-300" />
-                      <span>5 min read</span>
+                  <div className="space-y-3 p-4">
+                    <div className="flex items-center justify-between">
+                      <span style={{ fontWeight: 600, fontSize: '18px', color: '#FF3C3C' }}>STUDENT LIFE</span>
+                      <span style={{ fontWeight: 500, fontSize: '14px', color: '#6C6C6C' }}>{blog.read_time || '5 min read'}</span>
                     </div>
                     <h3 className="text-[20px] font-bold text-[#3E3E3E] leading-tight group-hover:text-[#FF3C3C] transition-colors line-clamp-2">
                       {blog.topic}
@@ -95,9 +104,15 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
                       {stripHtml(blog.description)}
                     </p>
 
-                    <div className="pt-4 flex items-center gap-2 text-[#FF3C3C] font-semibold text-[15px] uppercase tracking-widest">
-                      <span>Read Related Blog</span>
-                      <span className="material-symbols-rounded text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    <div className="pt-4 flex items-center gap-2">
+                      <img 
+                        src={blog.author_image ? buildImageUrl(blog.author_image) : DEFAULT_AVATAR} 
+                        alt={blog.author_name || "Author"}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                      <span className="text-[14px] font-semibold text-[#6C6C6C]">
+                        {blog.author_name || "Admin"}
+                      </span>
                     </div>
                   </div>
                 </Link>

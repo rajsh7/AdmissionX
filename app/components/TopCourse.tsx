@@ -115,16 +115,16 @@ export default function TopCourse() {
   const router = useRouter();
   const [active, setActive] = useState(0); // Start with Medical as per Figma
   const [searchQuery, setSearchQuery] = useState("");
-  
-  const filteredCourses = courses.filter(course => 
+
+  const filteredCourses = courses.filter(course =>
     course.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  
+
   const current = courses[active] || courses[0];
 
   return (
     <section className="w-full py-24 lg:py-32 bg-gradient-to-b from-white via-slate-50 to-white relative overflow-hidden">
-      
+
       <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24 relative z-10">
         <FadeIn>
           <div className="mb-16">
@@ -143,10 +143,10 @@ export default function TopCourse() {
         </FadeIn>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          
+
           {/* ── Left Column: Featured Course ──────────────────────────── */}
           <FadeIn className="lg:col-span-8 flex flex-col gap-10" direction="left">
-            <div className="relative aspect-[16/10] rounded-none overflow-hidden group shadow-2xl shadow-black/5">
+            <div className="relative aspect-[3/2] rounded-none overflow-hidden group shadow-2xl shadow-black/5">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={current.id}
@@ -156,7 +156,7 @@ export default function TopCourse() {
                   transition={{ duration: 0.5 }}
                   className="absolute inset-0"
                 >
-                  <Image 
+                  <Image
                     src={current.image}
                     alt={current.name}
                     fill
@@ -168,76 +168,76 @@ export default function TopCourse() {
             </div>
 
             <div className="flex flex-col gap-6">
-               <h3 className="text-[40px] lg:text-[56px] font-bold text-slate-900 tracking-tight leading-none">
-                  {current.name}
-               </h3>
-               <p className="text-xl text-slate-500 font-normal leading-relaxed max-w-2xl">
-                  {current.description}
-               </p>
-               <div className="flex flex-wrap gap-12 mt-4 items-center">
-                 <div className="flex flex-col">
-                    <span className="text-[28px] font-bold text-slate-900">{current.stats.colleges}</span>
-                    <span className="text-sm font-medium text-slate-400">Colleges</span>
-                 </div>
-                 <div className="flex flex-col">
-                    <span className="text-[28px] font-bold text-slate-900">{current.stats.salary}</span>
-                    <span className="text-sm font-medium text-slate-400">Avg. Salary</span>
-                 </div>
-                 <div className="flex flex-col">
-                    <span className="text-[28px] font-bold text-slate-900">{current.stats.growth}</span>
-                    <span className="text-sm font-medium text-slate-400">Job Growth</span>
-                 </div>
-                 <Link 
-                   href={`/careers-courses?stream=${current.slug}`} 
-                   className="flex items-center gap-2 hover:translate-x-1 transition-transform ml-4" 
-                   style={{ color: '#FF3C3C', fontSize: '25px', fontWeight: 700 }}
-                 >
-                    View more <span className="material-symbols-outlined" style={{ fontSize: '25px', fontWeight: 700 }}>arrow_forward</span>
-                 </Link>
+              <h3 className="text-[40px] lg:text-[56px] font-bold text-slate-900 tracking-tight leading-none">
+                {current.name}
+              </h3>
+              <p className="text-xl text-slate-500 font-normal leading-relaxed max-w-2xl">
+                {current.description}
+              </p>
+              <div className="flex flex-wrap gap-12 mt-4 items-center">
+                <div className="flex flex-col">
+                  <span className="text-[28px] font-bold text-slate-900">{current.stats.colleges}</span>
+                  <span className="text-sm font-medium text-slate-400">Colleges</span>
+                </div>
+                <span className="w-px h-12" style={{ backgroundColor: 'rgba(34, 34, 34, 1)' }} />
+                <div className="flex flex-col">
+                  <span className="text-[28px] font-bold text-slate-900">{current.stats.salary}</span>
+                  <span className="text-sm font-medium text-slate-400">Avg. Salary</span>
+                </div>
+                <span className="w-px h-12" style={{ backgroundColor: 'rgba(34, 34, 34, 1)' }} />
+                <div className="flex flex-col">
+                  <span className="text-[28px] font-bold" style={{ color: 'rgba(0, 177, 33, 1)' }}>{current.stats.growth}</span>
+                  <span className="text-sm font-medium text-slate-400">Job Growth</span>
+                </div>
+                <Link
+                  href={`/careers-courses?stream=${current.slug}`}
+                  className="flex items-center gap-2 hover:translate-x-1 transition-transform ml-4"
+                  style={{ color: '#FF3C3C', fontSize: '25px', fontWeight: 700 }}
+                >
+                  View more <span className="material-symbols-outlined" style={{ fontSize: '25px', fontWeight: 700 }}>arrow_forward</span>
+                </Link>
               </div>
             </div>
           </FadeIn>
 
           {/* ── Right Column: Selector List ───────────────────────────── */}
-          <FadeIn className="lg:col-span-4 bg-white rounded-[10px] border border-slate-100 p-0 shadow-xl shadow-black/5 flex flex-col h-full overflow-hidden" direction="right" delay={0.1}>
-             <div className="p-6 pb-4 border-b border-slate-50">
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                    <Search className="w-5 h-5" />
-                  </span>
-                  <input 
-                    type="text"
-                    placeholder="Search your course"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-12 pl-12 pr-6 bg-slate-50 border border-slate-100 focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none rounded-[10px] text-[16px] font-semibold transition-all placeholder:text-[#6C6C6C]"
-                  />
-                </div>
-             </div>
-             <div className="flex-1 px-3 py-3 flex flex-col gap-2">
-               {filteredCourses.map((course, idx) => {
-                 const originalIdx = courses.findIndex(c => c.id === course.id);
-                 return (
+          <FadeIn className="lg:col-span-4 bg-white rounded-[5px] border border-slate-200 p-0 shadow-[0_1px_3px_rgba(0,0,0,0.1)] flex flex-col h-full overflow-hidden" direction="right" delay={0.1}>
+            <div className="border-b border-slate-100">
+              <div className="relative border border-slate-200 rounded-[5px]">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#6C6C6C' }}>
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  placeholder="Search your course"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-16 pl-10 pr-4 outline-none rounded-[5px] transition-all"
+                  style={{ backgroundColor: 'rgba(244, 244, 244, 1)', fontSize: '20px', fontWeight: 400, color: 'rgba(108, 108, 108, 1)' }}
+                />
+              </div>
+            </div>
+            <div className="flex-1 flex flex-col gap-0">
+              {filteredCourses.map((course, idx) => {
+                const originalIdx = courses.findIndex(c => c.id === course.id);
+                return (
                   <button
                     key={course.id}
                     onMouseEnter={() => setActive(originalIdx)}
                     onClick={() => router.push(`/careers-courses?stream=${course.slug}`)}
-                    className={`flex items-center gap-4 p-3 rounded-[10px] transition-all duration-300 text-left ${
-                      active === originalIdx 
-                        ? 'translate-x-2 border border-[#ffd4d4] bg-[#fff5f5] text-slate-900'
-                        : 'border border-slate-200 bg-white text-slate-900 hover:bg-slate-50'
-                    }`}
-                    style={{
-                      boxShadow: active === originalIdx ? '0 10px 24px -14px rgba(255, 60, 60, 0.35)' : 'none'
-                    }}
+                    className={`flex items-center gap-4 p-4 transition-all duration-300 text-left border-b ${active === originalIdx
+                        ? 'bg-[#fff5f5] text-slate-900 border-l-4'
+                        : 'bg-white text-slate-900 hover:bg-slate-50'
+                      }`}
+                    style={active === originalIdx ? { borderLeftColor: 'rgba(216, 0, 5, 1)' } : { borderBottomColor: '#D9D9D9' }}
                   >
-                    <div className={`w-10 h-10 rounded-[8px] flex items-center justify-center shrink-0 transition-colors ${
-                      active === originalIdx ? 'border border-[#ffdcdc] bg-[#fff0f0] text-[#6C6C6C]' : 'border border-slate-200 bg-slate-50 text-[#6C6C6C]'
-                    }`}>
-                      <span className="material-symbols-outlined text-[20px]">{course.icon}</span>
+                    <div className="w-10 h-10 rounded-[5px] flex items-center justify-center shrink-0 transition-colors border border-black">
+                      <span className="material-symbols-outlined text-[20px] text-black">{course.icon}</span>
                     </div>
                     <div className="flex-1">
-                      <div className="text-[16px] font-semibold leading-none text-[#6C6C6C]">
+                      <div className="leading-none" style={{ fontWeight: 500, fontSize: '20px', color: 'rgba(108, 108, 108, 1)' }}>
                         {course.name}
                       </div>
                       <div className="text-[11px] mt-1 font-medium uppercase tracking-[0.1em] text-[#6C6C6C]">
@@ -245,12 +245,12 @@ export default function TopCourse() {
                       </div>
                     </div>
                     {active === originalIdx && (
-                       <span className="material-symbols-outlined text-[#6C6C6C] text-[20px]">arrow_forward</span>
+                      <span className="material-symbols-outlined text-[#6C6C6C] text-[20px]">arrow_forward</span>
                     )}
                   </button>
-                 );
-               })}
-             </div>
+                );
+              })}
+            </div>
           </FadeIn>
         </div>
       </div>

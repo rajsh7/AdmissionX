@@ -152,22 +152,11 @@ export default function TopUniversities({
           </div>
         </FadeIn>
 
-        <div className="mb-12 flex flex-col items-stretch gap-4 lg:flex-row lg:items-center">
-          <div className="group relative flex-1 rounded-[10px] border border-slate-100 bg-white shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all hover:shadow-lg">
-            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.3-4.3" />
+        <div className="mb-12 flex flex-col items-stretch gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="group relative flex-[0_0_800px] rounded-[5px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md flex">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </span>
             <input
@@ -176,24 +165,29 @@ export default function TopUniversities({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search your college, universities, courses..."
               suppressHydrationWarning
-              className="h-14 w-full rounded-[10px] bg-transparent pl-14 pr-4 text-base font-semibold text-slate-800 placeholder:text-[#6C6C6C] focus:outline-none"
+              className="h-12 flex-1 rounded-l-[5px] bg-transparent pl-12 text-base font-semibold text-slate-800 placeholder:text-[#6C6C6C] focus:outline-none"
             />
+            <button className="h-12 px-8 flex items-center justify-center rounded-r-[5px] bg-[#FF3C3C] text-white hover:bg-[#E63636] transition-colors font-semibold text-base whitespace-nowrap">
+              Search
+            </button>
           </div>
 
-          <div className="relative h-full">
-            <button
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className={`h-14 rounded-[10px] border px-8 text-sm font-semibold shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all active:scale-95 hover:shadow-lg ${
-                selectedCity !== "All Cities"
-                  ? "border-primary bg-primary text-white"
-                  : "border-slate-100 bg-white text-slate-600"
-              } flex items-center justify-center gap-2`}
-            >
-              <span className="material-symbols-rounded text-[20px]">
-                tune
-              </span>
-              {selectedCity === "All Cities" ? "Filters" : selectedCity}
-            </button>
+          <div className="flex items-center gap-3 ml-auto">
+            <div className="relative h-full">
+              <button
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                className={`h-12 rounded-[5px] border px-6 text-sm font-semibold transition-all active:scale-95 ${
+                  selectedCity !== "All Cities"
+                    ? "border-primary bg-primary text-white"
+                    : "border-slate-200 bg-white text-slate-600"
+                } flex items-center justify-center gap-2`}
+              >
+                <span className="material-symbols-rounded text-[20px]">
+                  tune
+                </span>
+                {selectedCity === "All Cities" ? "Filters" : selectedCity}
+              </button>
+            </div>
 
             <AnimatePresence>
               {isFilterOpen && (
@@ -237,10 +231,10 @@ export default function TopUniversities({
 
           <button
             onClick={() => setSortBy(sortBy === "rank" ? null : "rank")}
-            className={`h-14 rounded-[10px] border px-8 text-sm font-medium shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all active:scale-95 hover:shadow-lg ${
+            className={`h-12 rounded-[5px] border px-6 text-sm font-medium shadow-sm transition-all active:scale-95 hover:shadow-md ${
               sortBy === "rank"
-                ? "border-primary bg-primary text-white"
-                : "border-slate-100 bg-white text-slate-600"
+                ? "border-[#FF3C3C] bg-[#FF3C3C] text-white"
+                : "border-slate-200 bg-white text-slate-600"
             } flex items-center justify-center gap-2`}
           >
             <span className="material-symbols-rounded text-[20px]">
@@ -306,7 +300,7 @@ export default function TopUniversities({
 
                     <div className="flex flex-1 flex-col p-8">
                       <div className="mb-4 flex items-start justify-between">
-                        <h3 className="line-clamp-2 text-[16px] font-semibold leading-snug text-[#6C6C6C] transition-colors group-hover:text-primary">
+                        <h3 className="line-clamp-2 leading-snug transition-colors group-hover:text-primary" style={{ fontWeight: 700, fontSize: '22px', color: 'rgba(108, 108, 108, 1)' }}>
                           {uni.name}
                         </h3>
                       </div>
