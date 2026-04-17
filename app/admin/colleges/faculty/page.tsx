@@ -66,7 +66,7 @@ async function deleteFaculty(id: number) {
   revalidatePath("/", "layout");
 }
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 45;
 
 interface FacultyRow { id: number; name: string; suffix: string | null; designation_name: string | null; email: string | null; phone: string | null; imagename: string | null; college_name: string; collegeprofile_id: string; description: string | null; languageKnown: string | null; sortorder: string | null; gender: number | null; dob: string | null; }
 interface CollegeOption { id: number; name: string; }

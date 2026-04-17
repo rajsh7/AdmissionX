@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
+import PaginationFixed from "@/app/components/PaginationFixed";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -111,6 +112,14 @@ export default function ProfileClient({
   const [showFilters, setShowFilters] = useState(
     !!(q || filters.verified || filters.universityType || filters.showOnHome || filters.showOnTop)
   );
+  const [visibleCount, setVisibleCount] = useState(15);
+
+  const listKey = profiles[0]?.id ?? "empty";
+  const [lastKey, setLastKey] = useState(listKey);
+  if (listKey !== lastKey) {
+    setLastKey(listKey);
+    setVisibleCount(15);
+  }
 
   // ── Filter state — one entry per form field ─────────────────────────────────
   const [f, setF] = useState({
@@ -164,8 +173,11 @@ export default function ProfileClient({
     router.push(pathname);
   }
 
-  const start = (page - 1) * pageSize + 1;
-  const end   = Math.min(page * pageSize, total);
+  const showMore = visibleCount < profiles.length;
+  const showPagination = !showMore && totalPages > 1;
+
+  const start = total > 0 ? (page - 1) * 45 + 1 : 0;
+  const end = total > 0 ? (page - 1) * 45 + Math.min(visibleCount, profiles.length) : 0;
 
   const inputCls =
     "w-full h-10 px-3 border border-slate-200 rounded-[5px] bg-white text-slate-700 text-sm " +
@@ -423,12 +435,12 @@ export default function ProfileClient({
           <table className="w-full text-left border-collapse table-fixed">
             <colgroup>
               <col style={{ width: "4%" }} />
-              <col style={{ width: "27%" }} />
-              <col style={{ width: "12%" }} />
-              <col style={{ width: "10%" }} />
-              <col style={{ width: "22%" }} />
-              <col style={{ width: "12%" }} />
-              <col style={{ width: "13%" }} />
+              <col style={{ width: "25%" }} />
+              <col style={{ width: "11%" }} />
+              <col style={{ width: "9%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "14%" }} />
+              <col style={{ width: "17%" }} />
             </colgroup>
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
@@ -456,7 +468,7 @@ export default function ProfileClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {profiles.map((p, index) => (
+              {profiles.slice(0, visibleCount).map((p, index) => (
                 <tr
                   key={p.slug}
                   className="hover:bg-slate-50/60 transition-colors group"
@@ -464,7 +476,7 @@ export default function ProfileClient({
                   {/* ── S.No ── */}
                   <td className="px-3 py-2.5 text-center">
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
-                      {(page - 1) * pageSize + index + 1}
+                      {(page - 1) * 45 + index + 1}
                     </span>
                   </td>
 
@@ -545,58 +557,40 @@ export default function ProfileClient({
 
                   {/* ── Status & Flags ── */}
                   <td className="px-3 py-2.5">
-                    <div className="flex flex-wrap gap-1.5">
-                      {/* Verified */}
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${
-                          p.verified
-                            ? "bg-[#FF3C3C]/10 text-[#FF3C3C]"
-                            : "bg-slate-100 text-slate-500"
-                        }`}
-                      >
-                        <span className="material-symbols-outlined text-[12px]">
-                          {p.verified ? "verified" : "pending"}
-                        </span>
+                    <div className="grid grid-cols-2 gap-1">
+                      {/* Row 1 */}
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                        p.verified ? "bg-[#FF3C3C]/10 text-[#FF3C3C]" : "bg-slate-100 text-slate-500"
+                      }`}>
+                        <span className="material-symbols-outlined text-[12px]">{p.verified ? "verified" : "pending"}</span>
                         {p.verified ? "Verified" : "Unverified"}
                       </span>
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                        p.isTopUniversity === 1 ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-400"
+                      }`}>
+                        <span className="material-symbols-outlined text-[12px]">workspace_premium</span>
+                        Top Univ
+                      </span>
 
-                      {/* Top University */}
-                      {p.isTopUniversity === 1 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-700">
-                          <span className="material-symbols-outlined text-[12px]">
-                            workspace_premium
-                          </span>
-                          Top Univ
-                        </span>
-                      )}
+                      {/* Row 2 */}
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                        p.isShowOnHome === 1 ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-400"
+                      }`}>
+                        <span className="material-symbols-outlined text-[12px]">home</span>
+                        Home
+                      </span>
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                        p.isShowOnTop === 1 ? "bg-purple-100 text-purple-700" : "bg-slate-100 text-slate-400"
+                      }`}>
+                        <span className="material-symbols-outlined text-[12px]">trending_up</span>
+                        Top
+                      </span>
 
-                      {/* Show on Home */}
-                      {p.isShowOnHome === 1 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-700">
-                          <span className="material-symbols-outlined text-[12px]">
-                            home
-                          </span>
-                          Home
-                        </span>
-                      )}
-
-                      {/* Show on Top */}
-                      {p.isShowOnTop === 1 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-700">
-                          <span className="material-symbols-outlined text-[12px]">
-                            trending_up
-                          </span>
-                          Top
-                        </span>
-                      )}
-
-                      {/* Rating */}
-                      {p.rating > 0 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-yellow-50 text-yellow-700 border border-yellow-200">
-                          <span className="material-symbols-outlined text-[12px]">
-                            star
-                          </span>
-                          {p.rating.toFixed(1)}
+                      {/* Row 3 — Placements (only if exists) */}
+                      {p.count_placements > 0 && (
+                        <span className="col-span-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#FF3C3C]/10 text-[#FF3C3C]">
+                          <span className="material-symbols-outlined text-[12px]">monitoring</span>
+                          {p.count_placements} Placements
                         </span>
                       )}
                     </div>
@@ -605,32 +599,14 @@ export default function ProfileClient({
                   {/* ── Content Counts ── */}
                   <td className="px-3 py-2.5">
                     <div className="flex flex-col gap-1">
-                      <StatBadge
-                        count={p.count_courses}
-                        label="Courses"
-                        color="bg-[#FF3C3C]/10 text-[#FF3C3C]"
-                      />
-                      <StatBadge
-                        count={p.count_faculty}
-                        label="Faculty"
-                        color="bg-blue-50 text-blue-600"
-                      />
-                      <StatBadge
-                        count={p.count_reviews}
-                        label="Reviews"
-                        color="bg-amber-50 text-amber-600"
-                      />
-                      <StatBadge
-                        count={p.count_placements}
-                        label="Placements"
-                        color="bg-[#FF3C3C]/10 text-[#FF3C3C]"
-                      />
-                      {p.count_courses === 0 &&
-                        p.count_faculty === 0 &&
-                        p.count_reviews === 0 &&
-                        p.count_placements === 0 && (
-                          <span className="text-xs text-slate-300">—</span>
-                        )}
+                      <div className="flex gap-1">
+                        <StatBadge count={p.count_courses} label="Courses" color="bg-[#FF3C3C]/10 text-[#FF3C3C]" />
+                        <StatBadge count={p.count_faculty} label="Faculty" color="bg-blue-50 text-blue-600" />
+                      </div>
+                      <StatBadge count={p.count_reviews} label="Reviews" color="bg-amber-50 text-amber-600" />
+                      {p.count_courses === 0 && p.count_faculty === 0 && p.count_reviews === 0 && (
+                        <span className="text-xs text-slate-300">—</span>
+                      )}
                     </div>
                   </td>
 
@@ -683,65 +659,31 @@ export default function ProfileClient({
           </table>
         )}
 
+        {/* ── Show More ── */}
+        {showMore && (
+          <div className="mt-10 mb-8 flex flex-col items-center gap-2">
+            <button
+              onClick={() => setVisibleCount((c) => Math.min(c + 15, profiles.length))}
+              className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors"
+              type="button"
+            >
+              <span className="text-xs font-bold uppercase tracking-widest">
+                Show More
+              </span>
+              <span className="material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] animate-bounce">
+                keyboard_arrow_down
+              </span>
+            </button>
+          </div>
+        )}
+
         {/* ── Pagination ── */}
-        {totalPages > 1 && (
-          <div className="px-6 py-3 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+        {showPagination && (
+          <div className="px-6 py-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between bg-slate-50/50 mt-6 mb-6">
             <p className="text-sm text-slate-400 font-medium">
-              Page {page} of {totalPages}
+              Showing <strong>{start}</strong>-<strong>{end}</strong> of <strong>{total.toLocaleString()}</strong> profiles
             </p>
-            <div className="flex items-center gap-1.5">
-              {/* Prev */}
-              {page > 1 && (
-                <Link
-                  href={buildUrl({ page: page - 1 })}
-                  className="w-9 h-9 flex items-center justify-center rounded-[5px] border border-slate-200 text-slate-500 hover:border-[#FF3C3C] hover:text-[#FF3C3C] transition-colors bg-white"
-                >
-                  <span className="material-symbols-outlined text-[18px]">
-                    chevron_left
-                  </span>
-                </Link>
-              )}
-
-              {/* Page numbers */}
-              {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-                let p_num: number;
-                if (totalPages <= 7) {
-                  p_num = i + 1;
-                } else if (page <= 4) {
-                  p_num = i + 1;
-                } else if (page >= totalPages - 3) {
-                  p_num = totalPages - 6 + i;
-                } else {
-                  p_num = page - 3 + i;
-                }
-                const isActive = p_num === page;
-                return (
-                  <Link
-                    key={p_num}
-                    href={buildUrl({ page: p_num })}
-                    className={`w-9 h-9 flex items-center justify-center rounded-[5px] text-sm font-bold transition-colors ${
-                      isActive
-                        ? "bg-[#FF3C3C] text-white shadow-sm shadow-[#FF3C3C]/20"
-                        : "border border-slate-200 text-slate-500 hover:border-[#FF3C3C] hover:text-[#FF3C3C] bg-white"
-                    }`}
-                  >
-                    {p_num}
-                  </Link>
-                );
-              })}
-
-              {/* Next */}
-              {page < totalPages && (
-                <Link
-                  href={buildUrl({ page: page + 1 })}
-                  className="w-9 h-9 flex items-center justify-center rounded-[5px] border border-slate-200 text-slate-500 hover:border-[#FF3C3C] hover:text-[#FF3C3C] transition-colors bg-white"
-                >
-                  <span className="material-symbols-outlined text-[18px]">
-                    chevron_right
-                  </span>
-                </Link>
-              )}
-            </div>
+            <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
           </div>
         )}
       </div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import StudentProfileFormModal from "./StudentProfileFormModal";
 import { formatDate } from "@/lib/utils";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
+import PaginationFixed from "@/app/components/PaginationFixed";
 
 interface StudentProfileRow {
   id: number | string;
@@ -68,9 +69,21 @@ export default function StudentProfileClient({
         selectedParentsName,
     ),
   );
+  const [visibleCount, setVisibleCount] = useState(25);
 
-  const start = total > 0 ? (page - 1) * 25 + 1 : 0;
-  const end = Math.min(page * 25, total);
+  // Reset visibleCount when profiles change (new page loaded)
+  const profilesKey = profiles[0]?.id ?? "empty";
+  const [lastKey, setLastKey] = useState(profilesKey);
+  if (profilesKey !== lastKey) {
+    setLastKey(profilesKey);
+    setVisibleCount(25);
+  }
+
+  const showPagination = totalPages > 1 && visibleCount >= Math.min(100, profiles.length);
+  const showMore = visibleCount < profiles.length && !showPagination;
+
+  const start = total > 0 ? (page - 1) * 100 + 1 : 0;
+  const end = total > 0 ? (page - 1) * 100 + Math.min(visibleCount, profiles.length) : 0;
 
   const formatPhone = (val: string | null | undefined) => {
     if (!val) return "-";
@@ -89,7 +102,11 @@ export default function StudentProfileClient({
 
   return (
     <>
-      <div className="flex justify-end mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-lg font-black text-slate-800">Profile Information</h1>
+          <p className="text-xs text-slate-400 font-medium mt-0.5">Manage and monitor all student profiles</p>
+        </div>
         <button
           type="button"
           onClick={() => setShowFilters((value) => !value)}
@@ -249,7 +266,7 @@ export default function StudentProfileClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {profiles.map((profile, i) => (
+              {profiles.slice(0, visibleCount).map((profile, i) => (
                 <tr key={profile.id} className="hover:bg-slate-50/60 transition-colors group">
                   <td className="px-3 py-2.5 text-center">
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
@@ -327,38 +344,31 @@ export default function StudentProfileClient({
         )}
       </div>
 
-      {totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-          <p className="text-xs text-slate-500">
+      {/* Show More */}
+      {showMore && (
+        <div className="mt-10 flex flex-col items-center gap-2">
+          <button
+            onClick={() => setVisibleCount((c) => Math.min(c + 25, profiles.length))}
+            className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors"
+            type="button"
+          >
+            <span className="text-xs font-bold uppercase tracking-widest">
+              Show More
+            </span>
+            <span className="material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] animate-bounce">
+              keyboard_arrow_down
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Pagination — shows after all load more clicks */}
+      {showPagination && (
+        <div className="px-6 py-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between bg-slate-50/50 mt-6 mb-6">
+          <p className="text-sm text-slate-400 font-medium">
             Showing <strong>{start}</strong>-<strong>{end}</strong> of <strong>{total.toLocaleString()}</strong> profiles
           </p>
-          <div className="flex items-center gap-2">
-            {page > 1 ? (
-              <Link
-                href={buildPageHref(page - 1)}
-                className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-              >
-                Prev
-              </Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg">
-                Prev
-              </span>
-            )}
-            <span className="text-xs text-slate-500">Page {page} of {totalPages}</span>
-            {page < totalPages ? (
-              <Link
-                href={buildPageHref(page + 1)}
-                className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-              >
-                Next
-              </Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg">
-                Next
-              </span>
-            )}
-          </div>
+          <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
         </div>
       )}
 

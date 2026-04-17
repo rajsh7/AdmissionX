@@ -247,7 +247,7 @@ export default function SearchClient({
     : `Showing ${colleges.length > 0 ? (page - 1) * 12 + 1 : 0}–${Math.min(page * 12, total)} of ${total.toLocaleString()} ${entityNamePlural.toLowerCase()}`;
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
+    <div suppressHydrationWarning className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
       <Header />
       <div className="relative w-full z-20" style={{ height: heroHeight }}>
         <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">

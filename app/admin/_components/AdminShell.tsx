@@ -25,6 +25,7 @@ function AvatarDropdown({ admin, onLogout }: { admin: Admin; onLogout: () => voi
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-3 cursor-pointer group"
+        suppressHydrationWarning
       >
         <div className="w-9 h-9 rounded bg-slate-200 overflow-hidden border border-slate-300 shadow-sm flex items-center justify-center text-slate-500 font-bold relative">
           <span className="absolute z-0 text-sm font-bold">{admin.name.charAt(0).toUpperCase()}</span>
@@ -144,7 +145,7 @@ export default function AdminShell({
   })();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 font-display">
+    <div className="flex h-screen overflow-hidden bg-slate-50 font-display" suppressHydrationWarning>
 
       {/* ── Desktop sidebar (always visible ≥ lg) ──────────────────────────── */}
       <aside className={`hidden lg:flex flex-col flex-shrink-0 overflow-hidden transition-all duration-300 ${collapsed ? "w-16" : "w-56 xl:w-60"}`} style={{ backgroundColor: "#313131" }}>
@@ -188,10 +189,10 @@ export default function AdminShell({
             
             {/* Action Icons */}
             <div className="flex items-center gap-3 text-slate-600">
-              <button className="hover:text-slate-900 transition-colors p-1">
+              <button className="hover:text-slate-900 transition-colors p-1" suppressHydrationWarning>
                 <span className="material-symbols-rounded text-[24px]" style={ICO}>chat_bubble_outline</span>
               </button>
-              <button className="hover:text-slate-900 transition-colors p-1">
+              <button className="hover:text-slate-900 transition-colors p-1" suppressHydrationWarning>
                 <span className="material-symbols-rounded text-[24px]" style={ICO}>notifications</span>
               </button>
             </div>

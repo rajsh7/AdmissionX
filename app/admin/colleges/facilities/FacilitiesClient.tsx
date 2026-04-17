@@ -6,6 +6,8 @@ import AdminModal from "@/app/admin/_components/AdminModal";
 import FacilityForm from "./FacilityForm";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 
+import PaginationFixed from "@/app/components/PaginationFixed";
+
 interface FacilityRow {
   id: string;
   collegeprofile_id: string;
@@ -23,6 +25,8 @@ interface FacilitiesClientProps {
   offset: number;
   total: number;
   pageSize: number;
+  page?: number;
+  totalPages?: number;
   onDelete: (id: string) => Promise<void>;
   onAdd: (formData: FormData) => Promise<void>;
   q: string;
@@ -33,24 +37,20 @@ interface FacilitiesClientProps {
 }
 
 export default function FacilitiesClient({
-  facilitiesList,
-  colleges,
-  facilityTypes,
-  offset,
-  total,
-  pageSize,
-  onDelete,
-  onAdd,
-  q,
-  collegeId,
-  facilityTypeId,
-  displayName,
-  description,
+  facilitiesList, colleges, facilityTypes, offset, total, pageSize,
+  page = 1, totalPages = 1,
+  onDelete, onAdd, q, collegeId, facilityTypeId, displayName, description,
 }: FacilitiesClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showFilter, setShowFilter] = useState(
-    Boolean(q || collegeId || facilityTypeId || displayName || description),
-  );
+  const [showFilter, setShowFilter] = useState(Boolean(q || collegeId || facilityTypeId || displayName || description));
+  const [visibleCount, setVisibleCount] = useState(15);
+
+  const listKey = facilitiesList[0]?.id ?? "empty";
+  const [lastKey, setLastKey] = useState(listKey);
+  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(15); }
+
+  const showMore = visibleCount < facilitiesList.length;
+  const showPagination = !showMore && totalPages > 1;
 
   function openAdd() {
     setIsModalOpen(true);
@@ -76,8 +76,12 @@ export default function FacilitiesClient({
 
   return (
     <>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-end mb-4">
-        <div className="flex flex-col gap-2 sm:items-end">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-lg font-black text-slate-800">College Facilities</h1>
+          <p className="text-xs text-slate-400 font-medium mt-0.5">Manage and monitor all college facility records</p>
+        </div>
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setShowFilter((value) => !value)}
@@ -255,7 +259,7 @@ export default function FacilitiesClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {facilitiesList.map((f, idx) => {
+              {facilitiesList.slice(0, visibleCount).map((f, idx) => {
                 const college = colleges.find((c) => c.id === f.collegeprofile_id);
                 const facilityType = facilityTypes.find((ft) => ft.id === f.facilities_id);
                 const displayName = f.facility_name_raw || facilityType?.name || "General Facility";
@@ -325,19 +329,29 @@ export default function FacilitiesClient({
         )}
       </div>
 
-      <AdminModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        title="Add New Campus Facility"
-      >
-        <FacilityForm
-          colleges={colleges}
-          facilityTypes={facilityTypes}
-          initialData={null}
-          onSubmitAction={onAdd}
-          onSuccess={closeModal}
-        />
+      <AdminModal isOpen={isModalOpen} onClose={closeModal} title="Add New Campus Facility">
+        <FacilityForm colleges={colleges} facilityTypes={facilityTypes} initialData={null} onSubmitAction={onAdd} onSuccess={closeModal} />
       </AdminModal>
+
+      {/* Show More */}
+      {showMore && (
+        <div className="mt-10 mb-8 flex flex-col items-center gap-2">
+          <button onClick={() => setVisibleCount((c) => Math.min(c + 15, facilitiesList.length))} className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors" type="button">
+            <span className="text-xs font-bold uppercase tracking-widest">Show More</span>
+            <span className="material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] animate-bounce">keyboard_arrow_down</span>
+          </button>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {showPagination && (
+        <div className="px-6 py-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between bg-slate-50/50 mt-6 mb-6">
+          <p className="text-sm text-slate-400 font-medium">
+            Showing <strong>{offset + 1}</strong>–<strong>{Math.min(offset + pageSize, total)}</strong> of <strong>{total.toLocaleString()}</strong> facilities
+          </p>
+          <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
+        </div>
+      )}
     </>
   );
 }

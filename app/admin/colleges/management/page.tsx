@@ -3,7 +3,7 @@ import Link from "next/link";
 import { revalidatePath, unstable_cache } from "next/cache";
 import ManagementListClient from "./ManagementListClient";
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 45;
 
 interface ManagementRow {
   id: number;
@@ -322,29 +322,6 @@ export default async function CollegeManagementPage({
         search={q}
         selectedCollegeId={collegeId}
       />
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-          <p className="text-xs text-slate-500">
-            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, finalTotal)}</strong> of <strong>{finalTotal.toLocaleString()}</strong> records
-          </p>
-          <div className="flex items-center gap-1">
-            {page > 1 ? (
-              <Link href={buildPageHref(page - 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">← Prev</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-            )}
-            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">
-              {page} / {totalPages}
-            </span>
-            {page < totalPages ? (
-              <Link href={buildPageHref(page + 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Next →</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

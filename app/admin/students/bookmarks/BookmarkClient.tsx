@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import BookmarkFormModal from "./BookmarkFormModal";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
+import PaginationFixed from "@/app/components/PaginationFixed";
 
 interface BookmarkClientProps {
   bookmarks: any[];
@@ -38,9 +39,20 @@ export default function BookmarkClient({
 }: BookmarkClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(Boolean(q || selectedStudentId || selectedTypeId));
+  const [visibleCount, setVisibleCount] = useState(25);
 
-  const start = total > 0 ? offset + 1 : 0;
-  const end = Math.min(offset + PAGE_SIZE, total);
+  const marksKey = bookmarks[0]?.id ?? "empty";
+  const [lastKey, setLastKey] = useState(marksKey);
+  if (marksKey !== lastKey) {
+    setLastKey(marksKey);
+    setVisibleCount(25);
+  }
+
+  const showPagination = totalPages > 1 && visibleCount >= Math.min(100, bookmarks.length);
+  const showMore = visibleCount < bookmarks.length && !showPagination;
+
+  const start = total > 0 ? (page - 1) * 100 + 1 : 0;
+  const end = total > 0 ? (page - 1) * 100 + Math.min(visibleCount, bookmarks.length) : 0;
 
   const buildPageHref = (targetPage: number) => {
     const params = new URLSearchParams({ page: String(targetPage) });
@@ -208,7 +220,7 @@ export default function BookmarkClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {bookmarks.map((bookmark, idx) => {
+              {bookmarks.slice(0, visibleCount).map((bookmark, idx) => {
                 const label = bookmark.type_name || "Bookmark";
                 const created = bookmark.created_at
                   ? new Date(bookmark.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
@@ -297,34 +309,31 @@ export default function BookmarkClient({
         )}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="px-6 py-3 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+      {/* Show More */}
+      {showMore && (
+        <div className="mt-10 flex flex-col items-center gap-2">
+          <button
+            onClick={() => setVisibleCount((c) => Math.min(c + 25, bookmarks.length))}
+            className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors"
+            type="button"
+          >
+            <span className="text-xs font-bold uppercase tracking-widest">
+              Show More
+            </span>
+            <span className="material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] animate-bounce">
+              keyboard_arrow_down
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Pagination — shows after all load more clicks */}
+      {showPagination && (
+        <div className="px-6 py-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between bg-slate-50/50 mt-6 mb-6">
           <p className="text-sm text-slate-400 font-medium">
-            Page {page} of {totalPages}
+            Showing <strong>{start}</strong>-<strong>{end}</strong> of <strong>{total.toLocaleString()}</strong> bookmarks
           </p>
-          <div className="flex items-center gap-1.5">
-            {page > 1 && (
-              <Link
-                href={buildPageHref(page - 1)}
-                className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:border-[#008080] hover:text-[#008080] transition-colors bg-white"
-              >
-                <span className="material-symbols-outlined text-[18px]">
-                  chevron_left
-                </span>
-              </Link>
-            )}
-            {page < totalPages && (
-              <Link
-                href={buildPageHref(page + 1)}
-                className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:border-[#008080] hover:text-[#008080] transition-colors bg-white"
-              >
-                <span className="material-symbols-outlined text-[18px]">
-                  chevron_right
-                </span>
-              </Link>
-            )}
-          </div>
+          <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
         </div>
       )}
 

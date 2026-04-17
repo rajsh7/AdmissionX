@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
+import PaginationFixed from "@/app/components/PaginationFixed";
 import ReviewFormModal from "./ReviewFormModal";
 
 interface CollegeOption { id: string; name: string; }
@@ -41,8 +42,16 @@ export default function ReviewsListClient({
 }: ReviewsListClientProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
+  const [visibleCount, setVisibleCount] = useState(15);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const listKey = reviews[0]?.id ?? "empty";
+  const [lastKey, setLastKey] = useState(listKey);
+  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(15); }
+
+  const showMore = visibleCount < reviews.length;
+  const showPagination = !showMore && totalPages > 1;
 
   function handleSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -87,7 +96,6 @@ export default function ReviewsListClient({
         <form method="GET" action="/admin/colleges/reviews" onSubmit={handleSearch} className="flex flex-col gap-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="relative w-full">
-              <label className="absolute -top-2.5 left-3 bg-white px-1 text-[13px] font-semibold text-slate-500">College Name</label>
               <div className="relative group">
                 <select 
                   name="collegeName" 
@@ -163,7 +171,7 @@ export default function ReviewsListClient({
                 </tr>
               </thead>
               <tbody>
-                  {reviews.map((r, idx) => (
+                  {reviews.slice(0, visibleCount).map((r, idx) => (
                     <tr key={r.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors align-top">
                       {/* S.NO */}
                       <td className="px-4 py-4 text-slate-600 text-[13px]">{offset + idx + 1}</td>
@@ -267,24 +275,27 @@ export default function ReviewsListClient({
         )}
       </div>
 
+      {/* Show More */}
+      {showMore && (
+        <div className="mt-10 mb-8 flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setVisibleCount((c) => Math.min(c + 15, reviews.length))}
+            className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors"
+          >
+            <span className="text-xs font-bold uppercase tracking-widest">Show More</span>
+            <span className="material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] animate-bounce">keyboard_arrow_down</span>
+          </button>
+        </div>
+      )}
+
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-6">
-          <p className="text-xs text-slate-500">
-            Showing <strong>{offset + 1}–{Math.min(offset + pageSize, total)}</strong> of <strong>{total.toLocaleString()}</strong> reviews
+      {showPagination && (
+        <div className="px-6 py-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between bg-slate-50/50 mt-6 mb-6">
+          <p className="text-sm text-slate-400 font-medium">
+            Showing <strong>{offset + 1}</strong>–<strong>{Math.min(offset + pageSize, total)}</strong> of <strong>{total.toLocaleString()}</strong> reviews
           </p>
-          <div className="flex items-center gap-1">
-            {page > 1 ? (
-              <Link href={`/admin/colleges/reviews?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">← Prev</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-            )}
-            {page < totalPages ? (
-              <Link href={`/admin/colleges/reviews?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Next →</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-            )}
-          </div>
+          <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
         </div>
       )}
 

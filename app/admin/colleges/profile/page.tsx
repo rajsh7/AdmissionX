@@ -45,7 +45,8 @@ interface ProfileRow {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 45;
+const FETCH_SIZE = 45;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -84,7 +85,7 @@ export default async function CollegeProfilePage({
   const showOnHome    = sp.showOnHome ?? "";
   const showOnTop     = sp.showOnTop ?? "";
   const page          = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
-  const offset        = (page - 1) * PAGE_SIZE;
+  const offset        = (page - 1) * FETCH_SIZE;
 
   // ── Build MongoDB filter ──────────────────────────────────────────────────
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -220,7 +221,7 @@ export default async function CollegeProfilePage({
       })
       .sort({ created_at: -1 })
       .skip(offset)
-      .limit(PAGE_SIZE)
+      .limit(FETCH_SIZE)
       .toArray(),
   ]);
 
@@ -335,7 +336,7 @@ export default async function CollegeProfilePage({
     };
   });
 
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(total / FETCH_SIZE));
 
   // ── University type options (distinct, clean) ─────────────────────────────
   const rawTypes = await col

@@ -5,6 +5,8 @@ import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import CourseFormModal from "./CourseFormModal";
 
+import PaginationFixed from "@/app/components/PaginationFixed";
+
 interface Option {
   id: number;
   name: string;
@@ -30,6 +32,8 @@ interface CourseListClientProps {
   total: number;
   pageSize: number;
   offset: number;
+  page?: number;
+  totalPages?: number;
   searchQuery?: string;
   selectedCollegeId?: string;
   selectedCourseId?: string;
@@ -47,27 +51,23 @@ interface CourseListClientProps {
 }
 
 export default function CourseListClient({
-  courses,
-  total,
-  pageSize,
-  offset,
-  searchQuery = "",
-  selectedCollegeId = "",
-  selectedCourseId = "",
-  selectedDegreeId = "",
-  selectedStreamId = "",
-  selectedFees = "",
-  selectedSeats = "",
-  selectedDuration = "",
-  collegeOptions = [],
-  courseOptions = [],
-  degreeOptions = [],
-  streamOptions = [],
-  onAdd,
-  onDelete,
+  courses, total, pageSize, offset, page = 1, totalPages = 1,
+  searchQuery = "", selectedCollegeId = "", selectedCourseId = "",
+  selectedDegreeId = "", selectedStreamId = "", selectedFees = "",
+  selectedSeats = "", selectedDuration = "",
+  collegeOptions = [], courseOptions = [], degreeOptions = [], streamOptions = [],
+  onAdd, onDelete,
 }: CourseListClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(15);
+
+  const listKey = courses[0]?.id ?? "empty";
+  const [lastKey, setLastKey] = useState(listKey);
+  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(15); }
+
+  const showMore = visibleCount < courses.length;
+  const showPagination = !showMore && totalPages > 1;
   const [options, setOptions] = useState<{
     colleges: Option[];
     courseOptions: Option[];
@@ -146,8 +146,12 @@ export default function CourseListClient({
 
   return (
     <>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-end mb-4">
-        <div className="flex flex-col gap-2 sm:items-end">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-lg font-black text-slate-800">College Courses</h1>
+          <p className="text-xs text-slate-400 font-medium mt-0.5">Manage and monitor all college course listings</p>
+        </div>
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setShowFilters((value) => !value)}
@@ -349,7 +353,7 @@ export default function CourseListClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {courses.map((course, idx) => (
+              {courses.slice(0, visibleCount).map((course, idx) => (
                 <tr key={course.id} className="hover:bg-slate-50/60 transition-colors group">
                   <td className="px-3 py-2.5 text-center">
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
@@ -450,10 +454,28 @@ export default function CourseListClient({
         streams={options.streams}
         optionsLoading={optionsState === "loading"}
         optionsError={optionsError}
-        onRetryOptions={() => {
-          void loadOptions(true);
-        }}
+        onRetryOptions={() => { void loadOptions(true); }}
       />
+
+      {/* Show More */}
+      {showMore && (
+        <div className="mt-10 mb-8 flex flex-col items-center gap-2">
+          <button onClick={() => setVisibleCount((c) => Math.min(c + 15, courses.length))} className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors" type="button">
+            <span className="text-xs font-bold uppercase tracking-widest">Show More</span>
+            <span className="material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] animate-bounce">keyboard_arrow_down</span>
+          </button>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {showPagination && (
+        <div className="px-6 py-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between bg-slate-50/50 mt-6 mb-6">
+          <p className="text-sm text-slate-400 font-medium">
+            Showing <strong>{offset + 1}</strong>–<strong>{Math.min(offset + pageSize, total)}</strong> of <strong>{total.toLocaleString()}</strong> courses
+          </p>
+          <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
+        </div>
+      )}
     </>
   );
 }

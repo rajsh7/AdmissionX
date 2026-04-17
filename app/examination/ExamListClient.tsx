@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import PaginationFixed from "@/app/components/PaginationFixed";
 
 export interface ExamItem {
   id: number;
@@ -29,7 +30,7 @@ function formatDate(raw: string | null | undefined): string {
 }
 
 const PAGE_SIZE = 4;
-const SHOW_MORE_LIMIT = 12;
+const SHOW_MORE_LIMIT = 16;
 const CATEGORIES = ["All Exams", "Engineering", "Medical", "Management", "Government", "Law"];
 
 function stripHtml(html: string | null | undefined): string {
@@ -186,39 +187,28 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
           </div>
 
           {hasMore ? (
-            <div
-              onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-              className="mt-6 flex flex-row justify-center items-center gap-1.5 cursor-pointer select-none group"
-            >
-              <span className="text-sm font-bold text-neutral-500 group-hover:text-red-500 transition-colors">Show More</span>
-              <span className="material-symbols-outlined text-[18px] text-neutral-400 group-hover:text-red-500 transition-colors animate-bounce">expand_more</span>
+            <div className="mt-10 flex flex-col items-center gap-2">
+              <button
+                onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors"
+                type="button"
+              >
+                <span className="text-xs font-bold uppercase tracking-widest">
+                  Show More
+                </span>
+                <span className="material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] animate-bounce">
+                  keyboard_arrow_down
+                </span>
+              </button>
             </div>
           ) : totalPages > 1 ? (
-            <div className="flex items-center justify-center gap-2 mt-8 mb-4 text-[13px] font-bold text-neutral-600">
-              <button onClick={() => goToPage(Math.max(1, page - 1))} disabled={page === 1} className="w-7 h-7 flex items-center justify-center hover:bg-neutral-200 bg-white rounded-[5px] transition-colors shadow-sm disabled:opacity-40">
-                <span className="material-symbols-outlined text-[16px]">chevron_left</span>
-              </button>
-              {(() => {
-                const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1);
-                const items: (number | string)[] = [];
-                pages.forEach((p, idx) => {
-                  if (idx > 0 && p - pages[idx - 1] > 1) items.push(`dots-${p}`);
-                  items.push(p);
-                });
-                return items.map((p) =>
-                  typeof p === "string" ? (
-                    <span key={p} className="px-1 text-neutral-400 tracking-widest">...</span>
-                  ) : (
-                    <button key={`page-${p}`} onClick={() => goToPage(p)} className={`w-7 h-7 flex items-center justify-center rounded-[5px] transition-colors ${page === p ? "bg-red-500 text-white shadow-sm" : "border border-neutral-300 bg-white hover:bg-neutral-50"}`}>
-                      {p}
-                    </button>
-                  )
-                );
-              })()}
-              <button onClick={() => goToPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} className="w-7 h-7 flex items-center justify-center hover:bg-neutral-200 bg-white rounded-[5px] transition-colors shadow-sm disabled:opacity-40">
-                <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-              </button>
+            <div className="mt-10 mb-4 flex justify-center">
+              <PaginationFixed
+                currentPage={page}
+                totalPages={totalPages}
+                useUrl={false}
+                onPageChange={goToPage}
+              />
             </div>
           ) : null}
         </div>
