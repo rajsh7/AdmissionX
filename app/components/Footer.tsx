@@ -134,7 +134,9 @@ export default function Footer() {
             className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 lg:gap-6"
             stagger={0.06}
           >
-            {Object.entries(footerLinks).map(([title, links]) => (
+            {Object.entries(footerLinks).map(([title, links]) => {
+              const forceWhiteLinks = title === "Top Colleges" || title === "Top Universities";
+              return (
               <StaggerItem key={title}>
                 <h4 className="text-[13px] font-bold text-white mb-5 pb-2 border-b border-white/10">
                   {title}
@@ -144,7 +146,9 @@ export default function Footer() {
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className="text-[13px] text-slate-500 hover:text-white transition-colors leading-tight block"
+                        className={`text-[13px] transition-colors leading-tight block ${
+                          forceWhiteLinks ? "text-slate-200 hover:text-white" : "text-slate-200 hover:text-white"
+                        }`}
                       >
                         {link.label}
                       </Link>
@@ -152,7 +156,7 @@ export default function Footer() {
                   ))}
                 </ul>
               </StaggerItem>
-            ))}
+            )})}
           </StaggerContainer>
 
           {/* Divider */}

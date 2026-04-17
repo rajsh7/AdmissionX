@@ -91,11 +91,11 @@ export default function CourseFiltersV2({
         <div className="p-4 flex flex-col gap-4">
           {/* Course Name */}
           <div>
-            <label className="text-xs font-semibold text-neutral-700 mb-1.5 block">Course Name</label>
+            <label className="text-[16px] font-semibold text-[#6C6C6C] mb-1.5 block">Course Name</label>
             <input
               type="text"
               placeholder="Search course name"
-              className="w-full px-3 py-2.5 text-xs border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white placeholder:text-neutral-400 transition-all"
+              className="w-full px-3 py-2.5 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white placeholder:text-[#9AA0B4] transition-all"
               onKeyDown={(e) => {
                 if (e.key === "Enter") applyFilters({ q: (e.target as HTMLInputElement).value });
               }}
@@ -104,12 +104,12 @@ export default function CourseFiltersV2({
 
           {/* Degree */}
           <div>
-            <label className="text-xs font-semibold text-neutral-700 mb-1.5 block">Degree</label>
+            <label className="text-[16px] font-semibold text-[#6C6C6C] mb-1.5 block">Degree</label>
             <div className="relative">
               <select
                 value={degree}
                 onChange={(e) => { const val = e.target.value; setDegree(val); applyFilters({ degree: val }); }}
-                className="w-full px-3 pr-8 py-2.5 text-xs border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all text-neutral-600"
+                className="w-full px-3 pr-8 py-2.5 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all"
               >
                 <option value="">Select Degree...</option>
                 {levels.map((l) => (
@@ -122,12 +122,12 @@ export default function CourseFiltersV2({
 
           {/* Education Level */}
           <div>
-            <label className="text-xs font-semibold text-neutral-700 mb-1.5 block">Education Level</label>
+            <label className="text-[16px] font-semibold text-[#6C6C6C] mb-1.5 block">Education Level</label>
             <div className="relative">
               <select
                 value={level}
                 onChange={(e) => { const val = e.target.value; setLevel(val); applyFilters({ level: val }); }}
-                className="w-full px-3 pr-8 py-2.5 text-xs border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all text-neutral-600"
+                className="w-full px-3 pr-8 py-2.5 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all"
               >
                 <option value="">Select Education Level...</option>
                 {levels.map((l) => (
@@ -140,12 +140,12 @@ export default function CourseFiltersV2({
 
           {/* Stream */}
           <div>
-            <label className="text-xs font-semibold text-neutral-700 mb-1.5 block">Stream</label>
+            <label className="text-[16px] font-semibold text-[#6C6C6C] mb-1.5 block">Stream</label>
             <div className="relative">
               <select
                 value={stream}
                 onChange={(e) => { const val = e.target.value; setStream(val); applyFilters({ stream: val }); }}
-                className="w-full px-3 pr-8 py-2.5 text-xs border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all text-neutral-600"
+                className="w-full px-3 pr-8 py-2.5 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all"
               >
                 <option value="">Select Stream...</option>
                 {streams.map((s) => (
@@ -161,14 +161,14 @@ export default function CourseFiltersV2({
             <button
               type="button"
               onClick={() => applyFilters()}
-              className="w-full bg-[#FF3C3C] hover:bg-[#E63636] text-white text-xs font-bold py-2.5 rounded-[5px] transition-all"
+              className="w-full bg-[#FF3C3C] hover:bg-[#E63636] text-white text-[16px] font-semibold py-2.5 rounded-[5px] transition-all"
             >
               Apply filter
             </button>
             <button
               type="button"
               onClick={resetAll}
-              className="w-full bg-white border border-neutral-300 text-neutral-500 hover:text-neutral-700 text-xs font-bold py-2.5 rounded-[5px] transition-all"
+              className="w-full bg-white border border-neutral-300 text-[#6C6C6C] hover:text-[#6C6C6C] text-[16px] font-semibold py-2.5 rounded-[5px] transition-all"
             >
               Reset
             </button>

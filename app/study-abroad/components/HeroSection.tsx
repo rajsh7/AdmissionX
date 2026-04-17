@@ -2,40 +2,31 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
-const ALL_COUNTRIES = [
-  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia",
-  "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Belarus", "Belgium", "Belize",
-  "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei",
-  "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Chad", "Chile",
-  "China", "Colombia", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic",
-  "Denmark", "Djibouti", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Estonia",
-  "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Georgia", "Germany", "Ghana", "Greece",
-  "Guatemala", "Guinea", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia",
-  "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan",
-  "Kenya", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Libya", "Liechtenstein",
-  "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta",
-  "Mauritius", "Mexico", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique",
-  "Myanmar", "Namibia", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria",
-  "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Panama", "Paraguay", "Peru",
-  "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saudi Arabia",
-  "Senegal", "Serbia", "Singapore", "Slovakia", "Slovenia", "Somalia", "South Africa",
-  "South Korea", "Spain", "Sri Lanka", "Sudan", "Sweden", "Switzerland", "Syria", "Taiwan",
-  "Tajikistan", "Tanzania", "Thailand", "Tunisia", "Turkey", "Turkmenistan", "Uganda", "Ukraine",
-  "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan",
-  "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe",
-];
+interface CountryOption {
+  id: string | number;
+  name: string;
+}
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  countries: CountryOption[];
+  quickFilters: CountryOption[];
+}
+
+export default function HeroSection({ countries, quickFilters }: HeroSectionProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("Any Country");
+  const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
   const [countrySearch, setCountrySearch] = useState("");
   const [isCountryOpen, setIsCountryOpen] = useState(false);
   const countryRef = useRef<HTMLDivElement>(null);
 
   const filteredCountries = countrySearch.trim()
-    ? ALL_COUNTRIES.filter((c) => c.toLowerCase().includes(countrySearch.toLowerCase()))
-    : ALL_COUNTRIES;
+    ? countries.filter((country) =>
+        country.name.toLowerCase().includes(countrySearch.toLowerCase()),
+      )
+    : countries;
 
   useEffect(() => {
     function handler(e: MouseEvent) {
@@ -47,6 +38,33 @@ export default function HeroSection() {
   }, []);
 
   const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24" };
+
+  const applySearch = (overrides?: {
+    query?: string;
+    country?: CountryOption | null;
+  }) => {
+    const nextQuery = overrides?.query ?? searchQuery.trim();
+    const nextCountry = overrides?.country ?? selectedCountry;
+    const params = new URLSearchParams();
+
+    if (nextQuery) {
+      params.set("q", nextQuery);
+    }
+
+    if (nextCountry) {
+      params.set("country_id", String(nextCountry.id));
+    }
+
+    const queryString = params.toString();
+    router.push(queryString ? `/study-abroad?${queryString}` : "/study-abroad");
+  };
+
+  const handleQuickFilterClick = (country: CountryOption) => {
+    const isSameCountry = selectedCountry?.id === country.id;
+    const nextCountry = isSameCountry ? null : country;
+    setSelectedCountry(nextCountry);
+    applySearch({ country: nextCountry });
+  };
 
   return (
     <section className="relative bg-white pt-[120px] pb-48 overflow-visible border-b border-slate-50">
@@ -131,6 +149,12 @@ export default function HeroSection() {
                 placeholder="Location, universities, courses..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    applySearch();
+                  }
+                }}
                 className="w-full pl-12 pr-4 h-14 bg-white border border-slate-200 rounded-[5px] focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all font-medium text-slate-700 placeholder:text-slate-300"
               />
             </div>
@@ -145,7 +169,7 @@ export default function HeroSection() {
                 onClick={() => { setIsCountryOpen(!isCountryOpen); setCountrySearch(""); }}
                 className="w-full pl-12 pr-10 h-14 bg-white border border-slate-200 rounded-[5px] focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all font-bold text-slate-600 text-left cursor-pointer"
               >
-                {selectedCountry}
+                {selectedCountry?.name ?? "Any Country"}
               </button>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                 <span className="material-symbols-rounded text-slate-400">{isCountryOpen ? "expand_less" : "expand_more"}</span>
@@ -168,24 +192,24 @@ export default function HeroSection() {
                     <li>
                       <button
                         type="button"
-                        onClick={() => { setSelectedCountry("Any Country"); setIsCountryOpen(false); }}
+                        onClick={() => { setSelectedCountry(null); setIsCountryOpen(false); }}
                         className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition-colors ${
-                          selectedCountry === "Any Country" ? "text-[#FF3C3C]" : "text-slate-600"
+                          !selectedCountry ? "text-[#FF3C3C]" : "text-slate-600"
                         }`}
                       >
                         Any Country
                       </button>
                     </li>
                     {filteredCountries.map((country) => (
-                      <li key={country}>
+                      <li key={country.id}>
                         <button
                           type="button"
                           onClick={() => { setSelectedCountry(country); setIsCountryOpen(false); }}
                           className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition-colors ${
-                            selectedCountry === country ? "text-[#FF3C3C]" : "text-slate-600"
+                            selectedCountry?.id === country.id ? "text-[#FF3C3C]" : "text-slate-600"
                           }`}
                         >
-                          {country}
+                          {country.name}
                         </button>
                       </li>
                     ))}
@@ -198,23 +222,41 @@ export default function HeroSection() {
             </div>
 
             {/* Main Search Button */}
-            <button className="w-full lg:w-auto px-12 h-14 bg-[#FF3C3C] hover:bg-[#E23434] text-white rounded-[5px] font-bold text-lg transition-all shadow-lg shadow-red-500/20 flex items-center justify-center">
+            <button
+              type="button"
+              onClick={() => applySearch()}
+              className="w-full lg:w-auto px-12 h-14 bg-[#FF3C3C] hover:bg-[#E23434] text-white rounded-[5px] font-bold text-lg transition-all shadow-lg shadow-red-500/20 flex items-center justify-center"
+            >
               Search
             </button>
           </div>
 
           {/* Quick Filters */}
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span className="text-[13px] font-bold text-slate-300 uppercase tracking-widest mr-2">Quick Filters:</span>
-            {["Undergraduate", "Postgraduate", "Fall 2026"].map((filter) => (
-              <button 
-                key={filter}
-                className="px-5 py-1.5 rounded-[5px] border border-slate-100 text-[13px] font-bold text-slate-400 hover:border-[#FF3C3C] hover:text-[#FF3C3C] transition-all bg-slate-50/30 hover:bg-white"
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
+          {quickFilters.length > 0 && (
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <span className="text-[13px] font-bold text-slate-300 uppercase tracking-widest mr-2">
+                Popular Destinations:
+              </span>
+              {quickFilters.map((country) => {
+                const isActive = selectedCountry?.id === country.id;
+
+                return (
+                  <button
+                    key={country.id}
+                    type="button"
+                    onClick={() => handleQuickFilterClick(country)}
+                    className={`px-5 py-1.5 rounded-[5px] border text-[13px] font-bold transition-all ${
+                      isActive
+                        ? "border-[#FF3C3C] bg-red-50 text-[#FF3C3C]"
+                        : "border-slate-100 text-slate-400 hover:border-[#FF3C3C] hover:text-[#FF3C3C] bg-slate-50/30 hover:bg-white"
+                    }`}
+                  >
+                    {country.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
         </div>
       </div>

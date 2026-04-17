@@ -24,6 +24,20 @@ interface FilterOption {
   count?: number;
 }
 
+type CourseSort = "popular" | "newest" | "name";
+
+function getCourseSort(sort: string): Record<string, 1 | -1> {
+  if (sort === "newest") {
+    return { created_at: -1, id: -1 };
+  }
+
+  if (sort === "name") {
+    return { name: 1, id: -1 };
+  }
+
+  return { isShowOnTop: -1, id: -1 };
+}
+
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
@@ -37,6 +51,9 @@ export default async function CareerCoursesPage({ searchParams }: PageProps) {
   const level = getString("level");
   const degree = getString("degree");
   const stream = getString("stream");
+  const sortParam = getString("sort", "popular").trim().toLowerCase();
+  const sort: CourseSort =
+    sortParam === "newest" || sortParam === "name" ? sortParam : "popular";
   const page = Math.max(1, parseInt(getString("page", "1")));
   const limit = 12;
   const offset = (page - 1) * limit;
@@ -79,7 +96,7 @@ export default async function CareerCoursesPage({ searchParams }: PageProps) {
       .toArray(),
     db.collection("course").aggregate([
       { $match: filter },
-      { $sort: { id: -1 } },
+      { $sort: getCourseSort(sort) },
       { $skip: offset },
       { $limit: limit },
       { $lookup: { from: "degree", localField: "degree_id", foreignField: "id", as: "deg" } },
@@ -127,6 +144,7 @@ export default async function CareerCoursesPage({ searchParams }: PageProps) {
       initLevel={level}
       initDegree={degree}
       initStream={stream}
+      initSort={sort}
       initPage={page}
       heroImage="/Background-images/student-hero-bg.png"
       heroRightImage="/images/2999ec4e5233aa8cb9dbf010e3c51149ae41f951.png"

@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import FacultyFormModal from "./FacultyFormModal";
 
+import PaginationFixed from "@/app/components/PaginationFixed";
+
 interface CollegeOption { id: number; name: string; }
 
 interface FacultyListClientProps {
@@ -82,11 +84,17 @@ export default function FacultyListClient({
 }: FacultyListClientProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
-  const [showFilters, setShowFilters] = useState(
-    !!(q || collegeId || facultyName || email || phone || collegeName)
-  );
+  const [showFilters, setShowFilters] = useState(!!(q || collegeId || facultyName || email || phone || collegeName));
+  const [visibleCount, setVisibleCount] = useState(15);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const listKey = facultyMembers[0]?.id ?? "empty";
+  const [lastKey, setLastKey] = useState(listKey);
+  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(15); }
+
+  const showMore = visibleCount < facultyMembers.length;
+  const showPagination = !showMore && totalPages > 1;
 
   function handleSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -208,17 +216,21 @@ export default function FacultyListClient({
 
       {/* Cards List */}
       <div className="flex flex-col gap-6 w-full">
-        {facultyMembers.map((f, idx) => (
+        {facultyMembers.slice(0, visibleCount).map((f, idx) => (
           <div key={f.id} className="bg-[#fafafa] border border-slate-200 rounded-[4px] p-5 flex flex-col xl:flex-row gap-6 w-full">
             
             {/* Left Image */}
             <div 
-              className="relative flex-shrink-0 flex items-center justify-center text-[100px] font-serif shadow-inner overflow-hidden rounded-[2px]"
-              style={{ width: "269px", minWidth: "269px", height: "265px", backgroundColor: "#D77809", color: "white" }}
+              className="relative flex-shrink-0 flex items-center justify-center overflow-hidden rounded-[2px]"
+              style={{ width: "269px", minWidth: "269px", height: "265px", backgroundColor: "#ffffff" }}
             >
-               <span className="font-bold tracking-widest z-0" style={{ textShadow: "4px 4px 0px rgba(0,0,0,0.15), 6px 6px 8px rgba(0,0,0,0.3)" }}>
-                AKT
-              </span>
+              {/* Default: Saroje Education Group Logo */}
+              <img
+                src="/seglogo.webp"
+                alt="Saroje Education Group"
+                className="w-full h-full object-contain p-4 z-0"
+                onError={(e) => { e.currentTarget.style.display = "none"; }}
+              />
               {f.imagename && (
                 <img 
                   src={buildAvatarUrl(f.imagename)} 
@@ -306,24 +318,23 @@ export default function FacultyListClient({
         ))}
       </div>
 
+      {/* Show More */}
+      {showMore && (
+        <div className="mt-10 mb-8 flex flex-col items-center gap-2">
+          <button onClick={() => setVisibleCount((c) => Math.min(c + 15, facultyMembers.length))} className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors" type="button">
+            <span className="text-xs font-bold uppercase tracking-widest">Show More</span>
+            <span className="material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] animate-bounce">keyboard_arrow_down</span>
+          </button>
+        </div>
+      )}
+
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-8">
-          <p className="text-xs text-slate-500">
-            Showing <strong>{offset + 1}–{Math.min(offset + pageSize, total)}</strong> of <strong>{total.toLocaleString()}</strong> faculty members
+      {showPagination && (
+        <div className="px-6 py-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between bg-slate-50/50 mt-6 mb-6">
+          <p className="text-sm text-slate-400 font-medium">
+            Showing <strong>{offset + 1}</strong>–<strong>{Math.min(offset + pageSize, total)}</strong> of <strong>{total.toLocaleString()}</strong> faculty members
           </p>
-          <div className="flex items-center gap-1">
-            {page > 1 ? (
-              <Link href={`/admin/colleges/faculty?page=${page - 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">← Prev</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-            )}
-            {page < totalPages ? (
-              <Link href={`/admin/colleges/faculty?page=${page + 1}${q ? `&q=${q}` : ''}`} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Next →</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-            )}
-          </div>
+          <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
         </div>
       )}
 

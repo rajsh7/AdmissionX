@@ -74,11 +74,13 @@ function totalBlogPages(total: number, q: string): number {
 export default async function BlogsListingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; q?: string }>;
+  searchParams: Promise<{ page?: string; q?: string; sort?: string }>;
 }) {
-  const { page: pageParam, q: qParam } = await searchParams;
+  const { page: pageParam, q: qParam, sort: sortParam } = await searchParams;
   const currentPage = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
   const q = (qParam ?? "").trim();
+  const currentSort: "latest" | "oldest" = sortParam === "oldest" ? "oldest" : "latest";
+  const createdAtSort = currentSort === "oldest" ? 1 : -1;
 
   const db = await getDb();
 
@@ -124,7 +126,7 @@ export default async function BlogsListingPage({
   const rawBlogs = await db
     .collection("blogs")
     .find(filter)
-    .sort({ created_at: -1 })
+    .sort({ created_at: createdAtSort })
     .skip(skip)
     .limit(limit)
     .project({ id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 })
@@ -137,6 +139,7 @@ export default async function BlogsListingPage({
     const params = new URLSearchParams();
     if (p > 1) params.set("page", String(p));
     if (q) params.set("q", q);
+    if (currentSort !== "latest") params.set("sort", currentSort);
     const qs = params.toString();
     return `/blogs${qs ? `?${qs}` : ""}`;
   }
@@ -208,20 +211,21 @@ export default async function BlogsListingPage({
                 </div>
                 <Link
                   href={`/blogs/${featured.slug}`}
-                  className="relative w-full lg:w-[35%] min-h-[220px] lg:min-h-[280px] shrink-0 order-1 lg:order-2 bg-neutral-200 lg:m-0 lg:rounded-none overflow-hidden"
+                  className="relative w-full lg:w-[35%] min-h-[220px] lg:min-h-[280px] shrink-0 order-1 lg:order-2 lg:m-0 lg:rounded-none overflow-hidden"
                 >
                   <BlogImage
                     src={buildImageUrl(featured.featimage)}
                     alt={featured.topic}
                     className="w-full h-full min-h-[220px] lg:min-h-full object-cover rounded-none"
                   />
+                  <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-l from-transparent to-white/75 hidden lg:block" />
                 </Link>
               </div>
             </section>
           )}
 
           {/* Search + filters */}
-          <BlogFilters currentQuery={q} />
+          <BlogFilters currentQuery={q} currentSort={currentSort} />
 
           {q && (
             <div className="mb-6 flex flex-wrap items-center gap-2 text-sm">

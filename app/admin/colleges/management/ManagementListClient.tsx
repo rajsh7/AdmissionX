@@ -3,8 +3,9 @@
 import { useState } from "react";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import ManagementFormModal from "./ManagementFormModal";
-import Image from "next/image";
 import { createManagementMember, updateManagementMember, deleteManagementRow } from "./actions";
+
+import PaginationFixed from "@/app/components/PaginationFixed";
 
 interface Option { id: number; name: string; }
 
@@ -31,20 +32,24 @@ interface ManagementListClientProps {
   selectedCollegeId?: string;
 }
 
+const STEP = 15;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
 export default function ManagementListClient({
-  members,
-  colleges,
-  offset,
-  total,
-  page,
-  totalPages,
-  search = "",
-  selectedCollegeId = "",
+  members, colleges, offset, total, page, totalPages, search = "", selectedCollegeId = "",
 }: ManagementListClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<ManagementRow | null>(null);
+  const [visibleCount, setVisibleCount] = useState(STEP);
+
+  const listKey = members[0]?.id ?? "empty";
+  const [lastKey, setLastKey] = useState(listKey);
+  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(STEP); }
+
+  const showMore = visibleCount < members.length;
+  const showPagination = !showMore && totalPages > 1;
+  const start = total > 0 ? offset + 1 : 0;
+  const end = Math.min(offset + members.length, total);
 
   function openAdd() {
     setEditingMember(null);
@@ -99,21 +104,30 @@ export default function ManagementListClient({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {members.map((m, idx) => (
+                {members.slice(0, visibleCount).map((m, idx) => (
                   <tr key={m.id} className="hover:bg-blue-50/20 transition-colors group">
                     <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-slate-100 relative overflow-hidden flex-shrink-0 border border-slate-100">
-                          <Image
-                            src={m.picture ? (m.picture.startsWith('http') ? m.picture : `https://admin.admissionx.in/uploads/${m.picture}`) : '/placeholder.png'}
-                            alt={m.name}
-                            fill
-                            sizes="40px"
-                            className="object-cover"
-                            loading="lazy"
-                            unoptimized={Boolean(m.picture)}
-                          />
+                        <div className="w-10 h-10 rounded-full bg-slate-100 relative overflow-hidden flex-shrink-0 border border-slate-100 flex items-center justify-center">
+                          {m.picture ? (
+                            <img
+                              src={m.picture.startsWith('http') ? m.picture : `/uploads/${m.picture}`}
+                              alt={m.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                                const fb = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (fb) fb.style.display = "flex";
+                              }}
+                            />
+                          ) : null}
+                          <div
+                            className="w-full h-full items-center justify-center bg-slate-200 text-slate-500 font-black text-sm rounded-full"
+                            style={{ display: m.picture ? "none" : "flex" }}
+                          >
+                            {(m.name || "?")[0].toUpperCase()}
+                          </div>
                         </div>
                         <div className="flex flex-col min-w-0">
                           <span className="font-bold text-slate-800 leading-none truncate">
@@ -160,6 +174,26 @@ export default function ManagementListClient({
         member={editingMember}
         colleges={colleges}
       />
+
+      {/* Show More */}
+      {showMore && (
+        <div className="mt-10 mb-8 flex flex-col items-center gap-2">
+          <button onClick={() => setVisibleCount((c) => Math.min(c + STEP, members.length))} className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors" type="button">
+            <span className="text-xs font-bold uppercase tracking-widest">Show More</span>
+            <span className="material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] animate-bounce">keyboard_arrow_down</span>
+          </button>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {showPagination && (
+        <div className="px-6 py-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between bg-slate-50/50 mt-6 mb-6">
+          <p className="text-sm text-slate-400 font-medium">
+            Showing <strong>{start}</strong>–<strong>{end}</strong> of <strong>{total.toLocaleString()}</strong> records
+          </p>
+          <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
+        </div>
+      )}
     </>
   );
 }

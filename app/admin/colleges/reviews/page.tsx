@@ -88,7 +88,7 @@ async function deleteReview(id: string) {
   revalidatePath("/admin/colleges/reviews");
 }
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 45;
 
 function escapeRegex(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

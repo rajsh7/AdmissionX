@@ -75,23 +75,21 @@ export default function EventListClient({
   return (
     <>
       {/* Add button and filter toggle */}
-      <div className="flex flex-col gap-3 sm:flex-row items-start justify-end gap-3 mb-4">
-        <div className="flex flex-col gap-2 sm:items-end">
-          <button
-            type="button"
-            onClick={() => setFiltersOpen((prev) => !prev)}
-            className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 rounded text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-all"
-          >
-            <span className="material-symbols-rounded text-[18px]">filter_alt</span>
-            Filters
-          </button>
-          <button
-            onClick={openAdd}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
-          >
-            Add new college event +
-          </button>
-        </div>
+      <div className="flex items-center justify-end gap-3 mb-4">
+        <button
+          type="button"
+          onClick={() => setFiltersOpen((prev) => !prev)}
+          className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 rounded text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-all"
+        >
+          <span className="material-symbols-rounded text-[18px]">filter_alt</span>
+          Filters
+        </button>
+        <button
+          onClick={openAdd}
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
+        >
+          Add new college event +
+        </button>
       </div>
 
       {filtersOpen && (

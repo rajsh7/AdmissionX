@@ -278,7 +278,7 @@ function ComparePageInner() {
         </section>
 
         <div className="max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-24 relative z-40 -mt-10">
-          <div className="bg-white rounded-[5px] border border-slate-100 overflow-hidden" style={{ boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>
+          <div className="bg-white rounded-[5px] border border-slate-100 overflow-hidden" style={{ boxShadow: "0 8px 20px -16px rgba(0, 0, 0, 0.12)" }}>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>

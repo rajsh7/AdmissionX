@@ -19,16 +19,24 @@ import CourseFiltersV2 from "./CourseFiltersV2";
 import PaginationFixed from "./PaginationFixed";
 import type { CourseResult } from "@/app/api/search/courses/route";
 
+interface FilterOption {
+  id: string | number;
+  name: string;
+  slug?: string;
+  count?: number;
+}
+
 interface CourseSearchClientProps {
   initialCourses: CourseResult[];
   initialTotal: number;
   initialTotalPages: number;
-  levels: any[];
-  streams: any[];
+  levels: FilterOption[];
+  streams: FilterOption[];
   initQ: string;
   initLevel: string;
   initDegree: string;
   initStream: string;
+  initSort: string;
   initPage: number;
   heroImage?: string;
   heroRightImage?: string;
@@ -36,6 +44,12 @@ interface CourseSearchClientProps {
   heroObjectPosition?: string;
   heroFit?: "cover" | "contain";
 }
+
+const SORT_OPTIONS = [
+  { value: "popular", label: "Most Popular" },
+  { value: "newest", label: "Newest" },
+  { value: "name", label: "A-Z" },
+] as const;
 
 export default function ListingSearchV4({
   initialCourses,
@@ -47,6 +61,7 @@ export default function ListingSearchV4({
   initLevel,
   initDegree,
   initStream,
+  initSort,
   initPage,
   heroImage = "/images/hero-student.png",
   heroRightImage = "/images/2999ec4e5233aa8cb9dbf010e3c51149ae41f951.png",
@@ -70,6 +85,7 @@ export default function ListingSearchV4({
   const level = searchParams.get("level") ?? initLevel;
   const degree = searchParams.get("degree") ?? initDegree;
   const stream = searchParams.get("stream") ?? initStream;
+  const sort = searchParams.get("sort") ?? initSort;
   const page = parseInt(searchParams.get("page") ?? String(initPage));
 
   useEffect(() => {
@@ -185,29 +201,29 @@ export default function ListingSearchV4({
               {/* Active Filters + Sort bar */}
               <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap uppercase tracking-wider mr-1">Active Filters:</span>
+                  <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap tracking-wider mr-1">Active Filters:</span>
                   {q && (
-                    <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                    <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
                       {q}
-                      <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("q"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                      <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("q"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="text-[#6C6C6C] hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
                     </div>
                   )}
                   {degree && (
-                    <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                    <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
                       {levels.find((l) => l.slug === degree)?.name || degree}
-                      <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("degree"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                      <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("degree"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="text-[#6C6C6C] hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
                     </div>
                   )}
                   {level && (
-                    <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                    <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
                       {levels.find((l) => l.slug === level)?.name || level}
-                      <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("level"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                      <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("level"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="text-[#6C6C6C] hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
                     </div>
                   )}
                   {stream && (
-                    <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                    <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
                       {streams.find((s) => s.slug === stream)?.name || stream}
-                      <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("stream"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                      <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("stream"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="text-[#6C6C6C] hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
                     </div>
                   )}
                   {!q && !degree && !level && !stream && (
@@ -216,10 +232,32 @@ export default function ListingSearchV4({
                 </div>
                 {/* Sort By */}
                 <div className="flex items-center gap-2">
-                  <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap uppercase tracking-wider">Short by:</span>
-                  <div className="flex items-center gap-1.5 bg-white border border-neutral-200 rounded-[6px] px-3 py-1.5 shadow-sm cursor-pointer">
-                    <span className="text-[13px] font-semibold text-neutral-700">Most Popular</span>
-                    <span className="material-symbols-outlined text-[16px] text-neutral-400">expand_more</span>
+                  <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap tracking-wider">Short by:</span>
+                  <div className="relative">
+                    <select
+                      value={sort || "popular"}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const p = new URLSearchParams(searchParams.toString());
+                        if (!val || val === "popular") p.delete("sort");
+                        else p.set("sort", val);
+                        p.delete("page");
+                        setLoading(true);
+                        startTransition(() => {
+                          router.push(`${pathname}?${p.toString()}`);
+                        });
+                      }}
+                      className="appearance-none bg-white border border-neutral-200 rounded-[6px] px-3 pr-9 py-1.5 text-[13px] font-medium text-[#6C6C6C] shadow-sm focus:outline-none focus:border-[#FF3C3C]/30 transition-all cursor-pointer min-w-[142px]"
+                    >
+                      {SORT_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[16px] text-neutral-400 pointer-events-none">
+                      expand_more
+                    </span>
                   </div>
                 </div>
               </div>

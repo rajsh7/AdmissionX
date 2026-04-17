@@ -92,8 +92,8 @@ function AdContent({ ad, imgSrc }: { ad: AdItem; imgSrc: string | null }) {
         </>
       ) : (
         <div className="flex flex-col justify-center h-full w-full px-6 bg-gradient-to-br from-primary/10 to-primary/5">
-          <p className="font-bold text-slate-800 text-lg line-clamp-2">{ad.title || "Featured Partner"}</p>
-          {ad.description && <p className="text-slate-500 text-sm mt-2 line-clamp-2">{ad.description}</p>}
+          <p className="font-bold text-lg line-clamp-2" style={{ color: '#334155' }}>{ad.title || "Featured Partner"}</p>
+          {ad.description && <p className="text-sm mt-2 line-clamp-2" style={{ color: '#334155' }}>{ad.description}</p>}
         </div>
       )}
       <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-widest bg-black/50 text-white/90 px-2 py-0.5 rounded-full backdrop-blur-md z-10">

@@ -65,6 +65,7 @@ interface ExamBaseRow {
   applicationTo: string | null;
   exminationDate: string | null;
   resultAnnounce: string | null;
+  syllabus: string | null;
 }
 
 interface ExamDateRow {
@@ -134,6 +135,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
     getMoreInfoLink: examDoc.getMoreInfoLink ?? null,
     applicationFrom: examDoc.applicationFrom ?? null, applicationTo: examDoc.applicationTo ?? null,
     exminationDate: examDoc.exminationDate ?? null, resultAnnounce: examDoc.resultAnnounce ?? null,
+    syllabus: examDoc.syllabus ?? null,
   };
 
   // ── Step 2: fetch all sub-data in parallel using exam.id ─────────────────
@@ -159,6 +161,7 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
   const hasPattern = patternRows.length > 0;
   const hasFees = feeRows.length > 0;
   const hasProcess = appProcessRows.length > 0;
+  const hasSyllabus = !!exam.syllabus;
 
   // ── Jump nav items ────────────────────────────────────────────────────────
   const jumpItems = [
@@ -174,6 +177,12 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
       label: "Eligibility",
       show: hasEligibility,
       icon: "verified",
+    },
+    {
+      id: "syllabus",
+      label: "Syllabus",
+      show: hasSyllabus,
+      icon: "menu_book",
     },
     {
       id: "pattern",
@@ -449,6 +458,33 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
               </p>
             </div>
           ) : null}
+        </section>
+      )}
+
+      {/* ── Syllabus ───────────────────────────────────────────────────── */}
+      {hasSyllabus && (
+        <section
+          id="syllabus"
+          className="bg-white rounded-2xl border border-neutral-100 p-6 scroll-mt-24 shadow-md"
+        >
+          <SectionTitle icon="menu_book" title="Syllabus" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+            <p className="text-sm text-black font-medium leading-relaxed">
+              View and download the complete syllabus for {exam.title}.
+            </p>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById("syllabus-modal")?.classList.remove("hidden");
+                document.getElementById("syllabus-modal")?.classList.add("flex");
+              }}
+              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg"
+            >
+              <span className="material-symbols-outlined text-[18px]">visibility</span>
+              View Syllabus
+            </a>
+          </div>
         </section>
       )}
 
@@ -757,6 +793,68 @@ export default async function ExamOverviewPage({ params }: { params: Promise<{ s
               arrow_forward
             </span>
           </a>
+        </div>
+      )}
+
+      {/* ── Syllabus Modal ───────────────────────────────────────────────── */}
+      {hasSyllabus && exam.syllabus && (
+        <div
+          id="syllabus-modal"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              e.currentTarget.classList.add("hidden");
+              e.currentTarget.classList.remove("flex");
+            }
+          }}
+        >
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 shrink-0">
+              <h3 className="text-lg font-black text-black flex items-center gap-2">
+                <span className="material-symbols-outlined text-[22px] text-red-500" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  menu_book
+                </span>
+                {exam.title} Syllabus
+              </h3>
+              <button
+                onClick={() => {
+                  document.getElementById("syllabus-modal")?.classList.add("hidden");
+                  document.getElementById("syllabus-modal")?.classList.remove("flex");
+                }}
+                className="w-8 h-8 rounded-lg bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors"
+              >
+                <span className="material-symbols-outlined text-[20px] text-neutral-600">close</span>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div className="prose prose-sm max-w-none text-black font-medium leading-relaxed whitespace-pre-line">
+                {stripHtml(exam.syllabus)}
+              </div>
+            </div>
+            <div className="flex items-center justify-between px-6 py-4 border-t border-neutral-100 bg-neutral-50 shrink-0">
+              <p className="text-xs text-neutral-500">
+                Download the official syllabus for reference.
+              </p>
+              <button
+                onClick={() => {
+                  const content = stripHtml(exam.syllabus);
+                  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `${exam.title.replace(/[^a-z0-9]/gi, "-")}-syllabus.txt`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                }}
+                className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg"
+              >
+                <span className="material-symbols-outlined text-[18px]">download</span>
+                Download
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

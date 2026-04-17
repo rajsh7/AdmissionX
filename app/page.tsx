@@ -128,7 +128,7 @@ const getHomePageData = unstable_cache(
         ]).toArray() as Promise<(CollegeRow & { avgPackage?: string })[]>,
 
         // 2. Latest 8 active blogs
-        db.collection("blogs").find({ isactive: 1 }).sort({ created_at: -1 }).limit(8).project({ _id: 0, id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 }).toArray() as Promise<DbBlog[]>,
+        db.collection("blogs").find({ isactive: 1 }).sort({ created_at: -1 }).limit(8).project({ _id: 0, id: 1, topic: 1, featimage: 1, fullimage: 1, image: 1, description: 1, slug: 1, created_at: 1 }).toArray() as Promise<DbBlog[]>,
 
         // 3. Top 8 exams
         db.collection("examination_details").find({}).sort({ totalViews: -1, created_at: -1 }).limit(8).project({ _id: 0, id: 1, title: 1, slug: 1, exminationDate: 1, image: 1, functionalarea_id: 1, courses_id: 1, totalViews: 1 }).toArray() as Promise<DbExam[]>,

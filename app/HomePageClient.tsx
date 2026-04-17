@@ -57,7 +57,7 @@ export default function HomePageClient({
   const switchMode = (mode: "login" | "register") => setAuthModal(mode);
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 selection:bg-primary selection:text-white">
+    <div suppressHydrationWarning className="min-h-screen bg-white text-slate-900 selection:bg-primary selection:text-white">
       {authModal && (
         <AuthModal mode={authModal} onClose={closeModal} onSwitchMode={switchMode} />
       )}

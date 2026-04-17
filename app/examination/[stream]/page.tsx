@@ -36,7 +36,7 @@ function isUpcoming(raw: string | null | undefined): boolean {
 interface ExamRow {
   id: number;
   title: string;
-  slug: string;
+  slug: string | null;
   image: string | null;
   description: string | null;
   applicationFrom: string | null;
@@ -45,6 +45,7 @@ interface ExamRow {
   resultAnnounce: string | null;
   status: string | null;
   exam_type_name: string | null;
+  getMoreInfoLink: string | null;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ stream: string }> }): Promise<Metadata> {
@@ -72,7 +73,7 @@ export default async function ExaminationStreamPage({ params }: { params: Promis
     const examDocs = await db.collection("examination_details")
       .find({ functionalarea_id: secDoc.functionalarea_id, slug: { $exists: true, $ne: "" } })
       .sort({ created_at: -1 })
-      .project({ id: 1, title: 1, slug: 1, image: 1, description: 1, applicationFrom: 1, applicationTo: 1, exminationDate: 1, resultAnnounce: 1, status: 1, typeOfExaminations_id: 1 })
+      .project({ id: 1, title: 1, slug: 1, image: 1, description: 1, applicationFrom: 1, applicationTo: 1, exminationDate: 1, resultAnnounce: 1, status: 1, typeOfExaminations_id: 1, getMoreInfoLink: 1 })
       .toArray();
 
     const typeIds = [...new Set(examDocs.map((e) => e.typeOfExaminations_id).filter(Boolean))];
@@ -87,6 +88,7 @@ export default async function ExaminationStreamPage({ params }: { params: Promis
       applicationTo: e.applicationTo ?? null, exminationDate: e.exminationDate ?? null,
       resultAnnounce: e.resultAnnounce ?? null, status: e.status ?? null,
       exam_type_name: e.typeOfExaminations_id ? (typeMap[e.typeOfExaminations_id] ?? null) : null,
+      getMoreInfoLink: e.getMoreInfoLink ?? null,
     }));
   }
 

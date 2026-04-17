@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface DestinationCardProps {
+  href: string;
   country: string;
   image: string;
   fees: string;
@@ -16,6 +17,7 @@ interface DestinationCardProps {
 }
 
 const DestinationCard = ({
+  href,
   country,
   image,
   fees,
@@ -66,14 +68,36 @@ const DestinationCard = ({
         </div>
       </div>
 
-      <button className="w-full mt-8 py-3.5 border border-[#FF3C3C] text-[#FF3C3C] hover:bg-[#FF3C3C] hover:text-white rounded-[5px] font-bold text-[15px] transition-all flex items-center justify-center active:scale-[0.98]">
+      <Link
+        href={href}
+        className="w-full mt-8 py-3.5 border border-[#FF3C3C] text-[#FF3C3C] hover:bg-[#FF3C3C] hover:text-white rounded-[5px] font-bold text-[15px] transition-all flex items-center justify-center active:scale-[0.98]"
+      >
         Explore {country}
-      </button>
+      </Link>
     </div>
   </div>
 );
 
-export default function TopDestinations() {
+interface CountryOption {
+  id: number;
+  name: string;
+}
+
+interface TopDestinationsProps {
+  countries: CountryOption[];
+}
+
+export default function TopDestinations({ countries }: TopDestinationsProps) {
+  const getCountryHref = (countryName: string) => {
+    const matchedCountry = countries.find(
+      (country) => country.name.trim().toLowerCase() === countryName.trim().toLowerCase()
+    );
+
+    return matchedCountry
+      ? `/study-abroad?country_id=${matchedCountry.id}`
+      : "/study-abroad?view=all";
+  };
+
   const destinations = [
     {
       country: "United States",
@@ -117,7 +141,7 @@ export default function TopDestinations() {
               quality of education, post study work right, and living standards.
             </p>
           </div>
-          <Link href="/search" className="flex items-center gap-2 text-[#FF3C3C] font-bold text-[18px] group transition-all">
+          <Link href="/study-abroad?view=all" className="flex items-center gap-2 text-[#FF3C3C] font-bold text-[18px] group transition-all">
             View All
             <span className="material-symbols-rounded font-bold text-[22px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
           </Link>
@@ -125,7 +149,7 @@ export default function TopDestinations() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {destinations.map((dest) => (
-            <DestinationCard key={dest.country} {...dest} />
+            <DestinationCard key={dest.country} href={getCountryHref(dest.country)} {...dest} />
           ))}
         </div>
 

@@ -5,6 +5,8 @@ import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import PlacementFormModal from "./PlacementFormModal";
 
+import PaginationFixed from "@/app/components/PaginationFixed";
+
 interface Option { id: number; name: string; }
 
 interface PlacementRow {
@@ -24,6 +26,8 @@ interface PlacementListClientProps {
   offset: number;
   total: number;
   pageSize: number;
+  page?: number;
+  totalPages?: number;
   searchQuery?: string;
   selectedCollegeId?: string;
   selectedHighestCtc?: string;
@@ -36,33 +40,23 @@ interface PlacementListClientProps {
 }
 
 export default function PlacementListClient({
-  placements,
-  colleges,
-  offset,
-  total,
-  pageSize,
-  searchQuery = "",
-  selectedCollegeId = "",
-  selectedHighestCtc = "",
-  selectedLowestCtc = "",
-  selectedAverageCtc = "",
-  selectedRecruitingCompanies = "",
-  selectedPlacementInfo = "",
-  onAdd,
-  onDelete,
+  placements, colleges, offset, total, pageSize,
+  page = 1, totalPages = 1,
+  searchQuery = "", selectedCollegeId = "", selectedHighestCtc = "",
+  selectedLowestCtc = "", selectedAverageCtc = "",
+  selectedRecruitingCompanies = "", selectedPlacementInfo = "",
+  onAdd, onDelete,
 }: PlacementListClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showFilters, setShowFilters] = useState(
-    Boolean(
-      searchQuery ||
-        selectedCollegeId ||
-        selectedHighestCtc ||
-        selectedLowestCtc ||
-        selectedAverageCtc ||
-        selectedRecruitingCompanies ||
-        selectedPlacementInfo,
-    ),
-  );
+  const [showFilters, setShowFilters] = useState(Boolean(searchQuery || selectedCollegeId || selectedHighestCtc || selectedLowestCtc || selectedAverageCtc || selectedRecruitingCompanies || selectedPlacementInfo));
+  const [visibleCount, setVisibleCount] = useState(15);
+
+  const listKey = placements[0]?.id ?? "empty";
+  const [lastKey, setLastKey] = useState(listKey);
+  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(15); }
+
+  const showMore = visibleCount < placements.length;
+  const showPagination = !showMore && totalPages > 1;
 
   function openAdd() {
     setIsModalOpen(true);
@@ -77,23 +71,21 @@ export default function PlacementListClient({
 
   return (
     <>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-end mb-4">
-        <div className="flex flex-col gap-2 sm:items-end">
-          <button
-            type="button"
-            onClick={() => setShowFilters((value) => !value)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-all"
-          >
-            <span className="material-symbols-outlined text-[18px]">filter_alt</span>
-            Filters
-          </button>
-          <button
-            onClick={openAdd}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
-          >
-            Add new placement +
-          </button>
-        </div>
+      <div className="flex items-center justify-end gap-3 mb-4">
+        <button
+          type="button"
+          onClick={() => setShowFilters((value) => !value)}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-all"
+        >
+          <span className="material-symbols-outlined text-[18px]">filter_alt</span>
+          Filters
+        </button>
+        <button
+          onClick={openAdd}
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
+        >
+          Add new placement +
+        </button>
       </div>
 
       {showFilters && (
@@ -261,7 +253,7 @@ export default function PlacementListClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {placements.map((p, idx) => (
+              {placements.slice(0, visibleCount).map((p, idx) => (
                 <tr key={p.id} className="hover:bg-slate-50/60 transition-colors group">
                   <td className="px-3 py-2.5 text-center">
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
@@ -338,6 +330,26 @@ export default function PlacementListClient({
         placement={undefined}
         colleges={colleges}
       />
+
+      {/* Show More */}
+      {showMore && (
+        <div className="mt-10 mb-8 flex flex-col items-center gap-2">
+          <button onClick={() => setVisibleCount((c) => Math.min(c + 15, placements.length))} className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors" type="button">
+            <span className="text-xs font-bold uppercase tracking-widest">Show More</span>
+            <span className="material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] animate-bounce">keyboard_arrow_down</span>
+          </button>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {showPagination && (
+        <div className="px-6 py-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between bg-slate-50/50 mt-6 mb-6">
+          <p className="text-sm text-slate-400 font-medium">
+            Showing <strong>{offset + 1}</strong>–<strong>{Math.min(offset + pageSize, total)}</strong> of <strong>{total.toLocaleString()}</strong> placements
+          </p>
+          <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
+        </div>
+      )}
     </>
   );
 }

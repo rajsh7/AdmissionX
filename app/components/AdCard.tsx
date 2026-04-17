@@ -16,6 +16,8 @@ export interface AdCardItem {
 interface AdCardProps {
   ads: AdCardItem[] | AdItem[];
   className?: string;
+  emptyTitle?: string;
+  emptyDescription?: string;
 }
 
 function buildImgUrl(raw: string | null): string | null {
@@ -30,7 +32,12 @@ function isRenderable(value: string | null | undefined): value is string {
   return Boolean(value && !value.toUpperCase().includes("NULL"));
 }
 
-export default function AdCard({ ads, className = "" }: AdCardProps) {
+export default function AdCard({
+  ads,
+  className = "",
+  emptyTitle = "No active ads found in the database",
+  emptyDescription = "Add or activate ads for this section in admin to display them here.",
+}: AdCardProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -101,16 +108,16 @@ export default function AdCard({ ads, className = "" }: AdCardProps) {
 
   if (source.length === 0) {
     return (
-      <div className={`relative flex h-[220px] w-full items-end overflow-hidden rounded-[5px] border border-slate-200 bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.14),_transparent_34%),linear-gradient(135deg,#e2e8f0_0%,#f8fafc_55%,#ffffff_100%)] p-6 shadow-[0_24px_70px_-32px_rgba(15,23,42,0.2)] sm:h-[240px] ${className}`}>
+      <div className={`relative flex h-[220px] w-full items-end overflow-hidden rounded-[5px] border border-primary/10 bg-[radial-gradient(circle_at_top_left,_rgba(255,60,60,0.16),_transparent_34%),linear-gradient(135deg,#fff7f7_0%,#ffe9e9_55%,#fffdfd_100%)] p-6 shadow-[0_24px_70px_-32px_rgba(255,60,60,0.18)] sm:h-[240px] ${className}`}>
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+          <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary/60">
             Live Ads
           </p>
           <h4 className="mt-2 text-xl font-bold leading-tight text-slate-800">
-            No active home ads found in the database
+            {emptyTitle}
           </h4>
           <p className="mt-2 text-sm font-medium leading-6 text-slate-500">
-            Add or activate an ad with position <span className="font-bold text-slate-700">home</span> or <span className="font-bold text-slate-700">default</span>.
+            {emptyDescription}
           </p>
         </div>
       </div>
@@ -118,7 +125,7 @@ export default function AdCard({ ads, className = "" }: AdCardProps) {
   }
 
   return (
-    <div className={`group relative h-[220px] w-full overflow-hidden rounded-[5px] border border-slate-200 bg-slate-950 shadow-[0_24px_70px_-32px_rgba(15,23,42,0.75)] sm:h-[240px] ${className}`}>
+    <div className={`group relative h-[220px] w-full overflow-hidden rounded-[5px] border border-slate-200 bg-white shadow-[0_16px_40px_-24px_rgba(15,23,42,0.22)] sm:h-[240px] ${className}`}>
       <div
         ref={scrollRef}
         onScroll={handleScroll}
@@ -135,16 +142,16 @@ export default function AdCard({ ads, className = "" }: AdCardProps) {
                   src={imgSrc}
                   alt={ad.title || "Advertisement"}
                   fill
-                  className="object-cover opacity-75 transition duration-700 group-hover:scale-105"
+                  className="object-cover opacity-80 transition duration-700 group-hover:scale-105"
                   unoptimized
                 />
               ) : (
-                <div className="h-full w-full bg-[linear-gradient(135deg,#1e293b_0%,#0f172a_100%)]" />
+                <div className="h-full w-full bg-[linear-gradient(135deg,#fff1f1_0%,#ffdede_100%)]" />
               )}
 
-              <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(2,6,23,0.92)_0%,rgba(2,6,23,0.45)_52%,transparent_100%)]" />
+              <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(15,23,42,0.82)_0%,rgba(15,23,42,0.3)_54%,rgba(255,255,255,0.06)_100%)]" />
 
-              <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-md">
+              <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/18 px-3 py-1 backdrop-blur-md">
                 <span className="h-2 w-2 rounded-full bg-primary" />
                 <span className="text-[10px] font-black uppercase tracking-[0.24em] text-white">
                   Ads

@@ -1,12 +1,22 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 
 const countries = [
-  { name: "United States", tuition: 2800000, living: 1500000, scholarship: 800000, salary: 7000000 },
-  { name: "United Kingdom", tuition: 2500000, living: 1400000, scholarship: 700000, salary: 6000000 },
-  { name: "Canada", tuition: 1800000, living: 1200000, scholarship: 500000, salary: 5500000 },
   { name: "Australia", tuition: 2200000, living: 1300000, scholarship: 600000, salary: 6500000 },
+  { name: "Canada", tuition: 1800000, living: 1200000, scholarship: 500000, salary: 5500000 },
+  { name: "France", tuition: 1400000, living: 1100000, scholarship: 450000, salary: 4200000 },
+  { name: "Germany", tuition: 1200000, living: 1000000, scholarship: 400000, salary: 4800000 },
+  { name: "Ireland", tuition: 2100000, living: 1250000, scholarship: 550000, salary: 5800000 },
+  { name: "Italy", tuition: 1300000, living: 950000, scholarship: 420000, salary: 3900000 },
+  { name: "Netherlands", tuition: 1900000, living: 1150000, scholarship: 500000, salary: 5200000 },
+  { name: "New Zealand", tuition: 2000000, living: 1200000, scholarship: 480000, salary: 5000000 },
+  { name: "Singapore", tuition: 2400000, living: 1600000, scholarship: 650000, salary: 7200000 },
+  { name: "Sweden", tuition: 1700000, living: 1050000, scholarship: 460000, salary: 4900000 },
+  { name: "United Arab Emirates", tuition: 1600000, living: 1150000, scholarship: 430000, salary: 5100000 },
+  { name: "United Kingdom", tuition: 2500000, living: 1400000, scholarship: 700000, salary: 6000000 },
+  { name: "United States", tuition: 2800000, living: 1500000, scholarship: 800000, salary: 7000000 },
 ];
 
 export default function CostCalculator() {
@@ -25,6 +35,21 @@ export default function CostCalculator() {
       salary: country.salary,
     };
   }, [selectedCountry, degree, duration]);
+
+  const financialPlanHref = useMemo(() => {
+    const params = new URLSearchParams({
+      destination: selectedCountry,
+      degree,
+      duration: String(duration),
+      total: String(stats.total),
+      tuition: String(stats.tuition),
+      living: String(stats.living),
+      scholarship: String(stats.scholarship),
+      salary: String(stats.salary),
+    });
+
+    return `/study-abroad/financial-plan?${params.toString()}`;
+  }, [degree, duration, selectedCountry, stats]);
 
   return (
     <section className="py-24 bg-white">
@@ -166,9 +191,12 @@ export default function CostCalculator() {
                   </div>
                </div>
 
-               <button className="w-full bg-[#333333] hover:bg-black text-white py-5 rounded-[5px] font-bold text-[16px] transition-all shadow-xl shadow-slate-900/10 active:scale-[0.98]">
-                  Get Detailed financial Plan
-               </button>
+               <Link
+                 href={financialPlanHref}
+                 className="w-full inline-flex items-center justify-center bg-[#333333] hover:bg-black text-white py-5 rounded-[5px] font-bold text-[16px] transition-all shadow-xl shadow-slate-900/10 active:scale-[0.98]"
+               >
+                  Get Detailed Financial Plan
+               </Link>
             </div>
           </div>
 

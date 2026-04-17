@@ -1,4 +1,4 @@
-"use client";
+/*  */"use client";
 
 import AdminModal from "@/app/admin/_components/AdminModal";
 import { useState } from "react";

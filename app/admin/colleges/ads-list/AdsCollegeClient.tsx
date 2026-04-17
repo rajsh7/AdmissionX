@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import AdminModal from "@/app/admin/_components/AdminModal";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
+import PaginationFixed from "@/app/components/PaginationFixed";
 
 interface AdCollegeRow {
   id: number;
@@ -33,6 +34,8 @@ interface PageProps {
   total: number;
   offset: number;
   pageSize: number;
+  page?: number;
+  totalPages?: number;
   q: string;
   createAction: (data: FormData) => Promise<void>;
   updateAction: (data: FormData) => Promise<void>;
@@ -45,6 +48,8 @@ export default function AdsCollegeClient({
   total,
   offset,
   pageSize,
+  page = 1,
+  totalPages = 1,
   q,
   createAction,
   updateAction,
@@ -53,6 +58,14 @@ export default function AdsCollegeClient({
 }: PageProps) {
   const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
   const [editingRow, setEditingRow] = useState<AdCollegeRow | null>(null);
+  const [visibleCount, setVisibleCount] = useState(25);
+
+  const listKey = adsRows[0]?.id ?? "empty";
+  const [lastKey, setLastKey] = useState(listKey);
+  if (listKey !== lastKey) {
+    setLastKey(listKey);
+    setVisibleCount(25);
+  }
 
   const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
   const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
@@ -78,8 +91,11 @@ export default function AdsCollegeClient({
     return date.toLocaleDateString();
   }
 
-  const totalPages = Math.ceil(total / pageSize);
-  const page = Math.floor(offset / pageSize) + 1;
+  const showPagination = totalPages > 1 && visibleCount >= Math.min(100, adsRows.length);
+  const showMore = visibleCount < adsRows.length && !showPagination;
+
+  const start = total > 0 ? (page - 1) * 100 + 1 : 0;
+  const end = total > 0 ? (page - 1) * 100 + Math.min(visibleCount, adsRows.length) : 0;
 
   function buildUrl(overrides: Record<string, string | number>) {
     const merged = { q, page: "1", ...overrides };
@@ -125,9 +141,9 @@ export default function AdsCollegeClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50 text-slate-600">
-              {adsRows.map((row, idx) => (
+              {adsRows.slice(0, visibleCount).map((row, idx) => (
                 <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-5 py-4 text-xs font-mono text-slate-400">{offset + idx + 1}</td>
+                  <td className="px-5 py-4 text-xs font-mono text-slate-400">{(page - 1) * 100 + idx + 1}</td>
                   <td className="px-4 py-4 min-w-[200px]">
                     <p className="font-semibold text-slate-800">{row.college_name}</p>
                     <p className="text-[10px] text-slate-500 mt-1 truncate max-w-[150px]">{row.degree_name || "No degree"} • {row.course_name || "No course"}</p>
@@ -183,13 +199,31 @@ export default function AdsCollegeClient({
           </table>
         )}
         
-        {totalPages > 1 && (
-          <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
-            <p className="text-xs text-slate-500">Showing <strong>{offset + 1}-{Math.min(offset + pageSize, total)}</strong> of <strong>{total}</strong></p>
-            <div className="flex gap-1">
-              {page > 1 && <Link href={buildUrl({ page: page - 1 })} className="px-3 py-1.5 text-xs font-bold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Prev</Link>}
-              {page < totalPages && <Link href={buildUrl({ page: page + 1 })} className="px-3 py-1.5 text-xs font-bold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Next</Link>}
-            </div>
+        {/* ── Show More ── */}
+        {showMore && (
+          <div className="mt-10 mb-8 flex flex-col items-center gap-2">
+            <button
+              onClick={() => setVisibleCount((c) => Math.min(c + 25, adsRows.length))}
+              className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors"
+              type="button"
+            >
+              <span className="text-xs font-bold uppercase tracking-widest">
+                Show More
+              </span>
+              <span className="material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] animate-bounce">
+                keyboard_arrow_down
+              </span>
+            </button>
+          </div>
+        )}
+
+        {/* ── Pagination ── */}
+        {showPagination && (
+          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-white border-t border-slate-100 mt-6 mb-6">
+            <p className="text-xs text-slate-500">
+              Showing <strong>{start}</strong>-<strong>{end}</strong> of <strong>{total.toLocaleString()}</strong> procedures
+            </p>
+            <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
           </div>
         )}
       </div>

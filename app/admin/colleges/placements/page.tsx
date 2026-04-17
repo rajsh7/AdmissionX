@@ -55,7 +55,7 @@ async function deletePlacementRow(id: number) {
   revalidatePath("/admin/colleges/placements");
 }
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 45;
 
 interface PlacementRow {
   id: number;
@@ -183,6 +183,8 @@ export default async function CollegePlacementsPage({
         offset={offset}
         total={total}
         pageSize={PAGE_SIZE}
+        page={page}
+        totalPages={totalPages}
         searchQuery={q}
         selectedCollegeId={collegeId}
         selectedHighestCtc={highestCtc}
@@ -193,27 +195,6 @@ export default async function CollegePlacementsPage({
         onAdd={createPlacement}
         onDelete={deletePlacementRow}
       />
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-          <p className="text-xs text-slate-500">
-            Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong> placement records
-          </p>
-          <div className="flex items-center gap-1">
-            {page > 1 ? (
-              <Link href={buildPageHref(page - 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">← Prev</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">← Prev</span>
-            )}
-            <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-blue-50 border border-blue-100 rounded-lg">{page} / {totalPages}</span>
-            {page < totalPages ? (
-              <Link href={buildPageHref(page + 1)} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Next →</Link>
-            ) : (
-              <span className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white border border-slate-100 rounded-lg cursor-not-allowed">Next →</span>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

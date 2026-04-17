@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import AdmissionFormModal from "./AdmissionFormModal";
+import PaginationFixed from "@/app/components/PaginationFixed";
 
 interface Option { id: number; name: string; }
 
@@ -21,6 +22,8 @@ interface AdmissionListClientProps {
   offset: number;
   total: number;
   pageSize: number;
+  page?: number;
+  totalPages?: number;
   searchQuery?: string;
   selectedCollegeId?: string;
   selectedTitle?: string;
@@ -35,6 +38,8 @@ export default function AdmissionListClient({
   offset,
   total,
   pageSize,
+  page = 1,
+  totalPages = 1,
   searchQuery = "",
   selectedCollegeId = "",
   selectedTitle = "",
@@ -51,6 +56,14 @@ export default function AdmissionListClient({
         selectedDescription,
     ),
   );
+  const [visibleCount, setVisibleCount] = useState(25);
+
+  const listKey = admissions[0]?.id ?? "empty";
+  const [lastKey, setLastKey] = useState(listKey);
+  if (listKey !== lastKey) {
+    setLastKey(listKey);
+    setVisibleCount(25);
+  }
 
   function openAdd() {
     setIsModalOpen(true);
@@ -60,28 +73,29 @@ export default function AdmissionListClient({
     setIsModalOpen(false);
   }
 
-  const start = total > 0 ? offset + 1 : 0;
-  const end = Math.min(offset + pageSize, total);
+  const showPagination = totalPages > 1 && visibleCount >= Math.min(100, admissions.length);
+  const showMore = visibleCount < admissions.length && !showPagination;
+
+  const start = total > 0 ? (page - 1) * 100 + 1 : 0;
+  const end = total > 0 ? (page - 1) * 100 + Math.min(visibleCount, admissions.length) : 0;
 
   return (
     <>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-end mb-4">
-        <div className="flex flex-col gap-2 sm:items-end">
-          <button
-            type="button"
-            onClick={() => setShowFilters((value) => !value)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-all"
-          >
-            <span className="material-symbols-outlined text-[18px]">filter_alt</span>
-            Filters
-          </button>
-          <button
-            onClick={openAdd}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
-          >
-            Add admission +
-          </button>
-        </div>
+      <div className="flex items-center justify-end gap-3 mb-4">
+        <button
+          type="button"
+          onClick={() => setShowFilters((value) => !value)}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-all"
+        >
+          <span className="material-symbols-outlined text-[18px]">filter_alt</span>
+          Filters
+        </button>
+        <button
+          onClick={openAdd}
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#313131] hover:bg-black text-white font-bold rounded shadow-lg transition-all text-xs uppercase tracking-tight"
+        >
+          Add admission +
+        </button>
       </div>
 
       {showFilters && (
@@ -215,11 +229,11 @@ export default function AdmissionListClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {admissions.map((a, idx) => (
+              {admissions.slice(0, visibleCount).map((a, idx) => (
                 <tr key={a.id} className="hover:bg-slate-50/60 transition-colors group">
                   <td className="px-3 py-2.5 text-center">
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
-                      {offset + idx + 1}
+                      {(page - 1) * 100 + idx + 1}
                     </span>
                   </td>
                   <td className="px-4 py-2.5">
@@ -272,6 +286,34 @@ export default function AdmissionListClient({
               ))}
             </tbody>
           </table>
+        )}
+
+        {/* ── Show More ── */}
+        {showMore && (
+          <div className="mt-10 mb-8 flex flex-col items-center gap-2">
+            <button
+              onClick={() => setVisibleCount((c) => Math.min(c + 25, admissions.length))}
+              className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors"
+              type="button"
+            >
+              <span className="text-xs font-bold uppercase tracking-widest">
+                Show More
+              </span>
+              <span className="material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] animate-bounce">
+                keyboard_arrow_down
+              </span>
+            </button>
+          </div>
+        )}
+
+        {/* ── Pagination ── */}
+        {showPagination && (
+          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-white border-t border-slate-100 mt-6 mb-6">
+            <p className="text-xs text-slate-500">
+              Showing <strong>{start}</strong>-<strong>{end}</strong> of <strong>{total.toLocaleString()}</strong> procedures
+            </p>
+            <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
+          </div>
         )}
       </div>
 
