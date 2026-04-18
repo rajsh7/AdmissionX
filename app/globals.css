@@ -872,13 +872,25 @@ a, button, [role="button"] {
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
+/* ─── Student dashboard scroll fix ─────────────────────────── */
+/* body overflow-x:hidden makes <html> the scroll root, breaking
+   overflow-y-auto on inner dashboard containers. Force the
+   dashboard wrapper to be the scroll container instead. */
+.student-dashboard-scroll {
+  overflow-y: auto !important;
+  height: 100% !important;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* ─── Hide scrollbar globally ───────────────────────────────── */
 body:not(.admin-layout) { scrollbar-width: none; -ms-overflow-style: none; }
-.hide-scrollbar::-webkit-scrollbar {
+.hide-scrollbar::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
   display: none !important;
   width: 0 !important;
 }
-.hide-scrollbar {
+.hide-scrollbar,
+.no-scrollbar {
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }

@@ -221,7 +221,7 @@ export default function Footer() {
 
               {/* Stats grid */}
               <FadeIn>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 justify-items-center">
                   {STATS.map((stat) => (
                     <div key={stat.label}
                       className="rounded-xl p-4 text-center"

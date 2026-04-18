@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { NavItem, NavGroup, NAV_GROUPS } from "./nav-config";
+import { canAccess, ROLE_LABELS, ROLE_BADGE_COLORS } from "@/lib/permissions";
+import type { AdminRole } from "@/lib/permissions";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface Admin {
   id: string;
   name: string;
   email: string;
+  adminRole?: AdminRole;
 }
 
 export type { NavItem, NavGroup };
@@ -32,6 +35,24 @@ export function UnifiedSidebarV3({
   onToggleCollapse?: () => void;
 }) {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const adminRole = admin.adminRole ?? "super_admin";
+
+  // Filter nav groups based on role
+  const filteredGroups = NAV_GROUPS.map((group) => ({
+    ...group,
+    items: group.items
+      .map((item) => {
+        // Filter sub-items
+        const filteredSubs = item.subItems?.filter((sub) => canAccess(adminRole, sub.href));
+        return { ...item, subItems: filteredSubs };
+      })
+      .filter((item) => {
+        // Keep item if it has accessible sub-items or its own href is accessible
+        if (item.subItems && item.subItems.length > 0) return true;
+        if (item.subItems !== undefined && item.subItems.length === 0) return false;
+        return canAccess(adminRole, item.href);
+      }),
+  })).filter((group) => group.items.length > 0);
 
   const toggleExpand = (label: string) => {
     setExpandedItems((prev) => {
@@ -51,10 +72,19 @@ export function UnifiedSidebarV3({
           <img src="/admissionx-logo.png" alt="AdmissionX" className={`object-contain ${collapsed ? "h-7 w-7" : "h-9 w-auto"}`} />
         </Link>
       </div>
+      {/* Role badge */}
+      {!collapsed && (
+        <div className="px-3 pb-2">
+          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${ROLE_BADGE_COLORS[adminRole]}`}>
+            <span className="material-symbols-rounded text-[12px]" style={ICO}>shield</span>
+            {ROLE_LABELS[adminRole]}
+          </span>
+        </div>
+      )}
       <hr className="border-white/10" />
 
       <div data-lenis-prevent className="flex-1 overflow-y-auto py-2 space-y-6">
-        {NAV_GROUPS.map((group, gIdx) => (
+        {filteredGroups.map((group, gIdx) => (
           <div key={`v3-group-${group.label || gIdx}`}>
             {group.label && !collapsed && (
               <div className="flex items-center justify-between px-6 mb-2 mt-2">

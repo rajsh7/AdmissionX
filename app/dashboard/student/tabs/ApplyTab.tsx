@@ -624,6 +624,31 @@ function ApplicationFormStep({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // ── Personal info (auto-filled from profile) ───────────────────────────────
+  const [piName, setPiName]     = useState(user?.name ?? "");
+  const [piPhone, setPiPhone]   = useState("");
+  const [piDob, setPiDob]       = useState("");
+  const [piGender, setPiGender] = useState("");
+  const [piCity, setPiCity]     = useState("");
+  const [piState, setPiState]   = useState("");
+  const [piLoaded, setPiLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    fetch(`/api/student/${user.id}/profile`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.name)   setPiName(d.name);
+        if (d.phone)  setPiPhone(d.phone);
+        if (d.dob)    setPiDob(d.dob.slice(0, 10));
+        if (d.gender) setPiGender(d.gender);
+        if (d.city)   setPiCity(d.city);
+        if (d.state)  setPiState(d.state);
+        setPiLoaded(true);
+      })
+      .catch(() => setPiLoaded(true));
+  }, [user?.id]);
+
   // ── Document upload state ──────────────────────────────────────────────────
   const REQUIRED_DOCS = [
     { type: "10th Marksheet", icon: "description" },
@@ -698,6 +723,14 @@ function ApplicationFormStep({
           fees,
           notes: notes.trim() || undefined,
           documents: REQUIRED_DOCS.map((d) => ({ type: d.type, url: docUrls[d.type] })),
+          personal_info: {
+            name: piName.trim() || undefined,
+            phone: piPhone.trim() || undefined,
+            dob: piDob || undefined,
+            gender: piGender || undefined,
+            city: piCity.trim() || undefined,
+            state: piState || undefined,
+          },
         }),
       });
 
@@ -794,6 +827,79 @@ function ApplicationFormStep({
               <span className="font-bold text-primary text-base">
                 {formatCurrency(fees)}
               </span>
+            </div>
+          </div>
+
+          {/* Personal Details — auto-filled, editable */}
+          <div className="mb-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+              Personal Details
+              {piLoaded && (
+                <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full normal-case tracking-normal">
+                  Auto-filled from your profile
+                </span>
+              )}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Full Name</label>
+                <input
+                  value={piName}
+                  onChange={(e) => setPiName(e.target.value)}
+                  placeholder="Your full name"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Phone</label>
+                <input
+                  value={piPhone}
+                  onChange={(e) => setPiPhone(e.target.value)}
+                  placeholder="10-digit mobile number"
+                  type="tel"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Date of Birth</label>
+                <input
+                  value={piDob}
+                  onChange={(e) => setPiDob(e.target.value)}
+                  type="date"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Gender</label>
+                <select
+                  value={piGender}
+                  onChange={(e) => setPiGender(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all appearance-none"
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">City</label>
+                <input
+                  value={piCity}
+                  onChange={(e) => setPiCity(e.target.value)}
+                  placeholder="Your city"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">State</label>
+                <input
+                  value={piState}
+                  onChange={(e) => setPiState(e.target.value)}
+                  placeholder="Your state"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
+                />
+              </div>
             </div>
           </div>
 

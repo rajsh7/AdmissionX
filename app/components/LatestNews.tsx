@@ -10,8 +10,10 @@ const NEWS_FALLBACK_IMAGE =
 
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || !raw.trim()) return NEWS_FALLBACK_IMAGE;
-  if (raw.startsWith("http")) return `/api/image-proxy?url=${encodeURIComponent(raw)}`;
-  return `/api/image-proxy?url=${encodeURIComponent(IMAGE_BASE + raw)}`;
+  // Fix double /uploads//uploads/ from bad DB data
+  const cleaned = raw.replace(/\/uploads\/\/uploads\//g, "/uploads/");
+  if (cleaned.startsWith("http")) return `/api/image-proxy?url=${encodeURIComponent(cleaned)}`;
+  return `/api/image-proxy?url=${encodeURIComponent(IMAGE_BASE + cleaned)}`;
 }
 
 function formatDate(dateStr: string): string {

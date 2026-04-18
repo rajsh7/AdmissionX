@@ -1,243 +1,528 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
+import { useState, useEffect, useCallback, useRef, ChangeEvent } from "react";
 
 interface Props {
   user: { id: string | number; name: string; email: string } | null;
 }
 
-interface ProfileData {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  dob: string;
-  gender: string;
-  city: string;
-  state: string;
-  country: string;
-  photo: string;
-  hobbies: string;
-  interest: string;
-  about: string;
-  member_since: string;
-  profile_complete: number;
-}
+type InnerTab = "profile" | "address" | "certificates" | "projects" | "settings";
 
-const INDIAN_STATES = [
-  "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh",
-  "Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka",
-  "Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram",
-  "Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana",
-  "Tripura","Uttar Pradesh","Uttarakhand","West Bengal",
-  "Andaman and Nicobar Islands","Chandigarh","Dadra and Nagar Haveli",
-  "Daman and Diu","Delhi","Jammu and Kashmir","Ladakh","Lakshadweep","Puducherry",
-];
-
-// ── Tab Navigation Component ──────────────────────────────────────────────────
-function ProfileTabs({ active = "profile" }: { active?: string }) {
-  const tabs = [
-    { id: "profile", label: "Profile", icon: "person" },
-    { id: "address", label: "Address", icon: "location_on" },
-    { id: "academic", label: "Academic Certificates", icon: "workspace_premium" },
-    { id: "projects", label: "Projects", icon: "work" },
-    { id: "settings", label: "Account Settings", icon: "settings" },
-  ];
-
+// ── Shared field component ────────────────────────────────────────────────────
+function Field({
+  label, value, onChange, type = "text", placeholder, disabled, children,
+}: {
+  label: string; value?: string; onChange?: (v: string) => void;
+  type?: string; placeholder?: string; disabled?: boolean;
+  children?: React.ReactNode;
+}) {
   return (
-    <div className="flex border-b border-gray-200 mb-10 overflow-x-auto no-scrollbar">
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          className={`flex items-center gap-2 px-6 py-4 text-[13px] font-semibold uppercase tracking-wider transition-all whitespace-nowrap border-b-2 ${
-            active === tab.id 
-              ? "border-[#e31e24] text-[#e31e24]" 
-              : "border-transparent text-gray-400 hover:text-gray-600"
-          }`}
-        >
-          <span className="material-symbols-outlined text-[18px]">{tab.icon}</span>
-          {tab.label}
-        </button>
-      ))}
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider">{label}</label>
+      {children ?? (
+        <input
+          type={type} value={value ?? ""} disabled={disabled}
+          onChange={(e) => onChange?.(e.target.value)}
+          placeholder={placeholder ?? `Enter ${label.toLowerCase()}`}
+          className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-[14px] text-[#111] bg-white outline-none focus:border-[#e31e24]/40 focus:ring-2 focus:ring-[#e31e24]/10 transition-all disabled:bg-gray-50 disabled:text-gray-400"
+        />
+      )}
     </div>
   );
 }
 
-// ── Premium Input Field ──────────────────────────────────────────────────────
-function InputField({
-  label,
-  value,
-  onChange,
-  placeholder,
-  type = "text",
-  disabled = false,
-  icon,
-}: {
-  label: string;
-  value: string;
-  onChange?: (v: string) => void;
-  placeholder?: string;
-  type?: string;
-  disabled?: boolean;
-  icon?: string;
-}) {
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function Toast({ msg }: { msg: string }) {
+  if (!msg) return null;
   return (
-    <div className="relative pt-2">
-      <label className="absolute left-4 -top-0.5 px-1.5 bg-white text-[11px] font-semibold text-gray-400 uppercase tracking-widest z-10">
-        {label}
-      </label>
-      <div className="relative">
-        <input
-          type={type}
-          value={value}
-          onChange={(e) => onChange?.(e.target.value)}
-          placeholder={placeholder}
-          disabled={disabled}
-          className="w-full bg-white border-2 border-gray-100 rounded-[8px] px-4 py-3.5 text-[14px] font-medium text-[#333] placeholder:text-gray-300 focus:border-[#e31e24]/30 focus:ring-4 focus:ring-[#e31e24]/5 outline-none transition-all disabled:bg-gray-50 disabled:text-gray-400"
-        />
-        {icon && (
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-300 text-[20px]">
-            {icon}
-          </span>
-        )}
+    <div className="fixed top-5 right-5 z-[9999] bg-[#222] text-white text-[13px] font-medium px-5 py-3 rounded-xl shadow-2xl animate-in slide-in-from-top-2 duration-300">
+      {msg}
+    </div>
+  );
+}
+
+// ── Stat Card (matching screenshot) ──────────────────────────────────────────
+function StatCard({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-5 flex items-start justify-between">
+      <div>
+        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">{label}</p>
+        <p className="text-[15px] font-bold text-[#111]">- {value}</p>
+      </div>
+      <div className="w-9 h-9 bg-red-50 rounded-lg flex items-center justify-center shrink-0">
+        <span className="material-symbols-outlined text-[#e31e24] text-[20px]">account_balance</span>
       </div>
     </div>
   );
 }
 
-export default function ProfileTab({ user }: Props) {
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+// ── Inner tab bar (matching screenshot style) ─────────────────────────────────
+const INNER_TABS: { id: InnerTab; label: string }[] = [
+  { id: "profile",      label: "Profile" },
+  { id: "address",      label: "Address" },
+  { id: "certificates", label: "Academic Certificates" },
+  { id: "projects",     label: "Projects" },
+  { id: "settings",     label: "Account Settings" },
+];
 
-  const [name, setName]       = useState("");
-  const [phone, setPhone]     = useState("");
-  const [dob, setDob]         = useState("");
+// ══════════════════════════════════════════════════════════════════════════════
+// PROFILE INNER TAB
+// ══════════════════════════════════════════════════════════════════════════════
+function ProfileInner({ user, showToast }: { user: Props["user"]; showToast: (m: string) => void }) {
+  const [name, setName]       = useState(user?.name ?? "");
   const [gender, setGender]   = useState("");
-  const [city, setCity]       = useState("");
-  const [state, setState]     = useState("");
-  const [country, setCountry] = useState("India");
+  const [hobbies, setHobbies] = useState("");
+  const [interest, setInterest] = useState("");
+  const [dob, setDob]         = useState("");
+  const [phone, setPhone]     = useState("");
+  const [about, setAbout]     = useState("");
+  const [saving, setSaving]   = useState(false);
 
   const load = useCallback(async () => {
     if (!user?.id) return;
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/student/${user.id}/profile`);
-      const data: ProfileData = await res.json();
-      setProfile(data);
-      setName(data.name ?? "");
-      setPhone(data.phone ?? "");
-      setDob(data.dob ? data.dob.slice(0, 10) : "");
-      setGender(data.gender ?? "");
-      setCity(data.city ?? "");
-      setState(data.state ?? "");
-      setCountry(data.country ?? "India");
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  }, [user?.id]);
+    const res = await fetch(`/api/student/${user.id}/profile`);
+    const d = await res.json();
+    setName(d.name ?? user.name ?? "");
+    setGender(d.gender ?? "");
+    setHobbies(d.hobbies ?? "");
+    setInterest(d.interest ?? "");
+    setDob(d.dob ? d.dob.slice(0, 10) : "");
+    setPhone(d.phone ?? "");
+    setAbout(d.about ?? "");
+  }, [user?.id, user?.name]);
 
   useEffect(() => { load(); }, [load]);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    setSuccess(false);
     try {
       const res = await fetch(`/api/student/${user?.id}/profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, dob, gender, city, state, country }),
+        body: JSON.stringify({ name, gender, hobbies, interest, dob, phone, about }),
       });
-      if (res.ok) {
-        setSuccess(true);
-        setTimeout(() => setSuccess(false), 3000);
-      }
-    } catch (e) {
-      setError("Failed to save");
+      if (res.ok) showToast("Profile saved!");
     } finally {
       setSaving(false);
     }
   }
 
-  if (loading) return <div className="animate-pulse space-y-8 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-    <div className="h-10 bg-gray-100 rounded w-1/4" />
-    <div className="grid grid-cols-2 gap-8">
-      {[1, 2, 3, 4].map(i => <div key={i} className="h-14 bg-gray-50 rounded" />)}
-    </div>
-  </div>;
+  return (
+    <form onSubmit={handleSave} className="space-y-5">
+      <Field label="Name" value={name} onChange={setName} placeholder="Enter name here" />
+      <Field label="Gender">
+        <select value={gender} onChange={(e) => setGender(e.target.value)}
+          className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-[14px] text-[#111] bg-white outline-none focus:border-[#e31e24]/40 appearance-none">
+          <option value="">Select Sex</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </Field>
+      <Field label="Hobbies" value={hobbies} onChange={setHobbies} placeholder="Enter hobbies here" />
+      <Field label="Interest" value={interest} onChange={setInterest} placeholder="Enter your Interests here" />
+      <Field label="Date of Birth" value={dob} onChange={setDob} type="date" />
+      <Field label="Phone Number" value={phone} onChange={setPhone} type="tel" placeholder="Enter phone number" />
+      <Field label="About">
+        <textarea value={about} onChange={(e) => setAbout(e.target.value)}
+          placeholder="Tell us about yourself" rows={4}
+          className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-[14px] text-[#111] bg-white outline-none focus:border-[#e31e24]/40 resize-none" />
+      </Field>
+      <button type="submit" disabled={saving}
+        className="px-8 py-2.5 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all disabled:opacity-50">
+        {saving ? "Saving..." : "Save Profile"}
+      </button>
+    </form>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ADDRESS INNER TAB
+// ══════════════════════════════════════════════════════════════════════════════
+function AddressInner({ user, showToast }: { user: Props["user"]; showToast: (m: string) => void }) {
+  const [perm, setPerm] = useState({ street: "", city: "", state: "", pincode: "", country: "" });
+  const [pres, setPres] = useState({ street: "", city: "", state: "", pincode: "", country: "" });
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => {
+    if (!user?.id) return;
+    const res = await fetch(`/api/student/${user.id}/profile`);
+    const d = await res.json();
+    setPerm({
+      street: d.address ?? "", city: d.city ?? "", state: d.state ?? "",
+      pincode: d.pincode ?? "", country: d.country ?? "India",
+    });
+  }, [user?.id]);
+
+  useEffect(() => { load(); }, [load]);
+
+  async function saveSection(data: typeof perm, label: string) {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/student/${user?.id}/profile`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: data.street, city: data.city, state: data.state, pincode: data.pincode, country: data.country }),
+      });
+      if (res.ok) showToast(`${label} saved!`);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function AddressSection({ title, data, setData }: { title: string; data: typeof perm; setData: (d: typeof perm) => void }) {
+    return (
+      <div className="border border-gray-200 rounded-xl p-5 space-y-4">
+        <h3 className="text-[15px] font-semibold text-[#111]">{title}</h3>
+        <Field label="Street Address" value={data.street} onChange={(v) => setData({ ...data, street: v })} />
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="City" value={data.city} onChange={(v) => setData({ ...data, city: v })} />
+          <Field label="State" value={data.state} onChange={(v) => setData({ ...data, state: v })} />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Pincode" value={data.pincode} onChange={(v) => setData({ ...data, pincode: v })} />
+          <Field label="Country" value={data.country} onChange={(v) => setData({ ...data, country: v })} />
+        </div>
+        <button onClick={() => saveSection(data, title)} disabled={saving}
+          className="px-6 py-2 bg-gray-400 text-white text-[13px] font-medium rounded-lg hover:bg-gray-500 transition-all disabled:opacity-50">
+          Update Now
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="animate-in slide-in-from-bottom-4 duration-500">
-      <div className="mb-8">
-        <h2 className="text-[26px] font-bold text-[#222]">Student Details</h2>
-        <p className="text-gray-400 font-semibold uppercase text-[12px] tracking-widest mt-1">Manage your records</p>
+    <div className="space-y-6">
+      <AddressSection title="Add Permanent address" data={perm} setData={setPerm} />
+      <AddressSection title="Add Present Address" data={pres} setData={setPres} />
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CERTIFICATES INNER TAB
+// ══════════════════════════════════════════════════════════════════════════════
+function CertificatesInner({ user, showToast }: { user: Props["user"]; showToast: (m: string) => void }) {
+  const [caption, setCaption]   = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [docs, setDocs]         = useState<{ id: number; name: string; file_path: string; category_label: string; is_image: boolean }[]>([]);
+  const [category, setCategory] = useState("other");
+  const certRef = useRef<HTMLInputElement>(null);
+
+  const CATEGORIES: Record<string, string> = {
+    marksheet_10: "10th Marksheet", marksheet_12: "12th Marksheet",
+    marksheet_grad: "Graduation Marksheet", id_proof: "ID Proof",
+    photo: "Passport Photo", caste_cert: "Caste Certificate",
+    income_cert: "Income Certificate", migration: "Migration Certificate",
+    other: "Other Document",
+  };
+
+  const load = useCallback(async () => {
+    if (!user?.id) return;
+    const res = await fetch(`/api/student/${user.id}/documents`);
+    const d = await res.json();
+    setDocs(d.documents ?? []);
+  }, [user?.id]);
+
+  useEffect(() => { load(); }, [load]);
+
+  async function handleUpload() {
+    if (!selectedFile || !user?.id) { showToast("Please select a file first."); return; }
+    setUploading(true);
+    const fd = new FormData();
+    fd.append("file", selectedFile);
+    fd.append("name", caption || selectedFile.name);
+    fd.append("category", category);
+    try {
+      const res = await fetch(`/api/student/${user.id}/documents`, { method: "POST", body: fd });
+      if (res.ok) {
+        showToast("Certificate uploaded successfully!");
+        setCaption(""); setSelectedFile(null);
+        if (certRef.current) certRef.current.value = "";
+        load();
+      }
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleDelete(id: number) {
+    if (!confirm("Delete this document?")) return;
+    await fetch(`/api/student/${user?.id}/documents?docId=${id}`, { method: "DELETE" });
+    load();
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* Caption input */}
+      <div className="border border-gray-200 rounded-xl p-4 flex items-center gap-3">
+        <span className="text-[#e31e24] text-xl font-bold">+</span>
+        <input value={caption} onChange={(e) => setCaption(e.target.value)}
+          placeholder="add caption"
+          className="flex-1 outline-none text-[14px] text-gray-600 bg-transparent" />
       </div>
 
-      <div className="bg-white rounded-[10px] shadow-sm border border-gray-100 overflow-hidden">
-        <ProfileTabs active="profile" />
-        
-        <form onSubmit={handleSave} className="p-10 space-y-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-            <InputField label="Student Name" value={name} onChange={setName} icon="person" />
-            <InputField label="Email Address" value={user?.email ?? ""} disabled icon="mail" />
-            <InputField label="Phone Number" value={phone} onChange={setPhone} type="tel" icon="call" />
-            <InputField label="Alt Phone Number" value="" placeholder="Optional" icon="call" />
-            
-            <div className="relative pt-2">
-              <label className="absolute left-4 -top-0.5 px-1.5 bg-white text-[11px] font-semibold text-gray-400 uppercase tracking-widest z-10">
-                Gender
-              </label>
-              <select 
-                value={gender} 
-                onChange={(e) => setGender(e.target.value)}
-                className="w-full bg-white border-2 border-gray-100 rounded-[8px] px-4 py-3.5 text-[14px] font-medium text-[#333] focus:border-[#e31e24]/30 outline-none transition-all appearance-none"
-              >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-300 pointer-events-none">expand_more</span>
-            </div>
+      {/* Category select */}
+      <Field label="Category">
+        <select value={category} onChange={(e) => setCategory(e.target.value)}
+          className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-[14px] text-[#111] bg-white outline-none appearance-none">
+          {Object.entries(CATEGORIES).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+        </select>
+      </Field>
 
-            <InputField label="Date of Birth" value={dob} onChange={setDob} type="date" icon="calendar_today" />
-          </div>
+      {/* Upload area */}
+      <div className="border border-gray-200 rounded-xl p-6 text-center space-y-4">
+        <p className="text-[15px] font-semibold text-[#111]">Upload new document to your academic record</p>
+        <div onClick={() => certRef.current?.click()}
+          className="w-44 h-28 border-2 border-dashed border-gray-300 rounded-xl mx-auto flex flex-col items-center justify-center cursor-pointer hover:border-[#e31e24]/50 transition-colors bg-gray-50">
+          <span className="text-3xl text-gray-300">+</span>
+          <span className="text-[13px] text-gray-400">Add Image</span>
+        </div>
+        <input ref={certRef} type="file" accept="image/*,.pdf" className="hidden"
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setSelectedFile(e.target.files?.[0] ?? null)} />
+        <div className="inline-block bg-gray-100 border border-gray-200 rounded-md px-4 py-1.5 text-[13px] text-gray-500">
+          {selectedFile ? selectedFile.name : "0 Files Selected"}
+        </div>
+        <br />
+        <button onClick={handleUpload} disabled={uploading}
+          className="px-8 py-2.5 bg-gray-400 text-white text-[13px] font-medium rounded-lg hover:bg-gray-500 transition-all disabled:opacity-50">
+          {uploading ? "Uploading..." : "Upload Image"}
+        </button>
+      </div>
 
-          <div className="flex items-center justify-between pt-6 border-t border-gray-50">
-            <div className="flex items-center gap-3">
-              {success && (
-                <span className="flex items-center gap-1.5 text-green-600 text-[13px] font-semibold">
-                  <span className="material-symbols-outlined text-[18px]">check_circle</span>
-                  Changes saved!
-                </span>
-              )}
-              {error && <span className="text-red-500 text-[13px] font-semibold">{error}</span>}
-            </div>
-            
-            <div className="flex gap-4">
-              <button 
-                type="button"
-                onClick={load}
-                className="px-6 py-3 bg-gray-50 text-gray-500 text-[13px] font-semibold uppercase tracking-wider rounded-lg hover:bg-gray-100 transition-all"
-              >
-                Reset
-              </button>
-              <button 
-                type="submit"
-                disabled={saving}
-                className="px-10 py-3 bg-[#e31e24] text-white text-[13px] font-semibold uppercase tracking-wider rounded-lg shadow-lg shadow-red-100 hover:bg-[#c0191e] transition-all active:scale-95 disabled:opacity-50"
-              >
-                {saving ? "Saving..." : "Save Changes"}
-              </button>
-            </div>
+      {/* Uploaded list */}
+      {docs.length > 0 && (
+        <div className="space-y-3">
+          <h4 className="text-[13px] font-semibold text-gray-500 uppercase tracking-wider">Uploaded Certificates</h4>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {docs.map((doc) => (
+              <div key={doc.id} className="border border-gray-200 rounded-xl overflow-hidden relative group">
+                {doc.is_image
+                  ? <img src={doc.file_path} alt={doc.name} className="w-full h-24 object-cover" />
+                  : <div className="w-full h-24 bg-gray-50 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[40px] text-gray-300">description</span>
+                    </div>
+                }
+                <div className="p-2">
+                  <p className="text-[11px] text-gray-600 truncate">{doc.name}</p>
+                  <p className="text-[10px] text-gray-400">{doc.category_label}</p>
+                </div>
+                <button onClick={() => handleDelete(doc.id)}
+                  className="absolute top-2 right-2 w-6 h-6 bg-[#e31e24] text-white rounded text-[11px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  ✕
+                </button>
+              </div>
+            ))}
           </div>
-        </form>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PROJECTS INNER TAB
+// ══════════════════════════════════════════════════════════════════════════════
+function ProjectsInner({ showToast }: { showToast: (m: string) => void }) {
+  const [desc, setDesc]   = useState("");
+  const [saved, setSaved] = useState("");
+  const MAX = 1000;
+
+  function handleSubmit() {
+    setSaved(desc);
+    showToast("Project saved!");
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* Current saved */}
+      <div className="border border-gray-200 rounded-xl p-5">
+        <h3 className="text-[15px] font-semibold text-[#111] mb-2">Project Description</h3>
+        <p className="text-[14px] text-gray-500">{saved || "Not updated yet"}</p>
+      </div>
+
+      {/* Update form */}
+      <div className="border border-gray-200 rounded-xl p-5 space-y-4">
+        <h3 className="text-[15px] font-semibold text-[#111]">Update small description about your project&apos;s</h3>
+        <Field label="Description">
+          <textarea value={desc} onChange={(e) => setDesc(e.target.value.slice(0, MAX))}
+            placeholder="Enter project description here" rows={8}
+            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-[14px] text-[#111] bg-white outline-none focus:border-[#e31e24]/40 resize-vertical" />
+        </Field>
+        <p className="text-[12px] text-gray-400">( Maximum character limit {MAX} )</p>
+        <p className="text-[12px] text-gray-400">{MAX - desc.length} characters left</p>
+        <div className="text-center">
+          <button onClick={handleSubmit}
+            className="px-10 py-2.5 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all">
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SETTINGS INNER TAB
+// ══════════════════════════════════════════════════════════════════════════════
+function SettingsInner({ user, showToast }: { user: Props["user"]; showToast: (m: string) => void }) {
+  const [firstName, setFirstName]   = useState("");
+  const [middleName, setMiddleName] = useState("");
+  const [lastName, setLastName]     = useState("");
+  const [email, setEmail]           = useState(user?.email ?? "");
+  const [phone, setPhone]           = useState("");
+  const [showPw, setShowPw]         = useState(false);
+  const [currentPw, setCurrentPw]   = useState("");
+  const [newPw, setNewPw]           = useState("");
+  const [confirmPw, setConfirmPw]   = useState("");
+  const [saving, setSaving]         = useState(false);
+
+  useEffect(() => {
+    if (!user?.name) return;
+    const parts = user.name.split(" ");
+    setFirstName(parts[0] ?? "");
+    setLastName(parts[parts.length - 1] ?? "");
+  }, [user?.name]);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (showPw && newPw !== confirmPw) { showToast("Passwords don't match"); return; }
+    setSaving(true);
+    try {
+      if (showPw && newPw) {
+        const res = await fetch(`/api/student/${user?.id}/settings`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "change_password", currentPassword: currentPw, newPassword: newPw }),
+        });
+        if (res.ok) { showToast("Settings saved!"); setCurrentPw(""); setNewPw(""); setConfirmPw(""); }
+        else showToast("Password update failed");
+      } else {
+        showToast("Settings saved!");
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="border border-gray-200 rounded-xl p-5 space-y-4">
+        <Field label="First Name" value={firstName} onChange={setFirstName} placeholder="Enter your first name" />
+        <Field label="Middle Name" value={middleName} onChange={setMiddleName} placeholder="Enter your middle name" />
+        <Field label="Last Name" value={lastName} onChange={setLastName} placeholder="Enter your last name" />
+        <Field label="Email Address" value={email} disabled />
+        <Field label="Register Contact Number" value={phone} onChange={setPhone} type="tel" placeholder="xxxx-xxx-xxx" />
+
+        <button type="button" onClick={() => setShowPw(!showPw)}
+          className="px-5 py-2 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all">
+          Change Password
+        </button>
+
+        {showPw && (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-4">
+            <Field label="Current Password" value={currentPw} onChange={setCurrentPw} type="password" placeholder="Enter current password" />
+            <Field label="New Password" value={newPw} onChange={setNewPw} type="password" placeholder="Enter new password" />
+            <Field label="Confirm Password" value={confirmPw} onChange={setConfirmPw} type="password" placeholder="Confirm new password" />
+          </div>
+        )}
+
+        <div className="text-center pt-2">
+          <button type="submit" disabled={saving}
+            className="px-10 py-2.5 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all disabled:opacity-50">
+            {saving ? "Saving..." : "Submit"}
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MAIN — ProfileTab (Student Details page)
+// ══════════════════════════════════════════════════════════════════════════════
+export default function ProfileTab({ user }: Props) {
+  const [activeTab, setActiveTab] = useState<InnerTab>("profile");
+  const [toast, setToast]         = useState("");
+  const [stats, setStats]         = useState({ total: 0, bookmarkCourse: 0, bookmarkCollege: 0, bookmarkBlog: 0, queries: 0 });
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 2500);
+  };
+
+  useEffect(() => {
+    if (!user?.id) return;
+    Promise.all([
+      fetch(`/api/student/${user.id}/applications`).then(r => r.json()).catch(() => ({})),
+      fetch(`/api/student/${user.id}/bookmarks`).then(r => r.json()).catch(() => ({})),
+      fetch(`/api/student/${user.id}/queries`).then(r => r.json()).catch(() => ({})),
+    ]).then(([apps, bookmarks, queries]) => {
+      setStats({
+        total:           apps?.stats?.total          ?? 0,
+        bookmarkCourse:  bookmarks?.courses?.length  ?? 0,
+        bookmarkCollege: bookmarks?.colleges?.length ?? 0,
+        bookmarkBlog:    bookmarks?.blogs?.length    ?? 0,
+        queries:         queries?.total              ?? 0,
+      });
+    });
+  }, [user?.id]);
+
+  const name = user?.name ?? "Student";
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-300">
+      <Toast msg={toast} />
+
+      {/* Page header */}
+      <div>
+        <h1 className="text-[22px] font-bold text-[#111]">Dashboard</h1>
+        <p className="text-[14px] text-gray-400 mt-0.5">Welcome back!</p>
+      </div>
+
+      {/* Top 4 stat cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="TOTAL APPLICATION"  value={stats.total} />
+        <StatCard label="BOOKMARK COURSE"    value={stats.bookmarkCourse} />
+        <StatCard label="BOOKMARK COLLEGE"   value={stats.bookmarkCollege} />
+        <StatCard label="BOOKMARK BLOGS"     value={stats.bookmarkBlog} />
+      </div>
+
+      {/* Greeting + Total Queries row */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-4">
+        <div className="bg-white rounded-xl border border-gray-200 px-6 py-5">
+          <p className="text-[18px] font-semibold text-[#111]">Hi! {name}</p>
+        </div>
+        <StatCard label="TOTAL QUERIES" value={stats.queries} />
+      </div>
+
+      {/* Inner tab panel */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        {/* Tab bar */}
+        <div className="flex border-b border-gray-200 overflow-x-auto no-scrollbar">
+          {INNER_TABS.map((tab) => (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-5 py-3.5 text-[13px] font-medium whitespace-nowrap transition-all border-b-2 -mb-px ${
+                activeTab === tab.id
+                  ? "bg-[#e31e24] text-white border-[#e31e24]"
+                  : "text-gray-600 border-transparent hover:text-[#e31e24]"
+              }`}>
+              {tab.label}
+              <span className="material-symbols-outlined text-[14px] opacity-60">edit</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Tab content */}
+        <div className="p-6">
+          {activeTab === "profile"      && <ProfileInner      user={user} showToast={showToast} />}
+          {activeTab === "address"      && <AddressInner      user={user} showToast={showToast} />}
+          {activeTab === "certificates" && <CertificatesInner user={user} showToast={showToast} />}
+          {activeTab === "projects"     && <ProjectsInner     showToast={showToast} />}
+          {activeTab === "settings"     && <SettingsInner     user={user} showToast={showToast} />}
+        </div>
       </div>
     </div>
   );

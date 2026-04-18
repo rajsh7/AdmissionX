@@ -14,12 +14,13 @@ export default function SmoothScrollProvider({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith("/admin");
+  const isAdmin    = pathname?.startsWith("/admin");
+  const isDashboard = pathname?.startsWith("/dashboard");
 
   useEffect(() => {
-    // Skip Lenis entirely on admin pages — it hijacks window scroll
-    // and breaks overflow-y-auto containers used in the admin layout.
-    if (isAdmin) return;
+    // Skip Lenis on admin and dashboard pages — it hijacks window scroll
+    // and breaks overflow-y-auto containers used in those layouts.
+    if (isAdmin || isDashboard) return;
 
     const lenis = new Lenis({
       duration: 1.2,

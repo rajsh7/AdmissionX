@@ -12,8 +12,8 @@ export default function GSAPAnimations() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // No GSAP scroll animations needed in admin
-    if (pathname?.startsWith("/admin")) return;
+    // No GSAP scroll animations needed in admin or dashboard
+    if (pathname?.startsWith("/admin") || pathname?.startsWith("/dashboard")) return;
 
     if (initialized.current) return;
     initialized.current = true;

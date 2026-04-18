@@ -1,9 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import PaginationFixed from "@/app/components/PaginationFixed";
 
 const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
+
+const STEP = 25;
 
 interface AppRow {
   id: number;
@@ -22,6 +26,10 @@ interface AppRow {
 interface ApplicationsListClientProps {
   initialRows: AppRow[];
   offset: number;
+  page: number;
+  totalPages: number;
+  total: number;
+  pageSize: number;
 }
 
 const STATUS_STYLE: Record<string, { cls: string; dot: string }> = {
@@ -47,9 +55,20 @@ function formatDate(d: string | null | undefined): string {
   } catch { return "—"; }
 }
 
-export default function ApplicationsListClient({ initialRows, offset }: ApplicationsListClientProps) {
+export default function ApplicationsListClient({ initialRows, offset, page, totalPages, total, pageSize }: ApplicationsListClientProps) {
+  const [visibleCount, setVisibleCount] = useState(STEP);
+
+  const listKey = initialRows[0]?.id ?? "empty";
+  const [lastKey, setLastKey] = useState(listKey);
+  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(STEP); }
+
+  const showMore = visibleCount < initialRows.length;
+  const showPagination = !showMore && totalPages > 1;
+  const visibleRows = initialRows.slice(0, visibleCount);
+
   return (
-    <div className="overflow-x-auto">
+    <>
+      <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-slate-50 border-b border-slate-100">
@@ -63,7 +82,7 @@ export default function ApplicationsListClient({ initialRows, offset }: Applicat
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
-          {initialRows.map((app, idx) => {
+          {visibleRows.map((app, idx) => {
             const style = getStatusStyle(app.status);
             return (
               <tr
@@ -147,6 +166,29 @@ export default function ApplicationsListClient({ initialRows, offset }: Applicat
         </tbody>
       </table>
     </div>
+
+      {showMore && (
+        <div className="mt-6 mb-4 flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setVisibleCount((c) => Math.min(c + STEP, initialRows.length))}
+            className="group flex flex-col items-center gap-1 text-neutral-400 hover:text-[#FF3C3C] transition-colors"
+          >
+            <span className="text-xs font-bold uppercase tracking-widest">Show More</span>
+            <span className="material-symbols-outlined text-[36px] group-hover:text-[#FF3C3C] animate-bounce">keyboard_arrow_down</span>
+          </button>
+        </div>
+      )}
+
+      {showPagination && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-5 border-t border-slate-100 bg-slate-50/50">
+          <p className="text-xs text-slate-500 font-semibold">
+            Showing <span className="text-slate-900">{offset + 1}–{Math.min(offset + pageSize, total)}</span> of <span className="text-slate-900">{total.toLocaleString()}</span> entries
+          </p>
+          <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
+        </div>
+      )}
+    </>
   );
 }
 

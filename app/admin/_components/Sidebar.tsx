@@ -9,6 +9,7 @@ export interface Admin {
   id: string;
   name: string;
   email: string;
+  adminRole?: import("@/lib/permissions").AdminRole;
 }
 
 import { NavItem, NavGroup, NAV_GROUPS } from "./nav-config";

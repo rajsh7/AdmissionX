@@ -21,14 +21,25 @@ export async function POST(req: NextRequest) {
     }
 
     const emailLower = email.trim().toLowerCase();
+    const phoneTrimmed = phone.trim();
     const db = await getDb();
 
-    const existing = await db.collection("next_student_signups").findOne({ email: emailLower });
-    if (existing) {
+    const existingEmail = await db.collection("next_student_signups").findOne({ email: emailLower });
+    if (existingEmail) {
       return NextResponse.json(
         { error: "An account with this email already exists. Please login or use a different email." },
         { status: 409 }
       );
+    }
+
+    if (phoneTrimmed) {
+      const existingPhone = await db.collection("next_student_signups").findOne({ phone: phoneTrimmed });
+      if (existingPhone) {
+        return NextResponse.json(
+          { error: "An account with this mobile number already exists. Please use a different number." },
+          { status: 409 }
+        );
+      }
     }
 
     const hashed = await bcrypt.hash(password, 12);
@@ -38,7 +49,7 @@ export async function POST(req: NextRequest) {
     const result = await db.collection("next_student_signups").insertOne({
       name: name.trim(),
       email: emailLower,
-      phone: phone.trim(),
+      phone: phoneTrimmed,
       password_hash: hashed,
       is_active: 0,
       activation_token: activationToken,
@@ -90,6 +101,11 @@ export async function POST(req: NextRequest) {
     }
 
     console.error("[Signup Internal Error]:", err);
+    // MongoDB duplicate key error
+    if (err.code === 11000) {
+      const field = err.keyPattern?.email ? "email" : "mobile number";
+      return NextResponse.json({ error: `An account with this ${field} already exists.` }, { status: 409 });
+    }
     return NextResponse.json(
       { error: err.message || "Internal server error. Please try again." }, 
       { status: 500 }
