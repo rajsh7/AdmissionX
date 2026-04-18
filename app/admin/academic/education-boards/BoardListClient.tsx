@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import BoardFormModal from "./BoardFormModal";
+import PaginationFixed from "@/app/components/PaginationFixed";
+import { formatDate } from "@/lib/utils";
+
+const STEP = 25;
 
 interface Board {
   id: number;
@@ -17,6 +21,10 @@ interface Board {
 
 interface BoardListClientProps {
   boards: Board[];
+  total: number;
+  page: number;
+  totalPages: number;
+  pageSize: number;
   createBoard: (formData: FormData) => Promise<void>;
   updateBoard: (formData: FormData) => Promise<void>;
   deleteBoard: (id: number) => Promise<void>;
@@ -24,12 +32,35 @@ interface BoardListClientProps {
 
 export default function BoardListClient({
   boards,
+  total,
+  page,
+  totalPages,
+  pageSize,
   createBoard,
   updateBoard,
   deleteBoard,
 }: BoardListClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBoard, setEditingBoard] = useState<Board | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(STEP);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Reset visible count when page changes
+  const pageKey = `${page}-${boards[0]?.id}`;
+  const [lastPageKey, setLastPageKey] = useState(pageKey);
+  if (pageKey !== lastPageKey) {
+    setLastPageKey(pageKey);
+    setVisibleCount(STEP);
+  }
+
+  const showMore = visibleCount < boards.length;
+  const showPagination = !showMore && totalPages > 1;
+
+  if (!mounted) return <div className="min-h-[400px] bg-white rounded-2xl border border-slate-100 animate-pulse mt-6" />;
 
   const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
@@ -73,6 +104,7 @@ export default function BoardListClient({
               <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 <th className="px-5 py-3 text-left">Board Info</th>
                 <th className="px-4 py-3 text-left">Slug</th>
+                <th className="px-4 py-3 text-left">Date</th>
                 <th className="px-4 py-3 text-center">Status</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
@@ -85,7 +117,7 @@ export default function BoardListClient({
                   </td>
                 </tr>
               ) : (
-                boards.map((row) => (
+                boards.slice(0, visibleCount).map((row) => (
                   <tr key={row.id} className="hover:bg-indigo-50/20 transition-colors group">
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
@@ -112,6 +144,11 @@ export default function BoardListClient({
                       ) : (
                         <span className="text-[10px] text-slate-300 italic">—</span>
                       )}
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <span className="text-xs text-slate-400 whitespace-nowrap">
+                        {formatDate(row.created_at)}
+                      </span>
                     </td>
                     <td className="px-4 py-3.5 text-center">
                        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full ${row.status ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-400'}`}>
@@ -144,6 +181,34 @@ export default function BoardListClient({
         onSubmit={editingBoard ? updateBoard : createBoard}
         board={editingBoard}
       />
+
+      {/* Show More */}
+      {showMore && (
+        <div className="py-6 flex flex-col items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setVisibleCount(v => Math.min(v + STEP, boards.length))}
+            className="group flex flex-col items-center gap-1 text-slate-400 hover:text-indigo-600 transition-colors"
+          >
+            <span className="text-xs font-bold uppercase tracking-widest">
+              Show More ({boards.length - visibleCount} remaining)
+            </span>
+            <span className="material-symbols-outlined text-[36px] animate-bounce group-hover:text-indigo-600">
+              keyboard_arrow_down
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Pagination after all shown */}
+      {showPagination && (
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/30 rounded-b-2xl">
+          <p className="text-xs text-slate-400 font-medium">
+            Showing <span className="text-slate-700 font-bold">{(page-1)*pageSize + 1}–{Math.min((page-1)*pageSize + pageSize, total)}</span> of <span className="text-slate-700 font-bold">{total}</span> boards
+          </p>
+          <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
+        </div>
+      )}
     </>
   );
 }

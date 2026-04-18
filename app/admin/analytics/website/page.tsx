@@ -35,7 +35,7 @@ export default async function WebsiteMetricsPage() {
   const metrics = await safeQuery<MetricRow>("SELECT * FROM homepage_stats WHERE is_active = 1 ORDER BY id ASC");
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 mx-auto max-w-[1400px]">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
