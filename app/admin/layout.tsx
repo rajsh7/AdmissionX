@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifyAdminToken } from "@/lib/auth";
+import { canAccess } from "@/lib/permissions";
+import type { AdminRole } from "@/lib/permissions";
 import AdminShell from "./_components/AdminShell";
 
 export const dynamic = "force-dynamic";
@@ -18,15 +20,12 @@ export default async function AdminLayout({
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_admin")?.value;
 
-  if (!token) {
-    redirect("/login?redirect=/admin/dashboard");
-  }
+  if (!token) redirect("/login?redirect=/admin/dashboard");
 
   const payload = await verifyAdminToken(token);
+  if (!payload) redirect("/login?redirect=/admin/dashboard");
 
-  if (!payload) {
-    redirect("/login?redirect=/admin/dashboard");
-  }
+  const adminRole: AdminRole = (payload.adminRole as AdminRole) ?? "super_admin";
 
   return (
     <AdminShell
@@ -34,13 +33,10 @@ export default async function AdminLayout({
         id: payload.id,
         name: payload.name,
         email: payload.email,
+        adminRole,
       }}
     >
       {children}
     </AdminShell>
   );
 }
-
-
-
-

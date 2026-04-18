@@ -110,7 +110,7 @@ export default function OverviewTab({ user }: Props) {
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Page Header */}
       <div className="flex flex-col gap-1">
-        <h2 className="text-[26px] font-bold text-[#222] tracking-tight">Analytics Dashboard</h2>
+        <h2 className="text-[26px] font-bold text-[#222] tracking-tight">Dashboard</h2>
         <p className="text-[14px] font-semibold text-gray-400 uppercase tracking-widest leading-none">Welcome back!</p>
       </div>
 

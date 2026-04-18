@@ -248,7 +248,7 @@ export default function OverviewTab({ college, onNavigate }: Props) {
     <div className="space-y-6 pb-24">
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-[28px] font-black text-slate-800 tracking-tight leading-none">Analytics Dashboard</h1>
+        <h1 className="text-[28px] font-black text-slate-800 tracking-tight leading-none">Dashboard</h1>
         <p className="text-slate-400 font-bold text-sm tracking-wide">Welcome back!</p>
       </div>
 

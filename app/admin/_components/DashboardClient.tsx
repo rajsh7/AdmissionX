@@ -201,7 +201,7 @@ export default function DashboardClient({
     <div className="space-y-8 pb-10">
       {/* Title */}
       <div>
-        <h1 className="text-[25px] font-semibold text-[#3E3E3E]">Analytics Dashboard</h1>
+        <h1 className="text-[25px] font-semibold text-[#3E3E3E]">Dashboard</h1>
         <p className="text-[18px] font-normal text-slate-500">Overview of platform growth and activity.</p>
       </div>
 

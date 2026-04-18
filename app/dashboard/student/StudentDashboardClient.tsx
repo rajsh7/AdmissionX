@@ -17,7 +17,6 @@ import QATab from "./tabs/QATab";
 import CounsellingFormsTab from "./tabs/CounsellingFormsTab";
 import CounselingTab from "./tabs/CounselingTab";
 import HelpDeskTab from "./tabs/HelpDeskTab";
-import ProfileViewTab from "./tabs/ProfileViewTab";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Props {
@@ -33,7 +32,7 @@ type TabId =
   | "queries-replied" | "queries-pending" | "queries-all"
   | "bookmark-courses" | "bookmark-colleges" | "bookmark-blogs"
   | "qa-questions" | "qa-answers" | "qa-comments" | "qa-reviews"
-  | "counselling-forms" | "counseling" | "help-desk" | "profile-view";
+  | "counselling-forms" | "counseling" | "help-desk";
 
 interface NavItem { id: TabId; label: string; icon: string; groupId?: string }
 
@@ -74,7 +73,6 @@ export default function StudentDashboardClient({ user, activated }: Props) {
       case "qa-questions":           return <QATab                 user={user} type="questions" />;
       case "counselling-forms":      return <CounsellingFormsTab   user={user} />;
       case "help-desk":              return <HelpDeskTab           user={user} />;
-      case "profile-view":           return <ProfileViewTab        user={user} />;
       default:                       return <OverviewTab           user={user} />;
     }
   }
@@ -82,14 +80,14 @@ export default function StudentDashboardClient({ user, activated }: Props) {
   // ── Sidebar Inner ──────────────────────────────────────────────────────────
   function SidebarContent() {
     const MENU_ITEMS: NavItem[] = [
-      { id: "account-details", label: "Student Details", icon: "person" },
-      { id: "app-all",         label: "Application",     icon: "description" },
-      { id: "queries-all",     label: "Queries",         icon: "forum" },
-      { id: "bookmark-colleges", label: "Bookmarks",     icon: "bookmarks" },
-      { id: "qa-questions",    label: "Question | Answer | Comment", icon: "rate_review" },
-      { id: "counselling-forms", label: "Counseling Forms", icon: "assignment" },
-      { id: "help-desk",       label: "Help Desk",       icon: "help_center" },
-      { id: "profile-view",    label: "Profile View",    icon: "account_circle" },
+      { id: "overview",          label: "Dashboard",        icon: "bar_chart"       },
+      { id: "account-details",   label: "Student Details",            icon: "person"          },
+      { id: "app-all",           label: "Application",                icon: "description"     },
+      { id: "queries-all",       label: "Queries",                    icon: "forum"           },
+      { id: "bookmark-colleges", label: "Bookmarks",                  icon: "bookmarks"       },
+      { id: "qa-questions",      label: "Question | Answer | Comment",icon: "rate_review"     },
+      { id: "counselling-forms", label: "Counseling Forms",           icon: "assignment"      },
+      { id: "help-desk",         label: "Help Desk",                  icon: "help_center"     },
     ];
 
     return (
@@ -115,7 +113,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
         </div>
 
         {/* Flat Nav List */}
-        <nav className="flex-1 px-0 space-y-0">
+        <nav className="flex-1 px-0 space-y-0 overflow-y-auto no-scrollbar">
           {MENU_ITEMS.map((item) => {
             const isActive = activeTab === item.id;
             return (
@@ -220,7 +218,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 min-h-0 overflow-hidden relative">
         {/* Email Activated Banner */}
         {showActivatedBanner && (
           <div className="fixed top-[80px] left-0 right-0 z-50 flex items-center justify-between gap-3 px-6 py-3 bg-emerald-500 text-white text-sm font-semibold shadow-lg">
@@ -248,9 +246,9 @@ export default function StudentDashboardClient({ user, activated }: Props) {
         </aside>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-          <main className="flex-1 overflow-y-auto bg-[#f8f9fa]">
-            <div className="p-10 max-w-[1600px] mx-auto min-h-full">
+        <div className="flex-1 min-w-0 student-dashboard-scroll bg-[#f8f9fa] relative">
+          <main>
+            <div className="p-10 max-w-[1600px] mx-auto">
               {renderTab()}
             </div>
           </main>
@@ -274,9 +272,9 @@ function MobileBottomNav({
   const [showMore, setShowMore] = useState(false);
 
   const primary: { id: TabId; label: string; icon: string }[] = [
-    { id: "overview",      label: "Home",     icon: "dashboard"     },
-    { id: "app-all",       label: "Apps",     icon: "description"   },
-    { id: "profile-view",  label: "Profile",  icon: "badge"         },
+    { id: "overview",          label: "Home",  icon: "dashboard"   },
+    { id: "app-all",           label: "Apps",  icon: "description" },
+    { id: "account-details",   label: "Profile", icon: "badge"     },
     { id: "bookmark-colleges", label: "Saved", icon: "bookmarks"   },
   ];
 

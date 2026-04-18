@@ -1,4 +1,5 @@
 import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,6 @@ export default async function AdminReportsPage() {
     studentsToday,
     studentsThisWeek,
     studentsThisMonth,
-    totalApplications,
     totalBlogs,
     activeBlogs,
     totalNews,
@@ -77,7 +77,6 @@ export default async function AdminReportsPage() {
     totalSeo,
     totalAdmins,
     activeAdmins,
-    appStatusRows,
   ] = await Promise.all([
     safeCount("SELECT COUNT(*) AS cnt FROM next_college_signups"),
     safeCount(
@@ -98,11 +97,9 @@ export default async function AdminReportsPage() {
       "SELECT COUNT(*) AS cnt FROM next_student_signups WHERE DATE(created_at) >= ?",
       [weekStr],
     ),
-    safeCount(
-      "SELECT COUNT(*) AS cnt FROM next_student_signups WHERE DATE(created_at) >= ?",
+    safeCount("SELECT COUNT(*) AS cnt FROM next_student_signups WHERE DATE(created_at) >= ?",
       [monthStr],
     ),
-    safeCount("SELECT COUNT(*) AS cnt FROM application"),
     safeCount("SELECT COUNT(*) AS cnt FROM blogs"),
     safeCount("SELECT COUNT(*) AS cnt FROM blogs WHERE isactive = 1"),
     safeCount("SELECT COUNT(*) AS cnt FROM news"),
@@ -115,17 +112,24 @@ export default async function AdminReportsPage() {
     safeCount("SELECT COUNT(*) AS cnt FROM ads_managements WHERE isactive = 1"),
     safeCount("SELECT COUNT(*) AS cnt FROM seo_contents"),
     safeCount("SELECT COUNT(*) AS cnt FROM next_admin_users"),
-    safeCount(
-      "SELECT COUNT(*) AS cnt FROM next_admin_users WHERE is_active = 1",
-    ),
-    safeQuery<AppStatusRow>(
-      `SELECT COALESCE(s.name, 'Unknown') AS status_name, COUNT(*) AS cnt
-       FROM application a
-       LEFT JOIN applicationstatus s ON s.id = a.applicationstatus_id
-       GROUP BY a.applicationstatus_id, s.name
-       ORDER BY cnt DESC`,
+    safeCount("SELECT COUNT(*) AS cnt FROM next_admin_users WHERE is_active = 1",
     ),
   ]);
+
+  // MongoDB: application stats from 'application' collection
+  const db = await getDb();
+  const mongoAppAgg = await db.collection("application").aggregate([
+    { $group: { _id: "$applicationstatus_id", cnt: { $sum: 1 } } },
+    { $lookup: { from: "applicationstatus", localField: "_id", foreignField: "id", as: "s" } },
+    { $unwind: { path: "$s", preserveNullAndEmptyArrays: true } },
+    { $project: { status_name: { $trim: { input: { $ifNull: ["$s.name", "Unknown"] } } }, cnt: 1 } },
+    { $sort: { cnt: -1 } },
+  ]).toArray();
+  const appStatusRows = mongoAppAgg.map((r) => ({
+    status_name: String(r.status_name ?? "Unknown"),
+    cnt: Number(r.cnt),
+  }));
+  const mongoTotalApplications = appStatusRows.reduce((s, r) => s + r.cnt, 0);
 
   const inactiveBlogs = totalBlogs - activeBlogs;
   const inactiveNews = totalNews - activeNews;
@@ -159,7 +163,7 @@ export default async function AdminReportsPage() {
     },
     {
       label: "Applications",
-      value: totalApplications,
+      value: mongoTotalApplications,
       icon: "description",
       href: "/admin/applications",
       color: "text-amber-600",
@@ -257,7 +261,7 @@ export default async function AdminReportsPage() {
     return STATUS_COLORS[key] ?? STATUS_COLORS.default;
   }
 
-  const appTotal = appStatusRows.reduce((s, r) => s + Number(r.cnt), 0) || 1;
+  const appTotal = mongoTotalApplications || 1;
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
@@ -503,10 +507,7 @@ export default async function AdminReportsPage() {
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-600">
               <span>Total Applications</span>
               <span>
-                {(appTotal === 1 && totalApplications === 0
-                  ? 0
-                  : totalApplications
-                ).toLocaleString()}
+                {mongoTotalApplications.toLocaleString()}
               </span>
             </div>
           </div>

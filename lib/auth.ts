@@ -80,6 +80,7 @@ export interface AdminTokenPayload extends JWTPayload {
   name: string;
   email: string;
   role: "admin";
+  adminRole?: "super_admin" | "role_admin" | "role_counsellor";
 }
 
 export async function signAdminToken(
@@ -88,7 +89,7 @@ export async function signAdminToken(
   return new SignJWT({ ...data })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("1d") // shorter session for admin
+    .setExpirationTime("1d")
     .sign(SECRET);
 }
 

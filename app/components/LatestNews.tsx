@@ -8,8 +8,10 @@ const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 
 function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || !raw.trim()) return "https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800&auto=format&fit=crop";
-  if (raw.startsWith("http")) return `/api/image-proxy?url=${encodeURIComponent(raw)}`;
-  return `/api/image-proxy?url=${encodeURIComponent(IMAGE_BASE + raw)}`;
+  // Fix double /uploads//uploads/ from bad DB data
+  const cleaned = raw.replace(/\/uploads\/\/uploads\//g, "/uploads/");
+  if (cleaned.startsWith("http")) return `/api/image-proxy?url=${encodeURIComponent(cleaned)}`;
+  return `/api/image-proxy?url=${encodeURIComponent(IMAGE_BASE + cleaned)}`;
 }
 
 function formatDate(dateStr: string): string {

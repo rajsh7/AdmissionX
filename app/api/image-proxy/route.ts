@@ -50,26 +50,40 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // Fix double /uploads//uploads/ path that comes from bad data
+    const cleanUrl = url.replace(/\/uploads\/\/uploads\//g, "/uploads/");
+
     const buffer = await new Promise<Buffer>((resolve, reject) => {
-      const chunks: Buffer[] = [];
-      
-      // Force HTTP internally to bypass fatal SSL/TLS handshake failures
-      const fetchUrl = url.replace("https://", "http://");
       const http = require("http");
 
-      http.get(fetchUrl, { timeout: 10000 }, (res: any) => {
-        if (res.statusCode !== 200) {
-          reject(new Error(`Status ${res.statusCode}`));
-          res.resume();
-          return;
-        }
-        res.on("data", (chunk: Buffer) => chunks.push(chunk));
-        res.on("end", () => resolve(Buffer.concat(chunks)));
-        res.on("error", reject);
-      }).on("error", (error: any) => {
-        console.error("HTTP request error:", error);
-        reject(error);
-      });
+      function fetchWithRedirects(targetUrl: string, redirectsLeft = 5) {
+        const fetchUrl = targetUrl.replace("https://", "http://");
+        http.get(fetchUrl, { timeout: 10000 }, (res: any) => {
+          // Follow 3xx redirects
+          if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location && redirectsLeft > 0) {
+            res.resume();
+            const next = res.headers.location.startsWith("http")
+              ? res.headers.location
+              : new URL(res.headers.location, targetUrl).toString();
+            fetchWithRedirects(next, redirectsLeft - 1);
+            return;
+          }
+          if (res.statusCode !== 200) {
+            reject(new Error(`Status ${res.statusCode}`));
+            res.resume();
+            return;
+          }
+          const chunks: Buffer[] = [];
+          res.on("data", (chunk: Buffer) => chunks.push(chunk));
+          res.on("end", () => resolve(Buffer.concat(chunks)));
+          res.on("error", reject);
+        }).on("error", (error: any) => {
+          console.error("HTTP request error:", error);
+          reject(error);
+        });
+      }
+
+      fetchWithRedirects(cleanUrl);
     });
 
     const ext = url.split(".").pop()?.toLowerCase() ?? "jpg";

@@ -7,6 +7,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { NAV_GROUPS } from "./nav-config";
 import { Admin, SidebarSkeleton, ICO } from "./Sidebar";
+import { canAccess, ROLE_LABELS, ROLE_BADGE_COLORS } from "@/lib/permissions";
+import type { AdminRole } from "@/lib/permissions";
 
 function AvatarDropdown({ admin, onLogout }: { admin: Admin; onLogout: () => void }) {
   const [open, setOpen] = useState(false);
@@ -74,7 +76,7 @@ export default function AdminShell({
   admin,
 }: {
   children: React.ReactNode;
-  admin: Admin;
+  admin: Admin & { adminRole?: AdminRole };
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -100,6 +102,9 @@ export default function AdminShell({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, []);
+
+  const adminRole = admin.adminRole ?? "super_admin";
+  const hasAccess = canAccess(adminRole, pathname);
 
   async function handleLogout() {
     try {
@@ -207,7 +212,17 @@ export default function AdminShell({
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-track-slate-100 scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400">
-          {children}
+          {!hasAccess ? (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center p-8">
+              <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center">
+                <span className="material-symbols-rounded text-[32px] text-red-400">lock</span>
+              </div>
+              <h2 className="text-xl font-black text-slate-700">Access Denied</h2>
+              <p className="text-sm text-slate-400 max-w-sm">
+                Your role (<span className="font-semibold text-slate-600">{ROLE_LABELS[adminRole]}</span>) does not have permission to access this page.
+              </p>
+            </div>
+          ) : children}
         </main>
       </div>
     </div>
