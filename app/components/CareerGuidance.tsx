@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function CareerGuidance() {
   return (
     <section className="w-full py-16 lg:py-24 bg-white overflow-hidden">
-      <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
+      <div className="home-page-shell">
         <div
           className="relative rounded-[5px] pt-8 px-8 lg:pt-16 lg:px-16 pb-0 flex flex-col lg:flex-row items-center lg:items-stretch gap-12 border border-slate-300 overflow-hidden bg-white"
           style={{ boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.25)' }}
@@ -57,13 +57,13 @@ export default function CareerGuidance() {
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
               <Link
                 href="/counselling"
-                className="w-full sm:w-auto px-8 py-4 rounded-[10px] bg-[#FF3C3C] text-white shadow-lg shadow-[#FF3C3C]/20 hover:brightness-105 transition-all text-center"
+                className="flex h-[51.8px] w-full items-center justify-center rounded-[10px] bg-[#FF3C3C] px-8 text-center text-white shadow-lg shadow-[#FF3C3C]/20 transition-all hover:brightness-105 sm:w-auto"
                 style={{ fontSize: '24px', fontWeight: 600 }}
               >
                 Start Free Assessment
               </Link>
               <button
-                className="w-full sm:w-auto px-8 py-4 rounded-[10px] bg-neutral-800 text-white shadow-lg shadow-black/10 hover:bg-neutral-900 transition-all text-center"
+                className="flex h-[51.8px] w-full items-center justify-center rounded-[10px] bg-neutral-800 px-8 text-center text-white shadow-lg shadow-black/10 transition-all hover:bg-neutral-900 sm:w-auto"
                 style={{ fontSize: '24px', fontWeight: 600 }}
               >
                 Watch how its work

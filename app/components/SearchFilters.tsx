@@ -146,7 +146,7 @@ export default function SearchFilters({
   const panel = (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-2.5 bg-[#1A1A1A] -mx-4 -mt-4 mb-2 rounded-t-[10px] shadow-lg border-b border-white/5">
+      <div className="flex items-center justify-between p-2.5 bg-[#1A1A1A] -mx-4 -mt-4 mb-2 rounded-t-[10px] border-b border-white/5">
         <h2 className="text-[25px] font-black text-white flex items-center gap-2">
           <span className="material-symbols-outlined text-[20px] text-[#FF3C3C]">filter_alt</span>
           Filters
@@ -403,13 +403,15 @@ export default function SearchFilters({
         </div>
 
         {/* Actions */}
-        <div className="pt-0 grid grid-cols-2 items-stretch gap-2">
+        <div className="pt-0 grid grid-cols-2 items-stretch gap-3">
           <button type="button" onClick={() => setMobileOpen(false)}
-            className="w-full whitespace-nowrap bg-[#FF3C3C] hover:bg-[#E63636] text-white text-[16px] font-semibold py-2 rounded-[5px] shadow-lg shadow-[#FF3C3C]/20 transition-all active:scale-[0.98]">
+            className="w-full flex items-center justify-center whitespace-nowrap bg-[#FF3C3C] border border-transparent hover:bg-[#E63636] text-white text-[14px] font-bold rounded-[5px] shadow-lg shadow-[#FF3C3C]/20 transition-all active:scale-[0.98]"
+            style={{ height: "51.8px" }}>
             Apply filter
           </button>
           <button type="button" onClick={resetAll}
-            className="w-full whitespace-nowrap bg-white border border-neutral-200 text-[#6C6C6C] hover:text-neutral-600 hover:border-neutral-400 text-[16px] font-semibold py-2 rounded-[5px] transition-all">
+            className="w-full flex items-center justify-center whitespace-nowrap bg-white border border-neutral-200 text-[#6C6C6C] hover:text-neutral-600 hover:border-neutral-400 text-[14px] font-bold rounded-[5px] transition-all"
+            style={{ height: "51.8px" }}>
             Reset
           </button>
         </div>
@@ -420,7 +422,7 @@ export default function SearchFilters({
   return (
     <>
       <aside className="hidden lg:flex flex-col w-full flex-shrink-0 mr-6 ml-6">
-        <div className="sticky top-6 bg-white rounded-[5px] border border-neutral-100 shadow-xl p-4 flex flex-col">
+        <div className="sticky top-6 bg-white rounded-[5px] border border-neutral-200 shadow-md p-4 flex flex-col">
           {panel}
         </div>
       </aside>

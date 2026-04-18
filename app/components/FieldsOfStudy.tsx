@@ -19,7 +19,7 @@ export default function FieldsOfStudy() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary/10 blur-[120px] rounded-full" />
       </div>
 
-      <div className="relative mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24 z-10">
+      <div className="home-page-shell relative z-10">
         <div className="text-center mb-16">
           <h2 className="text-white text-[36px] lg:text-[52px] font-bold leading-tight tracking-tight">
             Explore Fields Of Study

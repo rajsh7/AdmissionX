@@ -95,7 +95,8 @@ export default function CourseFiltersV2({
             <input
               type="text"
               placeholder="Search course name"
-              className="w-full px-3 py-2.5 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white placeholder:text-[#9AA0B4] transition-all"
+              className="w-full px-3 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white placeholder:text-[#9AA0B4] transition-all"
+              style={{ height: "51.8px" }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") applyFilters({ q: (e.target as HTMLInputElement).value });
               }}
@@ -109,7 +110,8 @@ export default function CourseFiltersV2({
               <select
                 value={degree}
                 onChange={(e) => { const val = e.target.value; setDegree(val); applyFilters({ degree: val }); }}
-                className="w-full px-3 pr-8 py-2.5 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all"
+                className="w-full px-3 pr-8 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all"
+                style={{ height: "51.8px" }}
               >
                 <option value="">Select Degree...</option>
                 {levels.map((l) => (
@@ -127,7 +129,8 @@ export default function CourseFiltersV2({
               <select
                 value={level}
                 onChange={(e) => { const val = e.target.value; setLevel(val); applyFilters({ level: val }); }}
-                className="w-full px-3 pr-8 py-2.5 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all"
+                className="w-full px-3 pr-8 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all"
+                style={{ height: "51.8px" }}
               >
                 <option value="">Select Education Level...</option>
                 {levels.map((l) => (
@@ -145,7 +148,8 @@ export default function CourseFiltersV2({
               <select
                 value={stream}
                 onChange={(e) => { const val = e.target.value; setStream(val); applyFilters({ stream: val }); }}
-                className="w-full px-3 pr-8 py-2.5 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all"
+                className="w-full px-3 pr-8 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all"
+                style={{ height: "51.8px" }}
               >
                 <option value="">Select Stream...</option>
                 {streams.map((s) => (
@@ -157,18 +161,20 @@ export default function CourseFiltersV2({
           </div>
 
           {/* Buttons */}
-          <div className="grid grid-cols-2 gap-2.5 pt-1">
+          <div className="grid grid-cols-2 gap-3 pt-1 items-stretch">
             <button
               type="button"
               onClick={() => applyFilters()}
-              className="w-full bg-[#FF3C3C] hover:bg-[#E63636] text-white text-[16px] font-semibold py-2.5 rounded-[5px] transition-all"
+              className="w-full flex items-center justify-center bg-[#FF3C3C] border border-transparent hover:bg-[#E63636] text-white text-[14px] font-bold rounded-[5px] shadow-lg shadow-[#FF3C3C]/20 transition-all active:scale-[0.98]"
+              style={{ height: "51.8px" }}
             >
               Apply filter
             </button>
             <button
               type="button"
               onClick={resetAll}
-              className="w-full bg-white border border-neutral-300 text-[#6C6C6C] hover:text-[#6C6C6C] text-[16px] font-semibold py-2.5 rounded-[5px] transition-all"
+              className="w-full flex items-center justify-center bg-white border border-neutral-200 text-[#6C6C6C] hover:text-neutral-600 hover:border-neutral-400 text-[14px] font-bold rounded-[5px] transition-all"
+              style={{ height: "51.8px" }}
             >
               Reset
             </button>

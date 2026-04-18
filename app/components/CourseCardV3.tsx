@@ -49,7 +49,7 @@ export default function CourseCardV3({
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-red-100 flex flex-col items-center justify-center p-4 text-center">
               <span className="material-symbols-outlined text-4xl text-primary/60 mb-2">menu_book</span>
-              <span className="text-xs font-bold text-primary/50 uppercase tracking-widest leading-tight line-clamp-2">{title}</span>
+              <span className="text-xs font-bold text-primary/50 uppercase tracking-widest leading-tight line-clamp-1 truncate">{title}</span>
             </div>
           )}
 
@@ -58,7 +58,7 @@ export default function CourseCardV3({
 {/* ── Body ── */}
         <div className="flex flex-col flex-1 p-3">
           {/* Title */}
-          <h3 className="text-[20px] font-semibold mb-2.5 line-clamp-2 leading-snug" style={{ color: 'rgba(62, 62, 62, 1)' }}>
+          <h3 className="text-[20px] font-semibold mb-2.5 line-clamp-1 leading-snug" style={{ color: 'rgba(62, 62, 62, 1)' }}>
             {title}
           </h3>
 
@@ -67,11 +67,11 @@ export default function CourseCardV3({
             <div className="flex items-stretch border-t border-[#6C6C6C]/20">
               <div className="flex items-center gap-2 w-1/2 border-r border-[#6C6C6C]/20 pr-3 pt-2 pb-2 pl-3 border-b border-[#6C6C6C]/20">
                 <span className="material-symbols-outlined text-[16px]" style={{ color: 'rgba(62, 62, 62, 1)' }}>schedule</span>
-                <span className="text-[16px] font-medium text-[#6C6C6C]">{duration}</span>
+                <span className="text-[16px] font-medium text-[#6C6C6C] truncate">{duration}</span>
               </div>
               <div className="flex items-center gap-2 w-1/2 pt-2 pb-2 pl-3 border-b border-[#6C6C6C]/20">
                 <span className="material-symbols-outlined text-[16px]" style={{ color: 'rgba(62, 62, 62, 1)' }}>school</span>
-                <span className="text-[16px] font-medium text-[#6C6C6C]">{degreeLevel === "Bachelor" ? "Certificate Course" : degreeLevel}</span>
+                <span className="text-[16px] font-medium text-[#6C6C6C] truncate">{degreeLevel === "Bachelor" ? "Certificate Course" : degreeLevel}</span>
               </div>
             </div>
             <div className="flex items-center gap-3 pt-2 pb-2.5 px-3">
@@ -104,7 +104,3 @@ export default function CourseCardV3({
     </motion.div>
   );
 }
-
-
-
-

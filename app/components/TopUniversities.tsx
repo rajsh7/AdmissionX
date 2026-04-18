@@ -37,7 +37,6 @@ const categories = [
   "Design",
   "Fashion",
   "Pharmacy",
-  "Humanities",
 ];
 
 export default function TopUniversities({
@@ -132,9 +131,9 @@ export default function TopUniversities({
   const activeTabSlug = categoryToSlug(activeTab);
 
   return (
-    <section className="w-full bg-[#f8fafc]/30 py-24 lg:py-32">
-      <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
-        <FadeIn>
+     <section className="w-full bg-[#f8fafc]/30 py-24 lg:py-32">
+       <div className="home-page-shell">
+         <FadeIn>
           <div className="mb-16 grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
             <div className="lg:col-span-8">
               <h2 className="text-[40px] font-semibold leading-[1.1] tracking-tight text-slate-900 lg:text-[68px]">
@@ -153,7 +152,7 @@ export default function TopUniversities({
         </FadeIn>
 
         <div className="mb-12 flex flex-col items-stretch gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="group relative flex-[0_0_800px] rounded-[5px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md flex">
+          <div className="group relative flex h-[57px] flex-[0_0_800px] overflow-hidden rounded-[5px] border border-slate-200 bg-white shadow-[0_2px_8px_rgba(15,23,42,0.06)] transition-all hover:shadow-md">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -165,73 +164,16 @@ export default function TopUniversities({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search your college, universities, courses..."
               suppressHydrationWarning
-              className="h-12 flex-1 rounded-l-[5px] bg-transparent pl-12 text-base font-semibold text-slate-800 placeholder:text-[#6C6C6C] focus:outline-none"
+              className="h-[57px] flex-1 bg-[#FFFFFF] pl-12 text-[20px] font-normal text-[#6C6C6CA1] placeholder:text-[#6C6C6CA1] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(15,23,42,0.03)] focus:outline-none"
             />
-            <button className="h-12 px-8 flex items-center justify-center rounded-r-[5px] bg-[#FF3C3C] text-white hover:bg-[#E63636] transition-colors font-semibold text-base whitespace-nowrap">
+            <button className="flex h-[57px] min-w-[170px] items-center justify-center bg-[#FF3C3C] px-12 text-base font-semibold whitespace-nowrap text-white transition-colors hover:bg-[#E63636]">
               Search
             </button>
           </div>
 
-          <div className="flex items-center gap-3 ml-auto">
-            <div className="relative h-full">
-              <button
-                onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className={`h-12 rounded-[5px] border px-6 text-sm font-semibold transition-all active:scale-95 ${
-                  selectedCity !== "All Cities"
-                    ? "border-primary bg-primary text-white"
-                    : "border-slate-200 bg-white text-slate-600"
-                } flex items-center justify-center gap-2`}
-              >
-                <span className="material-symbols-rounded text-[20px]">
-                  tune
-                </span>
-                {selectedCity === "All Cities" ? "Filters" : selectedCity}
-              </button>
-            </div>
-
-            <AnimatePresence>
-              {isFilterOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setIsFilterOpen(false)}
-                  />
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 top-full z-50 mt-3 w-56 overflow-hidden rounded-[10px] border border-slate-100 bg-white shadow-2xl"
-                  >
-                    <div className="hide-scrollbar max-h-60 overflow-y-auto p-2">
-                      <div className="px-3 py-2 text-[12px] font-semibold uppercase tracking-widest text-[#6C6C6C]">
-                        Filter by City
-                      </div>
-                      {uniqueCities.map((city) => (
-                        <button
-                          key={city}
-                          onClick={() => {
-                            setSelectedCity(city);
-                            setIsFilterOpen(false);
-                          }}
-                          className={`w-full rounded-[10px] px-4 py-2.5 text-left text-sm font-normal transition-colors ${
-                            selectedCity === city
-                              ? "bg-primary/10 text-primary"
-                              : "text-slate-600 hover:bg-slate-50"
-                          }`}
-                        >
-                          {city}
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
-          </div>
-
           <button
             onClick={() => setSortBy(sortBy === "rank" ? null : "rank")}
-            className={`h-12 rounded-[5px] border px-6 text-sm font-medium shadow-sm transition-all active:scale-95 hover:shadow-md ${
+            className={`h-[51.8px] rounded-[5px] border px-6 text-sm font-medium shadow-sm transition-all active:scale-95 hover:shadow-md ${
               sortBy === "rank"
                 ? "border-[#FF3C3C] bg-[#FF3C3C] text-white"
                 : "border-slate-200 bg-white text-slate-600"
@@ -249,7 +191,7 @@ export default function TopUniversities({
             <button
               key={cat}
               onClick={() => handleTabClick(cat)}
-              className={`whitespace-nowrap rounded-[10px] px-6 py-2.5 text-sm font-normal transition-all active:scale-95 ${
+              className={`whitespace-nowrap rounded-[5px] px-6 py-2.5 text-sm font-normal transition-all active:scale-95 ${
                 activeTab === cat
                   ? "bg-primary text-white shadow-lg shadow-primary/20"
                   : "border border-slate-200 bg-white text-slate-600 hover:border-primary/50 hover:text-primary"
@@ -261,7 +203,7 @@ export default function TopUniversities({
         </div>
 
         <div className="mb-8 flex items-center gap-4">
-          <h3 className="whitespace-nowrap text-[25px] font-bold uppercase tracking-wider text-slate-900">
+          <h3 className="whitespace-nowrap text-[20px] font-bold uppercase tracking-wider text-slate-900">
             Top rank universities !
           </h3>
           <div className="h-px flex-1 bg-slate-100" />
@@ -282,14 +224,14 @@ export default function TopUniversities({
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                       />
 
-                      <div className="absolute right-4 top-4 flex items-center gap-1 rounded-[10px] bg-white/90 px-2.5 py-1 shadow-sm backdrop-blur">
-                        <span className="material-symbols-rounded text-[18px] text-yellow-500">
-                          star
-                        </span>
-                        <span className="text-[16px] font-semibold text-[#6C6C6C]">
-                          {uni.rating}
-                        </span>
-                      </div>
+                       <div className="absolute right-4 top-4 flex items-center gap-1 rounded-[10px] bg-white/90 px-2 py-0.5 shadow-sm backdrop-blur">
+                         <span className="material-symbols-rounded text-[18px] text-yellow-500">
+                           star
+                         </span>
+                         <span className="text-[16px] font-semibold text-[#6C6C6C]">
+                           {uni.rating}
+                         </span>
+                       </div>
 
                       <div className="absolute bottom-4 left-4">
                         <span className="rounded-[10px] bg-primary px-3 py-1 text-[12px] font-semibold uppercase tracking-wider text-white shadow-lg">
@@ -298,7 +240,7 @@ export default function TopUniversities({
                       </div>
                     </div>
 
-                    <div className="flex flex-1 flex-col p-8">
+                     <div className="flex flex-1 flex-col pt-5 pl-5 pr-5 pb-8">
                       <div className="mb-4 flex items-start justify-between">
                         <h3 className="line-clamp-2 leading-snug transition-colors group-hover:text-primary" style={{ fontWeight: 700, fontSize: '22px', color: 'rgba(108, 108, 108, 1)' }}>
                           {uni.name}
@@ -371,7 +313,7 @@ export default function TopUniversities({
         <div className="mt-12 text-center">
           <Link
             href="/top-university"
-            className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-primary border border-primary rounded-[5px] transition-all hover:bg-primary/5 active:scale-95"
+            className="group inline-flex h-[51.8px] items-center gap-2 rounded-[5px] border border-primary px-6 text-sm font-bold text-primary transition-all hover:bg-primary/5 active:scale-95"
           >
             Explore All Universities
             <span className="material-symbols-rounded text-[20px] transition-transform group-hover:translate-x-1">
@@ -380,7 +322,9 @@ export default function TopUniversities({
           </Link>
         </div>
       </div>
-      <hr className="border-t border-slate-200 mt-12" />
+      <div className="home-page-shell">
+        <hr className="mt-12 border-t border-slate-200" />
+      </div>
     </section>
   );
 }

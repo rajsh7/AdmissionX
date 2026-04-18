@@ -24,7 +24,7 @@ export default function ContactSection() {
 
   return (
     <section className="w-full py-24 lg:py-32 overflow-hidden" style={{ backgroundColor: '#F8FAFC' }}>
-      <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
+      <div className="home-page-shell">
         <div className="p-2 sm:p-4 lg:p-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
 
@@ -128,8 +128,8 @@ export default function ContactSection() {
                   <button
                     type="submit"
                     disabled={status === "loading"}
-                    className="h-14 rounded-[5px] bg-primary text-white tracking-wider hover:brightness-105 transition-all shadow-xl shadow-primary/20 disabled:opacity-60"
-                    style={{ width: '317.86px', fontSize: '24px', fontWeight: '700' }}
+                    className="rounded-[5px] bg-primary text-white tracking-wider hover:brightness-105 transition-all shadow-xl shadow-primary/20 disabled:opacity-60"
+                    style={{ width: '317.86px', height: '51.8px', fontSize: '24px', fontWeight: '700' }}
                   >
                     {status === "loading" ? "Sending..." : "Send Message"}
                   </button>

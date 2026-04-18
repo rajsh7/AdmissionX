@@ -50,7 +50,7 @@ export default function StatsBar() {
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-900/85" />
       
-      <div className="relative z-10 mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
+      <div className="home-page-shell relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-8">
           {stats.map((stat, i) => (
             <motion.div
@@ -62,19 +62,21 @@ export default function StatsBar() {
               className="relative rounded-[5px] bg-white/5 border border-white/10 p-5 py-6 backdrop-blur-sm"
             >
               <div className="flex flex-col items-center text-center">
-                {/* Counter */}
-                <div className="text-4xl lg:text-5xl font-medium text-white tracking-tight mb-1">
-                  <AnimatedCounter 
-                    target={stat.target} 
-                    suffix={stat.suffix} 
-                    prefix={stat.prefix} 
-                  />
-                </div>
-                
-                {/* Label */}
-                <div className="text-sm font-semibold text-slate-400 uppercase tracking-wider">
-                  {stat.label}
-                </div>
+               {/* Counter + Label */}
+               <div className="flex flex-col items-center text-center">
+                 <div className="text-4xl lg:text-5xl font-medium text-white tracking-tight">
+                   <AnimatedCounter 
+                     target={stat.target} 
+                     suffix={stat.suffix} 
+                     prefix={stat.prefix} 
+                   />
+                 </div>
+                 
+                 {/* Label */}
+                 <div className="text-sm font-semibold text-slate-400 uppercase tracking-wider mt-3">
+                   {stat.label}
+                 </div>
+               </div>
               </div>
             </motion.div>
           ))}

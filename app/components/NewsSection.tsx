@@ -48,17 +48,18 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
 
   return (
     <section className="w-full py-16 lg:py-24 bg-white">
-      <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+      <div className="home-page-shell">
+        <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-start">
            <div className="flex-1">
-              <h2 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">Student Life & Beyond</h2>
+               <h2 className="text-3xl lg:text-4xl font-black tracking-tight">Student <span style={{ color: '#FF3C3C' }}>Life & Beyond</span></h2>
               <p className="mt-3 text-slate-500 font-medium max-w-lg">
                 Explore our latest articles, guides, and student stories to stay ahead in your academic journey.
               </p>
            </div>
 <Link 
               href="/blogs" 
-              className="inline-flex items-center justify-center px-8 py-4 rounded-[5px] bg-white border border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition-all shadow-sm hover:shadow-md group/btn"
+              className="group/btn inline-flex h-[51.8px] items-center justify-center rounded-[5px] border border-slate-200 bg-white px-8 font-medium transition-all hover:bg-slate-50 shadow-sm hover:shadow-md"
+              style={{ color: "#475569" }}
             >
               Explore All Articles
               <span className="ml-2 material-symbols-rounded transition-transform group-hover/btn:translate-x-1">arrow_right_alt</span>
@@ -124,7 +125,3 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
     </section>
   );
 }
-
-
-
-

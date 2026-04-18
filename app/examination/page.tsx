@@ -158,7 +158,7 @@ export default async function ExaminationHubPage({
                   placeholder="Location, universities, courses..."
                   className="flex-1 py-3 px-2 text-sm text-neutral-800 placeholder-neutral-400 focus:outline-none bg-transparent font-medium"
                 />
-                <button type="submit" suppressHydrationWarning className="bg-red-500 hover:bg-red-600 text-white font-bold px-10 py-3 transition-colors text-sm tracking-wide rounded-[5px]">
+                <button type="submit" suppressHydrationWarning className="bg-red-500 hover:bg-red-600 text-white font-bold px-10 py-3 transition-colors text-sm tracking-wide round-tr  -[5px]">
                   Search
                 </button>
               </form>

@@ -92,7 +92,7 @@ export default function CollegeCard({
     >
       <Link
         href={`/college/${slug}`}
-        className="group flex flex-col bg-white rounded-[5px] border border-slate-100 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300 overflow-hidden h-full"
+        className="group flex flex-col bg-white rounded-[5px] border border-neutral-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden h-full"
       >
         {/* ── Image ── */}
         <div className="relative aspect-[4/3] overflow-hidden bg-neutral-50 flex-shrink-0">

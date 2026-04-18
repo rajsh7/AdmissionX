@@ -23,6 +23,31 @@
     font-family: "Poppins", sans-serif;
 }
 
+.home-page-shell {
+    width: 100%;
+    max-width: 1920px;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+}
+
+@media (min-width: 640px) {
+    .home-page-shell {
+        padding-inline: 2.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .home-page-shell {
+        padding-inline: 4rem;
+    }
+}
+
+@media (min-width: 1280px) {
+    .home-page-shell {
+        padding-inline: 5rem;
+    }
+}
+
 @layer base {
   :root {
     --color-primary: #FF3C3C;

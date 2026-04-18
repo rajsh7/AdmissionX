@@ -95,9 +95,9 @@ export default function SearchBar({
     <div className={`relative w-full ${className}`}>
       <form
         onSubmit={handleSearch}
-        className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full"
+        className="flex w-full items-stretch overflow-hidden rounded-[5px] border border-white/30 bg-white/40 shadow-2xl backdrop-blur-md transition-all duration-300 focus-within:border-[#FF3C3C] focus-within:ring-4 focus-within:ring-[#FF3C3C]/10"
       >
-        <div className="flex-1 flex items-center gap-3 bg-white/40 backdrop-blur-md rounded-[5px] border border-white/30 shadow-2xl focus-within:border-[#FF3C3C] focus-within:ring-4 focus-within:ring-[#FF3C3C]/10 transition-all duration-300 px-6 h-14">
+        <div className="flex h-[57px] min-w-0 flex-1 items-center gap-3 px-6">
           <span className="material-symbols-outlined text-[20px] text-white flex-shrink-0">search</span>
           <input
             type="text"
@@ -106,13 +106,13 @@ export default function SearchBar({
             onFocus={() => searchQuery.length >= 2 && setShowDropdown(true)}
             placeholder={placeholder}
             suppressHydrationWarning
-            className="flex-1 h-full text-base text-white placeholder:text-white/80 bg-transparent outline-none min-w-0 font-semibold"
+            className="min-w-0 flex-1 bg-transparent text-[20px] font-normal text-white placeholder:text-white/80 outline-none"
           />
         </div>
         <button
           type="submit"
           suppressHydrationWarning
-          className="flex-shrink-0 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-[16px] font-semibold px-10 h-14 rounded-[5px] transition-all active:scale-[0.98] shadow-xl shadow-[#FF3C3C]/30 min-w-max"
+          className="h-[57px] min-w-max flex-shrink-0 bg-[#FF3C3C] px-10 text-[20px] font-normal text-white transition-colors hover:bg-[#E63636]"
         >
           {isLoading ? "Searching..." : "Search Now"}
         </button>

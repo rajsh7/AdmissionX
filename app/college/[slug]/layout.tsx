@@ -90,7 +90,7 @@ async function fetchCollegeBase(slug: string) {
 
     // Fast: lookup user, city, collegetype by _id (all indexed)
     const [user, city, ct] = await Promise.all([
-      cp.users_id ? db.collection("users").findOne({ _id: cp.users_id }, { projection: { firstname: 1 } }) : null,
+      cp.users_id ? db.collection("users").findOne({ _id: cp.users_id }, { projection: { firstname: 1, profileimage: 1 } }) : null,
       cp.registeredAddressCityId ? db.collection("city").findOne({ _id: cp.registeredAddressCityId }, { projection: { name: 1 } }) : null,
       cp.collegetype_id ? db.collection("collegetype").findOne({ _id: cp.collegetype_id }, { projection: { name: 1 } }) : null,
     ]);
@@ -98,6 +98,7 @@ async function fetchCollegeBase(slug: string) {
     return {
       ...cp,
       college_name: user?.firstname?.trim() || cp.slug,
+      logo: user?.profileimage || null,
       city_name: city?.name || null,
       college_type_name: ct?.name || null,
     } as CollegeBase;
@@ -341,6 +342,7 @@ export default async function CollegeLayout({
     ACCampus: raw.ACCampus ? 1 : 0,
     city_name: raw.city_name,
     college_type_name: raw.college_type_name,
+    logo: buildImageUrl((raw as any).logo),
   };
 
   return (
