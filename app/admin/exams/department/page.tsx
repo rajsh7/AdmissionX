@@ -1,11 +1,12 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
 
 async function deleteDepartment(id: number) {
   "use server";
   try {
-    await pool.query("DELETE FROM faculty_departments WHERE id = ?", [id]);
+    const db = await getDb();
+    await db.collection("faculty_departments").deleteOne({ id });
   } catch (e) {
     console.error("[admin/exams/department deleteAction]", e);
   }
@@ -13,26 +14,13 @@ async function deleteDepartment(id: number) {
   revalidatePath("/", "layout");
 }
 
-async function safeQuery<T >(
-  sql: string,
-  params: (string | number | boolean)[] = [],
-): Promise<T[]> {
-  try {
-    console.log("[admin/exams/department] Executing SQL:", sql);
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/exams/department safeQuery]", err);
-    return [];
-  }
-}
-
-interface DeptRow  {
+interface DeptRow {
   id: number;
   collegeName: string | null;
   functionalArea: string | null;
   degree: string | null;
   course: string | null;
+  created_at: string | null;
 }
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -46,30 +34,95 @@ export default async function ExamDeptPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE u.firstname LIKE ? OR fa.name LIKE ? OR d.name LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
+  const db = await getDb();
 
-  const data = await safeQuery<DeptRow>(
-    `SELECT 
-      fd.id, 
-      COALESCE(u.firstname, cp.slug) as collegeName,
-      fa.name as functionalArea,
-      d.name as degree,
-      c.name as course
-     FROM faculty_departments fd
-     LEFT JOIN collegeprofile cp ON cp.id = fd.collegeprofile_id
-     LEFT JOIN users u ON u.id = cp.users_id
-     LEFT JOIN functionalarea fa ON fa.id = fd.functionalarea_id
-     LEFT JOIN degree d ON d.id = fd.degree_id
-     LEFT JOIN course c ON c.id = fd.course_id
-     ${where}
-     ORDER BY fd.id DESC
-     LIMIT 100`,
-    params
-  );
+  const pipeline: object[] = [
+    {
+      $lookup: {
+        from: "collegeprofile",
+        localField: "collegeprofile_id",
+        foreignField: "id",
+        as: "college",
+      },
+    },
+    { $unwind: { path: "$college", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "college.users_id",
+        foreignField: "id",
+        as: "user",
+      },
+    },
+    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "functionalarea",
+        localField: "functionalarea_id",
+        foreignField: "id",
+        as: "fa",
+      },
+    },
+    { $unwind: { path: "$fa", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "degree",
+        localField: "degree_id",
+        foreignField: "id",
+        as: "deg",
+      },
+    },
+    { $unwind: { path: "$deg", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "course",
+        localField: "course_id",
+        foreignField: "id",
+        as: "crs",
+      },
+    },
+    { $unwind: { path: "$crs", preserveNullAndEmptyArrays: true } },
+    {
+      $project: {
+        _id: 0,
+        id: 1,
+        created_at: 1,
+        collegeName: { $ifNull: ["$user.firstname", "$college.slug"] },
+        functionalArea: { $ifNull: ["$fa.name", null] },
+        degree: { $ifNull: ["$deg.name", null] },
+        course: { $ifNull: ["$crs.name", null] },
+      },
+    },
+    { $sort: { id: -1 } },
+    { $limit: 100 },
+  ];
+
+  if (q) {
+    const regex = { $regex: q, $options: "i" };
+    pipeline.splice(pipeline.length - 2, 0, {
+      $match: {
+        $or: [
+          { "user.firstname": regex },
+          { "fa.name": regex },
+          { "deg.name": regex },
+        ],
+      },
+    });
+  }
+
+  const raw = await db.collection("faculty_departments").aggregate(pipeline).toArray();
+
+  const data: DeptRow[] = raw.map((r: any) => ({
+    id: Number(r.id),
+    collegeName: r.collegeName || null,
+    functionalArea: r.functionalArea || null,
+    degree: r.degree || null,
+    course: r.course || null,
+    created_at: r.created_at ? String(r.created_at) : null,
+  }));
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -97,13 +150,14 @@ export default async function ExamDeptPage({
                 <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College / Area</th>
                 <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Degree</th>
                 <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Course</th>
+                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Created At</th>
                 <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {data.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-5 py-10 text-center text-slate-400">
+                  <td colSpan={5} className="px-5 py-10 text-center text-slate-400">
                      No departments found.
                   </td>
                 </tr>
@@ -121,6 +175,9 @@ export default async function ExamDeptPage({
                     </td>
                     <td className="px-4 py-4 text-xs text-slate-500">
                       {r.course || "—"}
+                    </td>
+                    <td className="px-4 py-4 text-xs text-slate-500">
+                      {r.created_at ? new Date(r.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
                     </td>
                     <td className="px-4 py-4 text-right">
                        <DeleteButton action={deleteDepartment.bind(null, r.id)} size="sm" />

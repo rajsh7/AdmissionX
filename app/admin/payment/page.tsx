@@ -1,7 +1,6 @@
 import { getDb } from "@/lib/db";
-import Link from "next/link";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
+import PaymentListClient from "./PaymentListClient";
 
 async function deletePaymentRecord(id: number) {
   "use server";
@@ -14,7 +13,7 @@ async function deletePaymentRecord(id: number) {
   revalidatePath("/", "layout");
 }
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 75;
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
@@ -131,12 +130,21 @@ export default async function ApplicationPaymentPage({
   ];
 
   const result = await db.collection("collegemaster").aggregate(pipeline).toArray();
-  const payments = (result[0]?.data ?? []) as any[];
+  const payments = (result[0]?.data ?? []).map((p: any) => ({
+    id: Number(p.id ?? 0),
+    fees: p.fees ? String(p.fees) : null,
+    seats: p.seats ? Number(p.seats) : null,
+    college_name: String(p.college_name ?? ""),
+    slug: String(p.slug ?? ""),
+    course_name: String(p.course_name ?? ""),
+    degree_name: String(p.degree_name ?? ""),
+    stream_name: String(p.stream_name ?? ""),
+  }));
   const total    = Number(result[0]?.total?.[0]?.count ?? 0);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
 
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -161,119 +169,15 @@ export default async function ApplicationPaymentPage({
 
       {/* ── Table ── */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          {payments.length === 0 ? (
-            <div className="py-24 text-center">
-              <span className="material-symbols-rounded text-7xl text-slate-200 block mb-4" style={ICO_FILL}>payments</span>
-              <p className="text-slate-500 font-semibold text-sm">No payment records found.</p>
-            </div>
-          ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100 text-left">
-                  <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College Name</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Course / Degree / Stream</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Listed Fee</th>
-                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {payments.map((p: any, idx: number) => (
-                  <tr key={p.id} className="hover:bg-blue-50/20 transition-colors group">
-                    <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
-
-                    {/* College */}
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="font-bold text-slate-800 leading-snug truncate max-w-[220px] block">
-                          {p.college_name || "—"}
-                        </span>
-                        {p.slug && (
-                          <span className="text-[10px] text-slate-400 font-mono truncate max-w-[220px]">{p.slug}</span>
-                        )}
-                      </div>
-                    </td>
-
-                    {/* Course / Degree / Stream */}
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col gap-0.5">
-                        {p.course_name ? (
-                          <span className="font-semibold text-slate-700 line-clamp-1">{p.course_name}</span>
-                        ) : (
-                          <span className="text-slate-400 text-xs">No course</span>
-                        )}
-                        {p.degree_name && (
-                          <span className="text-[11px] text-blue-600 font-bold">{p.degree_name}</span>
-                        )}
-                        {p.stream_name && (
-                          <span className="text-[10px] text-slate-400 font-medium">{p.stream_name}</span>
-                        )}
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
-                          {p.seats || 0} seats
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Fee */}
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-[13px] font-black text-blue-600">
-                          {p.fees ? `₹ ${p.fees}` : "N/A"}
-                        </span>
-                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Listed Course Fee</p>
-                      </div>
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Update Fee">
-                          <span className="material-symbols-rounded text-[20px]">edit_note</span>
-                        </button>
-                        <DeleteButton action={deletePaymentRecord.bind(null, p.id)} size="sm" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-
-        {/* ── Pagination ── */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/30">
-            <p className="text-xs text-slate-400 font-medium">
-              Showing <span className="text-slate-700 font-bold">{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</span> of <span className="text-slate-700 font-bold">{total.toLocaleString()}</span> records
-            </p>
-            <div className="flex items-center gap-1.5">
-              {page > 1 ? (
-                <Link href={`/admin/payment?page=${page - 1}${q ? `&q=${q}` : ""}`} className="w-9 h-9 flex items-center justify-center text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all shadow-sm">
-                  <span className="material-symbols-rounded text-[18px]">chevron_left</span>
-                </Link>
-              ) : (
-                <span className="w-9 h-9 flex items-center justify-center text-slate-300 bg-white border border-slate-100 rounded-xl cursor-not-allowed">
-                  <span className="material-symbols-rounded text-[18px]">chevron_left</span>
-                </span>
-              )}
-              <div className="flex items-center gap-1 mx-1">
-                <span className="text-xs font-bold text-slate-700 bg-blue-50 w-9 h-9 flex items-center justify-center rounded-xl border border-blue-100">{page}</span>
-                <span className="text-[10px] text-slate-300 font-bold">/</span>
-                <span className="text-xs font-bold text-slate-400 w-9 h-9 flex items-center justify-center">{totalPages}</span>
-              </div>
-              {page < totalPages ? (
-                <Link href={`/admin/payment?page=${page + 1}${q ? `&q=${q}` : ""}`} className="w-9 h-9 flex items-center justify-center text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all shadow-sm">
-                  <span className="material-symbols-rounded text-[18px]">chevron_right</span>
-                </Link>
-              ) : (
-                <span className="w-9 h-9 flex items-center justify-center text-slate-300 bg-white border border-slate-100 rounded-xl cursor-not-allowed">
-                  <span className="material-symbols-rounded text-[18px]">chevron_right</span>
-                </span>
-              )}
-            </div>
-          </div>
-        )}
+        <PaymentListClient
+          payments={payments}
+          offset={offset}
+          total={total}
+          page={page}
+          totalPages={totalPages}
+          pageSize={PAGE_SIZE}
+          onDelete={deletePaymentRecord}
+        />
       </div>
     </div>
   );

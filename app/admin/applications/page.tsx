@@ -25,7 +25,7 @@ async function updateApplicationStatus(formData: FormData): Promise<void> {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 75;
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
@@ -200,7 +200,7 @@ export default async function AdminApplicationsPage({
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
 
       {/* ── Page Header ───────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -330,66 +330,19 @@ export default async function AdminApplicationsPage({
           </div>
         ) : (
           <>
-            <ApplicationsListClient initialRows={appRows} offset={offset} />
-
-            {/* ── Pagination ─────────────────────────────────────────────── */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-5 border-t border-slate-50 bg-slate-50/50">
-              <p className="text-xs text-slate-500 font-semibold">
-                Showing <span className="text-slate-900">{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</span> of <span className="text-slate-900">{total.toLocaleString()}</span> entries
-              </p>
-
-              {totalPages > 1 && (
-                <div className="flex items-center gap-1.5">
-                  {page > 1 && (
-                    <Link href={buildUrl({ page: page - 1 })} className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all text-slate-600 shadow-sm">
-                      <span className="material-symbols-rounded text-[18px]" style={ICO}>chevron_left</span>
-                    </Link>
-                  )}
-
-                  <div className="flex items-center gap-1 px-1 py-1 bg-white border border-slate-200 rounded-xl shadow-sm">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let p = 1;
-                      if (totalPages <= 5) p = i + 1;
-                      else if (page <= 3) p = i + 1;
-                      else if (page >= totalPages - 2) p = totalPages - 4 + i;
-                      else p = page - 2 + i;
-                      return (
-                        <Link
-                          key={p}
-                          href={buildUrl({ page: p })}
-                          className={`w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold transition-all ${
-                            p === page ? "bg-teal-600 text-white shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-teal-600"
-                          }`}
-                        >
-                          {p}
-                        </Link>
-                      );
-                    })}
-                  </div>
-
-                  {page < totalPages && (
-                    <Link href={buildUrl({ page: page + 1 })} className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all text-slate-600 shadow-sm">
-                      <span className="material-symbols-rounded text-[18px]" style={ICO}>chevron_right</span>
-                    </Link>
-                  )}
-                </div>
-              )}
-            </div>
+            <ApplicationsListClient
+              initialRows={appRows}
+              offset={offset}
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              pageSize={PAGE_SIZE}
+            />
           </>
         )}
       </div>
 
       {/* ── Footer Notice ────────────────────────────────────────────────── */}
-      <div className="flex items-start gap-3 bg-slate-100/50 border border-slate-200/50 rounded-2xl px-6 py-5 text-xs text-slate-500">
-        <span className="material-symbols-rounded text-slate-400 text-[20px]" style={ICO_FILL}>info</span>
-        <div className="space-y-1">
-          <p className="font-bold text-slate-700">System Information</p>
-          <p className="leading-relaxed font-semibold">
-            Application statuses are managed directly by individual institutions.
-            Administrators can monitor progress and view details, but cannot modify application states from this dashboard.
-          </p>
-        </div>
-      </div>
     </div>
   );
 }

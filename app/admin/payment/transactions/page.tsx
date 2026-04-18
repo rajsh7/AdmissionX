@@ -1,7 +1,7 @@
 import { getDb } from "@/lib/db";
 import Link from "next/link";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
+import TransactionListClient from "./TransactionListClient";
 
 async function deleteTransaction(id: number) {
   "use server";
@@ -14,7 +14,7 @@ async function deleteTransaction(id: number) {
   revalidatePath("/admin/payment/transactions");
 }
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 75;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
@@ -93,7 +93,25 @@ export default async function ApplicationTransactionPage({
     ];
 
     const cr      = await db.collection("collegemaster").aggregate(collegePipeline).toArray();
-    const cData   = (cr[0]?.data ?? []) as any[];
+    const cData   = (cr[0]?.data ?? []).map((p: any) => ({
+      id: Number(p.id ?? 0),
+      name: null,
+      application_id: null,
+      created_at: null,
+      transactionHashKey: null,
+      payment_status: "",
+      amount: 0,
+      student_name: null,
+      student_email: null,
+      student_phone: null,
+      college_name: String(p.college_name ?? ""),
+      college_slug: String(p.slug ?? ""),
+      course_name: String(p.course_name ?? ""),
+      degree_name: String(p.degree_name ?? ""),
+      stream_name: String(p.stream_name ?? ""),
+      fees: p.fees ? String(p.fees) : null,
+      seats: p.seats ? Number(p.seats) : null,
+    }));
     const cTotal  = Number(cr[0]?.total?.[0]?.count ?? 0);
     const cPages  = Math.ceil(cTotal / PAGE_SIZE);
 
@@ -104,7 +122,7 @@ export default async function ApplicationTransactionPage({
     }
 
     return (
-      <div className="p-6 space-y-6 max-w-[1400px]">
+      <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>account_balance</span>
@@ -151,60 +169,17 @@ export default async function ApplicationTransactionPage({
           </div>
         </form>
 
-        {/* Table */}
         <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-          {cData.length === 0 ? (
-            <div className="py-20 text-center text-slate-400">
-              <span className="material-symbols-rounded text-6xl block mb-4" style={ICO}>account_balance</span>
-              <p className="text-sm font-semibold">No college fee records found.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="px-4 py-3 w-10">#</th>
-                    <th className="px-4 py-3">College Name</th>
-                    <th className="px-4 py-3">Course / Degree / Stream</th>
-                    <th className="px-4 py-3">Fee Structure</th>
-                    <th className="px-4 py-3">Seats</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {cData.map((p: any, idx: number) => (
-                    <tr key={p.id} className="hover:bg-blue-50/20 transition-colors">
-                      <td className="px-4 py-3 text-xs font-mono text-slate-400">{offset + idx + 1}</td>
-                      <td className="px-4 py-3">
-                        <p className="font-bold text-slate-800 text-[13px] truncate max-w-[220px]">{p.college_name || "—"}</p>
-                        {p.slug && <p className="text-[10px] text-slate-400 font-mono truncate max-w-[220px]">{p.slug}</p>}
-                      </td>
-                      <td className="px-4 py-3">
-                        {p.course_name ? <p className="font-semibold text-slate-700 text-[12px]">{p.course_name}</p> : <p className="text-slate-400 text-xs">No course</p>}
-                        {p.degree_name && <p className="text-[11px] text-blue-600 font-bold">{p.degree_name}</p>}
-                        {p.stream_name && <p className="text-[10px] text-slate-400">{p.stream_name}</p>}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="text-[13px] font-black text-blue-600">{p.fees ? `₹ ${p.fees}` : "N/A"}</span>
-                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Total Program Fee</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="text-[12px] font-bold text-slate-600">{p.seats || 0}</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-          {cPages > 1 && (
-            <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
-              <p className="text-xs text-slate-500">Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, cTotal)}</strong> of <strong>{cTotal.toLocaleString()}</strong></p>
-              <div className="flex gap-1">
-                {page > 1 && <Link href={buildCollegeUrl({ page: page - 1 })} className="px-3 py-1.5 text-xs font-bold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">← Prev</Link>}
-                {page < cPages && <Link href={buildCollegeUrl({ page: page + 1 })} className="px-3 py-1.5 text-xs font-bold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Next →</Link>}
-              </div>
-            </div>
-          )}
+          <TransactionListClient
+            rows={cData}
+            offset={offset}
+            total={cTotal}
+            page={page}
+            totalPages={cPages}
+            pageSize={PAGE_SIZE}
+            type="college"
+            onDelete={deleteTransaction}
+          />
         </div>
       </div>
     );
@@ -297,7 +272,21 @@ export default async function ApplicationTransactionPage({
   ];
 
   const result   = await db.collection("transaction").aggregate(basePipeline).toArray();
-  const payments = (result[0]?.data ?? []) as any[];
+  const payments = (result[0]?.data ?? []).map((t: any) => ({
+    id: Number(t.id ?? 0),
+    name: t.name ? String(t.name) : null,
+    application_id: t.application_id ? Number(t.application_id) : null,
+    created_at: t.created_at ? String(t.created_at) : null,
+    transactionHashKey: t.transactionHashKey ? String(t.transactionHashKey) : null,
+    payment_status: String(t.payment_status ?? ""),
+    amount: Number(t.amount ?? 0),
+    student_name: t.student_name ? String(t.student_name) : null,
+    student_email: t.student_email ? String(t.student_email) : null,
+    student_phone: t.student_phone ? String(t.student_phone) : null,
+    college_name: t.college_name ? String(t.college_name) : null,
+    college_slug: t.college_slug ? String(t.college_slug) : null,
+    course_name: t.course_name ? String(t.course_name) : null,
+  }));
   const total    = Number(result[0]?.total?.[0]?.count ?? 0);
   const stats    = result[0]?.stats?.[0] ?? {};
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -309,7 +298,7 @@ export default async function ApplicationTransactionPage({
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
 
       {/* Header */}
       <div>
@@ -376,122 +365,17 @@ export default async function ApplicationTransactionPage({
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-        {payments.length === 0 ? (
-          <div className="py-20 text-center text-slate-400">
-            <span className="material-symbols-rounded text-6xl block mb-4" style={ICO}>receipt_long</span>
-            <p className="text-sm font-semibold">No transactions found.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  <th className="px-4 py-3 w-10">#</th>
-                  {type === "student" ? (
-                    <th className="px-4 py-3">Student</th>
-                  ) : (
-                    <th className="px-4 py-3">College / Course</th>
-                  )}
-                  {type === "student" && <th className="px-4 py-3">College / Course</th>}
-                  {type === "college" && <th className="px-4 py-3">Student</th>}
-                  <th className="px-4 py-3">Amount</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Date</th>
-                  <th className="px-4 py-3">Transaction Ref</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50 text-slate-600">
-                {payments.map((t: any, idx: number) => (
-                  <tr key={`${t.id}-${idx}`} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-4 py-3 text-xs font-mono text-slate-400">{offset + idx + 1}</td>
-
-                    {/* First col — primary entity */}
-                    {type === "student" ? (
-                      <td className="px-4 py-3">
-                        <p className="font-bold text-slate-800 text-[13px]">{t.student_name?.trim() || "—"}</p>
-                        {t.student_email && <p className="text-[10px] text-slate-400 truncate max-w-[160px]">{t.student_email}</p>}
-                        {t.student_phone && <p className="text-[10px] text-slate-400">{t.student_phone}</p>}
-                        <p className="text-[10px] text-slate-300 font-mono">App #{t.application_id || "—"}</p>
-                      </td>
-                    ) : (
-                      <td className="px-4 py-3">
-                        <p className="font-bold text-slate-800 text-[13px] truncate max-w-[180px]">{t.college_name || "—"}</p>
-                        {t.course_name && <p className="text-[10px] text-slate-400 truncate max-w-[180px] mt-0.5">{t.course_name}</p>}
-                        {t.college_slug && <p className="text-[10px] text-slate-300 font-mono truncate max-w-[180px]">{t.college_slug}</p>}
-                      </td>
-                    )}
-
-                    {/* Second col — secondary entity */}
-                    {type === "student" ? (
-                      <td className="px-4 py-3">
-                        <p className="font-semibold text-slate-700 text-[12px] truncate max-w-[160px]">{t.college_name || "—"}</p>
-                        {t.course_name && <p className="text-[10px] text-slate-400 truncate max-w-[160px] mt-0.5">{t.course_name}</p>}
-                      </td>
-                    ) : (
-                      <td className="px-4 py-3">
-                        <p className="font-semibold text-slate-700 text-[12px]">{t.student_name?.trim() || "—"}</p>
-                        {t.student_email && <p className="text-[10px] text-slate-400 truncate max-w-[140px]">{t.student_email}</p>}
-                      </td>
-                    )}
-
-                    {/* Amount */}
-                    <td className="px-4 py-3">
-                      <span className="font-black text-slate-800 text-[13px]">{formatAmount(t.amount)}</span>
-                    </td>
-
-                    {/* Status */}
-                    <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        t.payment_status === "Success" ? "bg-emerald-100 text-emerald-700" :
-                        t.payment_status === "Pending" ? "bg-amber-100 text-amber-700" :
-                        t.payment_status === "Failed"  ? "bg-rose-100 text-rose-700" :
-                        "bg-slate-100 text-slate-500"
-                      }`}>{t.payment_status}</span>
-                    </td>
-
-                    {/* Date */}
-                    <td className="px-4 py-3 text-[12px] text-slate-500 whitespace-nowrap">{formatDate(t.created_at)}</td>
-
-                    {/* Transaction Ref */}
-                    <td className="px-4 py-3">
-                      {(() => {
-                        const key = t.transactionHashKey?.toString().trim();
-                        const hashValid = key && key !== "NULL" && key !== "null" && key.length > 3;
-                        const display = hashValid ? key : t.name?.toString().trim() || null;
-                        return display ? (
-                          <code className="text-[11px] font-bold text-slate-700 font-mono bg-slate-50 px-2 py-1 rounded select-all block max-w-[160px] break-all">{display}</code>
-                        ) : (
-                          <span className="text-slate-300 text-xs">—</span>
-                        );
-                      })()}
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-4 py-3 text-right">
-                      <DeleteButton action={deleteTransaction.bind(null, t.id)} size="sm" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
-            <p className="text-xs text-slate-500">
-              Showing <strong>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total.toLocaleString()}</strong>
-            </p>
-            <div className="flex gap-1">
-              {page > 1 && <Link href={buildUrl({ page: page - 1 })} className="px-3 py-1.5 text-xs font-bold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">← Prev</Link>}
-              {page < totalPages && <Link href={buildUrl({ page: page + 1 })} className="px-3 py-1.5 text-xs font-bold bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Next →</Link>}
-            </div>
-          </div>
-        )}
+        <TransactionListClient
+          rows={payments}
+          offset={offset}
+          total={total}
+          page={page}
+          totalPages={totalPages}
+          pageSize={PAGE_SIZE}
+          type={type}
+          onDelete={deleteTransaction}
+        />
       </div>
     </div>
   );

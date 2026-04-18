@@ -60,21 +60,6 @@ export default function FieldsOfStudy() {
             </motion.div>
           ))}
         </div>
-
-        {/* Bottom stats */}
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-          {[
-            { value: "500+", label: "Partner Colleges" },
-            { value: "50K+", label: "Students Helped" },
-            { value: "200+", label: "Courses Listed" },
-            { value: "95%", label: "Success Rate" },
-          ].map((s) => (
-            <div key={s.label} className="text-center">
-              <p className="text-primary text-[32px] font-bold leading-none">{s.value}</p>
-              <p className="text-white/50 text-[14px] font-medium mt-1">{s.label}</p>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );

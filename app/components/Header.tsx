@@ -399,7 +399,8 @@ export default function Header({ theme }: HeaderProps) {
                   {/* Sign Up Dropdown */}
                   <div ref={signupRef} className="relative" onMouseEnter={openSignup} onMouseLeave={closeSignup}>
                     <button
-                      className="flex items-center gap-1.5 px-6 py-2.5 rounded-[10px] bg-primary text-white hover:bg-primary-dark transition-all shadow-lg shadow-primary/10 font-medium text-[16px]"
+                      className="flex items-center gap-1.5 px-6 py-2.5 rounded-[5px] text-white hover:bg-neutral-800 transition-all shadow-md font-medium text-[16px]"
+                      style={{ backgroundColor: 'rgba(34, 34, 34, 1)' }}
                     >
                       Sign Up
                       <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${signupOpen ? "rotate-180" : ""}`}>expand_more</span>
@@ -522,8 +523,8 @@ export default function Header({ theme }: HeaderProps) {
                     </Link>
                     <Link
                       href="/signup/student"
-                      className="flex items-center justify-center py-3.5 rounded-[10px] text-white text-[16px] font-medium shadow-lg shadow-primary/20"
-                      style={{ backgroundColor: '#FF3C3C' }}
+                      className="flex items-center justify-center py-3.5 rounded-[5px] text-white text-[16px] font-medium shadow-md"
+                      style={{ backgroundColor: 'rgba(34, 34, 34, 1)' }}
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Sign Up

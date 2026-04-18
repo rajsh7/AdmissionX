@@ -173,7 +173,7 @@ export default function EventListClient({
       {/* Table (matches profile information table style) */}
       <div className="bg-white">
         {/* Table header info */}
-        <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
+        <div className="px-3 py-3 border-b border-slate-100 flex items-center justify-between">
           <p className="text-sm text-slate-500 font-medium">
             {total > 0 ? (
               <>

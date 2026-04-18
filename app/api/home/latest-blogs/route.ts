@@ -8,6 +8,9 @@ export interface DbBlog {
   description: string;
   slug: string;
   created_at: string;
+  author_name?: string;
+  author_image?: string;
+  read_time?: string;
 }
 
 export async function GET() {
@@ -18,7 +21,7 @@ export async function GET() {
       .find({ isactive: 1 })
       .sort({ created_at: -1 })
       .limit(4)
-      .project({ _id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 })
+      .project({ _id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1, author_name: 1, author_image: 1, read_time: 1 })
       .toArray();
 
     return NextResponse.json({ success: true, data: rows });

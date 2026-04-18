@@ -74,7 +74,7 @@ export default function MovingAdsCard({ ads, className = "" }: MovingAdsCardProp
 
 function AdContent({ ad, imgSrc }: { ad: AdItem; imgSrc: string | null }) {
   return (
-    <div className="w-full h-full overflow-hidden rounded-[12px]">
+    <div className="w-full h-full overflow-hidden rounded-[5px]">
       {imgSrc ? (
         <>
           <img

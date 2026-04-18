@@ -109,7 +109,7 @@ export default async function CollegesPage({
         )}
 
         {/* Explore Cards */}
-        <div className="mt-10">
+        <div className="mt-10 ">
           <ExploreCards />
         </div>
       </main>
