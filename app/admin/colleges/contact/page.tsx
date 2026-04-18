@@ -27,6 +27,11 @@ interface ContactRow {
   contact_name: string;
   email: string;
   phone: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  college_type: string;
   _source: "old" | "new";
 }
 
