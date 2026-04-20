@@ -45,6 +45,7 @@ interface CollegeBase {
   registeredAddressCityId: ObjectId | null;
   collegetype_id: ObjectId | null;
   college_name: string;
+  logo: string | null;
   city_name: string | null;
   college_type_name: string | null;
 }

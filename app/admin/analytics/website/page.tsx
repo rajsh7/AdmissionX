@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
+const COLORS = ["#3b82f6","#10b981","#f59e0b","#8b5cf6","#ef4444","#06b6d4","#ec4899"];
 
 interface AnalyticsData {
   timestamp: string;
@@ -16,10 +17,6 @@ interface AnalyticsData {
   chartData: { date: string; label: string; students: number; colleges: number; views: number }[];
 }
 
-const DEVICE_ICONS: Record<string, string> = { desktop: "computer", mobile: "smartphone", tablet: "tablet" };
-const BROWSER_ICONS: Record<string, string> = { Chrome: "language", Firefox: "language", Safari: "language", Edge: "language", Opera: "language", Other: "public" };
-const COLORS = ["#3b82f6","#10b981","#f59e0b","#8b5cf6","#ef4444","#06b6d4","#ec4899"];
-
 function StatCard({ label, value, sub, icon, color, pulse }: {
   label: string; value: number | string; sub?: string; icon: string; color: string; pulse?: boolean;
 }) {
@@ -28,15 +25,6 @@ function StatCard({ label, value, sub, icon, color, pulse }: {
       <div className="flex items-center justify-between">
         <div className="p-2.5 rounded-xl" style={{ backgroundColor: `${color}18` }}>
           <span className="material-symbols-rounded text-[20px]" style={{ ...ICO_FILL, color }}>{icon}</span>
-    <div className="p-6 space-y-6 mx-auto max-w-[1400px]">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-emerald-600 text-[22px]" style={ICO_FILL}>monitoring</span>
-            Website Metrics
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">Key performance indicators displayed on the homepage.</p>
         </div>
         {pulse && (
           <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
@@ -60,7 +48,7 @@ function BarChart({ data }: { data: AnalyticsData["chartData"] }) {
       {data.map((d) => (
         <div key={d.date} className="flex-1 flex flex-col items-center gap-0.5 group relative">
           <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-semibold px-2 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
-            {d.label}<br/>👁 {d.views} views<br/>🎓 {d.students} students<br/>🏛 {d.colleges} colleges
+            {d.label} — {d.views}v / {d.students}s / {d.colleges}c
           </div>
           <div className="w-full flex gap-px items-end" style={{ height: "100%" }}>
             <div className="flex-1 rounded-t-sm bg-slate-200 transition-all duration-500" style={{ height: `${(d.views / maxVal) * 100}%`, minHeight: d.views > 0 ? "3px" : "0" }} />
@@ -79,7 +67,7 @@ function PctBar({ label, pct, color, count }: { label: string; pct: number; colo
     <div className="space-y-1">
       <div className="flex justify-between text-[12px] font-semibold">
         <span className="text-slate-600 capitalize">{label}</span>
-        <span className="text-slate-400">{count.toLocaleString()} <span className="text-slate-300">({pct}%)</span></span>
+        <span className="text-slate-400">{count.toLocaleString()} ({pct}%)</span>
       </div>
       <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
         <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: color }} />
@@ -89,10 +77,10 @@ function PctBar({ label, pct, color, count }: { label: string; pct: number; colo
 }
 
 export default function WebsiteMetricsPage() {
-  const [data, setData]       = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData]           = useState<AnalyticsData | null>(null);
+  const [loading, setLoading]     = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
-  const [countdown, setCountdown]     = useState(30);
+  const [countdown, setCountdown] = useState(30);
 
   const fetchData = useCallback(async () => {
     try {
@@ -119,7 +107,9 @@ export default function WebsiteMetricsPage() {
   if (loading) return (
     <div className="p-6 space-y-6 animate-pulse">
       <div className="h-8 w-64 bg-slate-200 rounded" />
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">{[1,2,3,4].map(i=><div key={i} className="h-32 bg-slate-100 rounded-2xl"/>)}</div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        {[1,2,3,4].map(i => <div key={i} className="h-32 bg-slate-100 rounded-2xl" />)}
+      </div>
       <div className="h-64 bg-slate-100 rounded-2xl" />
     </div>
   );
@@ -161,8 +151,8 @@ export default function WebsiteMetricsPage() {
       <div>
         <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Visitor Traffic</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-          <StatCard label="Page Views Today"    value={pv?.today ?? 0}       icon="visibility"      color="#6366f1" pulse />
-          <StatCard label="Page Views This Week" value={pv?.week ?? 0}       icon="bar_chart"       color="#8b5cf6" />
+          <StatCard label="Page Views Today"     value={pv?.today ?? 0}       icon="visibility"     color="#6366f1" pulse />
+          <StatCard label="Page Views This Week" value={pv?.week ?? 0}        icon="bar_chart"      color="#8b5cf6" />
           <StatCard label="Unique Visitors Today" value={pv?.uniqueToday ?? 0} icon="person_outline" color="#ec4899" pulse />
           <StatCard label="Unique Visitors Week"  value={pv?.uniqueWeek ?? 0}  icon="groups"         color="#f59e0b" />
         </div>
@@ -172,10 +162,10 @@ export default function WebsiteMetricsPage() {
       <div>
         <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Platform Registrations</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-          <StatCard label="Total Students"    value={s?.total ?? 0}  sub={`${s?.active ?? 0} verified`} icon="school"           color="#3b82f6" />
-          <StatCard label="Students Today"    value={s?.today ?? 0}  sub={`+${s?.week ?? 0} this week`} icon="person_add"       color="#10b981" pulse />
-          <StatCard label="Total Colleges"    value={c?.total ?? 0}  sub={`+${c?.today ?? 0} today`}    icon="account_balance"  color="#8b5cf6" />
-          <StatCard label="Total Applications" value={data?.applications.total ?? 0}                    icon="description"      color="#f59e0b" />
+          <StatCard label="Total Students"     value={s?.total ?? 0} sub={`${s?.active ?? 0} verified`} icon="school"          color="#3b82f6" />
+          <StatCard label="Students Today"     value={s?.today ?? 0} sub={`+${s?.week ?? 0} this week`} icon="person_add"      color="#10b981" pulse />
+          <StatCard label="Total Colleges"     value={c?.total ?? 0} sub={`+${c?.today ?? 0} today`}    icon="account_balance" color="#8b5cf6" />
+          <StatCard label="Total Applications" value={data?.applications.total ?? 0}                    icon="description"     color="#f59e0b" />
         </div>
       </div>
 
@@ -183,24 +173,24 @@ export default function WebsiteMetricsPage() {
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-sm font-bold text-slate-700">Traffic & Signups — Last 14 Days</h2>
+            <h2 className="text-sm font-bold text-slate-700">Traffic &amp; Signups — Last 14 Days</h2>
             <p className="text-[11px] text-slate-400 mt-0.5">Hover over bars for details</p>
           </div>
           <div className="flex items-center gap-4 text-[11px] font-semibold">
-            <span className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm bg-slate-200 inline-block"/>Page Views</span>
-            <span className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm bg-blue-400 inline-block"/>Students</span>
-            <span className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm bg-emerald-400 inline-block"/>Colleges</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm bg-slate-200 inline-block" />Page Views</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm bg-blue-400 inline-block" />Students</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm bg-emerald-400 inline-block" />Colleges</span>
           </div>
         </div>
-        {data?.chartData?.length ? <BarChart data={data.chartData} /> : (
+        {data?.chartData?.length ? (
+          <BarChart data={data.chartData} />
+        ) : (
           <div className="h-44 flex items-center justify-center text-slate-400 text-sm">No data yet — visit some pages first</div>
         )}
       </div>
 
       {/* Top Pages + Devices + Browsers */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        {/* Top Pages */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
           <h3 className="text-sm font-bold text-slate-700 mb-4">Top Pages (This Week)</h3>
           {data?.topPages?.length ? (
@@ -216,7 +206,6 @@ export default function WebsiteMetricsPage() {
           ) : <p className="text-[12px] text-slate-400">No page view data yet</p>}
         </div>
 
-        {/* Devices */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
           <h3 className="text-sm font-bold text-slate-700 mb-4">Devices (This Month)</h3>
           {data?.devices?.length ? (
@@ -228,7 +217,6 @@ export default function WebsiteMetricsPage() {
           ) : <p className="text-[12px] text-slate-400">No device data yet</p>}
         </div>
 
-        {/* Browsers */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
           <h3 className="text-sm font-bold text-slate-700 mb-4">Browsers (This Month)</h3>
           {data?.browsers?.length ? (
@@ -241,7 +229,7 @@ export default function WebsiteMetricsPage() {
         </div>
       </div>
 
-      {/* Student growth table */}
+      {/* Summary Table */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50">
           <h2 className="text-sm font-bold text-slate-700">Registration Summary</h2>
@@ -258,10 +246,10 @@ export default function WebsiteMetricsPage() {
           </thead>
           <tbody className="divide-y divide-slate-50">
             {[
-              { label: "Page Views", icon: "visibility", color: "#6366f1", total: pv?.month, today: pv?.today, week: pv?.week, month: pv?.month },
+              { label: "Page Views",      icon: "visibility",     color: "#6366f1", total: pv?.month,      today: pv?.today,      week: pv?.week,      month: pv?.month },
               { label: "Unique Visitors", icon: "person_outline", color: "#ec4899", total: pv?.uniqueWeek, today: pv?.uniqueToday, week: pv?.uniqueWeek, month: null },
-              { label: "Students", icon: "school", color: "#3b82f6", total: s?.total, today: s?.today, week: s?.week, month: s?.month },
-              { label: "Colleges", icon: "account_balance", color: "#8b5cf6", total: c?.total, today: c?.today, week: null, month: null },
+              { label: "Students",        icon: "school",         color: "#3b82f6", total: s?.total,       today: s?.today,       week: s?.week,       month: s?.month },
+              { label: "Colleges",        icon: "account_balance",color: "#8b5cf6", total: c?.total,       today: c?.today,       week: null,          month: null },
             ].map(row => (
               <tr key={row.label} className="hover:bg-slate-50/50">
                 <td className="px-5 py-3.5 font-semibold text-slate-700">
