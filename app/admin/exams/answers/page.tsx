@@ -45,24 +45,25 @@ export default async function ExamAnswersPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE ea.answer LIKE ? OR eq.question LIKE ? OR u.firstname LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
-
-  const data = await safeQuery<AnswerRow>(
-    `SELECT 
-      ea.id, 
-      ea.answer, 
-      ea.answerDate,
-      eq.question as question,
-      u.firstname as userName
-     FROM exam_question_answers ea
-     LEFT JOIN exam_questions eq ON eq.id = ea.questionId
-     LEFT JOIN users u ON u.id = ea.userId
-     ${where}
-     ORDER BY ea.id DESC
-     LIMIT 100`,
-    params
-  );
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { answer: { $regex: q, $options: "i" } } : {};
+  const docs = await db.collection("exam_question_answers").find(filter).sort({ id: -1 }).limit(100).toArray();
+  const qIds = [...new Set(docs.map((d: any) => Number(d.questionId)).filter(Boolean))];
+  const uIds = [...new Set(docs.map((d: any) => Number(d.userId)).filter(Boolean))];
+  const [qDocs, uDocs] = await Promise.all([
+    qIds.length ? db.collection("exam_questions").find({ id: { $in: qIds } }, { projection: { id: 1, question: 1 } }).toArray() : [],
+    uIds.length ? db.collection("users").find({ id: { $in: uIds } }, { projection: { id: 1, firstname: 1 } }).toArray() : [],
+  ]);
+  const qMap = new Map(qDocs.map((d: any) => [Number(d.id), String(d.question ?? "").replace(/<[^>]*>/g, "").trim()]));
+  const uMap = new Map(uDocs.map((d: any) => [Number(d.id), String(d.firstname ?? "").trim()]));
+  const data: AnswerRow[] = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    answer: String(d.answer ?? "").replace(/<[^>]*>/g, "").trim(),
+    answerDate: d.answerDate ? String(d.answerDate).trim() : null,
+    question: qMap.get(Number(d.questionId)) || null,
+    userName: uMap.get(Number(d.userId)) || null,
+  }));
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px] mx-auto">

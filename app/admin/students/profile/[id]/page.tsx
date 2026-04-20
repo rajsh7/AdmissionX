@@ -27,6 +27,8 @@ async function updateProfile(formData: FormData) {
   const address = String(formData.get("address") ?? "");
   const parentsname   = String(formData.get("parentsname")   ?? "");
   const parentsnumber = String(formData.get("parentsnumber") ?? "");
+  const project_title = String(formData.get("project_title") ?? "");
+  const projects      = String(formData.get("projects")      ?? "");
 
   // Academic marks
   const MARKS_FIELDS = [
@@ -56,7 +58,7 @@ async function updateProfile(formData: FormData) {
             student_id: studentId,
             gender, dob, about, hobbies, interest: interests,
             city, state, country, pincode, address,
-            parentsname, parentsnumber,
+            parentsname, parentsnumber, project_title, projects,
             updated_at: new Date(),
           },
           $setOnInsert: { created_at: new Date() },
@@ -126,6 +128,8 @@ export default async function EditStudentProfilePage({ params }: { params: Promi
   let prof: Record<string, any> = {};
   let marks: Record<string, any> = {};
   let docs: Record<string, any>[] = [];
+  let projects = "";
+  let project_title_val = "";
   let formattedDob = "";
 
   if (isObjectId) {
@@ -141,6 +145,8 @@ export default async function EditStudentProfilePage({ params }: { params: Promi
     prof  = await db.collection("next_student_profiles").findOne({ student_id: id }) ?? {};
     marks = await db.collection("next_student_marks").findOne({ student_id: id })   ?? {};
     docs  = await db.collection("next_student_documents").find({ student_id: id }).sort({ created_at: -1 }).toArray();
+    projects = String(prof.projects || "");
+    project_title_val = String(prof.project_title || "");
     formattedDob = prof.dob ? (() => { try { return new Date(prof.dob).toISOString().split("T")[0]; } catch { return ""; } })() : "";
   } else {
     const p = await db.collection("studentprofile").findOne({ id: Number(id) });
@@ -291,6 +297,17 @@ export default async function EditStudentProfilePage({ params }: { params: Promi
               </div>
             </Card>
 
+            {/* Projects */}
+            <Card>
+              <SectionHeading icon="work" title="Projects" />
+              <div className="space-y-4">
+                <Field label="Project Title"><input name="project_title" defaultValue={project_title_val} placeholder="e.g. E-commerce Website" className={inputCls} /></Field>
+                <Field label="Project Description">
+                  <textarea name="projects" defaultValue={projects} rows={5} placeholder="Student project description..." className={textareaCls} />
+                </Field>
+              </div>
+            </Card>
+
             {/* Uploaded Documents */}
             <Card>
               <SectionHeading icon="folder" title={`Uploaded Documents (${docs.length})`} />
@@ -386,6 +403,7 @@ export default async function EditStudentProfilePage({ params }: { params: Promi
                   { label: "Class 12", value: marks.class12_percent ? `${marks.class12_percent}%` : "-" },
                   { label: "Grad",     value: marks.grad_percent ? `${marks.grad_percent}%` : marks.grad_cgpa ? `${marks.grad_cgpa} CGPA` : "-" },
                   { label: "Docs",     value: `${docs.length} file${docs.length !== 1 ? "s" : ""}` },
+                  { label: "Projects", value: project_title_val ? `${project_title_val}${projects ? " — " + projects.slice(0, 30) + (projects.length > 30 ? "..." : "") : ""}` : (projects ? projects.slice(0, 40) + (projects.length > 40 ? "..." : "") : "-") },
                 ].map(({ label, value }) => (
                   <div key={label} className="flex justify-between gap-2 py-1.5 border-b border-slate-50 last:border-0">
                     <span className="font-bold text-slate-400 uppercase tracking-wide shrink-0">{label}</span>

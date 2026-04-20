@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import ManagementFormModal from "./ManagementFormModal";
 import { createManagementMember, updateManagementMember, deleteManagementRow } from "./actions";
@@ -42,9 +42,10 @@ export default function ManagementListClient({
   const [editingMember, setEditingMember] = useState<ManagementRow | null>(null);
   const [visibleCount, setVisibleCount] = useState(STEP);
 
-  const listKey = members[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(STEP); }
+  // Reset visibleCount when members change (new page)
+  useEffect(() => {
+    setVisibleCount(STEP);
+  }, [members[0]?.id]);
 
   const showMore = visibleCount < members.length;
   const showPagination = !showMore && totalPages > 1;
@@ -142,8 +143,8 @@ export default function ManagementListClient({
                       <span className="text-slate-600 font-medium truncate max-w-[200px] block">{m.college_name}</span>
                     </td>
                     <td className="px-4 py-4">
-                      <div className="flex flex-col text-[11px] empty:hidden">
-                        {m.emailaddress && <span className="text-slate-600 font-medium truncate max-w-[150px]">{m.emailaddress}</span>}
+                      <div className="flex flex-col text-[11px]">
+                        <span className="text-slate-600 font-medium truncate max-w-[150px]">{m.emailaddress || "-"}</span>
                         {m.phoneno && <span className="text-slate-400">{m.phoneno}</span>}
                       </div>
                     </td>

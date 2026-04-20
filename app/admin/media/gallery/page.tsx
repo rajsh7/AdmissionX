@@ -109,17 +109,17 @@ export default async function GalleryPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE name LIKE ? OR caption LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`] : [];
-
-  const data = await safeQuery<GalleryRow>(
-    `SELECT id, name, fullimage, caption, users_id
-     FROM gallery
-     ${where}
-     ORDER BY id DESC
-     LIMIT 100`,
-    params
-  );
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { $or: [{ name: { $regex: q, $options: "i" } }, { caption: { $regex: q, $options: "i" } }] } : {};
+  const docs = await db.collection("gallery").find(filter).sort({ id: -1 }).limit(100).toArray();
+  const data: GalleryRow[] = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    name: String(d.name ?? "").trim(),
+    fullimage: d.fullimage ? String(d.fullimage).trim() : null,
+    caption: d.caption ? String(d.caption).trim() : null,
+    users_id: d.users_id ? Number(d.users_id) : null,
+  }));
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">

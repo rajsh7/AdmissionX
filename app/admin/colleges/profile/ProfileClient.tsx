@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
@@ -114,12 +114,10 @@ export default function ProfileClient({
   );
   const [visibleCount, setVisibleCount] = useState(15);
 
-  const listKey = profiles[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) {
-    setLastKey(listKey);
+  // Reset when profiles change
+  useEffect(() => {
     setVisibleCount(15);
-  }
+  }, [profiles[0]?.id]);
 
   // ── Filter state — one entry per form field ─────────────────────────────────
   const [f, setF] = useState({

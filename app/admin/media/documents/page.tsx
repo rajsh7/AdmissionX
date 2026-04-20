@@ -43,17 +43,15 @@ export default async function DocumentsPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE name LIKE ?" : "";
-  const params = q ? [`%${q}%`] : [];
-
-  const data = await safeQuery<DocumentRow>(
-    `SELECT id, name, fullimage
-     FROM documents
-     ${where}
-     ORDER BY id DESC
-     LIMIT 100`,
-    params
-  );
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { name: { $regex: q, $options: "i" } } : {};
+  const docs = await db.collection("documents").find(filter).sort({ id: -1 }).limit(100).toArray();
+  const data: DocumentRow[] = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    name: String(d.name ?? "").trim(),
+    fullimage: d.fullimage ? String(d.fullimage).trim() : null,
+  }));
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">

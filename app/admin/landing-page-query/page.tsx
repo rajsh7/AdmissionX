@@ -45,17 +45,19 @@ export default async function LandingPageQueryPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE fullname LIKE ? OR emailaddress LIKE ? OR mobilenumber LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
-
-  const data = await safeQuery<QueryRow>(
-    `SELECT id, fullname, emailaddress, mobilenumber, created_at
-     FROM landing_page_query_forms
-     ${where}
-     ORDER BY id DESC
-     LIMIT 100`,
-    params
-  );
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q
+    ? { $or: [{ fullname: { $regex: q, $options: "i" } }, { emailaddress: { $regex: q, $options: "i" } }, { mobilenumber: { $regex: q, $options: "i" } }] }
+    : {};
+  const docs = await db.collection("landing_page_query_forms").find(filter).sort({ id: -1 }).limit(100).toArray();
+  const data: QueryRow[] = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    fullname: String(d.fullname ?? "").trim(),
+    emailaddress: d.emailaddress ? String(d.emailaddress).trim() : null,
+    mobilenumber: d.mobilenumber ? String(d.mobilenumber).trim() : null,
+    created_at: String(d.created_at ?? "").trim(),
+  }));
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">

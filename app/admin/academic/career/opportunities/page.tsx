@@ -98,21 +98,23 @@ export default async function CareerOpportunitiesPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE o.title LIKE ? OR o.topCompany LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`] : [];
-
-  const [opportunities, careerStreams] = await Promise.all([
-    safeQuery<OppRow>(
-      `SELECT o.*, cd.title as career_title
-       FROM counseling_career_job_role_saleries o
-       LEFT JOIN counseling_career_details cd ON cd.id = o.careerDetailsId
-       ${where}
-       ORDER BY o.id DESC
-       LIMIT 200`,
-      params
-    ),
-    safeQuery<CareerStreamOption>("SELECT id, title FROM counseling_career_details ORDER BY title ASC"),
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { $or: [{ title: { $regex: q, $options: "i" } }, { topCompany: { $regex: q, $options: "i" } }] } : {};
+  const [oppDocs, careerDocs] = await Promise.all([
+    db.collection("counseling_career_job_role_saleries").find(filter).sort({ id: -1 }).limit(200).toArray(),
+    db.collection("counseling_career_details").find({}, { projection: { id: 1, title: 1 } }).sort({ title: 1 }).toArray(),
   ]);
+  const careerMap = new Map(careerDocs.map((d: any) => [Number(d.id), String(d.title ?? "").trim()]));
+  const opportunities: OppRow[] = oppDocs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    title: String(d.title ?? "").trim(),
+    avgSalery: d.avgSalery ? String(d.avgSalery).trim() : null,
+    topCompany: d.topCompany ? String(d.topCompany).trim() : null,
+    careerDetailsId: Number(d.careerDetailsId ?? 0),
+    career_title: careerMap.get(Number(d.careerDetailsId)) || null,
+  }));
+  const careerStreams: CareerStreamOption[] = careerDocs.map((d: any) => ({ id: Number(d.id ?? 0), title: String(d.title ?? "").trim() }));
 
   const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 

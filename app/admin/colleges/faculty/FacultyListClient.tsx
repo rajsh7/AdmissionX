@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
@@ -89,9 +89,10 @@ export default function FacultyListClient({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const listKey = facultyMembers[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(15); }
+  // Reset visibleCount when facultyMembers change
+  useEffect(() => {
+    setVisibleCount(15);
+  }, [facultyMembers[0]?.id]);
 
   const showMore = visibleCount < facultyMembers.length;
   const showPagination = !showMore && totalPages > 1;

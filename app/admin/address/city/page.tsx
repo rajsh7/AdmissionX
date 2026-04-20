@@ -85,45 +85,30 @@ export default async function CityPage({
   const page = Math.max(1, parseInt(sp.page || "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Build WHERE clause ─────────────────────────────────────────────────────
-  const conditions: string[] = [];
-  const queryParams: (string | number)[] = [];
-
-  if (q) {
-    conditions.push("(ci.name LIKE ? OR s.name LIKE ? OR c.name LIKE ?)");
-    queryParams.push(`%${q}%`, `%${q}%`, `%${q}%`);
-  }
-
-  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-
-  // ── Query data ─────────────────────────────────────────────────────────────
-  const [data, countRows, countries, states] = await Promise.all([
-    safeQuery<CityRow>(
-      `SELECT ci.id, ci.name, s.name as stateName, c.name as countryName, ci.state_id, s.country_id
-       FROM city ci
-       LEFT JOIN state s ON s.id = ci.state_id
-       LEFT JOIN country c ON c.id = s.country_id
-       ${where}
-       ORDER BY ci.name ASC
-       LIMIT ? OFFSET ?`,
-      [...queryParams, PAGE_SIZE, offset]
-    ),
-    safeQuery<{ total: number }>(
-      `SELECT COUNT(*) as total FROM city ci 
-       LEFT JOIN state s ON s.id = ci.state_id
-       LEFT JOIN country c ON c.id = s.country_id 
-       ${where}`,
-      queryParams
-    ),
-    safeQuery<{ id: number; name: string }>(
-      "SELECT id, name FROM country ORDER BY name ASC"
-    ),
-    safeQuery<{ id: number; name: string; country_id: number | null }>(
-      "SELECT id, name, country_id FROM state ORDER BY name ASC"
-    )
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { name: { $regex: q, $options: "i" } } : {};
+  const [cityDocs, total, countryDocs, stateDocs] = await Promise.all([
+    db.collection("city").find(filter).sort({ name: 1 }).skip(offset).limit(PAGE_SIZE).toArray(),
+    db.collection("city").countDocuments(filter),
+    db.collection("country").find({}, { projection: { id: 1, name: 1 } }).sort({ name: 1 }).toArray(),
+    db.collection("state").find({}, { projection: { id: 1, name: 1, country_id: 1 } }).sort({ name: 1 }).toArray(),
   ]);
-
-  const total = Number(countRows[0]?.total || 0);
+  const stateMap = new Map(stateDocs.map((d: any) => [Number(d.id), { name: String(d.name ?? "").trim(), country_id: Number(d.country_id ?? 0) }]));
+  const countryMap = new Map(countryDocs.map((d: any) => [Number(d.id), String(d.name ?? "").trim()]));
+  const data: CityRow[] = cityDocs.map((d: any) => {
+    const st = stateMap.get(Number(d.state_id));
+    return {
+      id: Number(d.id ?? 0),
+      name: String(d.name ?? "").trim(),
+      stateName: st?.name || null,
+      countryName: st ? (countryMap.get(st.country_id) || null) : null,
+      state_id: d.state_id ? Number(d.state_id) : null,
+      country_id: st?.country_id || null,
+    };
+  });
+  const countries = countryDocs.map((d: any) => ({ id: Number(d.id ?? 0), name: String(d.name ?? "").trim() }));
+  const states = stateDocs.map((d: any) => ({ id: Number(d.id ?? 0), name: String(d.name ?? "").trim(), country_id: Number(d.country_id ?? 0) }));
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (

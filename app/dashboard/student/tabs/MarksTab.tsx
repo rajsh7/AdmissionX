@@ -11,21 +11,27 @@ interface Marks {
   class10_school: string;
   class10_year: string;
   class10_percent: string;
+  class10_total: string;
+  class10_obtained: string;
   class12_board: string;
   class12_school: string;
   class12_year: string;
   class12_percent: string;
+  class12_total: string;
+  class12_obtained: string;
   class12_stream: string;
   grad_university: string;
+  grad_college: string;
   grad_program: string;
   grad_year: string;
   grad_percent: string;
+  grad_cgpa: string;
 }
 
 const EMPTY_MARKS: Marks = {
-  class10_board: "", class10_school: "", class10_year: "", class10_percent: "",
-  class12_board: "", class12_school: "", class12_year: "", class12_percent: "", class12_stream: "",
-  grad_university: "", grad_program: "", grad_year: "", grad_percent: "",
+  class10_board: "", class10_school: "", class10_year: "", class10_percent: "", class10_total: "", class10_obtained: "",
+  class12_board: "", class12_school: "", class12_year: "", class12_percent: "", class12_total: "", class12_obtained: "", class12_stream: "",
+  grad_university: "", grad_college: "", grad_program: "", grad_year: "", grad_percent: "", grad_cgpa: "",
 };
 
 const BOARDS = ["CBSE", "ICSE", "State Board", "IB", "IGCSE", "NIOS", "Other"];
@@ -215,7 +221,9 @@ export default function MarksTab({ user }: Props) {
               <SelectField label="10th Board" value={marks.class10_board} onChange={v => update("class10_board", v)} options={BOARDS} icon="expand_more" />
               <InputField label="10th School Name" value={marks.class10_school} onChange={v => update("class10_school", v)} icon="apartment" />
               <SelectField label="Passing Year" value={marks.class10_year} onChange={v => update("class10_year", v)} options={YEAR_OPTIONS} icon="expand_more" />
-              <InputField label="Percentage / CGPA" value={marks.class10_percent} onChange={v => update("class10_percent", v)} icon="percent" />
+              <InputField label="Percentage %" value={marks.class10_percent} onChange={v => update("class10_percent", v)} placeholder="e.g. 85.5" icon="percent" />
+              <InputField label="Total Marks" value={marks.class10_total} onChange={v => update("class10_total", v)} placeholder="e.g. 500" icon="calculate" />
+              <InputField label="Marks Obtained" value={marks.class10_obtained} onChange={v => update("class10_obtained", v)} placeholder="e.g. 425" icon="grade" />
             </div>
           </div>
 
@@ -234,7 +242,27 @@ export default function MarksTab({ user }: Props) {
               <InputField label="12th School Name" value={marks.class12_school} onChange={v => update("class12_school", v)} icon="apartment" />
               <SelectField label="Passing Year" value={marks.class12_year} onChange={v => update("class12_year", v)} options={YEAR_OPTIONS} icon="expand_more" />
               <SelectField label="Stream" value={marks.class12_stream} onChange={v => update("class12_stream", v)} options={STREAMS_12} icon="expand_more" />
-              <InputField label="Percentage / CGPA" value={marks.class12_percent} onChange={v => update("class12_percent", v)} icon="percent" />
+              <InputField label="Percentage %" value={marks.class12_percent} onChange={v => update("class12_percent", v)} placeholder="e.g. 90.0" icon="percent" />
+              <InputField label="Total Marks" value={marks.class12_total} onChange={v => update("class12_total", v)} placeholder="e.g. 500" icon="calculate" />
+              <InputField label="Marks Obtained" value={marks.class12_obtained} onChange={v => update("class12_obtained", v)} placeholder="e.g. 450" icon="grade" />
+            </div>
+          </div>
+
+          {/* Graduation Section */}
+          <div className="space-y-8">
+            <div className="flex items-center gap-3">
+               <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                  <span className="material-symbols-outlined text-blue-500 text-[18px]">workspace_premium</span>
+               </div>
+               <h3 className="text-[18px] font-bold text-[#333]">Graduation Details</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <InputField label="University" value={marks.grad_university} onChange={v => update("grad_university", v)} icon="account_balance" />
+              <InputField label="College" value={marks.grad_college} onChange={v => update("grad_college", v)} icon="apartment" />
+              <InputField label="Program" value={marks.grad_program} onChange={v => update("grad_program", v)} placeholder="e.g. B.Tech CSE" icon="menu_book" />
+              <SelectField label="Pass Year" value={marks.grad_year} onChange={v => update("grad_year", v)} options={YEAR_OPTIONS} icon="expand_more" />
+              <InputField label="Percentage %" value={marks.grad_percent} onChange={v => update("grad_percent", v)} placeholder="e.g. 75.0" icon="percent" />
+              <InputField label="CGPA" value={marks.grad_cgpa} onChange={v => update("grad_cgpa", v)} placeholder="e.g. 8.5" icon="grade" />
             </div>
           </div>
 

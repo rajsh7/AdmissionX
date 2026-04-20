@@ -6,7 +6,7 @@ interface Props {
   user: { id: string | number; name: string; email: string } | null;
 }
 
-type InnerTab = "profile" | "address" | "certificates" | "projects" | "settings";
+type InnerTab = "profile" | "address" | "academic" | "certificates" | "projects" | "settings";
 
 // ── Shared field component ────────────────────────────────────────────────────
 function Field({
@@ -60,6 +60,7 @@ function StatCard({ label, value }: { label: string; value: string | number }) {
 const INNER_TABS: { id: InnerTab; label: string }[] = [
   { id: "profile",      label: "Profile" },
   { id: "address",      label: "Address" },
+  { id: "academic",     label: "Academic Details" },
   { id: "certificates", label: "Academic Certificates" },
   { id: "projects",     label: "Projects" },
   { id: "settings",     label: "Account Settings" },
@@ -76,6 +77,8 @@ function ProfileInner({ user, showToast }: { user: Props["user"]; showToast: (m:
   const [dob, setDob]         = useState("");
   const [phone, setPhone]     = useState("");
   const [about, setAbout]     = useState("");
+  const [parentsname, setParentsname]     = useState("");
+  const [parentsnumber, setParentsnumber] = useState("");
   const [saving, setSaving]   = useState(false);
 
   const load = useCallback(async () => {
@@ -89,6 +92,8 @@ function ProfileInner({ user, showToast }: { user: Props["user"]; showToast: (m:
     setDob(d.dob ? d.dob.slice(0, 10) : "");
     setPhone(d.phone ?? "");
     setAbout(d.about ?? "");
+    setParentsname(d.parentsname ?? "");
+    setParentsnumber(d.parentsnumber ?? "");
   }, [user?.id, user?.name]);
 
   useEffect(() => { load(); }, [load]);
@@ -100,7 +105,7 @@ function ProfileInner({ user, showToast }: { user: Props["user"]; showToast: (m:
       const res = await fetch(`/api/student/${user?.id}/profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, gender, hobbies, interest, dob, phone, about }),
+        body: JSON.stringify({ name, gender, hobbies, interest, dob, phone, about, parentsname, parentsnumber }),
       });
       if (res.ok) showToast("Profile saved!");
     } finally {
@@ -124,6 +129,8 @@ function ProfileInner({ user, showToast }: { user: Props["user"]; showToast: (m:
       <Field label="Interest" value={interest} onChange={setInterest} placeholder="Enter your Interests here" />
       <Field label="Date of Birth" value={dob} onChange={setDob} type="date" />
       <Field label="Phone Number" value={phone} onChange={setPhone} type="tel" placeholder="Enter phone number" />
+      <Field label="Parent Name" value={parentsname} onChange={setParentsname} placeholder="Enter parent name" />
+      <Field label="Parent Number" value={parentsnumber} onChange={setParentsnumber} type="tel" placeholder="Enter parent phone number" />
       <Field label="About">
         <textarea value={about} onChange={(e) => setAbout(e.target.value)}
           placeholder="Tell us about yourself" rows={4}
@@ -171,32 +178,188 @@ function AddressInner({ user, showToast }: { user: Props["user"]; showToast: (m:
     }
   }
 
-  function AddressSection({ title, data, setData }: { title: string; data: typeof perm; setData: (d: typeof perm) => void }) {
-    return (
-      <div className="border border-gray-200 rounded-xl p-5 space-y-4">
-        <h3 className="text-[15px] font-semibold text-[#111]">{title}</h3>
-        <Field label="Street Address" value={data.street} onChange={(v) => setData({ ...data, street: v })} />
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="City" value={data.city} onChange={(v) => setData({ ...data, city: v })} />
-          <Field label="State" value={data.state} onChange={(v) => setData({ ...data, state: v })} />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Pincode" value={data.pincode} onChange={(v) => setData({ ...data, pincode: v })} />
-          <Field label="Country" value={data.country} onChange={(v) => setData({ ...data, country: v })} />
-        </div>
-        <button onClick={() => saveSection(data, title)} disabled={saving}
-          className="px-6 py-2 bg-gray-400 text-white text-[13px] font-medium rounded-lg hover:bg-gray-500 transition-all disabled:opacity-50">
-          Update Now
-        </button>
+  return (
+    <div className="space-y-6">
+      <AddressSection title="Add Permanent address" data={perm} setData={setPerm} onSave={() => saveSection(perm, "Permanent address")} saving={saving} />
+      <AddressSection title="Add Present Address" data={pres} setData={setPres} onSave={() => saveSection(pres, "Present address")} saving={saving} />
+    </div>
+  );
+}
+
+function AddressSection({ title, data, setData, onSave, saving }: {
+  title: string;
+  data: { street: string; city: string; state: string; pincode: string; country: string };
+  setData: (d: { street: string; city: string; state: string; pincode: string; country: string }) => void;
+  onSave: () => void;
+  saving: boolean;
+}) {
+  return (
+    <div className="border border-gray-200 rounded-xl p-5 space-y-4">
+      <h3 className="text-[15px] font-semibold text-[#111]">{title}</h3>
+      <Field label="Street Address" value={data.street} onChange={(v) => setData({ ...data, street: v })} />
+      <div className="grid grid-cols-2 gap-4">
+        <Field label="City" value={data.city} onChange={(v) => setData({ ...data, city: v })} />
+        <Field label="State" value={data.state} onChange={(v) => setData({ ...data, state: v })} />
       </div>
-    );
+      <div className="grid grid-cols-2 gap-4">
+        <Field label="Pincode" value={data.pincode} onChange={(v) => setData({ ...data, pincode: v })} />
+        <Field label="Country" value={data.country} onChange={(v) => setData({ ...data, country: v })} />
+      </div>
+      <button onClick={onSave} disabled={saving}
+        className="px-6 py-2 bg-gray-400 text-white text-[13px] font-medium rounded-lg hover:bg-gray-500 transition-all disabled:opacity-50">
+        Update Now
+      </button>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ACADEMIC DETAILS INNER TAB
+// ══════════════════════════════════════════════════════════════════════════════
+const BOARDS = ["CBSE", "ICSE", "State Board", "IB", "IGCSE", "NIOS", "Other"];
+const STREAMS_12 = ["Science (PCM)", "Science (PCB)", "Commerce", "Arts", "Vocational", "Other"];
+const YEAR_OPTIONS = Array.from({ length: 30 }, (_, i) => String(new Date().getFullYear() - i));
+
+const aCls = "w-full border border-gray-200 rounded-lg px-4 py-2.5 text-[14px] text-[#111] bg-white outline-none focus:border-[#e31e24]/40 focus:ring-2 focus:ring-[#e31e24]/10 transition-all";
+
+function AField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider">{label}</label>
+      <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder ?? `Enter ${label.toLowerCase()}`} className={aCls} />
+    </div>
+  );
+}
+
+function ASelect({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: string[] }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider">{label}</label>
+      <select value={value} onChange={e => onChange(e.target.value)} className={`${aCls} appearance-none`}>
+        <option value="">Select {label}</option>
+        {options.map(o => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </div>
+  );
+}
+
+interface Marks {
+  class10_board: string; class10_school: string; class10_year: string;
+  class10_percent: string; class10_total: string; class10_obtained: string;
+  class12_board: string; class12_school: string; class12_year: string;
+  class12_percent: string; class12_total: string; class12_obtained: string; class12_stream: string;
+  grad_university: string; grad_college: string; grad_program: string;
+  grad_year: string; grad_percent: string; grad_cgpa: string;
+}
+const EMPTY_MARKS: Marks = {
+  class10_board: "", class10_school: "", class10_year: "", class10_percent: "", class10_total: "", class10_obtained: "",
+  class12_board: "", class12_school: "", class12_year: "", class12_percent: "", class12_total: "", class12_obtained: "", class12_stream: "",
+  grad_university: "", grad_college: "", grad_program: "", grad_year: "", grad_percent: "", grad_cgpa: "",
+};
+
+function AcademicInner({ user, showToast }: { user: Props["user"]; showToast: (m: string) => void }) {
+  const [marks, setMarks] = useState<Marks>({ ...EMPTY_MARKS });
+  const [saving, setSaving] = useState<"class10" | "class12" | "grad" | false>(false);
+
+  const load = useCallback(async () => {
+    if (!user?.id) return;
+    const res = await fetch(`/api/student/${user.id}/marks`);
+    const d = await res.json();
+    setMarks({ ...EMPTY_MARKS, ...(d.marks ?? {}) });
+  }, [user?.id]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const upd = (k: keyof Marks, v: string) => setMarks(p => ({ ...p, [k]: v }));
+  const f = (k: keyof Marks) => ({ value: marks[k], onChange: (v: string) => upd(k, v) });
+
+  async function handleSaveSection(section: "class10" | "class12" | "grad") {
+    setSaving(section);
+    const sectionFields: Record<string, (keyof Marks)[]> = {
+      class10: ["class10_board","class10_school","class10_year","class10_percent","class10_total","class10_obtained"],
+      class12: ["class12_board","class12_school","class12_year","class12_percent","class12_total","class12_obtained","class12_stream"],
+      grad:    ["grad_university","grad_college","grad_program","grad_year","grad_percent","grad_cgpa"],
+    };
+    const payload: Partial<Marks> = {};
+    for (const key of sectionFields[section]) payload[key] = marks[key];
+    try {
+      const res = await fetch(`/api/student/${user?.id}/marks`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) showToast(`${section === "class10" ? "Class 10" : section === "class12" ? "Class 12" : "Graduation"} details saved!`);
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
-    <div className="space-y-6">
-      <AddressSection title="Add Permanent address" data={perm} setData={setPerm} />
-      <AddressSection title="Add Present Address" data={pres} setData={setPres} />
-    </div>
+    <form onSubmit={e => e.preventDefault()} className="space-y-6">
+      {/* Class 10 */}
+      <div className="border border-gray-200 rounded-xl p-5 space-y-4">
+        <h3 className="text-[15px] font-semibold text-[#111] flex items-center gap-2">
+          <span className="material-symbols-outlined text-[#e31e24] text-[18px]">school</span> Class 10th Details
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <ASelect label="Board" {...f("class10_board")} options={BOARDS} />
+          <AField  label="School Name" {...f("class10_school")} />
+          <ASelect label="Passing Year" {...f("class10_year")} options={YEAR_OPTIONS} />
+          <AField  label="Percentage %" {...f("class10_percent")} placeholder="e.g. 85.5" />
+          <AField  label="Total Marks" {...f("class10_total")} placeholder="e.g. 500" />
+          <AField  label="Marks Obtained" {...f("class10_obtained")} placeholder="e.g. 425" />
+        </div>
+        <div className="flex justify-end pt-2">
+          <button type="button" disabled={saving} onClick={() => handleSaveSection("class10")}
+            className="px-6 py-2 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all disabled:opacity-50">
+            {saving === "class10" ? "Saving..." : "Save Class 10"}
+          </button>
+        </div>
+      </div>
+
+      {/* Class 12 */}
+      <div className="border border-gray-200 rounded-xl p-5 space-y-4">
+        <h3 className="text-[15px] font-semibold text-[#111] flex items-center gap-2">
+          <span className="material-symbols-outlined text-[#111] text-[18px]">workspace_premium</span> Class 12th Details
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <ASelect label="Board" {...f("class12_board")} options={BOARDS} />
+          <AField  label="School Name" {...f("class12_school")} />
+          <ASelect label="Passing Year" {...f("class12_year")} options={YEAR_OPTIONS} />
+          <ASelect label="Stream" {...f("class12_stream")} options={STREAMS_12} />
+          <AField  label="Percentage %" {...f("class12_percent")} placeholder="e.g. 90.0" />
+          <AField  label="Total Marks" {...f("class12_total")} placeholder="e.g. 500" />
+          <AField  label="Marks Obtained" {...f("class12_obtained")} placeholder="e.g. 450" />
+        </div>
+        <div className="flex justify-end pt-2">
+          <button type="button" disabled={saving} onClick={() => handleSaveSection("class12")}
+            className="px-6 py-2 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all disabled:opacity-50">
+            {saving === "class12" ? "Saving..." : "Save Class 12"}
+          </button>
+        </div>
+      </div>
+
+      {/* Graduation */}
+      <div className="border border-gray-200 rounded-xl p-5 space-y-4">
+        <h3 className="text-[15px] font-semibold text-[#111] flex items-center gap-2">
+          <span className="material-symbols-outlined text-blue-500 text-[18px]">account_balance</span> Graduation Details
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <AField  label="University" {...f("grad_university")} />
+          <AField  label="College" {...f("grad_college")} />
+          <AField  label="Program" {...f("grad_program")} placeholder="e.g. B.Tech CSE" />
+          <ASelect label="Pass Year" {...f("grad_year")} options={YEAR_OPTIONS} />
+          <AField  label="Percentage %" {...f("grad_percent")} placeholder="e.g. 75.0" />
+          <AField  label="CGPA" {...f("grad_cgpa")} placeholder="e.g. 8.5" />
+        </div>
+        <div className="flex justify-end pt-2">
+          <button type="button" disabled={saving} onClick={() => handleSaveSection("grad")}
+            className="px-6 py-2 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all disabled:opacity-50">
+            {saving === "grad" ? "Saving..." : "Save Graduation"}
+          </button>
+        </div>
+      </div>
+    </form>
   );
 }
 
@@ -325,42 +488,70 @@ function CertificatesInner({ user, showToast }: { user: Props["user"]; showToast
 // ══════════════════════════════════════════════════════════════════════════════
 // PROJECTS INNER TAB
 // ══════════════════════════════════════════════════════════════════════════════
-function ProjectsInner({ showToast }: { showToast: (m: string) => void }) {
-  const [desc, setDesc]   = useState("");
-  const [saved, setSaved] = useState("");
+function ProjectsInner({ user, showToast }: { user: Props["user"]; showToast: (m: string) => void }) {
+  const [title, setTitle] = useState("");
+  const [desc, setDesc] = useState("");
+  const [saving, setSaving] = useState(false);
   const MAX = 1000;
 
-  function handleSubmit() {
-    setSaved(desc);
-    showToast("Project saved!");
+  const load = useCallback(async () => {
+    if (!user?.id) return;
+    const res = await fetch(`/api/student/${user.id}/profile`);
+    const d = await res.json();
+    setTitle(d.project_title ?? "");
+    setDesc(d.projects ?? "");
+  }, [user?.id]);
+
+  useEffect(() => { load(); }, [load]);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/student/${user?.id}/profile`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project_title: title, projects: desc }),
+      });
+      if (res.ok) showToast("Project saved!");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
-    <div className="space-y-5">
-      {/* Current saved */}
-      <div className="border border-gray-200 rounded-xl p-5">
-        <h3 className="text-[15px] font-semibold text-[#111] mb-2">Project Description</h3>
-        <p className="text-[14px] text-gray-500">{saved || "Not updated yet"}</p>
-      </div>
-
-      {/* Update form */}
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Form */}
       <div className="border border-gray-200 rounded-xl p-5 space-y-4">
-        <h3 className="text-[15px] font-semibold text-[#111]">Update small description about your project&apos;s</h3>
-        <Field label="Description">
-          <textarea value={desc} onChange={(e) => setDesc(e.target.value.slice(0, MAX))}
-            placeholder="Enter project description here" rows={8}
-            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-[14px] text-[#111] bg-white outline-none focus:border-[#e31e24]/40 resize-vertical" />
-        </Field>
-        <p className="text-[12px] text-gray-400">( Maximum character limit {MAX} )</p>
+        <h3 className="text-[15px] font-semibold text-[#111]">Update your project details</h3>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider">Project Title</label>
+          <input
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            placeholder="Enter project title here"
+            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-[14px] text-[#111] bg-white outline-none focus:border-[#e31e24]/40 focus:ring-2 focus:ring-[#e31e24]/10 transition-all"
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider">Description</label>
+          <textarea
+            value={desc}
+            onChange={e => setDesc(e.target.value.slice(0, MAX))}
+            placeholder="Enter project description here"
+            rows={8}
+            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-[14px] text-[#111] bg-white outline-none focus:border-[#e31e24]/40 resize-vertical"
+          />
+        </div>
         <p className="text-[12px] text-gray-400">{MAX - desc.length} characters left</p>
         <div className="text-center">
-          <button onClick={handleSubmit}
-            className="px-10 py-2.5 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all">
-            Submit
+          <button type="submit" disabled={saving}
+            className="px-10 py-2.5 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all disabled:opacity-50">
+            {saving ? "Saving..." : "Submit"}
           </button>
         </div>
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -379,29 +570,40 @@ function SettingsInner({ user, showToast }: { user: Props["user"]; showToast: (m
   const [confirmPw, setConfirmPw]   = useState("");
   const [saving, setSaving]         = useState(false);
 
-  useEffect(() => {
-    if (!user?.name) return;
-    const parts = user.name.split(" ");
+  const load = useCallback(async () => {
+    if (!user?.id) return;
+    const res = await fetch(`/api/student/${user.id}/profile`);
+    const d = await res.json();
+    const parts = (d.name || user?.name || "").trim().split(" ");
     setFirstName(parts[0] ?? "");
-    setLastName(parts[parts.length - 1] ?? "");
-  }, [user?.name]);
+    setMiddleName(parts.length > 2 ? parts.slice(1, -1).join(" ") : "");
+    setLastName(parts.length > 1 ? parts[parts.length - 1] : "");
+    setPhone(d.phone ?? "");
+  }, [user?.id, user?.name]);
+
+  useEffect(() => { load(); }, [load]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (showPw && newPw !== confirmPw) { showToast("Passwords don't match"); return; }
     setSaving(true);
     try {
+      const fullName = [firstName, middleName, lastName].filter(Boolean).join(" ");
+      await fetch(`/api/student/${user?.id}/profile`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: fullName, phone }),
+      });
       if (showPw && newPw) {
         const res = await fetch(`/api/student/${user?.id}/settings`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "change_password", currentPassword: currentPw, newPassword: newPw }),
         });
-        if (res.ok) { showToast("Settings saved!"); setCurrentPw(""); setNewPw(""); setConfirmPw(""); }
-        else showToast("Password update failed");
-      } else {
-        showToast("Settings saved!");
+        if (res.ok) { setCurrentPw(""); setNewPw(""); setConfirmPw(""); }
+        else { showToast("Password update failed"); setSaving(false); return; }
       }
+      showToast("Settings saved!");
     } finally {
       setSaving(false);
     }
@@ -413,7 +615,7 @@ function SettingsInner({ user, showToast }: { user: Props["user"]; showToast: (m
         <Field label="First Name" value={firstName} onChange={setFirstName} placeholder="Enter your first name" />
         <Field label="Middle Name" value={middleName} onChange={setMiddleName} placeholder="Enter your middle name" />
         <Field label="Last Name" value={lastName} onChange={setLastName} placeholder="Enter your last name" />
-        <Field label="Email Address" value={email} disabled />
+        <Field label="Email Address" value={user?.email ?? ""} disabled />
         <Field label="Register Contact Number" value={phone} onChange={setPhone} type="tel" placeholder="xxxx-xxx-xxx" />
 
         <button type="button" onClick={() => setShowPw(!showPw)}
@@ -519,8 +721,9 @@ export default function ProfileTab({ user }: Props) {
         <div className="p-6">
           {activeTab === "profile"      && <ProfileInner      user={user} showToast={showToast} />}
           {activeTab === "address"      && <AddressInner      user={user} showToast={showToast} />}
+          {activeTab === "academic"     && <AcademicInner     user={user} showToast={showToast} />}
           {activeTab === "certificates" && <CertificatesInner user={user} showToast={showToast} />}
-          {activeTab === "projects"     && <ProjectsInner     showToast={showToast} />}
+          {activeTab === "projects"     && <ProjectsInner     user={user} showToast={showToast} />}
           {activeTab === "settings"     && <SettingsInner     user={user} showToast={showToast} />}
         </div>
       </div>

@@ -46,19 +46,27 @@ export default async function AddressListPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE a.name LIKE ? OR a.address1 LIKE ? OR a.postalcode LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
-
-  const data = await safeQuery<AddressRow>(
-    `SELECT a.id, a.name, a.address1, a.postalcode, ci.name as cityName, s.name as stateName
-     FROM address a
-     LEFT JOIN city ci ON ci.id = a.city_id
-     LEFT JOIN state s ON s.id = ci.state_id
-     ${where}
-     ORDER BY a.id DESC
-     LIMIT 100`,
-    params
-  );
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { $or: [{ name: { $regex: q, $options: "i" } }, { address1: { $regex: q, $options: "i" } }, { postalcode: { $regex: q, $options: "i" } }] } : {};
+  const docs = await db.collection("address").find(filter).sort({ id: -1 }).limit(100).toArray();
+  const cityIds = [...new Set(docs.map((d: any) => Number(d.city_id)).filter(Boolean))];
+  const cityDocs = cityIds.length ? await db.collection("city").find({ id: { $in: cityIds } }, { projection: { id: 1, name: 1, state_id: 1 } }).toArray() : [];
+  const stateIds = [...new Set(cityDocs.map((d: any) => Number(d.state_id)).filter(Boolean))];
+  const stateDocs = stateIds.length ? await db.collection("state").find({ id: { $in: stateIds } }, { projection: { id: 1, name: 1 } }).toArray() : [];
+  const cityMap = new Map(cityDocs.map((d: any) => [Number(d.id), { name: String(d.name ?? "").trim(), state_id: Number(d.state_id) }]));
+  const stateMap = new Map(stateDocs.map((d: any) => [Number(d.id), String(d.name ?? "").trim()]));
+  const data: AddressRow[] = docs.map((d: any) => {
+    const city = cityMap.get(Number(d.city_id));
+    return {
+      id: Number(d.id ?? 0),
+      name: d.name ? String(d.name).trim() : null,
+      address1: d.address1 ? String(d.address1).trim() : null,
+      postalcode: d.postalcode ? String(d.postalcode).trim() : null,
+      cityName: city?.name || null,
+      stateName: city ? (stateMap.get(city.state_id) || null) : null,
+    };
+  });
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">

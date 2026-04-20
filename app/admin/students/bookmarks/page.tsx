@@ -135,11 +135,6 @@ export default async function StudentBookmarksPage({
   const conditions: string[] = [];
   const params: (string | number)[] = [];
 
-  if (q) {
-    conditions.push("(s.name LIKE ? OR s.email LIKE ? OR b.title LIKE ? OR b.url LIKE ?)");
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
-  }
-
   if (studentId) {
     conditions.push("b.student_id = ?");
     params.push(studentId);
@@ -148,6 +143,11 @@ export default async function StudentBookmarksPage({
   if (typeId) {
     conditions.push("b.bookmarktypeinfo_id = ?");
     params.push(typeId);
+  }
+
+  if (q) {
+    conditions.push("(b.title LIKE ? OR b.url LIKE ?)");
+    params.push(`%${q}%`, `%${q}%`);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -171,14 +171,54 @@ export default async function StudentBookmarksPage({
 
   // Fetch user names from MongoDB users collection
   const db = await getDb();
-  const studentIds = [...new Set(bookmarks.map((b: any) => Number(b.student_id)).filter(Boolean))];
-  const userRows = studentIds.length > 0
-    ? await db.collection("users").find({ id: { $in: studentIds } }, { projection: { id: 1, firstname: 1, email: 1 } }).toArray()
-    : [];
+  const bookmarkStudentIds = [...new Set(bookmarks.map((b: any) => Number(b.student_id)).filter(Boolean))];
+
+  // If searching by name/email in q, also search MongoDB for matching users
+  let mongoUserFilter: Record<string, unknown> = {};
+  if (q) {
+    mongoUserFilter = { $or: [
+      { firstname: { $regex: q, $options: "i" } },
+      { email: { $regex: q, $options: "i" } },
+    ]};
+  }
+
+  const [userRows, matchedUserRows] = await Promise.all([
+    bookmarkStudentIds.length > 0
+      ? db.collection("users").find({ id: { $in: bookmarkStudentIds } }, { projection: { id: 1, firstname: 1, email: 1 } }).toArray()
+      : Promise.resolve([]),
+    q
+      ? db.collection("users").find(mongoUserFilter, { projection: { id: 1, firstname: 1, email: 1 } }).limit(200).toArray()
+      : Promise.resolve([]),
+  ]);
+
   const userMap = new Map(userRows.map((u: any) => [Number(u.id), u]));
 
-  // Enrich bookmarks with student names — serialize fully to avoid RowDataPacket toJSON error
-  const enrichedBookmarks = bookmarks.map((b: any) => ({
+  // If q matches student names/emails, fetch their bookmarks too and merge
+  let extraBookmarks: any[] = [];
+  if (q && matchedUserRows.length > 0) {
+    const matchedIds = matchedUserRows.map((u: any) => Number(u.id)).filter((id: number) => !bookmarkStudentIds.includes(id));
+    if (matchedIds.length > 0) {
+      const extraConditions = ["b.student_id IN (" + matchedIds.map(() => "?").join(",") + ")"];
+      if (typeId) { extraConditions.push("b.bookmarktypeinfo_id = ?"); }
+      const extraWhere = `WHERE ${extraConditions.join(" AND ")}`;
+      const extraParams: (string | number)[] = [...matchedIds, ...(typeId ? [typeId] : [])];
+      extraBookmarks = await safeQuery<BookmarkRow>(
+        `SELECT b.*, bt.name as type_name
+         FROM bookmarks b
+         LEFT JOIN bookmarktypeinfos bt ON b.bookmarktypeinfo_id = bt.id
+         ${extraWhere}
+         ORDER BY b.created_at DESC
+         LIMIT ?`,
+        [...extraParams, FETCH_SIZE]
+      );
+      matchedUserRows.forEach((u: any) => userMap.set(Number(u.id), u));
+    }
+  }
+
+  const allBookmarks = [...bookmarks, ...extraBookmarks];
+
+  // Enrich bookmarks with student names
+  const enrichedBookmarks = allBookmarks.map((b: any) => ({
     id:                  Number(b.id),
     student_id:          Number(b.student_id),
     college_id:          Number(b.college_id  ?? 0),
@@ -193,10 +233,14 @@ export default async function StudentBookmarksPage({
     student_email:       userMap.get(Number(b.student_id))?.email?.trim()     || "-",
   }));
 
-  // Users list for filter dropdown
-  const users = userRows.map((u: any) => ({ id: u.id, name: (u.firstname || "").trim(), email: (u.email || "").trim() }));
+  // Users list for filter dropdown — fetch all users who have bookmarks
+  const allUserIds = [...new Set(allBookmarks.map((b: any) => Number(b.student_id)).filter(Boolean))];
+  const allUserRows = allUserIds.length > 0
+    ? await db.collection("users").find({ id: { $in: allUserIds } }, { projection: { id: 1, firstname: 1, email: 1 } }).toArray()
+    : [];
+  const users = allUserRows.map((u: any) => ({ id: Number(u.id), name: (u.firstname || "").trim(), email: (u.email || "").trim() }));
 
-  const total = Number(countRows[0]?.total ?? 0);
+  const total = Number(countRows[0]?.total ?? 0) + extraBookmarks.length;
   const totalPages = Math.ceil(total / FETCH_SIZE);
 
   return (

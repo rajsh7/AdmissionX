@@ -44,17 +44,16 @@ export default async function AppModePage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE name LIKE ? OR slug LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`] : [];
-
-  const data = await safeQuery<ModeRow>(
-    `SELECT id, name, slug, status
-     FROM application_modes
-     ${where}
-     ORDER BY id DESC
-     LIMIT 100`,
-    params
-  );
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { $or: [{ name: { $regex: q, $options: "i" } }, { slug: { $regex: q, $options: "i" } }] } : {};
+  const docs = await db.collection("application_modes").find(filter).sort({ id: -1 }).limit(100).toArray();
+  const data: ModeRow[] = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    name: String(d.name ?? "").trim(),
+    slug: d.slug ? String(d.slug).trim() : null,
+    status: Number(String(d.status ?? "0").trim()),
+  }));
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">

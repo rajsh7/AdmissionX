@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PaginationFixed from "@/app/components/PaginationFixed";
 
 export interface SeoRow {
@@ -70,12 +70,10 @@ export default function SeoClient({
 }: SeoClientProps) {
   const [visibleCount, setVisibleCount] = useState(STEP);
 
-  const listKey = rows[0]?.id || rows[0]?.slugurl || "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) {
-    setLastKey(listKey);
+  // Reset when data changes (new search or page)
+  useEffect(() => {
     setVisibleCount(STEP);
-  }
+  }, [rows[0]?.id]);
 
   const showMore = visibleCount < rows.length;
   const showPagination = !showMore && totalPages > 1;
@@ -118,7 +116,7 @@ export default function SeoClient({
                   const hasTitle = !!(row.pagetitle?.trim());
                   return (
                     <tr
-                      key={row.slugurl || row.id || idx}
+                      key={row.id}
                       className="hover:bg-slate-50/60 transition-colors group"
                     >
                       {/* # */}

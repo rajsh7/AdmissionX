@@ -43,18 +43,18 @@ export default async function ExamSectionPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE es.name LIKE ? OR fa.name LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`] : [];
-
-  const data = await safeQuery<SectionRow>(
-    `SELECT es.id, es.name, fa.name as functionalArea
-     FROM exam_sections es
-     LEFT JOIN functionalarea fa ON fa.id = es.functionalarea_id
-     ${where}
-     ORDER BY es.id DESC
-     LIMIT 100`,
-    params
-  );
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { name: { $regex: q, $options: "i" } } : {};
+  const docs = await db.collection("exam_sections").find(filter).sort({ id: -1 }).limit(100).toArray();
+  const faIds = [...new Set(docs.map((d: any) => Number(d.functionalarea_id)).filter(Boolean))];
+  const faDocs = faIds.length ? await db.collection("functionalarea").find({ id: { $in: faIds } }, { projection: { id: 1, name: 1 } }).toArray() : [];
+  const faMap = new Map(faDocs.map((d: any) => [Number(d.id), String(d.name ?? "").trim()]));
+  const data: SectionRow[] = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    name: String(d.name ?? "").trim(),
+    functionalArea: faMap.get(Number(d.functionalarea_id)) || null,
+  }));
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">

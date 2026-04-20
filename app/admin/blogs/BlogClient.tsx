@@ -1,7 +1,7 @@
 "use client";
 // Forced HMR trigger for hydration fix
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminModal from "@/app/admin/_components/AdminModal";
 import BlogForm from "./BlogForm";
 import DeleteButton from "../_components/DeleteButton";
@@ -41,12 +41,10 @@ export default function BlogClient({
   const [visibleCount, setVisibleCount] = useState(STEP);
 
   // Reset when page changes (blogs change)
-  const listKey = blogs[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) {
-    setLastKey(listKey);
+  // Reset when blogs change
+  useEffect(() => {
     setVisibleCount(STEP);
-  }
+  }, [blogs[0]?.id]);
 
   const showMore = visibleCount < blogs.length;
   const showPagination = !showMore && totalPages > 1;
@@ -119,7 +117,7 @@ export default function BlogClient({
                   <td className="px-5 py-3.5 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
                   <td className="px-3 py-3.5">
                     <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 shadow-inner shrink-0 relative">
-                      {blog.featimage ? (
+                      {blog.featimage && blog.featimage.trim() ? (
                         <img 
                           src={
                             blog.featimage.startsWith('/') 
@@ -129,11 +127,19 @@ export default function BlogClient({
                                 : `/api/image-proxy?url=${encodeURIComponent(`https://admin.admissionx.in/uploads/${blog.featimage}`)}`
                           } 
                           alt="" 
-                          className="w-full h-full object-cover" 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              e.currentTarget.remove();
+                              parent.className = "w-full h-full flex items-center justify-center bg-violet-100 text-violet-600 font-black text-sm";
+                              parent.textContent = (blog.topic || "?").charAt(0).toUpperCase();
+                            }
+                          }}
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-slate-300">
-                          <span className="material-symbols-rounded text-base">image</span>
+                        <div className="w-full h-full flex items-center justify-center bg-violet-100 text-violet-600 font-black text-sm">
+                          {(blog.topic || "?").charAt(0).toUpperCase()}
                         </div>
                       )}
                     </div>
