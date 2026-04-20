@@ -103,21 +103,26 @@ export default async function CareerStreamsPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE c.title LIKE ? OR c.slug LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`] : [];
-
-  const [careerStreams, streams] = await Promise.all([
-    safeQuery<CareerStreamRow>(
-      `SELECT c.*, f.name as stream_name
-       FROM counseling_career_details c
-       LEFT JOIN functionalarea f ON f.id = c.functionalarea_id
-       ${where}
-       ORDER BY c.id DESC
-       LIMIT 200`,
-      params
-    ),
-    safeQuery<StreamOption>("SELECT id, name FROM functionalarea ORDER BY name ASC"),
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { $or: [{ title: { $regex: q, $options: "i" } }, { slug: { $regex: q, $options: "i" } }] } : {};
+  const [streamDocs, faDocs] = await Promise.all([
+    db.collection("counseling_career_details").find(filter).sort({ id: -1 }).limit(200).toArray(),
+    db.collection("functionalarea").find({}, { projection: { id: 1, name: 1 } }).sort({ name: 1 }).toArray(),
   ]);
+  const faMap = new Map(faDocs.map((d: any) => [Number(d.id), String(d.name ?? "").trim()]));
+  const careerStreams: CareerStreamRow[] = streamDocs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    title: String(d.title ?? "").trim(),
+    slug: d.slug ? String(d.slug).trim() : null,
+    status: Number(String(d.status ?? "0").trim()),
+    descrition: d.descrition ? String(d.descrition).trim() : null,
+    functionalarea_id: Number(d.functionalarea_id ?? 0),
+    stream_name: faMap.get(Number(d.functionalarea_id)) || "",
+    created_at: String(d.created_at ?? "").trim(),
+    updated_at: String(d.updated_at ?? "").trim(),
+  }));
+  const streams: StreamOption[] = faDocs.map((d: any) => ({ id: Number(d.id ?? 0), name: String(d.name ?? "").trim() }));
 
   const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 

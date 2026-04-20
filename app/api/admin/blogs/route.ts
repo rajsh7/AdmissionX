@@ -43,6 +43,16 @@ export async function PUT(req: NextRequest) {
     const existing = formData.get("bannerimage_existing") as string | null;
 
     let featimage: string | null = existing || null;
+    if (featimage && featimage.startsWith("/api/image-proxy?url=")) {
+      // Decode the URL and optionally clean the legacy domain off so only the true filename remains
+      const decoded = decodeURIComponent(featimage.split("url=")[1]);
+      if (decoded.startsWith("https://admin.admissionx.in/uploads/")) {
+        featimage = decoded.replace("https://admin.admissionx.in/uploads/", "");
+      } else {
+        featimage = decoded;
+      }
+    }
+    
     if (imageFile && imageFile.size > 0) {
       featimage = await saveUpload(imageFile, "blogs", "blog");
     }

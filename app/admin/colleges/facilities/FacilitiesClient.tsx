@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import AdminModal from "@/app/admin/_components/AdminModal";
 import FacilityForm from "./FacilityForm";
@@ -45,9 +45,10 @@ export default function FacilitiesClient({
   const [showFilter, setShowFilter] = useState(Boolean(q || collegeId || facilityTypeId || displayName || description));
   const [visibleCount, setVisibleCount] = useState(15);
 
-  const listKey = facilitiesList[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(15); }
+  // Reset visibleCount when facilitiesList changes
+  useEffect(() => {
+    setVisibleCount(15);
+  }, [facilitiesList[0]?.id]);
 
   const showMore = visibleCount < facilitiesList.length;
   const showPagination = !showMore && totalPages > 1;

@@ -1,18 +1,26 @@
 "use client";
 // Forced HMR trigger for hydration fix
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminModal from "@/app/admin/_components/AdminModal";
 import BlogForm from "./BlogForm";
 import DeleteButton from "../_components/DeleteButton";
 import Link from "next/link";
+import PaginationFixed from "@/app/components/PaginationFixed";
 
 interface BlogClientProps {
   blogs: any[];
   onDelete: (id: number) => Promise<void>;
   onToggle: (formData: FormData) => Promise<void>;
   offset: number;
+  total: number;
+  page: number;
+  totalPages: number;
+  pageSize: number;
+  q: string;
 }
+
+const STEP = 25;
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
@@ -20,10 +28,29 @@ export default function BlogClient({
   blogs,
   onDelete,
   onToggle,
-  offset
+  offset,
+  total,
+  page,
+  totalPages,
+  pageSize,
+  q
 }: BlogClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBlog, setEditingBlog] = useState<any>(null);
+  
+  const [visibleCount, setVisibleCount] = useState(STEP);
+
+  // Reset when page changes (blogs change)
+  // Reset when blogs change
+  useEffect(() => {
+    setVisibleCount(STEP);
+  }, [blogs[0]?.id]);
+
+  const showMore = visibleCount < blogs.length;
+  const showPagination = !showMore && totalPages > 1;
+
+  const start = total > 0 ? offset + 1 : 0;
+  const end   = total > 0 ? Math.min(offset + pageSize, total) : 0;
 
   const handleEdit = (blog: any) => {
     setEditingBlog(blog);
@@ -85,16 +112,34 @@ export default function BlogClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {blogs.map((blog, idx) => (
+              {blogs.slice(0, visibleCount).map((blog, idx) => (
                 <tr key={blog.id} className="hover:bg-violet-50/30 transition-colors group">
                   <td className="px-5 py-3.5 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
                   <td className="px-3 py-3.5">
-                    <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden border border-slate-200">
-                      {blog.featimage ? (
-                        <img src={blog.featimage} alt="" className="w-full h-full object-cover" />
+                    <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 shadow-inner shrink-0 relative">
+                      {blog.featimage && blog.featimage.trim() ? (
+                        <img 
+                          src={
+                            blog.featimage.startsWith('/') 
+                              ? `/api/image-proxy?url=${encodeURIComponent(blog.featimage)}`
+                              : blog.featimage.startsWith('http')
+                                ? `/api/image-proxy?url=${encodeURIComponent(blog.featimage)}`
+                                : `/api/image-proxy?url=${encodeURIComponent(`https://admin.admissionx.in/uploads/${blog.featimage}`)}`
+                          } 
+                          alt="" 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              e.currentTarget.remove();
+                              parent.className = "w-full h-full flex items-center justify-center bg-violet-100 text-violet-600 font-black text-sm";
+                              parent.textContent = (blog.topic || "?").charAt(0).toUpperCase();
+                            }
+                          }}
+                        />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-slate-300">
-                          <span className="material-symbols-rounded text-base">image</span>
+                        <div className="w-full h-full flex items-center justify-center bg-violet-100 text-violet-600 font-black text-sm">
+                          {(blog.topic || "?").charAt(0).toUpperCase()}
                         </div>
                       )}
                     </div>
@@ -140,6 +185,32 @@ export default function BlogClient({
           </table>
         </div>
       </div>
+
+      {/* Show More */}
+      {showMore && (
+        <div className="mt-6 mb-8 flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setVisibleCount((c) => Math.min(c + STEP, blogs.length))}
+            className="group flex flex-col items-center gap-1 text-slate-400 hover:text-violet-600 transition-colors"
+          >
+            <span className="text-xs font-bold uppercase tracking-widest">Show More</span>
+            <span className="material-symbols-outlined text-[36px] group-hover:text-violet-600 animate-bounce">
+              keyboard_arrow_down
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Pagination — shown only after all blogs are visible */}
+      {showPagination && (
+        <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between bg-slate-50/50 mt-6 rounded-b-2xl">
+          <p className="text-sm text-slate-500 font-medium">
+            Showing <strong>{start}</strong>–<strong>{end}</strong> of <strong>{total.toLocaleString()}</strong> blogs
+          </p>
+          <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
+        </div>
+      )}
 
       {/* CRUD Modal */}
       <AdminModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingBlog ? "Update Blog Post" : "Create New Post"}>

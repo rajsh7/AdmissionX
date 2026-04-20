@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
@@ -46,9 +46,10 @@ export default function ReviewsListClient({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const listKey = reviews[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(15); }
+  // Reset visibleCount when reviews change
+  useEffect(() => {
+    setVisibleCount(15);
+  }, [reviews[0]?.id]);
 
   const showMore = visibleCount < reviews.length;
   const showPagination = !showMore && totalPages > 1;

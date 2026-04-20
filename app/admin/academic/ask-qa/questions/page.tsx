@@ -90,17 +90,22 @@ export default async function AskQaPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE question LIKE ? OR slug LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`] : [];
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
 
-  const questions = await safeQuery<QuestionRow>(
-    `SELECT id, question, questionDate, status, slug
-     FROM ask_questions
-     ${where}
-     ORDER BY id DESC
-     LIMIT 200`,
-    params
-  );
+  const filter = q
+    ? { $or: [{ question: { $regex: q, $options: "i" } }, { slug: { $regex: q, $options: "i" } }] }
+    : {};
+
+  const docs = await db.collection("ask_questions").find(filter).sort({ id: -1 }).limit(200).toArray();
+
+  const questions: QuestionRow[] = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    question: String(d.question ?? "").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim(),
+    questionDate: d.questionDate ? String(d.questionDate).trim() : null,
+    status: Number(String(d.status ?? "0").trim()),
+    slug: d.slug ? String(d.slug).trim() : null,
+  })).filter(r => r.question);
 
   const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 

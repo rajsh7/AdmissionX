@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import ContactActions from "./ContactActions";
@@ -40,12 +40,9 @@ export default function ContactListClient({
   const [visibleCount, setVisibleCount] = useState(STEP);
 
   // Reset when page changes (rows change)
-  const listKey = rows[0]?._id ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) {
-    setLastKey(listKey);
+  useEffect(() => {
     setVisibleCount(STEP);
-  }
+  }, [rows[0]?._id]);
 
   const showMore = visibleCount < rows.length;
   const showPagination = !showMore && totalPages > 1;

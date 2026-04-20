@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import PaginationFixed from "@/app/components/PaginationFixed";
 
@@ -58,9 +58,10 @@ function formatDate(d: string | null | undefined): string {
 export default function ApplicationsListClient({ initialRows, offset, page, totalPages, total, pageSize }: ApplicationsListClientProps) {
   const [visibleCount, setVisibleCount] = useState(STEP);
 
-  const listKey = initialRows[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(STEP); }
+  // Reset visibleCount when applications change
+  useEffect(() => {
+    setVisibleCount(STEP);
+  }, [initialRows[0]?.id]);
 
   const showMore = visibleCount < initialRows.length;
   const showPagination = !showMore && totalPages > 1;

@@ -6,6 +6,7 @@ import Link from "next/link";
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Props {
   user: { id: string | number; name: string; email: string } | null;
+  navigate: (tab: string) => void;
 }
 
 interface ProfileData {
@@ -67,23 +68,27 @@ function StatCard({
   );
 }
 
-export default function OverviewTab({ user }: Props) {
+export default function OverviewTab({ user, navigate }: Props) {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [stats, setStats] = useState<AppStats | null>(null);
+  const [topCollege, setTopCollege] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!user?.id) return;
     setLoading(true);
     try {
-      const [profRes, appRes] = await Promise.all([
+      const [profRes, appRes, bookmarkRes] = await Promise.all([
         fetch(`/api/student/${user.id}/profile`),
         fetch(`/api/student/${user.id}/applications`),
+        fetch(`/api/student/${user.id}/bookmarks`),
       ]);
       const profData = await profRes.json();
-      const appData = await appRes.json();
+      const appData  = await appRes.json();
+      const bmData   = await bookmarkRes.json();
       setProfile(profData);
       setStats(appData.stats);
+      setTopCollege(bmData?.colleges?.[0]?.title ?? null);
     } catch (e) {
       console.error("Failed to load dashboard data", e);
     } finally {
@@ -105,6 +110,7 @@ export default function OverviewTab({ user }: Props) {
   }
 
   const name = profile?.name ?? user?.name ?? "Student";
+  const matchPct = profile?.profile_complete ?? 0;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -153,8 +159,11 @@ export default function OverviewTab({ user }: Props) {
           <div className="bg-white rounded-[10px] p-8 shadow-sm border border-gray-100 flex items-center gap-8 relative overflow-hidden group">
             <div className="absolute right-0 top-0 w-32 h-32 bg-[#e31e24] opacity-[0.03] rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
             
-            <div className="w-24 h-24 bg-gray-100 rounded-full shrink-0 border-4 border-gray-50 flex items-center justify-center text-gray-300">
-               <span className="material-symbols-outlined text-[48px]">person</span>
+            <div className="w-24 h-24 bg-gray-100 rounded-full shrink-0 border-4 border-gray-50 flex items-center justify-center text-gray-300 overflow-hidden">
+               {profile?.photo
+                 ? <img src={profile.photo} alt={name} className="w-full h-full object-cover" />
+                 : <span className="material-symbols-outlined text-[48px]">person</span>
+               }
             </div>
             
             <div className="space-y-2">
@@ -163,10 +172,10 @@ export default function OverviewTab({ user }: Props) {
                 Your admission journey is progressing well. You have {stats?.total ?? 0} active applications currently being processed.
               </p>
               <div className="pt-2 flex gap-3">
-                <button className="px-5 py-2 bg-[#e31e24] text-white text-[13px] font-medium rounded-lg hover:shadow-lg transition-all active:scale-95">
+                <button onClick={() => navigate("account-details")} className="px-5 py-2 bg-[#e31e24] text-white text-[13px] font-medium rounded-lg hover:shadow-lg transition-all active:scale-95">
                   Complete Profile
                 </button>
-                <button className="px-5 py-2 bg-gray-100 text-gray-600 text-[13px] font-medium rounded-lg hover:bg-gray-200 transition-all">
+                <button onClick={() => navigate("app-all")} className="px-5 py-2 bg-gray-100 text-gray-600 text-[13px] font-medium rounded-lg hover:bg-gray-200 transition-all">
                   View Timeline
                 </button>
               </div>
@@ -177,7 +186,7 @@ export default function OverviewTab({ user }: Props) {
           <div className="bg-white rounded-[10px] p-8 shadow-sm border border-gray-100">
              <div className="flex items-center justify-between mb-8">
                 <h4 className="text-[18px] font-bold text-[#222]">Recent Applications</h4>
-                <button onClick={() => {}} className="text-[12px] font-semibold text-[#e31e24] uppercase tracking-wider">View All</button>
+                <button onClick={() => navigate("app-all")} className="text-[12px] font-semibold text-[#e31e24] uppercase tracking-wider">View All</button>
              </div>
              {stats?.total === 0 ? (
                <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -210,16 +219,16 @@ export default function OverviewTab({ user }: Props) {
                  <span className="material-symbols-outlined text-[100px]">equalizer</span>
               </div>
               <h4 className="text-[12px] font-semibold uppercase tracking-widest text-white/50 mb-1">Top Goal</h4>
-              <h3 className="text-[24px] font-bold mb-6">University of Delhi</h3>
+              <h3 className="text-[24px] font-bold mb-6">{topCollege ?? "Explore Colleges"}</h3>
               <div className="space-y-4">
                  <div className="flex justify-between text-[13px] font-medium">
                     <span className="text-white/60">Match Probability</span>
-                    <span>85%</span>
+                    <span>{matchPct}%</span>
                  </div>
                  <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#e31e24] w-[85%] rounded-full shadow-[0_0_15px_rgba(227,30,36,0.5)]" />
+                    <div className="h-full bg-[#e31e24] rounded-full shadow-[0_0_15px_rgba(227,30,36,0.5)] transition-all duration-700" style={{ width: `${matchPct}%` }} />
                  </div>
-                 <button className="w-full mt-4 py-3 bg-white/10 hover:bg-white/20 text-white text-[13px] font-medium rounded-lg transition-all border border-white/10">
+                 <button onClick={() => navigate("account-details")} className="w-full mt-4 py-3 bg-white/10 hover:bg-white/20 text-white text-[13px] font-medium rounded-lg transition-all border border-white/10">
                     Improve Match Score
                  </button>
               </div>
@@ -233,7 +242,7 @@ export default function OverviewTab({ user }: Props) {
               <p className="text-[13px] font-medium text-gray-500 mb-6 leading-relaxed">
                  Chat with our experts to find the perfect course for you.
               </p>
-              <button className="w-full py-3 bg-[#1a1a1a] text-white text-[13px] font-medium rounded-lg hover:bg-black transition-all">
+              <button onClick={() => navigate("help-desk")} className="w-full py-3 bg-[#1a1a1a] text-white text-[13px] font-medium rounded-lg hover:bg-black transition-all">
                  Live Chat Now
               </button>
            </div>

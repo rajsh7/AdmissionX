@@ -45,24 +45,25 @@ export default async function ExamQuestionsPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE eq.question LIKE ? OR u.firstname LIKE ? OR et.name LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
-
-  const data = await safeQuery<QuestionRow>(
-    `SELECT 
-      eq.id, 
-      eq.question, 
-      eq.questionDate,
-      u.firstname as userName,
-      et.name as examType
-     FROM exam_questions eq
-     LEFT JOIN users u ON u.id = eq.userId
-     LEFT JOIN type_of_examinations et ON et.id = eq.typeOfExaminations_id
-     ${where}
-     ORDER BY eq.id DESC
-     LIMIT 100`,
-    params
-  );
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { question: { $regex: q, $options: "i" } } : {};
+  const docs = await db.collection("exam_questions").find(filter).sort({ id: -1 }).limit(100).toArray();
+  const uIds = [...new Set(docs.map((d: any) => Number(d.userId)).filter(Boolean))];
+  const etIds = [...new Set(docs.map((d: any) => Number(d.typeOfExaminations_id)).filter(Boolean))];
+  const [uDocs, etDocs] = await Promise.all([
+    uIds.length ? db.collection("users").find({ id: { $in: uIds } }, { projection: { id: 1, firstname: 1 } }).toArray() : [],
+    etIds.length ? db.collection("type_of_examinations").find({ id: { $in: etIds } }, { projection: { id: 1, title: 1 } }).toArray() : [],
+  ]);
+  const uMap = new Map(uDocs.map((d: any) => [Number(d.id), String(d.firstname ?? "").trim()]));
+  const etMap = new Map(etDocs.map((d: any) => [Number(d.id), String(d.title ?? "").trim()]));
+  const data: QuestionRow[] = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    question: String(d.question ?? "").replace(/<[^>]*>/g, "").trim(),
+    questionDate: d.questionDate ? String(d.questionDate).trim() : null,
+    userName: uMap.get(Number(d.userId)) || null,
+    examType: etMap.get(Number(d.typeOfExaminations_id)) || null,
+  }));
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px] mx-auto">

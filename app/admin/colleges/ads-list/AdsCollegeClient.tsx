@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import AdminModal from "@/app/admin/_components/AdminModal";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
@@ -60,12 +60,10 @@ export default function AdsCollegeClient({
   const [editingRow, setEditingRow] = useState<AdCollegeRow | null>(null);
   const [visibleCount, setVisibleCount] = useState(25);
 
-  const listKey = adsRows[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) {
-    setLastKey(listKey);
+  // Reset visibleCount when adsRows change
+  useEffect(() => {
     setVisibleCount(25);
-  }
+  }, [adsRows[0]?.id]);
 
   const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
   const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };

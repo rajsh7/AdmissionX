@@ -5,6 +5,18 @@ import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { formatDate } from "@/lib/utils";
 import NewsFormModal from "./NewsFormModal";
+import PaginationFixed from "@/app/components/PaginationFixed";
+
+const STEP = 25;
+
+function buildImgSrc(raw: string | null): string | null {
+  if (!raw) return null;
+  const t = raw.trim();
+  if (!t || t.toUpperCase() === "NULL") return null;
+  if (t.startsWith("/")) return `/api/image-proxy?url=${encodeURIComponent(t)}`;
+  if (t.startsWith("http")) return `/api/image-proxy?url=${encodeURIComponent(t)}`;
+  return `/api/image-proxy?url=${encodeURIComponent(`https://admin.admissionx.in/uploads/${t}`)}`;
+}
 
 export interface NewsRow {
   id: number;
@@ -28,6 +40,10 @@ interface NewsListClientProps {
   deleteAction: (id: number) => Promise<void>;
   toggleAction: (formData: FormData) => Promise<void>;
   offset: number;
+  total: number;
+  page: number;
+  totalPages: number;
+  pageSize: number;
 }
 
 export default function NewsListClientV2({
@@ -39,14 +55,30 @@ export default function NewsListClientV2({
   deleteAction,
   toggleAction,
   offset,
+  total,
+  page,
+  totalPages,
+  pageSize,
 }: NewsListClientProps) {
   const [mounted, setMounted] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<NewsRow | null>(null);
+  const [visibleCount, setVisibleCount] = useState(STEP);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Reset visible count when page changes
+  const pageKey = `${page}-${data[0]?.id}`;
+  const [lastPageKey, setLastPageKey] = useState(pageKey);
+  if (pageKey !== lastPageKey) {
+    setLastPageKey(pageKey);
+    setVisibleCount(STEP);
+  }
+
+  const showMore = visibleCount < data.length;
+  const showPagination = !showMore && totalPages > 1;
 
   if (!mounted) return <div className="min-h-[400px] bg-white rounded-2xl border border-slate-100 animate-pulse" />;
 
@@ -92,7 +124,7 @@ export default function NewsListClientV2({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {data.map((item, idx) => {
+              {data.slice(0, visibleCount).map((item, idx) => {
                 const rowNum = offset + idx + 1;
                 const typeNames = resolveTypeNames(item.newstypeids);
                 const tagCount = parseIds(item.newstagsids).length;
@@ -104,13 +136,13 @@ export default function NewsListClientV2({
                     </td>
                     <td className="px-6 py-5">
                       <div className="w-14 h-10 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 shadow-sm flex-shrink-0">
-                        {item.featimage ? (
+                        {buildImgSrc(item.featimage) ? (
                           <img 
-                            src={item.featimage.startsWith('http') || item.featimage.startsWith('/') ? item.featimage : `https://admin.admissionx.in/uploads/${item.featimage}`} 
+                            src={buildImgSrc(item.featimage)!} 
                             alt="" 
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              e.currentTarget.src = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=100";
+                              e.currentTarget.style.display = 'none';
                             }}
                           />
                         ) : (
@@ -177,7 +209,7 @@ export default function NewsListClientV2({
                       </form>
                     </td>
                     <td className="px-6 py-5 text-right">
-                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center justify-end gap-2 transition-opacity">
                         <button
                           onClick={() => setEditingItem(item)}
                           className="p-2 text-slate-400 hover:text-cyan-600 hover:bg-white rounded-xl transition-all border border-transparent hover:border-cyan-100"
@@ -221,6 +253,34 @@ export default function NewsListClientV2({
         types={types}
         tags={tags}
       />
+
+      {/* Show More */}
+      {showMore && (
+        <div className="py-6 flex flex-col items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setVisibleCount(v => Math.min(v + STEP, data.length))}
+            className="group flex flex-col items-center gap-1 text-slate-400 hover:text-cyan-600 transition-colors"
+          >
+            <span className="text-xs font-bold uppercase tracking-widest">
+              Show More ({data.length - visibleCount} remaining)
+            </span>
+            <span className="material-symbols-outlined text-[36px] animate-bounce group-hover:text-cyan-600">
+              keyboard_arrow_down
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Pagination after all shown */}
+      {showPagination && (
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/30 rounded-b-2xl mt-4">
+          <p className="text-xs text-slate-400 font-medium">
+            Showing <span className="text-slate-700 font-bold">{(page-1)*pageSize + 1}–{Math.min((page-1)*pageSize + pageSize, total)}</span> of <span className="text-slate-700 font-bold">{total}</span> articles
+          </p>
+          <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
+        </div>
+      )}
     </div>
   );
 }

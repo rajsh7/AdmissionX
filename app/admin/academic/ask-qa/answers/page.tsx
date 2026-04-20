@@ -97,29 +97,40 @@ export default async function AskAnswersPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE ans.answer LIKE ? OR q.question LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`] : [];
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
 
-  const [answers, questions] = await Promise.all([
-    safeQuery<AnswerRow>(
-      `SELECT 
-        ans.id, 
-        ans.answer, 
-        ans.answerDate, 
-        ans.status,
-        ans.questionId,
-        q.question,
-        u.firstname as userName
-       FROM ask_question_answers ans
-       LEFT JOIN ask_questions q ON q.id = ans.questionId
-       LEFT JOIN users u ON u.id = ans.userId
-       ${where}
-       ORDER BY ans.id DESC
-       LIMIT 200`,
-      params
-    ),
-    safeQuery<QuestionOption>("SELECT id, question FROM ask_questions ORDER BY id DESC"),
+  const filter = q
+    ? { answer: { $regex: q, $options: "i" } }
+    : {};
+
+  const [answerDocs, questionDocs] = await Promise.all([
+    db.collection("ask_question_answers").find(filter).sort({ id: -1 }).limit(200).toArray(),
+    db.collection("ask_questions").find({}, { projection: { id: 1, question: 1 } }).toArray(),
   ]);
+
+  // Lookup user names
+  const userIds = [...new Set(answerDocs.map((d: any) => Number(d.userId)).filter(Boolean))];
+  const userDocs = userIds.length
+    ? await db.collection("users").find({ id: { $in: userIds } }, { projection: { id: 1, firstname: 1, lastname: 1 } }).toArray()
+    : [];
+  const userMap = new Map(userDocs.map((u: any) => [Number(u.id), `${String(u.firstname ?? "").trim()} ${String(u.lastname ?? "").trim()}`.trim()]));
+  const questionMap = new Map(questionDocs.map((q: any) => [Number(q.id), String(q.question ?? "").replace(/<[^>]*>/g, "").trim()]));
+
+  const answers: AnswerRow[] = answerDocs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    answer: String(d.answer ?? "").replace(/<[^>]*>/g, "").trim(),
+    answerDate: d.answerDate ? String(d.answerDate).trim() : null,
+    status: Number(String(d.status ?? "0").trim()),
+    questionId: Number(d.questionId ?? 0),
+    question: questionMap.get(Number(d.questionId)) || null,
+    userName: userMap.get(Number(d.userId)) || null,
+  }));
+
+  const questions: QuestionOption[] = questionDocs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    question: String(d.question ?? "").replace(/<[^>]*>/g, "").trim(),
+  }));
 
   const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 

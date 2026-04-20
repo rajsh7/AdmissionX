@@ -63,6 +63,8 @@ async function deleteBoard(id: number) {
   revalidatePath("/", "layout");
 }
 
+const PAGE_SIZE = 75;
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeQuery<T >(
@@ -89,6 +91,10 @@ interface BoardRow  {
   updated_at: string;
 }
 
+interface CountRow {
+  total: number;
+}
+
 export default async function EducationBoardsPage({
   searchParams,
 }: {
@@ -96,23 +102,32 @@ export default async function EducationBoardsPage({
 }) {
   const sp = await searchParams;
   const q = (sp.q || "").trim();
+  const page = Math.max(1, parseInt(sp.page || "1", 10) || 1);
+  const offset = (page - 1) * PAGE_SIZE;
 
-  const where = q ? "WHERE name LIKE ? OR title LIKE ? OR slug LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
-
-  const boards = await safeQuery<BoardRow>(
-    `SELECT id, name, title, slug, status, misc, created_at, updated_at
-     FROM counseling_boards
-     ${where}
-     ORDER BY id DESC
-     LIMIT 200`,
-    params
-  );
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { $or: [{ name: { $regex: q, $options: "i" } }, { title: { $regex: q, $options: "i" } }, { slug: { $regex: q, $options: "i" } }] } : {};
+  const [docs, total] = await Promise.all([
+    db.collection("counseling_boards").find(filter).sort({ id: -1 }).skip(offset).limit(PAGE_SIZE).toArray(),
+    db.collection("counseling_boards").countDocuments(filter),
+  ]);
+  const boards: BoardRow[] = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    name: String(d.name ?? "").trim(),
+    title: d.title ? String(d.title).trim() : null,
+    slug: d.slug ? String(d.slug).trim() : null,
+    status: Number(String(d.status ?? "0").trim()),
+    misc: d.misc ? String(d.misc).trim() : null,
+    created_at: String(d.created_at ?? "").trim(),
+    updated_at: String(d.updated_at ?? "").trim(),
+  }));
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 mx-auto max-w-[1400px]">
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
         <form method="GET" className="relative max-w-sm w-full">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[18px]" style={ICO}>search</span>
@@ -127,6 +142,10 @@ export default async function EducationBoardsPage({
 
       <BoardListClient 
         boards={boards}
+        total={total}
+        page={page}
+        totalPages={totalPages}
+        pageSize={PAGE_SIZE}
         createBoard={createBoard}
         updateBoard={updateBoard}
         deleteBoard={deleteBoard}

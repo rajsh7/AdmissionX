@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import CourseFormModal from "./CourseFormModal";
@@ -62,9 +62,10 @@ export default function CourseListClient({
   const [showFilters, setShowFilters] = useState(false);
   const [visibleCount, setVisibleCount] = useState(15);
 
-  const listKey = courses[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(15); }
+  // Reset visibleCount when courses change
+  useEffect(() => {
+    setVisibleCount(15);
+  }, [courses[0]?.id]);
 
   const showMore = visibleCount < courses.length;
   const showPagination = !showMore && totalPages > 1;

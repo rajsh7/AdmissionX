@@ -91,7 +91,7 @@ export default function ExamListClient({
                         </span>
                         {exam.slug && <span className="text-amber-500 font-mono font-bold">/{exam.slug}</span>}
                       </div>
-                      <p className="text-[11px] text-slate-400 truncate mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <p className="text-[11px] text-slate-400 truncate mt-1.5">
                         {stripHtml(exam.description) || "No description provided."}
                       </p>
                     </div>
@@ -119,7 +119,7 @@ export default function ExamListClient({
                      </div>
                   </td>
                   <td className="px-6 py-5 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => setEditingItem(exam)}
                         className="p-2 text-slate-400 hover:text-amber-600 hover:bg-white rounded-xl transition-all border border-transparent hover:border-amber-100 shadow-sm"

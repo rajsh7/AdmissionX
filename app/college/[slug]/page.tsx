@@ -2,6 +2,7 @@ import { getDb } from "@/lib/db";
 import { notFound } from "next/navigation";
 
 import AboutTab from "./components/AboutTab";
+import TrackCollegeView from "@/app/components/TrackCollegeView";
 
 export const dynamic = "force-dynamic";
 
@@ -132,7 +133,9 @@ export default async function CollegeOverviewPage({
   ];
 
   return (
-    <AboutTab
+    <>
+      <TrackCollegeView slug={slug} name={collegeName} />
+      <AboutTab
       collegeName={collegeName}
       slug={slug}
       location={location}
@@ -150,5 +153,6 @@ export default async function CollegeOverviewPage({
       descriptionText={descriptionText}
       paragraphs={paragraphs}
     />
+    </>
   );
 }

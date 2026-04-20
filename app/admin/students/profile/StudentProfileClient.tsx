@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import StudentProfileFormModal from "./StudentProfileFormModal";
 import { formatDate } from "@/lib/utils";
@@ -72,12 +72,9 @@ export default function StudentProfileClient({
   const [visibleCount, setVisibleCount] = useState(25);
 
   // Reset visibleCount when profiles change (new page loaded)
-  const profilesKey = profiles[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(profilesKey);
-  if (profilesKey !== lastKey) {
-    setLastKey(profilesKey);
+  useEffect(() => {
     setVisibleCount(25);
-  }
+  }, [profiles[0]?.id]);
 
   const showPagination = totalPages > 1 && visibleCount >= Math.min(100, profiles.length);
   const showMore = visibleCount < profiles.length && !showPagination;

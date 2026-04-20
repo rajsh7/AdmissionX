@@ -1,6 +1,9 @@
+import { getDb } from "@/lib/db";
 import pool from "@/lib/db";
-import DeleteButton from "@/app/admin/_components/DeleteButton";
 import { revalidatePath } from "next/cache";
+import OtherCareerListClient from "./OtherCareerListClient";
+
+// ─── Server Actions ────────────────────────────────────────────────────────────
 
 async function deleteCareer(id: number) {
   "use server";
@@ -13,102 +16,83 @@ async function deleteCareer(id: number) {
   revalidatePath("/", "layout");
 }
 
-async function safeQuery<T >(
-  sql: string,
-  params: (string | number | boolean)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/other-info/career safeQuery]", err);
-    return [];
-  }
-}
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-interface CareerRow  {
-  id: number;
-  name: string;
-}
-
+const PAGE_SIZE = 75;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function CareerPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
-  const sp = await searchParams;
-  const q = (sp.q || "").trim();
+  const sp     = await searchParams;
+  const q      = (sp.q || "").trim();
+  const page   = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
+  const offset = (page - 1) * PAGE_SIZE;
 
-  const where = q ? "WHERE firstname LIKE ?" : "";
-  const params = q ? [`%${q}%`] : [];
+  const db  = await getDb();
+  const col = db.collection("careers");
 
-  const data = await safeQuery<CareerRow>(
-    `SELECT id, firstname as name
-     FROM careers
-     ${where}
-     ORDER BY firstname ASC
-     LIMIT 100`,
-    params
-  );
+  const filter = q
+    ? { $or: [{ firstname: { $regex: q, $options: "i" } }, { postappliedfor: { $regex: q, $options: "i" } }, { email: { $regex: q, $options: "i" } }] }
+    : {};
+
+  const [docs, total] = await Promise.all([
+    col.find(filter).sort({ _id: -1 }).skip(offset).limit(PAGE_SIZE).toArray(),
+    col.countDocuments(filter),
+  ]);
+
+  const data = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    name: `${String(d.firstname ?? "").trim()} ${String(d.middlename ?? "").trim()} ${String(d.lastname ?? "").trim()}`.replace(/\s+/g, " ").trim() || "Unknown Applicant",
+    email: String(d.email ?? "").trim(),
+    phone: String(d.phonenumber ?? "").trim(),
+    post: d.postappliedfor ? String(d.postappliedfor).trim() : null,
+    gender: d.gender ? String(d.gender).trim() : null,
+    created_at: d.created_at ? String(d.created_at).trim() : null,
+  }));
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="material-symbols-rounded text-cyan-600 text-[22px]" style={ICO_FILL}>work</span>
-            Careers
+            <span className="material-symbols-rounded text-pink-600 text-[22px]" style={ICO_FILL}>work</span>
+            Career Applications
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">Manage various career paths and professional opportunities.</p>
+          <p className="text-sm text-slate-500 mt-0.5">Manage job applications submitted by candidates.</p>
         </div>
-        <form method="GET" className="relative max-w-sm w-full">
-           <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[20px]" style={ICO}>search</span>
-           <input 
-             name="q" 
-             defaultValue={q}
-             placeholder="Search careers..." 
-             className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
-           />
-        </form>
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-bold text-slate-400 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+            {total.toLocaleString()} records
+          </span>
+          <form method="GET" className="relative w-72">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[20px]" style={ICO}>search</span>
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Search name, email, post..."
+              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-500/20 shadow-sm"
+            />
+          </form>
+        </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-50/50 border-b border-slate-100 text-left">
-                <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Career Name</th>
-                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {data.length === 0 ? (
-                <tr>
-                  <td colSpan={2} className="px-5 py-10 text-center text-slate-400">
-                     No careers found.
-                  </td>
-                </tr>
-              ) : (
-                data.map((r) => (
-                  <tr key={r.id} className="hover:bg-cyan-50/20 transition-colors group">
-                    <td className="px-5 py-4 font-bold text-slate-800">{r.name}</td>
-                    <td className="px-4 py-4 text-right">
-                       <DeleteButton action={deleteCareer.bind(null, r.id)} size="sm" />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <OtherCareerListClient 
+        data={data}
+        total={total}
+        page={page}
+        totalPages={totalPages}
+        pageSize={PAGE_SIZE}
+        offset={offset}
+        deleteAction={deleteCareer}
+      />
     </div>
   );
 }
-
-
-
-

@@ -123,7 +123,7 @@ export default function AnswerListClient({
                     </td>
                     <td className="px-4 py-3.5">
                       <span className="text-xs text-slate-400 whitespace-nowrap">
-                        {row.answerDate ? new Date(row.answerDate).toLocaleDateString() : "—"}
+                        {row.answerDate ? new Date(row.answerDate.trim()).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
                       </span>
                     </td>
                     <td className="px-4 py-3.5 text-center">
