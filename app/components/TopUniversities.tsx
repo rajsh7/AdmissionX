@@ -131,9 +131,9 @@ export default function TopUniversities({
   const activeTabSlug = categoryToSlug(activeTab);
 
   return (
-     <section className="w-full bg-[#f8fafc]/30 py-24 lg:py-32">
-       <div className="home-page-shell">
-         <FadeIn>
+    <section className="w-full bg-[#f8fafc]/30 py-24 lg:py-32">
+      <div className="home-page-shell">
+        <FadeIn>
           <div className="mb-16 grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
             <div className="lg:col-span-8">
               <h2 className="text-[40px] font-semibold leading-[1.1] tracking-tight text-slate-900 lg:text-[68px]">
@@ -151,8 +151,8 @@ export default function TopUniversities({
           </div>
         </FadeIn>
 
-        <div className="mb-12 flex flex-col items-stretch gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="group relative flex h-[57px] flex-[0_0_800px] overflow-hidden rounded-[5px] border border-slate-200 bg-white shadow-[0_2px_8px_rgba(15,23,42,0.06)] transition-all hover:shadow-md">
+        <div className="mb-12 flex items-center justify-between gap-4">
+          <div className="group relative flex h-[51.8px] flex-1 max-w-[800px] overflow-hidden rounded-[5px] border border-slate-200 bg-white shadow-[0_2px_8px_rgba(15,23,42,0.06)] transition-all hover:shadow-md">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -164,9 +164,9 @@ export default function TopUniversities({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search your college, universities, courses..."
               suppressHydrationWarning
-              className="h-[57px] flex-1 bg-[#FFFFFF] pl-12 text-[20px] font-normal text-[#6C6C6CA1] placeholder:text-[#6C6C6CA1] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(15,23,42,0.03)] focus:outline-none"
+              className="h-[51.8px] flex-1 bg-[#FFFFFF] pl-12 text-[20px] font-normal text-[#6C6C6CA1] placeholder:text-[#6C6C6CA1] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(15,23,42,0.03)] focus:outline-none"
             />
-            <button className="flex h-[57px] min-w-[170px] items-center justify-center bg-[#FF3C3C] px-12 text-base font-semibold whitespace-nowrap text-white transition-colors hover:bg-[#E63636]">
+            <button className="flex h-[51.8px] min-w-[170px] items-center justify-center bg-[#FF3C3C] px-12 text-base font-semibold whitespace-nowrap text-white transition-colors hover:bg-[#E63636]">
               Search
             </button>
           </div>
@@ -215,7 +215,7 @@ export default function TopUniversities({
           {filteredUniversities.length > 0 ? (
             filteredUniversities.slice(0, 8).map((uni, i) => (
               <div key={`${uni.href}-${i}`}>
-                  <div className="group flex h-full flex-col overflow-hidden rounded-[10px] border border-slate-100 bg-white shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5">
+                  <div className="group flex h-full flex-col overflow-hidden rounded-[5px] border border-slate-100 bg-white shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5">
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <Image
                         src={uni.image}
@@ -224,7 +224,7 @@ export default function TopUniversities({
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                       />
 
-                       <div className="absolute right-4 top-4 flex items-center gap-1 rounded-[10px] bg-white/90 px-2 py-0.5 shadow-sm backdrop-blur">
+                       <div className="absolute right-4 top-4 flex items-center gap-1 rounded-[5px] bg-white/90 px-2 py-0.5 shadow-sm backdrop-blur">
                          <span className="material-symbols-rounded text-[18px] text-yellow-500">
                            star
                          </span>
@@ -234,7 +234,7 @@ export default function TopUniversities({
                        </div>
 
                       <div className="absolute bottom-4 left-4">
-                        <span className="rounded-[10px] bg-primary px-3 py-1 text-[12px] font-semibold uppercase tracking-wider text-white shadow-lg">
+                        <span className="rounded-[5px] bg-primary px-3 py-1 text-[12px] font-semibold uppercase tracking-wider text-white shadow-lg">
                           {sortBy === "rank" ? `#${i + 1} Ranked` : "Featured"}
                         </span>
                       </div>

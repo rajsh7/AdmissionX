@@ -24,8 +24,8 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
 
   const filteredCountries = countrySearch.trim()
     ? countries.filter((country) =>
-        country.name.toLowerCase().includes(countrySearch.toLowerCase()),
-      )
+      country.name.toLowerCase().includes(countrySearch.toLowerCase()),
+    )
     : countries;
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
   };
 
   return (
-    <section className="relative bg-white pt-[120px] pb-48 overflow-visible border-b border-slate-50">
+    <section className="relative bg-white h-[565px] flex items-center overflow-visible border-b border-slate-50 shadow-md">
       {/* Background Image - User provided abstract pattern */}
       <div className="absolute inset-x-0 bottom-0 top-[90px] z-0 opacity-40 pointer-events-none">
         <Image
@@ -85,17 +85,17 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
         <div className="absolute top-0 right-[-10%] w-[30%] h-full bg-gradient-to-l from-slate-900 to-transparent transform skew-x-12" />
       </div>
 
-      <div className="max-w-[1300px] mx-auto px-6 relative z-10">
+      <div className="home-page-shell relative z-10 w-full mb-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-20">
-          
+
           {/* Left Content */}
           <div className="space-y-8 animate-in fade-in slide-in-from-left duration-700">
             <div>
-              <h1 className="text-[54px] font-black text-slate-800 leading-[1.1] tracking-tight">
-                Study Abroad <br />
-                <span className="text-[#FF3C3C]">Made Simple</span>
+              <h1 className="leading-[1.1] tracking-tight">
+                <span className="text-[48px] font-semibold text-[#3E3E3E] block mb-1">Study Abroad</span>
+                <span className="text-[48px] font-semibold text-[#FF3C3C] block">Made Simple</span>
               </h1>
-              <p className="text-[17px] text-slate-400 font-medium mt-6 leading-relaxed max-w-lg">
+              <p className="text-[20px] text-[#3E3E3EB5] font-medium mt-6 leading-relaxed max-w-2xl">
                 Discover all exams which can refine your future, unlock <br className="hidden md:block" />
                 gate for dream University.
               </p>
@@ -104,23 +104,23 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
             {/* Stats with icons */}
             <div className="flex flex-wrap items-center gap-6">
               {[
-                "10,000+ Programs", 
-                "500+ Universities", 
-                "500+ Universities"
+                "10,000+ Programs",
+                "500+ Universities",
+                "100+ Countries"
               ].map((stat, i) => (
                 <div key={i} className="flex items-center gap-2.5">
                   <div className="w-5 h-5 rounded-full bg-[#FF3C3C] flex items-center justify-center">
                     <span className="material-symbols-rounded text-white text-[14px] font-bold">check</span>
                   </div>
-                  <span className="text-slate-400 font-bold text-[14px]">{stat}</span>
+                  <span className="text-[#3E3E3EB5] font-medium text-[15px]">{stat}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Right Image */}
-          <div className="relative group animate-in fade-in slide-in-from-right duration-700 delay-200">
-            <div className="relative aspect-[16/9] lg:aspect-[1.6/1] rounded-[5px] overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.15)] border border-slate-100">
+          <div className="relative group animate-in fade-in slide-in-from-right duration-700 delay-200 lg:p-10">
+            <div className="relative aspect-[16/9] lg:aspect-[2.2/1] rounded-[5px] overflow-hidden shadow-md border border-slate-100 bg-white">
               <Image
                 src="/images/72297360ccd8d493c15ef805130a31280431261f.png"
                 alt="Study Abroad Destination"
@@ -136,8 +136,8 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
 
       {/* ─── Floating Search Card ─────────────────────────────────────── */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[90%] max-w-[1300px] z-50 animate-in fade-in slide-in-from-bottom duration-700 delay-300">
-        <div className="bg-white rounded-[5px] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.2)] p-8 md:p-10 border border-slate-100/50">
-          
+        <div className="bg-white rounded-[5px] shadow-md p-8 md:p-10 border border-slate-100/50">
+
           <div className="flex flex-col lg:flex-row items-center gap-4">
             {/* Search Input */}
             <div className="flex-1 w-full relative">
@@ -155,7 +155,7 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
                     applySearch();
                   }
                 }}
-                className="w-full pl-12 pr-4 h-14 bg-white border border-slate-200 rounded-[5px] focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all font-medium text-slate-700 placeholder:text-slate-300"
+                className="w-full pl-12 pr-4 h-[51.8px] bg-white border border-slate-200 rounded-[5px] focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all font-medium text-slate-700 placeholder:text-slate-300"
               />
             </div>
 
@@ -167,7 +167,7 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
               <button
                 type="button"
                 onClick={() => { setIsCountryOpen(!isCountryOpen); setCountrySearch(""); }}
-                className="w-full pl-12 pr-10 h-14 bg-white border border-slate-200 rounded-[5px] focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all font-bold text-slate-600 text-left cursor-pointer"
+                className="w-full pl-12 pr-10 h-[51.8px] bg-white border border-slate-200 rounded-[5px] focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all font-bold text-slate-600 text-left cursor-pointer"
               >
                 {selectedCountry?.name ?? "Any Country"}
               </button>
@@ -193,9 +193,8 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
                       <button
                         type="button"
                         onClick={() => { setSelectedCountry(null); setIsCountryOpen(false); }}
-                        className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition-colors ${
-                          !selectedCountry ? "text-[#FF3C3C]" : "text-slate-600"
-                        }`}
+                        className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition-colors ${!selectedCountry ? "text-[#FF3C3C]" : "text-slate-600"
+                          }`}
                       >
                         Any Country
                       </button>
@@ -205,9 +204,8 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
                         <button
                           type="button"
                           onClick={() => { setSelectedCountry(country); setIsCountryOpen(false); }}
-                          className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition-colors ${
-                            selectedCountry?.id === country.id ? "text-[#FF3C3C]" : "text-slate-600"
-                          }`}
+                          className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition-colors ${selectedCountry?.id === country.id ? "text-[#FF3C3C]" : "text-slate-600"
+                            }`}
                         >
                           {country.name}
                         </button>
@@ -225,7 +223,7 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
             <button
               type="button"
               onClick={() => applySearch()}
-              className="w-full lg:w-auto px-12 h-14 bg-[#FF3C3C] hover:bg-[#E23434] text-white rounded-[5px] font-bold text-lg transition-all shadow-lg shadow-red-500/20 flex items-center justify-center"
+              className="w-full lg:w-auto px-12 h-[51.8px] bg-[#FF3C3C] hover:bg-[#E23434] text-white rounded-[5px] font-bold text-lg transition-all shadow-lg shadow-red-500/20 flex items-center justify-center"
             >
               Search
             </button>
@@ -245,11 +243,10 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
                     key={country.id}
                     type="button"
                     onClick={() => handleQuickFilterClick(country)}
-                    className={`px-5 py-1.5 rounded-[5px] border text-[13px] font-bold transition-all ${
-                      isActive
-                        ? "border-[#FF3C3C] bg-red-50 text-[#FF3C3C]"
-                        : "border-slate-100 text-slate-400 hover:border-[#FF3C3C] hover:text-[#FF3C3C] bg-slate-50/30 hover:bg-white"
-                    }`}
+                    className={`px-5 py-1.5 rounded-[5px] border text-[13px] font-bold transition-all ${isActive
+                      ? "border-[#FF3C3C] bg-red-50 text-[#FF3C3C]"
+                      : "border-slate-100 text-slate-400 hover:border-[#FF3C3C] hover:text-[#FF3C3C] bg-slate-50/30 hover:bg-white"
+                      }`}
                   >
                     {country.name}
                   </button>

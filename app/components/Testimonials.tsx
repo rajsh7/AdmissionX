@@ -76,7 +76,7 @@ export default function Testimonials({ testimonials: dynamicTestimonials }: Test
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-               className="pt-6 pl-6 pr-6 pb-2 rounded-[10px] bg-white border border-slate-100 shadow-[0_15px_40px_-20px_rgba(0,0,0,0.1)] flex flex-col h-auto group transition-all hover:shadow-xl hover:border-slate-200"
+               className="pt-6 pl-6 pr-6 pb-2 rounded-[5px] bg-white border border-slate-100 shadow-[0_15px_40px_-20px_rgba(0,0,0,0.1)] flex flex-col h-auto group transition-all hover:shadow-xl hover:border-slate-200"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-4">

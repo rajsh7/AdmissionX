@@ -47,6 +47,7 @@ interface CollegeBase {
   college_name: string;
   city_name: string | null;
   college_type_name: string | null;
+  logo: string | null;
 }
 
 export const revalidate = 300;

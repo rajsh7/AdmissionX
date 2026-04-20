@@ -57,13 +57,13 @@ export default function CareerGuidance() {
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
               <Link
                 href="/counselling"
-                className="flex h-[51.8px] w-full items-center justify-center rounded-[10px] bg-[#FF3C3C] px-8 text-center text-white shadow-lg shadow-[#FF3C3C]/20 transition-all hover:brightness-105 sm:w-auto"
+                className="flex h-[51.8px] w-full items-center justify-center rounded-[5px] bg-[#FF3C3C] px-8 text-center text-white shadow-lg shadow-[#FF3C3C]/20 transition-all hover:brightness-105 sm:w-auto"
                 style={{ fontSize: '24px', fontWeight: 600 }}
               >
                 Start Free Assessment
               </Link>
               <button
-                className="flex h-[51.8px] w-full items-center justify-center rounded-[10px] bg-neutral-800 px-8 text-center text-white shadow-lg shadow-black/10 transition-all hover:bg-neutral-900 sm:w-auto"
+                className="flex h-[51.8px] w-full items-center justify-center rounded-[5px] bg-neutral-800 px-8 text-center text-white shadow-lg shadow-black/10 transition-all hover:bg-neutral-900 sm:w-auto"
                 style={{ fontSize: '24px', fontWeight: 600 }}
               >
                 Watch how its work
@@ -77,7 +77,7 @@ export default function CareerGuidance() {
               <img
                 src="/images/3718e82201e432bd5219be08e1391c20ad9829af.png"
                 alt="Confused Career Path Boy"
-                className="w-full h-auto object-contain block object-bottom translate-y-[2px]"
+                className="w-full h-auto object-contain block object-bottom translate-y-[20px]"
                 style={{ filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.18))' }}
               />
             </div>
