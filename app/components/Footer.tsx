@@ -147,7 +147,7 @@ export default function Footer() {
                       <Link
                         href={link.href}
                         className={`text-[13px] transition-colors leading-tight block ${
-                          forceWhiteLinks ? "text-slate-200 hover:text-white" : "text-slate-200 hover:text-white"
+                          forceWhiteLinks ? "text-slate-400 hover:text-white" : "text-slate-400 hover:text-white"
                         }`}
                       >
                         {link.label}
@@ -181,7 +181,7 @@ export default function Footer() {
 
             {/* Left — Brand + description */}
             <FadeIn className="lg:col-span-5">
-              <Link href="/" className="inline-block mb-6 bg-white px-5 py-2.5 rounded-xl">
+              <Link href="/" className="inline-block mb-6 bg-white px-5 py-2.5 rounded-[5px]">
                 <img src="/admissionx-logo.png" className="h-8 w-auto object-contain" alt="AdmissionX" />
               </Link>
 

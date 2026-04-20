@@ -47,9 +47,9 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/10 to-transparent" />
       </div>
 
-      <div className="relative z-10 w-full h-screen min-h-[850px] flex items-center">
-        <div className="w-full h-full flex items-center justify-center lg:justify-end">
-          <div className="w-full lg:w-[60%] xl:w-[64%] 2xl:w-[68%] px-6 sm:px-10 lg:px-0 lg:pr-20 xl:pr-28 py-24 lg:py-32">
+      <div className="relative z-10 flex h-screen min-h-[850px] w-full items-center">
+        <div className="home-page-shell flex h-full items-center justify-center lg:justify-end">
+           <div className="w-full py-24 lg:w-[60%] lg:py-32 xl:w-[64%] 2xl:w-[68%]">
             
             <motion.div
               initial={{ opacity: 0, x: 30 }}

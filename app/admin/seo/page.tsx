@@ -1,8 +1,9 @@
 import pool from "@/lib/db";
 import Link from "next/link";
+import SeoClient from "./SeoClient";
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 75;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
@@ -144,7 +145,7 @@ export default async function AdminSeoPage({
   ];
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 mx-auto max-w-[1400px]">
 
       {/* ── Header ───────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -223,168 +224,15 @@ export default async function AdminSeoPage({
       </div>
 
       {/* ── Table card ────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        {rows.length === 0 ? (
-          <div className="py-20 text-center">
-            <span
-              className="material-symbols-rounded text-6xl text-slate-200 block mb-4"
-              style={ICO_FILL}
-            >
-              travel_explore
-            </span>
-            <p className="text-sm font-semibold text-slate-500">
-              {q ? `No SEO entries matching "${q}"` : "No SEO entries found."}
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="px-5 py-3 text-left w-10">#</th>
-                    <th className="px-4 py-3 text-left">Page URL</th>
-                    <th className="px-4 py-3 text-left hidden md:table-cell">Title</th>
-                    <th className="px-4 py-3 text-left hidden lg:table-cell">Description</th>
-                    <th className="px-4 py-3 text-left hidden xl:table-cell">Keywords</th>
-                    <th className="px-4 py-3 text-center">Entity</th>
-                    <th className="px-4 py-3 text-left hidden sm:table-cell">Updated</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {rows.map((row, idx) => {
-                    const entity = getEntityType(row);
-                    const hasTitle = !!(row.pagetitle?.trim());
-                    return (
-                      <tr
-                        key={row.id}
-                        className="hover:bg-slate-50/60 transition-colors group"
-                      >
-                        {/* # */}
-                        <td className="px-5 py-3.5 text-xs text-slate-400 font-mono">
-                          {offset + idx + 1}
-                        </td>
-
-                        {/* Page URL */}
-                        <td className="px-4 py-3.5 max-w-[200px]">
-                          <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
-                              <span
-                                className="material-symbols-rounded text-slate-500 text-[14px]"
-                                style={ICO_FILL}
-                              >
-                                link
-                              </span>
-                            </div>
-                            <span className="text-xs font-mono text-slate-600 truncate block max-w-[160px]">
-                              {row.slugurl ? `/${row.slugurl}` : <span className="text-slate-300 italic">no slug</span>}
-                            </span>
-                          </div>
-                        </td>
-
-                        {/* Title */}
-                        <td className="px-4 py-3.5 hidden md:table-cell max-w-[200px]">
-                          {hasTitle ? (
-                            <span className="text-xs text-slate-700 font-medium block truncate max-w-[200px]">
-                              {truncate(row.pagetitle, 55)}
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
-                              <span className="material-symbols-rounded text-[11px]" style={ICO_FILL}>
-                                warning
-                              </span>
-                              Missing
-                            </span>
-                          )}
-                        </td>
-
-                        {/* Description */}
-                        <td className="px-4 py-3.5 hidden lg:table-cell max-w-[220px]">
-                          <span className="text-xs text-slate-500 block truncate max-w-[220px]">
-                            {truncate(row.description, 80)}
-                          </span>
-                        </td>
-
-                        {/* Keywords */}
-                        <td className="px-4 py-3.5 hidden xl:table-cell max-w-[180px]">
-                          <span className="text-xs text-slate-400 font-mono block truncate max-w-[180px]">
-                            {truncate(row.keyword, 50)}
-                          </span>
-                        </td>
-
-                        {/* Entity */}
-                        <td className="px-4 py-3.5 text-center">
-                          <span
-                            className={`inline-block text-[10px] font-bold px-2.5 py-1 rounded-full ${entity.cls}`}
-                          >
-                            {entity.label}
-                          </span>
-                        </td>
-
-                        {/* Updated */}
-                        <td className="px-4 py-3.5 hidden sm:table-cell">
-                          <span className="text-xs text-slate-400 whitespace-nowrap">
-                            {formatDate(row.updated_at || row.created_at)}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-                <p className="text-xs text-slate-500">
-                  Showing{" "}
-                  <strong className="text-slate-700">
-                    {offset + 1}–{Math.min(offset + PAGE_SIZE, total)}
-                  </strong>{" "}
-                  of <strong className="text-slate-700">{total}</strong> entries
-                </p>
-                <div className="flex items-center gap-1">
-                  {page > 1 && (
-                    <Link
-                      href={buildUrl({ page: page - 1 })}
-                      className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
-                      ← Prev
-                    </Link>
-                  )}
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const start = Math.max(1, Math.min(page - 2, totalPages - 4));
-                    const p = start + i;
-                    if (p > totalPages) return null;
-                    return (
-                      <Link
-                        key={p}
-                        href={buildUrl({ page: p })}
-                        className={`min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition-colors ${
-                          p === page
-                            ? "bg-slate-700 text-white shadow-sm"
-                            : "text-slate-500 bg-white border border-slate-200 hover:bg-slate-50"
-                        }`}
-                      >
-                        {p}
-                      </Link>
-                    );
-                  })}
-                  {page < totalPages && (
-                    <Link
-                      href={buildUrl({ page: page + 1 })}
-                      className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
-                      Next →
-                    </Link>
-                  )}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      <SeoClient
+        rows={rows}
+        total={total}
+        page={page}
+        totalPages={totalPages}
+        offset={offset}
+        pageSize={PAGE_SIZE}
+        q={q}
+      />
 
       {/* ── Legacy note ───────────────────────────────────────────────────── */}
       <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4">

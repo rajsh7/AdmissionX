@@ -114,7 +114,7 @@ export default function QuestionListClient({
                     </td>
                     <td className="px-4 py-3.5">
                       <span className="text-xs text-slate-400 whitespace-nowrap">
-                        {row.questionDate ? new Date(row.questionDate).toLocaleDateString() : "—"}
+                        {row.questionDate ? new Date(row.questionDate.trim()).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
                       </span>
                     </td>
                     <td className="px-4 py-3.5 text-center">

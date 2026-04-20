@@ -90,7 +90,7 @@ interface StatsRow  {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 75;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
@@ -157,7 +157,7 @@ export default async function AdminBlogsPage({
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 mx-auto max-w-[1400px]">
 
       {/* ── Page header ──────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -279,55 +279,14 @@ export default async function AdminBlogsPage({
         onDelete={deleteBlogById}
         onToggle={toggleBlogAction}
         offset={offset}
+        total={total}
+        page={page}
+        totalPages={totalPages}
+        pageSize={PAGE_SIZE}
+        q={q}
       />
 
-      {/* ── Pagination ──────────────────────────────────────────────── */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50">
-          <p className="text-xs text-slate-500">
-            Showing {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of{" "}
-            {total.toLocaleString()} blogs
-          </p>
-          <div className="flex items-center gap-1">
-            {page > 1 && (
-              <Link
-                href={buildUrl({ page: page - 1 })}
-                className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-              >
-                ← Prev
-              </Link>
-            )}
 
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              const start = Math.max(1, Math.min(page - 2, totalPages - 4));
-              const p = start + i;
-              if (p > totalPages) return null;
-              return (
-                <Link
-                  key={p}
-                  href={buildUrl({ page: p })}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                    p === page
-                      ? "bg-violet-600 text-white"
-                      : "text-slate-600 bg-white border border-slate-200 hover:bg-slate-50"
-                  }`}
-                >
-                  {p}
-                </Link>
-              );
-            })}
-
-            {page < totalPages && (
-              <Link
-                href={buildUrl({ page: page + 1 })}
-                className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-              >
-                Next →
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

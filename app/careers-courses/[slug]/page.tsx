@@ -83,7 +83,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
               backgroundPosition: "right",
               minHeight: "400px"
             }}
-            className="rounded-[5px] border border-slate-100 overflow-hidden relative flex flex-col lg:flex-row lg:items-stretch shadow-xl shadow-slate-200/60"
+            className="rounded-[5px] border border-slate-100 overflow-hidden relative flex flex-col lg:flex-row lg:items-stretch shadow-sm"
           >
             {/* Left Side Content */}
             <div className="flex-1 p-8 lg:p-12 xl:p-16 flex flex-col justify-center relative z-10">
@@ -95,7 +95,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                 {/* Metadata Badges + CTA — same width column */}
                 <div className="flex flex-col gap-4 w-fit">
                   {/* Metadata Badges */}
-                  <div className="flex items-center gap-5 px-6 py-3.5 rounded-[5px] bg-white/80 border border-slate-100 shadow-xl shadow-slate-200/50">
+                  <div className="flex items-center gap-5 px-6 py-3.5 rounded-[5px] bg-white/80 border border-slate-100 shadow-sm">
                     {[degreeLevel, duration, streamName].filter(Boolean).map((tag, i, arr) => (
                       <span key={tag} className="flex items-center gap-5 text-[16px] font-semibold" style={{ color: "rgba(0, 81, 68, 0.75)" }}>
                         {tag}
@@ -111,10 +111,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
                   {/* CTA Buttons */}
                   <div className="flex gap-4">
-                    <button className="flex-1 py-2.5 bg-[#FF3C3C] text-white rounded-[5px] font-bold text-base hover:bg-red-600 transition-all active:scale-95 shadow-lg shadow-red-200">
+                    <button className="flex-1 py-2.5 bg-[#FF3C3C] text-white rounded-[5px] font-bold text-base hover:bg-red-600 transition-all active:scale-95 shadow-sm">
                       Apply Now
                     </button>
-                    <button className="flex-1 py-2.5 bg-white border-2 border-[#FF3C3C] text-[#FF3C3C] rounded-[5px] font-bold text-base hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-2">
+                    <button className="flex-1 py-2.5 bg-white border-2 border-[#FF3C3C] text-[#FF3C3C] rounded-[5px] font-bold text-base hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
                       <Download className="w-4 h-4" />
                       Download Brochure
                     </button>
@@ -134,14 +134,14 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
               <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent" />
             </div>
 
-            </div>
           </div>
-        </section>
+        </div>
+      </section>
 
       {/* ─── Stats Bar ────────────────────────────────────────────────────────── */}
       <section className="pb-16 px-4 sm:px-8 lg:px-12">
         <div className="max-w-[1920px] mx-auto">
-          <div className="bg-white rounded-[5px] border border-slate-100 p-8 grid grid-cols-2 lg:grid-cols-4 gap-8 divide-x divide-slate-100 shadow-xl shadow-slate-200/60">
+          <div className="bg-white rounded-[5px] border border-neutral-200 border-t-2 border-t-black p-8 grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 divide-x lg:divide-y-0 divide-y divide-neutral-400 shadow-xl shadow-slate-200/60">
             <StatItem label="Duration" value={duration} />
             <StatItem label="Fees" value={avgFees ? formatFees(avgFees) : "—"} suffix={avgFees ? "/year" : undefined} />
             <StatItem label="Placement Rate" value="94%" />
@@ -154,11 +154,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
       {description && (
         <section className="pb-24 px-4 sm:px-8 lg:px-12">
           <div className="max-w-[1920px] mx-auto">
-            <div className="bg-white rounded-[5px] p-4 lg:p-4 pb-4 lg:pb-6 border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/60">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+            <div className="bg-white rounded-[5px] p-4 lg:p-6 border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/60">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
                 {/* Image */}
-                <div className="lg:col-span-5 relative">
-                  <div className="aspect-[4/4.5] rounded-[5px] overflow-hidden relative">
+                <div className="lg:col-span-4 relative">
+                  <div className="aspect-[16/10] rounded-[5px] overflow-hidden relative">
                     <Image
                       src={STUDENT_IMAGE}
                       alt="Student Overview"
@@ -170,7 +170,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                 </div>
 
                 {/* Text Content */}
-                <div className="lg:col-span-7 flex flex-col gap-6">
+                <div className="lg:col-span-8 flex flex-col gap-4">
                   <h2 className="text-[32px] font-bold text-slate-900 leading-tight">
                     Course Overview
                   </h2>
@@ -179,7 +179,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       {description.length > 400 ? description.substring(0, 400) + "..." : description}
                     </p>
                     {description.length > 400 && (
-                      <button className="text-[#1CB098] font-bold text-lg flex items-center gap-2 hover:gap-3 transition-all">
+                      <button className="text-[#FF3C3C] font-bold text-lg flex items-center gap-2 hover:gap-3 transition-all">
                         Read more <ArrowRight className="w-5 h-5" />
                       </button>
                     )}

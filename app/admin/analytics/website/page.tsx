@@ -28,6 +28,15 @@ function StatCard({ label, value, sub, icon, color, pulse }: {
       <div className="flex items-center justify-between">
         <div className="p-2.5 rounded-xl" style={{ backgroundColor: `${color}18` }}>
           <span className="material-symbols-rounded text-[20px]" style={{ ...ICO_FILL, color }}>{icon}</span>
+    <div className="p-6 space-y-6 mx-auto max-w-[1400px]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <span className="material-symbols-rounded text-emerald-600 text-[22px]" style={ICO_FILL}>monitoring</span>
+            Website Metrics
+          </h1>
+          <p className="text-sm text-slate-500 mt-0.5">Key performance indicators displayed on the homepage.</p>
         </div>
         {pulse && (
           <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">

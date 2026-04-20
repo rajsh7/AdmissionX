@@ -314,11 +314,11 @@ export default function Header({ theme }: HeaderProps) {
             : "bg-white/95 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.05)] py-3"
         }`}
       >
-        <div className="flex items-center justify-between px-4 sm:px-8 w-full max-w-[1920px] mx-auto">
+        <div className="home-page-shell flex w-full items-center justify-between">
           {/* Logo Area */}
           <div className="shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
-              <img src="/admissionx-logo.png" alt="AdmissionX" className="h-9 sm:h-10 w-auto object-contain bg-transparent mix-blend-multiply" />
+              <img src="/admissionx-logo.png" alt="AdmissionX" className="h-6 sm:h-7 w-auto object-contain bg-transparent mix-blend-multiply" />
             </Link>
           </div>
 
@@ -396,17 +396,17 @@ export default function Header({ theme }: HeaderProps) {
                     <Dropdown items={loginOptions} isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
                   </div>
 
-                  {/* Sign Up Dropdown */}
-                  <div ref={signupRef} className="relative" onMouseEnter={openSignup} onMouseLeave={closeSignup}>
-                    <button
-                      className="flex items-center gap-1.5 px-6 py-2.5 rounded-[5px] text-white hover:bg-neutral-800 transition-all shadow-md font-medium text-[16px]"
-                      style={{ backgroundColor: 'rgba(34, 34, 34, 1)' }}
-                    >
-                      Sign Up
-                      <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${signupOpen ? "rotate-180" : ""}`}>expand_more</span>
-                    </button>
-                    <Dropdown items={signupOptions} isOpen={signupOpen} onClose={() => setSignupOpen(false)} />
-                  </div>
+                   {/* Sign Up Dropdown */}
+                   <div ref={signupRef} className="relative" onMouseEnter={openSignup} onMouseLeave={closeSignup}>
+                     <button
+                       className="flex items-center gap-1.5 px-6 py-2.5 rounded-[5px] text-white hover:bg-neutral-800 transition-all shadow-md font-medium text-[16px]"
+                       style={{ backgroundColor: 'rgba(34, 34, 34, 1)' }}
+                     >
+                       Sign Up
+                       <span className={`material-symbols-outlined text-[16px] transition-transform duration-200 ${signupOpen ? "rotate-180" : ""}`}>expand_more</span>
+                     </button>
+                     <Dropdown items={signupOptions} isOpen={signupOpen} onClose={() => setSignupOpen(false)} />
+                   </div>
                 </div>
               )}
             </div>
@@ -539,7 +539,6 @@ export default function Header({ theme }: HeaderProps) {
     </>
   );
 }
-
 
 
 

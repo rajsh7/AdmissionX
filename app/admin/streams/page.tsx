@@ -5,7 +5,7 @@ import { formatDate } from "@/lib/utils";
 import { saveUpload } from "@/lib/upload-utils";
 import StreamListClient from "./StreamListClient";
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 75;
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
@@ -212,7 +212,7 @@ export default async function AdminStreamsPage({
   const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 mx-auto max-w-[1400px]">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Stat mini-cards */}
         <div className="grid grid-cols-3 gap-4 flex-1">
@@ -272,32 +272,16 @@ export default async function AdminStreamsPage({
       <StreamListClient 
         streams={streams} 
         offset={offset}
+        total={total}
+        page={page}
+        totalPages={totalPages}
+        pageSize={PAGE_SIZE}
         createStream={createStream}
         updateStream={updateStream}
         deleteStream={deleteStream}
         toggleStreamTop={toggleStreamTop}
         toggleStreamHome={toggleStreamHome}
       />
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 bg-slate-50/50 rounded-b-2xl shadow-sm">
-          <p className="text-xs text-slate-500">
-            Showing <strong>{offset + 1}</strong> to <strong>{Math.min(offset + PAGE_SIZE, total)}</strong> of <strong>{total}</strong> streams
-          </p>
-          <div className="flex items-center gap-1">
-            {page > 1 && (
-              <Link href={buildUrl({ page: page - 1 })} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
-                Prev
-              </Link>
-            )}
-            {page < totalPages && (
-              <Link href={buildUrl({ page: page + 1 })} className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
-                Next
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -66,12 +66,20 @@ export default function BlogForm({ initialData, onSuccess }: BlogFormProps) {
       </div>
 
       {/* Banner Image Upload */}
-      <ImageUpload 
-        name="bannerimage_file" 
-        label="Blog Banner Image" 
-        initialImage={initialData?.featimage} 
-        existingName="bannerimage_existing"
-      />
+      {(() => {
+        let fn = initialData?.featimage;
+        if (fn && !fn.startsWith("http") && !fn.startsWith("/")) {
+          fn = `/api/image-proxy?url=${encodeURIComponent(`https://admin.admissionx.in/uploads/${fn}`)}`;
+        }
+        return (
+          <ImageUpload 
+            name="bannerimage_file" 
+            label="Blog Banner Image" 
+            initialImage={fn} 
+            existingName="bannerimage_existing"
+          />
+        );
+      })()}
 
       {/* Description / Content */}
       <div className="space-y-1.5">

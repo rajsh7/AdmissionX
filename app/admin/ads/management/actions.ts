@@ -1,6 +1,6 @@
 "use server";
 
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { saveUpload } from "@/lib/upload-utils";
 
@@ -9,7 +9,11 @@ export async function toggleAdAction(formData: FormData) {
   const cur = parseInt(formData.get("cur") as string, 10);
   if (isNaN(id)) return;
   try {
-    await pool.query("UPDATE ads_managements SET isactive = ? WHERE id = ?", [cur ? 0 : 1, id]);
+    const db = await getDb();
+    await db.collection("ads_managements").updateOne(
+      { id },
+      { $set: { isactive: cur ? 0 : 1, updated_at: new Date().toISOString() } }
+    );
   } catch (e) {
     console.error("[admin/ads toggleAd]", e);
   }
@@ -19,6 +23,9 @@ export async function toggleAdAction(formData: FormData) {
 
 export async function createAdManagement(formData: FormData) {
   try {
+    const db = await getDb();
+    const col = db.collection("ads_managements");
+
     const title        = formData.get("title") as string;
     const slug         = formData.get("slug") as string;
     const description  = formData.get("description") as string;
@@ -36,11 +43,17 @@ export async function createAdManagement(formData: FormData) {
       img = publicUrl.replace("/uploads/", "");
     }
 
-    await pool.query(
-      `INSERT INTO ads_managements (title, slug, description, img, redirectto, start, end, ads_position, users_id, isactive, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      [title, slug, description, img, redirectto, start || null, end || null, ads_position, isNaN(users_id) ? null : users_id, isactive]
-    );
+    const last = await col.find({}, { projection: { id: 1 } }).sort({ id: -1 }).limit(1).toArray();
+    const newId = ((last[0]?.id as number) ?? 0) + 1;
+
+    await col.insertOne({
+      id: newId, title, slug, description, img, redirectto,
+      start: start || null, end: end || null, ads_position,
+      users_id: isNaN(users_id) ? null : users_id,
+      isactive,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
   } catch (e) {
     console.error("[admin/ads createAd]", e);
   }
@@ -53,6 +66,7 @@ export async function updateAdManagement(formData: FormData) {
     const id = parseInt(formData.get("id") as string, 10);
     if (isNaN(id)) return;
 
+    const db = await getDb();
     const title        = formData.get("title") as string;
     const slug         = formData.get("slug") as string;
     const description  = formData.get("description") as string;
@@ -70,9 +84,9 @@ export async function updateAdManagement(formData: FormData) {
       img = publicUrl.replace("/uploads/", "");
     }
 
-    await pool.query(
-      `UPDATE ads_managements SET title=?, slug=?, description=?, img=?, redirectto=?, start=?, end=?, ads_position=?, users_id=?, isactive=?, updated_at=NOW() WHERE id=?`,
-      [title, slug, description, img, redirectto, start || null, end || null, ads_position, isNaN(users_id) ? null : users_id, isactive, id]
+    await db.collection("ads_managements").updateOne(
+      { id },
+      { $set: { title, slug, description, img, redirectto, start: start || null, end: end || null, ads_position, users_id: isNaN(users_id) ? null : users_id, isactive, updated_at: new Date().toISOString() } }
     );
   } catch (e) {
     console.error("[admin/ads updateAd]", e);
@@ -85,7 +99,8 @@ export async function deleteAdManagement(formData: FormData) {
   const id = parseInt(formData.get("id") as string, 10);
   if (isNaN(id)) return;
   try {
-    await pool.query("DELETE FROM ads_managements WHERE id = ?", [id]);
+    const db = await getDb();
+    await db.collection("ads_managements").deleteOne({ id });
   } catch (e) {
     console.error("[admin/ads deleteAd]", e);
   }

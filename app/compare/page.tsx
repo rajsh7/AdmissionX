@@ -214,8 +214,8 @@ function ComparePageInner() {
               </p>
 
               {/* Search Layout */}
-              <div ref={searchRef} className="flex flex-col sm:flex-row gap-4 max-w-2xl relative">
-                <div className="flex-1 flex items-center gap-3 bg-white border border-slate-200 rounded-[5px] px-5 py-3.5 shadow-sm focus-within:border-[#FF3C3C] focus-within:ring-4 focus-within:ring-[#FF3C3C]/10 transition-all duration-300">
+              <div ref={searchRef} className="flex flex-col sm:flex-row max-w-2xl relative shadow-lg shadow-red-200/20 rounded-[5px] overflow-hidden">
+                <div className="flex-1 flex items-center gap-3 bg-white border border-slate-200 sm:border-r-0 rounded-t-[5px] sm:rounded-t-none sm:rounded-l-[5px] sm:rounded-r-none px-5 py-3.5 focus-within:border-[#FF3C3C] transition-all duration-300">
                   <span className="material-symbols-outlined text-[#FF3C3C] text-[24px]">school</span>
                   <input
                     ref={inputRef}
@@ -235,7 +235,7 @@ function ComparePageInner() {
                 <button
                   onClick={handleAddButton}
                   disabled={loading}
-                  className="bg-[#FF3C3C] text-white text-[16px] font-bold px-8 py-3.5 rounded-[5px] hover:bg-red-600 transition-all active:scale-95 shadow-lg shadow-red-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[150px]"
+                  className="bg-[#FF3C3C] text-white text-[16px] font-bold px-8 py-3.5 rounded-b-[5px] sm:rounded-b-none sm:rounded-r-[5px] rounded-l-none hover:bg-red-600 transition-all active:scale-95 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[150px]"
                 >
                   {loading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
                   {loading ? "Adding..." : "Add College"}

@@ -3,6 +3,18 @@
 import { useState, useEffect } from "react";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import StreamFormModal from "./StreamFormModal";
+import PaginationFixed from "@/app/components/PaginationFixed";
+
+const STEP = 25;
+
+function buildImgSrc(raw: string | null): string | null {
+  if (!raw) return null;
+  const t = raw.trim();
+  if (!t || t.toUpperCase() === "NULL") return null;
+  if (t.startsWith("/")) return `/api/image-proxy?url=${encodeURIComponent(t)}`;
+  if (t.startsWith("http")) return `/api/image-proxy?url=${encodeURIComponent(t)}`;
+  return `/api/image-proxy?url=${encodeURIComponent(`https://admin.admissionx.in/uploads/${t}`)}`;
+}
 
 interface Stream {
   id: number;
@@ -21,6 +33,10 @@ interface Stream {
 interface StreamListClientProps {
   streams: Stream[];
   offset: number;
+  total: number;
+  page: number;
+  totalPages: number;
+  pageSize: number;
   createStream: (formData: FormData) => Promise<void>;
   updateStream: (formData: FormData) => Promise<void>;
   deleteStream: (id: number) => Promise<void>;
@@ -31,6 +47,10 @@ interface StreamListClientProps {
 export default function StreamListClient({
   streams,
   offset,
+  total,
+  page,
+  totalPages,
+  pageSize,
   createStream,
   updateStream,
   deleteStream,
@@ -40,10 +60,22 @@ export default function StreamListClient({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStream, setEditingStream] = useState<Stream | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(STEP);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Reset visible count when page changes
+  const pageKey = `${page}-${streams[0]?.id}`;
+  const [lastPageKey, setLastPageKey] = useState(pageKey);
+  if (pageKey !== lastPageKey) {
+    setLastPageKey(pageKey);
+    setVisibleCount(STEP);
+  }
+
+  const showMore = visibleCount < streams.length;
+  const showPagination = !showMore && totalPages > 1;
 
   if (!mounted) return <div className="min-h-[400px] bg-white rounded-2xl border border-slate-100 animate-pulse mt-6" />;
 
@@ -102,7 +134,6 @@ export default function StreamListClient({
                 <th className="px-5 py-3 text-left w-10">#</th>
                 <th className="px-4 py-3 text-left">Stream Name</th>
                 <th className="px-4 py-3 text-left hidden lg:table-cell">Slug</th>
-                <th className="px-4 py-3 text-center hidden md:table-cell">Images</th>
                 <th className="px-4 py-3 text-center">Show on Top</th>
                 <th className="px-4 py-3 text-center">Show on Home</th>
                 <th className="px-4 py-3 text-left hidden sm:table-cell">Updated</th>
@@ -110,7 +141,7 @@ export default function StreamListClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {streams.map((row, idx) => (
+              {streams.slice(0, visibleCount).map((row, idx) => (
                 <tr key={row.id} className="hover:bg-teal-50/20 transition-colors group">
                   <td className="px-5 py-3.5 text-xs text-slate-400 font-mono">
                     {offset + idx + 1}
@@ -140,40 +171,6 @@ export default function StreamListClient({
                     ) : (
                       <span className="text-xs text-slate-300 italic">no slug</span>
                     )}
-                  </td>
-                  <td className="px-4 py-3.5 hidden md:table-cell">
-                    <div className="flex items-center justify-center gap-2">
-                      {/* Logo Thumbnail */}
-                      <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden flex-shrink-0 shadow-sm group/img relative" title="Logo">
-                        {row.logoimage ? (
-                          <img 
-                            src={row.logoimage} 
-                            alt="" 
-                            className="w-full h-full object-contain p-1"
-                            onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=100"; }}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-slate-50">
-                            <span className="material-symbols-rounded text-slate-200 text-lg" style={ICO_FILL}>image</span>
-                          </div>
-                        )}
-                      </div>
-                      {/* Banner Thumbnail */}
-                      <div className="w-16 h-10 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden flex-shrink-0 shadow-sm group/img relative" title="Banner">
-                        {row.bannerimage ? (
-                          <img 
-                            src={row.bannerimage} 
-                            alt="" 
-                            className="w-full h-full object-cover"
-                            onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=160"; }}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-slate-50">
-                            <span className="material-symbols-rounded text-slate-200 text-lg" style={ICO_FILL}>panorama</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
                   </td>
                   <td className="px-4 py-3.5 text-center">
                     <form action={toggleStreamTop} className="inline-block">
@@ -244,6 +241,34 @@ export default function StreamListClient({
         onSubmit={editingStream ? updateStream : createStream}
         stream={editingStream}
       />
+
+      {/* Show More */}
+      {showMore && (
+        <div className="py-6 flex flex-col items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setVisibleCount(v => Math.min(v + STEP, streams.length))}
+            className="group flex flex-col items-center gap-1 text-slate-400 hover:text-teal-600 transition-colors"
+          >
+            <span className="text-xs font-bold uppercase tracking-widest">
+              Show More ({streams.length - visibleCount} remaining)
+            </span>
+            <span className="material-symbols-outlined text-[36px] animate-bounce group-hover:text-teal-600">
+              keyboard_arrow_down
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Pagination after all shown */}
+      {showPagination && (
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/30 rounded-b-2xl">
+          <p className="text-xs text-slate-400 font-medium">
+            Showing <span className="text-slate-700 font-bold">{offset + 1}–{Math.min(offset + pageSize, total)}</span> of <span className="text-slate-700 font-bold">{total}</span> streams
+          </p>
+          <PaginationFixed currentPage={page} totalPages={totalPages} useUrl />
+        </div>
+      )}
     </div>
   );
 }

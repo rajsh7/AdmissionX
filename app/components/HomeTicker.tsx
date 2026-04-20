@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 
 export interface TickerAdItem {
   id: number;
@@ -29,9 +30,6 @@ function hasText(value: string | null | undefined): value is string {
 }
 
 export default function HomeTicker({ ads }: HomeTickerProps) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number>(0);
-
   const source = ads.map((ad, index) => ({
     id: ad.id ?? -(index + 1),
     title: ad.title ?? null,
@@ -39,51 +37,40 @@ export default function HomeTicker({ ads }: HomeTickerProps) {
     img: ad.img ?? null,
     redirectto: ad.redirectto ?? null,
   }));
+  const [startIndex, setStartIndex] = useState(0);
 
   useEffect(() => {
-    return () => cancelAnimationFrame(rafRef.current);
-  }, []);
-
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track || source.length === 0) return;
-
-    let x = 0;
-    const speed = 0.8;
-
-    const step = () => {
-      x -= speed;
-      const singleWidth = track.scrollWidth / 3;
-      if (Math.abs(x) >= singleWidth) x = 0;
-      track.style.transform = `translateX(${x}px)`;
-      rafRef.current = requestAnimationFrame(step);
-    };
-
-    rafRef.current = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(rafRef.current);
+    if (source.length <= 1) return;
+    const interval = window.setInterval(() => {
+      setStartIndex((current) => (current + 1) % source.length);
+    }, 2600);
+    return () => window.clearInterval(interval);
   }, [source.length]);
 
   if (source.length === 0) return null;
 
-  const items = [...source, ...source, ...source];
+  const visibleAds = Array.from({ length: 5 }, (_, offset) => {
+    const index = (startIndex + offset) % source.length;
+    return source[index];
+  });
+
+  const slotClasses = [
+    "block",
+    "block",
+    "hidden md:block",
+    "hidden xl:block",
+    "hidden xl:block",
+  ];
 
   return (
-    <div className="flex w-full justify-center py-6">
-      <div
-        className="relative h-[110px] overflow-hidden rounded-2xl border border-slate-100 shadow-md"
-        style={{ width: "70%" }}
-      >
-        <div
-          ref={trackRef}
-          className="flex h-full will-change-transform"
-          style={{ width: "max-content" }}
-        >
-          {items.map((ad, i) => {
+    <div className="w-full py-6">
+      <div className="home-page-shell">
+        <div className="relative h-[136px] w-full overflow-hidden rounded-[5px] border border-slate-100 shadow-md">
+          <div className="grid h-full grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+          {visibleAds.map((ad, i) => {
             const imgSrc = buildImgUrl(ad.img);
             const inner = (
-              <div
-                className="group relative h-[110px] w-[320px] flex-shrink-0 overflow-hidden"
-              >
+              <div className="group relative h-full overflow-hidden">
                 {imgSrc ? (
                   <Image
                     src={imgSrc}
@@ -91,7 +78,7 @@ export default function HomeTicker({ ads }: HomeTickerProps) {
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                     unoptimized
-                    sizes="320px"
+                    sizes="(min-width: 1280px) 20vw, (min-width: 768px) 33vw, 50vw"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
@@ -126,26 +113,39 @@ export default function HomeTicker({ ads }: HomeTickerProps) {
               </div>
             );
 
-            return ad.redirectto ? (
-              <Link
-                key={`${ad.id}-${i}`}
-                href={ad.redirectto}
-                target={ad.id > 0 ? "_blank" : "_self"}
-                rel={ad.id > 0 ? "noopener noreferrer sponsored" : undefined}
-                className="flex-shrink-0"
-              >
-                {inner}
-              </Link>
-            ) : (
-              <div key={`${ad.id}-${i}`} className="flex-shrink-0">
-                {inner}
+            return (
+              <div key={`slot-${i}`} className={`${slotClasses[i]} relative h-full overflow-hidden`}>
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={`${i}-${ad.id}-${startIndex}`}
+                    initial={{ opacity: 0, x: 28 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -28 }}
+                    transition={{ duration: 0.45, ease: "easeInOut" }}
+                    className="absolute inset-0"
+                  >
+                    {ad.redirectto ? (
+                      <Link
+                        href={ad.redirectto}
+                        target={ad.id > 0 ? "_blank" : "_self"}
+                        rel={ad.id > 0 ? "noopener noreferrer sponsored" : undefined}
+                        className="block h-full"
+                      >
+                        {inner}
+                      </Link>
+                    ) : (
+                      <div className="h-full">{inner}</div>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
               </div>
             );
           })}
-        </div>
+          </div>
 
-        <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-12 bg-gradient-to-r from-white/20 to-transparent" />
-        <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-12 bg-gradient-to-l from-white/20 to-transparent" />
+          <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-12 bg-gradient-to-r from-white/20 to-transparent" />
+          <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-12 bg-gradient-to-l from-white/20 to-transparent" />
+        </div>
       </div>
     </div>
   );

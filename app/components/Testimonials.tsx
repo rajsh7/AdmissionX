@@ -20,7 +20,7 @@ function TestimonialStars({ rating }: { rating: number }) {
   const filledStars = Math.max(0, Math.min(5, Math.round(rating)));
 
 return (
-    <div className="mt-auto flex gap-1.5 border-t border-slate-200 pt-3">
+    <div className="mt-auto flex gap-1.5 border-t border-slate-200 pt-2">
       {Array.from({ length: 5 }, (_, starIdx) => {
         const isFilled = starIdx < filledStars;
 
@@ -49,20 +49,20 @@ export default function Testimonials({ testimonials: dynamicTestimonials }: Test
 
   return (
     <section className="w-full py-24 lg:py-32 bg-white overflow-hidden">
-      <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
+      <div className="home-page-shell">
         
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
+        <div className="mb-16 flex flex-col justify-between gap-8 md:flex-row md:items-start">
             <div className="max-w-2xl">
                 <h2 className="text-[40px] font-semibold tracking-tight leading-[1.1] mb-4">
-                  <span className="text-[#6C6C6C]">Unfiltered</span> <span className="text-primary">Student Voices</span>
+                  <span className="text-[#0F182A]">Unfiltered</span> <span className="text-primary">Student Voices</span>
                 </h2>
                 <p className="text-slate-500 font-normal text-lg">
                   Get the real story about campus life, professors, and placements from people who&apos;ve actually been there.
                 </p>
             </div>
             <button 
-              className="hidden sm:flex items-center justify-center px-6 h-12 bg-white shadow-sm border border-slate-200 whitespace-nowrap transition-all rounded-[5px]"
-              style={{ fontSize: '16px', fontWeight: 500, color: '#334155' }}
+              className="hidden sm:flex h-[51.8px] items-center justify-center rounded-[5px] border border-slate-200 bg-white px-6 whitespace-nowrap transition-all shadow-sm"
+              style={{ fontSize: '16px', fontWeight: 500, color: '#475569' }}
             >
                 Read all reviews <span className="material-symbols-outlined text-[18px] ml-1">arrow_forward</span>
             </button>
@@ -76,7 +76,7 @@ export default function Testimonials({ testimonials: dynamicTestimonials }: Test
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="p-6 rounded-[10px] bg-white border border-slate-100 shadow-[0_15px_40px_-20px_rgba(0,0,0,0.1)] flex flex-col h-auto group transition-all hover:shadow-xl hover:border-slate-200"
+               className="pt-6 pl-6 pr-6 pb-2 rounded-[10px] bg-white border border-slate-100 shadow-[0_15px_40px_-20px_rgba(0,0,0,0.1)] flex flex-col h-auto group transition-all hover:shadow-xl hover:border-slate-200"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-4">

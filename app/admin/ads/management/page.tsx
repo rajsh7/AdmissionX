@@ -1,4 +1,4 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
 import AdsManagementDashboardClient from "./AdsManagementDashboardClient";
 
@@ -7,40 +7,6 @@ import AdsManagementDashboardClient from "./AdsManagementDashboardClient";
 const PAGE_SIZE = 25;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
-
-async function safeQuery<T >(
-  sql: string,
-  params: (string | number)[] = [],
-): Promise<T[]> {
-  try {
-    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
-    return rows;
-  } catch (err) {
-    console.error("[admin/ads/management safeQuery]", err);
-    return [];
-  }
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface AdRow  {
-  id: number;
-  title: string | null;
-  img: string | null;
-  description: string | null;
-  isactive: number;
-  slug: string | null;
-  redirectto: string | null;
-  start: string | null;
-  end: string | null;
-  ads_position: string | null;
-  users_id: number | null;
-  college_banner: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-interface CountRow  { total: number; }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -55,40 +21,47 @@ export default async function AdminAdsPage({
   const filter = sp.filter ?? "all"; // all | active | inactive
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── WHERE ──────────────────────────────────────────────────────────────────
-  const conditions: string[] = [];
-  const params: (string | number)[] = [];
+  // ── MongoDB filter ──────────────────────────────────────────────────────
+  const db = await getDb();
+  const col = db.collection("ads_managements");
 
+  const mongoFilter: Record<string, any> = {};
   if (q) {
-    conditions.push("(title LIKE ? OR ads_position LIKE ? OR redirectto LIKE ?)");
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`);
+    const regex = { $regex: q, $options: "i" };
+    mongoFilter.$or = [
+      { title: regex },
+      { ads_position: regex },
+      { redirectto: regex },
+    ];
   }
-  if (filter === "active")   conditions.push("isactive = 1");
-  if (filter === "inactive") conditions.push("isactive = 0");
-
-  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  if (filter === "active")   mongoFilter.isactive = { $in: [1, true, "1"] };
+  if (filter === "inactive") mongoFilter.isactive = { $in: [0, false, "0", null] };
 
   // ── Parallel queries ───────────────────────────────────────────────────────
-  const [ads, countRows, totalRow, activeRow, inactiveRow] = await Promise.all([
-    safeQuery<AdRow>(
-      `SELECT a.*, cp.bannerimage AS college_banner
-       FROM ads_managements a
-       LEFT JOIN collegeprofile cp ON a.users_id = cp.users_id
-       ${where ? where.replace(/title|ads_position|redirectto/g, (m) => "a." + m) : ""}
-       ORDER BY a.isactive DESC, a.created_at DESC
-       LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
-    ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total FROM ads_managements a ${where ? where.replace(/title|ads_position|redirectto/g, (m) => "a." + m) : ""}`,
-      params,
-    ),
-    safeQuery<CountRow>("SELECT COUNT(*) AS total FROM ads_managements"),
-    safeQuery<CountRow>("SELECT COUNT(*) AS total FROM ads_managements WHERE isactive = 1"),
-    safeQuery<CountRow>("SELECT COUNT(*) AS total FROM ads_managements WHERE isactive = 0"),
+  const [ads, total, totalCount, activeCount, inactiveCount] = await Promise.all([
+    col.find(mongoFilter).sort({ isactive: -1, created_at: -1 }).skip(offset).limit(PAGE_SIZE).toArray(),
+    col.countDocuments(mongoFilter),
+    col.countDocuments({}),
+    col.countDocuments({ isactive: { $in: [1, true, "1"] } }),
+    col.countDocuments({ isactive: { $in: [0, false, "0", null] } }),
   ]);
 
-  const total = Number(countRows[0]?.total ?? 0);
+  const cleanAds = ads.map((a: any) => ({
+    id: Number(a.id ?? 0),
+    title: a.title ? String(a.title) : null,
+    img: a.img ? String(a.img) : null,
+    description: a.description ? String(a.description) : null,
+    isactive: a.isactive === 1 || a.isactive === true || a.isactive === "1" ? 1 : 0,
+    slug: a.slug ? String(a.slug) : null,
+    redirectto: a.redirectto ? String(a.redirectto) : null,
+    start: a.start ? String(a.start) : null,
+    end: a.end ? String(a.end) : null,
+    ads_position: a.ads_position ? String(a.ads_position) : null,
+    users_id: a.users_id ? Number(a.users_id) : null,
+    college_banner: a.college_banner ? String(a.college_banner) : null,
+    created_at: a.created_at ? String(a.created_at) : "",
+    updated_at: a.updated_at ? String(a.updated_at) : "",
+  }));
 
   function buildUrl(overrides: Record<string, string | number>) {
     const merged = { q, page: "1", filter, ...overrides };
@@ -100,15 +73,15 @@ export default async function AdminAdsPage({
   }
 
   const FILTER_TABS = [
-    { value: "all",      label: "All Ads",  count: totalRow[0]?.total    ?? 0 },
-    { value: "active",   label: "Active",   count: activeRow[0]?.total   ?? 0 },
-    { value: "inactive", label: "Inactive", count: inactiveRow[0]?.total ?? 0 },
+    { value: "all",      label: "All Ads",  count: totalCount },
+    { value: "active",   label: "Active",   count: activeCount },
+    { value: "inactive", label: "Inactive", count: inactiveCount },
   ];
 
   const STAT_CARDS = [
-    { label: "Total Ads", count: totalRow[0]?.total    ?? 0, icon: "ad_units",       accent: "bg-rose-50 text-rose-600"    },
-    { label: "Active",    count: activeRow[0]?.total   ?? 0, icon: "check_circle",   accent: "bg-emerald-50 text-emerald-600" },
-    { label: "Inactive",  count: inactiveRow[0]?.total ?? 0, icon: "cancel",         accent: "bg-slate-50 text-slate-500"  },
+    { label: "Total Ads", count: totalCount,    icon: "ad_units",     accent: "bg-rose-50 text-rose-600"       },
+    { label: "Active",    count: activeCount,   icon: "check_circle", accent: "bg-emerald-50 text-emerald-600" },
+    { label: "Inactive",  count: inactiveCount, icon: "cancel",       accent: "bg-slate-50 text-slate-500"    },
   ];
 
   return (
@@ -128,7 +101,7 @@ export default async function AdminAdsPage({
           </p>
         </div>
         <span className="text-sm font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-xl flex-shrink-0">
-          {(totalRow[0]?.total ?? 0).toLocaleString()} total
+          {totalCount.toLocaleString()} total
         </span>
       </div>
 
@@ -203,7 +176,7 @@ export default async function AdminAdsPage({
       </div>
 
       <AdsManagementDashboardClient
-        ads={ads}
+        ads={cleanAds}
         total={total}
         offset={offset}
         pageSize={PAGE_SIZE}

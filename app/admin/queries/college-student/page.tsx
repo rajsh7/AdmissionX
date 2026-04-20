@@ -65,44 +65,50 @@ export default async function CollegeStudentQueryPage({
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // ── Build WHERE clause ─────────────────────────────────────────────────────
-  const conditions: string[] = ["q.queryflowtype = 'student-to-college'"];
-  const params: (string | number)[] = [];
+  // ── MongoDB direct query ───────────────────────────────────────────────────
+  const { getDb } = await import("@/lib/db");
+  const db  = await getDb();
+  const col = db.collection("query");
 
-  if (q) {
-    conditions.push("(u_s.firstname LIKE ? OR u_c.firstname LIKE ? OR q.subject LIKE ?)");
-    params.push(`%${q}%`, `%${q}%`, `%${q}%`);
-  }
+  const baseFilter: any = { queryflowtype: { $regex: "student-to-college", $options: "i" } };
+  const filter = q
+    ? { ...baseFilter, $or: [{ subject: { $regex: q, $options: "i" } }, { message: { $regex: q, $options: "i" } }] }
+    : baseFilter;
 
-  const where = "WHERE " + conditions.join(" AND ");
-
-  // ── Query records ──────────────────────────────────────────────────────────
-  const [queries, countRows] = await Promise.all([
-    safeQuery<QueryRow>(
-      `SELECT 
-        q.id, 
-        COALESCE(u_s.firstname, q.guestname, 'Anonymous Student') as student_name, 
-        COALESCE(u_c.firstname, 'General Institution') as college_name, 
-        q.subject, 
-        q.message, 
-        'Pending' as status, 
-        q.created_at
-       FROM query q
-       LEFT JOIN users u_s ON q.student_id = u_s.id
-       LEFT JOIN collegeprofile cp ON q.college_id = cp.id
-       LEFT JOIN users u_c ON cp.users_id = u_c.id
-       ${where}
-       ORDER BY q.created_at DESC
-       LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset],
-    ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) as total FROM query q ${where}`,
-      params,
-    ),
+  const [docs, total] = await Promise.all([
+    col.find(filter).sort({ id: -1 }).skip(offset).limit(PAGE_SIZE).toArray(),
+    col.countDocuments(filter),
   ]);
 
-  const total = Number(countRows[0]?.total ?? 0);
+  // Lookup student names and college names
+  const studentIds = [...new Set(docs.map((d: any) => Number(d.student_id)).filter(Boolean))];
+  const collegeIds = [...new Set(docs.map((d: any) => Number(d.college_id)).filter(Boolean))];
+
+  const [studentDocs, collegeDocs] = await Promise.all([
+    studentIds.length ? db.collection("users").find({ id: { $in: studentIds } }, { projection: { id: 1, firstname: 1, lastname: 1 } }).toArray() : [],
+    collegeIds.length ? db.collection("collegeprofile").find({ id: { $in: collegeIds } }, { projection: { id: 1, users_id: 1, slug: 1 } }).toArray() : [],
+  ]);
+
+  // Fetch college user names
+  const collegeUserIds = [...new Set(collegeDocs.map((c: any) => Number(c.users_id)).filter(Boolean))];
+  const collegeUserDocs = collegeUserIds.length
+    ? await db.collection("users").find({ id: { $in: collegeUserIds } }, { projection: { id: 1, firstname: 1, lastname: 1 } }).toArray()
+    : [];
+
+  const studentMap = new Map(studentDocs.map((u: any) => [Number(u.id), `${String(u.firstname ?? "").trim()} ${String(u.lastname ?? "").trim()}`.trim()]));
+  const collegeUserMap = new Map(collegeUserDocs.map((u: any) => [Number(u.id), `${String(u.firstname ?? "").trim()} ${String(u.lastname ?? "").trim()}`.trim()]));
+  const collegeMap = new Map(collegeDocs.map((c: any) => [Number(c.id), collegeUserMap.get(Number(c.users_id)) || null]));
+
+  const queries = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    student_name: studentMap.get(Number(d.student_id)) || (d.guestname && String(d.guestname).trim() !== "NULL" ? String(d.guestname).trim() : "Anonymous"),
+    college_name: collegeMap.get(Number(d.college_id)) || "Unknown College",
+    subject: String(d.subject ?? "").trim(),
+    message: String(d.message ?? "").trim(),
+    status: String(d.querytypeinfo ?? "pending").trim(),
+    created_at: String(d.created_at ?? "").trim(),
+  }));
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
@@ -118,6 +124,9 @@ export default async function CollegeStudentQueryPage({
           <p className="text-sm text-slate-500 mt-0.5">Manage interactions and inquiries between students and institutions.</p>
         </div>
         <div className="flex items-center gap-3">
+          <span className="text-sm font-bold text-slate-400 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+            {total.toLocaleString()} records
+          </span>
           <form method="GET" action="/admin/queries/college-student" className="w-full sm:w-80">
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-[18px] text-slate-400 pointer-events-none" style={ICO}>search</span>
