@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
+import { clarityEvent, clarityTag, clarityUpgrade } from "@/lib/clarity";
 
 interface Props {
   user: { id: string | number; name: string; email: string } | null;
@@ -1498,12 +1499,16 @@ export default function ApplyTab({ user }: Props) {
     setCollege(col);
     setCourse(cou);
     setStep("form");
+    clarityEvent("college_apply_click");
+    clarityTag("college", col.college_name);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function handleApplicationSubmitted(app: ApplicationResult) {
     setApplication(app);
     setStep("payment");
+    clarityEvent("application_submit");
+    clarityUpgrade("application_submitted");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 

@@ -3,6 +3,8 @@ import Script from "next/script";
 import "./globals.css";
 import ChatbotWrapper from "./components/ChatbotWrapper";
 import PublicProviders from "./components/PublicProviders";
+import TrackPageView from "./components/TrackPageView";
+import ClarityInit from "./components/ClarityInit";
 
 export const metadata: Metadata = {
   title: "Admissionx - Find Your Dream College",
@@ -31,10 +33,25 @@ export default function RootLayout({
       </head>
       <body className="font-display antialiased overflow-x-hidden" suppressHydrationWarning>
         <PublicProviders>
+          <TrackPageView />
+          <ClarityInit />
           {children}
         </PublicProviders>
 
         <ChatbotWrapper />
+
+        {/* Google Analytics 4 (optional) */}
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <>
+            <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} strategy="afterInteractive" />
+            <Script id="ga4" strategy="afterInteractive">{`
+              window.dataLayer=window.dataLayer||[];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js',new Date());
+              gtag('config','${process.env.NEXT_PUBLIC_GA_ID}');
+            `}</Script>
+          </>
+        )}
 
         <Script id="fonts-loaded" strategy="afterInteractive">{`
           (function() {
