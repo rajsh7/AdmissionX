@@ -20,7 +20,7 @@ import HelpDeskTab from "./tabs/HelpDeskTab";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Props {
-  user: { id: string | number; name: string; email: string } | null;
+  user: { id: string | number; name: string; email: string; avatar?: string } | null;
   activated?: boolean;
 }
 
@@ -95,11 +95,18 @@ export default function StudentDashboardClient({ user, activated }: Props) {
         {/* Profile Card Section */}
         <div className="p-5 space-y-4">
           <div className="bg-white rounded-xl overflow-hidden shadow-2xl p-4 flex flex-col items-center">
-            <div className="w-28 h-28 rounded-full border-[8px] border-[#f5f5f5] flex items-center justify-center bg-white mb-4 relative">
-              <span className="material-symbols-outlined text-[54px] text-[#ddd]">photo_camera</span>
+            <div className="w-28 h-28 rounded-full border-[8px] border-[#f5f5f5] flex items-center justify-center bg-white mb-4 relative overflow-hidden">
+              {user?.avatar ? (
+                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+              ) : (
+                <span className="material-symbols-outlined text-[54px] text-[#ddd]">photo_camera</span>
+              )}
             </div>
-            <p className="text-[13px] font-semibold text-[#555] uppercase tracking-tight text-center leading-tight mb-2">
-              IMAGE NOT AVAILABLE
+            <p className="text-[13px] font-semibold text-[#555] text-center leading-tight mb-1">
+              {user?.name ?? "Student"}
+            </p>
+            <p className="text-[11px] text-gray-400 text-center truncate max-w-full px-2">
+              {user?.email ?? ""}
             </p>
           </div>
           <button className="w-full py-2.5 bg-[#8b8b8b] text-white text-[12px] font-medium rounded-[6px] hover:bg-[#777] transition-colors uppercase tracking-wider shadow-md">
