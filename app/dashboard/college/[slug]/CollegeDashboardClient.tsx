@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "../../../components/Header";
@@ -124,12 +124,35 @@ export default function CollegeDashboardClient({
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [infoExpanded, setInfoExpanded] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [logo, setLogo] = useState<string | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const logoRef = useRef<HTMLInputElement>(null);
   const slug = college.slug;
   const router = useRouter();
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    // Load existing logo
+    fetch(`/api/college/dashboard/${slug}/overview`)
+      .then(r => r.json())
+      .then(d => setLogo(d.profile?.logoimage || null))
+      .catch(() => {});
+  }, [slug]);
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLogoUploading(true);
+    const fd = new FormData();
+    fd.append("logo", file);
+    try {
+      const res = await fetch(`/api/college/dashboard/${slug}/logo`, { method: "POST", body: fd });
+      const d = await res.json();
+      if (res.ok && d.logo) setLogo(d.logo);
+    } finally {
+      setLogoUploading(false);
+    }
+  }
 
   async function handleLogout() {
     if (window.confirm("Are you sure you want to logout?")) {
@@ -218,16 +241,24 @@ export default function CollegeDashboardClient({
         >
           <div className="p-4 flex flex-col items-center border-b border-[#E5E7EB] shrink-0 bg-white">
             <div className="w-[110px] h-[110px] bg-white border border-[#4a90e2] rounded-sm mb-4 flex flex-col items-center justify-center shadow-sm relative group overflow-hidden">
-              <div className="w-[50px] h-[50px] bg-slate-100 rounded-full flex items-center justify-center mb-1">
-                <span className="material-symbols-outlined text-slate-300 text-3xl">photo_camera</span>
-              </div>
-              <span className="text-[8px] font-bold text-slate-400 whitespace-nowrap">IMAGE NOT AVAILABLE</span>
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+              {logo ? (
+                <img src={logo} alt="College Logo" className="w-full h-full object-contain" />
+              ) : (
+                <>
+                  <div className="w-[50px] h-[50px] bg-slate-100 rounded-full flex items-center justify-center mb-1">
+                    <span className="material-symbols-outlined text-slate-300 text-3xl">photo_camera</span>
+                  </div>
+                  <span className="text-[8px] font-bold text-slate-400 whitespace-nowrap">IMAGE NOT AVAILABLE</span>
+                </>
+              )}
+              <div onClick={() => logoRef.current?.click()} className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                 <span className="material-symbols-outlined text-white text-3xl">upload</span>
               </div>
             </div>
-            <button className="w-[320px] h-[39px] bg-[#6b7280] hover:bg-[#4b5563] text-[13px] font-bold text-slate-100 rounded-md transition-colors flex items-center justify-center gap-2">
-              Upload College logo
+            <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+            <button onClick={() => logoRef.current?.click()} disabled={logoUploading}
+              className="w-[320px] h-[39px] bg-[#6b7280] hover:bg-[#4b5563] text-[13px] font-bold text-slate-100 rounded-md transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
+              {logoUploading ? "Uploading..." : "Upload College logo"}
             </button>
           </div>
 

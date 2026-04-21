@@ -21,13 +21,13 @@ export default function GalleryTab({ college }: Props) {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // Image Upload State
+  const [success, setSuccess] = useState<string | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-  
-  // Video URL State
+
   const [videoUrl, setVideoUrl] = useState("");
   const [submittingVideo, setSubmittingVideo] = useState(false);
 
@@ -48,182 +48,164 @@ export default function GalleryTab({ college }: Props) {
     }
   }, [slug]);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  useEffect(() => { load(); }, [load]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-    }
-  };
+    if (!file) return;
+    setSelectedFile(file);
+    setPreview(URL.createObjectURL(file));
+    setSuccess(null);
+    setError(null);
+  }
 
-  const handleUploadImage = async () => {
+  async function handleUploadImage() {
     if (!selectedFile) return;
     setUploadingImage(true);
+    setError(null);
     try {
       const fd = new FormData();
       fd.append("file", selectedFile);
       fd.append("name", selectedFile.name);
-      
-      const res = await fetch(`/api/college/dashboard/${slug}/gallery`, {
-        method: "POST",
-        body: fd,
-      });
+      const res = await fetch(`/api/college/dashboard/${slug}/gallery`, { method: "POST", body: fd });
       if (!res.ok) throw new Error("Upload failed.");
-      
       const data = await res.json();
-      setImages((prev) => [data.image, ...prev]);
+      setImages(prev => [data.image, ...prev]);
       setSelectedFile(null);
-      alert("Image uploaded successfully!");
-    } catch (e) {
-      alert("Upload failed.");
+      setPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      setSuccess("Image uploaded successfully!");
+      setTimeout(() => setSuccess(null), 4000);
+    } catch {
+      setError("Upload failed. Please try again.");
     } finally {
       setUploadingImage(false);
     }
-  };
+  }
 
-  const handleSubmitVideo = async () => {
+  async function handleDelete(id: number) {
+    if (!confirm("Delete this image?")) return;
+    try {
+      const res = await fetch(`/api/college/dashboard/${slug}/gallery?imageId=${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
+      setImages(prev => prev.filter(img => img.id !== id));
+      setSuccess("Image deleted!");
+      setTimeout(() => setSuccess(null), 3000);
+    } catch {
+      setError("Delete failed. Please try again.");
+    }
+  }
+
+  async function handleSubmitVideo() {
     if (!videoUrl) return;
     setSubmittingVideo(true);
-    // Placeholder for video submission logic
     setTimeout(() => {
-      alert("Video URL submitted!");
+      setSuccess("Video URL submitted!");
       setVideoUrl("");
       setSubmittingVideo(false);
+      setTimeout(() => setSuccess(null), 4000);
     }, 1000);
-  };
-
-  const tabs = [
-    { id: "address", label: "Address", icon: "location_on" },
-    { id: "gallery", label: "Gallery", icon: "image" },
-    { id: "achievements", label: "Achievements", icon: "emoji_events" },
-    { id: "courses", label: "Courses", icon: "menu_book" },
-    { id: "facilities", label: "Facilities", icon: "apartment" },
-    { id: "events", label: "Events", icon: "event" },
-    { id: "scholarships", label: "Scholarships", icon: "payments" },
-    { id: "placement", label: "Placements", icon: "work" },
-    { id: "letters", label: "Letters", icon: "description" },
-    { id: "sports", label: "Sports", icon: "sports_soccer" },
-    { id: "cutoffs", label: "Cut Offs", icon: "assignment" },
-    { id: "faculty", label: "Faculties", icon: "groups" },
-  ];
+  }
 
   return (
     <div className="pb-24 font-poppins bg-[#fcfcfc] min-h-[600px] border border-slate-200 rounded-[10px] overflow-hidden shadow-sm">
-      {/* ── Sub-navigation ────────────────────────────────────────────────── */}
-      <div className="flex bg-white border-b border-slate-200 overflow-x-auto hide-scrollbar scroll-smooth">
-        {tabs.map((tab) => {
-          const isActive = tab.id === "gallery";
-          return (
-            <div
-              key={tab.id}
-              className={`flex items-center justify-center gap-2 py-3 px-6 text-[13px] font-bold transition-all cursor-pointer border-r border-slate-100 flex-1 min-w-[140px] ${
-                isActive ? "bg-[#FF3C3C] text-white" : "text-slate-500 hover:bg-slate-50"
-              }`}
-            >
-              <span className="whitespace-nowrap">{tab.label}</span>
-              <span className={`material-symbols-outlined text-[18px] ${isActive ? "text-white" : "text-slate-400"}`}>
-                {tab.icon}
-              </span>
-            </div>
-          );
-        })}
-      </div>
 
-      {/* ── Content Area ─────────────────────────────────────────────────── */}
-      <div className="p-8 md:p-12">
-        <h2 className="text-[22px] font-bold text-[#333] mb-12">Upload New Photo To your Gallery</h2>
+      {/* Content Area */}
+      <div className="p-6 md:p-10">
+        <h2 className="text-[20px] font-bold text-[#333] mb-8">Upload New Photo To your Gallery</h2>
 
-        <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-0 lg:divide-x lg:divide-slate-200 bg-white p-4 rounded-xl">
-          {/* Left: Image Upload Section */}
-          <div className="flex-1 w-full flex flex-col items-center px-4 lg:px-12">
-            <div 
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full max-w-[320px] aspect-[4/3] bg-[#f0f0f0] border border-slate-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition-colors group mb-4"
-            >
-              <span className="material-symbols-outlined text-[48px] text-slate-400 group-hover:scale-110 transition-transform">add</span>
-              <span className="text-[18px] font-bold text-slate-500 mt-2">Add Image</span>
-            </div>
-            
-            <input 
-              ref={fileInputRef}
-              type="file" 
-              className="hidden" 
-              accept="image/*"
-              onChange={handleFileChange}
-            />
-            
-            <div className="w-full max-w-[320px] bg-[#f0f0f0] border border-slate-200 rounded py-2 text-center text-[14px] text-slate-500 mb-8">
-              {selectedFile ? `1 File Selected (${selectedFile.name})` : "0 Files Selected"}
-            </div>
-
-            <button 
-              onClick={handleUploadImage}
-              disabled={!selectedFile || uploadingImage}
-              className="bg-[#9DA6B7] hover:bg-[#8e99ac] disabled:opacity-50 text-white px-12 py-3.5 rounded-[10px] font-bold text-[18px] transition-all shadow-[0_4px_12px_rgba(157,166,183,0.3)] w-full max-w-[240px]"
-            >
-              {uploadingImage ? "Uploading..." : "Upload Image"}
-            </button>
+        {/* Feedback */}
+        {success && (
+          <div className="mb-6 flex items-center gap-2 p-4 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-700 text-sm font-semibold">
+            <span className="material-symbols-outlined text-[18px]">check_circle</span>
+            {success}
           </div>
-
-          {/* Middle: OR Divider */}
-          <div className="hidden lg:flex flex-col items-center px-4">
-            <div className="w-[1px] h-32 bg-slate-200 mb-4" />
-            <span className="text-slate-400 font-bold text-[14px]">OR</span>
-            <div className="w-[1px] h-32 bg-slate-200 mt-4" />
+        )}
+        {error && (
+          <div className="mb-6 flex items-center gap-2 p-4 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm font-semibold">
+            <span className="material-symbols-outlined text-[18px]">error</span>
+            {error}
           </div>
-          <div className="lg:hidden flex items-center w-full gap-4 px-8">
-             <div className="flex-1 h-[1px] bg-slate-200" />
-             <span className="text-slate-400 font-bold text-[14px]">OR</span>
-             <div className="flex-1 h-[1px] bg-slate-200" />
-          </div>
+        )}
 
-          {/* Right: Video URL Section */}
-          <div className="flex-1 w-full flex flex-col items-center px-4 lg:px-12">
-            <div className="w-full text-center mb-10">
-              <p className="text-[14px] text-[#666] font-bold leading-relaxed">
+        {/* Upload Panel */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6 md:p-10">
+          <div className="flex flex-col lg:flex-row gap-10">
+
+            {/* Image Upload */}
+            <div className="flex-1 flex flex-col items-center">
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full max-w-[280px] aspect-[4/3] bg-[#f0f0f0] border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-[#FF3C3C] hover:bg-red-50/30 transition-all group mb-4"
+              >
+                {preview ? (
+                  <img src={preview} alt="preview" className="w-full h-full object-cover rounded-xl" />
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-[48px] text-slate-300 group-hover:text-[#FF3C3C] transition-colors">add_photo_alternate</span>
+                    <span className="text-[14px] font-bold text-slate-400 mt-2">Add Image</span>
+                  </>
+                )}
+              </div>
+
+              <input ref={fileInputRef} type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+
+              <div className="w-full max-w-[280px] bg-[#f0f0f0] border border-slate-200 rounded py-2 px-3 text-center text-[13px] text-slate-500 mb-6 truncate">
+                {selectedFile ? selectedFile.name : "0 Files Selected"}
+              </div>
+
+              <button
+                onClick={handleUploadImage}
+                disabled={!selectedFile || uploadingImage}
+                className="bg-[#9DA6B7] hover:bg-[#8e99ac] disabled:opacity-50 text-white px-10 py-3 rounded-[10px] font-bold text-[15px] transition-all w-full max-w-[200px]"
+              >
+                {uploadingImage ? "Uploading..." : "Upload Image"}
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div className="flex lg:flex-col items-center gap-4">
+              <div className="flex-1 lg:flex-none h-px lg:h-24 w-full lg:w-px bg-slate-200" />
+              <span className="text-slate-400 font-bold text-[13px] shrink-0">OR</span>
+              <div className="flex-1 lg:flex-none h-px lg:h-24 w-full lg:w-px bg-slate-200" />
+            </div>
+
+            {/* Video URL */}
+            <div className="flex-1 flex flex-col items-center justify-center">
+              <p className="text-[14px] text-[#666] font-bold text-center mb-2">
                 Update Youtube / Vimeo videos in your college profile
               </p>
-              <p className="text-[12px] text-slate-400 mt-1 italic">
+              <p className="text-[12px] text-slate-400 italic text-center mb-6">
                 ( https://www.youtube.com/watch?v=kSERoMjkIM )
               </p>
+              <input
+                type="text"
+                value={videoUrl}
+                onChange={e => setVideoUrl(e.target.value)}
+                placeholder="Enter Video url here"
+                className="w-full border border-slate-200 rounded px-4 py-3 text-[14px] text-slate-600 focus:outline-none focus:border-red-400 transition-colors mb-6"
+              />
+              <button
+                onClick={handleSubmitVideo}
+                disabled={!videoUrl || submittingVideo}
+                className="bg-[#FF3C3C] hover:bg-[#e63535] disabled:opacity-50 text-white px-10 py-3 rounded-[6px] font-bold text-[15px] transition-all w-full max-w-[160px]"
+              >
+                {submittingVideo ? "Submitting..." : "Submit"}
+              </button>
             </div>
-
-            <input 
-              type="text"
-              value={videoUrl}
-              onChange={(e) => setVideoUrl(e.target.value)}
-              placeholder="Enter Video url here"
-              className="w-full border border-slate-200 rounded px-4 py-3 text-[14px] text-slate-600 focus:outline-none focus:border-red-400 transition-colors mb-8"
-            />
-
-            <button 
-              onClick={handleSubmitVideo}
-              disabled={!videoUrl || submittingVideo}
-              className="bg-[#FF3C3C] hover:bg-[#e63535] disabled:opacity-50 text-white px-12 py-3 rounded-[6px] font-bold text-[18px] transition-all shadow-md w-full max-w-[200px]"
-            >
-              {submittingVideo ? "Submitting..." : "Submit"}
-            </button>
           </div>
         </div>
 
-        {/* Existing Gallery Grid (kept for UX) */}
+        {/* Gallery Grid */}
         {!loading && images.length > 0 && (
-          <div className="mt-16 pt-8 border-t border-slate-100">
-            <h3 className="text-[18px] font-bold text-slate-600 mb-6 px-2">Uploaded Photos ({images.length})</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {images.map((img) => (
-                <div key={img.id} className="group relative aspect-square rounded-xl overflow-hidden border border-slate-100 shadow-sm">
-                  <Image
-                    src={img.fullimage}
-                    alt={img.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+          <div className="mt-12 pt-8 border-t border-slate-100">
+            <h3 className="text-[16px] font-bold text-slate-600 mb-6">Uploaded Photos ({images.length})</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {images.map((img, idx) => (
+                <div key={img.id ?? `img-${idx}`} className="group relative aspect-square rounded-xl overflow-hidden border border-slate-100 shadow-sm">
+                  <Image src={img.fullimage} alt={img.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button className="text-white text-xs font-bold bg-black/50 px-3 py-1.5 rounded-full hover:bg-red-600 transition-colors">
+                    <button onClick={() => handleDelete(img.id ?? 0)} className="text-white text-xs font-bold bg-red-600/80 px-3 py-1.5 rounded-full hover:bg-red-600 transition-colors">
                       Delete
                     </button>
                   </div>
@@ -232,14 +214,13 @@ export default function GalleryTab({ college }: Props) {
             </div>
           </div>
         )}
-      </div>
 
-      {error && (
-        <div className="m-6 p-4 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm font-medium flex items-center gap-2">
-          <span className="material-symbols-outlined text-[18px]">error</span>
-          {error}
-        </div>
-      )}
+        {loading && (
+          <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 animate-pulse">
+            {[1,2,3,4].map(i => <div key={i} className="aspect-square bg-slate-100 rounded-xl" />)}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

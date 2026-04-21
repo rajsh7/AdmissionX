@@ -281,6 +281,100 @@ export default async function EditCollegeProfilePage({
 
   const bannerUrl = college.bannerimage ? buildImageUrl(college.bannerimage) : null;
 
+  // Fetch gallery images for this college
+  const [galleryImages, achievementsList, coursesList, facilitiesList, eventsList, scholarshipsList] = await Promise.all([
+    db.collection("gallery")
+      .find({
+        $or: [
+          { college_slug: slug },
+          ...(cp.users_id ? [{ users_id: Number(cp.users_id) }] : []),
+        ],
+        fullimage: { $exists: true, $ne: "" },
+        $expr: { $gt: [{ $strLenCP: { $trim: { input: "$fullimage" } } }, 0] },
+      })
+      .sort({ id: -1 })
+      .limit(20)
+      .toArray(),
+    db.collection("college_achievements")
+      .find({ college_slug: slug })
+      .sort({ year: -1, _id: -1 })
+      .toArray(),
+    (async () => {
+      const cpId = cp.id ? Number(cp.id) : cp._id.toString();
+      const rows = await db.collection("collegemaster")
+        .find({ collegeprofile_id: cpId })
+        .sort({ _id: -1 })
+        .toArray();
+      const courseIds = [...new Set(rows.map((r: any) => Number(r.course_id)).filter(Boolean))];
+      const degreeIds = [...new Set(rows.map((r: any) => Number(r.degree_id)).filter(Boolean))];
+      const streamIds = [...new Set(rows.map((r: any) => Number(r.functionalarea_id)).filter(Boolean))];
+      const [courses, degrees, streams] = await Promise.all([
+        courseIds.length ? db.collection("course").find({ id: { $in: courseIds } }, { projection: { id: 1, name: 1, _id: 0 } }).toArray() : [],
+        degreeIds.length ? db.collection("degree").find({ id: { $in: degreeIds } }, { projection: { id: 1, name: 1, _id: 0 } }).toArray() : [],
+        streamIds.length ? db.collection("functionalarea").find({ id: { $in: streamIds } }, { projection: { id: 1, name: 1, _id: 0 } }).toArray() : [],
+      ]);
+      const cMap = new Map(courses.map((c: any) => [Number(c.id), c.name]));
+      const dMap = new Map(degrees.map((d: any) => [Number(d.id), d.name]));
+      const sMap = new Map(streams.map((s: any) => [Number(s.id), s.name]));
+      return rows.map((r: any) => ({
+        id: r.id,
+        course_name: cMap.get(Number(r.course_id)) ?? null,
+        degree_name: dMap.get(Number(r.degree_id)) ?? null,
+        stream_name: sMap.get(Number(r.functionalarea_id)) ?? null,
+        fees: r.fees ?? null,
+        seats: r.seats ?? null,
+        courseduration: r.courseduration ?? null,
+      }));
+    })(),
+    // Facilities
+    (async () => {
+      const cpId = cp.id ? Number(cp.id) : cp._id.toString();
+      const enabled = await db.collection("collegefacilities")
+        .find({ collegeprofile_id: cpId })
+        .toArray();
+      const fIds = enabled.map((f: any) => Number(f.facilities_id)).filter(Boolean);
+      if (!fIds.length) return [];
+      const refs = await db.collection("facilities")
+        .find({ id: { $in: fIds } }, { projection: { id: 1, name: 1, _id: 0 } })
+        .toArray();
+      const refMap = new Map(refs.map((r: any) => [Number(r.id), String(r.name ?? "").trim()]));
+      return enabled.map((f: any) => ({
+        id: Number(f.facilities_id),
+        name: refMap.get(Number(f.facilities_id)) ?? "Unknown",
+        description: f.description ?? null,
+      }));
+    })(),
+    // Events
+    (async () => {
+      const cpId = cp.id ? Number(cp.id) : cp._id.toString();
+      const rows = await db.collection("event")
+        .find({ collegeprofile_id: cpId })
+        .sort({ datetime: -1 })
+        .limit(5)
+        .toArray();
+      return rows.map((e: any) => ({
+        id: e._id.toString(),
+        name: String(e.name ?? ""),
+        datetime: String(e.datetime ?? ""),
+        venue: String(e.venue ?? ""),
+      }));
+    })(),
+    // Scholarships
+    (async () => {
+      const cpId = cp.id ? Number(cp.id) : cp._id.toString();
+      const rows = await db.collection("college_scholarships")
+        .find({ collegeprofile_id: cpId })
+        .sort({ id: 1 })
+        .limit(5)
+        .toArray();
+      return rows.map((r: any) => ({
+        id: r.id,
+        title: String(r.title ?? ""),
+        description: String(r.description ?? ""),
+      }));
+    })(),
+  ]);
+
   return (
     <div className="min-h-screen bg-slate-50/60 p-4 sm:p-6 lg:p-8">
       <form action={updateCollegeProfile}>
@@ -559,25 +653,178 @@ export default async function EditCollegeProfilePage({
               <div className="space-y-4">
                 <div>
                   <label className={labelCls}>Facebook URL</label>
-                  <input
-                    type="url"
-                    name="facebookurl"
-                    defaultValue={college.facebookurl ?? ""}
-                    className={inputCls}
-                    placeholder="https://facebook.com/collegepage"
-                  />
+                  <input type="url" name="facebookurl" defaultValue={college.facebookurl ?? ""} className={inputCls} placeholder="https://facebook.com/collegepage" />
                 </div>
                 <div>
                   <label className={labelCls}>Twitter / X URL</label>
-                  <input
-                    type="url"
-                    name="twitterurl"
-                    defaultValue={college.twitterurl ?? ""}
-                    className={inputCls}
-                    placeholder="https://twitter.com/collegepage"
-                  />
+                  <input type="url" name="twitterurl" defaultValue={college.twitterurl ?? ""} className={inputCls} placeholder="https://twitter.com/collegepage" />
                 </div>
               </div>
+            </Card>
+
+            {/* Section 7 — Achievements */}
+            <Card>
+              <div className="flex items-center justify-between mb-4">
+                <SectionHeading icon="emoji_events" title={`Achievements (${achievementsList.length})`} />
+                <Link
+                  href={`/admin/colleges/achievements?slug=${college.slug}`}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  Manage
+                </Link>
+              </div>
+              {achievementsList.length === 0 ? (
+                <p className="text-sm text-slate-400">No achievements added yet. <Link href={`/admin/colleges/achievements?slug=${college.slug}`} className="text-blue-600 font-semibold hover:underline">Add one →</Link></p>
+              ) : (
+                <div className="space-y-3">
+                  {achievementsList.map((a: any) => (
+                    <div key={a._id.toString()} className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50">
+                      <span className="material-symbols-outlined text-yellow-500 text-[20px] shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-700 truncate">{a.title}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[11px] font-semibold text-slate-400">{a.category}</span>
+                          {a.year && <span className="text-[11px] text-slate-400">{a.year}</span>}
+                        </div>
+                        {a.description && <p className="text-[12px] text-slate-500 mt-1 line-clamp-2">{a.description}</p>}
+                      </div>
+                    </div>
+                  ))}
+                  <Link href={`/admin/colleges/achievements?slug=${college.slug}`} className="block text-center text-xs font-bold text-blue-600 hover:text-blue-700 pt-1 transition-colors">
+                    Manage all achievements →
+                  </Link>
+                </div>
+              )}
+            </Card>
+
+            {/* Section 8 — Courses */}
+            <Card>
+              <div className="flex items-center justify-between mb-4">
+                <SectionHeading icon="menu_book" title={`Courses (${coursesList.length})`} />
+                <Link
+                  href={`/admin/colleges/courses?collegeId=${cp.id || cp._id.toString()}`}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  Manage
+                </Link>
+              </div>
+              {coursesList.length === 0 ? (
+                <p className="text-sm text-slate-400">No courses added yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {coursesList.slice(0, 5).map((c: any) => (
+                    <div key={c.id} className="flex items-center gap-2 p-2 rounded-lg border border-slate-100 bg-slate-50">
+                      <span className="material-symbols-outlined text-blue-500 text-[16px] shrink-0">menu_book</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-bold text-slate-700 truncate">{c.course_name || "—"}</p>
+                        <p className="text-[11px] text-slate-400">{c.degree_name || "—"} · {c.stream_name || "—"}</p>
+                      </div>
+                      {c.fees && <span className="text-[11px] font-semibold text-slate-500 shrink-0">₹{Number(c.fees).toLocaleString()}</span>}
+                    </div>
+                  ))}
+                  {coursesList.length > 5 && (
+                    <p className="text-[11px] text-slate-400 text-center pt-1">+ {coursesList.length - 5} more</p>
+                  )}
+                  <Link href={`/admin/colleges/courses?collegeId=${cp.id || cp._id.toString()}`} className="block text-center text-xs font-bold text-blue-600 hover:text-blue-700 pt-2 transition-colors">
+                    Manage all courses →
+                  </Link>
+                </div>
+              )}
+            </Card>
+
+            {/* Section 9 — Facilities */}
+            <Card>
+              <div className="flex items-center justify-between mb-4">
+                <SectionHeading icon="apartment" title={`Facilities (${facilitiesList.length})`} />
+                <Link
+                  href={`/admin/colleges/facilities?collegeId=${cp.id || cp._id.toString()}`}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  Manage
+                </Link>
+              </div>
+              {facilitiesList.length === 0 ? (
+                <p className="text-sm text-slate-400">No facilities added yet.</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {facilitiesList.map((f: any) => (
+                    <span key={f.id} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-[12px] font-semibold text-slate-700">
+                      <span className="material-symbols-outlined text-[#FF3C3C] text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      {f.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </Card>
+
+            {/* Section 10 — Events */}
+            <Card>
+              <div className="flex items-center justify-between mb-4">
+                <SectionHeading icon="event" title={`Events (${eventsList.length})`} />
+                <Link
+                  href={`/admin/colleges/events?collegeId=${cp.id || cp._id.toString()}`}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  Manage
+                </Link>
+              </div>
+              {eventsList.length === 0 ? (
+                <p className="text-sm text-slate-400">No events added yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {eventsList.map((e: any) => (
+                    <div key={e.id} className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50">
+                      <span className="material-symbols-outlined text-[#FF3C3C] text-[18px] shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>event</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-700 truncate">{e.name}</p>
+                        <div className="flex flex-wrap gap-2 mt-0.5">
+                          {e.datetime && <span className="text-[11px] text-slate-400">{new Date(e.datetime).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</span>}
+                          {e.venue && <span className="text-[11px] text-slate-400">{e.venue}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <Link href={`/admin/colleges/events?collegeId=${cp.id || cp._id.toString()}`} className="block text-center text-xs font-bold text-blue-600 hover:text-blue-700 pt-1 transition-colors">
+                    Manage all events →
+                  </Link>
+                </div>
+              )}
+            </Card>
+
+            {/* Section 11 — Scholarships */}
+            <Card>
+              <div className="flex items-center justify-between mb-4">
+                <SectionHeading icon="payments" title={`Scholarships (${scholarshipsList.length})`} />
+                <Link
+                  href={`/admin/colleges/scholarships?collegeId=${cp.id || cp._id.toString()}`}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  Manage
+                </Link>
+              </div>
+              {scholarshipsList.length === 0 ? (
+                <p className="text-sm text-slate-400">No scholarships added yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {scholarshipsList.map((s: any) => (
+                    <div key={s.id} className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50">
+                      <span className="material-symbols-outlined text-green-600 text-[18px] shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>payments</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-700 truncate">{s.title}</p>
+                        {s.description && <p className="text-[12px] text-slate-400 mt-0.5 line-clamp-1">{s.description}</p>}
+                      </div>
+                    </div>
+                  ))}
+                  <Link href={`/admin/colleges/scholarships?collegeId=${cp.id || cp._id.toString()}`} className="block text-center text-xs font-bold text-blue-600 hover:text-blue-700 pt-1 transition-colors">
+                    Manage all scholarships →
+                  </Link>
+                </div>
+              )}
             </Card>
 
           </div>
@@ -644,6 +891,32 @@ export default async function EditCollegeProfilePage({
                   existingName="logoimage_existing"
                 />
               </div>
+
+              {/* Gallery */}
+              {galleryImages.length > 0 && (
+                <div className="mb-5 pt-3 border-t border-slate-100">
+                  <p className="text-[10px] font-black text-neutral-500 uppercase tracking-widest mb-3">
+                    Gallery ({galleryImages.length} photos)
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {galleryImages.map((img: any, idx: number) => {
+                      const src = String(img.fullimage ?? "");
+                      const url = src.startsWith("http") || src.startsWith("/") ? src : `${IMAGE_BASE}${src}`;
+                      return (
+                        <a key={img.id ?? idx} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square rounded-lg overflow-hidden border border-slate-100 hover:opacity-80 transition-opacity">
+                          <img src={url} alt={String(img.name ?? "")} className="w-full h-full object-cover" />
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              {galleryImages.length === 0 && (
+                <div className="mb-5 pt-3 border-t border-slate-100">
+                  <p className="text-[10px] font-black text-neutral-500 uppercase tracking-widest mb-2">Gallery</p>
+                  <p className="text-xs text-slate-400">No gallery images uploaded yet.</p>
+                </div>
+              )}
 
               {/* Read-only identity */}
               <div className="px-3 py-3 bg-slate-50 rounded-xl border border-slate-100 mb-5 space-y-1">

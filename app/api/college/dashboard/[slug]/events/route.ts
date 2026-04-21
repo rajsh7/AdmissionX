@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { ObjectId } from "mongodb";
 
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
@@ -36,19 +37,21 @@ export async function GET(
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const db = await getDb();
-  const rows = await db.collection("college_scholarships")
+  const rows = await db.collection("event")
     .find({ collegeprofile_id: auth.collegeprofile_id })
-    .sort({ id: 1 })
+    .sort({ datetime: -1, _id: -1 })
     .toArray();
 
-  return NextResponse.json({
-    scholarships: rows.map((r: any) => ({
-      id: r.id,
-      title: r.title ?? "",
-      description: r.description ?? "",
-    })),
-    total: rows.length,
-  });
+  const events = rows.map((e: any) => ({
+    id: e._id.toString(),
+    name: e.name ?? "",
+    datetime: e.datetime ?? "",
+    venue: e.venue ?? "",
+    description: e.description ?? "",
+    link: e.link ?? "",
+  }));
+
+  return NextResponse.json({ events });
 }
 
 // POST
@@ -63,23 +66,26 @@ export async function POST(
   let body: any;
   try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 }); }
 
-  const title = body.title?.trim();
-  if (!title) return NextResponse.json({ error: "title is required." }, { status: 400 });
+  const { name, datetime, venue, description, link } = body;
+  if (!name?.trim()) return NextResponse.json({ error: "Event name is required." }, { status: 400 });
 
   const db = await getDb();
-  const last = await db.collection("college_scholarships").find({}, { projection: { id: 1 } }).sort({ id: -1 }).limit(1).toArray();
+  const last = await db.collection("event").find({}, { projection: { id: 1 } }).sort({ id: -1 }).limit(1).toArray();
   const newId = ((last[0]?.id as number) ?? 0) + 1;
 
-  await db.collection("college_scholarships").insertOne({
+  const result = await db.collection("event").insertOne({
     id: newId,
     collegeprofile_id: auth.collegeprofile_id,
-    title,
-    description: body.description?.trim() || null,
+    name: name.trim(),
+    datetime: datetime?.trim() || null,
+    venue: venue?.trim() || null,
+    description: description?.trim() || null,
+    link: link?.trim() || null,
     created_at: new Date(),
     updated_at: new Date(),
   });
 
-  return NextResponse.json({ success: true, id: newId }, { status: 201 });
+  return NextResponse.json({ success: true, id: result.insertedId.toString() }, { status: 201 });
 }
 
 // PUT
@@ -94,13 +100,13 @@ export async function PUT(
   let body: any;
   try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 }); }
 
-  const { id, title, description } = body;
-  if (!id || !title?.trim()) return NextResponse.json({ error: "id and title are required." }, { status: 400 });
+  const { id, name, datetime, venue, description, link } = body;
+  if (!id || !name?.trim()) return NextResponse.json({ error: "id and name are required." }, { status: 400 });
 
   const db = await getDb();
-  await db.collection("college_scholarships").updateOne(
-    { id: Number(id), collegeprofile_id: auth.collegeprofile_id },
-    { $set: { title: title.trim(), description: description?.trim() || null, updated_at: new Date() } }
+  await db.collection("event").updateOne(
+    { _id: new ObjectId(id), collegeprofile_id: auth.collegeprofile_id },
+    { $set: { name: name.trim(), datetime: datetime?.trim() || null, venue: venue?.trim() || null, description: description?.trim() || null, link: link?.trim() || null, updated_at: new Date() } }
   );
 
   return NextResponse.json({ success: true });
@@ -115,14 +121,11 @@ export async function DELETE(
   const auth = await checkAuth(slug);
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const scholarshipId = Number(req.nextUrl.searchParams.get("scholarshipId"));
-  if (!scholarshipId) return NextResponse.json({ error: "scholarshipId is required." }, { status: 400 });
+  const id = req.nextUrl.searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "id is required." }, { status: 400 });
 
   const db = await getDb();
-  await db.collection("college_scholarships").deleteOne({
-    id: scholarshipId,
-    collegeprofile_id: auth.collegeprofile_id,
-  });
+  await db.collection("event").deleteOne({ _id: new ObjectId(id), collegeprofile_id: auth.collegeprofile_id });
 
   return NextResponse.json({ success: true });
 }

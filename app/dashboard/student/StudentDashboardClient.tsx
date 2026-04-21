@@ -40,6 +40,7 @@ interface NavItem { id: TabId; label: string; icon: string; groupId?: string }
 export default function StudentDashboardClient({ user, activated }: Props) {
   const [activeTab, setActiveTab]     = useState<TabId>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed]     = useState(false);
   const [showActivatedBanner, setShowActivatedBanner] = useState(!!activated);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [photo, setPhoto] = useState<string | null>(null);
@@ -120,36 +121,55 @@ export default function StudentDashboardClient({ user, activated }: Props) {
     ];
 
     return (
-      <div className="flex flex-col h-full bg-[#333333] text-white font-sans">
+      <div className="flex flex-col h-full bg-[#333333] text-white font-sans transition-all duration-300">
         {/* Profile Card Section */}
-        <div className="p-5 space-y-4">
+        <div className={`p-5 space-y-4 ${collapsed ? "px-2" : "px-5"}`}>
           <div className="flex flex-col items-center">
-            <div className="w-28 h-28 rounded-full border-[4px] border-white/20 flex items-center justify-center bg-white/10 mb-3 relative overflow-hidden">
+            <div className={`rounded-full border-[4px] border-white/20 flex items-center justify-center bg-white/10 relative overflow-hidden transition-all duration-300 ${collapsed ? "w-12 h-12 mb-0" : "w-28 h-28 mb-3"}`}>
               {photo ? (
                 <img src={photo} alt="Profile" className="w-full h-full object-cover rounded-full" />
               ) : (
-                <span className="material-symbols-outlined text-[54px] text-white/30">photo_camera</span>
+                <span className={`material-symbols-outlined text-white/30 transition-all ${collapsed ? "text-[24px]" : "text-[54px]"}`}>photo_camera</span>
               )}
             </div>
-            {!photo && (
-              <p className="text-[11px] font-semibold text-white/40 uppercase tracking-tight text-center leading-tight mb-2">
-                IMAGE NOT AVAILABLE
-              </p>
-            )}
-            {photo && (
-              <p className="text-[12px] font-semibold text-white/70 truncate max-w-[160px] text-center mb-1">{user?.name}</p>
+            {!collapsed && (
+              <>
+                {!photo && (
+                  <p className="text-[11px] font-semibold text-white/40 uppercase tracking-tight text-center leading-tight mb-2">
+                    IMAGE NOT AVAILABLE
+                  </p>
+                )}
+                {photo && (
+                  <p className="text-[12px] font-semibold text-white/70 truncate max-w-[160px] text-center mb-1">{user?.name}</p>
+                )}
+              </>
             )}
           </div>
-          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
-          <button onClick={() => fileRef.current?.click()} disabled={uploading}
-            className="w-full py-2.5 bg-[#8b8b8b] text-white text-[12px] font-medium rounded-[6px] hover:bg-[#777] transition-colors uppercase tracking-wider shadow-md disabled:opacity-50">
-            {uploading ? "Uploading..." : "Upload New Profile image"}
-          </button>
+          {!collapsed && (
+            <>
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+              <button onClick={() => fileRef.current?.click()} disabled={uploading}
+                className="w-full py-2.5 bg-[#8b8b8b] text-white text-[12px] font-medium rounded-[6px] hover:bg-[#777] transition-colors uppercase tracking-wider shadow-md disabled:opacity-50">
+                {uploading ? "Uploading..." : "Upload New Profile image"}
+              </button>
+            </>
+          )}
         </div>
 
-        {/* Main Menu Label */}
-        <div className="px-6 py-4 mt-2">
-          <p className="text-[11px] font-medium text-white/40 uppercase tracking-[1.5px]">MAIN MENU</p>
+        {/* Main Menu Label + Toggle */}
+        <div className={`px-6 py-4 mt-2 transition-all flex items-center ${collapsed ? "justify-center px-0" : "justify-between"}`}>
+          {!collapsed && (
+            <p className="text-[11px] font-medium text-white/40 uppercase tracking-[1.5px]">MAIN MENU</p>
+          )}
+          <button
+            onClick={() => setCollapsed(v => !v)}
+            className="p-1 rounded hover:bg-white/10 text-white/40 hover:text-white transition-colors"
+            title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            <span className="material-symbols-outlined text-[18px]">
+              {collapsed ? "menu" : "menu_open"}
+            </span>
+          </button>
         </div>
 
         {/* Flat Nav List */}
@@ -160,18 +180,20 @@ export default function StudentDashboardClient({ user, activated }: Props) {
               <button
                 key={item.id}
                 onClick={() => navigate(item.id)}
+                title={collapsed ? item.label : ""}
                 className={`
-                  w-full flex items-center gap-4 px-6 py-4 text-[14px] font-medium transition-all border-l-[4px]
+                  w-full flex items-center gap-4 py-4 text-[14px] font-medium transition-all border-l-[4px]
+                  ${collapsed ? "justify-center px-0 p-3" : "px-6"}
                   ${isActive
                     ? "bg-[#e31e24] text-white border-white"
                     : "text-white/70 hover:bg-white/5 hover:text-white border-transparent"
                   }
                 `}
               >
-                <span className={`material-symbols-outlined text-[20px] ${isActive ? "text-white" : "text-white/60"}`}>
+                <span className={`material-symbols-outlined text-[20px] shrink-0 ${isActive ? "text-white" : "text-white/60"}`}>
                   {item.icon}
                 </span>
-                <span className="truncate">{item.label}</span>
+                {!collapsed && <span className="truncate">{item.label}</span>}
               </button>
             );
           })}
@@ -191,6 +213,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
           >
             <span className="material-symbols-outlined text-[28px]">menu</span>
           </button>
+
           <Link href="/" className="shrink-0">
             <img src="/admissionx-logo.png" alt="AdmissionX logo" className="h-8 w-auto object-contain" />
           </Link>
@@ -272,8 +295,9 @@ export default function StudentDashboardClient({ user, activated }: Props) {
 
         {/* Sidebar ASIDE */}
         <aside className={`
-          fixed inset-y-0 left-0 z-[70] lg:static w-[280px] h-full shadow-2xl lg:shadow-none
-          transition-transform duration-300 ease-in-out
+          fixed inset-y-0 left-0 z-[70] lg:static h-full shadow-2xl lg:shadow-none
+          transition-all duration-300 ease-in-out
+          ${collapsed ? "w-[80px]" : "w-[280px]"}
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}>
           <SidebarContent />

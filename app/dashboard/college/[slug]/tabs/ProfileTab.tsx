@@ -105,6 +105,7 @@ export default function ProfileTab({ college }: Props) {
   const [website, setWebsite] = useState("");
   const [universityType, setUniversityType] = useState("");
   const [collegeCode, setCollegeCode] = useState("");
+  const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [mediumOfInstruction, setMediumOfInstruction] = useState("");
@@ -114,7 +115,7 @@ export default function ProfileTab({ college }: Props) {
   const [admissionEnd, setAdmissionEnd] = useState("");
   const [cctv, setCctv] = useState("No");
   const [acCampus, setAcCampus] = useState("No");
-  const [totalStudents, setTotalStudents] = useState("No");
+  const [totalStudents, setTotalStudents] = useState("");
 
   const slug = college.slug;
 
@@ -136,6 +137,16 @@ export default function ProfileTab({ college }: Props) {
       setWebsite(p.website ?? "");
       setUniversityType(p.universityType || "");
       setCollegeCode(p.collegecode || "");
+      setContactEmail((p as any).contactpersonemail || "");
+      setContactName((p as any).contactpersonname || "");
+      setContactPhone((p as any).contactpersonnumber || "");
+      setMediumOfInstruction((p as any).mediumOfInstruction || "");
+      setStudyFrom((p as any).studyForm || "");
+      setAdmissionStart((p as any).admissionStart || "");
+      setAdmissionEnd((p as any).admissionEnd || "");
+      setCctv((p as any).CCTVSurveillance || "No");
+      setAcCampus((p as any).ACCampus || "No");
+      setTotalStudents((p as any).totalStudent || "");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
     } finally {
@@ -156,11 +167,12 @@ export default function ProfileTab({ college }: Props) {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          estyear: estyear || null,
-          website: website.trim(),
+          estyear:              estyear || null,
+          website:              website.trim() || null,
           universityType,
-          collegecode: collegeCode,
+          collegecode:          collegeCode,
           contactEmail,
+          contactName,
           contactPhone,
           mediumOfInstruction,
           studyFrom,
@@ -169,7 +181,7 @@ export default function ProfileTab({ college }: Props) {
           admissionEnd,
           cctv,
           acCampus,
-          totalStudents
+          totalStudent:         totalStudents,
         }),
       });
       const data = await res.json();
@@ -240,7 +252,7 @@ export default function ProfileTab({ college }: Props) {
                   <LegendInput label="Approved By" value="AICTE, UGC, NAAC" placeholder="Select approved type" disabled />
                   <LegendInput label="Established Year" value={estyear} onChange={setEstyear} placeholder="e.g. 1995" type="number" />
                   <LegendInput label="College code" value={collegeCode} onChange={setCollegeCode} placeholder="College code" />
-                  <LegendInput label="Contact Person / Administrator office Name" value="" placeholder="Name" />
+                  <LegendInput label="Contact Person / Administrator office Name" value={contactName} onChange={setContactName} placeholder="Name" />
                   <LegendInput label="Contact Person / Administrator office Email" value={contactEmail} onChange={setContactEmail} placeholder="Email" type="email" />
                   <LegendInput label="Contact Person / Administrator office Phone" value={contactPhone} onChange={setContactPhone} placeholder="Phone" type="tel" />
                   <LegendInput label="Medium instruction" value={mediumOfInstruction} onChange={setMediumOfInstruction} placeholder="e.g. English" />
@@ -258,7 +270,7 @@ export default function ProfileTab({ college }: Props) {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-10">
                     <LegendInput label="CCTV Surveillance" value={cctv} onChange={setCctv} isSelect options={["Yes", "No"]} />
                     <LegendInput label="AC Campus" value={acCampus} onChange={setAcCampus} isSelect options={["Yes", "No"]} />
-                    <LegendInput label="Total No Of Students" value={totalStudents} onChange={setTotalStudents} isSelect options={["Yes", "No"]} />
+                    <LegendInput label="Total No Of Students" value={totalStudents} onChange={setTotalStudents} placeholder="e.g. 5000" type="number" />
                   </div>
                </div>
 

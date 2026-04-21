@@ -21,6 +21,7 @@ interface OverviewData {
     verified: number;
     address: string;
     bannerimage: string | null;
+    logoimage: string | null;
     estyear: number | null;
     admissionStatus: "open" | "closed" | "unknown";
     profileComplete: number;
@@ -125,10 +126,12 @@ export default function OverviewTab({ college, onNavigate }: Props) {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
   
+  const [collegeType, setCollegeType] = useState("");
   const [estyear, setEstyear] = useState("");
   const [website, setWebsite] = useState("");
   const [universityType, setUniversityType] = useState("");
   const [collegeCode, setCollegeCode] = useState("");
+  const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [mediumOfInstruction, setMediumOfInstruction] = useState("");
@@ -138,7 +141,7 @@ export default function OverviewTab({ college, onNavigate }: Props) {
   const [admissionEnd, setAdmissionEnd] = useState("");
   const [cctv, setCctv] = useState("No");
   const [acCampus, setAcCampus] = useState("No");
-  const [totalStudents, setTotalStudents] = useState("No");
+  const [totalStudents, setTotalStudents] = useState("");
 
   const SUB_TABS = [
     { id: "institute", label: "Institute Profile", icon: "edit_square" },
@@ -155,10 +158,21 @@ export default function OverviewTab({ college, onNavigate }: Props) {
       setData(json);
       
       const p = json.profile;
+      setCollegeType(p.college_type_name || "");
       setEstyear(p.estyear?.toString() || "");
       setWebsite(p.website || "");
       setUniversityType(p.universityType || "");
       setCollegeCode(p.collegecode || "");
+      setContactName(p.contactpersonname || "");
+      setContactEmail(p.contactpersonemail || "");
+      setContactPhone(p.contactpersonnumber || "");
+      setMediumOfInstruction(p.mediumOfInstruction || "");
+      setStudyFrom(p.studyForm || "");
+      setAdmissionStart(p.admissionStart || "");
+      setAdmissionEnd(p.admissionEnd || "");
+      setCctv(p.CCTVSurveillance || "No");
+      setAcCampus(p.ACCampus || "No");
+      setTotalStudents(p.totalStudent || "");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
     } finally {
@@ -182,8 +196,10 @@ export default function OverviewTab({ college, onNavigate }: Props) {
           estyear: estyear || null,
           website: website.trim(),
           universityType,
+          collegeType,
           collegecode: collegeCode,
           contactEmail,
+          contactName,
           contactPhone,
           mediumOfInstruction,
           studyFrom,
@@ -192,7 +208,7 @@ export default function OverviewTab({ college, onNavigate }: Props) {
           admissionEnd,
           cctv,
           acCampus,
-          totalStudents
+          totalStudent: totalStudents,
         }),
       });
       const json = await res.json();
@@ -279,8 +295,11 @@ export default function OverviewTab({ college, onNavigate }: Props) {
       </div>
 
       {/* ── Greeting ──────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-[10px] border border-slate-100 shadow-sm p-12 min-h-[140px] flex items-center mb-8">
-         <h2 className="text-[26px] font-black text-slate-700 tracking-tight">Hi! {college.name}</h2>
+      <div className="bg-white rounded-[10px] border border-slate-100 shadow-sm p-12 min-h-[140px] flex items-center gap-6 mb-8">
+        {data.profile.logoimage && (
+          <img src={data.profile.logoimage} alt="College Logo" className="w-20 h-20 object-contain rounded-lg border border-slate-100 shrink-0" />
+        )}
+        <h2 className="text-[26px] font-black text-slate-700 tracking-tight">Hi! {college.name}</h2>
       </div>
 
       {/* ── Sub-navigation ────────────────────────────────────────────────── */}
@@ -318,12 +337,12 @@ export default function OverviewTab({ college, onNavigate }: Props) {
             <div className="bg-white rounded-[10px] border border-slate-100 shadow-sm p-8 md:p-12">
                <div className="grid grid-cols-1 gap-y-10">
                   <LegendInput label="Select University" value={universityType} onChange={setUniversityType} placeholder="Select University" isSelect options={["Amity", "Delhi", "IP", "Other"]} />
-                  <LegendInput label="Select College Type" value="" placeholder="Select College Type" isSelect options={["Private", "Government"]} />
+                  <LegendInput label="Select College Type" value={collegeType} onChange={setCollegeType} placeholder="Select College Type" isSelect options={["Private", "Government"]} />
                   <LegendInput label="Website" value={website} onChange={setWebsite} placeholder="Enter your url here" />
                   <LegendInput label="Approved By" value="AICTE, UGC, NAAC" placeholder="Select approved type" disabled />
                   <LegendInput label="Established Year" value={estyear} onChange={setEstyear} placeholder="e.g. 1995" type="number" />
                   <LegendInput label="College code" value={collegeCode} onChange={setCollegeCode} placeholder="College code" />
-                  <LegendInput label="Contact Person / Administrator office Name" value="" placeholder="Name" />
+                  <LegendInput label="Contact Person / Administrator office Name" value={contactName} onChange={setContactName} placeholder="Name" />
                   <LegendInput label="Contact Person / Administrator office Email" value={contactEmail} onChange={setContactEmail} placeholder="Email" type="email" />
                   <LegendInput label="Contact Person / Administrator office Phone" value={contactPhone} onChange={setContactPhone} placeholder="Phone" type="tel" />
                   <LegendInput label="Medium instruction" value={mediumOfInstruction} onChange={setMediumOfInstruction} placeholder="e.g. English" />
@@ -341,7 +360,7 @@ export default function OverviewTab({ college, onNavigate }: Props) {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-10">
                     <LegendInput label="CCTV Surveillance" value={cctv} onChange={setCctv} isSelect options={["Yes", "No"]} />
                     <LegendInput label="AC Campus" value={acCampus} onChange={setAcCampus} isSelect options={["Yes", "No"]} />
-                    <LegendInput label="Total No Of Students" value={totalStudents} onChange={setTotalStudents} isSelect options={["Yes", "No"]} />
+                    <LegendInput label="Total No Of Students" value={totalStudents} onChange={setTotalStudents} placeholder="e.g. 5000" type="number" />
                   </div>
                </div>
                <div className="mt-16 flex justify-start">
