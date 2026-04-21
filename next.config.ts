@@ -11,6 +11,7 @@ if (
 // Force dev server restart to register new API routes
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   // Prevent Next.js from picking a parent folder as the workspace root when
   // multiple lockfiles exist on the machine.
   outputFileTracingRoot: path.join(__dirname),
