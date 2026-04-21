@@ -84,26 +84,22 @@ export default async function BlogsListingPage({
 
   const db = await getDb();
 
-  const filter: Record<string, unknown> = {
+  const filter: Record<string, any> = {
     isactive: 1,
     slug: { $exists: true, $ne: "" },
   };
-  if (q) {
-    filter.$or = [
-      { topic: { $regex: q, $options: "i" } },
-      { description: { $regex: q, $options: "i" } },
-    ];
-  }
 
-  // Always fetch the latest blog for the hero
-  const featuredRaw = await db
-    .collection("blogs")
-    .find({ isactive: 1, slug: { $exists: true, $ne: "" } })
-    .sort({ created_at: -1 })
-    .limit(1)
-    .project({ id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 })
-    .toArray();
-  const featured = (featuredRaw[0] as unknown as BlogRow) ?? null;
+  if (q) {
+    const keywords = q.split(/\s+/).filter(Boolean);
+    if (keywords.length > 0) {
+      filter.$and = keywords.map((k) => ({
+        $or: [
+          { topic: { $regex: k, $options: "i" } },
+          { description: { $regex: k, $options: "i" } },
+        ],
+      }));
+    }
+  }
 
   const total = await db.collection("blogs").countDocuments(filter);
   const totalPages = totalBlogPages(total, q);
@@ -133,6 +129,21 @@ export default async function BlogsListingPage({
     .toArray();
 
   const blogs = rawBlogs as unknown as BlogRow[];
+
+  // Dynamic hero: if searching, use the very first result found; otherwise use the latest across all blogs
+  let featured: BlogRow | null = null;
+  if (q && blogs.length > 0) {
+    featured = blogs[0];
+  } else {
+    const featuredRaw = await db
+      .collection("blogs")
+      .find({ isactive: 1, slug: { $exists: true, $ne: "" } })
+      .sort({ created_at: -1 })
+      .limit(1)
+      .project({ id: 1, topic: 1, featimage: 1, description: 1, slug: 1, created_at: 1 })
+      .toArray();
+    featured = (featuredRaw[0] as unknown as BlogRow) ?? null;
+  }
   const gridBlogs = blogs;
 
   function href(p: number) {

@@ -10,16 +10,22 @@ export async function GET(req: NextRequest) {
   try {
     const db = await getDb();
 
-    const filter: object = q
-      ? {
-          isactive: 1,
-          slug: { $exists: true, $ne: "" },
+    const filter: Record<string, any> = {
+      isactive: 1,
+      slug: { $exists: true, $ne: "" },
+    };
+
+    if (q) {
+      const keywords = q.split(/\s+/).filter(Boolean);
+      if (keywords.length > 0) {
+        filter.$and = keywords.map((k) => ({
           $or: [
-            { topic: { $regex: q, $options: "i" } },
-            { description: { $regex: q, $options: "i" } },
+            { topic: { $regex: k, $options: "i" } },
+            { description: { $regex: k, $options: "i" } },
           ],
-        }
-      : { isactive: 1, slug: { $exists: true, $ne: "" } };
+        }));
+      }
+    }
 
     const [rows, total] = await Promise.all([
       db.collection("blogs")
