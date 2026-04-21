@@ -35,13 +35,14 @@ const CARDS = [
 
 export default function ExploreCards() {
   return (
-    <section className="w-[1600px] max-w-none  px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10 pb-16">
-      <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <section className="w-full pb-16">
+      <div className="w-full px-6 md:px-10 lg:px-20">
+        <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {CARDS.map((card) => (
           <Link
             key={card.title}
             href={card.href}
-            className="group relative overflow-hidden rounded-[5px] border border-neutral-200/90  p-6 shadow-sm hover:shadow-md transition-all"
+            className="group relative overflow-hidden rounded-[5px] border border-neutral-200/90 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-md transition-all"
           >
             <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${card.gradient} opacity-10 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-500`} />
             <div className="relative">
@@ -59,6 +60,7 @@ export default function ExploreCards() {
             </div>
           </Link>
         ))}
+        </div>
       </div>
     </section>
   );

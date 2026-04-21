@@ -61,6 +61,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
   function renderTab() {
     switch (activeTab) {
       case "overview":               return <OverviewTab           user={user} />;
+      case "overview":               return <OverviewTab           user={user} navigate={(tab: string) => navigate(tab as TabId)} />;
       case "account-details":        return <ProfileTab            user={user} />;
       case "address":                return <AddressTab            user={user} />;
       case "academic-details":       return <MarksTab              user={user} />;
@@ -73,7 +74,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
       case "qa-questions":           return <QATab                 user={user} type="questions" />;
       case "counselling-forms":      return <CounsellingFormsTab   user={user} />;
       case "help-desk":              return <HelpDeskTab           user={user} />;
-      default:                       return <OverviewTab           user={user} />;
+      default:                       return <OverviewTab           user={user} navigate={(tab: string) => navigate(tab as TabId)} />;
     }
   }
 

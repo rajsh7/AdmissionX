@@ -38,7 +38,7 @@ export default function PlacementsTab({
     <div className="w-full bg-white pt-10 pb-24">
       {/* --- PHASE 1: UNIFIED PLACEMENTS CARD --- */}
       <div className="w-full px-4 md:px-10 lg:px-12 mx-auto max-w-[1920px]">
-        <div className="bg-white rounded-[5px] shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] overflow-hidden border border-neutral-100 mt-8 relative">
+        <div className="bg-white rounded-[5px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden border border-neutral-100 mt-8 relative">
           {/* Unified Background Image & Overlay */}
           <div className="absolute inset-0 z-0">
             {mosaicImage && (
@@ -58,9 +58,10 @@ export default function PlacementsTab({
             <section className="relative w-full overflow-hidden py-12 lg:py-16 flex flex-col justify-center">
               <div className="w-full px-6 md:px-10 lg:px-12">
                 <div className="flex flex-col gap-10">
-                  {/* Title & Location */}
+                  {/* Title & Location with High-Fidelity Labels */}
                   <div className="animate-in fade-in slide-in-from-left duration-700">
-                    <h2 className="text-[24px] font-bold leading-tight" style={{ color: 'rgba(255, 255, 255, 1)' }}>
+                    <span className="text-[#FF3C3C] text-[24px] font-bold tracking-[0.3em] uppercase block mb-4">PLACEMENTS</span>
+                    <h2 className="text-[45px] font-bold leading-[1.1] mb-6 text-white">
                       India&apos;s biggest university,<br />
                       {collegeName}
                     </h2>
@@ -70,23 +71,23 @@ export default function PlacementsTab({
                     </div>
                   </div>
 
-                  {/* Placement Stats Grid */}
+                  {/* Placement Stats Grid - Standardized Typography */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 max-w-5xl animate-in fade-in slide-in-from-bottom duration-700 delay-200">
                     <div className="bg-white rounded-[5px] p-6 lg:p-8 flex flex-col items-start shadow-xl border border-neutral-100 transition-transform hover:-translate-y-1">
-                      <span className="text-[24px] font-semibold leading-none" style={{ color: 'rgba(62, 62, 62, 1)' }}>{placementRatio}</span>
-                      <span className="text-[18px] font-semibold mt-1.5 leading-tight" style={{ color: 'rgba(62, 62, 62, 1)' }}>Placement Ratio</span>
+                      <span className="text-[28px] font-bold leading-none text-slate-800">{placementRatio}</span>
+                      <span className="text-[20px] font-semibold mt-2 leading-tight text-slate-600">Placement Ratio</span>
                     </div>
                     <div className="bg-white rounded-[5px] p-6 lg:p-8 flex flex-col items-start shadow-xl border border-neutral-100 transition-transform hover:-translate-y-1">
-                      <span className="text-[24px] font-semibold leading-none" style={{ color: 'rgba(62, 62, 62, 1)' }}>{avgPackage}</span>
-                      <span className="text-[18px] font-semibold mt-1.5 leading-tight" style={{ color: 'rgba(62, 62, 62, 1)' }}>Average Package</span>
+                      <span className="text-[28px] font-bold leading-none text-slate-800">{avgPackage}</span>
+                      <span className="text-[20px] font-semibold mt-2 leading-tight text-slate-600">Average Package</span>
                     </div>
                     <div className="bg-white rounded-[5px] p-6 lg:p-8 flex flex-col items-start shadow-xl border border-neutral-100 transition-transform hover:-translate-y-1">
-                      <span className="text-[24px] font-semibold leading-none" style={{ color: 'rgba(62, 62, 62, 1)' }}>{highPackage}</span>
-                      <span className="text-[18px] font-semibold mt-1.5 leading-tight" style={{ color: 'rgba(62, 62, 62, 1)' }}>Highest Package</span>
+                      <span className="text-[28px] font-bold leading-none text-slate-800">{highPackage}</span>
+                      <span className="text-[20px] font-semibold mt-2 leading-tight text-slate-600">Highest Package</span>
                     </div>
                     <div className="bg-white rounded-[5px] p-6 lg:p-8 flex flex-col items-start shadow-xl border border-neutral-100 transition-transform hover:-translate-y-1">
-                      <span className="text-[24px] font-semibold leading-none" style={{ color: 'rgba(62, 62, 62, 1)' }}>{recruitersCount}</span>
-                      <span className="text-[18px] font-semibold mt-1.5 leading-tight" style={{ color: 'rgba(62, 62, 62, 1)' }}>Recruiters</span>
+                      <span className="text-[28px] font-bold leading-none text-slate-800">{recruitersCount}</span>
+                      <span className="text-[20px] font-semibold mt-2 leading-tight text-slate-600">Recruiters</span>
                     </div>
                   </div>
                   
@@ -101,9 +102,9 @@ export default function PlacementsTab({
 
             {/* Bottom: Top Recruiters Inside Card */}
             <div className="px-6 md:px-10 lg:px-12 pb-16 lg:pb-24">
-              <section className="bg-white rounded-[5px] shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] p-10 lg:p-16 border border-neutral-100 relative z-30">
+              <section className="bg-white rounded-[5px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-10 lg:p-16 border border-neutral-100 relative z-30">
               <div className="border-b border-neutral-200 pb-8 mb-12 flex justify-between items-center text-slate-900">
-                <h3 className="text-3xl lg:text-4xl font-bold tracking-tight">Top Recruiters 2025</h3>
+                <h3 className="text-[45px] font-bold tracking-tight">Top Recruiters 2025</h3>
                 <div className="h-1 lg:w-32 bg-[#FF3C3C] rounded-full hidden sm:block" />
               </div>
 

@@ -212,9 +212,9 @@ export default async function NewsPage({
     <div className="min-h-screen bg-white font-poppins">
       <Header />
 
-      <main className="pt-[72px] sm:pt-20 pb-16 w-full">
+      <main className="pt-[42px] sm:pt-20 pb-16 w-full">
         <div className="w-full max-w-none mx-auto px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10">
-          <div className="pt-6 sm:pt-8 lg:pt-10" />
+          <div className="pt-2" />
           {/* Featured */}
           {featured && (
             <article className="mb-10 rounded-[5px] border border-neutral-200/80 bg-neutral-100 shadow-[0_1px_4px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col md:flex-row"
@@ -235,15 +235,23 @@ export default async function NewsPage({
                 <div className="absolute inset-0 bg-black/10 transition-opacity flex items-center justify-center pointer-events-none" />
                 <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-r from-transparent to-white/75" />
               </Link>
-              <div className="flex-1 p-6 sm:p-8 flex flex-col justify-center">
-                <h2 className="text-xl sm:text-2xl font-bold text-neutral-800 leading-snug mb-3">{featured.topic}</h2>
-                <p className="text-sm text-neutral-500 leading-relaxed line-clamp-5 mb-4 pr-4">
+              <div className="flex-1 p-6 sm:p-8 flex flex-col justify-start">
+                <h2
+                  className="text-[32px] font-semibold leading-tight mb-3"
+                  style={{ color: "#3E3E3E" }}
+                >
+                  {featured.topic}
+                </h2>
+                <p
+                  className="text-[20px] font-medium leading-relaxed line-clamp-3 mb-4 pr-4"
+                  style={{ color: "#3E3E3EB5" }}
+                >
                   {excerpt(featured.description, 450) ||
                     "Stay updated with the latest announcements, schedules, and guidance for students and parents."}
                 </p>
                 <div
-                  className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold mb-5"
-                  style={{ color: ACCENT }}
+                  className="flex flex-wrap items-center gap-x-6 gap-y-1 text-[15px] font-medium mb-5"
+                  style={{ color: "#FF3C3C" }}
                 >
                   {timeAgo(featured.created_at) && <span>{timeAgo(featured.created_at)}</span>}
                   {formatFullDate(featured.created_at) && <span>{formatFullDate(featured.created_at)}</span>}
@@ -251,11 +259,11 @@ export default async function NewsPage({
                 </div>
                 <Link
                   href={`/news/${featured.slug}`}
-                  className="inline-flex items-center gap-1 text-sm font-bold w-fit hover:opacity-80 transition-opacity"
-                  style={{ color: ACCENT }}
+                  className="inline-flex items-center gap-1 text-[20px] font-semibold w-fit hover:opacity-80 transition-opacity"
+                  style={{ color: "#D40C11" }}
                 >
                   Read Full Story
-                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                  <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
                 </Link>
               </div>
             </article>

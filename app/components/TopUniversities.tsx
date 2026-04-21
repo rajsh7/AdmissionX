@@ -14,6 +14,7 @@ export interface University {
   location: string;
   image: string;
   rating: number;
+  totalRatingUser: number;
   abbr: string;
   abbrBg: string;
   tags: string[];
@@ -182,7 +183,7 @@ export default function TopUniversities({
             <span className="material-symbols-rounded text-[20px]">
               swap_vert
             </span>
-            Short By: rank
+            Sort By: rank
           </button>
         </div>
 
@@ -224,12 +225,15 @@ export default function TopUniversities({
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                       />
 
-                       <div className="absolute right-4 top-4 flex items-center gap-1 rounded-[5px] bg-white/90 px-2 py-0.5 shadow-sm backdrop-blur">
-                         <span className="material-symbols-rounded text-[18px] text-yellow-500">
+                       <div className="absolute top-3 right-0 bg-white px-2.5 py-1 flex items-center gap-1.5 shadow-md rounded-l-[5px] border border-r-0 border-neutral-100 z-10">
+                         <span className="material-symbols-rounded text-[#FF3C3C] text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                            star
                          </span>
-                         <span className="text-[16px] font-semibold text-[#6C6C6C]">
-                           {uni.rating}
+                         <span className="font-semibold" style={{ fontSize: "13px", color: "#3E3E3E" }}>
+                           {uni.rating.toFixed(1)}
+                           <span className="ml-1 font-medium">
+                             ( {uni.totalRatingUser >= 1000 ? `${(uni.totalRatingUser / 1000).toFixed(1)}k` : uni.totalRatingUser} Reviews )
+                           </span>
                          </span>
                        </div>
 
@@ -240,7 +244,7 @@ export default function TopUniversities({
                       </div>
                     </div>
 
-                     <div className="flex flex-1 flex-col pt-5 pl-5 pr-5 pb-8">
+                     <div className="flex flex-1 flex-col p-5">
                       <div className="mb-4 flex items-start justify-between">
                         <h3 className="line-clamp-2 leading-snug transition-colors group-hover:text-primary" style={{ fontWeight: 700, fontSize: '22px', color: 'rgba(108, 108, 108, 1)' }}>
                           {uni.name}
@@ -256,25 +260,25 @@ export default function TopUniversities({
                         </span>
                       </div>
 
-                      <div className="mb-6 flex flex-wrap gap-3">
+                      <div className="mb-5 flex flex-wrap gap-3">
                         {(uni.offeredCourses?.length ? uni.offeredCourses : [activeTab])
                           .slice(0, 4)
                           .map((course) => (
                             <span
                               key={`${uni.name}-${course}`}
-                              className="inline-flex items-center rounded-[5px] border border-slate-400 px-4 py-2 text-[16px] font-semibold leading-none text-[#6C6C6C]"
+                              className="inline-flex items-center rounded-[5px] border border-slate-400 bg-[#F8FAFC] px-4 py-2 text-[16px] font-semibold leading-none text-[#6C6C6C]"
                             >
                               {course}
                             </span>
                           ))}
                         {(uni.offeredCourses?.length ?? 0) > 4 && (
-                          <span className="inline-flex items-center rounded-[5px] border border-slate-400 px-4 py-2 text-[16px] font-semibold leading-none text-[#6C6C6C]">
+                          <span className="inline-flex items-center rounded-[5px] border border-slate-400 bg-[#F8FAFC] px-4 py-2 text-[16px] font-semibold leading-none text-[#6C6C6C]">
                             +{(uni.offeredCourses?.length ?? 0) - 4} More
                           </span>
                         )}
                       </div>
 
-                      <div className="mt-auto flex items-center justify-between border-t border-slate-200 pt-5">
+                      <div className="mt-auto flex items-center justify-between border-t border-slate-200 pt-4">
                         <div className="text-[16px] font-semibold text-[#6C6C6C]">
                           Avg. Package:{" "}
                           <span className="font-bold text-primary">

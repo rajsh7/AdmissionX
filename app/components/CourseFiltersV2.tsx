@@ -96,7 +96,7 @@ export default function CourseFiltersV2({
               type="text"
               placeholder="Search course name"
               className="w-full px-3 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white placeholder:text-[#9AA0B4] transition-all"
-              style={{ height: "51.8px" }}
+              style={{ height: "45px" }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") applyFilters({ q: (e.target as HTMLInputElement).value });
               }}
@@ -111,7 +111,7 @@ export default function CourseFiltersV2({
                 value={degree}
                 onChange={(e) => { const val = e.target.value; setDegree(val); applyFilters({ degree: val }); }}
                 className="w-full px-3 pr-8 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all"
-                style={{ height: "51.8px" }}
+                style={{ height: "45px" }}
               >
                 <option value="">Select Degree...</option>
                 {levels.map((l) => (
@@ -130,7 +130,7 @@ export default function CourseFiltersV2({
                 value={level}
                 onChange={(e) => { const val = e.target.value; setLevel(val); applyFilters({ level: val }); }}
                 className="w-full px-3 pr-8 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all"
-                style={{ height: "51.8px" }}
+                style={{ height: "45px" }}
               >
                 <option value="">Select Education Level...</option>
                 {levels.map((l) => (
@@ -149,7 +149,7 @@ export default function CourseFiltersV2({
                 value={stream}
                 onChange={(e) => { const val = e.target.value; setStream(val); applyFilters({ stream: val }); }}
                 className="w-full px-3 pr-8 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all"
-                style={{ height: "51.8px" }}
+                style={{ height: "45px" }}
               >
                 <option value="">Select Stream...</option>
                 {streams.map((s) => (
@@ -166,7 +166,7 @@ export default function CourseFiltersV2({
               type="button"
               onClick={() => applyFilters()}
               className="w-full flex items-center justify-center bg-[#FF3C3C] border border-transparent hover:bg-[#E63636] text-white text-[14px] font-bold rounded-[5px] shadow-lg shadow-[#FF3C3C]/20 transition-all active:scale-[0.98]"
-              style={{ height: "51.8px" }}
+              style={{ height: "45px" }}
             >
               Apply filter
             </button>
@@ -174,7 +174,7 @@ export default function CourseFiltersV2({
               type="button"
               onClick={resetAll}
               className="w-full flex items-center justify-center bg-white border border-neutral-200 text-[#6C6C6C] hover:text-neutral-600 hover:border-neutral-400 text-[14px] font-bold rounded-[5px] transition-all"
-              style={{ height: "51.8px" }}
+              style={{ height: "45px" }}
             >
               Reset
             </button>

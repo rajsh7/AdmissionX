@@ -275,23 +275,29 @@ export default function CounsellingPageClient() {
       {/* Hero — single section: background + copy + image */}
       <section className="mt-8 sm:mt-10 lg:mt-12 mb-8 sm:mb-10 lg:mb-12 w-full max-w-none px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10">
         <div
-          className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 lg:items-center px-6 sm:px-8 lg:px-12 xl:px-14 pt-10 sm:pt-12 lg:pt-14 pb-12 sm:pb-14 lg:pb-16 rounded-[5px] bg-neutral-100 bg-cover bg-center bg-no-repeat shadow-[0_12px_40px_-8px_rgba(0,0,0,0.18)] shadow-neutral-900/15 ring-1 ring-neutral-900/[0.06]"
-          style={{ backgroundImage: `url("${HERO_BG}")` }}
+          className="relative flex flex-col lg:flex-row items-center px-6 sm:px-8 lg:px-12 xl:px-14 rounded-[5px] bg-neutral-100 bg-cover bg-center bg-no-repeat shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] shadow-neutral-900/10 overflow-hidden"
+          style={{ backgroundImage: `url("${HERO_BG}")`, minHeight: "400px" }}
         >
-          <div className="flex-1 w-full text-center lg:text-left space-y-5">
-            <h1 className="text-3xl sm:text-4xl lg:text-[2.5rem] font-bold text-neutral-800 leading-tight tracking-tight [text-shadow:0_1px_2px_rgba(255,255,255,0.85)]">
+          {/* Text Content */}
+          <div className="relative z-10 flex-1 w-full text-center lg:text-left py-10 lg:py-0">
+            <h1
+              className="font-semibold leading-[1.1] tracking-tight [text-shadow:0_1px_2px_rgba(255,255,255,0.85)] mb-4 max-w-[850px]"
+              style={{ fontSize: "40px", color: "#3E3E3E" }}
+            >
               Find the Right Course &amp; college in 60 Seconds
             </h1>
-            <p className="text-neutral-700 text-sm sm:text-base leading-relaxed max-w-xl mx-auto lg:mx-0 [text-shadow:0_1px_1px_rgba(255,255,255,0.75)]">
-              Our AI-powered matcher learns your interests and goals, then suggests courses and colleges
-              that fit — so you spend less time searching and more time planning your future.
+            <p
+              className="font-medium leading-relaxed mx-auto lg:mx-0 mb-8 max-w-[850px]"
+              style={{ fontSize: "20px", color: "#3E3E3EB5" }}
+            >
+              Our AI-powered matcher learns your interests and goals, then suggests courses <br className="hidden lg:block" /> and colleges that fit — so you spend less time searching and more <br className="hidden lg:block" /> time planning your future.
             </p>
             <div className="flex justify-center lg:justify-start pt-1">
               <button
                 type="button"
                 onClick={scrollToWizard}
-                className="inline-flex items-center gap-2 text-white font-semibold text-sm sm:text-base px-7 py-3.5 rounded-[5px] shadow-md hover:opacity-95 transition-opacity"
-                style={{ backgroundColor: RED }}
+                className="inline-flex items-center gap-2 text-white font-semibold text-sm sm:text-base px-8 py-3.5 rounded-[5px] shadow-md hover:opacity-95 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{ backgroundColor: "#D40C11" }}
               >
                 Start your journey
                 <span className="material-symbols-outlined text-[20px]" aria-hidden>
@@ -300,13 +306,15 @@ export default function CounsellingPageClient() {
               </button>
             </div>
           </div>
-          <div className="flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[380px] aspect-square relative">
+
+          {/* Robot Mascot */}
+          <div className="absolute right-8 sm:right-16 lg:right-24 top-1/2 -translate-y-1/2 w-[300px] sm:w-[340px] lg:w-[380px] aspect-square pointer-events-none select-none">
             <Image
               src={HERO_ROBOT_SRC}
               alt="Friendly AI counselling assistant"
-              width={380}
-              height={380}
-              className="object-contain object-center w-full h-full drop-shadow-lg"
+              width={400}
+              height={400}
+              className="object-contain object-center w-full h-full drop-shadow-xl"
               priority
             />
           </div>
@@ -315,7 +323,7 @@ export default function CounsellingPageClient() {
 
       {/* Wizard */}
       <section id="counselling-wizard" className="w-full max-w-none px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10 pb-6 scroll-mt-24">
-        <div className="w-full max-w-none mx-auto bg-white rounded-[5px] border border-neutral-200/90 shadow-[0_8px_30px_rgb(0,0,0,0.06)] p-6 sm:p-8 lg:p-10">
+        <div className="w-full max-w-none mx-auto bg-white rounded-[5px] border border-neutral-200/90 shadow-[0_8px_30px_rgb(0,0,0,0.06)] px-6 sm:px-8 lg:px-12 xl:px-14 py-6 sm:py-8 lg:py-10">
           <div className="flex flex-wrap items-start justify-between gap-2 text-xs sm:text-sm text-neutral-500 mb-3">
             <span>
               Step {step} of {STEPS.length}
@@ -333,9 +341,17 @@ export default function CounsellingPageClient() {
           </div>
 
           {step === 1 && (
-            <div className="space-y-4 max-w-lg">
-              <h2 className="text-lg sm:text-xl font-semibold text-neutral-800">Let&apos;s personalize your journey</h2>
-              <p className="text-sm text-neutral-500 leading-relaxed">
+            <div className="space-y-4 max-w-4xl">
+              <h2
+                className="font-medium mb-2"
+                style={{ fontSize: "32px", color: "#3E3E3E" }}
+              >
+                Let&apos;s personalize your journey
+              </h2>
+              <p
+                className="font-medium leading-relaxed"
+                style={{ fontSize: "20px", color: "#3E3E3E80" }}
+              >
                 Answer a few quick questions. It takes about a minute, and we&apos;ll use your answers to surface
                 colleges and courses that fit you.
               </p>
@@ -345,10 +361,18 @@ export default function CounsellingPageClient() {
           {step === 2 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg sm:text-xl font-semibold text-neutral-800 mb-1">
+                <h2
+                  className="font-medium mb-1"
+                  style={{ fontSize: "32px", color: "#3E3E3E" }}
+                >
                   What fields are you most interested in?
                 </h2>
-                <p className="text-sm text-neutral-500">Select up to 3 options to help us narrow down your perfect fit.</p>
+                <p
+                  className="font-medium"
+                  style={{ fontSize: "20px", color: "#3E3E3E80" }}
+                >
+                  Select up to 3 options to help us narrow down your perfect fit.
+                </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {FIELD_OPTIONS.map((f) => {
@@ -393,20 +417,29 @@ export default function CounsellingPageClient() {
           )}
 
           {step === 3 && (
-            <div className="space-y-4 max-w-lg">
-              <h2 className="text-lg sm:text-xl font-semibold text-neutral-800">What&apos;s your current academic level?</h2>
-              <p className="text-sm text-neutral-500">This helps us recommend realistic entry paths.</p>
+            <div className="space-y-4 max-w-4xl">
+              <h2
+                className="font-medium"
+                style={{ fontSize: "32px", color: "#3E3E3E" }}
+              >
+                What&apos;s your current academic level?
+              </h2>
+              <p
+                className="font-medium"
+                style={{ fontSize: "20px", color: "#3E3E3E80" }}
+              >
+                This helps us recommend realistic entry paths.
+              </p>
               <ul className="space-y-2 text-sm text-neutral-700">
                 {ACADEMIC_OPTIONS.map((o) => (
                   <li key={o}>
                     <button
                       type="button"
                       onClick={() => setAcademicLevel(o)}
-                      className={`w-full text-left flex items-center gap-2 rounded-[5px] border px-4 py-3 transition-colors ${
-                        academicLevel === o
-                          ? "border-[#E52E2E] bg-rose-50 text-[#991b1b]"
-                          : "border-neutral-200 bg-neutral-50 hover:border-neutral-300"
-                      }`}
+                      className={`w-full text-left flex items-center gap-2 rounded-[5px] border px-4 py-3 transition-colors ${academicLevel === o
+                        ? "border-[#E52E2E] bg-rose-50 text-[#991b1b]"
+                        : "border-neutral-200 bg-neutral-50 hover:border-neutral-300"
+                        }`}
                     >
                       <span className="material-symbols-outlined text-[20px]">
                         {academicLevel === o ? "radio_button_checked" : "radio_button_unchecked"}
@@ -420,20 +453,29 @@ export default function CounsellingPageClient() {
           )}
 
           {step === 4 && (
-            <div className="space-y-4 max-w-lg">
-              <h2 className="text-lg sm:text-xl font-semibold text-neutral-800">Preferred study locations</h2>
-              <p className="text-sm text-neutral-500">You can refine this later — pick what feels right today.</p>
+            <div className="space-y-4 max-w-4xl">
+              <h2
+                className="font-medium"
+                style={{ fontSize: "32px", color: "#3E3E3E" }}
+              >
+                Preferred study locations
+              </h2>
+              <p
+                className="font-medium"
+                style={{ fontSize: "24px", color: "#3E3E3E80" }}
+              >
+                You can refine this later — pick what feels right today.
+              </p>
               <div className="flex flex-wrap gap-2">
                 {LOCATION_OPTIONS.map((x) => (
                   <button
                     key={x}
                     type="button"
                     onClick={() => toggleLocation(x)}
-                    className={`text-xs font-medium px-3 py-2 rounded-[5px] border transition-colors ${
-                      preferredLocations.has(x)
-                        ? "bg-rose-50 text-[#991b1b] border-[#E52E2E]"
-                        : "bg-neutral-100 text-neutral-700 border-neutral-200 hover:border-neutral-300"
-                    }`}
+                    className={`text-xs font-medium px-3 py-2 rounded-[5px] border transition-colors ${preferredLocations.has(x)
+                      ? "bg-rose-50 text-[#991b1b] border-[#E52E2E]"
+                      : "bg-neutral-100 text-neutral-700 border-neutral-200 hover:border-neutral-300"
+                      }`}
                   >
                     {x}
                   </button>
@@ -443,20 +485,29 @@ export default function CounsellingPageClient() {
           )}
 
           {step === 5 && (
-            <div className="space-y-4 max-w-lg">
-              <h2 className="text-lg sm:text-xl font-semibold text-neutral-800">Annual fee comfort zone</h2>
-              <p className="text-sm text-neutral-500">Rough range is fine; we use it to filter suggestions.</p>
+            <div className="space-y-4 max-w-4xl">
+              <h2
+                className="font-medium"
+                style={{ fontSize: "36px", color: "#3E3E3E" }}
+              >
+                Annual fee comfort zone
+              </h2>
+              <p
+                className="font-medium"
+                style={{ fontSize: "24px", color: "#3E3E3E80" }}
+              >
+                Rough range is fine; we use it to filter suggestions.
+              </p>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 {BUDGET_OPTIONS.map((b) => (
                   <button
                     key={b}
                     type="button"
                     onClick={() => setBudgetRange(b)}
-                    className={`rounded-[5px] border px-4 py-3 font-medium text-center transition-colors ${
-                      budgetRange === b
-                        ? "border-[#E52E2E] bg-rose-50 text-[#991b1b]"
-                        : "border-neutral-200 bg-neutral-50 text-neutral-700 hover:border-neutral-300"
-                    }`}
+                    className={`rounded-[5px] border px-4 py-3 font-medium text-center transition-colors ${budgetRange === b
+                      ? "border-[#E52E2E] bg-rose-50 text-[#991b1b]"
+                      : "border-neutral-200 bg-neutral-50 text-neutral-700 hover:border-neutral-300"
+                      }`}
                   >
                     {b}
                   </button>
@@ -525,15 +576,23 @@ export default function CounsellingPageClient() {
 
       {/* Top matches */}
       <section className="w-full max-w-none px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10 pb-16">
-        <div className="w-full max-w-none mx-auto">
+        <div className="w-full max-w-none mx-auto px-6 sm:px-8 lg:px-12 xl:px-14">
           <div className="mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-neutral-800">Your Top Matches</h2>
-            <p className="text-sm text-neutral-500 mt-1">
+            <h2
+              className="font-semibold"
+              style={{ fontSize: "32px", color: "#3E3E3E" }}
+            >
+              Your Top Matches
+            </h2>
+            <p
+              className="font-normal mt-1"
+              style={{ fontSize: "20px", color: "#3E3E3E80" }}
+            >
               {!hasPersonalizedAnswers
                 ? "Start selecting your preferences to see personalized matches."
                 : personalizedMatches.length === 0
-                ? "No exact matches found for the answers selected so far. Try adjusting a choice to see relevant recommendations."
-                : "Showing matches that fit the personalized answers you selected so far."}
+                  ? "No exact matches found for the answers selected so far. Try adjusting a choice to see relevant recommendations."
+                  : "Showing matches that fit the personalized answers you selected so far."}
             </p>
           </div>
           {personalizedMatches.length === 0 && hasPersonalizedAnswers ? (
@@ -551,43 +610,52 @@ export default function CounsellingPageClient() {
               {personalizedMatches.map((m, idx) => (
                 <article
                   key={`${m.name}-${idx}`}
-                  className="bg-white rounded-[5px] border border-neutral-200/90 overflow-hidden shadow-[0_4px_24px_rgb(0,0,0,0.06)] flex flex-col"
+                  className="bg-white rounded-[5px] border border-neutral-200 overflow-hidden shadow-sm flex flex-col"
                 >
                   <div className="relative aspect-[16/9] w-full">
                     <Image src={m.image} alt={m.name} fill className="object-cover" sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw" />
                     <div
-                      className="absolute top-2 right-2 flex items-center gap-0.5 rounded-[5px] px-2 py-0.5 text-[11px] font-semibold shadow-md"
-                      style={{ backgroundColor: "#FCD34D", color: "#78350F" }}
+                      className="absolute top-3 right-0 flex items-center gap-1 rounded-l-[5px] px-2.5 py-1 bg-white shadow-md z-10"
                     >
-                      <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                      <span className="material-symbols-rounded text-[16px] text-[#FF3C3C]" style={{ fontVariationSettings: "'FILL' 1" }}>
                         star
                       </span>
-                      {m.rating} ({m.reviews})
+                      <span className="font-semibold" style={{ fontSize: "13px", color: "#3E3E3E" }}>
+                        {m.rating} <span className="font-medium ml-1"></span>
+                      </span>
                     </div>
                   </div>
-                  <div className="p-3.5 flex flex-col flex-1 gap-2">
-                    <div className="flex flex-wrap items-start justify-between gap-1">
-                      <h3 className="text-sm font-bold text-neutral-900">{m.name}</h3>
-                      <span className="text-xs font-semibold text-neutral-600 whitespace-nowrap">Avg. Fees {m.fees}</span>
-                    </div>
-                    <p className="text-[11px] text-neutral-500 flex items-center gap-0.5">
+                  <div className="p-5 flex flex-col flex-1 gap-1">
+                    <h3 className="text-[22px] font-semibold text-[#6C6C6C] mb-0.5 leading-tight">{m.name}</h3>
+                    <p className="text-xs text-neutral-500 flex items-center gap-1 mb-4">
                       <span className="material-symbols-outlined text-[14px] text-neutral-400">location_on</span>
                       {m.location}
                     </p>
-                    <span className="text-[10px] font-semibold text-neutral-600 bg-neutral-100 border border-neutral-200/80 rounded-[5px] px-1.5 py-0.5 w-fit">
-                      {m.tag}
-                    </span>
-                    <div>
-                      <p className="text-[11px] font-semibold text-neutral-700 mb-0.5">Why it fits you</p>
-                      <p className="text-xs text-neutral-600 leading-relaxed line-clamp-3">{m.blurb}</p>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                      <span className="text-[11px] font-medium text-neutral-600 bg-neutral-100 border border-neutral-200 rounded-[5px] px-2.5 py-1 whitespace-nowrap">
+                        {m.tag}
+                      </span>
+                      <div className="flex flex-col text-right leading-tight">
+                        <span className="text-[10px] text-neutral-400">Avg. Fees</span>
+                        <span className="text-xs font-bold text-neutral-600">{m.fees}</span>
+                      </div>
                     </div>
-                    <p className="text-xs font-semibold mt-auto" style={{ color: RED }}>
-                      Avg. Package: {m.package}
-                    </p>
-                    <Link href="/top-colleges" className="text-xs font-semibold inline-flex items-center gap-0.5" style={{ color: RED }}>
-                      View Details
-                      <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-                    </Link>
+
+                    <div className="mb-4 flex-1">
+                      <p className="text-[11px] font-medium text-neutral-500 mb-1.5">Why it fits you</p>
+                      <p className="text-xs text-neutral-500 leading-relaxed line-clamp-3">{m.blurb}</p>
+                    </div>
+
+                    <div className="mt-auto border-t border-neutral-100 pt-3.5 flex items-center justify-between">
+                      <p className="text-[15px] font-medium text-neutral-600">
+                        Avg. Package: <span className="font-bold text-[#FF3C3C]">{m.package}</span>
+                      </p>
+                      <Link href="/top-colleges" className="text-[15px] font-semibold text-[#FF3C3C] inline-flex items-center gap-1">
+                        View Details
+                        <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                      </Link>
+                    </div>
                   </div>
                 </article>
               ))}

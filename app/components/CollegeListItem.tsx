@@ -18,23 +18,22 @@ function formatFees(fees: number | null): string {
   return `₹${fees}`;
 }
 
-function StarRating({ rating }: { rating: number }) {
-  const stars = Math.round(rating);
+function StarRating({ rating, count }: { rating: number; count: number }) {
+  if (rating === 0) return null;
+  const countStr = count >= 1000 ? `${(count / 1000).toFixed(1)}k` : count;
   return (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((s) => (
-        <span
-          key={s}
-          className={`material-symbols-outlined text-[12px] ${
-            s <= stars ? "text-amber-400" : "text-neutral-200"
-          }`}
-          style={{ fontVariationSettings: "'FILL' 1" }}
-        >
-          star
+    <div className="flex items-center gap-1.5">
+      <span className="material-symbols-rounded text-[#FCD34D] text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+        star
+      </span>
+      <span 
+        className="font-semibold"
+        style={{ fontSize: "13px", color: "#3E3E3E" }}
+      >
+        {rating.toFixed(1)}
+        <span className="ml-1 font-medium">
+          ( {countStr} Reviews )
         </span>
-      ))}
-      <span className="text-xs font-semibold text-neutral-700 ml-0.5">
-        {rating > 0 ? rating.toFixed(1) : "N/A"}
       </span>
     </div>
   );
@@ -107,9 +106,22 @@ export default function CollegeListItem({
                <span className="material-symbols-outlined text-3xl text-[#FF3C3C]/30">account_balance</span>
             </div>
           )}
+          {/* Top-right: Rating Badge */}
+          <div className="absolute top-1 right-0 bg-white px-1.5 py-0.5 flex items-center gap-1 shadow-md rounded-l-[5px] border border-r-0 border-neutral-100 z-10">
+            <span className="material-symbols-rounded text-[#FF3C3C] text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+              star
+            </span>
+            <span 
+              className="font-semibold"
+              style={{ fontSize: "11px", color: "#3E3E3E" }}
+            >
+              {rating.toFixed(1)}
+            </span>
+          </div>
+
           {/* Rank overlay */}
           {displayRank ? (
-            <div className="absolute top-1.5 left-1.5 w-7 h-7 rounded-[10px] bg-[#FF3C3C] text-white flex items-center justify-center text-[10px] font-black shadow-md">
+            <div className="absolute top-1.5 left-1.5 w-7 h-7 rounded-[5px] bg-[#FF3C3C] text-white flex items-center justify-center text-[10px] font-black shadow-md">
               #{displayRank}
             </div>
           ) : null}
@@ -140,15 +152,8 @@ export default function CollegeListItem({
             <span className="truncate">{location || "India"}</span>
           </p>
 
-          {/* Rating + badges row */}
           <div className="flex flex-wrap items-center gap-2 mb-2.5">
-            <StarRating rating={rating} />
-
-            {totalRatingUser > 0 && (
-              <span className="text-[10px] text-neutral-400">
-                ({totalRatingUser} reviews)
-              </span>
-            )}
+            <StarRating rating={rating} count={totalRatingUser} />
 
             <div className="w-px h-3 bg-neutral-200" />
 

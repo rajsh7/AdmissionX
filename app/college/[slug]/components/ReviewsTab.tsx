@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import Image from "next/image";
 import ExploreCards from "@/app/components/ExploreCards";
 
@@ -8,6 +10,7 @@ interface Review {
   rating: number;
   avatar: string;
   role: string;
+  category?: string;
 }
 
 interface ReviewsTabProps {
@@ -23,10 +26,16 @@ const fallbackReviews: Review[] = Array.from({ length: 6 }).map((_, i) => ({
   avatar: i % 2 === 0
     ? "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=60&w=150&h=150"
     : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=60&w=150&h=150",
+  category: ["All Reviews", "Student", "Alumni", "Campus Life", "Placements"][i % 5],
 }));
 
 export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {}) {
+  const [activeFilter, setActiveFilter] = useState("All Reviews");
   const reviews = propReviews && propReviews.length > 0 ? propReviews : fallbackReviews;
+
+  const filteredReviews = activeFilter === "All Reviews" 
+    ? reviews 
+    : reviews.filter(r => r.category === activeFilter);
 
   const ratingStats = [
     { star: 5, pct: 71 },
@@ -44,18 +53,21 @@ export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {
         <aside className="lg:col-span-4 space-y-8">
 
           {/* Overall Rating Card */}
-          <div className="bg-white rounded-[5px] shadow-[0_20px_80px_-10px_rgba(0,0,0,0.25)] pl-4 md:pl-6 pr-8 py-8 border border-neutral-100">
-            <h4 className="text-slate-900 font-black text-sm uppercase tracking-widest mb-6 flex items-center gap-2">
-              <span className="w-2 h-2 bg-[#FF3C3C] rounded-full" />
-              Overall Rating
-            </h4>
+          <div className="bg-white rounded-[5px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] pl-4 md:pl-6 pr-8 py-8 border border-neutral-100">
+            <span className="text-[#FF3C3C] text-[24px] font-bold tracking-[0.3em] uppercase block mb-4">OVERALL RATING</span>
 
             <div className="flex items-center gap-6 mb-8">
               <div className="text-[40px] font-bold leading-none tracking-tighter" style={{ color: 'rgba(62, 62, 62, 1)' }}>4.8</div>
               <div className="flex flex-col gap-1">
-                <div className="flex text-[#FF3C3C] text-xl">
+                <div className="flex text-yellow-400 gap-0.5">
                   {Array.from({ length: 5 }).map((_, idx) => (
-                    <span key={idx} className="material-symbols-rounded fill-1">star</span>
+                    <span 
+                      key={idx} 
+                      className="material-symbols-rounded text-xl"
+                      style={{ fontVariationSettings: "'FILL' 1" }}
+                    >
+                      star
+                    </span>
                   ))}
                 </div>
                 <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Based on 5,249 reviews</span>
@@ -80,8 +92,8 @@ export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {
           </div>
 
           {/* Satisfaction Stats Card */}
-          <div className="bg-white rounded-[5px] shadow-[0_20px_80px_-10px_rgba(0,0,0,0.25)] pl-4 md:pl-6 pr-8 py-8 border border-neutral-100 relative overflow-hidden">
-            <span className="text-[#FF3C3C] text-[10px] font-black tracking-[0.3em] uppercase block mb-2">STUDENT</span>
+          <div className="bg-white rounded-[5px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] pl-4 md:pl-6 pr-8 py-8 border border-neutral-100 relative overflow-hidden">
+            <span className="text-[#FF3C3C] text-[24px] font-bold tracking-[0.3em] uppercase block mb-3">STUDENT</span>
             <h4 className="text-2xl font-bold text-slate-900 mb-8">Student Satisfaction</h4>
 
             <div className="flex gap-4">
@@ -103,16 +115,17 @@ export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {
         <main className="lg:col-span-8">
 
           {/* Main Filter Tabs - Unified Block */}
-          <div className="mb-10 inline-flex items-center bg-white border border-neutral-200 rounded-[5px] shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] overflow-hidden">
+          <div className="mb-10 inline-flex items-center bg-white border border-neutral-200 rounded-[5px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
             {["All Reviews", "Student", "Alumni", "Campus Life", "Placements"].map((tag, idx) => (
               <button
                 key={idx}
+                onClick={() => setActiveFilter(tag)}
                 className={`px-6 md:px-8 py-3.5 text-xs font-black whitespace-nowrap transition-all duration-300 uppercase tracking-widest border-r border-neutral-100 last:border-r-0 ${
-                  idx === 0
+                  activeFilter === tag
                     ? 'text-[#FF3C3C]'
                     : 'bg-white text-slate-400 hover:text-slate-900 hover:bg-slate-50'
                 }`}
-                style={idx === 0 ? { backgroundColor: 'rgba(255, 60, 60, 0.2)' } : {}}
+                style={activeFilter === tag ? { backgroundColor: 'rgba(255, 60, 60, 0.2)' } : {}}
               >
                 {tag}
               </button>
@@ -121,37 +134,47 @@ export default function ReviewsTab({ reviews: propReviews }: ReviewsTabProps = {
 
           {/* Modern Review Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {reviews.map((rev) => (
+            {filteredReviews.map((rev) => (
               <div
                 key={rev.id}
-                className="bg-white rounded-[5px] pl-4 md:pl-6 pr-8 py-8 shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] border border-neutral-50 relative group transition-all duration-500 hover:-translate-y-2 hover:shadow-red-500/10"
+                className="bg-white rounded-[5px] pl-4 md:pl-6 pr-8 pt-8 pb-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-50 relative group transition-all duration-500 hover:-translate-y-2 hover:shadow-red-500/10"
               >
                 {/* Visual Quote Accent */}
-                <div className="absolute top-8 right-8 text-neutral-100 group-hover:text-red-50 transition-colors duration-500">
-                   <span className="material-symbols-rounded text-6xl rotate-180 opacity-50">format_quote</span>
+                <div className="absolute top-8 right-8 text-[#FF3C3C]">
+                  <span className="material-symbols-rounded text-3xl">format_quote</span>
                 </div>
 
                 <div className="relative z-10">
                   {/* User Info */}
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="relative w-14 h-14 rounded-[5px] overflow-hidden border-2 border-white shadow-xl">
-                       <Image src={rev.avatar} alt={rev.name} fill className="object-cover" />
+                    <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-[#FF3C3C] p-0.5 shrink-0 bg-white shadow-sm">
+                      <div className="w-full h-full rounded-full overflow-hidden relative">
+                        <Image src={rev.avatar} alt={rev.name} fill className="object-cover" />
+                      </div>
                     </div>
                     <div>
-                      <h5 className="text-base font-bold text-slate-900 leading-none mb-1">{rev.name}</h5>
-                      <span className="text-[11px] font-black text-[#FF3C3C] uppercase tracking-widest">{rev.role}</span>
+                      <h5 className="text-[16px] font-bold text-slate-900 leading-none mb-1">{rev.name}</h5>
+                      <span className="text-[11px] font-medium text-slate-400">{rev.role}</span>
                     </div>
                   </div>
 
-                  {/* Review Text */}
-                  <p className="text-sm leading-relaxed text-slate-600 font-medium mb-8">
-                    &ldquo;{rev.text}&rdquo;
-                  </p>
+                  {/* Review Text with Accent Bar */}
+                  <div className="border-l-2 border-[#FF3C3C] pl-4 mb-8">
+                    <p className="text-sm leading-relaxed text-slate-600 font-medium italic">
+                      &ldquo;{rev.text}&rdquo;
+                    </p>
+                  </div>
 
-                  {/* Rating Stars */}
-                  <div className="flex text-[#FF3C3C] border-t border-neutral-50 pt-4 gap-1">
+                  {/* Rating Stars - Yellow with Darker Grey Divider */}
+                  <div className="flex text-yellow-400 border-t border-neutral-200 pt-3 gap-1">
                     {Array.from({ length: 5 }).map((_, i) => (
-                       <span key={i} className={`material-symbols-rounded text-xl ${i < rev.rating ? 'fill-1' : 'text-neutral-200'}`}>star</span>
+                       <span 
+                         key={i} 
+                         className={`material-symbols-rounded text-xl ${i < rev.rating ? 'opacity-100' : 'text-neutral-200'}`}
+                         style={{ fontVariationSettings: i < rev.rating ? "'FILL' 1" : "'FILL' 0" }}
+                       >
+                         star
+                       </span>
                     ))}
                   </div>
                 </div>

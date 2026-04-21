@@ -120,7 +120,7 @@ export default function Footer() {
           FOOTER SECTION 1 — Links
       ══════════════════════════════════════════════════════════════════ */}
       <footer className="w-full bg-[#0a0a0a] pt-16 pb-10 border-t border-white/5">
-        <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
+        <div className="home-page-shell px-0">
 
           {/* Section label */}
           <FadeIn>
@@ -168,7 +168,7 @@ export default function Footer() {
           FOOTER SECTION 2 — About AdmissionX
       ══════════════════════════════════════════════════════════════════ */}
       <footer className="w-full bg-[#111111] pt-14 pb-10">
-        <div className="mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
+        <div className="home-page-shell px-0">
 
           <FadeIn>
             <div className="flex items-center gap-3 mb-10">
