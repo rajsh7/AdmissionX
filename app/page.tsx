@@ -242,6 +242,7 @@ export default async function Page() {
       location: row.location || "India",
       image,
       rating: Number(row.rating) || 4.5,
+      totalRatingUser: 0,
       abbr: abbreviation,
       abbrBg: "bg-primary",
       tags: ["Featured", "Top Ranked"],

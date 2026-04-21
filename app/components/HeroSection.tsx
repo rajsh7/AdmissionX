@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SearchBar from "./SearchBar";
 
@@ -14,7 +12,6 @@ const backgrounds = [
 ];
 
 export default function HeroSection() {
-  const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const [currentBg, setCurrentBg] = useState(0);
 
@@ -49,31 +46,26 @@ export default function HeroSection() {
 
       <div className="relative z-10 flex min-h-[100vh] w-full items-center">
         <div className="home-page-shell flex h-full items-center justify-center lg:justify-end">
-           <div className="w-full py-24 lg:w-[60%] lg:py-32 xl:w-[64%] 2xl:w-[68%]">
-            
+          <div className="w-full py-24 lg:w-[60%] lg:py-32 xl:w-[64%] 2xl:w-[68%]">
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
               className="flex flex-col items-center lg:items-start text-center lg:text-left pt-20 w-full lg:max-w-[920px] lg:ml-auto"
             >
-              <div className="mb-4">
-                <img 
-                  src="/images/Architect Your  Academic Future.png" 
-                  alt="Architect Your Academic Future" 
-                  className="h-auto w-full max-w-[320px] sm:max-w-[450px] lg:max-w-[760px] xl:max-w-[860px] object-contain"
-                />
-              </div>
+              <h1 className="text-[48px] sm:text-[60px] lg:text-[72px] xl:text-[84px] font-bold text-white leading-[1.1] tracking-tight drop-shadow-2xl mb-6">
+                Your Dream College.<br />One Search Away.
+              </h1>
 
-              <p className="mt-8 text-[22px] text-white/90 w-full max-w-3xl leading-relaxed font-normal drop-shadow-sm">
-                The world's most comprehensive academic discovery platform. Search 50,000+ universities, get exam guidance, and read unfiltered student reviews.
+              <p className="text-[20px] sm:text-[22px] text-white/90 w-full max-w-3xl leading-relaxed font-normal drop-shadow-sm">
+                The world&apos;s most comprehensive academic discovery platform. Search 50,000+ universities, get exam guidance, and read unfiltered student reviews.
               </p>
 
               <div className="mt-12 w-full max-w-4xl">
                 <SearchBar />
               </div>
 
-              {/* Social Proof / Students Count */}
+              {/* Social Proof */}
               <div className="mt-14 flex items-center gap-6">
                 <div className="flex -space-x-5 items-center">
                   {[
@@ -101,7 +93,3 @@ export default function HeroSection() {
     </section>
   );
 }
-
-
-
-

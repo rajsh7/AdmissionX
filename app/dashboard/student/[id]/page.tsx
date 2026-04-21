@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
 import { verifyStudentToken } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { getDb } from "@/lib/db";
+import { ObjectId } from "mongodb";
 import StudentDashboardClient from "../StudentDashboardClient";
 
 interface PageProps {
@@ -32,10 +34,22 @@ export default async function StudentDashboardPage({ params, searchParams }: Pag
 
   const { activated } = await searchParams;
 
+  // Fetch avatar from DB (for Google users)
+  let avatar = "";
+  try {
+    const db = await getDb();
+    const student = await db.collection("next_student_signups").findOne(
+      { _id: new ObjectId(id) },
+      { projection: { avatar: 1 } }
+    );
+    avatar = student?.avatar || "";
+  } catch {}
+
   const user = {
     id: payload.id,
     name: payload.name,
     email: payload.email,
+    avatar,
   };
 
   return <StudentDashboardClient user={user} activated={activated === "1"} />;
