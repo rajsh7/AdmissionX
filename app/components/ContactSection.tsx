@@ -129,7 +129,7 @@ export default function ContactSection() {
                     type="submit"
                     disabled={status === "loading"}
                     className="rounded-[5px] bg-primary text-white tracking-wider hover:brightness-105 transition-all shadow-xl shadow-primary/20 disabled:opacity-60"
-                    style={{ width: '317.86px', height: '51.8px', fontSize: '24px', fontWeight: '700' }}
+                    style={{ width: '317.86px', height: '45px', fontSize: '24px', fontWeight: '700' }}
                   >
                     {status === "loading" ? "Sending..." : "Send Message"}
                   </button>

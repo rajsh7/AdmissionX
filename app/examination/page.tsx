@@ -124,13 +124,13 @@ export default async function ExaminationHubPage({
         <Header />
 
         {/* Hero section */}
-        <div className="pt-[6.5rem] sm:pt-28 pb-8 w-full px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10">
+        <div className="pt-20 sm:pt-24 pb-8 w-full px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10">
           <div
             className="relative bg-white rounded-[5px] shadow-lg border border-neutral-200 overflow-hidden flex flex-col md:flex-row bg-cover bg-right bg-no-repeat"
             style={{ minHeight: "360px", backgroundImage: `url("${HERO_BG}")` }}
           >
 
-            <div className="relative z-10 p-8 md:p-12 lg:p-16 flex-1 flex flex-col justify-center">
+            <div className="relative z-10 pt-10 pb-16 px-8 md:px-12 lg:px-16 flex-1 flex flex-col justify-start">
               <h1
                 className="leading-[1.15] mb-4"
                 style={{ fontWeight: 600, fontSize: "48px", color: "rgba(62, 62, 62, 1)" }}
@@ -146,19 +146,21 @@ export default async function ExaminationHubPage({
                 unlock gate for dream University.
               </p>
 
-              <form method="GET" action="/examination" className="flex w-full max-w-[560px] h-[51.8px] bg-white border border-neutral-200 rounded-[5px] overflow-hidden shadow-md">
-                <div className="flex items-center pl-4 pr-2 text-neutral-400">
-                  <span className="material-symbols-outlined text-[20px]">search</span>
+              <form method="GET" action="/examination" className="flex w-full max-w-[560px] h-[51.8px] rounded-[5px] shadow-md transition-all">
+                <div className="flex flex-1 items-center bg-white border border-neutral-200 border-r-0 rounded-l-[5px]">
+                  <div className="flex items-center pl-4 pr-2 text-neutral-400">
+                    <span className="material-symbols-outlined text-[20px]">search</span>
+                  </div>
+                  <input
+                    type="text"
+                    name="q"
+                    defaultValue={q}
+                    suppressHydrationWarning
+                    placeholder="Location, universities, courses..."
+                    className="flex-1 px-2 text-sm text-neutral-800 placeholder-neutral-400 focus:outline-none bg-transparent font-medium min-w-0"
+                  />
                 </div>
-                <input
-                  type="text"
-                  name="q"
-                  defaultValue={q}
-                  suppressHydrationWarning
-                  placeholder="Location, universities, courses..."
-                  className="flex-1 px-2 text-sm text-neutral-800 placeholder-neutral-400 focus:outline-none bg-transparent font-medium"
-                />
-                <button type="submit" suppressHydrationWarning className="bg-[#FF3C3C] hover:bg-[#E23434] text-white font-bold px-10 transition-colors text-sm tracking-wide">
+                <button type="submit" suppressHydrationWarning className="flex-shrink-0 bg-[#FF3C3C] hover:bg-[#E23434] text-white font-bold px-10 transition-colors text-sm tracking-wide rounded-r-[5px]">
                   Search
                 </button>
               </form>

@@ -88,7 +88,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
             {/* Left Side Content */}
             <div className="flex-1 p-8 lg:p-12 xl:p-16 flex flex-col justify-center relative z-10">
               <div className="flex flex-col gap-6">
-                <h1 className="text-[32px] font-bold text-slate-900 leading-[1.1] tracking-tight">
+                <h1 className="text-[45px] font-bold text-slate-900 leading-[1.1] tracking-tight">
                   {title}
                 </h1>
 
@@ -111,10 +111,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
                   {/* CTA Buttons */}
                   <div className="flex gap-4">
-                    <button className="flex-1 py-2.5 bg-[#FF3C3C] text-white rounded-[5px] font-bold text-base hover:bg-red-600 transition-all active:scale-95 shadow-sm">
+                    <button className="flex-1 py-3 px-8 bg-[#FF3C3C] text-white rounded-[5px] font-bold text-base hover:bg-red-600 transition-all active:scale-95 shadow-lg shadow-red-500/20">
                       Apply Now
                     </button>
-                    <button className="flex-1 py-2.5 bg-white border-2 border-[#FF3C3C] text-[#FF3C3C] rounded-[5px] font-bold text-base hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
+                    <button className="flex-1 py-3 px-8 bg-white border-2 border-[#FF3C3C] text-[#FF3C3C] rounded-[5px] font-bold text-base hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
                       <Download className="w-4 h-4" />
                       Download Brochure
                     </button>
@@ -141,7 +141,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
       {/* ─── Stats Bar ────────────────────────────────────────────────────────── */}
       <section className="pb-16 px-4 sm:px-8 lg:px-12">
         <div className="max-w-[1920px] mx-auto">
-          <div className="bg-white rounded-[5px] border border-neutral-200 border-t-2 border-t-black p-8 grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 divide-x lg:divide-y-0 divide-y divide-neutral-400 shadow-xl shadow-slate-200/60">
+          <div className="bg-white rounded-[5px] border border-neutral-200 p-8 grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 divide-x lg:divide-y-0 divide-y divide-neutral-400 shadow-xl shadow-slate-200/60">
             <StatItem label="Duration" value={duration} />
             <StatItem label="Fees" value={avgFees ? formatFees(avgFees) : "—"} suffix={avgFees ? "/year" : undefined} />
             <StatItem label="Placement Rate" value="94%" />
@@ -171,18 +171,13 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
                 {/* Text Content */}
                 <div className="lg:col-span-8 flex flex-col gap-4">
-                  <h2 className="text-[32px] font-bold text-slate-900 leading-tight">
+                  <h2 className="text-[45px] font-bold text-slate-900 leading-tight">
                     Course Overview
                   </h2>
                   <div className="space-y-4">
-                    <p className="text-[20px] font-medium leading-relaxed" style={{ color: "rgba(62, 62, 62, 0.71)" }}>
-                      {description.length > 400 ? description.substring(0, 400) + "..." : description}
+                    <p className="text-[17px] font-normal leading-relaxed" style={{ color: "rgba(62, 62, 62, 1)" }}>
+                      {description}
                     </p>
-                    {description.length > 400 && (
-                      <button className="text-[#FF3C3C] font-bold text-lg flex items-center gap-2 hover:gap-3 transition-all">
-                        Read more <ArrowRight className="w-5 h-5" />
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
@@ -239,12 +234,12 @@ function StatItem({ label, value, suffix }: { label: string; value: string; suff
   return (
     <div className="flex flex-col items-center justify-center text-center p-4">
       <div className="flex items-baseline gap-1">
-        <span className="text-[32px] font-medium text-[#3e3e3e] leading-tight">
+        <span className="text-[28px] font-bold text-[#3e3e3e] leading-tight">
           {value}
         </span>
         {suffix && <span className="text-slate-400 font-semibold">{suffix}</span>}
       </div>
-      <span className="text-[20px] font-medium uppercase tracking-wide" style={{ color: "rgba(62, 62, 62, 0.71)" }}>
+      <span className="text-[20px] font-semibold uppercase tracking-wide" style={{ color: "rgba(62, 62, 62, 0.71)" }}>
         {label}
       </span>
     </div>

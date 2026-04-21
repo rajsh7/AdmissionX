@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 interface BlogFiltersProps {
@@ -9,30 +8,16 @@ interface BlogFiltersProps {
 }
 
 export default function BlogFilters({ currentQuery, currentSort }: BlogFiltersProps) {
-  const [showFilters, setShowFilters] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const sortLabel = currentSort === "oldest" ? "Oldest" : "Latest";
-
-  useEffect(() => {
-    function onClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setShowFilters(false);
-      }
-    }
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, []);
-
   return (
     <div className="mb-6 w-full flex flex-col gap-3">
       {/* Row 1: search + filters dropdown */}
-      <div className="flex flex-row items-center gap-2 w-full" style={{ height: "51.8px" }}>
+      <div className="flex flex-row items-center gap-2 w-full" style={{ height: "45px" }}>
         {/* Search form */}
         <form
           method="GET"
           action="/blogs"
           className="flex flex-row shrink-0"
-          style={{ height: "51.8px", width: "600px" }}
+          style={{ height: "45px", width: "600px" }}
         >
           <div className="flex-1 relative h-full">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[20px] text-neutral-400">
@@ -49,71 +34,12 @@ export default function BlogFilters({ currentQuery, currentSort }: BlogFiltersPr
           </div>
           <button
             type="submit"
-            style={{ backgroundColor: "#FF3B30", height: "51.8px" }}
+            style={{ backgroundColor: "#FF3B30", height: "45px" }}
             className="shrink-0 px-6 rounded-r-[5px] rounded-l-none text-sm font-bold text-white shadow-sm hover:opacity-95 transition-opacity whitespace-nowrap"
           >
             Search Now
           </button>
         </form>
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Filters dropdown */}
-        <div ref={dropdownRef} className="relative shrink-0">
-          <button
-            type="button"
-            onClick={() => setShowFilters(!showFilters)}
-            className="relative flex items-center min-w-[160px] appearance-none rounded-[5px] border border-neutral-200 bg-white px-4 pr-10 text-left text-[13px] font-medium shadow-sm transition-all hover:bg-neutral-50 focus:outline-none"
-            style={{ color: "#6C6C6C", height: "51.8px" }}
-          >
-            Filters ({sortLabel})
-            <span
-              className={`material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[24px] transition-transform duration-200 ${
-                showFilters ? "rotate-180" : ""
-              }`}
-              style={{ color: "#6C6C6C" }}
-            >
-              expand_more
-            </span>
-          </button>
-
-          {showFilters && (
-            <div
-              id="blog-filters"
-              className="absolute right-0 z-30 mt-2 w-[180px] overflow-hidden rounded-[10px] border border-neutral-200 bg-white p-1 shadow-2xl"
-            >
-              <div className="flex flex-col">
-                <Link
-                  href={`/blogs?${new URLSearchParams({
-                    ...(currentQuery ? { q: currentQuery } : {}),
-                    sort: "latest",
-                  }).toString()}`}
-                  className={`w-full rounded-[8px] px-3 py-2 text-[13px] font-medium transition-colors ${
-                    currentSort === "latest"
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-neutral-700 hover:bg-neutral-50"
-                  }`}
-                >
-                  Latest Blogs
-                </Link>
-                <Link
-                  href={`/blogs?${new URLSearchParams({
-                    ...(currentQuery ? { q: currentQuery } : {}),
-                    sort: "oldest",
-                  }).toString()}`}
-                  className={`w-full rounded-[8px] px-3 py-2 text-[13px] font-medium transition-colors ${
-                    currentSort === "oldest"
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-neutral-700 hover:bg-neutral-50"
-                  }`}
-                >
-                  Oldest Blogs
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Row 2: category pills */}

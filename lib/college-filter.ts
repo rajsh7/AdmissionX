@@ -12,6 +12,7 @@ export interface FilterCollegeResult {
   location: string;
   image: string;
   rating: number;
+  totalRatingUser: number;
   abbr: string;
   abbrBg: string;
   tags: string[];
@@ -123,6 +124,7 @@ export async function fetchCollegesForSlug(
             location: "$registeredSortAddress",
             image: "$bannerimage",
             rating: 1,
+            totalRatingUser: 1,
             avgPackage: "$placement.ctcaverage",
             streams: { $setUnion: ["$fa.name", []] },
           },
@@ -153,6 +155,7 @@ export async function fetchCollegesForSlug(
         location: (row.location || "India").trim(),
         image,
         rating: Math.round((Number(row.rating) || 4.5) * 10) / 10,
+        totalRatingUser: Number(row.totalRatingUser) || 20,
         abbr,
         abbrBg: "bg-primary",
         tags: ["Featured", "Top Ranked"],
