@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 
-// ── Auth + ownership helper ───────────────────────────────────────────────────
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
   const token = cookieStore.get("adx_college")?.value;
@@ -11,306 +10,148 @@ async function checkAuth(slug: string) {
   const payload = await verifyCollegeToken(token);
   if (!payload) return null;
 
-  const conn = await pool.getConnection();
-  try {
-    const [rows] = await conn.query(
-      `SELECT cp.id AS collegeprofile_id, cp.users_id
-       FROM collegeprofile cp
-       JOIN users u ON u.id = cp.users_id
-       WHERE cp.slug = ? AND TRIM(LOWER(u.email)) = LOWER(?)
-       LIMIT 1`,
-      [slug, payload.email],
-    );
-    const list = rows as { collegeprofile_id: number; users_id: number }[];
-    if (!list.length) return null;
-    return { payload, collegeprofile_id: list[0].collegeprofile_id, users_id: list[0].users_id };
-  } finally {
-    conn.release();
+  const db = await getDb();
+  const cp = await db.collection("collegeprofile").findOne(
+    { slug },
+    { projection: { _id: 1, id: 1, email: 1, users_id: 1 } }
+  );
+  if (!cp) return null;
+
+  const emailMatch = cp.email?.toLowerCase().trim() === payload.email.toLowerCase().trim();
+  if (!emailMatch) {
+    const user = await db.collection("users").findOne({ id: cp.users_id }, { projection: { email: 1 } });
+    if (!user || user.email?.toLowerCase().trim() !== payload.email.toLowerCase().trim()) return null;
   }
+
+  return { payload, collegeprofile_id: cp.id ? Number(cp.id) : cp._id.toString(), slug };
 }
 
-// ── GET /api/college/dashboard/[slug]/cutoffs ─────────────────────────────────
+// GET
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> },
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
   const auth = await checkAuth(slug);
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const conn = await pool.getConnection();
-  try {
-    const [rows] = await conn.query(
-      `SELECT
-         cc.id,
-         cc.title,
-         cc.description,
-         cc.degree_id,
-         cc.course_id,
-         cc.functionalarea_id,
-         d.name  AS degree_name,
-         co.name AS course_name,
-         fa.name AS stream_name,
-         cc.created_at,
-         cc.updated_at
-       FROM college_cut_offs cc
-       LEFT JOIN degree         d  ON d.id  = cc.degree_id
-       LEFT JOIN course         co ON co.id = cc.course_id
-       LEFT JOIN functionalarea fa ON fa.id = cc.functionalarea_id
-       WHERE cc.collegeprofile_id = ?
-       ORDER BY cc.id ASC`,
-      [auth.collegeprofile_id],
-    );
+  const db = await getDb();
 
-    // Fetch dropdown options for the form
-    const [degreeOptions] = await conn.query(
-      `SELECT id, name FROM degree ORDER BY name ASC LIMIT 200`,
-    );
-    const [courseOptions] = await conn.query(
-      `SELECT id, name FROM course ORDER BY name ASC LIMIT 500`,
-    );
-    const [streamOptions] = await conn.query(
-      `SELECT id, name FROM functionalarea ORDER BY name ASC LIMIT 100`,
-    );
+  const [rows, degreeOptions, courseOptions, streamOptions] = await Promise.all([
+    db.collection("college_cut_offs")
+      .find({ collegeprofile_id: auth.collegeprofile_id })
+      .sort({ id: 1 })
+      .toArray(),
+    db.collection("degree").find({}, { projection: { id: 1, name: 1, _id: 0 } }).sort({ name: 1 }).limit(200).toArray(),
+    db.collection("course").find({}, { projection: { id: 1, name: 1, _id: 0 } }).sort({ name: 1 }).limit(500).toArray(),
+    db.collection("functionalarea").find({}, { projection: { id: 1, name: 1, _id: 0 } }).sort({ name: 1 }).limit(100).toArray(),
+  ]);
 
-    return NextResponse.json({
-      cutoffs: rows,
-      total: (rows as unknown[]).length,
-      options: {
-        degrees: degreeOptions,
-        courses: courseOptions,
-        streams: streamOptions,
-      },
-    });
-  } finally {
-    conn.release();
-  }
+  const degreeMap = new Map(degreeOptions.map((d: any) => [Number(d.id), d.name]));
+  const courseMap = new Map(courseOptions.map((c: any) => [Number(c.id), c.name]));
+  const streamMap = new Map(streamOptions.map((s: any) => [Number(s.id), s.name]));
+
+  const cutoffs = rows.map((r: any) => ({
+    id: r.id,
+    title: r.title ?? "",
+    description: r.description ?? null,
+    degree_id: r.degree_id ?? null,
+    course_id: r.course_id ?? null,
+    functionalarea_id: r.functionalarea_id ?? null,
+    degree_name: r.degree_id ? degreeMap.get(Number(r.degree_id)) ?? null : null,
+    course_name: r.course_id ? courseMap.get(Number(r.course_id)) ?? null : null,
+    stream_name: r.functionalarea_id ? streamMap.get(Number(r.functionalarea_id)) ?? null : null,
+  }));
+
+  return NextResponse.json({
+    cutoffs,
+    total: cutoffs.length,
+    options: { degrees: degreeOptions, courses: courseOptions, streams: streamOptions },
+  });
 }
 
-// ── POST /api/college/dashboard/[slug]/cutoffs ────────────────────────────────
-// Body: { title: string, description?: string, degree_id?, course_id?, functionalarea_id? }
+// POST
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> },
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
   const auth = await checkAuth(slug);
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  let body: {
-    title?: string;
-    description?: string;
-    degree_id?: number | null;
-    course_id?: number | null;
-    functionalarea_id?: number | null;
-  };
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
-  }
+  let body: any;
+  try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 }); }
 
   const title = body.title?.trim();
-  if (!title) {
-    return NextResponse.json({ error: "title is required." }, { status: 400 });
-  }
+  if (!title) return NextResponse.json({ error: "title is required." }, { status: 400 });
 
-  const description      = body.description?.trim()     || null;
-  const degree_id        = body.degree_id        ?? null;
-  const course_id        = body.course_id        ?? null;
-  const functionalarea_id = body.functionalarea_id ?? null;
+  const db = await getDb();
+  const last = await db.collection("college_cut_offs").find({}, { projection: { id: 1 } }).sort({ id: -1 }).limit(1).toArray();
+  const newId = ((last[0]?.id as number) ?? 0) + 1;
 
-  const conn = await pool.getConnection();
-  try {
-    const [result] = await conn.query(
-      `INSERT INTO college_cut_offs
-         (title, description, degree_id, course_id, functionalarea_id,
-          collegeprofile_id, users_id, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-      [
-        title, description,
-        degree_id, course_id, functionalarea_id,
-        auth.collegeprofile_id, auth.users_id,
-      ],
-    );
+  await db.collection("college_cut_offs").insertOne({
+    id: newId,
+    collegeprofile_id: auth.collegeprofile_id,
+    title,
+    description: body.description?.trim() || null,
+    degree_id: body.degree_id ? Number(body.degree_id) : null,
+    course_id: body.course_id ? Number(body.course_id) : null,
+    functionalarea_id: body.functionalarea_id ? Number(body.functionalarea_id) : null,
+    created_at: new Date(),
+    updated_at: new Date(),
+  });
 
-    const insertId = (result as { insertId: number }).insertId;
-
-    const [newRows] = await conn.query(
-      `SELECT
-         cc.id, cc.title, cc.description,
-         cc.degree_id, cc.course_id, cc.functionalarea_id,
-         d.name  AS degree_name,
-         co.name AS course_name,
-         fa.name AS stream_name,
-         cc.created_at, cc.updated_at
-       FROM college_cut_offs cc
-       LEFT JOIN degree         d  ON d.id  = cc.degree_id
-       LEFT JOIN course         co ON co.id = cc.course_id
-       LEFT JOIN functionalarea fa ON fa.id = cc.functionalarea_id
-       WHERE cc.id = ?`,
-      [insertId],
-    );
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Cut-off entry added successfully.",
-        cutoff: (newRows as unknown[])[0],
-      },
-      { status: 201 },
-    );
-  } finally {
-    conn.release();
-  }
+  return NextResponse.json({ success: true, id: newId }, { status: 201 });
 }
 
-// ── PUT /api/college/dashboard/[slug]/cutoffs?cutoffId=X ─────────────────────
-// Body: { title?, description?, degree_id?, course_id?, functionalarea_id? }
+// PUT
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> },
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
   const auth = await checkAuth(slug);
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const cutoffId = req.nextUrl.searchParams.get("cutoffId");
-  if (!cutoffId) {
-    return NextResponse.json(
-      { error: "cutoffId query param is required." },
-      { status: 400 },
-    );
-  }
+  let body: any;
+  try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 }); }
 
-  let body: {
-    title?: string;
-    description?: string;
-    degree_id?: number | null;
-    course_id?: number | null;
-    functionalarea_id?: number | null;
-  };
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
-  }
+  const { id, title, description, degree_id, course_id, functionalarea_id } = body;
+  if (!id || !title?.trim()) return NextResponse.json({ error: "id and title are required." }, { status: 400 });
 
-  const setClauses: string[] = [];
-  const values: unknown[] = [];
+  const db = await getDb();
+  await db.collection("college_cut_offs").updateOne(
+    { id: Number(id), collegeprofile_id: auth.collegeprofile_id },
+    { $set: {
+      title: title.trim(),
+      description: description?.trim() || null,
+      degree_id: degree_id ? Number(degree_id) : null,
+      course_id: course_id ? Number(course_id) : null,
+      functionalarea_id: functionalarea_id ? Number(functionalarea_id) : null,
+      updated_at: new Date(),
+    }}
+  );
 
-  if (body.title !== undefined) {
-    const t = body.title.trim();
-    if (!t) return NextResponse.json({ error: "title cannot be empty." }, { status: 400 });
-    setClauses.push("title = ?");
-    values.push(t);
-  }
-  if (body.description !== undefined) {
-    setClauses.push("description = ?");
-    values.push(body.description.trim() || null);
-  }
-  if (Object.prototype.hasOwnProperty.call(body, "degree_id")) {
-    setClauses.push("degree_id = ?");
-    values.push(body.degree_id ?? null);
-  }
-  if (Object.prototype.hasOwnProperty.call(body, "course_id")) {
-    setClauses.push("course_id = ?");
-    values.push(body.course_id ?? null);
-  }
-  if (Object.prototype.hasOwnProperty.call(body, "functionalarea_id")) {
-    setClauses.push("functionalarea_id = ?");
-    values.push(body.functionalarea_id ?? null);
-  }
-
-  if (setClauses.length === 0) {
-    return NextResponse.json({ error: "No valid fields provided." }, { status: 400 });
-  }
-
-  const conn = await pool.getConnection();
-  try {
-    // Verify ownership
-    const [check] = await conn.query(
-      `SELECT id FROM college_cut_offs
-       WHERE id = ? AND collegeprofile_id = ? LIMIT 1`,
-      [cutoffId, auth.collegeprofile_id],
-    );
-    if (!(check as unknown[]).length) {
-      return NextResponse.json(
-        { error: "Cut-off entry not found or does not belong to your college." },
-        { status: 404 },
-      );
-    }
-
-    setClauses.push("updated_at = CURRENT_TIMESTAMP");
-    await conn.query(
-      `UPDATE college_cut_offs SET ${setClauses.join(", ")} WHERE id = ?`,
-      [...values, cutoffId],
-    );
-
-    const [updated] = await conn.query(
-      `SELECT
-         cc.id, cc.title, cc.description,
-         cc.degree_id, cc.course_id, cc.functionalarea_id,
-         d.name  AS degree_name,
-         co.name AS course_name,
-         fa.name AS stream_name,
-         cc.created_at, cc.updated_at
-       FROM college_cut_offs cc
-       LEFT JOIN degree         d  ON d.id  = cc.degree_id
-       LEFT JOIN course         co ON co.id = cc.course_id
-       LEFT JOIN functionalarea fa ON fa.id = cc.functionalarea_id
-       WHERE cc.id = ?`,
-      [cutoffId],
-    );
-
-    return NextResponse.json({
-      success: true,
-      message: "Cut-off entry updated successfully.",
-      cutoff: (updated as unknown[])[0],
-    });
-  } finally {
-    conn.release();
-  }
+  return NextResponse.json({ success: true });
 }
 
-// ── DELETE /api/college/dashboard/[slug]/cutoffs?cutoffId=X ──────────────────
+// DELETE
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> },
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
   const auth = await checkAuth(slug);
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const cutoffId = req.nextUrl.searchParams.get("cutoffId");
-  if (!cutoffId) {
-    return NextResponse.json(
-      { error: "cutoffId query param is required." },
-      { status: 400 },
-    );
-  }
+  const cutoffId = Number(req.nextUrl.searchParams.get("cutoffId"));
+  if (!cutoffId) return NextResponse.json({ error: "cutoffId is required." }, { status: 400 });
 
-  const conn = await pool.getConnection();
-  try {
-    const [result] = await conn.query(
-      `DELETE FROM college_cut_offs
-       WHERE id = ? AND collegeprofile_id = ?`,
-      [cutoffId, auth.collegeprofile_id],
-    );
+  const db = await getDb();
+  const result = await db.collection("college_cut_offs").deleteOne({
+    id: cutoffId, collegeprofile_id: auth.collegeprofile_id,
+  });
 
-    const affected = (result as { affectedRows: number }).affectedRows;
-    if (!affected) {
-      return NextResponse.json(
-        { error: "Cut-off entry not found or does not belong to your college." },
-        { status: 404 },
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Cut-off entry deleted successfully.",
-    });
-  } finally {
-    conn.release();
-  }
+  if (!result.deletedCount) return NextResponse.json({ error: "Cut-off not found." }, { status: 404 });
+  return NextResponse.json({ success: true });
 }

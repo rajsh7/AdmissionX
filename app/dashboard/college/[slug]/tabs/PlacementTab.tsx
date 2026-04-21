@@ -3,12 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import type { CollegeUser } from "../CollegeDashboardClient";
 
-interface Props {
-  college: CollegeUser;
-}
+interface Props { college: CollegeUser; }
 
 interface PlacementData {
-  id: number | null;
   numberofrecruitingcompany: string;
   numberofplacementlastyear: string;
   ctchighest: string;
@@ -18,7 +15,6 @@ interface PlacementData {
 }
 
 const EMPTY: PlacementData = {
-  id: null,
   numberofrecruitingcompany: "",
   numberofplacementlastyear: "",
   ctchighest: "",
@@ -27,36 +23,23 @@ const EMPTY: PlacementData = {
   placementinfo: "",
 };
 
-// ── Components ───────────────────────────────────────────────────────────────
+const inputCls = "w-full border border-slate-200 rounded-[5px] px-4 py-3 text-[14px] text-slate-800 bg-white outline-none focus:border-red-400 transition-all placeholder:text-slate-300";
 
-function LegendInput({
-  label,
-  children,
-  hint,
-  className = "mb-8",
-}: {
-  label: string;
-  children: React.ReactNode;
-  hint?: string;
-  className?: string;
-}) {
+function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className={`w-full ${className}`}>
-      <div className="relative border border-slate-200 rounded-[5px] px-4 pt-5 pb-2 focus-within:border-red-300 transition-colors">
-        <label className="absolute -top-[12px] left-3 bg-white px-2 text-[13px] font-semibold text-slate-500 z-10">
-          {label}
-        </label>
-        {children}
-      </div>
-      {hint && <p className="text-[12px] text-slate-400 mt-1 italic pl-1">{hint}</p>}
+    <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
+      <p className="text-[18px] font-black text-slate-800">{value || "—"}</p>
     </div>
   );
 }
 
 export default function PlacementTab({ college }: Props) {
-  const [form, setForm] = useState<PlacementData>(EMPTY);
+  const [form, setForm] = useState<PlacementData>({ ...EMPTY });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const slug = college.slug;
 
@@ -64,227 +47,144 @@ export default function PlacementTab({ college }: Props) {
     setLoading(true);
     try {
       const res = await fetch(`/api/college/dashboard/${slug}/placement`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed to load");
-      setForm(data.placement as PlacementData);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error ?? "Failed to load.");
+      setForm({ ...EMPTY, ...(d.placement ?? {}) });
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
   }, [slug]);
 
   useEffect(() => { load(); }, [load]);
 
-  const update = (field: keyof PlacementData, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
+  const upd = (k: keyof PlacementData, v: string) => setForm(p => ({ ...p, [k]: v }));
 
-  const handleSave = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setSaving(true);
-    try {
-      const body = {
-        numberofrecruitingcompany: form.numberofrecruitingcompany,
-        numberofplacementlastyear: form.numberofplacementlastyear,
-        ctchighest: form.ctchighest,
-        ctclowest: form.ctclowest,
-        ctcaverage: form.ctcaverage,
-        placementinfo: form.placementinfo,
-      };
-
-      const res = await fetch(`/api/college/dashboard/${slug}/placement`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) throw new Error("Save failed");
-      alert("Placement details saved successfully!");
-      load();
-    } catch (e) {
-      alert("Save failed.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleRemove = async () => {
-    if (!window.confirm("Are you sure you want to remove these placement details?")) return;
-    setSaving(true);
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true); setError(null);
     try {
       const res = await fetch(`/api/college/dashboard/${slug}/placement`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(EMPTY), // Send empty values to clear
+        body: JSON.stringify(form),
       });
-      if (!res.ok) throw new Error("Remove failed");
-      alert("Placement details removed.");
-      setForm(EMPTY);
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error ?? "Save failed.");
+      setSuccess("Placement details saved successfully!");
+      setTimeout(() => setSuccess(null), 4000);
       load();
-    } catch (e) {
-      alert("Remove failed.");
-    } finally {
-      setSaving(false);
-    }
-  };
+    } catch (e) { setError(e instanceof Error ? e.message : "Save failed."); }
+    finally { setSaving(false); }
+  }
 
-  const tabs = [
-    { id: "address", label: "Address", icon: "location_on" },
-    { id: "gallery", label: "Gallery", icon: "image" },
-    { id: "achievements", label: "Achievements", icon: "emoji_events" },
-    { id: "courses", label: "Courses", icon: "menu_book" },
-    { id: "facilities", label: "Facilities", icon: "apartment" },
-    { id: "events", label: "Events", icon: "event" },
-    { id: "scholarships", label: "Scholarships", icon: "payments" },
-    { id: "placement", label: "Placements", icon: "work" },
-    { id: "letters", label: "Letters", icon: "description" },
-    { id: "sports", label: "Sports", icon: "sports_soccer" },
-    { id: "cutoffs", label: "Cut Offs", icon: "assignment" },
-    { id: "faculty", label: "Faculties", icon: "groups" },
-  ];
+  async function handleClear() {
+    if (!confirm("Clear all placement details?")) return;
+    setSaving(true);
+    try {
+      await fetch(`/api/college/dashboard/${slug}/placement`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(EMPTY),
+      });
+      setForm({ ...EMPTY });
+      setSuccess("Placement details cleared.");
+      setTimeout(() => setSuccess(null), 3000);
+    } catch { setError("Clear failed."); }
+    finally { setSaving(false); }
+  }
 
-  const hasData = form.numberofrecruitingcompany || form.placementinfo;
+  const hasData = Object.values(form).some(v => v !== "");
 
   return (
     <div className="pb-24 font-poppins bg-[#fcfcfc] min-h-[600px] border border-slate-200 rounded-[10px] overflow-hidden shadow-sm">
-      {/* ── Sub-navigation ────────────────────────────────────────────────── */}
-      <div className="flex bg-white border-b border-slate-200 overflow-x-auto hide-scrollbar scroll-smooth">
-        {tabs.map((tab) => {
-          const isActive = tab.id === "placement";
-          return (
-            <div
-              key={tab.id}
-              className={`flex items-center justify-center gap-2 py-3 px-6 text-[13px] font-bold transition-all cursor-pointer border-r border-slate-100 flex-1 min-w-[140px] ${isActive ? "bg-[#FF3C3C] text-white" : "text-slate-500 hover:bg-slate-50"
-                }`}
-            >
-              <span className="whitespace-nowrap">{tab.label}</span>
-              <span className={`material-symbols-outlined text-[18px] ${isActive ? "text-white" : "text-slate-400"}`}>
-                {tab.icon}
-              </span>
-            </div>
-          );
-        })}
+      {/* Header */}
+      <div className="p-6 md:p-8 border-b border-slate-100">
+        <h2 className="text-[20px] font-bold text-[#333]">Placement Information</h2>
+        <p className="text-slate-400 text-sm mt-0.5">{college.name}</p>
       </div>
 
-      {/* ── Content Area ─────────────────────────────────────────────────── */}
-      <div className="p-8 md:p-12">
-
-        {/* Section 1: Placement Records */}
-        <div className="mb-16">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-            <h2 className="text-[22px] font-bold text-[#333]">Placement Records</h2>
-            <button className="bg-[#9DA6B7] hover:bg-[#8e99ac] text-white px-6 py-2.5 rounded-[5px] font-bold text-[14px] transition-all shadow-sm">
-              + Add New Placement Record
-            </button>
+      <div className="p-6 md:p-8 space-y-6">
+        {/* Feedback */}
+        {success && (
+          <div className="flex items-center gap-2 p-4 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-700 text-sm font-semibold">
+            <span className="material-symbols-outlined text-[18px]">check_circle</span>{success}
           </div>
+        )}
+        {error && (
+          <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm font-semibold">
+            <span className="material-symbols-outlined text-[18px]">error</span>{error}
+          </div>
+        )}
 
-          {hasData && (
-            <div className="bg-white border border-slate-200 rounded-[10px] p-8 shadow-sm">
-              <div className="space-y-3 text-[14px] text-slate-700 font-medium">
-                <p>Number Of Recruiting Companies : <span className="font-bold">{form.numberofrecruitingcompany || "—"}</span></p>
-                <p>Number Of placements & Year : <span className="font-bold">{form.numberofplacementlastyear || "—"}</span></p>
-                <p>Placement Information : <span className="font-bold">{form.placementinfo || "—"}</span></p>
-                <p>CTC Highest : <span className="font-bold">{form.ctchighest || "—"}</span></p>
-                <p>CTC Lowest : <span className="font-bold">{form.ctclowest || "—"}</span></p>
-                <p>CTC Average : <span className="font-bold">{form.ctcaverage || "—"}</span></p>
-              </div>
-
-              <div className="flex items-center gap-4 mt-10">
-                <button
-                  onClick={() => window.scrollTo({ top: 1000, behavior: "smooth" })}
-                  className="bg-[#00A3FF] hover:bg-[#0092e6] text-white px-10 py-2.5 rounded-[6px] font-bold text-[14px] shadow-sm transition-all"
-                >
-                  Update
-                </button>
-                <button
-                  onClick={handleRemove}
-                  className="bg-[#FF3C3C] hover:bg-[#e63535] text-white px-10 py-2.5 rounded-[6px] font-bold text-[14px] shadow-sm transition-all"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Section 2: Placement Information */}
-        <div>
-          <h2 className="text-[22px] font-bold text-[#333] mb-10">Placement Information</h2>
-
-          <div className="max-w-4xl">
-            <LegendInput label="Placement Description">
-              <textarea
-                value={form.placementinfo}
-                onChange={(e) => update("placementinfo", e.target.value)}
-                placeholder="Please enter placement info here"
-                rows={8}
-                className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1 resize-none"
-              />
-            </LegendInput>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-              <LegendInput label="Number od recruiting Companies">
-                <input
-                  type="text"
-                  value={form.numberofrecruitingcompany}
-                  onChange={(e) => update("numberofrecruitingcompany", e.target.value)}
-                  placeholder="Please enter number of recruiting companies here"
-                  className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1"
-                />
-              </LegendInput>
-              <LegendInput label="Number of Placement & year">
-                <input
-                  type="text"
-                  value={form.numberofplacementlastyear}
-                  onChange={(e) => update("numberofplacementlastyear", e.target.value)}
-                  placeholder="Please enter number of placement & year here"
-                  className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1"
-                />
-              </LegendInput>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6">
-              <LegendInput label="CTC Highest">
-                <input
-                  type="text"
-                  value={form.ctchighest}
-                  onChange={(e) => update("ctchighest", e.target.value)}
-                  placeholder="Please enter CTC highest here"
-                  className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1"
-                />
-              </LegendInput>
-              <LegendInput label="CTC Lowest">
-                <input
-                  type="text"
-                  value={form.ctclowest}
-                  onChange={(e) => update("ctclowest", e.target.value)}
-                  placeholder="Please enter CTC lowest here"
-                  className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1"
-                />
-              </LegendInput>
-              <LegendInput label="CTC Average">
-                <input
-                  type="text"
-                  value={form.ctcaverage}
-                  onChange={(e) => update("ctcaverage", e.target.value)}
-                  placeholder="Please enter CTC average here"
-                  className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1"
-                />
-              </LegendInput>
-            </div>
-
-            <div className="flex justify-center pt-8">
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="bg-[#FF3C3C] hover:bg-[#e63535] text-white px-24 py-3.5 rounded-[6px] font-bold text-[18px] transition-all shadow-md active:scale-95 disabled:opacity-50 min-w-[240px]"
-              >
-                {saving ? "Submitting..." : "Submit"}
+        {/* Current Data Preview */}
+        {hasData && !loading && (
+          <div className="bg-white border border-slate-100 rounded-xl p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[13px] font-black text-slate-500 uppercase tracking-wider">Current Placement Data</p>
+              <button onClick={handleClear} disabled={saving} className="text-xs font-bold text-red-500 hover:text-red-600 transition-colors">
+                Clear All
               </button>
             </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <StatCard label="Recruiting Companies" value={form.numberofrecruitingcompany} />
+              <StatCard label="Placements Last Year" value={form.numberofplacementlastyear} />
+              <StatCard label="Highest CTC" value={form.ctchighest} />
+              <StatCard label="Lowest CTC" value={form.ctclowest} />
+              <StatCard label="Average CTC" value={form.ctcaverage} />
+            </div>
+            {form.placementinfo && (
+              <p className="text-[13px] text-slate-500 mt-3 border-t border-slate-100 pt-3">{form.placementinfo}</p>
+            )}
           </div>
-        </div>
+        )}
 
+        {/* Form */}
+        {loading ? (
+          <div className="space-y-4 animate-pulse max-w-3xl">
+            {[1,2,3,4].map(i => <div key={i} className="h-12 bg-slate-100 rounded-lg" />)}
+          </div>
+        ) : (
+          <form onSubmit={handleSave} className="space-y-5 max-w-3xl">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Placement Description</label>
+              <textarea value={form.placementinfo} onChange={e => upd("placementinfo", e.target.value)}
+                placeholder="Describe your placement process, top recruiters, etc." rows={4}
+                className={`${inputCls} resize-none`} />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">No. of Recruiting Companies</label>
+                <input value={form.numberofrecruitingcompany} onChange={e => upd("numberofrecruitingcompany", e.target.value)} placeholder="e.g. 150" className={inputCls} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">No. of Placements Last Year</label>
+                <input value={form.numberofplacementlastyear} onChange={e => upd("numberofplacementlastyear", e.target.value)} placeholder="e.g. 450" className={inputCls} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">CTC Highest</label>
+                <input value={form.ctchighest} onChange={e => upd("ctchighest", e.target.value)} placeholder="e.g. 45 LPA" className={inputCls} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">CTC Lowest</label>
+                <input value={form.ctclowest} onChange={e => upd("ctclowest", e.target.value)} placeholder="e.g. 3.5 LPA" className={inputCls} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">CTC Average</label>
+                <input value={form.ctcaverage} onChange={e => upd("ctcaverage", e.target.value)} placeholder="e.g. 8 LPA" className={inputCls} />
+              </div>
+            </div>
+
+            <div className="flex justify-start pt-4">
+              <button type="submit" disabled={saving}
+                className="bg-[#FF3C3C] hover:bg-[#e63535] text-white px-12 py-3 rounded-[6px] font-bold text-[16px] transition-all disabled:opacity-50">
+                {saving ? "Saving..." : "Save Placement Details"}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

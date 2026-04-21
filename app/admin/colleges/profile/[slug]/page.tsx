@@ -282,7 +282,7 @@ export default async function EditCollegeProfilePage({
   const bannerUrl = college.bannerimage ? buildImageUrl(college.bannerimage) : null;
 
   // Fetch gallery images for this college
-  const [galleryImages, achievementsList, coursesList, facilitiesList, eventsList, scholarshipsList] = await Promise.all([
+  const [galleryImages, achievementsList, coursesList, facilitiesList, eventsList, scholarshipsList, placementData, lettersList, sportsList, cutoffsList] = await Promise.all([
     db.collection("gallery")
       .find({
         $or: [
@@ -372,6 +372,36 @@ export default async function EditCollegeProfilePage({
         title: String(r.title ?? ""),
         description: String(r.description ?? ""),
       }));
+    })(),
+    // Placement
+    (async () => {
+      const cpId = cp.id ? Number(cp.id) : cp._id.toString();
+      return await db.collection("placement").findOne({ collegeprofile_id: cpId }) ?? null;
+    })(),
+    // Letters
+    db.collection("college_letters")
+      .find({ college_slug: slug })
+      .sort({ created_at: -1 })
+      .limit(5)
+      .toArray(),
+    // Sports
+    (async () => {
+      const cpId = cp.id ? Number(cp.id) : cp._id.toString();
+      const rows = await db.collection("college_sports_activities")
+        .find({ collegeprofile_id: cpId })
+        .sort({ typeOfActivity: 1, name: 1 })
+        .toArray();
+      return rows.map((r: any) => ({ id: r.id, name: String(r.name ?? ""), typeOfActivity: String(r.typeOfActivity ?? "Sports") }));
+    })(),
+    // Cut Offs
+    (async () => {
+      const cpId = cp.id ? Number(cp.id) : cp._id.toString();
+      const rows = await db.collection("college_cut_offs")
+        .find({ collegeprofile_id: cpId })
+        .sort({ id: 1 })
+        .limit(5)
+        .toArray();
+      return rows.map((r: any) => ({ id: r.id, title: String(r.title ?? "") }));
     })(),
   ]);
 
@@ -822,6 +852,123 @@ export default async function EditCollegeProfilePage({
                   ))}
                   <Link href={`/admin/colleges/scholarships?collegeId=${cp.id || cp._id.toString()}`} className="block text-center text-xs font-bold text-blue-600 hover:text-blue-700 pt-1 transition-colors">
                     Manage all scholarships →
+                  </Link>
+                </div>
+              )}
+            </Card>
+
+            {/* Section 12 — Placements */}
+            <Card>
+              <div className="flex items-center justify-between mb-4">
+                <SectionHeading icon="work" title="Placements" />
+                <Link
+                  href={`/admin/colleges/placements?collegeId=${cp.id || cp._id.toString()}`}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  Manage
+                </Link>
+              </div>
+              {!placementData ? (
+                <p className="text-sm text-slate-400">No placement data added yet.</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { label: "Recruiting Companies", value: placementData.numberofrecruitingcompany },
+                    { label: "Placements Last Year", value: placementData.numberofplacementlastyear },
+                    { label: "Highest CTC", value: placementData.ctchighest },
+                    { label: "Lowest CTC", value: placementData.ctclowest },
+                    { label: "Average CTC", value: placementData.ctcaverage },
+                  ].map(({ label, value }) => value ? (
+                    <div key={label} className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</p>
+                      <p className="text-sm font-bold text-slate-700 mt-0.5">{String(value)}</p>
+                    </div>
+                  ) : null)}
+                </div>
+              )}
+            </Card>
+
+            {/* Section 13 — Letters */}
+            <Card>
+              <div className="flex items-center justify-between mb-4">
+                <SectionHeading icon="description" title={`Letters & Accreditations (${lettersList.length})`} />
+              </div>
+              {lettersList.length === 0 ? (
+                <p className="text-sm text-slate-400">No letters uploaded yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {lettersList.map((l: any) => {
+                    const isPdf = l.file_type === "application/pdf";
+                    const url = String(l.file_url ?? "");
+                    return (
+                      <div key={l._id?.toString()} className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50">
+                        <span className="material-symbols-outlined text-[18px] shrink-0" style={{ color: isPdf ? "#FF3C3C" : "#4A6CF7", fontVariationSettings: "'FILL' 1" }}>
+                          {isPdf ? "picture_as_pdf" : "image"}
+                        </span>
+                        <p className="text-sm font-bold text-slate-700 flex-1 truncate">{l.title}</p>
+                        {url && (
+                          <a href={url} target="_blank" rel="noopener noreferrer"
+                            className="text-[11px] font-bold text-blue-600 hover:underline shrink-0">View</a>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
+
+            {/* Section 14 — Sports & Activities */}
+            <Card>
+              <div className="flex items-center justify-between mb-4">
+                <SectionHeading icon="sports_soccer" title={`Sports & Activities (${sportsList.length})`} />
+                <Link
+                  href={`/admin/colleges/sports?collegeId=${cp.id || cp._id.toString()}`}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  Manage
+                </Link>
+              </div>
+              {sportsList.length === 0 ? (
+                <p className="text-sm text-slate-400">No activities added yet.</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {sportsList.map((a: any) => (
+                    <span key={a.id} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200 text-[12px] font-semibold text-slate-700">
+                      <span className="text-[10px] text-slate-400">{a.typeOfActivity}</span>
+                      <span className="text-slate-300">·</span>
+                      {a.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </Card>
+
+            {/* Section 15 — Cut Offs */}
+            <Card>
+              <div className="flex items-center justify-between mb-4">
+                <SectionHeading icon="assignment" title={`Cut Offs (${cutoffsList.length})`} />
+                <Link
+                  href={`/admin/colleges/cut-offs?collegeId=${cp.id || cp._id.toString()}`}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  Manage
+                </Link>
+              </div>
+              {cutoffsList.length === 0 ? (
+                <p className="text-sm text-slate-400">No cut-off entries added yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {cutoffsList.map((c: any) => (
+                    <div key={c.id} className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50">
+                      <span className="material-symbols-outlined text-orange-500 text-[18px] shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>assignment</span>
+                      <p className="text-sm font-bold text-slate-700 truncate">{c.title}</p>
+                    </div>
+                  ))}
+                  <Link href={`/admin/colleges/cut-offs?collegeId=${cp.id || cp._id.toString()}`} className="block text-center text-xs font-bold text-blue-600 hover:text-blue-700 pt-1 transition-colors">
+                    Manage all cut-offs →
                   </Link>
                 </div>
               )}
