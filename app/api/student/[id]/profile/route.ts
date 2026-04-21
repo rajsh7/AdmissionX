@@ -31,8 +31,7 @@ export async function GET(
 
   const prof = await db.collection("next_student_profiles").findOne(
     { student_id: id } as Filter<Document>,
-    { projection: { dob: 1, gender: 1, city: 1, state: 1, country: 1, photo: 1, hobbies: 1, interest: 1, about: 1, avatar: 1 } }
-    { projection: { dob: 1, gender: 1, city: 1, state: 1, country: 1, pincode: 1, address: 1, photo: 1, hobbies: 1, interest: 1, about: 1, parentsname: 1, parentsnumber: 1, project_title: 1, projects: 1 } }
+    { projection: { dob: 1, gender: 1, city: 1, state: 1, country: 1, pincode: 1, address: 1, photo: 1, hobbies: 1, interest: 1, about: 1, avatar: 1, parentsname: 1, parentsnumber: 1, project_title: 1, projects: 1 } }
   ) ?? {};
 
   const p = prof as Record<string, unknown>;
@@ -50,13 +49,9 @@ export async function GET(
     city: p.city ?? "",
     state: p.state ?? "",
     country: p.country ?? "India",
-<<<<<<< HEAD
     photo: photo,
-=======
     pincode: p.pincode ?? "",
     address: p.address ?? "",
-    photo: p.photo ?? "",
->>>>>>> b8095de4892b17c087e4ea882a2d91f529e87879
     hobbies: p.hobbies ?? "",
     interest: p.interest ?? "",
     about: p.about ?? "",

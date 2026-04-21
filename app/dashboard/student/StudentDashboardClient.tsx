@@ -60,7 +60,6 @@ export default function StudentDashboardClient({ user, activated }: Props) {
   // ── Tab renderer ──────────────────────────────────────────────────────────
   function renderTab() {
     switch (activeTab) {
-      case "overview":               return <OverviewTab           user={user} />;
       case "overview":               return <OverviewTab           user={user} navigate={(tab: string) => navigate(tab as TabId)} />;
       case "account-details":        return <ProfileTab            user={user} />;
       case "address":                return <AddressTab            user={user} />;
