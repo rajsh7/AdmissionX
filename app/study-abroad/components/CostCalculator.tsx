@@ -53,7 +53,7 @@ export default function CostCalculator() {
 
   return (
     <section className="py-24 bg-white">
-      <div className="max-w-[1920px] mx-auto px-8 lg:px-12">
+      <div className="home-page-shell">
         
         <div className="bg-white rounded-[5px] overflow-hidden shadow-[0_32px_80px_-16px_rgba(0,0,0,0.08)] flex flex-col xl:flex-row border border-slate-100/60">
           
@@ -193,7 +193,7 @@ export default function CostCalculator() {
 
                <Link
                  href={financialPlanHref}
-                 className="w-full inline-flex items-center justify-center bg-[#333333] hover:bg-black text-white py-5 rounded-[5px] font-bold text-[16px] transition-all shadow-xl shadow-slate-900/10 active:scale-[0.98]"
+                 className="w-full inline-flex items-center justify-center bg-[#333333] hover:bg-black text-white h-[51.8px] rounded-[5px] font-bold text-[16px] transition-all shadow-xl shadow-slate-900/10 active:scale-[0.98]"
                >
                   Get Detailed Financial Plan
                </Link>

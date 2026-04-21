@@ -95,9 +95,9 @@ export default function SearchBar({
     <div className={`relative w-full ${className}`}>
       <form
         onSubmit={handleSearch}
-        className="flex w-full items-stretch overflow-hidden rounded-[5px] border border-white/30 bg-white/40 shadow-2xl backdrop-blur-md transition-all duration-300 focus-within:border-[#FF3C3C] focus-within:ring-4 focus-within:ring-[#FF3C3C]/10"
+        className="flex w-full items-stretch rounded-[5px] shadow-2xl transition-all duration-300 focus-within:ring-4 focus-within:ring-[#FF3C3C]/10"
       >
-        <div className="flex h-[57px] min-w-0 flex-1 items-center gap-3 px-6">
+        <div className="flex h-[50px] min-w-0 flex-1 items-center gap-3 px-6 bg-white/40 backdrop-blur-md border border-white/30 border-r-0 rounded-l-[5px] focus-within:border-[#FF3C3C]">
           <span className="material-symbols-outlined text-[20px] text-white flex-shrink-0">search</span>
           <input
             type="text"
@@ -112,7 +112,7 @@ export default function SearchBar({
         <button
           type="submit"
           suppressHydrationWarning
-          className="h-[57px] min-w-max flex-shrink-0 bg-[#FF3C3C] px-10 text-[20px] font-normal text-white transition-colors hover:bg-[#E63636]"
+          className="h-[50px] min-w-max flex-shrink-0 bg-[#FF3C3C] px-10 text-[20px] font-normal text-white transition-colors hover:bg-[#E63636] rounded-r-[5px]"
         >
           {isLoading ? "Searching..." : "Search Now"}
         </button>

@@ -40,7 +40,7 @@ export default function AboutTab({
     <div className="w-full bg-white pt-4 pb-6">
       <div className="w-full px-4 md:px-10 lg:px-12 mx-auto max-w-[1920px]">
         {/* -- STATS BANNER — Card Style --------------------------------------- */}
-        <section className="relative w-full overflow-hidden rounded-[5px] shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] bg-black" style={{ minHeight: 489 }}>
+        <section className="relative w-full overflow-hidden rounded-[5px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-black" style={{ minHeight: 489 }}>
           {/* Solid Black Background */}
           <div className="absolute inset-0 z-0 bg-black" />
 
@@ -61,7 +61,7 @@ export default function AboutTab({
 
               <div className="flex flex-wrap gap-4 mt-2">
                 {stats.map((stat, idx) => (
-                  <div key={idx} className="bg-white rounded-[5px] px-6 py-5 flex flex-col w-[280px] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-white/20 transition-transform hover:-translate-y-1">
+                  <div key={idx} className="bg-white rounded-[5px] px-6 py-5 flex flex-col w-[280px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/20 transition-transform hover:-translate-y-1">
                     <span className="text-[28px] font-bold leading-none" style={{ color: 'rgba(62,62,62,1)' }}>{stat.value}</span>
                     <span className="text-[20px] font-semibold mt-2 leading-tight" style={{ color: 'rgba(62,62,62,1)' }}>{stat.label}</span>
                   </div>
@@ -73,7 +73,7 @@ export default function AboutTab({
                   className="px-8 py-3 bg-[#FF3C3C] text-white font-bold text-[18px] rounded-[5px] shadow-lg shadow-red-500/20 hover:bg-red-700 transition-colors text-center min-w-[200px]">
                   Apply Now
                 </a>
-                <button className="px-8 py-3 bg-[#FF3C3C]/40 hover:bg-[#FF3C3C]/60 backdrop-blur-md border border-white/20 text-white font-bold text-[18px] rounded-[5px] transition-colors flex items-center justify-center gap-2 min-w-[200px]">
+                <button className="px-8 py-3 bg-[#FF3C3C66] hover:bg-[#FF3C3C]/60 backdrop-blur-sm text-white font-bold text-[18px] rounded-[5px] transition-colors flex items-center justify-center gap-2 min-w-[200px]">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
@@ -81,7 +81,7 @@ export default function AboutTab({
                 </button>
                 <Link
                   href={`/compare?colleges=${slug}`}
-                  className="px-8 py-3 bg-[#FF3C3C]/40 hover:bg-[#FF3C3C]/60 backdrop-blur-md border border-white/20 text-white font-bold text-[18px] rounded-[5px] transition-colors flex items-center justify-center gap-2 min-w-[200px]"
+                  className="px-8 py-3 bg-[#FF3C3C66] hover:bg-[#FF3C3C]/80 backdrop-blur-sm text-white font-bold text-[18px] rounded-[5px] transition-colors flex items-center justify-center gap-2 min-w-[200px]"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -125,28 +125,28 @@ export default function AboutTab({
 
             {/* Right: Content */}
             <div>
-              <span className="text-[#FF3C3C] text-[14px] font-black tracking-[0.3em] uppercase block mb-3">ABOUT US</span>
-              <h3 className="text-3xl md:text-4xl font-bold text-slate-900 leading-[1.15] mb-5">
+              <span className="text-[#FF3C3C] text-[24px] font-bold tracking-[0.3em] uppercase block mb-3">ABOUT US</span>
+              <h3 className="text-[45px] font-bold leading-[1.15] mb-5" style={{ color: "#0E2A46" }}>
                 Benefit From Our Online<br />
                 Learning Expertise Earn<br />
                 <span className="text-[#FF3C3C]">Professional</span>
               </h3>
-              <p className="text-sm text-slate-600 leading-relaxed mb-7">{aboutPara1}</p>
+              <p className="text-[17px] font-normal leading-relaxed mb-7" style={{ color: "#333931" }}>{aboutPara1}</p>
               <div className="grid grid-cols-2 gap-5 mb-8">
                 <div>
-                  <h4 className="text-[14px] font-black text-slate-900 mb-2 uppercase tracking-widest border-l-4 border-[#FF3C3C] pl-3">Our Mission</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed pl-3">{missionText}</p>
+                  <h4 className="text-[17px] font-bold text-slate-900 mb-2 uppercase tracking-widest border-l-4 border-[#FF3C3C] pl-3">Our Mission</h4>
+                  <p className="text-[17px] font-normal leading-relaxed pl-3" style={{ color: "#333931" }}>{missionText}</p>
                 </div>
                 <div>
-                  <h4 className="text-[14px] font-black text-slate-900 mb-2 uppercase tracking-widest border-l-4 border-[#FF3C3C] pl-3">Our Vision</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed pl-3">{visionText}</p>
+                  <h4 className="text-[17px] font-bold text-slate-900 mb-2 uppercase tracking-widest border-l-4 border-[#FF3C3C] pl-3">Our Vision</h4>
+                  <p className="text-[17px] font-normal leading-relaxed pl-3" style={{ color: "#333931" }}>{visionText}</p>
                 </div>
               </div>
               <a href={`/college/${slug}/admission-procedure`}
-                className="inline-flex items-center gap-3 px-7 py-3 bg-[#FF3C3C] text-white rounded-[5px] font-bold text-sm uppercase tracking-widest hover:bg-red-700 transition-colors group">
+                className="inline-flex items-center gap-3 px-7 py-3 bg-[#D40C11] text-white rounded-[5px] font-bold text-sm uppercase tracking-widest hover:bg-red-700 transition-colors group">
                 Apply
-                <svg className="w-8 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 60 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M56 8l4 4m0 0l-4 4m4-4H0" />
+                <svg className="w-10 h-6 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 60 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M56 8l4 4m0 0l-4 4m4-4H0" />
                 </svg>
               </a>
             </div>
@@ -158,12 +158,12 @@ export default function AboutTab({
             <div className="space-y-4">
               {paragraphs.length > 0 ? (
                 paragraphs.map((para, idx) => (
-                  <p key={idx} className="text-base leading-relaxed text-slate-600">{para}</p>
+                  <p key={idx} className="text-[17px] font-normal leading-relaxed" style={{ color: "#333931" }}>{para}</p>
                 ))
               ) : (
-                <p className="text-base leading-relaxed text-slate-600">
-                  {descriptionText || `${collegeName} is a premier educational institution dedicated to academic excellence.`}
-                </p>
+                  <p className="text-[17px] font-normal leading-relaxed" style={{ color: "#333931" }}>
+                    {descriptionText || `${collegeName} is a premier educational institution dedicated to academic excellence.`}
+                  </p>
               )}
             </div>
           </div>

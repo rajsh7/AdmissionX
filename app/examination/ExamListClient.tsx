@@ -63,14 +63,14 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
 
   const filtered = exams.filter((e) => {
     const query = search.toLowerCase().trim();
-    const searchMatch = !query || 
-      e.title.toLowerCase().includes(query) || 
-      (e.streamName?.toLowerCase() || "").includes(query) || 
+    const searchMatch = !query ||
+      e.title.toLowerCase().includes(query) ||
+      (e.streamName?.toLowerCase() || "").includes(query) ||
       (e.description?.toLowerCase() || "").includes(query);
-    
-    const catMatch = activeFilter === "All Exams" || 
+
+    const catMatch = activeFilter === "All Exams" ||
       (e.streamName?.toLowerCase() || "").includes(activeFilter.toLowerCase());
-      
+
     return searchMatch && catMatch;
   });
 
@@ -98,11 +98,10 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
           <button
             key={cat}
             onClick={() => handleFilter(cat)}
-            className={`px-4 sm:px-5 py-2.5 text-sm font-bold rounded-[5px] transition-all duration-200 border shadow-sm ${
-              activeFilter === cat
-                ? "bg-red-500 text-white border-[#d32f2f]"
-                : "bg-[#ffebee] text-black border-red-200 hover:bg-red-100"
-            }`}
+            className={`px-6 sm:px-8 h-[50px] flex items-center justify-center text-[20px] font-semibold rounded-[5px] transition-all duration-200 border shadow-sm ${activeFilter === cat
+              ? "bg-[#D40C11] text-white border-[#FF3C3C]"
+              : "bg-[#E2E3E9] text-[#000000] border-transparent hover:bg-[#D4D5DB]"
+              }`}
           >
             {cat}
           </button>
@@ -158,25 +157,25 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
                 </div>
                 <div className="flex items-center gap-3 sm:gap-4">
                   {exam.getMoreInfoLink ? (
-                    <a href={exam.getMoreInfoLink} target="_blank" rel="noopener noreferrer" className="bg-red-500 hover:bg-[#b30000] text-white text-[12px] font-bold px-8 py-2.5 min-w-[110px] justify-center rounded-[5px] transition-colors inline-flex items-center gap-2">
-                      Apply Now <span className="material-symbols-outlined text-[13px] font-black">open_in_new</span>
+                    <a href={exam.getMoreInfoLink} target="_blank" rel="noopener noreferrer" className="bg-[#D40C11] hover:bg-[#E23434] text-white text-[20px] font-semibold px-8 h-[50px] min-w-[110px] justify-center rounded-[5px] transition-colors inline-flex items-center gap-2">
+                      Apply Now <span className="material-symbols-outlined text-[20px] font-bold">open_in_new</span>
                     </a>
                   ) : (
-                    <Link href={`/examination/${exam.streamSlug}/${exam.slug}`} className="bg-red-500 hover:bg-[#b30000] text-white text-[12px] font-bold px-8 py-2.5 min-w-[110px] justify-center rounded-[5px] transition-colors inline-flex items-center gap-2">
-                      Apply Now <span className="material-symbols-outlined text-[13px] font-black">arrow_forward</span>
+                    <Link href={`/examination/${exam.streamSlug}/${exam.slug}`} className="bg-[#D40C11] hover:bg-[#E23434] text-white text-[20px] font-semibold px-8 h-[51.8px] min-w-[110px] justify-center rounded-[5px] transition-colors inline-flex items-center gap-2">
+                      Apply Now <span className="material-symbols-outlined text-[20px] font-bold">arrow_forward</span>
                     </Link>
                   )}
                   {exam.syllabus ? (
                     <button
                       onClick={() => setSelectedSyllabus(exam)}
-                      className="border border-red-300 text-[#f8312f] hover:bg-red-50 text-[12px] font-bold px-8 py-2.5 min-w-[120px] justify-center rounded-[5px] transition-colors inline-flex items-center"
+                      className="border border-[#6C6C6C] text-[#6C6C6C] hover:bg-neutral-50 text-[20px] font-semibold px-8 h-[50px] min-w-[120px] justify-center rounded-[5px] transition-colors inline-flex items-center"
                     >
                       View Syllabus
                     </button>
                   ) : (
                     <button
                       onClick={() => fetchAndShowSyllabus(exam)}
-                      className="border border-neutral-300 text-neutral-500 hover:bg-neutral-100 text-[12px] font-bold px-8 py-2.5 min-w-[120px] justify-center rounded-[5px] transition-colors inline-flex items-center"
+                      className="border border-neutral-300 text-[#6C6C6C] hover:bg-neutral-100 text-[20px] font-semibold px-8 h-[50px] min-w-[120px] justify-center rounded-[5px] transition-colors inline-flex items-center"
                     >
                       View Syllabus
                     </button>

@@ -41,16 +41,16 @@ export interface ActiveFilters {
 }
 
 const RANKING_OPTIONS = [
-  { id: "1-50",    name: "Top 50"    },
-  { id: "51-100",  name: "Top 100"   },
-  { id: "101-200", name: "Top 200"   },
-  { id: "201+",    name: "Above 200" },
+  { id: "1-50", name: "Top 50" },
+  { id: "51-100", name: "Top 100" },
+  { id: "101-200", name: "Top 200" },
+  { id: "201+", name: "Above 200" },
 ];
 
 const FEES_OPTIONS = [
-  { label: "Up to ₹1 Lakh",   value: "100000"  },
-  { label: "Up to ₹3 Lakhs",  value: "300000"  },
-  { label: "Up to ₹5 Lakhs",  value: "500000"  },
+  { label: "Up to ₹1 Lakh", value: "100000" },
+  { label: "Up to ₹3 Lakhs", value: "300000" },
+  { label: "Up to ₹5 Lakhs", value: "500000" },
   { label: "Up to ₹10 Lakhs", value: "1000000" },
   { label: "Up to ₹20 Lakhs", value: "2000000" },
 ];
@@ -76,14 +76,14 @@ export default function SearchFilters({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [stream, setStream]       = useState(activeStream);
-  const [degree, setDegree]       = useState(activeDegree);
-  const [cityId, setCityId]       = useState(activeCityId);
-  const [stateId, setStateId]     = useState(activeStateId);
+  const [stream, setStream] = useState(activeStream);
+  const [degree, setDegree] = useState(activeDegree);
+  const [cityId, setCityId] = useState(activeCityId);
+  const [stateId, setStateId] = useState(activeStateId);
   const [countryId, setCountryId] = useState(activeCountryId);
-  const [feesMax, setFeesMax]     = useState(activeFeesMax);
-  const [sort]                    = useState(activeSort || "rating");
-  const [ranking, setRanking]     = useState("");
+  const [feesMax, setFeesMax] = useState(activeFeesMax);
+  const [sort] = useState(activeSort || "rating");
+  const [ranking, setRanking] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [citySearch, setCitySearch] = useState("");
   const [cityDropOpen, setCityDropOpen] = useState(false);
@@ -93,15 +93,15 @@ export default function SearchFilters({
   const applyFilters = useCallback(
     (overrides: Partial<ActiveFilters> = {}) => {
       const next: ActiveFilters = {
-        stream:     overrides.stream     !== undefined ? overrides.stream     : stream,
-        degree:     overrides.degree     !== undefined ? overrides.degree     : degree,
-        city_id:    overrides.city_id    !== undefined ? overrides.city_id    : cityId,
-        state_id:   overrides.state_id   !== undefined ? overrides.state_id   : stateId,
+        stream: overrides.stream !== undefined ? overrides.stream : stream,
+        degree: overrides.degree !== undefined ? overrides.degree : degree,
+        city_id: overrides.city_id !== undefined ? overrides.city_id : cityId,
+        state_id: overrides.state_id !== undefined ? overrides.state_id : stateId,
         country_id: overrides.country_id !== undefined ? overrides.country_id : countryId,
-        fees_max:   overrides.fees_max   !== undefined ? overrides.fees_max   : feesMax,
-        sort:       overrides.sort       !== undefined ? overrides.sort       : sort,
-        q:          overrides.q          !== undefined ? overrides.q          : undefined,
-        ranking:    overrides.ranking    !== undefined ? overrides.ranking    : ranking,
+        fees_max: overrides.fees_max !== undefined ? overrides.fees_max : feesMax,
+        sort: overrides.sort !== undefined ? overrides.sort : sort,
+        q: overrides.q !== undefined ? overrides.q : undefined,
+        ranking: overrides.ranking !== undefined ? overrides.ranking : ranking,
       };
       const params = new URLSearchParams(searchParams.toString());
       Object.entries(next).forEach(([key, val]) => {
@@ -132,7 +132,7 @@ export default function SearchFilters({
 
   const handleStream = (val: string) => { setStream(val); applyFilters({ stream: val }); };
   const handleDegree = (val: string) => { setDegree(val); applyFilters({ degree: val }); };
-  const handleFees   = (val: string) => { setFeesMax(val); applyFilters({ fees_max: val }); };
+  const handleFees = (val: string) => { setFeesMax(val); applyFilters({ fees_max: val }); };
 
   const handleCityClick = (cId: string, sId: string, coId: string) => {
     setCityId(cId); setStateId(sId); setCountryId(coId);
@@ -146,7 +146,7 @@ export default function SearchFilters({
   const panel = (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-2.5 bg-[#1A1A1A] -mx-4 -mt-4 mb-2 rounded-t-[10px] border-b border-white/5">
+      <div className="flex items-center justify-between p-2.5 bg-[#1A1A1A] -mx-4 -mt-4 mb-2 rounded-t-[5px] border-b border-white/5">
         <h2 className="text-[25px] font-black text-white flex items-center gap-2">
           <span className="material-symbols-outlined text-[20px] text-[#FF3C3C]">filter_alt</span>
           Filters
@@ -163,7 +163,8 @@ export default function SearchFilters({
           <input
             type="text"
             placeholder="Search your university..."
-            className="w-full pl-3 pr-3 py-3 text-base font-semibold border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-[#6C6C6C]"
+            className="w-full pl-3 pr-3 text-base font-semibold border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-[#6C6C6C]"
+            style={{ height: "45px" }}
             onKeyDown={(e) => {
               if (e.key === "Enter") applyFilters({ q: (e.target as HTMLInputElement).value });
             }}
@@ -177,13 +178,12 @@ export default function SearchFilters({
           {/* Step indicator */}
           <div className="flex items-center gap-1 mb-2">
             {["Country", "State", "City"].map((step, i) => {
-              const done   = i === 0 ? !!countryId : i === 1 ? !!stateId : !!cityId;
-              const active = i === 0 ? !countryId  : i === 1 ? !!countryId && !stateId : !!stateId && !cityId;
+              const done = i === 0 ? !!countryId : i === 1 ? !!stateId : !!cityId;
+              const active = i === 0 ? !countryId : i === 1 ? !!countryId && !stateId : !!stateId && !cityId;
               return (
                 <span key={step} className="inline-flex items-center gap-1">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                    done ? "bg-[#FF3C3C] text-white" : active ? "bg-neutral-200 text-neutral-700" : "bg-neutral-100 text-neutral-400"
-                  }`}>{step}</span>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${done ? "bg-[#FF3C3C] text-white" : active ? "bg-neutral-200 text-neutral-700" : "bg-neutral-100 text-neutral-400"
+                    }`}>{step}</span>
                   {i < 2 && <span className="material-symbols-outlined text-[12px] text-neutral-300">chevron_right</span>}
                 </span>
               );
@@ -204,7 +204,8 @@ export default function SearchFilters({
                 onChange={(e) => { setCitySearch(e.target.value); setCityDropOpen(true); }}
                 onFocus={() => setCityDropOpen(true)}
                 onBlur={() => setTimeout(() => setCityDropOpen(false), 150)}
-                className="w-full pl-9 pr-3 py-2.5 text-base font-semibold border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-[#6C6C6C]"
+                className="w-full pl-9 pr-3 text-base font-semibold border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-[#6C6C6C]"
+                style={{ height: "45px" }}
               />
               {cityDropOpen && (
                 <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-[5px] shadow-xl max-h-48 overflow-y-auto">
@@ -251,7 +252,8 @@ export default function SearchFilters({
                   onChange={(e) => { setCitySearch(e.target.value); setCityDropOpen(true); }}
                   onFocus={() => setCityDropOpen(true)}
                   onBlur={() => setTimeout(() => setCityDropOpen(false), 150)}
-                  className="w-full pl-9 pr-3 py-2.5 text-base font-semibold border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-[#6C6C6C]"
+                  className="w-full pl-9 pr-3 text-base font-semibold border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-[#6C6C6C]"
+                  style={{ height: "45px" }}
                 />
                 {cityDropOpen && (
                   <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-[5px] shadow-xl max-h-48 overflow-y-auto">
@@ -304,7 +306,8 @@ export default function SearchFilters({
                   onChange={(e) => { setCitySearch(e.target.value); setCityDropOpen(true); }}
                   onFocus={() => setCityDropOpen(true)}
                   onBlur={() => setTimeout(() => setCityDropOpen(false), 150)}
-                  className="w-full pl-9 pr-3 py-2.5 text-base font-semibold border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-[#6C6C6C]"
+                  className="w-full pl-9 pr-3 text-base font-semibold border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white transition-all placeholder:text-[#6C6C6C]"
+                  style={{ height: "45px" }}
                 />
                 {cityDropOpen && (
                   <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-[5px] shadow-xl max-h-48 overflow-y-auto">
@@ -345,7 +348,8 @@ export default function SearchFilters({
           <label className="text-[16px] font-semibold text-[#6C6C6C] block">Course name</label>
           <div className="relative">
             <select value={degree} onChange={(e) => handleDegree(e.target.value)}
-              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer">
+              className="w-full pl-3 pr-8 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
+              style={{ height: "45px" }}>
               <option value="">Search according to the course...</option>
               {degrees.map((d) => <option key={d.id} value={d.slug || String(d.id)}>{d.name}</option>)}
             </select>
@@ -358,7 +362,8 @@ export default function SearchFilters({
           <label className="text-[16px] font-semibold text-[#6C6C6C] block">Stream</label>
           <div className="relative">
             <select value={stream} onChange={(e) => handleStream(e.target.value)}
-              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer">
+              className="w-full pl-3 pr-8 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
+              style={{ height: "45px" }}>
               <option value="">Select Stream...</option>
               {streams.map((s) => <option key={s.id} value={s.slug || String(s.id)}>{s.name}</option>)}
             </select>
@@ -371,7 +376,8 @@ export default function SearchFilters({
           <label className="text-[16px] font-semibold text-[#6C6C6C] block">Tuition fee</label>
           <div className="relative">
             <select value={feesMax} onChange={(e) => handleFees(e.target.value)}
-              className="w-full pl-3 pr-8 py-3 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer">
+              className="w-full pl-3 pr-8 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
+              style={{ height: "45px" }}>
               <option value="">Select Fees Range...</option>
               {FEES_OPTIONS.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
             </select>
@@ -406,12 +412,12 @@ export default function SearchFilters({
         <div className="pt-0 grid grid-cols-2 items-stretch gap-3">
           <button type="button" onClick={() => setMobileOpen(false)}
             className="w-full flex items-center justify-center whitespace-nowrap bg-[#FF3C3C] border border-transparent hover:bg-[#E63636] text-white text-[14px] font-bold rounded-[5px] shadow-lg shadow-[#FF3C3C]/20 transition-all active:scale-[0.98]"
-            style={{ height: "51.8px" }}>
+            style={{ height: "45px" }}>
             Apply filter
           </button>
           <button type="button" onClick={resetAll}
             className="w-full flex items-center justify-center whitespace-nowrap bg-white border border-neutral-200 text-[#6C6C6C] hover:text-neutral-600 hover:border-neutral-400 text-[14px] font-bold rounded-[5px] transition-all"
-            style={{ height: "51.8px" }}>
+            style={{ height: "45px" }}>
             Reset
           </button>
         </div>

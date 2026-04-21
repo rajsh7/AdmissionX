@@ -169,7 +169,7 @@ export default async function BlogsListingPage({
 
       <main className="pt-[72px] sm:pt-20 pb-16 w-full">
         <div className="w-full max-w-none mx-auto px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10">
-          <div className="pt-6 sm:pt-8 lg:pt-10" />
+          <div className="pt-2 sm:pt-3" />
           {/* Hero — featured */}
           {featured && (
             <section
@@ -177,7 +177,7 @@ export default async function BlogsListingPage({
               style={{ backgroundImage: `url("${encodeURI("/Background-images/f0b10acfd1d98e25c40741fa92c81454f3557e55 (1).png")}")`, backgroundSize: "cover", backgroundPosition: "right", backgroundRepeat: "no-repeat" }}
             >
               <div className="relative flex flex-col lg:flex-row lg:items-stretch">
-                <div className="flex-1 p-6 sm:p-8 lg:p-10 flex flex-col justify-center order-2 lg:order-1">
+                <div className="flex-1 p-6 sm:p-8 lg:p-12 flex flex-col justify-center order-2 lg:order-1 min-h-[320px] lg:min-h-[380px]">
                   <Link href={`/blogs/${featured.slug}`} className="group mb-4 block">
                     <h1 
                       style={{ fontWeight: 700, fontSize: "32px", color: "#3E3E3E" }}
@@ -186,9 +186,12 @@ export default async function BlogsListingPage({
                       Advanced Global Analysis & Exam Intelligence Report | Admission X
                     </h1>
                   </Link>
-                  <p className="text-sm text-neutral-600 leading-relaxed line-clamp-3 mb-5">
-                    {excerpt(featured.description ?? "", 220) ||
-                      "Expert guidance, practical tips, and up-to-date information to help you plan your next academic step with confidence."}
+                  <p 
+                    className="leading-relaxed line-clamp-3 mb-5"
+                    style={{ fontWeight: 500, fontSize: "20px", color: "#3E3E3EB5" }}
+                  >
+                    {excerpt(featured.description ?? "", 480) ||
+                      "An Advanced Global Analysis & Exam Intelligence Report is a comprehensive, data-driven document that examines examination systems, question patterns, and student performance across different regions or education boards to generate meaningful insights for smarter preparation and decision-making. It combines historical exam data, statistical analysis, and predictive techniques to identify important trends such as frequently asked topics, changing difficulty levels, and…"}
                   </p>
                   <p className="text-xs text-neutral-400 mb-6">
                     <span>By Sarah Williams</span>
@@ -204,19 +207,19 @@ export default async function BlogsListingPage({
                   <Link
                     href={`/blogs/${featured.slug}`}
                     className="inline-flex items-center justify-center px-6 py-3 rounded-[5px] text-sm font-bold text-white shadow-sm hover:opacity-95 transition-opacity w-fit"
-                    style={{ backgroundColor: ACCENT }}
+                    style={{ backgroundColor: "#D40C11" }}
                   >
                     Read Article
                   </Link>
                 </div>
                 <Link
                   href={`/blogs/${featured.slug}`}
-                  className="relative w-full lg:w-[35%] min-h-[220px] lg:min-h-[280px] shrink-0 order-1 lg:order-2 lg:m-0 lg:rounded-none overflow-hidden"
+                  className="relative w-full lg:w-[35%] min-h-[260px] lg:min-h-[380px] shrink-0 order-1 lg:order-2 lg:m-0 lg:rounded-none overflow-hidden"
                 >
                   <BlogImage
                     src={buildImageUrl(featured.featimage)}
                     alt={featured.topic}
-                    className="w-full h-full min-h-[220px] lg:min-h-full object-cover rounded-none"
+                    className="w-full h-full min-h-[260px] lg:min-h-full object-cover rounded-none"
                   />
                   <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-l from-transparent to-white/75 hidden lg:block" />
                 </Link>

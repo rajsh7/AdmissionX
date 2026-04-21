@@ -13,13 +13,20 @@ interface CollegeCardProps {
 
 function StarRating({ rating, count }: { rating: number; count: number }) {
   if (rating === 0) return null;
+  const countStr = count >= 1000 ? `${(count / 1000).toFixed(1)}k` : count;
   return (
-    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur rounded-[10px] px-2.5 py-1 flex items-center gap-1 shadow-sm">
-      <span className="material-symbols-rounded text-yellow-500 text-[18px]">
+    <div className="absolute top-3 right-0 bg-white px-2.5 py-1 flex items-center gap-1.5 shadow-md rounded-l-[5px] border border-r-0 border-neutral-100 z-10">
+      <span className="material-symbols-rounded text-[#FF3C3C] text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
         star
       </span>
-      <span className="text-sm font-normal text-slate-800">
+      <span
+        className="font-semibold"
+        style={{ fontSize: "13px", color: "#3E3E3E" }}
+      >
         {rating.toFixed(1)}
+        <span className="ml-1 font-medium">
+          ( {countStr} Reviews )
+        </span>
       </span>
     </div>
   );
@@ -112,8 +119,8 @@ export default function CollegeCard({
           )}
 
           {/* Tag Overlay (Dynamic Rank / Featured) */}
-          <div className="absolute bottom-4 left-4">
-            <span className="px-3 py-1 rounded-[10px] bg-[#FF3C3C] text-white text-[10px] font-normal uppercase tracking-wider shadow-lg">
+          <div className="absolute bottom-3 left-3">
+            <span className="px-3 py-1 rounded-[5px] bg-[#FF3C3C] text-white text-[10px] font-medium uppercase tracking-wider shadow-lg">
               {displayRank ? `#${displayRank} Ranked` : "Featured"}
             </span>
           </div>
@@ -123,7 +130,7 @@ export default function CollegeCard({
         </div>
 
         {/* ── Body ── */}
-        <div className="p-8 flex flex-col flex-1">
+        <div className="px-5 pt-4 pb-5 flex flex-col flex-1">
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-[22px] font-bold text-[#6C6C6C] leading-snug group-hover:text-[#FF3C3C] transition-colors line-clamp-2">
               {name}
@@ -144,13 +151,13 @@ export default function CollegeCard({
             {(streams.length > 0 ? streams : ["Engineering"]).slice(0, 3).map((course) => (
               <span
                 key={course}
-                className="inline-flex items-center rounded-[5px] border border-slate-400 px-3 py-1.5 text-[13px] font-semibold text-[#6C6C6C] leading-none"
+                className="inline-flex items-center rounded-[5px] border border-slate-400 bg-[#F8FAFC] px-3 py-1.5 text-[13px] font-semibold text-[#6C6C6C] leading-none"
               >
                 {course}
               </span>
             ))}
             {streams.length > 3 && (
-              <span className="inline-flex items-center rounded-[5px] border border-slate-400 px-3 py-1.5 text-[13px] font-semibold text-[#6C6C6C] leading-none">
+              <span className="inline-flex items-center rounded-[5px] border border-slate-400 bg-[#F8FAFC] px-3 py-1.5 text-[13px] font-semibold text-[#6C6C6C] leading-none">
                 +{streams.length - 3} More
               </span>
             )}
@@ -162,8 +169,8 @@ export default function CollegeCard({
                 {college.avg_package || (min_fees
                   ? `₹${(min_fees / 100000).toFixed(1)} LPA`
                   : max_fees
-                  ? `₹${(max_fees / 100000).toFixed(1)} LPA`
-                  : "N/A")}
+                    ? `₹${(max_fees / 100000).toFixed(1)} LPA`
+                    : "N/A")}
               </span>
             </div>
             <span className="inline-flex items-center gap-1 text-[#FF3C3C] font-bold text-[14px] group-hover:translate-x-1 transition-transform">

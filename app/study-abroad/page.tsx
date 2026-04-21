@@ -486,7 +486,7 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
         <JourneySteps ads={ads} />
 
         {/* Explore Cards */}
-        <div className="w-full px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10 pb-16">
+        <div className="home-page-shell pb-16">
           <ExploreCards />
         </div>
       </main>

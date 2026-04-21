@@ -78,7 +78,7 @@ export default function LatestNews() {
         <div className="home-page-shell">
           <div className="h-8 w-48 bg-slate-200 rounded animate-pulse mb-12" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1,2,3,4,5,6].map(i => (
+            {[1, 2, 3, 4, 5, 6].map(i => (
               <div key={i} className="bg-white rounded-[5px] overflow-hidden animate-pulse">
                 <div className="aspect-[16/10] bg-slate-200" />
                 <div className="p-6 space-y-3">
@@ -115,8 +115,8 @@ export default function LatestNews() {
           </div>
           <Link
             href="/news"
-            className="group inline-flex h-[51.8px] shrink-0 items-center gap-2 rounded-[5px] border border-slate-200 bg-white px-8 font-medium transition-all hover:bg-slate-50 shadow-sm hover:shadow-md"
-            style={{ color: "#475569" }}
+            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[5px] border border-slate-200 bg-white px-8 font-medium transition-all hover:bg-slate-50 shadow-sm hover:shadow-md"
+            style={{ height: "45px", color: "#475569" }}
           >
             View All News
             <span className="material-symbols-rounded transition-transform group-hover:translate-x-1">arrow_right_alt</span>
@@ -191,17 +191,17 @@ export default function LatestNews() {
                   </div>
                   <div className="flex min-w-0 flex-1 flex-col justify-between">
                     <div>
-                      <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                      <p className="mb-1 text-[15px] font-semibold uppercase tracking-widest text-slate-400">
                         {formatDate(item.created_at)}
                       </p>
-                      <h4 className="line-clamp-3 text-[15px] font-bold leading-snug text-slate-800 transition-colors group-hover:text-primary">
+                      <h4 className="line-clamp-3 text-[20px] font-bold leading-snug text-slate-800 transition-colors group-hover:text-primary">
                         {item.topic}
                       </h4>
                       <p className="mt-2 text-[13px] leading-relaxed text-slate-500">
                         {stripHtml(item.description)}
                       </p>
                     </div>
-                    <span className="mt-3 flex items-center gap-1 text-[12px] font-semibold text-primary">
+                    <span className="mt-3 flex items-center gap-1 text-[15px] font-semibold text-primary">
                       Read
                       <span className="material-symbols-rounded text-[14px] transition-transform group-hover:translate-x-0.5">arrow_forward</span>
                     </span>

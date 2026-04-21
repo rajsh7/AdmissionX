@@ -332,12 +332,12 @@ export default function SearchClient({
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-1 pb-4 border-b border-neutral-100">
                   {/* Active Filters Row */}
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap uppercase tracking-wider">
+                    <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap">
                       Active Filters:
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {stream && (
-                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm transition-all hover:border-[#008080]">
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm transition-all hover:border-[#008080]">
                           {streams.find(s => String(s.slug || s.id) === stream)?.name || stream}
                           <button onClick={() => {
                             const p = new URLSearchParams(searchParams.toString());
@@ -349,7 +349,7 @@ export default function SearchClient({
                         </div>
                       )}
                       {degree && (
-                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm transition-all hover:border-[#008080]">
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm transition-all hover:border-[#008080]">
                           {degrees.find(d => String(d.slug || d.id) === degree)?.name || degree}
                           <button onClick={() => {
                             const p = new URLSearchParams(searchParams.toString());
@@ -360,31 +360,31 @@ export default function SearchClient({
                           </button>
                         </div>
                       )}
-                                            {cityId && (
-                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                      {cityId && (
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
                           {cities.find(c => String(c.id) === cityId)?.name || cityId}
                           <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("city_id"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
                         </div>
                       )}
                       {stateId && (
-                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
                           {states.find(s => String(s.id) === stateId)?.name || stateId}
                           <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("state_id"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
                         </div>
                       )}
                       {countryId && !stateId && !cityId && (
-                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
                           {countries.find(c => String(c.id) === countryId)?.name || countryId}
                           <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("country_id"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
                         </div>
                       )}
                       {feesMax && (
-                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-xs font-bold text-neutral-600 shadow-sm hover:border-[#FF3C3C] transition-all">
-                          Up to ₹{(Number(feesMax)/100000).toFixed(0)}L fees
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
+                          Up to ₹{(Number(feesMax) / 100000).toFixed(0)}L fees
                           <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("fees_max"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
                         </div>
                       )}
-{!stream && !degree && !cityId && !stateId && !countryId && !feesMax && (
+                      {!stream && !degree && !cityId && !stateId && !countryId && !feesMax && (
                         <span className="text-xs text-neutral-400 bg-neutral-50 px-3 py-1.5 rounded-[10px] border border-neutral-100 border-dashed">No filters applied</span>
                       )}
                     </div>
@@ -393,7 +393,7 @@ export default function SearchClient({
                   {/* Sort Row */}
                   <div className="flex items-center gap-4 ml-auto">
                     <div className="flex items-center gap-2">
-                      <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap uppercase tracking-wider">
+                      <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap">
                         Short by:
                       </span>
                       <div className="relative">
@@ -407,7 +407,8 @@ export default function SearchClient({
                             p.delete("page");
                             router.push(`${pathname}?${p.toString()}`);
                           }}
-                          className="appearance-none bg-white border border-neutral-200 rounded-[10px] px-4 pr-10 py-2.5 text-[13px] font-black text-neutral-700 shadow-sm focus:outline-none focus:border-[#008080] transition-all cursor-pointer min-w-[180px]"
+                          className="appearance-none bg-white border border-neutral-200 rounded-[5px] px-4 pr-10 text-[13px] font-medium text-[#6C6C6C] shadow-sm focus:outline-none focus:border-[#008080] transition-all cursor-pointer min-w-[180px]"
+                          style={{ height: "45px" }}
                         >
                           {SORT_OPTIONS.map((opt) => (
                             <option key={opt.value} value={opt.value}>
@@ -422,16 +423,16 @@ export default function SearchClient({
                     </div>
 
                     {/* View Toggle */}
-                    <div className="flex items-center bg-white border border-neutral-200 rounded-[10px] p-1 shadow-sm">
+                    <div className="flex items-center bg-white border border-neutral-200 rounded-[5px] p-1 shadow-sm">
                       <button
                         onClick={() => setViewMode("grid")}
-                        className={`p-1.5 rounded-[10px] transition-all ${viewMode === 'grid' ? 'bg-[#FF3C3C] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
+                        className={`p-1.5 rounded-[5px] transition-all ${viewMode === 'grid' ? 'bg-[#FF3C3C] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
                       >
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                       </button>
                       <button
                         onClick={() => setViewMode("list")}
-                        className={`p-1.5 rounded-[10px] transition-all ${viewMode === 'list' ? 'bg-[#FF3C3C] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
+                        className={`p-1.5 rounded-[5px] transition-all ${viewMode === 'list' ? 'bg-[#FF3C3C] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
                       >
                         <span className="material-symbols-outlined text-[20px]">view_headline</span>
                       </button>
@@ -555,7 +556,7 @@ export default function SearchClient({
       </div>
 
       {/* Explore Cards */}
-      <div className="mx-auto max-w-[1920px] w-full px-8 lg:px-12 xl:px-20 pb-12">
+      <div className="home-page-shell pb-12">
         <ExploreCards />
       </div>
 

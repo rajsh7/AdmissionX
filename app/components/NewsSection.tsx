@@ -58,7 +58,7 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
            </div>
 <Link 
               href="/blogs" 
-              className="group/btn inline-flex h-[51.8px] items-center justify-center rounded-[5px] border border-slate-200 bg-white px-8 font-medium transition-all hover:bg-slate-50 shadow-sm hover:shadow-md"
+              className="group/btn inline-flex h-[45px] items-center justify-center rounded-[5px] border border-slate-200 bg-white px-8 font-medium transition-all hover:bg-slate-50 shadow-sm hover:shadow-md"
               style={{ color: "#475569" }}
             >
               Explore All Articles

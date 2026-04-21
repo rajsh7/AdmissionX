@@ -1,3 +1,5 @@
+"use client";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import ExploreCards from "@/app/components/ExploreCards";
 
@@ -17,6 +19,15 @@ interface CoursesTabProps {
 }
 
 export default function CoursesTab({ courses }: CoursesTabProps) {
+  const [activeLevel, setActiveLevel] = useState("Undergraduate");
+  
+  const filteredCourses = useMemo(() => {
+    return courses.filter(course => {
+      if (!course.degree_name) return activeLevel === "Undergraduate"; // Default to UG if null
+      return course.degree_name.toLowerCase().includes(activeLevel.toLowerCase());
+    });
+  }, [courses, activeLevel]);
+
   // Hardcoded sub-tabs to match UI
   const subTabs = ["Undergraduate", "Postgraduate", "Phd", "Diploma", "Certificate Programs"];
   const instructors = [
@@ -31,15 +42,16 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
       <div className="max-w-[1920px] mx-auto px-4 md:px-10 lg:px-12 py-12">
 
         {/* --- PHASE 1: SUB-TABS FILTERS - Unified Block --- */}
-        <div className="mb-10 inline-flex items-center bg-white border border-neutral-200 rounded-[5px] shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] overflow-hidden">
+        <div className="mb-10 inline-flex items-center bg-white border border-neutral-200 rounded-[5px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
           {subTabs.map((tab, idx) => (
             <button
               key={idx}
-              className={`px-8 py-3.5 text-xs font-black whitespace-nowrap transition-all duration-300 uppercase tracking-widest border-r border-neutral-100 last:border-r-0 ${idx === 0
+              onClick={() => setActiveLevel(tab)}
+              className={`px-8 py-3.5 text-xs font-black whitespace-nowrap transition-all duration-300 uppercase tracking-widest border-r border-neutral-100 last:border-r-0 ${activeLevel === tab
                   ? 'text-[#FF3C3C]'
                   : 'bg-white text-slate-400 hover:text-slate-900 hover:bg-slate-50'
                 }`}
-              style={idx === 0 ? { backgroundColor: 'rgba(255, 60, 60, 0.2)' } : {}}
+              style={activeLevel === tab ? { backgroundColor: 'rgba(255, 60, 60, 0.2)' } : {}}
             >
               {tab}
             </button>
@@ -49,10 +61,10 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
         {/* ─── PHASE 2: COURSES LISTING GRID ─── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           <div className="space-y-6">
-            {courses.length > 0 ? courses.slice(0, 3).map((course, idx) => (
+            {filteredCourses.length > 0 ? filteredCourses.slice(0, 3).map((course, idx) => (
               <div
                 key={idx}
-                className="bg-white rounded-[5px] shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] border border-neutral-100 overflow-hidden transition-all hover:border-[#FF3C3C] hover:-translate-y-1"
+                className="bg-white rounded-[5px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100 overflow-hidden transition-all hover:border-[#FF3C3C] hover:-translate-y-1"
               >
                 {/* Course Header */}
                 <div className="p-8 border-b border-neutral-100 flex justify-between items-start">
@@ -106,11 +118,11 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
         </div>
 
         {/* --- PHASE 3: INSTRUCTORS SECTION --- */}
-        <div className="bg-slate-500 rounded-[5px] overflow-hidden p-12 lg:p-20 relative shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)]">
+        <div className="bg-slate-500 rounded-[5px] overflow-hidden p-12 lg:p-20 relative shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
           {/* Section Header */}
           <div className="flex flex-col lg:flex-row justify-between items-end gap-10 mb-16 relative z-10">
             <div>
-              <div className="flex items-center gap-3 text-white/70 text-xs font-black uppercase tracking-[0.3em] mb-4">
+              <div className="flex items-center gap-3 text-[#FF3C3C] text-[24px] font-bold uppercase tracking-[0.3em] mb-4">
                 <span className="w-10 h-[2px] bg-[#FF3C3C]" />
                 TEACHER
               </div>
@@ -138,7 +150,7 @@ export default function CoursesTab({ courses }: CoursesTabProps) {
           {/* Instructor Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
             {instructors.map((inst, idx) => (
-              <div key={idx} className="bg-white rounded-[5px] overflow-hidden flex flex-col group relative shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] transition-all duration-500 hover:-translate-y-3">
+              <div key={idx} className="bg-white rounded-[5px] overflow-hidden flex flex-col group relative shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-500 hover:-translate-y-3">
                 <div className="h-[320px] relative bg-slate-100 overflow-hidden">
                   {/* Design's Header Pattern */}
                   <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-br from-yellow-400 to-amber-600 opacity-90 transition-all duration-500 group-hover:h-full group-hover:opacity-100 z-0" />

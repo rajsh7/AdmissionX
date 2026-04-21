@@ -310,7 +310,7 @@ function AcademicInner({ user, showToast }: { user: Props["user"]; showToast: (m
           <AField  label="Marks Obtained" {...f("class10_obtained")} placeholder="e.g. 425" />
         </div>
         <div className="flex justify-end pt-2">
-          <button type="button" disabled={saving} onClick={() => handleSaveSection("class10")}
+          <button type="button" disabled={!!saving} onClick={() => handleSaveSection("class10")}
             className="px-6 py-2 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all disabled:opacity-50">
             {saving === "class10" ? "Saving..." : "Save Class 10"}
           </button>
@@ -332,7 +332,7 @@ function AcademicInner({ user, showToast }: { user: Props["user"]; showToast: (m
           <AField  label="Marks Obtained" {...f("class12_obtained")} placeholder="e.g. 450" />
         </div>
         <div className="flex justify-end pt-2">
-          <button type="button" disabled={saving} onClick={() => handleSaveSection("class12")}
+          <button type="button" disabled={!!saving} onClick={() => handleSaveSection("class12")}
             className="px-6 py-2 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all disabled:opacity-50">
             {saving === "class12" ? "Saving..." : "Save Class 12"}
           </button>
@@ -353,7 +353,7 @@ function AcademicInner({ user, showToast }: { user: Props["user"]; showToast: (m
           <AField  label="CGPA" {...f("grad_cgpa")} placeholder="e.g. 8.5" />
         </div>
         <div className="flex justify-end pt-2">
-          <button type="button" disabled={saving} onClick={() => handleSaveSection("grad")}
+          <button type="button" disabled={!!saving} onClick={() => handleSaveSection("grad")}
             className="px-6 py-2 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all disabled:opacity-50">
             {saving === "grad" ? "Saving..." : "Save Graduation"}
           </button>
