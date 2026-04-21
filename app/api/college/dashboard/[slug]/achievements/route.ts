@@ -13,7 +13,7 @@ async function checkAuth(slug: string) {
   const db = await getDb();
   const cp = await db.collection("collegeprofile").findOne(
     { slug },
-    { projection: { _id: 1, id: 1, email: 1, users_id: 1 } }
+    { projection: { _id: 1, email: 1, users_id: 1 } }
   );
   if (!cp) return null;
 
@@ -22,11 +22,10 @@ async function checkAuth(slug: string) {
     const user = await db.collection("users").findOne({ id: cp.users_id }, { projection: { email: 1 } });
     if (!user || user.email?.toLowerCase().trim() !== payload.email.toLowerCase().trim()) return null;
   }
-
-  return { payload, collegeprofile_id: cp.id ? Number(cp.id) : cp._id.toString(), slug };
+  return { payload, slug };
 }
 
-// GET
+// GET — list all achievements for this college
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -36,22 +35,23 @@ export async function GET(
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const db = await getDb();
-  const rows = await db.collection("college_scholarships")
-    .find({ collegeprofile_id: auth.collegeprofile_id })
-    .sort({ id: 1 })
+  const achievements = await db.collection("college_achievements")
+    .find({ college_slug: slug })
+    .sort({ year: -1, _id: -1 })
     .toArray();
 
   return NextResponse.json({
-    scholarships: rows.map((r: any) => ({
-      id: r.id,
-      title: r.title ?? "",
-      description: r.description ?? "",
+    achievements: achievements.map((a: any) => ({
+      id: a._id.toString(),
+      title: a.title ?? "",
+      description: a.description ?? "",
+      year: a.year ?? "",
+      category: a.category ?? "Other",
     })),
-    total: rows.length,
   });
 }
 
-// POST
+// POST — add new achievement
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -60,53 +60,25 @@ export async function POST(
   const auth = await checkAuth(slug);
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  let body: any;
-  try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 }); }
-
-  const title = body.title?.trim();
-  if (!title) return NextResponse.json({ error: "title is required." }, { status: 400 });
+  const body = await req.json();
+  const { title, description, year, category } = body;
+  if (!title?.trim()) return NextResponse.json({ error: "Title is required." }, { status: 400 });
 
   const db = await getDb();
-  const last = await db.collection("college_scholarships").find({}, { projection: { id: 1 } }).sort({ id: -1 }).limit(1).toArray();
-  const newId = ((last[0]?.id as number) ?? 0) + 1;
-
-  await db.collection("college_scholarships").insertOne({
-    id: newId,
-    collegeprofile_id: auth.collegeprofile_id,
-    title,
-    description: body.description?.trim() || null,
+  const result = await db.collection("college_achievements").insertOne({
+    college_slug: slug,
+    title: title.trim(),
+    description: description?.trim() || "",
+    year: year?.trim() || "",
+    category: category || "Other",
     created_at: new Date(),
     updated_at: new Date(),
   });
 
-  return NextResponse.json({ success: true, id: newId }, { status: 201 });
+  return NextResponse.json({ success: true, id: result.insertedId.toString() }, { status: 201 });
 }
 
-// PUT
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
-  const { slug } = await params;
-  const auth = await checkAuth(slug);
-  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  let body: any;
-  try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 }); }
-
-  const { id, title, description } = body;
-  if (!id || !title?.trim()) return NextResponse.json({ error: "id and title are required." }, { status: 400 });
-
-  const db = await getDb();
-  await db.collection("college_scholarships").updateOne(
-    { id: Number(id), collegeprofile_id: auth.collegeprofile_id },
-    { $set: { title: title.trim(), description: description?.trim() || null, updated_at: new Date() } }
-  );
-
-  return NextResponse.json({ success: true });
-}
-
-// DELETE
+// DELETE — remove achievement by id
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -115,14 +87,38 @@ export async function DELETE(
   const auth = await checkAuth(slug);
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const scholarshipId = Number(req.nextUrl.searchParams.get("scholarshipId"));
-  if (!scholarshipId) return NextResponse.json({ error: "scholarshipId is required." }, { status: 400 });
+  const id = req.nextUrl.searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "id is required." }, { status: 400 });
 
+  const { ObjectId } = await import("mongodb");
   const db = await getDb();
-  await db.collection("college_scholarships").deleteOne({
-    id: scholarshipId,
-    collegeprofile_id: auth.collegeprofile_id,
+  await db.collection("college_achievements").deleteOne({
+    _id: new ObjectId(id),
+    college_slug: slug,
   });
+
+  return NextResponse.json({ success: true });
+}
+
+// PUT — update achievement
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await params;
+  const auth = await checkAuth(slug);
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const body = await req.json();
+  const { id, title, description, year, category } = body;
+  if (!id || !title?.trim()) return NextResponse.json({ error: "id and title are required." }, { status: 400 });
+
+  const { ObjectId } = await import("mongodb");
+  const db = await getDb();
+  await db.collection("college_achievements").updateOne(
+    { _id: new ObjectId(id), college_slug: slug },
+    { $set: { title: title.trim(), description: description?.trim() || "", year: year?.trim() || "", category: category || "Other", updated_at: new Date() } }
+  );
 
   return NextResponse.json({ success: true });
 }

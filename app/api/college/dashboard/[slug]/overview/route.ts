@@ -50,7 +50,7 @@ export async function GET(
       { $match: { _id: cpId } },
       { $lookup: { from: "users", localField: "users_id", foreignField: "_id", as: "u" } },
       { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
-      { $project: { college_name: { $ifNull: [{ $trim: { input: "$u.firstname" } }, "$slug"] }, rating: 1, totalRatingUser: 1, verified: 1, admissionStart: 1, admissionEnd: 1, description: 1, bannerimage: 1, estyear: 1, registeredSortAddress: 1 } },
+      { $project: { college_name: { $ifNull: [{ $trim: { input: "$u.firstname" } }, "$slug"] }, rating: 1, totalRatingUser: 1, verified: 1, admissionStart: 1, admissionEnd: 1, description: 1, bannerimage: 1, logoimage: 1, estyear: 1, registeredSortAddress: 1, website: 1, universityType: 1, collegecode: 1, college_type_name: 1, contactpersonname: 1, contactpersonemail: 1, contactpersonnumber: 1, mediumOfInstruction: 1, studyForm: 1, CCTVSurveillance: 1, ACCampus: 1, totalStudent: 1 } },
       { $limit: 1 },
     ]).toArray(),
 
@@ -114,7 +114,32 @@ export async function GET(
   if (galleryCount === 0) quickActions.push({ icon: "photo_library", label: "Upload campus photos", tab: "gallery", urgent: false });
 
   return NextResponse.json({
-    profile: { college_name: profile.college_name ?? "", rating: profile.rating ?? null, totalRatingUser: profile.totalRatingUser ?? 0, verified: profile.verified ?? 0, address: profile.registeredSortAddress ?? "", bannerimage: profile.bannerimage ?? null, estyear: profile.estyear ?? null, admissionStatus, profileComplete },
+    profile: { 
+      college_name: profile.college_name ?? "", 
+      rating: profile.rating ?? null, 
+      totalRatingUser: profile.totalRatingUser ?? 0, 
+      verified: profile.verified ?? 0, 
+      address: profile.registeredSortAddress ?? "", 
+      bannerimage: profile.bannerimage ?? null,
+      logoimage: profile.logoimage ?? null, 
+      estyear: profile.estyear ?? null, 
+      website: profile.website ?? "",
+      universityType: profile.universityType ?? "",
+      collegecode: profile.collegecode ?? "",
+      contactpersonname: profile.contactpersonname ?? "",
+      contactpersonemail: profile.contactpersonemail ?? "",
+      contactpersonnumber: profile.contactpersonnumber ?? "",
+      mediumOfInstruction: profile.mediumOfInstruction ?? "",
+      studyForm: profile.studyForm ?? "",
+      CCTVSurveillance: profile.CCTVSurveillance ? "Yes" : "No",
+      ACCampus: profile.ACCampus ? "Yes" : "No",
+      totalStudent: profile.totalStudent ?? "",
+      admissionStart: profile.admissionStart ?? "",
+      admissionEnd: profile.admissionEnd ?? "",
+      college_type_name: profile.college_type_name ?? "",
+      admissionStatus, 
+      profileComplete 
+    },
     stats: {
       applications: { total: Number(as.total ?? 0), submitted: Number(as.submitted ?? 0), under_review: Number(as.under_review ?? 0), verified: Number(as.verified ?? 0), enrolled: Number(as.enrolled ?? 0), rejected: Number(as.rejected ?? 0), paid: Number(as.paid ?? 0), new_this_week: 0 },
       courses: { total: Number(cs.total_courses ?? 0), streams: (cs.total_streams ?? []).length, degrees: (cs.total_degrees ?? []).length, min_fees: Number(cs.min_fees ?? 0), max_fees: Number(cs.max_fees ?? 0), total_seats: Number(cs.total_seats ?? 0) },

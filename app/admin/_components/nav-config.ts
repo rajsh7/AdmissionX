@@ -51,6 +51,8 @@ export const NAV_GROUPS: NavGroup[] = [
           { href: "/admin/colleges/admission", label: "College Admission Procedure", icon: "assignment" },
           { href: "/admin/colleges/reviews", label: "College Reviews", icon: "reviews" },
           { href: "/admin/colleges/faqs", label: "College Faqs", icon: "help_outline" },
+          { href: "/admin/colleges/gallery", label: "College Gallery", icon: "photo_library" },
+          { href: "/admin/colleges/achievements", label: "College Achievements", icon: "emoji_events" },
         ]
       },
       {

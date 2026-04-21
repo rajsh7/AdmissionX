@@ -28,7 +28,9 @@ export async function GET(
   if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const db = await getDb();
-  const row = await db.collection("next_student_marks").findOne({ student_id: id }) ?? {};
+  const row = await db.collection("next_student_marks").findOne(
+    { $or: [{ student_id: id }, { student_id: payload.id }] }
+  ) ?? {};
 
   const marks: Record<string, string> = {};
   for (const key of MARKS_FIELDS) {
@@ -65,7 +67,7 @@ export async function PUT(
 
   const db = await getDb();
   await db.collection("next_student_marks").updateOne(
-    { student_id: id },
+    { $or: [{ student_id: id }, { student_id: payload.id }] },
     { $set: update, $setOnInsert: { created_at: new Date() } },
     { upsert: true }
   );

@@ -32,6 +32,8 @@ export async function GET(
   const prof = await db.collection("next_student_profiles").findOne(
     { student_id: id } as Filter<Document>,
     { projection: { dob: 1, gender: 1, city: 1, state: 1, country: 1, pincode: 1, address: 1, photo: 1, hobbies: 1, interest: 1, about: 1, avatar: 1, parentsname: 1, parentsnumber: 1, project_title: 1, projects: 1 } }
+    { $or: [{ student_id: id }, { student_id: base._id.toString() }] } as Filter<Document>,
+    { projection: { dob: 1, gender: 1, city: 1, state: 1, country: 1, pincode: 1, address: 1, photo: 1, hobbies: 1, interest: 1, about: 1, parentsname: 1, parentsnumber: 1, project_title: 1, projects: 1 } }
   ) ?? {};
 
   const p = prof as Record<string, unknown>;
@@ -84,6 +86,15 @@ export async function PUT(
   const { name, phone, dob, gender, city, state, country, pincode, address, hobbies, interest, about, parentsname, parentsnumber, project_title, projects } = body;
   const db = await getDb();
 
+  // Get the actual student document to ensure we use the correct _id
+  const base = await db.collection("next_student_signups").findOne(
+    { email: payload.email } as Filter<Document>,
+    { projection: { _id: 1, name: 1, phone: 1 } }
+  );
+  if (!base) return NextResponse.json({ error: "Student not found" }, { status: 404 });
+
+  const canonicalId = base._id.toString();
+
   const baseUpdate: Record<string, unknown> = { updated_at: new Date() };
   if (name?.trim()) baseUpdate.name = name.trim();
   if (phone !== undefined) baseUpdate.phone = phone.trim() || "";
@@ -94,7 +105,7 @@ export async function PUT(
   );
 
   // Only update fields that were actually sent in the request body
-  const profileSet: Record<string, unknown> = { student_id: id, updated_at: new Date() };
+  const profileSet: Record<string, unknown> = { student_id: canonicalId, updated_at: new Date() };
   if (dob !== undefined)           profileSet.dob           = dob || null;
   if (gender !== undefined)        profileSet.gender        = gender || null;
   if (city !== undefined)          profileSet.city          = city || null;
@@ -111,7 +122,7 @@ export async function PUT(
   if (projects !== undefined)       profileSet.projects       = projects || null;
 
   await db.collection("next_student_profiles").updateOne(
-    { student_id: id } as Filter<Document>,
+    { $or: [{ student_id: canonicalId }, { student_id: id }] } as Filter<Document>,
     {
       $set: profileSet,
       $setOnInsert: { created_at: new Date() },
