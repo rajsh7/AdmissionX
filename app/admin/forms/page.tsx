@@ -47,20 +47,22 @@ export default async function AdminFormPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  // Filter only for guest inquiries if appropriate, or show all general ones
-  const where = q 
-    ? "WHERE (subject LIKE ? OR message LIKE ? OR guestname LIKE ?) AND queryflowtype = 'guest-to-admin'" 
-    : "WHERE queryflowtype = 'guest-to-admin'";
-  const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
-
-  const data = await safeQuery<FormRow>(
-    `SELECT id, subject, message, guestname, guestemail, guestphone, created_at
-     FROM query
-     ${where}
-     ORDER BY id DESC
-     LIMIT 100`,
-    params
-  );
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const baseFilter = { queryflowtype: { $regex: "guest-to-admin", $options: "i" } };
+  const filter = q
+    ? { ...baseFilter, $or: [{ subject: { $regex: q, $options: "i" } }, { message: { $regex: q, $options: "i" } }, { guestname: { $regex: q, $options: "i" } }] }
+    : baseFilter;
+  const docs = await db.collection("query").find(filter).sort({ id: -1 }).limit(100).toArray();
+  const data: FormRow[] = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    subject: String(d.subject ?? "").trim(),
+    message: String(d.message ?? "").trim(),
+    guestname: (d.guestname && String(d.guestname).trim() !== "NULL") ? String(d.guestname).trim() : null,
+    guestemail: (d.guestemail && String(d.guestemail).trim() !== "NULL") ? String(d.guestemail).trim() : null,
+    guestphone: (d.guestphone && String(d.guestphone).trim() !== "NULL") ? String(d.guestphone).trim() : null,
+    created_at: String(d.created_at ?? "").trim(),
+  }));
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">

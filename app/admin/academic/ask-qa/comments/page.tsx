@@ -47,27 +47,35 @@ export default async function AskCommentsPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE comm.replyanswer LIKE ? OR ans.answer LIKE ? OR u.firstname LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
 
-  const data = await safeQuery<CommentRow>(
-    `SELECT 
-      comm.id, 
-      comm.replyanswer, 
-      comm.answerDate, 
-      comm.status,
-      ans.answer as parentAnswer,
-      q.question,
-      u.firstname as userName
-     FROM ask_question_answer_comments comm
-     LEFT JOIN ask_question_answers ans ON ans.id = comm.answerId
-     LEFT JOIN ask_questions q ON q.id = comm.questionId
-     LEFT JOIN users u ON u.id = comm.userId
-     ${where}
-     ORDER BY comm.id DESC
-     LIMIT 100`,
-    params
-  );
+  const filter = q ? { replyanswer: { $regex: q, $options: "i" } } : {};
+  const docs = await db.collection("ask_question_answer_comments").find(filter).sort({ id: -1 }).limit(100).toArray();
+
+  const answerIds = [...new Set(docs.map((d: any) => Number(d.answerId)).filter(Boolean))];
+  const questionIds = [...new Set(docs.map((d: any) => Number(d.questionId)).filter(Boolean))];
+  const userIds = [...new Set(docs.map((d: any) => Number(d.userId)).filter(Boolean))];
+
+  const [answerDocs, questionDocs, userDocs] = await Promise.all([
+    answerIds.length ? db.collection("ask_question_answers").find({ id: { $in: answerIds } }, { projection: { id: 1, answer: 1 } }).toArray() : [],
+    questionIds.length ? db.collection("ask_questions").find({ id: { $in: questionIds } }, { projection: { id: 1, question: 1 } }).toArray() : [],
+    userIds.length ? db.collection("users").find({ id: { $in: userIds } }, { projection: { id: 1, firstname: 1 } }).toArray() : [],
+  ]);
+
+  const answerMap = new Map(answerDocs.map((d: any) => [Number(d.id), String(d.answer ?? "").replace(/<[^>]*>/g, "").trim().slice(0, 80)]));
+  const questionMap = new Map(questionDocs.map((d: any) => [Number(d.id), String(d.question ?? "").replace(/<[^>]*>/g, "").trim().slice(0, 80)]));
+  const userMap = new Map(userDocs.map((d: any) => [Number(d.id), String(d.firstname ?? "").trim()]));
+
+  const data: CommentRow[] = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    replyanswer: String(d.replyanswer ?? "").trim(),
+    answerDate: d.answerDate ? String(d.answerDate).trim() : null,
+    parentAnswer: answerMap.get(Number(d.answerId)) || null,
+    question: questionMap.get(Number(d.questionId)) || null,
+    userName: userMap.get(Number(d.userId)) || null,
+    status: Number(String(d.status ?? "0").trim()),
+  }));
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import OverviewTab from "./tabs/OverviewTab";
@@ -42,7 +42,18 @@ export default function StudentDashboardClient({ user, activated }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showActivatedBanner, setShowActivatedBanner] = useState(!!activated);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const [photo, setPhoto] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    if (!user?.id) return;
+    fetch(`/api/student/${user.id}/profile`).then(r => r.json()).then(d => setPhoto(d.photo || null)).catch(() => {});
+  }, [user?.id]);
+
+  useEffect(() => {
+    document.body.classList.add("student-layout");
+    return () => document.body.classList.remove("student-layout");
+  }, []);
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -60,7 +71,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
   // ── Tab renderer ──────────────────────────────────────────────────────────
   function renderTab() {
     switch (activeTab) {
-      case "overview":               return <OverviewTab           user={user} />;
+      case "overview":               return <OverviewTab           user={user} navigate={navigate} />;
       case "account-details":        return <ProfileTab            user={user} />;
       case "address":                return <AddressTab            user={user} />;
       case "academic-details":       return <MarksTab              user={user} />;
@@ -71,7 +82,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
       case "queries-all":            return <QueriesTab            user={user} filter="all"      />;
       case "bookmark-colleges":      return <BookmarksTab          user={user} initialType="college" />;
       case "qa-questions":           return <QATab                 user={user} type="questions" />;
-      case "counselling-forms":      return <CounsellingFormsTab   user={user} />;
+      case "counselling-forms":      retugit rn <CounsellingFormsTab   user={user} />;
       case "help-desk":              return <HelpDeskTab           user={user} />;
       default:                       return <OverviewTab           user={user} />;
     }
@@ -79,8 +90,26 @@ export default function StudentDashboardClient({ user, activated }: Props) {
 
   // ── Sidebar Inner ──────────────────────────────────────────────────────────
   function SidebarContent() {
+    const [uploading, setUploading] = useState(false);
+    const fileRef = useRef<HTMLInputElement>(null);
+
+    async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+      const file = e.target.files?.[0];
+      if (!file || !user?.id) return;
+      setUploading(true);
+      const fd = new FormData();
+      fd.append("photo", file);
+      try {
+        const res = await fetch(`/api/student/${user.id}/photo`, { method: "POST", body: fd });
+        const d = await res.json();
+        if (res.ok && d.photo) setPhoto(d.photo);
+      } finally {
+        setUploading(false);
+      }
+    }
+
     const MENU_ITEMS: NavItem[] = [
-      { id: "overview",          label: "Dashboard",        icon: "bar_chart"       },
+      { id: "overview",          label: "Dashboard",                  icon: "bar_chart"       },
       { id: "account-details",   label: "Student Details",            icon: "person"          },
       { id: "app-all",           label: "Application",                icon: "description"     },
       { id: "queries-all",       label: "Queries",                    icon: "forum"           },
@@ -108,9 +137,27 @@ export default function StudentDashboardClient({ user, activated }: Props) {
             <p className="text-[11px] text-gray-400 text-center truncate max-w-full px-2">
               {user?.email ?? ""}
             </p>
+          <div className="flex flex-col items-center">
+            <div className="w-28 h-28 rounded-full border-[4px] border-white/20 flex items-center justify-center bg-white/10 mb-3 relative overflow-hidden">
+              {photo ? (
+                <img src={photo} alt="Profile" className="w-full h-full object-cover rounded-full" />
+              ) : (
+                <span className="material-symbols-outlined text-[54px] text-white/30">photo_camera</span>
+              )}
+            </div>
+            {!photo && (
+              <p className="text-[11px] font-semibold text-white/40 uppercase tracking-tight text-center leading-tight mb-2">
+                IMAGE NOT AVAILABLE
+              </p>
+            )}
+            {photo && (
+              <p className="text-[12px] font-semibold text-white/70 truncate max-w-[160px] text-center mb-1">{user?.name}</p>
+            )}
           </div>
-          <button className="w-full py-2.5 bg-[#8b8b8b] text-white text-[12px] font-medium rounded-[6px] hover:bg-[#777] transition-colors uppercase tracking-wider shadow-md">
-            Upload New Profile image
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+          <button onClick={() => fileRef.current?.click()} disabled={uploading}
+            className="w-full py-2.5 bg-[#8b8b8b] text-white text-[12px] font-medium rounded-[6px] hover:bg-[#777] transition-colors uppercase tracking-wider shadow-md disabled:opacity-50">
+            {uploading ? "Uploading..." : "Upload New Profile image"}
           </button>
         </div>
 
@@ -129,8 +176,8 @@ export default function StudentDashboardClient({ user, activated }: Props) {
                 onClick={() => navigate(item.id)}
                 className={`
                   w-full flex items-center gap-4 px-6 py-4 text-[14px] font-medium transition-all border-l-[4px]
-                  ${isActive 
-                    ? "bg-[#e31e24] text-white border-white" 
+                  ${isActive
+                    ? "bg-[#e31e24] text-white border-white"
                     : "text-white/70 hover:bg-white/5 hover:text-white border-transparent"
                   }
                 `}
@@ -159,7 +206,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
             <span className="material-symbols-outlined text-[28px]">menu</span>
           </button>
           <Link href="/" className="shrink-0">
-             <img src="/admissionx-logo.png" alt="AdmissionX logo" className="h-8 w-auto object-contain" />
+            <img src="/admissionx-logo.png" alt="AdmissionX logo" className="h-8 w-auto object-contain" />
           </Link>
         </div>
 
@@ -173,17 +220,11 @@ export default function StudentDashboardClient({ user, activated }: Props) {
               { label: "Study Abroad", href: "/study-abroad" },
               { label: "More", href: "#", hasSub: true },
             ].map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
+              <Link key={link.label} href={link.href}
                 className="flex items-center gap-1 px-4 py-2 text-[16px] font-normal text-slate-700 hover:text-primary transition-colors whitespace-nowrap"
               >
                 {link.label}
-                {link.hasSub && (
-                  <span className="material-symbols-outlined text-[18px] text-slate-300">
-                    expand_more
-                  </span>
-                )}
+                {link.hasSub && <span className="material-symbols-outlined text-[18px] text-slate-300">expand_more</span>}
               </Link>
             ))}
           </nav>

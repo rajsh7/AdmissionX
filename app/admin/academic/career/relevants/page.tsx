@@ -118,26 +118,31 @@ export default async function CareerRelevantsPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE cr.title LIKE ? OR cr.stream LIKE ? OR ci.title LIKE ? OR fa.name LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`] : [];
-
-  const [relevants, streams, interests] = await Promise.all([
-    safeQuery<RelevantRow>(
-      `SELECT 
-        cr.*, 
-        ci.title as interestTitle,
-        fa.name as functionalArea
-       FROM counseling_career_relevants cr
-       LEFT JOIN counseling_career_interests ci ON ci.id = cr.careerInterest
-       LEFT JOIN functionalarea fa ON fa.id = cr.functionalarea_id
-       ${where}
-       ORDER BY cr.id DESC
-       LIMIT 200`,
-      params
-    ),
-    safeQuery<StreamOption>("SELECT id, name FROM functionalarea ORDER BY name ASC"),
-    safeQuery<InterestOption>("SELECT id, title FROM counseling_career_interests ORDER BY title ASC"),
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { $or: [{ title: { $regex: q, $options: "i" } }, { stream: { $regex: q, $options: "i" } }] } : {};
+  const [relDocs, faDocs, intDocs] = await Promise.all([
+    db.collection("counseling_career_relevants").find(filter).sort({ id: -1 }).limit(200).toArray(),
+    db.collection("functionalarea").find({}, { projection: { id: 1, name: 1 } }).sort({ name: 1 }).toArray(),
+    db.collection("counseling_career_interests").find({}, { projection: { id: 1, title: 1 } }).sort({ title: 1 }).toArray(),
   ]);
+  const faMap = new Map(faDocs.map((d: any) => [Number(d.id), String(d.name ?? "").trim()]));
+  const intMap = new Map(intDocs.map((d: any) => [Number(d.id), String(d.title ?? "").trim()]));
+  const relevants: RelevantRow[] = relDocs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    title: String(d.title ?? "").trim(),
+    salery: d.salery ? String(d.salery).trim() : null,
+    stream: d.stream ? String(d.stream).trim() : null,
+    academicDifficulty: d.academicDifficulty ? String(d.academicDifficulty).trim() : null,
+    status: Number(String(d.status ?? "0").trim()),
+    careerInterest: d.careerInterest ? Number(d.careerInterest) : null,
+    functionalarea_id: d.functionalarea_id ? Number(d.functionalarea_id) : null,
+    interestTitle: intMap.get(Number(d.careerInterest)) || null,
+    functionalArea: faMap.get(Number(d.functionalarea_id)) || null,
+    slug: d.slug ? String(d.slug).trim() : null,
+  }));
+  const streams: StreamOption[] = faDocs.map((d: any) => ({ id: Number(d.id ?? 0), name: String(d.name ?? "").trim() }));
+  const interests: InterestOption[] = intDocs.map((d: any) => ({ id: Number(d.id ?? 0), title: String(d.title ?? "").trim() }));
 
   const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PaginationFixed from "@/app/components/PaginationFixed";
 
 interface StudentRow {
@@ -64,18 +64,17 @@ export default function StudentsTableClient({
   students, total, page, totalPages, offset, PAGE_SIZE,
 }: Props) {
   const [visibleCount, setVisibleCount] = useState(25);
+
+  // Reset visible count when the student list changes (e.g. new page or search)
+  useEffect(() => {
+    setVisibleCount(25);
+  }, [students[0]?.id]);
+
   const visibleStudents = students.slice(0, visibleCount);
   const showPagination = totalPages > 1 && visibleCount >= Math.min(50, students.length);
   const hasMore = visibleCount < students.length && !showPagination;
   const start = total > 0 ? offset + 1 : 0;
   const end = Math.min(offset + PAGE_SIZE, total);
-
-  const studentsKey = students[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(studentsKey);
-  if (studentsKey !== lastKey) {
-    setLastKey(studentsKey);
-    setVisibleCount(25);
-  }
 
   return (
     <>

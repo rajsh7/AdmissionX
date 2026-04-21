@@ -237,8 +237,8 @@ export default async function NewsPage({
               </Link>
               <div className="flex-1 p-6 sm:p-8 flex flex-col justify-center">
                 <h2 className="text-xl sm:text-2xl font-bold text-neutral-800 leading-snug mb-3">{featured.topic}</h2>
-                <p className="text-sm text-neutral-500 leading-relaxed line-clamp-3 mb-4">
-                  {excerpt(featured.description, 220) ||
+                <p className="text-sm text-neutral-500 leading-relaxed line-clamp-5 mb-4 pr-4">
+                  {excerpt(featured.description, 450) ||
                     "Stay updated with the latest announcements, schedules, and guidance for students and parents."}
                 </p>
                 <div
@@ -267,8 +267,8 @@ export default async function NewsPage({
               <Link
                 href={buildUrl({ type: undefined, tag: undefined, page: "1" })}
                 className={`flex-1 text-center py-3 text-sm font-semibold whitespace-nowrap transition-colors ${!activeType && !activeTag
-                    ? "text-[#FF3B30] border-b-2 border-b-[#FF3B30]"
-                    : "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50 border-r border-neutral-200"
+                  ? "text-[#FF3B30] border-b-2 border-b-[#FF3B30]"
+                  : "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50 border-r border-neutral-200"
                   }`}
                 style={{ fontWeight: 600, fontSize: "20px", color: "rgba(62, 62, 62, 0.71)" }}
               >
@@ -293,8 +293,8 @@ export default async function NewsPage({
           </div>
 
           {/* Search + filters */}
-          <form method="GET" action="/news" className="flex flex-row items-center gap-3 mb-10">
-            <div className="flex flex-row gap-3 min-w-0 w-full lg:w-1/2">
+          <form method="GET" action="/news" className="flex flex-row items-center mb-10">
+            <div className="flex flex-row min-w-0 w-full max-w-[750px]">
               <div className="flex-1 relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[20px] text-neutral-400">
                   search
@@ -304,14 +304,14 @@ export default async function NewsPage({
                   name="q"
                   defaultValue={q}
                   placeholder="Location, universities, courses..."
-                  className="w-full pl-11 pr-4 py-3 text-sm border border-neutral-200 rounded-[5px] bg-white text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-100 focus:border-red-300 transition-shadow shadow-sm"
+                  className="w-full pl-11 pr-4 py-3 text-sm border border-neutral-200 border-r-0 rounded-l-[5px] bg-white text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-100 focus:border-red-300 transition-shadow shadow-sm"
                 />
                 {activeType && <input type="hidden" name="type" value={activeType} />}
                 {activeTag && <input type="hidden" name="tag" value={activeTag} />}
               </div>
               <button
                 type="submit"
-                className="shrink-0 px-6 py-3 rounded-[5px] text-sm font-bold text-white shadow-sm hover:opacity-95 transition-opacity whitespace-nowrap"
+                className="shrink-0 px-6 py-3 rounded-r-[5px] text-sm font-bold text-white shadow-sm hover:opacity-95 transition-opacity whitespace-nowrap"
                 style={{ backgroundColor: ACCENT }}
               >
                 Search Now
@@ -383,9 +383,9 @@ export default async function NewsPage({
                   <div className="flex flex-col gap-4">
                     {listNews.map((item) => {
                       const imgUrl = buildImageUrl(item.featimage);
-                      const desc = excerpt(item.description, 140);
+                      const desc = excerpt(item.description, 300);
                       const ago = timeAgo(item.created_at);
-                      const source = firstTypeName(item.newstypeids, allTypesTyped);
+                      const source = "AdmissionX";
                       return (
                         <article
                           key={String(item._id)}
@@ -406,7 +406,7 @@ export default async function NewsPage({
                                 {item.topic}
                               </h3>
                             </Link>
-                            {desc && <p className="text-xs sm:text-sm text-neutral-500 mt-2 line-clamp-2 leading-relaxed">{desc}</p>}
+                            {desc && <p className="text-xs sm:text-sm text-neutral-500 mt-2 line-clamp-3 leading-relaxed">{desc}</p>}
                             <Link
                               href={`/news/${item.slug}`}
                               className="text-xs font-bold mt-2 w-fit"
@@ -461,8 +461,8 @@ export default async function NewsPage({
                               key={p}
                               href={buildUrl({ page: String(p) })}
                               className={`w-9 h-9 rounded-[5px] text-sm font-bold flex items-center justify-center transition-colors ${p === page
-                                  ? "text-white"
-                                  : "border border-neutral-200 text-neutral-700 hover:bg-neutral-50"
+                                ? "text-white"
+                                : "border border-neutral-200 text-neutral-700 hover:bg-neutral-50"
                                 }`}
                               style={p === page ? { backgroundColor: ACCENT } : undefined}
                             >
@@ -529,8 +529,8 @@ export default async function NewsPage({
                         key={String(tag._id)}
                         href={buildUrl({ tag: tag.slug, page: "1", type: undefined })}
                         className={`text-xs font-semibold px-3 py-1.5 rounded-[5px] border transition-colors ${activeTag === tag.slug?.toLowerCase()
-                            ? "border-[#FF3B30] bg-red-50 text-[#FF3B30]"
-                            : "border-neutral-200 text-neutral-600 hover:border-neutral-300"
+                          ? "border-[#FF3B30] bg-red-50 text-[#FF3B30]"
+                          : "border-neutral-200 text-neutral-600 hover:border-neutral-300"
                           }`}
                       >
                         {tag.name}

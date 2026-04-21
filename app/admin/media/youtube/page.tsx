@@ -46,21 +46,18 @@ export default async function YoutubeLinksPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  // Filter ONLY for Youtube related entries in socialmanagements
-  const where = q 
-    ? "WHERE title LIKE '%Youtube%' AND (title LIKE ? OR description LIKE ?)" 
-    : "WHERE title LIKE '%Youtube%'";
-  
-  const params = q ? [`%${q}%`, `%${q}%`] : [];
-
-  const data = await safeQuery<SocialRow>(
-    `SELECT id, title, description
-     FROM socialmanagements
-     ${where}
-     ORDER BY id DESC
-     LIMIT 100`,
-    params
-  );
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const baseFilter = { title: { $regex: "youtube", $options: "i" } };
+  const filter = q
+    ? { ...baseFilter, $or: [{ title: { $regex: q, $options: "i" } }, { description: { $regex: q, $options: "i" } }] }
+    : baseFilter;
+  const docs = await db.collection("socialmanagements").find(filter).sort({ id: -1 }).limit(100).toArray();
+  const data: SocialRow[] = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    title: String(d.title ?? "").trim(),
+    description: d.description ? String(d.description).trim() : null,
+  }));
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">

@@ -551,8 +551,8 @@ export default async function AdminCollegesPage({
 
                 {/* College Info */}
                 <div className="flex items-start gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-[1.25rem] bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm flex-shrink-0">
-                    <span className="text-2xl font-black">{(college.college_name || "?").charAt(0).toUpperCase()}</span>
+                  <div className="w-16 h-16 rounded-[1.25rem] bg-white border border-indigo-100 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
+                    <img src="/seglogo.webp" alt="college" className="w-full h-full object-contain p-1" />
                   </div>
                   <div className="min-w-0 flex-1 pt-1">
                     <h3 className="font-extrabold text-slate-800 line-clamp-2 leading-[1.2] group-hover:text-indigo-600 transition-colors text-lg">

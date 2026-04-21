@@ -74,6 +74,8 @@ function ComparePageInner() {
   const [searchQ, setSearchQ] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [addingSlot, setAddingSlot] = useState<number | null>(null);
+  const [inlineSearchQ, setInlineSearchQ] = useState("");
+  const [inlineSuggestions, setInlineSuggestions] = useState<Suggestion[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [dropdownStyle, setDropdownStyle] = useState<{ top: number; left: number; width: number } | null>(null);
@@ -105,7 +107,7 @@ function ComparePageInner() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Search suggestions
+  // Hero search suggestions
   useEffect(() => {
     if (searchQ.length < 2) { setSuggestions([]); return; }
     const t = setTimeout(() => {
@@ -116,13 +118,25 @@ function ComparePageInner() {
     return () => clearTimeout(t);
   }, [searchQ]);
 
+  // Inline search suggestions
+  useEffect(() => {
+    if (inlineSearchQ.length < 2) { setInlineSuggestions([]); return; }
+    const t = setTimeout(() => {
+      fetch(`/api/search?q=${encodeURIComponent(inlineSearchQ)}`)
+        .then((r) => r.json())
+        .then((d) => setInlineSuggestions((d.suggestions ?? []).filter((s: Suggestion) => s.type === "college").slice(0, 6)));
+    }, 300);
+    return () => clearTimeout(t);
+  }, [inlineSearchQ]);
+
   // Close suggestions on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (
-        searchRef.current && 
+        searchRef.current &&
         !searchRef.current.contains(e.target as Node) &&
-        !(e.target as HTMLElement).closest(".compare-suggestions-dropdown")
+        !(e.target as HTMLElement).closest(".compare-suggestions-dropdown") &&
+        !(e.target as HTMLElement).closest(".inline-suggestions-dropdown")
       ) {
         setSuggestions([]);
         setAddingSlot(null);
@@ -152,11 +166,11 @@ function ComparePageInner() {
         }
       })
       .catch(err => console.error("Add college error:", err))
-      .finally(() => { 
-        setLoading(false); 
-        setSearchQ(""); 
-        setSuggestions([]); 
-        setAddingSlot(null); 
+      .finally(() => {
+        setLoading(false);
+        setSearchQ("");
+        setSuggestions([]);
+        setAddingSlot(null);
       });
   }
 
@@ -220,13 +234,7 @@ function ComparePageInner() {
                   <input
                     ref={inputRef}
                     value={searchQ}
-                    onChange={(e) => {
-                      setSearchQ(e.target.value);
-                      if (addingSlot === null) {
-                        const slot = colleges.findIndex((c) => !c);
-                        setAddingSlot(slot !== -1 ? slot : 0); // Default to first slot if full
-                      }
-                    }}
+                    onChange={(e) => setSearchQ(e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Enter") handleAddButton(); }}
                     placeholder="Search universities, colleges..."
                     className="flex-1 text-[16px] text-slate-700 placeholder:text-slate-400 bg-transparent outline-none font-semibold"
@@ -278,17 +286,17 @@ function ComparePageInner() {
         </section>
 
         <div className="max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-24 relative z-40 -mt-10">
-          <div className="bg-white rounded-[5px] border border-slate-100 overflow-hidden" style={{ boxShadow: "0 8px 20px -16px rgba(0, 0, 0, 0.12)" }}>
+          <div className="bg-white rounded-[5px] border border-[#E0E0E0] overflow-hidden" style={{ boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)" }}>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    <th className="w-[300px] bg-[#F5F5F5] px-10 py-10 text-left border-b border-r border-slate-200 align-middle">
-                      <h2 className="text-[32px] font-bold text-slate-900 leading-[1.1]">Comparing<br/>Metrics</h2>
+                    <th className="w-[300px] bg-[#F5F5F5] px-10 py-10 text-left border-b border-r border-[#E0E0E0] align-middle">
+                      <h2 className="text-[32px] font-bold text-slate-900 leading-[1.1]">Comparing<br />Metrics</h2>
                     </th>
 
                     {colleges.map((college, i) => (
-                      <th key={i} className="relative px-8 py-8 border-b border-r border-slate-100 last:border-r-0 min-w-[320px] align-top bg-white group">
+                      <th key={i} className="relative px-8 py-8 border-b border-r border-[#E0E0E0] last:border-r-0 min-w-[320px] align-top bg-white group">
                         {college ? (
                           <div className="flex flex-col h-full">
                             <button
@@ -324,32 +332,54 @@ function ComparePageInner() {
                               Apply
                             </Link>
                           </div>
+                        ) : addingSlot === i ? (
+                           <div className="w-full min-h-[160px] p-4 flex flex-col justify-center relative">
+                             <div className="relative mb-2">
+                               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">search</span>
+                               <input
+                                 autoFocus
+                                 value={inlineSearchQ}
+                                 onChange={(e) => setInlineSearchQ(e.target.value)}
+                                 placeholder="Search college..."
+                                 className="w-full pl-9 pr-9 py-2.5 text-sm border border-[#FF3C3C] rounded-[5px] outline-none focus:ring-2 focus:ring-red-100"
+                               />
+                               <button
+                                 onClick={() => { setAddingSlot(null); setInlineSearchQ(""); setInlineSuggestions([]); }}
+                                 className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                               >
+                                 <span className="material-symbols-outlined text-[18px]">close</span>
+                               </button>
+                             </div>
+                             {inlineSuggestions.length > 0 && (
+                               <div className="inline-suggestions-dropdown absolute left-4 right-4 top-[72px] z-50 bg-white rounded-[5px] border border-[#E0E0E0] shadow-xl overflow-hidden">
+                                 {inlineSuggestions.map((s) => (
+                                   <button
+                                     key={s.slug}
+                                     onClick={() => { addCollege(s.slug, i); setInlineSearchQ(""); setInlineSuggestions([]); }}
+                                     className="w-full text-left px-4 py-3 hover:bg-red-50 text-sm font-medium text-slate-800 border-b border-slate-50 last:border-0 transition-colors"
+                                   >
+                                     <p className="font-semibold text-slate-800 truncate">{s.name}</p>
+                                     <p className="text-xs text-slate-400 mt-0.5">{s.location}</p>
+                                   </button>
+                                 ))}
+                               </div>
+                             )}
+                             {inlineSearchQ.length >= 2 && inlineSuggestions.length === 0 && (
+                               <p className="text-xs text-slate-400 text-center mt-2">No results found</p>
+                             )}
+                           </div>
                         ) : (
-                          <div className="h-full flex items-center justify-center min-h-[160px] pt-2">
-                            <button
-                              onClick={() => {
-                                setAddingSlot(i);
-                                setSearchQ("");
-                                setTimeout(() => inputRef.current?.focus(), 50);
-                              }}
-                              className={`w-full h-full min-h-[160px] flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-[5px] transition-all group ${
-                                addingSlot === i 
-                                  ? "border-[#FF3C3C] bg-[#FF3C3C]/5 ring-4 ring-[#FF3C3C]/10" 
-                                  : "border-slate-100 hover:border-[#FF3C3C] hover:bg-[#FF3C3C]/5"
-                              }`}
-                            >
-                              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
-                                addingSlot === i ? "bg-white text-[#FF3C3C]" : "bg-slate-50 group-hover:bg-white text-slate-400 group-hover:text-[#FF3C3C]"
-                              }`}>
-                                <span className="material-symbols-outlined text-[24px]">{addingSlot === i ? "edit" : "add"}</span>
-                              </div>
-                              <span className={`text-[15px] font-bold transition-colors ${
-                                addingSlot === i ? "text-[#FF3C3C]" : "text-slate-400 group-hover:text-[#FF3C3C]"
-                              }`}>
-                                {addingSlot === i ? "Selecting..." : "Add College"}
-                              </span>
-                            </button>
-                          </div>
+                           <div className="h-full flex items-center justify-center min-h-[160px] pt-2">
+                             <button
+                               onClick={() => { setAddingSlot(i); setInlineSearchQ(""); setInlineSuggestions([]); }}
+                               className="w-full h-full min-h-[160px] flex flex-col items-center justify-center gap-3 border-2 border-dashed border-slate-300 hover:border-[#FF3C3C] hover:bg-[#FF3C3C]/5 rounded-[5px] transition-all group"
+                             >
+                               <div className="w-12 h-12 rounded-full bg-slate-50 group-hover:bg-white flex items-center justify-center text-slate-400 group-hover:text-[#FF3C3C] transition-colors">
+                                 <span className="material-symbols-outlined text-[24px]">add</span>
+                               </div>
+                               <span className="text-[15px] font-bold text-slate-400 group-hover:text-[#FF3C3C] transition-colors">Add College</span>
+                             </button>
+                           </div>
                         )}
                       </th>
                     ))}
@@ -359,11 +389,11 @@ function ComparePageInner() {
                 <tbody>
                   {METRICS.map((metric) => (
                     <tr key={metric.key} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-10 py-8 border-r border-b border-slate-100">
+                      <td className="px-10 py-8 border-r border-b border-[#E0E0E0]">
                         <span className="text-[17px] font-bold text-slate-800">{metric.label}</span>
                       </td>
                       {colleges.map((college, ci) => (
-                        <td key={ci} className="px-8 py-8 border-r border-b border-slate-100 last:border-r-0">
+                        <td key={ci} className="px-8 py-8 border-r border-b border-[#E0E0E0] last:border-r-0">
                           {college ? (
                             loading ? (
                               <div className="space-y-2">

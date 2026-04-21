@@ -73,6 +73,8 @@ function CompareCoursePageInner() {
   const [searchQ, setSearchQ] = useState("");
   const [suggestions, setSuggestions] = useState<CourseSuggestion[]>([]);
   const [addingSlot, setAddingSlot] = useState<number | null>(null);
+  const [inlineSearchQ, setInlineSearchQ] = useState("");
+  const [inlineSuggestions, setInlineSuggestions] = useState<CourseSuggestion[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [dropdownStyle, setDropdownStyle] = useState<{
@@ -139,12 +141,32 @@ function CompareCoursePageInner() {
     return () => clearTimeout(t);
   }, [searchQ]);
 
+  // Inline search suggestions
+  useEffect(() => {
+    if (inlineSearchQ.length < 2) { setInlineSuggestions([]); return; }
+    const t = setTimeout(() => {
+      fetch(`/api/search?q=${encodeURIComponent(inlineSearchQ)}`)
+        .then((r) => r.json())
+        .then((d) => {
+          const uniqueBySlug = new Set<string>();
+          const normalized = (d.suggestions ?? [])
+            .filter((s: CourseSuggestion) => s.type === "course")
+            .map((s: CourseSuggestion) => ({ type: s.type, slug: s.slug, name: s.name, location: s.location || "Course" }))
+            .filter((s: CourseSuggestion) => { if (!s.slug || uniqueBySlug.has(s.slug)) return false; uniqueBySlug.add(s.slug); return true; })
+            .slice(0, 6);
+          setInlineSuggestions(normalized);
+        });
+    }, 300);
+    return () => clearTimeout(t);
+  }, [inlineSearchQ]);
+
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (
         searchRef.current &&
         !searchRef.current.contains(e.target as Node) &&
-        !(e.target as HTMLElement).closest(".compare-suggestions-dropdown")
+        !(e.target as HTMLElement).closest(".compare-suggestions-dropdown") &&
+        !(e.target as HTMLElement).closest(".inline-suggestions-dropdown")
       ) {
         setSuggestions([]);
         setAddingSlot(null);
@@ -245,22 +267,16 @@ function CompareCoursePageInner() {
 
               <div
                 ref={searchRef}
-                className="relative flex max-w-2xl flex-col gap-4 sm:flex-row"
+                className="relative flex flex-col sm:flex-row max-w-2xl shadow-lg shadow-red-200/20 rounded-[5px] overflow-hidden"
               >
-                <div className="flex flex-1 items-center gap-3 rounded-[5px] border border-slate-200 bg-white px-5 py-3.5 shadow-sm transition-all duration-300 focus-within:border-[#FF3C3C] focus-within:ring-4 focus-within:ring-[#FF3C3C]/10">
+                <div className="flex flex-1 items-center gap-3 bg-white border border-slate-200 sm:border-r-0 rounded-t-[5px] sm:rounded-t-none sm:rounded-l-[5px] sm:rounded-r-none px-5 py-3.5 focus-within:border-[#FF3C3C] transition-all duration-300">
                   <span className="material-symbols-outlined text-[24px] text-[#FF3C3C]">
                     menu_book
                   </span>
                   <input
                     ref={inputRef}
                     value={searchQ}
-                    onChange={(e) => {
-                      setSearchQ(e.target.value);
-                      if (addingSlot === null) {
-                        const slot = courses.findIndex((c) => !c);
-                        setAddingSlot(slot !== -1 ? slot : 0);
-                      }
-                    }}
+                    onChange={(e) => setSearchQ(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleAddButton();
                     }}
@@ -271,7 +287,7 @@ function CompareCoursePageInner() {
                 <button
                   onClick={handleAddButton}
                   disabled={loading}
-                  className="flex min-w-[150px] items-center justify-center gap-2 whitespace-nowrap rounded-[5px] bg-[#FF3C3C] px-8 py-3.5 text-[16px] font-bold text-white shadow-lg shadow-red-200 transition-all active:scale-95 hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex min-w-[150px] items-center justify-center gap-2 whitespace-nowrap bg-[#FF3C3C] px-8 py-3.5 text-[16px] font-bold text-white rounded-b-[5px] sm:rounded-b-none sm:rounded-r-[5px] sm:rounded-l-none hover:bg-red-600 transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loading && (
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -334,14 +350,14 @@ function CompareCoursePageInner() {
 
         <div className="relative z-40 mx-auto -mt-10 max-w-[1920px] px-6 sm:px-12 lg:px-24">
           <div
-            className="overflow-hidden rounded-[5px] border border-slate-100 bg-white"
-            style={{ boxShadow: "0 8px 20px -16px rgba(0, 0, 0, 0.12)" }}
+            className="overflow-hidden rounded-[5px] border border-[#E0E0E0] bg-white"
+            style={{ boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)" }}
           >
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    <th className="w-[300px] border-b border-r border-slate-200 bg-[#F5F5F5] px-10 py-10 text-left align-middle">
+                    <th className="w-[300px] border-b border-r border-[#E0E0E0] bg-[#F5F5F5] px-10 py-10 text-left align-middle">
                       <h2 className="text-[32px] font-bold leading-[1.1] text-slate-900">
                         Comparing
                         <br />
@@ -352,7 +368,7 @@ function CompareCoursePageInner() {
                     {courses.map((course, i) => (
                       <th
                         key={i}
-                        className="group relative min-w-[320px] border-b border-r border-slate-100 bg-white px-8 py-8 align-top last:border-r-0"
+                        className="group relative min-w-[320px] border-b border-r border-[#E0E0E0] bg-white px-8 py-8 align-top last:border-r-0"
                       >
                         {course ? (
                           <div className="flex h-full flex-col">
@@ -402,40 +418,52 @@ function CompareCoursePageInner() {
                               View Course
                             </Link>
                           </div>
+                        ) : addingSlot === i ? (
+                          <div className="w-full min-h-[160px] p-4 flex flex-col justify-center relative">
+                            <div className="relative mb-2">
+                              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">search</span>
+                              <input
+                                autoFocus
+                                value={inlineSearchQ}
+                                onChange={(e) => setInlineSearchQ(e.target.value)}
+                                placeholder="Search course..."
+                                className="w-full pl-9 pr-9 py-2.5 text-sm border border-[#FF3C3C] rounded-[5px] outline-none focus:ring-2 focus:ring-red-100"
+                              />
+                              <button
+                                onClick={() => { setAddingSlot(null); setInlineSearchQ(""); setInlineSuggestions([]); }}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                              >
+                                <span className="material-symbols-outlined text-[18px]">close</span>
+                              </button>
+                            </div>
+                            {inlineSuggestions.length > 0 && (
+                              <div className="inline-suggestions-dropdown absolute left-4 right-4 top-[72px] z-50 bg-white rounded-[5px] border border-[#E0E0E0] shadow-xl overflow-hidden">
+                                {inlineSuggestions.map((s) => (
+                                  <button
+                                    key={s.slug}
+                                    onClick={() => { addCourse(s.slug, i); setInlineSearchQ(""); setInlineSuggestions([]); }}
+                                    className="w-full text-left px-4 py-3 hover:bg-red-50 text-sm border-b border-slate-50 last:border-0 transition-colors"
+                                  >
+                                    <p className="font-semibold text-slate-800 truncate">{s.name}</p>
+                                    <p className="text-xs text-slate-400 mt-0.5">{s.location}</p>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                            {inlineSearchQ.length >= 2 && inlineSuggestions.length === 0 && (
+                              <p className="text-xs text-slate-400 text-center mt-2">No results found</p>
+                            )}
+                          </div>
                         ) : (
                           <div className="flex h-full min-h-[160px] items-center justify-center pt-2">
                             <button
-                              onClick={() => {
-                                setAddingSlot(i);
-                                setSearchQ("");
-                                setTimeout(() => inputRef.current?.focus(), 50);
-                              }}
-                              className={`group flex h-full min-h-[160px] w-full flex-col items-center justify-center gap-3 rounded-[5px] border-2 border-dashed transition-all ${
-                                addingSlot === i
-                                  ? "border-[#FF3C3C] bg-[#FF3C3C]/5 ring-4 ring-[#FF3C3C]/10"
-                                  : "border-slate-100 hover:border-[#FF3C3C] hover:bg-[#FF3C3C]/5"
-                              }`}
+                              onClick={() => { setAddingSlot(i); setInlineSearchQ(""); setInlineSuggestions([]); }}
+                              className="group flex h-full min-h-[160px] w-full flex-col items-center justify-center gap-3 rounded-[5px] border-2 border-dashed border-slate-300 hover:border-[#FF3C3C] hover:bg-[#FF3C3C]/5 transition-all"
                             >
-                              <div
-                                className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
-                                  addingSlot === i
-                                    ? "bg-white text-[#FF3C3C]"
-                                    : "bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-[#FF3C3C]"
-                                }`}
-                              >
-                                <span className="material-symbols-outlined text-[24px]">
-                                  {addingSlot === i ? "edit" : "add"}
-                                </span>
+                              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 group-hover:bg-white text-slate-400 group-hover:text-[#FF3C3C] transition-colors">
+                                <span className="material-symbols-outlined text-[24px]">add</span>
                               </div>
-                              <span
-                                className={`text-[15px] font-medium transition-colors ${
-                                  addingSlot === i
-                                    ? "text-[#FF3C3C]"
-                                    : "text-slate-400 group-hover:text-[#FF3C3C]"
-                                }`}
-                              >
-                                {addingSlot === i ? "Selecting..." : "Add Course"}
-                              </span>
+                              <span className="text-[15px] font-bold text-slate-400 group-hover:text-[#FF3C3C] transition-colors">Add Course</span>
                             </button>
                           </div>
                         )}
@@ -450,7 +478,7 @@ function CompareCoursePageInner() {
                       key={metric.key}
                       className="transition-colors hover:bg-slate-50/50"
                     >
-                      <td className="border-b border-r border-slate-100 px-10 py-8">
+                      <td className="border-b border-r border-[#E0E0E0] px-10 py-8">
                         <span className="text-[17px] font-bold text-slate-800">
                           {metric.label}
                         </span>
@@ -458,7 +486,7 @@ function CompareCoursePageInner() {
                       {courses.map((course, ci) => (
                         <td
                           key={ci}
-                          className="border-b border-r border-slate-100 px-8 py-8 last:border-r-0"
+                          className="border-b border-r border-[#E0E0E0] px-8 py-8 last:border-r-0"
                         >
                           {course ? (
                             loading ? (

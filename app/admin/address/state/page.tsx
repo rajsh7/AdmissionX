@@ -72,23 +72,21 @@ export default async function StatePage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE s.name LIKE ? OR c.name LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`] : [];
-
-  const [data, countries] = await Promise.all([
-    safeQuery<StateRow>(
-      `SELECT s.id, s.name, s.country_id, c.name as countryName
-       FROM state s
-       LEFT JOIN country c ON c.id = s.country_id
-       ${where}
-       ORDER BY s.name ASC
-       LIMIT 100`,
-      params
-    ),
-    safeQuery<{ id: number; name: string }>(
-      "SELECT id, name FROM country ORDER BY name ASC"
-    )
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { $or: [{ name: { $regex: q, $options: "i" } }] } : {};
+  const [stateDocs, countryDocs] = await Promise.all([
+    db.collection("state").find(filter).sort({ name: 1 }).limit(100).toArray(),
+    db.collection("country").find({}, { projection: { id: 1, name: 1 } }).sort({ name: 1 }).toArray(),
   ]);
+  const countryMap = new Map(countryDocs.map((d: any) => [Number(d.id), String(d.name ?? "").trim()]));
+  const data: StateRow[] = stateDocs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    name: String(d.name ?? "").trim(),
+    countryName: countryMap.get(Number(d.country_id)) || null,
+    country_id: d.country_id ? Number(d.country_id) : null,
+  }));
+  const countries = countryDocs.map((d: any) => ({ id: Number(d.id ?? 0), name: String(d.name ?? "").trim() }));
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">

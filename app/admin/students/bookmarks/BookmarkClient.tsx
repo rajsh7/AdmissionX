@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import BookmarkFormModal from "./BookmarkFormModal";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
@@ -41,12 +41,10 @@ export default function BookmarkClient({
   const [showFilters, setShowFilters] = useState(Boolean(q || selectedStudentId || selectedTypeId));
   const [visibleCount, setVisibleCount] = useState(25);
 
-  const marksKey = bookmarks[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(marksKey);
-  if (marksKey !== lastKey) {
-    setLastKey(marksKey);
+  // Reset when bookmarks change
+  useEffect(() => {
     setVisibleCount(25);
-  }
+  }, [bookmarks[0]?.id]);
 
   const showPagination = totalPages > 1 && visibleCount >= Math.min(100, bookmarks.length);
   const showMore = visibleCount < bookmarks.length && !showPagination;

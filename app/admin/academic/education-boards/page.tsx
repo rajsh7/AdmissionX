@@ -105,25 +105,23 @@ export default async function EducationBoardsPage({
   const page = Math.max(1, parseInt(sp.page || "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  const where = q ? "WHERE name LIKE ? OR title LIKE ? OR slug LIKE ?" : "";
-  const params = q ? [`%${q}%`, `%${q}%`, `%${q}%`] : [];
-
-  const [boards, countRows] = await Promise.all([
-    safeQuery<BoardRow>(
-      `SELECT id, name, title, slug, status, misc, created_at, updated_at
-       FROM counseling_boards
-       ${where}
-       ORDER BY id DESC
-       LIMIT ? OFFSET ?`,
-      [...params, PAGE_SIZE, offset]
-    ),
-    safeQuery<CountRow>(
-      `SELECT COUNT(*) AS total FROM counseling_boards ${where}`,
-      params
-    )
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { $or: [{ name: { $regex: q, $options: "i" } }, { title: { $regex: q, $options: "i" } }, { slug: { $regex: q, $options: "i" } }] } : {};
+  const [docs, total] = await Promise.all([
+    db.collection("counseling_boards").find(filter).sort({ id: -1 }).skip(offset).limit(PAGE_SIZE).toArray(),
+    db.collection("counseling_boards").countDocuments(filter),
   ]);
-
-  const total = Number(countRows[0]?.total || 0);
+  const boards: BoardRow[] = docs.map((d: any) => ({
+    id: Number(d.id ?? 0),
+    name: String(d.name ?? "").trim(),
+    title: d.title ? String(d.title).trim() : null,
+    slug: d.slug ? String(d.slug).trim() : null,
+    status: Number(String(d.status ?? "0").trim()),
+    misc: d.misc ? String(d.misc).trim() : null,
+    created_at: String(d.created_at ?? "").trim(),
+    updated_at: String(d.updated_at ?? "").trim(),
+  }));
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };

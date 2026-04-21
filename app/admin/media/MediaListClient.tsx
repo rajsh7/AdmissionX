@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import PaginationFixed from "@/app/components/PaginationFixed";
@@ -46,12 +46,10 @@ export default function MediaListClient({
 }: MediaListClientProps) {
   const [visibleCount, setVisibleCount] = useState(STEP);
 
-  const listKey = profiles[0]?.slug ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) {
-    setLastKey(listKey);
+  // Reset when items change
+  useEffect(() => {
     setVisibleCount(STEP);
-  }
+  }, [profiles[0]?.id]);
 
   const showMore = visibleCount < profiles.length;
   const showPagination = !showMore && totalPages > 1;

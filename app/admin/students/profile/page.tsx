@@ -17,6 +17,8 @@ export default async function StudentProfilePage({
   const studentName = (sp.studentName ?? "").trim();
   const email = (sp.email ?? "").trim();
   const gender = (sp.gender ?? "").trim();
+  const phoneNumber = (sp.phoneNumber ?? "").trim();
+  const parentsName = (sp.parentsname ?? "").trim();
   const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const offset = (page - 1) * FETCH_SIZE;
 
@@ -25,6 +27,8 @@ export default async function StudentProfilePage({
   // Build filter on studentprofile
   const filter: Record<string, unknown> = {};
   if (gender) filter.gender = { $regex: gender, $options: "i" };
+  if (phoneNumber) filter.parentsnumber = { $regex: phoneNumber, $options: "i" };
+  if (parentsName) filter.parentsname = { $regex: parentsName, $options: "i" };
 
   // Fetch from old studentprofile collection
   const [profileRows, totalCount] = await Promise.all([
@@ -46,11 +50,14 @@ export default async function StudentProfilePage({
 
   // Also check next_student_signups for newer students
   const newSignupFilter: Record<string, unknown> = {};
-  if (studentName) newSignupFilter.$or = [
+  const andConditions: Record<string, unknown>[] = [];
+  if (studentName) andConditions.push({ $or: [
     { name: { $regex: studentName, $options: "i" } },
     { email: { $regex: studentName, $options: "i" } },
-  ];
-  if (email) newSignupFilter.email = { $regex: email, $options: "i" };
+  ]});
+  if (email) andConditions.push({ email: { $regex: email, $options: "i" } });
+  if (phoneNumber) andConditions.push({ phone: { $regex: phoneNumber, $options: "i" } });
+  if (andConditions.length > 0) newSignupFilter.$and = andConditions;
 
   const newStudents = await db.collection("next_student_signups")
     .find(newSignupFilter)
@@ -88,14 +95,13 @@ export default async function StudentProfilePage({
 
   // Filter old profiles by name/email if search provided
   let filteredOldRows = profileRows;
-  if (studentName || email) {
-    const q = (studentName || email).toLowerCase();
+  if (studentName || email || phoneNumber) {
     filteredOldRows = profileRows.filter((p: any) => {
       const u = userMap.get(Number(p.users_id));
-      return (
-        (u?.firstname || "").toLowerCase().includes(q) ||
-        (u?.email || "").toLowerCase().includes(q)
-      );
+      const nameMatch = !studentName || (u?.firstname || "").toLowerCase().includes(studentName.toLowerCase());
+      const emailMatch = !email || (u?.email || "").toLowerCase().includes(email.toLowerCase());
+      const phoneMatch = !phoneNumber || (u?.phone || "").toLowerCase().includes(phoneNumber.toLowerCase());
+      return nameMatch && emailMatch && phoneMatch;
     });
   }
 
@@ -157,9 +163,9 @@ export default async function StudentProfilePage({
         totalPages={totalPages}
         selectedStudentName={studentName}
         selectedEmail={email}
-        selectedPhoneNumber={""}
+        selectedPhoneNumber={phoneNumber}
         selectedGender={gender}
-        selectedParentsName={""}
+        selectedParentsName={parentsName}
         createProfile={createProfile}
         deleteProfile={deleteProfile}
       />

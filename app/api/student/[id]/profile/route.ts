@@ -32,6 +32,7 @@ export async function GET(
   const prof = await db.collection("next_student_profiles").findOne(
     { student_id: id } as Filter<Document>,
     { projection: { dob: 1, gender: 1, city: 1, state: 1, country: 1, photo: 1, hobbies: 1, interest: 1, about: 1, avatar: 1 } }
+    { projection: { dob: 1, gender: 1, city: 1, state: 1, country: 1, pincode: 1, address: 1, photo: 1, hobbies: 1, interest: 1, about: 1, parentsname: 1, parentsnumber: 1, project_title: 1, projects: 1 } }
   ) ?? {};
 
   const p = prof as Record<string, unknown>;
@@ -49,10 +50,20 @@ export async function GET(
     city: p.city ?? "",
     state: p.state ?? "",
     country: p.country ?? "India",
+<<<<<<< HEAD
     photo: photo,
+=======
+    pincode: p.pincode ?? "",
+    address: p.address ?? "",
+    photo: p.photo ?? "",
+>>>>>>> b8095de4892b17c087e4ea882a2d91f529e87879
     hobbies: p.hobbies ?? "",
     interest: p.interest ?? "",
     about: p.about ?? "",
+    parentsname: p.parentsname ?? "",
+    parentsnumber: p.parentsnumber ?? "",
+    project_title: p.project_title ?? "",
+    projects: p.projects ?? "",
     member_since: base.created_at,
     profile_complete: profileComplete,
     auth_provider: base.auth_provider ?? "email",
@@ -75,7 +86,7 @@ export async function PUT(
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { name, phone, dob, gender, city, state, country, hobbies, interest, about } = body;
+  const { name, phone, dob, gender, city, state, country, pincode, address, hobbies, interest, about, parentsname, parentsnumber, project_title, projects } = body;
   const db = await getDb();
 
   const baseUpdate: Record<string, unknown> = { updated_at: new Date() };
@@ -87,21 +98,27 @@ export async function PUT(
     { $set: baseUpdate }
   );
 
+  // Only update fields that were actually sent in the request body
+  const profileSet: Record<string, unknown> = { student_id: id, updated_at: new Date() };
+  if (dob !== undefined)           profileSet.dob           = dob || null;
+  if (gender !== undefined)        profileSet.gender        = gender || null;
+  if (city !== undefined)          profileSet.city          = city || null;
+  if (state !== undefined)         profileSet.state         = state || null;
+  if (country !== undefined)       profileSet.country       = country || "India";
+  if (pincode !== undefined)       profileSet.pincode       = pincode || null;
+  if (address !== undefined)       profileSet.address       = address || null;
+  if (hobbies !== undefined)       profileSet.hobbies       = hobbies || null;
+  if (interest !== undefined)      profileSet.interest      = interest || null;
+  if (about !== undefined)         profileSet.about         = about || null;
+  if (parentsname !== undefined)    profileSet.parentsname    = parentsname || null;
+  if (parentsnumber !== undefined)  profileSet.parentsnumber  = parentsnumber || null;
+  if (project_title !== undefined)  profileSet.project_title  = project_title || null;
+  if (projects !== undefined)       profileSet.projects       = projects || null;
+
   await db.collection("next_student_profiles").updateOne(
     { student_id: id } as Filter<Document>,
     {
-      $set: {
-        student_id: id,
-        dob: dob || null,
-        gender: gender || null,
-        city: city || null,
-        state: state || null,
-        country: country || "India",
-        hobbies: hobbies || null,
-        interest: interest || null,
-        about: about || null,
-        updated_at: new Date(),
-      },
+      $set: profileSet,
       $setOnInsert: { created_at: new Date() },
     },
     { upsert: true }

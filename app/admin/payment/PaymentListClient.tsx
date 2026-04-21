@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import PaginationFixed from "@/app/components/PaginationFixed";
 
@@ -32,9 +32,10 @@ const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz
 export default function PaymentListClient({ payments, offset, total, page, totalPages, pageSize, onDelete }: Props) {
   const [visibleCount, setVisibleCount] = useState(STEP);
 
-  const listKey = payments[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(STEP); }
+  // Reset visible count when payments change
+  useEffect(() => {
+    setVisibleCount(STEP);
+  }, [payments[0]?.id]);
 
   const showMore = visibleCount < payments.length;
   const showPagination = !showMore && totalPages > 1;

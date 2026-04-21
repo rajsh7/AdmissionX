@@ -49,13 +49,10 @@ export default function BoardListClient({
     setMounted(true);
   }, []);
 
-  // Reset visible count when page changes
-  const pageKey = `${page}-${boards[0]?.id}`;
-  const [lastPageKey, setLastPageKey] = useState(pageKey);
-  if (pageKey !== lastPageKey) {
-    setLastPageKey(pageKey);
+  // Reset visible count when page or board data changes
+  useEffect(() => {
     setVisibleCount(STEP);
-  }
+  }, [page, boards[0]?.id]);
 
   const showMore = visibleCount < boards.length;
   const showPagination = !showMore && totalPages > 1;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import PlacementFormModal from "./PlacementFormModal";
@@ -51,9 +51,10 @@ export default function PlacementListClient({
   const [showFilters, setShowFilters] = useState(Boolean(searchQuery || selectedCollegeId || selectedHighestCtc || selectedLowestCtc || selectedAverageCtc || selectedRecruitingCompanies || selectedPlacementInfo));
   const [visibleCount, setVisibleCount] = useState(15);
 
-  const listKey = placements[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) { setLastKey(listKey); setVisibleCount(15); }
+  // Reset visibleCount when placements change
+  useEffect(() => {
+    setVisibleCount(15);
+  }, [placements[0]?.id]);
 
   const showMore = visibleCount < placements.length;
   const showPagination = !showMore && totalPages > 1;

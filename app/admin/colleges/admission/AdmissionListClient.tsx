@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import AdmissionFormModal from "./AdmissionFormModal";
@@ -58,12 +58,10 @@ export default function AdmissionListClient({
   );
   const [visibleCount, setVisibleCount] = useState(25);
 
-  const listKey = admissions[0]?.id ?? "empty";
-  const [lastKey, setLastKey] = useState(listKey);
-  if (listKey !== lastKey) {
-    setLastKey(listKey);
+  // Reset visibleCount when admissions change
+  useEffect(() => {
     setVisibleCount(25);
-  }
+  }, [admissions[0]?.id]);
 
   function openAdd() {
     setIsModalOpen(true);

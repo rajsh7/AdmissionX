@@ -10,11 +10,11 @@ interface JourneyStepsProps {
 export default function JourneySteps({ ads = [] }: JourneyStepsProps) {
   return (
     <section className="py-24 bg-white">
-      <div className="max-w-[1920px] mx-auto px-8 lg:px-12">
+      <div className="home-page-shell">
         
         <div className="mb-20">
-          <h2 className="text-[40px] font-bold text-slate-800 mb-4 tracking-tight text-center lg:text-left">Your Journey to Study Abroad</h2>
-          <p className="text-[17px] text-slate-400 max-w-2xl leading-relaxed text-center lg:text-left">
+          <h2 className="text-[32px] font-semibold text-[#3E3E3E] mb-4 tracking-tight text-center lg:text-left">Your Journey to Study Abroad</h2>
+          <p className="text-[16px] text-[#6C6C6C] font-medium max-w-2xl leading-relaxed text-center lg:text-left">
             Explore the most popular countries for international student based on quality of education, post study work right, and living standards.
           </p>
         </div>
@@ -23,16 +23,21 @@ export default function JourneySteps({ ads = [] }: JourneyStepsProps) {
         <div className="max-w-full mx-auto mb-20 px-4">
           
           <div className="relative">
-            {/* Background Line */}
-            <div className="absolute top-[36px] left-[12.5%] right-[12.5%] h-[2px] bg-slate-100 -z-10" />
-            
-            {/* Red Active Line Segment (from step 1 to 2) */}
-            <div className="absolute top-[36px] left-[12.5%] w-[25%] h-[2px] bg-[#FF3C3C] -z-10" />
+            {/* Progress connector line — half red (completed), half grey (remaining) */}
+            <div
+              className="absolute top-[36px] z-0"
+              style={{
+                left: "12.5%",
+                right: "12.5%",
+                height: "2px",
+                background: "linear-gradient(to right, #FF3C3C 0%, #FF3C3C 33.33%, #e2e8f0 33.33%, #e2e8f0 100%)",
+              }}
+            />
 
             <div className="grid grid-cols-4 gap-8">
               
               {/* Step 1 */}
-              <div className="flex flex-col items-center text-center space-y-8">
+              <div className="relative z-10 flex flex-col items-center text-center space-y-8">
                 <div className="w-[72px] h-[72px] bg-[#FF3C3C] rounded-[5px] flex items-center justify-center text-white text-[24px] font-bold shadow-xl shadow-red-500/20">
                   1
                 </div>
@@ -45,7 +50,7 @@ export default function JourneySteps({ ads = [] }: JourneyStepsProps) {
               </div>
 
               {/* Step 2 */}
-              <div className="flex flex-col items-center text-center space-y-8">
+              <div className="relative z-10 flex flex-col items-center text-center space-y-8">
                 <div className="w-[72px] h-[72px] bg-white border border-slate-100 rounded-[5px] flex items-center justify-center text-slate-300 text-[24px] font-bold shadow-sm">
                   2
                 </div>
@@ -58,7 +63,7 @@ export default function JourneySteps({ ads = [] }: JourneyStepsProps) {
               </div>
 
               {/* Step 3 */}
-              <div className="flex flex-col items-center text-center space-y-8">
+              <div className="relative z-10 flex flex-col items-center text-center space-y-8">
                 <div className="w-[72px] h-[72px] bg-white border border-slate-100 rounded-[5px] flex items-center justify-center text-slate-300 text-[24px] font-bold shadow-sm">
                   3
                 </div>
@@ -71,7 +76,7 @@ export default function JourneySteps({ ads = [] }: JourneyStepsProps) {
               </div>
 
               {/* Step 4 */}
-              <div className="flex flex-col items-center text-center space-y-8">
+              <div className="relative z-10 flex flex-col items-center text-center space-y-8">
                 <div className="w-[72px] h-[72px] bg-white border border-slate-100 rounded-[5px] flex items-center justify-center text-slate-300 text-[24px] font-bold shadow-sm">
                   4
                 </div>

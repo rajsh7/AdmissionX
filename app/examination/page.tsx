@@ -146,7 +146,7 @@ export default async function ExaminationHubPage({
                 unlock gate for dream University.
               </p>
 
-              <form method="GET" action="/examination" className="flex w-full max-w-[560px] bg-white border border-neutral-200 rounded-[5px] overflow-hidden shadow-md">
+              <form method="GET" action="/examination" className="flex w-full max-w-[560px] h-[51.8px] bg-white border border-neutral-200 rounded-[5px] overflow-hidden shadow-md">
                 <div className="flex items-center pl-4 pr-2 text-neutral-400">
                   <span className="material-symbols-outlined text-[20px]">search</span>
                 </div>
@@ -156,9 +156,9 @@ export default async function ExaminationHubPage({
                   defaultValue={q}
                   suppressHydrationWarning
                   placeholder="Location, universities, courses..."
-                  className="flex-1 py-3 px-2 text-sm text-neutral-800 placeholder-neutral-400 focus:outline-none bg-transparent font-medium"
+                  className="flex-1 px-2 text-sm text-neutral-800 placeholder-neutral-400 focus:outline-none bg-transparent font-medium"
                 />
-                <button type="submit" suppressHydrationWarning className="bg-red-500 hover:bg-red-600 text-white font-bold px-10 py-3 transition-colors text-sm tracking-wide round-tr  -[5px]">
+                <button type="submit" suppressHydrationWarning className="bg-[#FF3C3C] hover:bg-[#E23434] text-white font-bold px-10 transition-colors text-sm tracking-wide">
                   Search
                 </button>
               </form>

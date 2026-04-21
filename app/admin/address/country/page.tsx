@@ -68,17 +68,11 @@ export default async function CountryPage({
   const sp = await searchParams;
   const q = (sp.q || "").trim();
 
-  const where = q ? "WHERE name LIKE ?" : "";
-  const params = q ? [`%${q}%`] : [];
-
-  const data = await safeQuery<CountryRow>(
-    `SELECT id, name
-     FROM country
-     ${where}
-     ORDER BY name ASC
-     LIMIT 100`,
-    params
-  );
+  const { getDb } = await import("@/lib/db");
+  const db = await getDb();
+  const filter = q ? { name: { $regex: q, $options: "i" } } : {};
+  const docs = await db.collection("country").find(filter).sort({ name: 1 }).limit(100).toArray();
+  const data: CountryRow[] = docs.map((d: any) => ({ id: Number(d.id ?? 0), name: String(d.name ?? "").trim() }));
 
   return (
     <div className="p-6 space-y-6 max-w-[1400px]">
