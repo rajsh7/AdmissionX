@@ -12,7 +12,7 @@ export async function fetchCollegeOptions(): Promise<CollegeOption[]> {
       .aggregate([
         { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
         { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-        { $project: { _id: 0, id: 1, slug: 1, name: { $ifNull: ["$user.firstname", "$slug"] } } },
+        { $project: { _id: 0, id: 1, slug: 1, name: { $ifNull: ["$name", { $ifNull: ["$user.firstname", "$slug"] }] } } },
         { $sort: { name: 1 } },
         { $limit: 2000 },
       ])

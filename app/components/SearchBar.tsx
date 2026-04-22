@@ -63,16 +63,6 @@ export default function SearchBar({
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (onSearch) {
-      onSearch(searchQuery);
-    } else {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-    }
-    setShowDropdown(false);
-  };
-
   const navigateToItem = (item: Suggestion) => {
     setSearchQuery(item.name);
     setShowDropdown(false);
@@ -81,7 +71,8 @@ export default function SearchBar({
     } else if (item.type === "course") {
       router.push(`/careers-courses?q=${encodeURIComponent(item.name)}`);
     } else if (item.type === "stream") {
-      const params = new URLSearchParams({ stream: item.slug ?? "" });
+      const params = new URLSearchParams();
+      if (item.slug) params.set("stream", item.slug);
       if ((item as any).cityId) params.set("city_id", String((item as any).cityId));
       router.push(`/top-colleges?${params.toString()}`);
     } else if (item.type === "city") {
@@ -89,6 +80,23 @@ export default function SearchBar({
     } else {
       router.push(`/search?q=${encodeURIComponent(item.name)}`);
     }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onSearch) {
+      onSearch(searchQuery);
+    } else {
+      // Parse "X in Y" for direct search navigation
+      const inMatch = searchQuery.match(/^(.+?)\s+in\s+(.+)$/i);
+      if (inMatch) {
+        const params = new URLSearchParams({ q: inMatch[1].trim(), city: inMatch[2].trim() });
+        router.push(`/search?${params.toString()}`);
+      } else {
+        router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+      }
+    }
+    setShowDropdown(false);
   };
 
   return (

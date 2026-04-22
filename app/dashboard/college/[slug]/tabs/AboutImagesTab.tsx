@@ -13,18 +13,16 @@ function buildUrl(raw: string | null) {
 }
 
 interface ImageSlot {
-  field: "bannerimage" | "mosaic1" | "mosaic2" | "mosaic3" | "mosaic4";
+  field: "mosaic2" | "mosaic3" | "mosaic4";
   label: string;
   hint: string;
   aspect: string;
 }
 
-const SLOTS: ImageSlot[] = [
-  { field: "bannerimage", label: "Hero Banner",            hint: "1200×400px recommended",  aspect: "aspect-[3/1]" },
-  { field: "mosaic1",     label: "Stats Section BG",       hint: "Full-width background",    aspect: "aspect-[3/1]" },
-  { field: "mosaic2",     label: "About Image 1 (Large)",  hint: "Vertical — 600×800px",     aspect: "aspect-[3/4]" },
-  { field: "mosaic3",     label: "About Image 2",          hint: "Square — 600×600px",       aspect: "aspect-square" },
-  { field: "mosaic4",     label: "About Image 3",          hint: "Square — 600×600px",       aspect: "aspect-square" },
+const ABOUT_SLOTS: ImageSlot[] = [
+  { field: "mosaic2", label: "About Image 1 (Large Vertical)", hint: "600×800px recommended", aspect: "aspect-[3/4]" },
+  { field: "mosaic3", label: "About Image 2 (Square)",         hint: "600×600px recommended", aspect: "aspect-square" },
+  { field: "mosaic4", label: "About Image 3 (Square)",         hint: "600×600px recommended", aspect: "aspect-square" },
 ];
 
 function ImageUploadCard({
@@ -166,9 +164,9 @@ function ImageUploadCard({
   );
 }
 
-export default function BannerTab({ college }: Props) {
+export default function AboutImagesTab({ college }: Props) {
   const [images, setImages] = useState<Record<string, string | null>>({
-    bannerimage: null, mosaic1: null, mosaic2: null, mosaic3: null, mosaic4: null,
+    mosaic2: null, mosaic3: null, mosaic4: null,
   });
   const [loading, setLoading] = useState(true);
 
@@ -178,11 +176,9 @@ export default function BannerTab({ college }: Props) {
       const d = await res.json();
       const p = d.profile ?? {};
       setImages({
-        bannerimage: buildUrl(p.bannerimage),
-        mosaic1:     buildUrl(p.mosaic1),
-        mosaic2:     buildUrl(p.mosaic2),
-        mosaic3:     buildUrl(p.mosaic3),
-        mosaic4:     buildUrl(p.mosaic4),
+        mosaic2: buildUrl(p.mosaic2),
+        mosaic3: buildUrl(p.mosaic3),
+        mosaic4: buildUrl(p.mosaic4),
       });
     } catch {}
     finally { setLoading(false); }
@@ -199,63 +195,47 @@ export default function BannerTab({ college }: Props) {
 
       {/* Header */}
       <div className="p-8 border-b border-slate-100">
-        <h2 className="text-[22px] font-bold text-[#333]">College Images</h2>
+        <h2 className="text-[22px] font-bold text-[#333]">About Us Section Images</h2>
         <p className="text-slate-400 text-sm mt-1">
-          Upload your college banner and about section images. Changes sync instantly with the admin panel.
+          Upload 3 images that appear in the About Us section on your public college page. These sync with the admin panel.
         </p>
       </div>
 
       {loading ? (
-        <div className="p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-          {[1,2,3,4,5].map(i => <div key={i} className="h-48 bg-slate-100 rounded-xl" />)}
+        <div className="p-8 grid grid-cols-1 sm:grid-cols-3 gap-6 animate-pulse">
+          {[1,2,3].map(i => <div key={i} className="h-64 bg-slate-100 rounded-xl" />)}
         </div>
       ) : (
-        <div className="p-8 space-y-8">
+        <div className="p-8 space-y-6">
 
-          {/* Banner + Stats BG */}
-          <div>
-            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">
-              Banner & Background Images
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {SLOTS.slice(0, 2).map(slot => (
-                <ImageUploadCard
-                  key={slot.field}
-                  slot={slot}
-                  currentUrl={images[slot.field]}
-                  slug={college.slug}
-                  onUploaded={handleUploaded}
-                />
-              ))}
+          {/* Layout preview */}
+          <div className="flex items-start gap-3 px-4 py-3 bg-blue-50 border border-blue-100 rounded-xl">
+            <span className="material-symbols-outlined text-[18px] text-blue-500 shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>info</span>
+            <div className="text-[12px] text-blue-700 font-medium">
+              <p className="font-bold mb-1">Layout on public page:</p>
+              <p><strong>Image 1</strong> appears as a large vertical image on the left.</p>
+              <p><strong>Images 2 & 3</strong> appear as smaller square images stacked on the right.</p>
             </div>
           </div>
 
-          {/* About section images */}
-          <div>
-            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">
-              About Us Section Images
-            </p>
-            <p className="text-[12px] text-slate-400 mb-4">
-              These 3 images appear in the About Us section on your public college page.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {SLOTS.slice(2).map(slot => (
-                <ImageUploadCard
-                  key={slot.field}
-                  slot={slot}
-                  currentUrl={images[slot.field]}
-                  slug={college.slug}
-                  onUploaded={handleUploaded}
-                />
-              ))}
-            </div>
+          {/* Image cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {ABOUT_SLOTS.map(slot => (
+              <ImageUploadCard
+                key={slot.field}
+                slot={slot}
+                currentUrl={images[slot.field]}
+                slug={college.slug}
+                onUploaded={handleUploaded}
+              />
+            ))}
           </div>
 
           {/* Sync note */}
-          <div className="flex items-start gap-3 px-4 py-3 bg-blue-50 border border-blue-100 rounded-xl">
-            <span className="material-symbols-outlined text-[18px] text-blue-500 shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>sync</span>
-            <p className="text-[12px] text-blue-700 font-medium">
-              All images are stored in the same database as the admin panel. Changes made here are immediately visible in the admin panel under <strong>Colleges → Profile → [Your College]</strong>, and vice versa.
+          <div className="flex items-start gap-3 px-4 py-3 bg-emerald-50 border border-emerald-100 rounded-xl">
+            <span className="material-symbols-outlined text-[18px] text-emerald-600 shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>sync</span>
+            <p className="text-[12px] text-emerald-700 font-medium">
+              These images are stored in the same database as the admin panel. Changes made here are immediately visible in <strong>Admin → Colleges → Profile → [Your College] → About Us Images</strong>, and vice versa.
             </p>
           </div>
         </div>

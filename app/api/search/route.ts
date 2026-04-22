@@ -4,26 +4,22 @@ import { getDb } from "@/lib/db";
 // Parse "X in Y" pattern → { subject: "X", location: "Y" }
 function parseQuery(q: string): { subject: string; location: string | null } {
   const inMatch = q.match(/^(.+?)\s+in\s+(.+)$/i);
-  if (inMatch) {
-    return { subject: inMatch[1].trim(), location: inMatch[2].trim() };
-  }
+  if (inMatch) return { subject: inMatch[1].trim(), location: inMatch[2].trim() };
   return { subject: q, location: null };
 }
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const q = (searchParams.get("q") ?? "").trim();
-
   if (q.length < 2) return NextResponse.json({ suggestions: [] });
 
   try {
     const db = await getDb();
     const { subject, location } = parseQuery(q);
-
     const subjectRegex = { $regex: subject, $options: "i" };
     const locationRegex = location ? { $regex: location, $options: "i" } : null;
 
-    // Resolve location → city IDs if "in <city>" present
+    // Resolve city
     let cityIds: unknown[] = [];
     let cityName = "";
     if (locationRegex) {
@@ -36,7 +32,7 @@ export async function GET(request: NextRequest) {
       cityName = cityDocs[0]?.name ?? location ?? "";
     }
 
-    // Resolve subject → stream/degree IDs for college filtering
+    // Resolve subject → streams, degrees, courses
     const [streamDocs, degreeDocs, courseDocs] = await Promise.all([
       db.collection("functionalarea").find({ name: subjectRegex }).project({ _id: 1, id: 1, name: 1, pageslug: 1 }).limit(5).toArray(),
       db.collection("degree").find({ name: subjectRegex }).project({ _id: 1, id: 1, name: 1, pageslug: 1 }).limit(5).toArray(),
@@ -46,7 +42,7 @@ export async function GET(request: NextRequest) {
     const suggestions: any[] = [];
 
     // ── 1. "course in city" → colleges offering that course in that city ──
-    if ((streamDocs.length > 0 || degreeDocs.length > 0) && cityIds.length > 0) {
+    if ((streamDocs.length > 0 || degreeDocs.length > 0) && location) {
       const streamIds = streamDocs.map((s) => s.id ?? s._id);
       const degreeIds = degreeDocs.map((d) => d.id ?? d._id);
 
@@ -61,21 +57,33 @@ export async function GET(request: NextRequest) {
       const cpIds = [...new Set(cmDocs.map((c) => c.collegeprofile_id))];
 
       if (cpIds.length > 0) {
+        // Match by city ID OR by address text (for colleges without cityId set)
+        const cityFilter: Record<string, unknown>[] = [];
+        if (cityIds.length > 0) cityFilter.push({ registeredAddressCityId: { $in: cityIds } });
+        if (location) {
+          cityFilter.push({ registeredSortAddress: { $regex: location, $options: "i" } });
+          cityFilter.push({ registeredFullAddress: { $regex: location, $options: "i" } });
+          cityFilter.push({ campusSortAddress: { $regex: location, $options: "i" } });
+        }
+
         const collegeFilter: Record<string, unknown> = {
-          id: { $in: cpIds },
-          registeredAddressCityId: { $in: cityIds },
+          $or: [
+            { id: { $in: cpIds } },
+            { _id: { $in: cpIds } },
+          ],
+          ...(cityFilter.length > 0 ? { $and: [{ $or: cityFilter }] } : {}),
         };
 
         const colleges = await db.collection("collegeprofile").aggregate([
           { $match: collegeFilter },
           { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
           { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-          { $project: { slug: 1, "user.firstname": 1, registeredSortAddress: 1 } },
+          { $project: { slug: 1, "user.firstname": 1, registeredSortAddress: 1, college_name: 1 } },
           { $limit: 6 },
         ]).toArray();
 
         colleges.forEach((r) => {
-          const name = r.user?.firstname?.trim() || r.slug || "";
+          const name = r.user?.firstname?.trim() || r.college_name || r.slug || "";
           suggestions.push({
             type: "college",
             name,
@@ -87,7 +95,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // ── 2. Direct college name match ──
+    // ── 2. Direct college name match (with optional city filter) ──
     if (suggestions.length < 6) {
       const nameMatchedUsers = await db.collection("users")
         .find({ firstname: subjectRegex }, { projection: { id: 1, _id: 1 } })
@@ -95,24 +103,34 @@ export async function GET(request: NextRequest) {
         .toArray();
       const matchedUserIds = nameMatchedUsers.map((u) => u.id ?? u._id);
 
-      const collegeFilter: Record<string, unknown> = {
+      const nameFilter: Record<string, unknown> = {
         $or: [
           { slug: subjectRegex },
+          { college_name: subjectRegex },
           ...(matchedUserIds.length > 0 ? [{ users_id: { $in: matchedUserIds } }] : []),
         ],
       };
-      if (cityIds.length > 0) collegeFilter.registeredAddressCityId = { $in: cityIds };
+
+      // Apply city filter if location provided
+      if (location) {
+        const cityFilter: Record<string, unknown>[] = [];
+        if (cityIds.length > 0) cityFilter.push({ registeredAddressCityId: { $in: cityIds } });
+        cityFilter.push({ registeredSortAddress: { $regex: location, $options: "i" } });
+        cityFilter.push({ registeredFullAddress: { $regex: location, $options: "i" } });
+        cityFilter.push({ campusSortAddress: { $regex: location, $options: "i" } });
+        nameFilter.$and = [{ $or: cityFilter }];
+      }
 
       const colleges = await db.collection("collegeprofile").aggregate([
-        { $match: collegeFilter },
+        { $match: nameFilter },
         { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
         { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-        { $project: { slug: 1, "user.firstname": 1, registeredSortAddress: 1 } },
+        { $project: { slug: 1, "user.firstname": 1, registeredSortAddress: 1, college_name: 1 } },
         { $limit: 5 },
       ]).toArray();
 
       colleges.forEach((r) => {
-        const name = r.user?.firstname?.trim() || r.slug || "";
+        const name = r.user?.firstname?.trim() || r.college_name || r.slug || "";
         if (!suggestions.find((s) => s.slug === r.slug)) {
           suggestions.push({
             type: "college",
@@ -151,6 +169,16 @@ export async function GET(request: NextRequest) {
         .toArray();
       cities.forEach((city) => {
         suggestions.push({ type: "city", name: city.name, location: "Location", id: city.id });
+      });
+    }
+
+    // ── 6. If "X in Y" but no colleges found yet, show city as suggestion ──
+    if (location && suggestions.length === 0 && cityName) {
+      suggestions.push({
+        type: "city",
+        name: cityName,
+        location: `Colleges in ${cityName}`,
+        id: cityIds[0] ?? null,
       });
     }
 

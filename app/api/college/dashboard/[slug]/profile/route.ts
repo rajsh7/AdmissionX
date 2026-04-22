@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { saveUpload } from "@/lib/upload-utils";
 
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
@@ -22,9 +23,9 @@ async function checkAuth(slug: string) {
     cp.email && cp.email.toLowerCase().trim() === payload.email.toLowerCase().trim();
 
   if (!emailMatch) {
-    // fallback: check via users collection
+    // fallback: check via users collection — users_id can be ObjectId or number
     const user = await db.collection("users").findOne(
-      { id: cp.users_id },
+      { $or: [{ _id: cp.users_id }, { id: cp.users_id }] },
       { projection: { email: 1 } }
     );
     if (!user || user.email?.toLowerCase().trim() !== payload.email.toLowerCase().trim()) {
@@ -76,6 +77,10 @@ export async function GET(
     facebookurl:           s(cp.facebookurl),
     twitterurl:            s(cp.twitterurl),
     bannerimage:           s(cp.bannerimage),
+    mosaic1:               s(cp.mosaic1),
+    mosaic2:               s(cp.mosaic2),
+    mosaic3:               s(cp.mosaic3),
+    mosaic4:               s(cp.mosaic4),
     ranking:               cp.ranking ?? null,
   };
 
@@ -160,6 +165,14 @@ export async function PATCH(
   }
 
   const file = formData.get("file") as File | null;
+  const fieldName = (formData.get("field") as string) || "bannerimage";
+
+  // Validate field name
+  const allowedFields = ["bannerimage", "mosaic1", "mosaic2", "mosaic3", "mosaic4"];
+  if (!allowedFields.includes(fieldName)) {
+    return NextResponse.json({ error: "Invalid field name." }, { status: 400 });
+  }
+
   if (!file || typeof file === "string") {
     return NextResponse.json({ error: "No file provided." }, { status: 400 });
   }
@@ -173,14 +186,19 @@ export async function PATCH(
     return NextResponse.json({ error: "Image must be under 3 MB." }, { status: 400 });
   }
 
-  const { saveUpload } = await import("@/lib/upload-utils");
-  const publicUrl = await saveUpload(file, `college/${slug}`, "banner");
+  try {
+    const prefix = fieldName === "bannerimage" ? "banner" : fieldName;
+    const publicUrl = await saveUpload(file, `college/${slug}`, prefix);
 
-  const db = await getDb();
-  await db.collection("collegeprofile").updateOne(
-    { slug },
-    { $set: { bannerimage: publicUrl, updated_at: new Date() } }
-  );
+    const db = await getDb();
+    await db.collection("collegeprofile").updateOne(
+      { slug },
+      { $set: { [fieldName]: publicUrl, updated_at: new Date() } }
+    );
 
-  return NextResponse.json({ success: true, url: publicUrl });
+    return NextResponse.json({ success: true, url: publicUrl, field: fieldName });
+  } catch (e) {
+    console.error("[profile PATCH] upload error:", e);
+    return NextResponse.json({ error: "Upload failed. Please try again." }, { status: 500 });
+  }
 }

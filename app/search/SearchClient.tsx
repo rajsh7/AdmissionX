@@ -556,7 +556,7 @@ export default function SearchClient({
       </div>
 
       {/* Explore Cards */}
-      <div className="home-page-shell pb-12">
+      <div className="w-full pb-0">
         <ExploreCards />
       </div>
 

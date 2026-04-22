@@ -14,6 +14,7 @@ interface CollegeUser {
   email: string;
   slug: string;
   collegeprofile_id: unknown | null;
+  logoimage?: string | null;
 }
 
 export default async function CollegeDashboardPage({ params }: PageProps) {
@@ -33,15 +34,29 @@ export default async function CollegeDashboardPage({ params }: PageProps) {
 
   // Look up collegeprofile by email (set during approval flow)
   const profile = await db.collection("collegeprofile").findOne(
-    { email: payload.email.toLowerCase() },
-    { projection: { _id: 1, slug: 1, college_name: 1 } }
+    { $or: [
+      { email: payload.email.toLowerCase() },
+      { slug },
+    ]},
+    { projection: { _id: 1, id: 1, slug: 1, college_name: 1, logoimage: 1, users_id: 1 } }
   );
 
   if (profile) {
     collegeprofile_id = profile._id.toString();
-    collegeName = profile.college_name || payload.name;
     collegeSlug = profile.slug || slug;
-    // If URL slug doesn't match their actual slug, redirect
+
+    // Get college name: try profile.college_name first, then users.firstname
+    if (profile.college_name) {
+      collegeName = profile.college_name;
+    } else if (profile.users_id) {
+      const user = await db.collection("users").findOne(
+        { $or: [{ _id: profile.users_id }, { id: profile.users_id }] },
+        { projection: { firstname: 1 } }
+      );
+      if (user?.firstname) collegeName = String(user.firstname).trim();
+    }
+    if (!collegeName) collegeName = payload.name || collegeSlug;
+
     if (profile.slug && profile.slug !== slug) {
       redirect(`/dashboard/college/${profile.slug}`);
     }
@@ -53,6 +68,7 @@ export default async function CollegeDashboardPage({ params }: PageProps) {
     email: payload.email,
     slug: collegeSlug,
     collegeprofile_id,
+    logoimage: profile?.logoimage ? String(profile.logoimage) : null,
   };
 
   return <CollegeDashboardClient college={college} />;

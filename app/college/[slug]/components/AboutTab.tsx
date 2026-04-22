@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import ExploreCards from "@/app/components/ExploreCards";
+import AskQueryModal from "./AskQueryModal";
 
 interface Stat { label: string; value: string; }
 
@@ -69,16 +70,11 @@ export default function AboutTab({
               </div>
 
               <div className="flex flex-wrap gap-4 mt-2">
-                <a href={`/college/${slug}/admission-procedure`}
+                <a href={`/apply/${slug}`}
                   className="px-8 py-3 bg-[#FF3C3C] text-white font-bold text-[18px] rounded-[5px] shadow-lg shadow-red-500/20 hover:bg-red-700 transition-colors text-center min-w-[200px]">
                   Apply Now
                 </a>
-                <button className="px-8 py-3 bg-[#FF3C3C66] hover:bg-[#FF3C3C]/60 backdrop-blur-sm text-white font-bold text-[18px] rounded-[5px] transition-colors flex items-center justify-center gap-2 min-w-[200px]">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Download Brochure
-                </button>
+                <AskQueryModal slug={slug} collegeName={collegeName} />
                 <Link
                   href={`/compare?colleges=${slug}`}
                   className="px-8 py-3 bg-[#FF3C3C66] hover:bg-[#FF3C3C]/80 backdrop-blur-sm text-white font-bold text-[18px] rounded-[5px] transition-colors flex items-center justify-center gap-2 min-w-[200px]"
@@ -142,7 +138,7 @@ export default function AboutTab({
                   <p className="text-[17px] font-normal leading-relaxed pl-3" style={{ color: "#333931" }}>{visionText}</p>
                 </div>
               </div>
-              <a href={`/college/${slug}/admission-procedure`}
+              <a href={`/apply/${slug}`}
                 className="inline-flex items-center gap-3 px-7 py-3 bg-[#D40C11] text-white rounded-[5px] font-bold text-sm uppercase tracking-widest hover:bg-red-700 transition-colors group">
                 Apply
                 <svg className="w-10 h-6 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 60 24">

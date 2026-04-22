@@ -64,6 +64,9 @@ export async function GET(
     courseduration: cm.courseduration ?? null,
     twelvemarks: cm.twelvemarks ?? null,
     description: cm.description ?? null,
+    admission_start: cm.admission_start ? new Date(cm.admission_start).toISOString().split("T")[0] : null,
+    admission_end:   cm.admission_end   ? new Date(cm.admission_end).toISOString().split("T")[0]   : null,
+    last_date:       cm.last_date       ? new Date(cm.last_date).toISOString().split("T")[0]       : null,
   }));
 
   return NextResponse.json({
@@ -112,6 +115,9 @@ export async function POST(
     courseduration: courseduration?.trim() || null,
     twelvemarks: twelvemarks ? Number(twelvemarks) : null,
     description: description?.trim() || null,
+    admission_start: body.admission_start ? new Date(body.admission_start) : null,
+    admission_end:   body.admission_end   ? new Date(body.admission_end)   : null,
+    last_date:       body.last_date       ? new Date(body.last_date)       : null,
     created_at: new Date(),
     updated_at: new Date(),
   });
@@ -141,6 +147,9 @@ export async function PUT(
   if (body.courseduration !== undefined) $set.courseduration = body.courseduration?.trim() || null;
   if (body.twelvemarks !== undefined) $set.twelvemarks = body.twelvemarks ? Number(body.twelvemarks) : null;
   if (body.description !== undefined) $set.description = body.description?.trim() || null;
+  if (body.admission_start !== undefined) $set.admission_start = body.admission_start ? new Date(body.admission_start) : null;
+  if (body.admission_end   !== undefined) $set.admission_end   = body.admission_end   ? new Date(body.admission_end)   : null;
+  if (body.last_date       !== undefined) $set.last_date       = body.last_date       ? new Date(body.last_date)       : null;
 
   const result = await db.collection("collegemaster").updateOne(
     { id: courseId, collegeprofile_id: auth.collegeprofile_id },

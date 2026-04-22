@@ -7,7 +7,7 @@ import FAQFormModal from "./FAQFormModal";
 interface Option { id: number; name: string; }
 
 interface FAQRow {
-  id: number;
+  id: string;
   collegeprofile_id: number;
   college_name: string;
   question: string;
@@ -229,7 +229,7 @@ export default function FAQListClient({
                         >
                           <span className="material-symbols-rounded text-[18px]">edit</span>
                         </button>
-                        <DeleteButton action={onDelete.bind(null, f.id)} size="sm" />
+                        <DeleteButton action={onDelete.bind(null, Number(f.id))} size="sm" />
                       </div>
                     </td>
                   </tr>

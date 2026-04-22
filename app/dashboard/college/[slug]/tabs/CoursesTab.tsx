@@ -18,6 +18,9 @@ interface Course {
   courseduration: string | null;
   twelvemarks: number | null;
   description: string | null;
+  admission_start: string | null;
+  admission_end: string | null;
+  last_date: string | null;
 }
 
 interface Option { id: number; name: string; }
@@ -25,6 +28,7 @@ interface Option { id: number; name: string; }
 const EMPTY_FORM = {
   course_id: "", degree_id: "", functionalarea_id: "",
   fees: "", seats: "", courseduration: "", twelvemarks: "", description: "",
+  admission_start: "", admission_end: "", last_date: "",
 };
 
 const DURATION_OPTIONS = ["6 Months", "1 Year", "2 Years", "3 Years", "4 Years", "5 Years"];
@@ -87,6 +91,9 @@ export default function CoursesTab({ college }: Props) {
           courseduration: form.courseduration || null,
           twelvemarks: form.twelvemarks || null,
           description: form.description || null,
+          admission_start: form.admission_start || null,
+          admission_end: form.admission_end || null,
+          last_date: form.last_date || null,
         }),
       });
       const data = await res.json();
@@ -203,6 +210,21 @@ export default function CoursesTab({ college }: Props) {
                 placeholder="e.g. 60" className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1" />
             </LegendInput>
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6">
+              <LegendInput label="Admission Start Date">
+                <input type="date" value={form.admission_start} onChange={e => upd("admission_start", e.target.value)}
+                  className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1" />
+              </LegendInput>
+              <LegendInput label="Admission End Date">
+                <input type="date" value={form.admission_end} onChange={e => upd("admission_end", e.target.value)}
+                  className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1" />
+              </LegendInput>
+              <LegendInput label="Last Date to Apply">
+                <input type="date" value={form.last_date} onChange={e => upd("last_date", e.target.value)}
+                  className="w-full bg-transparent outline-none text-[14px] text-slate-600 py-1" />
+              </LegendInput>
+            </div>
+
             <LegendInput label="Description">
               <textarea value={form.description} onChange={e => upd("description", e.target.value)}
                 placeholder="Enter course description" rows={3}
@@ -245,6 +267,9 @@ export default function CoursesTab({ college }: Props) {
                   <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Fees</th>
                   <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Seats</th>
                   <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Duration</th>
+                  <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Adm. Start</th>
+                  <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Adm. End</th>
+                  <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Last Date</th>
                   <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider text-right">Actions</th>
                 </tr>
               </thead>
@@ -257,6 +282,21 @@ export default function CoursesTab({ college }: Props) {
                     <td className="px-4 py-3 text-sm text-slate-600">{c.fees ? `₹${Number(c.fees).toLocaleString()}` : "—"}</td>
                     <td className="px-4 py-3 text-sm text-slate-600">{c.seats || "—"}</td>
                     <td className="px-4 py-3 text-sm text-slate-600">{c.courseduration || "—"}</td>
+                    <td className="px-4 py-3 text-sm text-slate-600">
+                      {c.admission_start ? new Date(c.admission_start).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-slate-600">
+                      {c.admission_end ? new Date(c.admission_end).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      {c.last_date ? (
+                        <span className={`font-bold ${
+                          new Date(c.last_date) < new Date() ? "text-red-500" : "text-emerald-600"
+                        }`}>
+                          {new Date(c.last_date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                        </span>
+                      ) : "—"}
+                    </td>
                     <td className="px-4 py-3 text-right">
                       <button onClick={() => handleDelete(c.id)}
                         className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">

@@ -168,17 +168,99 @@ async function fetchColleges(opts: {
   const match: Record<string, unknown> = {};
 
   if (q.length >= 2) {
-    match.$or = [
-      { slug: { $regex: q, $options: "i" } },
-      { registeredSortAddress: { $regex: q, $options: "i" } },
-    ];
+    // Build alias-aware regex — handle common short forms
+    const aliases: Record<string, string> = {
+      "btech": "b.tech|be/b.tech|b tech",
+      "b.tech": "b.tech|be/b.tech",
+      "mtech": "m.tech|me/m.tech|m tech",
+      "m.tech": "m.tech|me/m.tech",
+      "bsc": "b.sc|bachelor of science",
+      "b.sc": "b.sc|bachelor of science",
+      "msc": "m.sc|master of science",
+      "m.sc": "m.sc|master of science",
+      "bca": "bca",
+      "mca": "mca",
+      "bba": "bba",
+      "mba": "mba",
+      "mbbs": "mbbs",
+      "bcom": "b.com|bachelor of commerce",
+      "b.com": "b.com|bachelor of commerce",
+      "mcom": "m.com|master of commerce",
+      "m.com": "m.com|master of commerce",
+      "ba": "bachelor of arts|b\.a\.",
+      "ma": "master of arts|m\.a\.",
+      "llb": "ll.b|bachelor of laws",
+      "llm": "ll.m|master of laws",
+      "barch": "b.arch|bachelor of architecture",
+      "phd": "ph.d|doctor of philosophy|m.phil",
+      "pgdm": "pgdm",
+      "bpharma": "b.pharma",
+      "mpharma": "m.pharma",
+      "bds": "bachelor of dental",
+      "bed": "bachelor of education|b.ed",
+      "med": "master of education|m.ed",
+      "bpe": "bachelor of physical education|b.p.ed",
+      "bhm": "bachelor of hotel management",
+      "bfa": "bachelor of fine arts",
+      "bdes": "bachelor of design",
+      "diploma": "diploma",
+      "engineering": "engineering|be/b.tech|b.tech",
+      "medical": "mbbs|medical|bds|bams",
+      "management": "mba|bba|management|pgdm",
+      "law": "ll.b|ll.m|bachelor of laws|master of laws",
+      "architecture": "b.arch|m.arch|architecture",
+      "pharmacy": "b.pharma|m.pharma|pharmacy",
+      "nursing": "nursing",
+      "bams": "bams|ayurved",
+    };
+
+    const qLower = q.toLowerCase().replace(/\s+/g, "");
+    const aliasPattern = aliases[qLower] ?? q;
+    const courseRegex = { $regex: aliasPattern, $options: "i" };
+
+    // Match ALL degrees and streams that match
+    const [matchedDegrees, matchedStreams] = await Promise.all([
+      db.collection("degree").find({ name: courseRegex }).project({ id: 1 }).toArray(),
+      db.collection("functionalarea").find({ name: courseRegex }).project({ id: 1 }).toArray(),
+    ]);
+
+    if (matchedDegrees.length > 0 || matchedStreams.length > 0) {
+      const cmFilter: Record<string, unknown>[] = [];
+      if (matchedDegrees.length > 0) cmFilter.push({ degree_id: { $in: matchedDegrees.map((d: any) => d.id) } });
+      if (matchedStreams.length > 0) cmFilter.push({ functionalarea_id: { $in: matchedStreams.map((s: any) => s.id) } });
+
+      const cpIds = await db.collection("collegemaster")
+        .find(cmFilter.length === 1 ? cmFilter[0] : { $or: cmFilter }, { projection: { collegeprofile_id: 1 } })
+        .limit(10000).toArray()
+        .then((r) => [...new Set(r.map((x: any) => Number(x.collegeprofile_id)))]);
+
+      match.$and = [...((match.$and as any[]) ?? []), { id: { $in: cpIds } }];
+    } else {
+      // Fallback: text search on college name/address
+      match.$or = [
+        { slug: { $regex: q, $options: "i" } },
+        { registeredSortAddress: { $regex: q, $options: "i" } },
+        { college_name: { $regex: q, $options: "i" } },
+      ];
+    }
   }
   if (type === "top") match.isShowOnTop = 1;
   else if (type === "university") match.isTopUniversity = 1;
   else if (type === "abroad") match.registeredAddressCountryId = { $ne: 1 };
 
-  if (cityId) match.registeredAddressCityId = Number(cityId);
-  else if (stateId) {
+  if (cityId) {
+    const cityDoc = await db.collection("city").findOne({ id: Number(cityId) }, { projection: { name: 1 } });
+    const cityNameForMatch = String(cityDoc?.name ?? "").trim();
+    const cityOrConditions: Record<string, unknown>[] = [
+      { registeredAddressCityId: Number(cityId) },
+    ];
+    if (cityNameForMatch) {
+      cityOrConditions.push({ registeredSortAddress: { $regex: cityNameForMatch, $options: "i" } });
+      cityOrConditions.push({ registeredFullAddress: { $regex: cityNameForMatch, $options: "i" } });
+      cityOrConditions.push({ campusSortAddress: { $regex: cityNameForMatch, $options: "i" } });
+    }
+    match.$and = [...((match.$and as any[]) ?? []), { $or: cityOrConditions }];
+  } else if (stateId) {
     const stateCities = await db.collection("city").find({ state_id: Number(stateId) }, { projection: { _id: 0, id: 1 } }).toArray();
     match.registeredAddressCityId = { $in: stateCities.map((c: any) => Number(c.id)) };
   } else if (countryId) {
@@ -198,18 +280,21 @@ async function fetchColleges(opts: {
       .then((r) => [...new Set(r.map((x: any) => x.collegeprofile_id))]) : null,
   ]);
 
-  if (streamIds) match.id = { $in: streamIds };
+  if (streamIds) match.$and = [...((match.$and as any[]) ?? []), { id: { $in: streamIds } }];
   if (degreeIds) {
-    const existing = (match.id as { $in: unknown[] } | undefined)?.$in;
-    match.id = { $in: existing ? existing.filter((id) => (degreeIds as unknown[]).some(d => String(d) === String(id))) : degreeIds };
+    const existing = ((match.$and as any[]) ?? []).find((c: any) => c.id?.$in);
+    if (existing) {
+      existing.id.$in = existing.id.$in.filter((id: unknown) => (degreeIds as unknown[]).some(d => String(d) === String(id)));
+    } else {
+      match.$and = [...((match.$and as any[]) ?? []), { id: { $in: degreeIds } }];
+    }
   }
 
   if (feesMax && !isNaN(Number(feesMax))) {
     const feeIds = await db.collection("collegemaster")
       .find({ fees: { $gt: 0, $lte: Number(feesMax) } }, { projection: { collegeprofile_id: 1 } })
-      .limit(5000).toArray().then((r) => [...new Set(r.map((x: any) => x.collegeprofile_id))]);
-    const existing = (match.id as { $in: unknown[] } | undefined)?.$in;
-    match.id = { $in: existing ? existing.filter((id) => feeIds.some((f: unknown) => String(f) === String(id))) : feeIds };
+      .limit(5000).toArray().then((r) => [...new Set(r.map((x: any) => Number(x.collegeprofile_id)))]);
+    match.$and = [...((match.$and as any[]) ?? []), { id: { $in: feeIds } }];
   }
 
   const sortStage: Record<string, 1 | -1> =
@@ -291,6 +376,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const stream = getString("stream");
   const degree = getString("degree");
   const cityId = getString("city_id");
+  const cityText = getString("city"); // text-based city from "X in Y" search
   const stateId = getString("state_id");
   const countryId = getString("country_id");
   const feesMax = getString("fees_max");
@@ -298,6 +384,23 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const type = getString("type");
   const page = Math.max(1, parseInt(getString("page", "1")));
   const limit = 12;
+
+  // Resolve city text → city_id if not already set
+  let resolvedCityId = cityId;
+  let resolvedCityName = "";
+  if (!cityId && cityText) {
+    const db = await getDb();
+    const cityDoc = await db.collection("city").findOne(
+      { name: { $regex: cityText, $options: "i" } },
+      { projection: { id: 1, name: 1 } }
+    );
+    if (cityDoc) {
+      resolvedCityId = String(cityDoc.id);
+      resolvedCityName = String(cityDoc.name);
+    } else {
+      resolvedCityName = cityText;
+    }
+  }
 
   // ── Parallel: initial college results + filter options ─────────────────────
   const [{ colleges, total, totalPages }, streamRows, degreeRows, cityRows, stateRows, countryRows] =
@@ -307,7 +410,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         q,
         stream,
         degree,
-        cityId,
+        cityId: resolvedCityId,
         stateId,
         countryId,
         feesMax,
@@ -436,7 +539,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     pageTitle = "Study Abroad Colleges";
     pageSubtitle = "Explore international colleges and universities worldwide";
   } else if (q) {
-    pageTitle = `Search: "${q}"`;
+    const cityLabel = resolvedCityName || (cityText ?? "");
+    pageTitle = cityLabel ? `"${q}" Colleges in ${cityLabel}` : `Search: "${q}"`;
     pageSubtitle = `${total.toLocaleString()} colleges match your search`;
   } else if (stream) {
     const streamName =
@@ -458,7 +562,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       initQ={q}
       initStream={stream}
       initDegree={degree}
-      initCityId={cityId}
+      initCityId={resolvedCityId}
       initStateId={stateId}
       initFeesMax={feesMax}
       initSort={sort}

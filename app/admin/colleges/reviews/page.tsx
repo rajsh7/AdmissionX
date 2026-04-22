@@ -152,7 +152,7 @@ export default async function CollegeReviewsPage({
       $lookup: {
         from: "collegeprofile",
         localField: "collegeprofile_id",
-        foreignField: "id",
+        foreignField: "_id",
         as: "cp",
       },
     },

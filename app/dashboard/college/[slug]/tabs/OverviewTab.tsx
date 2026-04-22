@@ -50,6 +50,9 @@ interface OverviewData {
     };
     gallery: { total: number };
     faculty: { total: number };
+    queries:  { total: number; pending: number };
+    reviews:  { total: number };
+    helpdesk: { total: number; open: number };
   };
   placement: {
     companies: string;
@@ -254,10 +257,56 @@ export default function OverviewTab({ college, onNavigate }: Props) {
   if (!data) return null;
 
   const statCards = [
-    { label: "Total Applications", value: data.stats.applications.total, sub: "+12.5% this week", icon: "description", id: "apps" },
-    { label: "Active Courses", value: data.stats.courses.total, sub: "Check courses", icon: "menu_book", id: "courses" },
-    { label: "Avg. Rating", value: data.profile.rating || "—", sub: "Reviews", icon: "star", id: "rating" },
-    { label: "Faculty Members", value: data.stats.faculty.total, sub: "View team", icon: "groups", id: "faculty" },
+    {
+      tab: "applications" as TabId,
+      label: "Applications",
+      value: data.stats.applications.total,
+      sub: data.stats.applications.submitted > 0
+        ? `${data.stats.applications.submitted} pending review`
+        : "No pending",
+      icon: "description",
+      accent: "#3B82F6",
+      bg: "#EFF6FF",
+      badge: data.stats.applications.submitted > 0 ? data.stats.applications.submitted : null,
+      badgeColor: "bg-blue-500",
+    },
+    {
+      tab: "queries" as TabId,
+      label: "Student Queries",
+      value: data.stats.queries.total,
+      sub: data.stats.queries.pending > 0
+        ? `${data.stats.queries.pending} unanswered`
+        : "All answered",
+      icon: "forum",
+      accent: "#F59E0B",
+      bg: "#FFFBEB",
+      badge: data.stats.queries.pending > 0 ? data.stats.queries.pending : null,
+      badgeColor: "bg-amber-500",
+    },
+    {
+      tab: "reviews" as TabId,
+      label: "Reviews",
+      value: data.stats.reviews.total,
+      sub: data.profile.rating ? `Avg. ${Number(data.profile.rating).toFixed(1)} / 5` : "No rating yet",
+      icon: "star",
+      accent: "#8B5CF6",
+      bg: "#F5F3FF",
+      badge: null,
+      badgeColor: "",
+    },
+    {
+      tab: "courses" as TabId,
+      label: "Courses",
+      value: data.stats.courses.total,
+      sub: data.stats.courses.total > 0
+        ? `${data.stats.courses.streams} streams · ${data.stats.courses.degrees} degrees`
+        : "No courses added",
+      icon: "menu_book",
+      accent: "#10B981",
+      bg: "#ECFDF5",
+      badge: null,
+      badgeColor: "",
+    },
   ];
 
   return (
@@ -269,37 +318,73 @@ export default function OverviewTab({ college, onNavigate }: Props) {
       </div>
 
       {/* ── Stats ─────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
         {statCards.map((card) => (
-          <div key={card.label} className="bg-white rounded-[10px] border border-slate-100 p-6 shadow-sm">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">TOTAL APPLICATION</p>
-                <div className="flex items-center gap-1">
-                  <span className="text-[24px] font-black text-slate-900 leading-none">-</span>
-                  <p className="text-[26px] font-black text-slate-900 leading-none tabular-nums">{card.value}</p>
-                </div>
-              </div>
-              <div style={{ backgroundColor: '#E95252' }} className="w-10 h-10 rounded-lg flex items-center justify-center text-white shrink-0 shadow-sm">
-                <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {card.id === 'faculty' ? 'groups' : 'school'}
-                </span>
-              </div>
+          <button
+            key={card.tab}
+            onClick={() => onNavigate(card.tab)}
+            className="bg-white rounded-[10px] border border-slate-100 p-5 shadow-sm text-left hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group relative overflow-hidden"
+          >
+            {/* Badge */}
+            {card.badge !== null && (
+              <span className={`absolute top-3 right-3 ${card.badgeColor} text-white text-[10px] font-black px-2 py-0.5 rounded-full`}>
+                {card.badge}
+              </span>
+            )}
+
+            {/* Icon */}
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 shadow-sm"
+              style={{ backgroundColor: card.bg }}
+            >
+              <span
+                className="material-symbols-outlined text-[22px]"
+                style={{ color: card.accent, fontVariationSettings: "'FILL' 1" }}
+              >
+                {card.icon}
+              </span>
             </div>
-            <div className="mt-8 flex items-center justify-end gap-1">
-               <span className="material-symbols-outlined text-[18px] text-emerald-500 font-bold">trending_up</span>
-               <span className="text-[13px] font-black text-emerald-500 tracking-tight">+12.5%</span>
-            </div>
-          </div>
+
+            {/* Value */}
+            <p className="text-[28px] font-black text-slate-900 leading-none tabular-nums">
+              {card.value}
+            </p>
+
+            {/* Label */}
+            <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest mt-1.5">
+              {card.label}
+            </p>
+
+            {/* Sub */}
+            <p className="text-[11px] font-semibold mt-2 flex items-center gap-1" style={{ color: card.accent }}>
+              <span className="material-symbols-outlined text-[13px]">arrow_forward</span>
+              {card.sub}
+            </p>
+          </button>
         ))}
       </div>
 
       {/* ── Greeting ──────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-[10px] border border-slate-100 shadow-sm p-12 min-h-[140px] flex items-center gap-6 mb-8">
-        {data.profile.logoimage && (
-          <img src={data.profile.logoimage} alt="College Logo" className="w-20 h-20 object-contain rounded-lg border border-slate-100 shrink-0" />
+      <div className="bg-white rounded-[10px] border border-slate-100 shadow-sm p-8 min-h-[140px] flex items-center gap-6 mb-8">
+        {(data.profile.logoimage || college.logoimage) && (
+          <img
+            src={(data.profile.logoimage || college.logoimage)!}
+            alt="College Logo"
+            className="w-20 h-20 object-contain rounded-xl border border-slate-100 shrink-0"
+          />
         )}
-        <h2 className="text-[26px] font-black text-slate-700 tracking-tight">Hi! {college.name}</h2>
+        <div>
+          <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">Welcome back</p>
+          <h2 className="text-[26px] font-black text-slate-800 tracking-tight leading-tight">
+            Hi! {data.profile.college_name || college.name}
+          </h2>
+          {data.profile.address && (
+            <p className="text-[13px] text-slate-400 font-medium mt-1 flex items-center gap-1">
+              <span className="material-symbols-outlined text-[14px]">location_on</span>
+              {data.profile.address}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* ── Sub-navigation ────────────────────────────────────────────────── */}

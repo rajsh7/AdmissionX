@@ -282,7 +282,7 @@ export default async function EditCollegeProfilePage({
   const bannerUrl = college.bannerimage ? buildImageUrl(college.bannerimage) : null;
 
   // Fetch gallery images for this college
-  const [galleryImages, achievementsList, coursesList, facilitiesList, eventsList, scholarshipsList, placementData, lettersList, sportsList, cutoffsList] = await Promise.all([
+  const [galleryImages, achievementsList, coursesList, facilitiesList, eventsList, scholarshipsList, placementData, lettersList, sportsList, cutoffsList, facultyList, transactionsList, faqsList] = await Promise.all([
     db.collection("gallery")
       .find({
         $or: [
@@ -402,6 +402,39 @@ export default async function EditCollegeProfilePage({
         .limit(5)
         .toArray();
       return rows.map((r: any) => ({ id: r.id, title: String(r.title ?? "") }));
+    })(),
+    // Faculty
+    (async () => {
+      const cpId = cp.id ? Number(cp.id) : cp._id.toString();
+      return await db.collection("faculty")
+        .find({ collegeprofile_id: Number(cpId) })
+        .sort({ sortorder: 1, name: 1 })
+        .limit(5)
+        .toArray();
+    })(),
+    // Transactions
+    (async () => {
+      const cpId = cp.id ? Number(cp.id) : cp._id.toString();
+      const rows = await db.collection("next_student_applications")
+        .aggregate([
+          { $match: { collegeprofile_id: cpId, payment_status: "paid" } },
+          { $lookup: { from: "next_student_signups", localField: "student_id", foreignField: "_id", as: "s" } },
+          { $unwind: { path: "$s", preserveNullAndEmptyArrays: true } },
+          { $project: { application_ref: 1, amount_paid: 1, transaction_id: 1, student_name: "$s.name", updated_at: 1 } },
+          { $sort: { updated_at: -1 } },
+          { $limit: 5 }
+        ])
+        .toArray();
+      return rows;
+    })(),
+    // FAQs — match both ObjectId and numeric id since dashboard stores ObjectId, admin stores Number
+    (async () => {
+      const cpObjectId = cp._id;
+      const cpNumId = cp.id ? Number(cp.id) : null;
+      const filter = cpNumId
+        ? { $or: [{ collegeprofile_id: cpObjectId }, { collegeprofile_id: cpNumId }] }
+        : { collegeprofile_id: cpObjectId };
+      return db.collection("college_faqs").find(filter).sort({ created_at: -1 }).toArray();
     })(),
   ]);
 
@@ -974,9 +1007,85 @@ export default async function EditCollegeProfilePage({
               )}
             </Card>
 
-          </div>
+            {/* Section 16 — Faculties */}
+            <Card>
+              <div className="flex items-center justify-between mb-4">
+                <SectionHeading icon="groups" title={`Faculties (${facultyList.length})`} />
+                <Link
+                  href={`/admin/colleges/faculty?collegeId=${cp.id || cp._id.toString()}`}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  Manage
+                </Link>
+              </div>
+              {facultyList.length === 0 ? (
+                <p className="text-sm text-slate-400">No faculty members added yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {facultyList.map((f: any) => (
+                    <div key={f.id} className="flex items-center gap-3 p-2.5 rounded-xl border border-slate-100 bg-slate-50">
+                      <div className="w-10 h-10 rounded-lg bg-slate-200 overflow-hidden flex-shrink-0">
+                        {f.imagename ? (
+                          <img 
+                            src={f.imagename.startsWith("http") ? f.imagename : `${IMAGE_BASE}${f.imagename}`} 
+                            alt={f.name} 
+                            className="w-full h-full object-cover" 
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-red-100 text-red-600 font-bold text-xs">
+                            {String(f.name || "F").charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-bold text-slate-700 truncate">
+                          {f.suffix ? `${f.suffix} ` : ""}{f.name}
+                        </p>
+                        <p className="text-[11px] text-red-600 font-semibold truncate">{f.designation || "Faculty"}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <Link href={`/admin/colleges/faculty?collegeId=${cp.id || cp._id.toString()}`} className="block text-center text-xs font-bold text-blue-600 hover:text-blue-700 pt-1 transition-colors">
+                    Manage all faculties →
+                  </Link>
+                </div>
+              )}
+            </Card>
 
-          {/* ── Right column (sticky) ── */}
+            {/* Section 17 — FAQs */}
+            <Card>
+              <div className="flex items-center justify-between mb-4">
+                <SectionHeading icon="quiz" title={`FAQs (${faqsList.length})`} />
+                <Link
+                  href={`/admin/colleges/faqs?collegeId=${cp.id || cp._id.toString()}`}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  Manage
+                </Link>
+              </div>
+              {faqsList.length === 0 ? (
+                <p className="text-sm text-slate-400">No FAQs added yet. <Link href={`/admin/colleges/faqs?collegeId=${cp.id || cp._id.toString()}`} className="text-blue-600 font-semibold hover:underline">Add one →</Link></p>
+              ) : (
+                <div className="space-y-2">
+                  {faqsList.slice(0, 5).map((f: any) => (
+                    <div key={f._id.toString()} className="p-3 rounded-xl border border-slate-100 bg-slate-50">
+                      <p className="text-[13px] font-bold text-slate-700 leading-snug">{f.question}</p>
+                      {f.answer && <p className="text-[12px] text-slate-400 mt-1 line-clamp-2">{f.answer}</p>}
+                    </div>
+                  ))}
+                  {faqsList.length > 5 && (
+                    <p className="text-[11px] text-slate-400 text-center pt-1">+ {faqsList.length - 5} more</p>
+                  )}
+                  <Link href={`/admin/colleges/faqs?collegeId=${cp.id || cp._id.toString()}`} className="block text-center text-xs font-bold text-blue-600 hover:text-blue-700 pt-1 transition-colors">
+                    Manage all FAQs →
+                  </Link>
+                </div>
+              )}
+            </Card>
+
+          </div>
           <div className="w-full xl:w-96 flex-shrink-0 space-y-5 xl:sticky xl:top-6">
 
             <Card>
@@ -1131,6 +1240,38 @@ export default async function EditCollegeProfilePage({
               </span>
               Save Changes
             </button>
+
+            {/* Section 12 — Recent Transactions */}
+            <Card>
+              <div className="flex items-center justify-between mb-4">
+                <SectionHeading icon="payments" title={`Recent Transactions (${transactionsList.length}+)`} />
+                <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded uppercase tracking-wider">Payments</span>
+              </div>
+              {transactionsList.length === 0 ? (
+                <p className="text-sm text-slate-400">No successful transactions found for this college.</p>
+              ) : (
+                <div className="space-y-3">
+                  {transactionsList.map((txn: any) => (
+                    <div key={txn._id.toString()} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50 group hover:border-emerald-200 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                          <span className="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[13px] font-bold text-slate-700 truncate">{txn.student_name || "Unknown Student"}</p>
+                          <p className="text-[11px] text-slate-400 font-medium font-mono">{txn.transaction_id}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-black text-emerald-600">₹{Number(txn.amount_paid).toLocaleString()}</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">{new Date(txn.updated_at).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <p className="text-center text-[10px] font-black text-slate-400 uppercase tracking-widest pt-1">Showing last 5 payments</p>
+                </div>
+              )}
+            </Card>
 
           </div>
         </div>

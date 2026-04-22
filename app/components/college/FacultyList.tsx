@@ -51,11 +51,11 @@ function FacultyCard({ faculty }: { faculty: FacultyData }) {
               src={image}
               alt={displayName}
               fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 250px"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 250px"
               className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
             />
             {/* subtle gradient at bottom */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
           </>
         ) : (
           <div
@@ -201,7 +201,7 @@ export default function FacultyList({ faculty, collegeName }: FacultyListProps) 
                   {members.length} member{members.length > 1 ? "s" : ""}
                 </span>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {members.map((f) => (
                   <FacultyCard key={f.id} faculty={f} />
                 ))}
@@ -209,7 +209,7 @@ export default function FacultyList({ faculty, collegeName }: FacultyListProps) 
             </section>
           ))
         : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {faculty.map((f) => (
               <FacultyCard key={f.id} faculty={f} />
             ))}

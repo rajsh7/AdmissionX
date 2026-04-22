@@ -6,7 +6,7 @@ import Link from "next/link";
 import Header from "../../../components/Header";
 import OverviewTab from "./tabs/OverviewTab";
 import BannerTab from "./tabs/BannerTab";
-import ProfileTab from "./tabs/ProfileTab";
+import AboutImagesTab from "./tabs/AboutImagesTab";
 import CoursesTab from "./tabs/CoursesTab";
 import GalleryTab from "./tabs/GalleryTab";
 import FacultyTab from "./tabs/FacultyTab";
@@ -24,6 +24,13 @@ import AchievementsTab from "./tabs/AchievementsTab";
 import LettersTab from "./tabs/LettersTab";
 import EventsTab from "./tabs/EventsTab";
 import SocialLinksTab from "./tabs/SocialLinksTab";
+import ReviewsTab from "./tabs/ReviewsTab";
+import TransactionsTab from "./tabs/TransactionsTab";
+import FAQsTab from "./tabs/FAQsTab";
+import QATab from "./tabs/QATab";
+import HelpdeskTab from "./tabs/HelpdeskTab";
+import AgreementTab from "./tabs/AgreementTab";
+import TermsTab from "./tabs/TermsTab";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface CollegeUser {
@@ -32,12 +39,13 @@ export interface CollegeUser {
   email: string;
   slug: string;
   collegeprofile_id: unknown | null;
+  logoimage?: string | null;
 }
 
 export type TabId =
   | "overview"
-  | "profile"
   | "banner"
+  | "about_images"
   | "address"
   | "gallery"
   | "achievements"
@@ -50,13 +58,10 @@ export type TabId =
   | "sports"
   | "cutoffs"
   | "faculty"
-  | "admission"
-  | "fb_widget"
   | "social_links"
   | "applications"
   | "queries"
   | "reviews"
-  | "metrics"
   | "transactions"
   | "faqs"
   | "qa"
@@ -80,34 +85,32 @@ const TABS: Tab[] = [
   { id: "overview", label: "Institute Details", icon: "school", mobileLabel: "Home" },
 
   // College Information Group
-  { id: "banner", label: "Upload College Banner", icon: "chat_bubble_outline", mobileLabel: "Banner", group: "info" },
-  { id: "address", label: "Address", icon: "chat_bubble_outline", mobileLabel: "Addr", group: "info" },
-  { id: "gallery", label: "Gallery", icon: "chat_bubble_outline", mobileLabel: "Gal", group: "info" },
-  { id: "achievements", label: "Achievements", icon: "chat_bubble_outline", mobileLabel: "Ach", group: "info" },
-  { id: "courses", label: "Courses", icon: "chat_bubble_outline", mobileLabel: "Edu", group: "info" },
-  { id: "facilities", label: "Facilities", icon: "chat_bubble_outline", mobileLabel: "Fac", group: "info" },
-  { id: "events", label: "Events", icon: "chat_bubble_outline", mobileLabel: "Eve", group: "info" },
-  { id: "scholarships", label: "Scholarship", icon: "chat_bubble_outline", mobileLabel: "Sch", group: "info" },
-  { id: "placement", label: "Placements", icon: "chat_bubble_outline", mobileLabel: "Plac", group: "info" },
-  { id: "letters", label: "Affiliation / Accreditation Letters", icon: "chat_bubble_outline", mobileLabel: "Let", group: "info" },
-  { id: "sports", label: "Sports & Activity", icon: "chat_bubble_outline", mobileLabel: "Spo", group: "info" },
-  { id: "cutoffs", label: "Cut Offs", icon: "chat_bubble_outline", mobileLabel: "Cut", group: "info" },
+  { id: "banner", label: "Upload College Banner", icon: "image", mobileLabel: "Banner", group: "info" },
+  { id: "about_images", label: "About Images", icon: "collections", mobileLabel: "About", group: "info" },
+  { id: "address", label: "Address", icon: "location_on", mobileLabel: "Addr", group: "info" },
+  { id: "gallery", label: "Gallery", icon: "photo_library", mobileLabel: "Gal", group: "info" },
+  { id: "achievements", label: "Achievements", icon: "emoji_events", mobileLabel: "Ach", group: "info" },
+  { id: "courses", label: "Courses", icon: "menu_book", mobileLabel: "Edu", group: "info" },
+  { id: "facilities", label: "Facilities", icon: "apartment", mobileLabel: "Fac", group: "info" },
+  { id: "events", label: "Events", icon: "event", mobileLabel: "Eve", group: "info" },
+  { id: "scholarships", label: "Scholarship", icon: "school", mobileLabel: "Sch", group: "info" },
+  { id: "placement", label: "Placements", icon: "work", mobileLabel: "Plac", group: "info" },
+  { id: "letters", label: "Affiliation / Accreditation Letters", icon: "description", mobileLabel: "Let", group: "info" },
+  { id: "sports", label: "Sports & Activity", icon: "sports_soccer", mobileLabel: "Spo", group: "info" },
+  { id: "cutoffs", label: "Cut Offs", icon: "trending_down", mobileLabel: "Cut", group: "info" },
 
   { id: "faculty", label: "Our faculties", icon: "groups", mobileLabel: "Faculty" },
-  { id: "admission", label: "Admission Procedure", icon: "edit_calendar", mobileLabel: "Adm." },
-  { id: "fb_widget", label: "Facebook Widget url", icon: "description", mobileLabel: "FB" },
-  { id: "social_links", label: "Social Link Management", icon: "groups", mobileLabel: "Social" },
+  { id: "social_links", label: "Social Link Management", icon: "share", mobileLabel: "Social" },
   { id: "applications", label: "Application", icon: "forum", mobileLabel: "Apps" },
-  { id: "queries", label: "Queries", icon: "account_circle", mobileLabel: "Queries" },
-  { id: "reviews", label: "Reviews", icon: "account_circle", mobileLabel: "Reviews" },
-  { id: "metrics", label: "Metrics", icon: "equalizer", mobileLabel: "Metrics" },
-  { id: "transactions", label: "Transaction Details", icon: "account_circle", mobileLabel: "Trans." },
-  { id: "faqs", label: "College Faqs", icon: "account_circle", mobileLabel: "FAQs" },
-  { id: "qa", label: "Question/ Answer / Comment", icon: "account_circle", mobileLabel: "Q&A" },
-  { id: "helpdesk", label: "Help Desk", icon: "account_circle", mobileLabel: "Help" },
-  { id: "public_view", label: "Public View", icon: "account_circle", mobileLabel: "Public" },
-  { id: "agreement", label: "College Partner Agreement", icon: "account_circle", mobileLabel: "Agr." },
-  { id: "terms", label: "Terms and conditions", icon: "account_circle", mobileLabel: "Terms" },
+  { id: "queries", label: "Queries", icon: "help", mobileLabel: "Queries" },
+  { id: "reviews", label: "Reviews", icon: "rate_review", mobileLabel: "Reviews" },
+  { id: "transactions", label: "Transaction Details", icon: "payments", mobileLabel: "Trans." },
+  { id: "faqs", label: "College Faqs", icon: "question_answer", mobileLabel: "FAQs" },
+  { id: "qa", label: "Question/ Answer / Comment", icon: "chat", mobileLabel: "Q&A" },
+  { id: "helpdesk", label: "Help Desk", icon: "support_agent", mobileLabel: "Help" },
+  { id: "public_view", label: "Public View", icon: "visibility", mobileLabel: "Public" },
+  { id: "agreement", label: "College Partner Agreement", icon: "handshake", mobileLabel: "Agr." },
+  { id: "terms", label: "Terms and conditions", icon: "gavel", mobileLabel: "Terms" },
   { id: "settings", label: "Account Settings", icon: "settings", mobileLabel: "Settings" },
   { id: "logout", label: "Logout", icon: "logout", mobileLabel: "Logout" },
 ];
@@ -124,7 +127,7 @@ export default function CollegeDashboardClient({
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [infoExpanded, setInfoExpanded] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [logo, setLogo] = useState<string | null>(null);
+  const [logo, setLogo] = useState<string | null>(college.logoimage ?? null);
   const [logoUploading, setLogoUploading] = useState(false);
   const logoRef = useRef<HTMLInputElement>(null);
   const slug = college.slug;
@@ -132,12 +135,7 @@ export default function CollegeDashboardClient({
 
   useEffect(() => {
     setIsMounted(true);
-    // Load existing logo
-    fetch(`/api/college/dashboard/${slug}/overview`)
-      .then(r => r.json())
-      .then(d => setLogo(d.profile?.logoimage || null))
-      .catch(() => {});
-  }, [slug]);
+  }, []);
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -184,25 +182,38 @@ export default function CollegeDashboardClient({
         return <OverviewTab college={college} onNavigate={handleTabChange} />;
       case "banner":
         return <BannerTab college={college} />;
+      case "about_images":
+        return <AboutImagesTab college={college} />;
       case "address":
         return <AddressTab college={college} />;
       case "achievements":
         return <AchievementsTab college={college} />;
       case "events":
         return <EventsTab college={college} />;
-      case "admission":
-      case "fb_widget":
-        return <ProfileTab college={college} />;
+      case "faculty":
+        return <FacultyTab college={college} />;
       case "social_links":
         return <SocialLinksTab college={college} onNavigate={handleTabChange} />;
       case "letters":
         return <LettersTab college={college} />;
-      case "faculty":
-        return <FacultyTab college={college} />;
       case "applications":
         return <ApplicationsTab college={college} />;
       case "queries":
         return <QueriesTab college={college} />;
+      case "reviews":
+        return <ReviewsTab college={college} />;
+      case "transactions":
+        return <TransactionsTab college={college} />;
+      case "faqs":
+        return <FAQsTab college={college} />;
+      case "qa":
+        return <QATab college={college} />;
+      case "helpdesk":
+        return <HelpdeskTab college={college} />;
+      case "agreement":
+        return <AgreementTab college={college} />;
+      case "terms":
+        return <TermsTab college={college} />;
       case "courses":
         return <CoursesTab college={college} />;
       case "gallery":
@@ -228,154 +239,161 @@ export default function CollegeDashboardClient({
     <div className="min-h-screen bg-[#f8f6f6] dark:bg-[#0f1623] font-poppins">
       <Header theme="light" />
 
-      <div className="flex pt-[80px]">
+      <div className="flex pt-[60px]">
         {/* Sidebar (Desktop) */}
         <aside
           suppressHydrationWarning
-          style={{
-            backgroundColor: '#3f3f3f',
-            top: '80px',
-            bottom: '0'
-          }}
-          className="hidden md:flex flex-col w-[350px] fixed left-0 text-white z-30 border-r border-[#E5E7EB]"
+          style={{ backgroundColor: '#313131', top: '60px', bottom: '0' }}
+          className="hidden md:flex flex-col w-[260px] fixed left-0 text-white  z-30"
         >
-          <div className="p-4 flex flex-col items-center border-b border-[#E5E7EB] shrink-0 bg-white">
-            <div className="w-[110px] h-[110px] bg-white border border-[#4a90e2] rounded-sm mb-4 flex flex-col items-center justify-center shadow-sm relative group overflow-hidden">
+          {/* Logo / College branding */}
+          <div
+            style={{ backgroundColor: logo ? '#111' : '#1e293b' }}
+            className="px-4 py-5 flex flex-col items-center gap-2 border-b border-white/10 shrink-0 transition-colors duration-300"
+          >
+            <div className="relative group w-[80px] h-[80px] rounded-xl overflow-hidden border-2 border-white/20 shadow-lg">
               {logo ? (
                 <img src={logo} alt="College Logo" className="w-full h-full object-contain" />
               ) : (
-                <>
-                  <div className="w-[50px] h-[50px] bg-slate-100 rounded-full flex items-center justify-center mb-1">
-                    <span className="material-symbols-outlined text-slate-300 text-3xl">photo_camera</span>
-                  </div>
-                  <span className="text-[8px] font-bold text-slate-400 whitespace-nowrap">IMAGE NOT AVAILABLE</span>
-                </>
+                <div className="w-full h-full bg-slate-700 flex flex-col items-center justify-center gap-1">
+                  <span className="material-symbols-outlined text-slate-400 text-[28px]">photo_camera</span>
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">No Logo</span>
+                </div>
               )}
-              <div onClick={() => logoRef.current?.click()} className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                <span className="material-symbols-outlined text-white text-3xl">upload</span>
+              <div
+                onClick={() => logoRef.current?.click()}
+                className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-white text-[22px]">upload</span>
               </div>
             </div>
             <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
-            <button onClick={() => logoRef.current?.click()} disabled={logoUploading}
-              className="w-[320px] h-[39px] bg-[#6b7280] hover:bg-[#4b5563] text-[13px] font-bold text-slate-100 rounded-md transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
-              {logoUploading ? "Uploading..." : "Upload College logo"}
+            <p className="text-[13px] font-black text-white text-center leading-tight line-clamp-2 px-1">
+              {college.name || 'College Dashboard'}
+            </p>
+            <button
+              onClick={() => logoRef.current?.click()}
+              disabled={logoUploading}
+              className="w-full h-[30px] bg-white/10 hover:bg-white/20 text-[11px] font-bold text-white/70 rounded-lg transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-[13px]">upload</span>
+              {logoUploading ? 'Uploading...' : 'Upload Logo'}
             </button>
           </div>
 
-          <div
-            data-lenis-prevent
-            className="flex-1 overflow-y-auto overflow-x-hidden py-4 pb-20 hide-scrollbar"
-          >
-            <h3 className="px-6 text-[12px] font-black text-slate-400 uppercase tracking-widest mb-1">Main Menu</h3>
+          {/* Nav */}
+          <div data-lenis-prevent className="flex-1 overflow-y-auto overflow-x-hidden py-3 pb-20 hide-scrollbar">
             <nav className="space-y-0">
               {isMounted ? (
                 <>
-                  {TABS.filter(t => t.id === "overview").map((tab) => {
+                  {/* Overview */}
+                  {TABS.filter(t => t.id === 'overview').map(tab => {
                     const isActive = activeTab === tab.id;
                     return (
                       <button
                         key={tab.id}
                         onClick={() => handleTabChange(tab.id)}
-                        className={`w-full flex items-center gap-3 px-6 py-2 text-[14px] font-bold transition-all group relative ${isActive
-                          ? "bg-[#8B3D3D] text-white"
-                          : "text-slate-300 hover:bg-white/5 hover:text-white"
-                          }`}
+                        style={isActive
+                          ? { backgroundColor: '#963737', borderLeft: '4px solid #6e2222', color: 'white' }
+                          : { borderLeft: '4px solid transparent', color: 'rgba(255,255,255,0.7)' }
+                        }
+                        className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] font-bold transition-all"
                       >
-                        {isActive && (
-                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-white" />
-                        )}
                         <span
-                          className={`material-symbols-outlined text-[20px] transition-transform group-hover:scale-110 ${isActive ? "text-white" : "text-slate-400"
-                            }`}
-                          style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
+                          className="material-symbols-outlined text-[20px] flex-shrink-0"
+                          style={isActive ? { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" } : { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" }}
                         >
                           school
                         </span>
-                        <span className="whitespace-nowrap truncate">
-                          Institute Details
-                        </span>
+                        <span className="truncate">Institute Details</span>
                       </button>
                     );
                   })}
 
-                  <div className="mt-0">
+                  {/* College Information group */}
+                  <div>
                     <button
                       onClick={() => setInfoExpanded(!infoExpanded)}
-                      className={`w-full flex items-center justify-between px-6 py-2 text-[14px] font-bold transition-all group relative ${infoExpanded || TABS.filter(t => t.group === "info").some(t => t.id === activeTab) ? "bg-[#8B3D3D] text-white" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}
+                      style={infoExpanded || TABS.filter(t => t.group === 'info').some(t => t.id === activeTab)
+                        ? { backgroundColor: '#963737', borderLeft: '4px solid #6e2222', color: 'white' }
+                        : { borderLeft: '4px solid transparent', color: 'rgba(255,255,255,0.7)' }
+                      }
+                      className="w-full flex items-center justify-between gap-3 px-5 py-2.5 text-[13px] font-bold transition-all"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="material-symbols-outlined text-[20px] text-white">
+                        <span
+                          className="material-symbols-outlined text-[20px] flex-shrink-0"
+                          style={{ fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" }}
+                        >
                           list_alt
                         </span>
-                        <span className="whitespace-nowrap truncate">College Information</span>
+                        <span className="truncate">College Information</span>
                       </div>
-                      <span className={`material-symbols-outlined text-[18px] transition-transform duration-300 ${infoExpanded ? "rotate-180 text-white" : "text-white"}`}>
+                      <span className={`material-symbols-outlined text-[18px] transition-transform duration-300 ${infoExpanded ? 'rotate-180' : ''}`}>
                         expand_more
                       </span>
                     </button>
 
                     {infoExpanded && (
-                      <div className="flex flex-col border-b border-t-0 border-[#8B3D3D]">
-                        {TABS.filter(t => t.group === "info").map(tab => {
+                      <ul className="bg-black/20 py-1">
+                        {TABS.filter(t => t.group === 'info').map(tab => {
                           const isActive = activeTab === tab.id;
                           return (
-                            <button
-                              key={tab.id}
-                              onClick={() => handleTabChange(tab.id)}
-                              className={`w-full flex items-center gap-3 px-6 py-2 border-b border-white/10 text-[13px] font-bold transition-all ${isActive ? "bg-[#6E3030] text-white shadow-inner" : "bg-[#7c7c7c] text-white hover:bg-[#666666]"
-                                }`}
-                            >
-                              <span className="material-symbols-outlined text-[16px]">chat</span>
-                              <span className="truncate">{tab.label}</span>
-                            </button>
+                            <li key={tab.id}>
+                              <button
+                                onClick={() => handleTabChange(tab.id)}
+                                className="w-full flex items-center gap-3 px-11 py-2.5 text-[12px] font-bold transition-colors"
+                                style={{ color: isActive ? 'white' : 'rgba(255,255,255,0.5)' }}
+                              >
+                                <span
+                                  className="material-symbols-outlined text-[16px] flex-shrink-0"
+                                  style={isActive ? { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" } : { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" }}
+                                >
+                                  {tab.icon}
+                                </span>
+                                <span className="truncate">{tab.label}</span>
+                              </button>
+                            </li>
                           );
                         })}
-                      </div>
+                      </ul>
                     )}
                   </div>
 
-                  <div className="mt-0 text-white">
-                    {TABS.filter(tab => !tab.group && tab.id !== "overview").map((tab) => {
-                      const isActive = activeTab === tab.id;
-                      return (
-                        <button
-                          key={tab.id}
-                          onClick={() => handleTabChange(tab.id)}
-                          className={`w-full flex items-center gap-3 px-6 py-2 text-[14px] font-bold transition-all group relative ${isActive
-                            ? "bg-[#8B3D3D] text-white"
-                            : "text-slate-300 hover:bg-white/5 hover:text-white"
-                            }`}
+                  {/* Rest of tabs */}
+                  {TABS.filter(tab => !tab.group && tab.id !== 'overview').map(tab => {
+                    const isActive = activeTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => handleTabChange(tab.id)}
+                        style={isActive
+                          ? { backgroundColor: '#963737', borderLeft: '4px solid #6e2222', color: 'white' }
+                          : { borderLeft: '4px solid transparent', color: 'rgba(255,255,255,0.7)' }
+                        }
+                        className="w-full flex items-center gap-3 px-5 py-2.5 text-[13px] font-bold transition-all"
+                      >
+                        <span
+                          className="material-symbols-outlined text-[20px] flex-shrink-0"
+                          style={isActive ? { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" } : { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" }}
                         >
-                          {isActive && (
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-white" />
-                          )}
-                          <span
-                            className={`material-symbols-outlined text-[20px] transition-transform group-hover:scale-110 ${isActive ? "text-white" : "text-slate-500"
-                              }`}
-                            style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
-                          >
-                            {tab.icon}
-                          </span>
-                          <span className="whitespace-nowrap truncate">
-                            {tab.label}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                          {tab.icon}
+                        </span>
+                        <span className="truncate">{tab.label}</span>
+                      </button>
+                    );
+                  })}
                 </>
               ) : (
-                <div className="space-y-2 px-4 animate-pulse">
-                  <div className="h-10 bg-white/5 rounded-lg w-full" />
-                  <div className="h-10 bg-[#8B3D3D]/20 rounded-lg w-full" />
-                  <div className="h-64 bg-white/5 rounded-lg w-full" />
+                <div className="space-y-1 px-3 py-2 animate-pulse">
+                  {[1,2,3,4,5].map(i => <div key={i} className="h-9 bg-white/5 rounded-lg" />)}
                 </div>
               )}
             </nav>
           </div>
         </aside>
 
-        <main className="flex-1 md:ml-[350px] min-h-[calc(100vh-80px)] bg-[#ffffff] text-slate-800 p-4 sm:p-6 pb-28 md:pb-10 transition-all duration-300">
+        <main className="flex-1 md:ml-[260px] min-h-[calc(100vh-80px)] bg-[#ffffff] text-slate-800 p-4 sm:p-6 pb-28 md:pb-10 transition-all duration-300">
           <div className="w-full">
             {renderTab()}
           </div>
