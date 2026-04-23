@@ -241,7 +241,7 @@ export default function TopCourse() {
       <div className="home-page-shell relative z-10">
         <FadeIn>
           <div className="mb-16">
-            <div className="mb-6 flex items-center justify-between gap-12">
+            <div className="mb-6 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center md:gap-12">
               <h2 className="text-[40px] font-semibold leading-[1.1] tracking-tight text-slate-900 lg:text-[68px]">
                 Discover the Top <span style={{ color: "#FF3C3C" }}>Course</span>
               </h2>
@@ -255,10 +255,10 @@ export default function TopCourse() {
                 </span>
               </Link>
             </div>
-            <p className="max-w-4xl text-[25px] font-medium leading-relaxed text-slate-500">
+            <p className="max-w-4xl text-xl font-medium leading-relaxed text-slate-500">
               Filter through thousands of institutions worldwide based on your
               specific academic preferences and{" "}
-             career goals.
+              career goals.
             </p>
           </div>
         </FadeIn>
@@ -291,11 +291,10 @@ export default function TopCourse() {
                   return (
                     <span
                       key={dotIndex}
-                      className={`block rounded-full border border-white/40 transition-all duration-300 ${
-                        isActiveDot
+                      className={`block rounded-full border border-white/40 transition-all duration-300 ${isActiveDot
                           ? "h-3 w-3 bg-[#ff6b4a] shadow-[0_0_0_2px_rgba(255,255,255,0.15)]"
                           : "h-3 w-3 bg-white"
-                      }`}
+                        }`}
                     />
                   );
                 })}
@@ -394,11 +393,10 @@ export default function TopCourse() {
                     onClick={() =>
                       router.push(`/careers-courses?stream=${course.slug}`)
                     }
-                    className={`group flex items-center gap-4 border-b p-4 text-left transition-all duration-300 ${
-                      isActive
+                    className={`group flex items-center gap-4 border-b p-4 text-left transition-all duration-300 ${isActive
                         ? "border-l-[10px] bg-[#fff5f5] text-slate-900"
                         : "bg-white text-slate-900 hover:bg-slate-50"
-                    }`}
+                      }`}
                     style={
                       isActive
                         ? { borderLeftColor: "rgba(216, 0, 5, 1)" }
@@ -406,24 +404,21 @@ export default function TopCourse() {
                     }
                   >
                     <div
-                      className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[5px] border transition-all duration-300 ${
-                        isActive
+                      className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[5px] border transition-all duration-300 ${isActive
                           ? `bg-gradient-to-br ${course.accent} border-transparent shadow-lg shadow-rose-200/60`
                           : `${course.accentSoft} border-slate-200 group-hover:-translate-y-0.5 group-hover:shadow-md`
-                      }`}
+                        }`}
                     >
                       <div
-                        className={`absolute inset-[1px] rounded-[4px] ${
-                          isActive ? "bg-white/18 backdrop-blur-[2px]" : "bg-white/80"
-                        }`}
+                        className={`absolute inset-[1px] rounded-[4px] ${isActive ? "bg-white/18 backdrop-blur-[2px]" : "bg-white/80"
+                          }`}
                       />
                       <div className="relative flex items-center justify-center">
                         <Icon
-                          className={`h-[22px] w-[22px] transition-transform duration-300 ${
-                            isActive
+                          className={`h-[22px] w-[22px] transition-transform duration-300 ${isActive
                               ? "scale-110 text-white"
                               : `${course.iconColor} group-hover:scale-110`
-                          }`}
+                            }`}
                           strokeWidth={2.1}
                         />
                       </div>

@@ -62,18 +62,15 @@ export default function StatsBar() {
               className="relative rounded-[5px] bg-white/5 border border-white/10 p-5 py-6 backdrop-blur-sm"
             >
               <div className="flex flex-col items-center text-center">
-               {/* Counter + Label */}
                <div className="flex flex-col items-center text-center">
-                 <div className="text-4xl lg:text-5xl font-medium text-white tracking-tight">
+                 <div className="text-3xl sm:text-4xl lg:text-5xl font-medium text-white tracking-tight">
                    <AnimatedCounter 
                      target={stat.target} 
                      suffix={stat.suffix} 
                      prefix={stat.prefix} 
                    />
                  </div>
-                 
-                 {/* Label */}
-                 <div className="text-sm font-semibold text-slate-400 uppercase tracking-wider mt-3">
+                 <div className="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider mt-2 sm:mt-3">
                    {stat.label}
                  </div>
                </div>

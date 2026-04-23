@@ -265,11 +265,11 @@ export default function Footer() {
 
           {/* Bottom bar */}
           <FadeIn>
-            <div className="mt-12 pt-6 border-t border-white/8 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-[12px] text-slate-600">
+            <div className="mt-12 pt-6 border-t border-white/8 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <p className="text-[12px] text-slate-600 text-center sm:text-left">
                 © {new Date().getFullYear()} AdmissionX. All rights reserved.
               </p>
-              <div className="flex items-center gap-6">
+              <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
                 <Link href="/privacy-policy" className="text-[12px] text-slate-600 hover:text-white transition-colors">Privacy Policy</Link>
                 <Link href="/terms-and-conditions" className="text-[12px] text-slate-600 hover:text-white transition-colors">Terms of Service</Link>
                 <Link href="/contact-us" className="text-[12px] text-slate-600 hover:text-white transition-colors">Contact Us</Link>

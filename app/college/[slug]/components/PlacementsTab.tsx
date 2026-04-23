@@ -7,143 +7,144 @@ interface PlacementsTabProps {
   placementRatio?: string;
   avgPackage?: string;
   highPackage?: string;
+  lowPackage?: string;
   recruitersCount?: string;
+  placementInfo?: string | null;
+  hasData?: boolean;
   mosaicImage?: string;
 }
+
+const TOP_RECRUITERS = [
+  { name: "Google",    logo: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" },
+  { name: "Microsoft", logo: "https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg" },
+  { name: "Amazon",    logo: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" },
+  { name: "IBM",       logo: "https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" },
+  { name: "Adobe",     logo: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Adobe_Corporate_logo.svg" },
+  { name: "Deloitte",  logo: "https://upload.wikimedia.org/wikipedia/commons/2/2b/Deloitte.svg" },
+  { name: "Accenture", logo: "https://upload.wikimedia.org/wikipedia/commons/c/cd/Accenture.svg" },
+  { name: "Infosys",   logo: "https://upload.wikimedia.org/wikipedia/commons/9/95/Infosys_logo.svg" },
+  { name: "TCS",       logo: "https://upload.wikimedia.org/wikipedia/commons/b/b1/Tata_Consultancy_Services_Logo.svg" },
+  { name: "Cognizant", logo: "https://upload.wikimedia.org/wikipedia/commons/4/43/Cognizant_logo_2022.svg" },
+];
 
 export default function PlacementsTab({
   collegeName,
   location,
-  placementRatio = "98%",
-  avgPackage = "8.2 LPA",
-  highPackage = "45 LPA",
-  recruitersCount = "1,200+",
-  mosaicImage
+  placementRatio = "—",
+  avgPackage = "—",
+  highPackage = "—",
+  lowPackage = "—",
+  recruitersCount = "—",
+  placementInfo,
+  hasData = false,
+  mosaicImage,
 }: PlacementsTabProps) {
-  
-  const topRecruiters = [
-    { name: "Google", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" },
-    { name: "Microsoft", logo: "https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg" },
-    { name: "Amazon", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" },
-    { name: "IBM", logo: "https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" },
-    { name: "Adobe", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Adobe_Corporate_logo.svg" },
-    { name: "Deloitte", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2b/Deloitte.svg" },
-    { name: "Accenture", logo: "https://upload.wikimedia.org/wikipedia/commons/c/cd/Accenture.svg" },
-    { name: "Infosys", logo: "https://upload.wikimedia.org/wikipedia/commons/9/95/Infosys_logo.svg" },
-    { name: "TCS", logo: "https://upload.wikimedia.org/wikipedia/commons/b/b1/Tata_Consultancy_Services_Logo.svg" },
-    { name: "Cognizant", logo: "https://upload.wikimedia.org/wikipedia/commons/4/43/Cognizant_logo_2022.svg" }
+
+  const stats = [
+    { label: "Placement Ratio",  value: placementRatio, icon: "verified",        color: "text-emerald-600" },
+    { label: "Average Package",  value: avgPackage,     icon: "trending_up",     color: "text-blue-600"    },
+    { label: "Highest Package",  value: highPackage,    icon: "workspace_premium",color: "text-amber-600"  },
+    { label: "Lowest Package",   value: lowPackage,     icon: "trending_down",   color: "text-slate-600"   },
+    { label: "Recruiters",       value: recruitersCount,icon: "business",        color: "text-purple-600"  },
   ];
 
   return (
     <div className="w-full bg-white pt-10 pb-24">
-      {/* --- PHASE 1: UNIFIED PLACEMENTS CARD --- */}
       <div className="w-full px-4 md:px-10 lg:px-12 mx-auto max-w-[1920px]">
-        <div className="bg-white rounded-[5px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden border border-neutral-100 mt-8 relative">
-          {/* Unified Background Image & Overlay */}
+
+        {/* Hero card with banner bg */}
+        <div className="bg-white rounded-[5px] shadow-sm overflow-hidden border border-neutral-100 mt-8 relative">
+          {/* Background */}
           <div className="absolute inset-0 z-0">
             {mosaicImage && (
-              <Image 
-                src={mosaicImage} 
-                alt="Placement Background" 
-                fill 
-                className="object-cover opacity-100" 
-                priority
-              />
+              <Image src={mosaicImage} alt="Placement Background" fill className="object-cover" priority unoptimized />
             )}
-            <div className="absolute inset-0 bg-black/75 backdrop-blur-[1px]" />
+            <div className="absolute inset-0 bg-black/75" />
           </div>
-          
-          <div className="relative z-10 w-full">
-            {/* Top: Stats Header (Transparent) */}
-            <section className="relative w-full overflow-hidden py-12 lg:py-16 flex flex-col justify-center">
-              <div className="w-full px-6 md:px-10 lg:px-12">
-                <div className="flex flex-col gap-10">
-                  {/* Title & Location with High-Fidelity Labels */}
-                  <div className="animate-in fade-in slide-in-from-left duration-700">
-                    <span className="text-[#FF3C3C] text-[24px] font-bold tracking-[0.3em] uppercase block mb-4">PLACEMENTS</span>
-                    <h2 className="text-[45px] font-bold leading-[1.1] mb-6 text-white">
-                      India&apos;s biggest university,<br />
-                      {collegeName}
-                    </h2>
-                    <div className="mt-4 flex items-center gap-2 bg-slate-800/50 backdrop-blur-sm self-start px-4 py-2 rounded-[5px] border border-white/10">
-                      <span className="material-symbols-rounded text-white text-xl">location_on</span>
-                      <span className="text-sm font-bold text-white/90 uppercase tracking-widest">{location}</span>
-                    </div>
-                  </div>
 
-                  {/* Placement Stats Grid - Standardized Typography */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 max-w-5xl animate-in fade-in slide-in-from-bottom duration-700 delay-200">
-                    <div className="bg-white rounded-[5px] p-6 lg:p-8 flex flex-col items-start shadow-xl border border-neutral-100 transition-transform hover:-translate-y-1">
-                      <span className="text-[28px] font-bold leading-none text-slate-800">{placementRatio}</span>
-                      <span className="text-[20px] font-semibold mt-2 leading-tight text-slate-600">Placement Ratio</span>
-                    </div>
-                    <div className="bg-white rounded-[5px] p-6 lg:p-8 flex flex-col items-start shadow-xl border border-neutral-100 transition-transform hover:-translate-y-1">
-                      <span className="text-[28px] font-bold leading-none text-slate-800">{avgPackage}</span>
-                      <span className="text-[20px] font-semibold mt-2 leading-tight text-slate-600">Average Package</span>
-                    </div>
-                    <div className="bg-white rounded-[5px] p-6 lg:p-8 flex flex-col items-start shadow-xl border border-neutral-100 transition-transform hover:-translate-y-1">
-                      <span className="text-[28px] font-bold leading-none text-slate-800">{highPackage}</span>
-                      <span className="text-[20px] font-semibold mt-2 leading-tight text-slate-600">Highest Package</span>
-                    </div>
-                    <div className="bg-white rounded-[5px] p-6 lg:p-8 flex flex-col items-start shadow-xl border border-neutral-100 transition-transform hover:-translate-y-1">
-                      <span className="text-[28px] font-bold leading-none text-slate-800">{recruitersCount}</span>
-                      <span className="text-[20px] font-semibold mt-2 leading-tight text-slate-600">Recruiters</span>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4">
-                    <button className="px-10 py-3 bg-[#FF3C3C] text-white font-black text-sm uppercase tracking-widest rounded-[5px] shadow-lg shadow-red-500/20 transition-all hover:bg-red-700">
-                      Download Placement Report 2025
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </section>
+          <div className="relative z-10 px-4 sm:px-6 md:px-10 lg:px-12 py-8 sm:py-12 lg:py-16">
+            {/* Title */}
+            <span className="text-[#FF3C3C] text-[16px] sm:text-[20px] font-bold tracking-[0.3em] uppercase block mb-3">Placements</span>
+            <h2 className="text-[24px] sm:text-[32px] md:text-[45px] font-bold leading-tight text-white mb-3">
+              {collegeName}
+            </h2>
+            <div className="flex items-center gap-2 mb-6 sm:mb-8">
+              <span className="material-symbols-rounded text-white text-xl">location_on</span>
+              <span className="text-sm font-bold text-white/80 uppercase tracking-widest">{location}</span>
+            </div>
 
-            {/* Bottom: Top Recruiters Inside Card */}
-            <div className="px-6 md:px-10 lg:px-12 pb-16 lg:pb-24">
-              <section className="bg-white rounded-[5px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-10 lg:p-16 border border-neutral-100 relative z-30">
-              <div className="border-b border-neutral-200 pb-8 mb-12 flex justify-between items-center text-slate-900">
-                <h3 className="text-[45px] font-bold tracking-tight">Top Recruiters 2025</h3>
-                <div className="h-1 lg:w-32 bg-[#FF3C3C] rounded-full hidden sm:block" />
-              </div>
-
-              <div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
-                {topRecruiters.map((recruiter, idx) => (
-                  <div key={idx} className="group bg-white rounded-[5px] flex flex-col items-center justify-center p-8 transition-all duration-500 shadow-[0_0_0_1px_rgba(0,0,0,0.03),0_3px_10px_-8px_rgba(0,0,0,0.08),0_18px_28px_-24px_rgba(0,0,0,0.2)] hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_5px_12px_-8px_rgba(0,0,0,0.1),0_24px_36px_-24px_rgba(0,0,0,0.24)] border border-neutral-100 h-32 lg:h-40 relative hover:-translate-y-2">
-                    <div className="relative w-full h-12 lg:h-16 flex items-center justify-center transition-all duration-500 group-hover:scale-110">
-                      <Image 
-                        src={recruiter.logo} 
-                        alt={recruiter.name} 
-                        fill 
-                        className="object-contain" 
-                        unoptimized
-                      />
-                    </div>
-                    <div className="absolute bottom-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="text-[10px] font-black text-[#FF3C3C] uppercase tracking-widest">{recruiter.name}</span>
-                    </div>
+            {/* Stats grid — 2 cols on mobile, 3 on sm, 5 on lg */}
+            {hasData ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 max-w-5xl">
+                {stats.map((s) => (
+                  <div key={s.label} className="bg-white rounded-[5px] p-4 sm:p-5 flex flex-col shadow-xl border border-neutral-100 hover:-translate-y-1 transition-transform">
+                    <span className={`material-symbols-rounded text-[18px] sm:text-[22px] mb-2 ${s.color}`} style={{ fontVariationSettings: "'FILL' 1" }}>
+                      {s.icon}
+                    </span>
+                    <span className="text-[18px] sm:text-[22px] lg:text-[24px] font-black text-slate-800 leading-none">{s.value}</span>
+                    <span className="text-[11px] sm:text-[13px] font-semibold text-slate-500 mt-1.5 leading-tight">{s.label}</span>
                   </div>
                 ))}
               </div>
-              
-              {/* Joined Status */}
-              <div className="mt-16 pt-10 border-t border-neutral-100 flex flex-col md:flex-row justify-between items-center gap-8">
-                <p className="text-slate-500 font-bold text-sm">Join the 10,000+ graduates placed at top Fortune 500 companies.</p>
-                <button className="px-10 py-3 rounded-[5px] bg-slate-900 text-white font-black text-xs uppercase tracking-widest transition-all hover:bg-[#FF3C3C]">
-                  View All Companies
-                </button>
+            ) : (
+              <div className="bg-white/10 border border-white/20 rounded-[5px] px-4 sm:px-6 py-4 sm:py-5 max-w-lg">
+                <p className="text-white/70 text-sm font-semibold">
+                  Placement data for {collegeName} will be updated soon. Contact the college for the latest placement statistics.
+                </p>
               </div>
+            )}
+
+            {/* Placement info */}
+            {placementInfo && (
+              <div className="mt-5 sm:mt-6 bg-white/10 border border-white/20 rounded-[5px] px-4 sm:px-6 py-3 sm:py-4 max-w-3xl">
+                <p className="text-white/80 text-sm leading-relaxed">{placementInfo}</p>
               </div>
-              </section>
+            )}
+          </div>
+        </div>
+
+        {/* Top Recruiters */}
+        <div className="mt-6 sm:mt-10 bg-white rounded-[5px] shadow-sm border border-neutral-100 p-5 sm:p-8 lg:p-12">
+          <div className="flex items-center justify-between mb-6 sm:mb-8 pb-4 sm:pb-6 border-b border-neutral-100">
+            <div>
+              <h3 className="text-[22px] sm:text-[28px] lg:text-[32px] font-bold text-slate-900">Top Recruiters</h3>
+              <p className="text-slate-400 text-xs sm:text-sm mt-1">Companies that regularly hire from this institution</p>
             </div>
+            <div className="h-1 w-16 sm:w-24 bg-[#FF3C3C] rounded-full hidden sm:block" />
+          </div>
+
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 sm:gap-6">
+            {TOP_RECRUITERS.map((r, idx) => (
+              <div
+                key={idx}
+                className="group bg-white rounded-[5px] flex flex-col items-center justify-center p-3 sm:p-6 border border-neutral-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all h-20 sm:h-28 relative"
+              >
+                <div className="relative w-full h-8 sm:h-10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Image src={r.logo} alt={r.name} fill className="object-contain" unoptimized />
+                </div>
+                <span className="absolute bottom-2 text-[9px] sm:text-[10px] font-black text-[#FF3C3C] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                  {r.name}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 sm:mt-10 pt-4 sm:pt-6 border-t border-neutral-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <p className="text-slate-500 font-semibold text-xs sm:text-sm">
+              Join thousands of graduates placed at top companies worldwide.
+            </p>
+            <a
+              href={`/apply`}
+              className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-[5px] bg-slate-900 text-white font-black text-xs uppercase tracking-widest hover:bg-[#FF3C3C] transition-colors whitespace-nowrap"
+            >
+              Apply Now
+            </a>
           </div>
         </div>
       </div>
 
       {/* Explore Cards */}
-      <div className="w-full px-4 md:px-10 lg:px-12 mx-auto max-w-[1920px] pt-8 md:pt-10 pb-10">
+      <div className="w-full px-4 md:px-10 lg:px-12 mx-auto max-w-[1920px] pt-8 pb-10">
         <ExploreCards />
       </div>
     </div>

@@ -37,7 +37,7 @@ export default function ExploreCards() {
   return (
     <section className="w-full pb-16">
       <div className="w-full px-0">
-        <div className="grid mx-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {CARDS.map((card) => (
           <Link
             key={card.title}

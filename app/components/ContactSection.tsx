@@ -30,10 +30,10 @@ export default function ContactSection() {
 
             {/* ── Left: Contact Info ────────────────────────────── */}
             <div className="flex flex-col justify-center">
-              <h2 className="tracking-tight leading-[1.1] mb-4" style={{ fontSize: '50px', fontWeight: '700', color: '#3E3E3E' }}>
+              <h2 className="tracking-tight leading-[1.1] mb-3 sm:mb-4 text-[28px] sm:text-[38px] lg:text-[50px]" style={{ fontWeight: '700', color: '#3E3E3E' }}>
                 Get in Touch
               </h2>
-              <p className="tracking-relaxed mb-12 max-w-xl" style={{ fontSize: '20px', fontWeight: '500', color: '#3E3E3E' }}>
+              <p className="tracking-relaxed mb-8 sm:mb-12 max-w-xl text-[15px] sm:text-[18px] lg:text-[20px]" style={{ fontWeight: '500', color: '#3E3E3E' }}>
                 Get the real story about campus life, professors, and placements from people who've actually been there.
               </p>
               <div className="space-y-8">
@@ -76,8 +76,8 @@ export default function ContactSection() {
             </div>
 
             {/* ── Right: Contact Form ─────────────────────────────── */}
-            <div className="bg-white rounded-[5px] p-10 lg:p-12 border border-slate-200/60 relative" style={{ boxShadow: '0 6px 16px -8px rgba(0, 0, 0, 0.25)' }}>
-              <h3 className="font-bold mb-10 tracking-tight" style={{ fontSize: '30px', fontWeight: '700', color: '#6C6C6C' }}>Send a message</h3>
+            <div className="bg-white rounded-[5px] p-6 sm:p-8 lg:p-12 border border-slate-200/60 relative" style={{ boxShadow: '0 6px 16px -8px rgba(0, 0, 0, 0.25)' }}>
+              <h3 className="font-bold mb-6 sm:mb-10 tracking-tight text-[20px] sm:text-[24px] lg:text-[30px]" style={{ fontWeight: '700', color: '#6C6C6C' }}>Send a message</h3>
               <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
@@ -128,8 +128,8 @@ export default function ContactSection() {
                   <button
                     type="submit"
                     disabled={status === "loading"}
-                    className="rounded-[5px] bg-primary text-white tracking-wider hover:brightness-105 transition-all shadow-xl shadow-primary/20 disabled:opacity-60"
-                    style={{ width: '317.86px', height: '45px', fontSize: '24px', fontWeight: '700' }}
+                    className="w-full sm:w-auto rounded-[5px] bg-primary text-white tracking-wider hover:brightness-105 transition-all shadow-xl shadow-primary/20 disabled:opacity-60 px-8 h-[45px] sm:h-[50px] text-[16px] sm:text-[18px] lg:text-[20px]"
+                    style={{ fontWeight: '700' }}
                   >
                     {status === "loading" ? "Sending..." : "Send Message"}
                   </button>

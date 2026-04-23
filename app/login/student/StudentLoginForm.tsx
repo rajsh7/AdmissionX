@@ -71,11 +71,11 @@ export default function StudentLoginForm() {
     <div className="min-h-screen flex flex-col font-display relative">
       <AuthBackgroundSlider />
       <Header />
-      <main className="relative flex-1 flex items-center justify-center px-6 py-48 z-10">
-        <div className="flex w-full max-w-[920px] rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.12)] overflow-hidden" style={{ minHeight: "520px" }}>
+      <main className="relative flex-1 flex items-center justify-center px-4 sm:px-6 py-24 md:py-32 lg:py-48 z-10">
+        <div className="flex flex-col md:flex-row w-full max-w-[920px] rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.12)] overflow-hidden" style={{ minHeight: "520px" }}>
 
           {/* LEFT: Slider */}
-          <div className="w-[38%] relative flex-shrink-0" style={{ minHeight: "520px" }}>
+          <div className="hidden md:block w-[38%] relative flex-shrink-0" style={{ minHeight: "520px" }}>
             {SLIDES.map((src, i) => (
               <div key={src} className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: i === slideIndex ? 1 : 0 }}>
                 <img src={src} alt="" className="w-full h-full object-cover" />
@@ -106,13 +106,13 @@ export default function StudentLoginForm() {
           </div>
 
           {/* RIGHT: Form */}
-          <div className="flex-1 bg-[#f3f4f6] flex items-center justify-center px-8 py-10">
-            <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-8 py-8">
-              <h1 className="text-[24px] font-bold text-[#111] mb-1">Student Login</h1>
-              <p className="text-[13px] text-gray-500 mb-6">Sign in to your AdmissionX account.</p>
+          <div className="flex-1 bg-[#f3f4f6] flex items-center justify-center px-4 sm:px-8 py-10">
+            <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-6 sm:px-8 py-8">
+              <h1 className="text-[20px] md:text-[24px] font-bold text-[#111] mb-1">Student Login</h1>
+              <p className="text-[12px] md:text-[13px] text-gray-500 mb-6">Sign in to your AdmissionX account.</p>
 
               <a href="/api/auth/google"
-                className="flex items-center justify-center gap-2.5 w-full py-2.5 border border-gray-300 rounded-lg text-[13px] font-medium text-[#111] bg-white hover:border-gray-400 transition-colors mb-4">
+                className="flex items-center justify-center gap-2.5 w-full py-2 md:py-2.5 border border-gray-300 rounded-lg text-[12px] md:text-[13px] font-medium text-[#111] bg-white hover:border-gray-400 transition-colors mb-4">
                 <GoogleIcon />Sign in with Google
               </a>
 
@@ -146,20 +146,20 @@ export default function StudentLoginForm() {
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1">
-                  <label className="text-[12px] font-semibold text-gray-700">Email<span className="text-red-500 ml-0.5">*</span></label>
+                  <label className="text-[11px] md:text-[12px] font-semibold text-gray-700">Email<span className="text-red-500 ml-0.5">*</span></label>
                   <input type="email" placeholder="Enter your email" required
                     value={email} onChange={e => setEmail(e.target.value)} suppressHydrationWarning
-                    className="px-3 py-2 border border-gray-300 rounded-[7px] text-[13px] text-[#111] outline-none focus:border-black transition-colors" />
+                    className="px-3 py-2 border border-gray-300 rounded-[7px] text-[12px] md:text-[13px] placeholder:text-[11px] md:placeholder:text-[12px] text-[#111] outline-none focus:border-black transition-colors" />
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="flex justify-between items-center">
-                    <label className="text-[12px] font-semibold text-gray-700">Password<span className="text-red-500 ml-0.5">*</span></label>
-                    <Link href="/forgot-password" className="text-[11px] text-gray-500 hover:text-black hover:underline">Forgot password?</Link>
+                    <label className="text-[11px] md:text-[12px] font-semibold text-gray-700">Password<span className="text-red-500 ml-0.5">*</span></label>
+                    <Link href="/forgot-password" className="text-[10px] md:text-[11px] text-gray-500 hover:text-black hover:underline">Forgot password?</Link>
                   </div>
                   <div className="relative">
                     <input type={showPassword ? "text" : "password"} placeholder="Enter your password" required
                       value={password} onChange={e => setPassword(e.target.value)} suppressHydrationWarning
-                      className="w-full px-3 py-2 border border-gray-300 rounded-[7px] text-[13px] text-[#111] outline-none focus:border-black transition-colors pr-9" />
+                      className="w-full px-3 py-2 border border-gray-300 rounded-[7px] text-[12px] md:text-[13px] placeholder:text-[11px] md:placeholder:text-[12px] text-[#111] outline-none focus:border-black transition-colors pr-9" />
                     <button type="button" tabIndex={-1} onClick={() => setShowPassword(p => !p)}
                       className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                       <span className="material-symbols-outlined text-[17px]">{showPassword ? "visibility_off" : "visibility"}</span>
@@ -167,16 +167,16 @@ export default function StudentLoginForm() {
                   </div>
                 </div>
                 <button type="submit" disabled={loading}
-                  className="mt-2 py-2.5 bg-[#111] hover:bg-[#333] disabled:opacity-60 text-white rounded-lg text-[13.5px] font-semibold transition-colors w-full">
+                  className="mt-2 py-2 md:py-2.5 bg-[#111] hover:bg-[#333] disabled:opacity-60 text-white rounded-lg text-[13px] md:text-[13.5px] font-semibold transition-colors w-full">
                   {loading ? "Signing in…" : "Log in"}
                 </button>
               </form>
 
-              <p className="mt-4 text-[12px] text-gray-500 text-center">
+              <p className="mt-4 text-[11px] md:text-[12px] text-gray-500 text-center">
                 Don&apos;t have an account?{" "}
                 <Link href="/signup/student" className="text-[#111] font-semibold hover:underline">Sign up</Link>
               </p>
-              <p className="mt-2.5 text-[11px] text-gray-400 text-center">
+              <p className="mt-2.5 text-[10px] md:text-[11px] text-gray-400 text-center">
                 By logging in, you agree to our{" "}
                 <Link href="/terms-and-conditions" className="text-gray-500 underline">terms of use</Link>.
               </p>

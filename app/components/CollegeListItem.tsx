@@ -87,22 +87,23 @@ export default function CollegeListItem({
         delay: Math.min(index * 0.05, 0.3),
       }}
     >
-      <Link
-        href={`/college/${slug}`}
-        className="group flex items-start gap-4 bg-white rounded-[5px] border border-neutral-100 hover:border-[#FF3C3C]/20 hover:shadow-xl hover:shadow-[#FF3C3C]/5 transition-all duration-300 p-4 sm:p-5 pr-6 sm:pr-8"
+      <div
+        className="group relative flex items-start gap-4 bg-white rounded-[5px] border border-neutral-100 hover:border-[#FF3C3C]/20 hover:shadow-xl hover:shadow-[#FF3C3C]/5 transition-all duration-300 p-4 sm:p-5 pr-6 sm:pr-8"
       >
+        <Link href={`/college/${slug}`} className="absolute inset-0 z-0" aria-label={`View ${name}`} />
+        
         {/* ── Thumbnail ── */}
-        <div className="relative w-24 h-20 sm:w-32 sm:h-24 flex-shrink-0 rounded-[5px] overflow-hidden bg-neutral-100 flex items-center justify-center">
+        <div className="relative z-10 w-24 h-20 sm:w-32 sm:h-24 flex-shrink-0 rounded-[5px] overflow-hidden bg-neutral-100 flex items-center justify-center">
           {image && image !== "" ? (
             <Image
               src={image}
               alt={name}
               fill
               sizes="150px"
-              className="object-cover group-hover:scale-105 transition-transform duration-700"
+              className="object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none"
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FF3C3C]/10 to-[#FF3C3C]/5 flex items-center justify-center p-2 text-center">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FF3C3C]/10 to-[#FF3C3C]/5 flex items-center justify-center p-2 text-center pointer-events-none">
                <span className="material-symbols-outlined text-3xl text-[#FF3C3C]/30">account_balance</span>
             </div>
           )}
@@ -128,20 +129,12 @@ export default function CollegeListItem({
         </div>
 
         {/* ── Main Info ── */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 z-10 relative">
           {/* Top row: name + badges */}
           <div className="flex items-start justify-between gap-2 mb-1.5">
-            <h3 className="text-sm sm:text-base font-extrabold text-[#333333] group-hover:text-[#FF3C3C] transition-colors leading-snug line-clamp-2">
+            <Link href={`/college/${slug}`} className="text-sm sm:text-base font-extrabold text-[#333333] group-hover:text-[#FF3C3C] transition-colors leading-snug line-clamp-2">
               {name}
-            </h3>
-
-            {/* Desktop action */}
-            <span className="hidden sm:inline-flex items-center gap-1.5 flex-shrink-0 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-xs font-bold px-4 py-2 rounded-[10px] transition-all duration-300 whitespace-nowrap">
-              View {entityName}
-              <span className="material-symbols-outlined text-sm group-hover:translate-x-0.5 transition-transform">
-                arrow_forward
-              </span>
-            </span>
+            </Link>
           </div>
 
           {/* Location */}
@@ -195,7 +188,7 @@ export default function CollegeListItem({
           </div>
 
           {/* Bottom row: streams + fees + est year */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pointer-events-none">
             {/* Streams */}
             {streams.length > 0 && (
               <div className="flex flex-wrap gap-1">
@@ -215,20 +208,12 @@ export default function CollegeListItem({
               </div>
             )}
 
-            {/* Avg Package */}
-            {avg_package && (
-              <div className="flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[13px] text-neutral-400">workspace_premium</span>
-                <span className="text-xs font-black text-[#FF3C3C]">{avg_package}</span>
-                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tight">avg pkg</span>
-              </div>
-            )}
-
             {/* Fees */}
             <div className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[13px] text-neutral-400">
                 currency_rupee
               </span>
+              <span className="text-[10px] text-neutral-500 font-medium">Starting Fees:</span>
               <span className="text-xs font-black text-[#FF3C3C]">
                 {feesLabel}
               </span>
@@ -248,17 +233,33 @@ export default function CollegeListItem({
             )}
           </div>
 
-          {/* Mobile CTA */}
-          <div className="sm:hidden mt-3">
-            <span className="inline-flex items-center gap-1.5 bg-[#FF3C3C] text-white text-xs font-bold px-4 py-2 rounded-[10px] transition-all duration-300">
-              View {entityName}
-              <span className="material-symbols-outlined text-sm">
-                arrow_forward
-              </span>
-            </span>
+          {/* Action Buttons */}
+          <div className="mt-4 flex flex-wrap items-center gap-3 relative z-20">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = `/college/${slug}`;
+              }}
+              className="flex items-center justify-center gap-1.5 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-xs font-bold px-5 py-2.5 rounded-[10px] transition-all duration-300 flex-1 sm:flex-none cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[16px]">edit_document</span>
+              Apply Now
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = `/college/${slug}`;
+              }}
+              className="flex items-center justify-center gap-1.5 bg-white border border-[#FF3C3C] hover:bg-red-50 text-[#FF3C3C] text-xs font-bold px-5 py-2.5 rounded-[10px] transition-all duration-300 flex-1 sm:flex-none cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[16px]">help</span>
+              Ask Query
+            </button>
           </div>
         </div>
-      </Link>
+      </div>
     </motion.div>
   );
 }

@@ -135,25 +135,24 @@ export default function TopUniversities({
     <section className="w-full bg-[#f8fafc]/30 py-24 lg:py-32">
       <div className="home-page-shell">
         <FadeIn>
-          <div className="mb-16 grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
+          <div className="mb-16 grid grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-12">
             <div className="lg:col-span-8">
-              <h2 className="text-[40px] font-semibold leading-[1.1] tracking-tight text-slate-900 lg:text-[68px]">
+              <h2 className="text-[28px] sm:text-[40px] lg:text-[56px] xl:text-[68px] font-semibold leading-[1.1] tracking-tight text-slate-900">
                 Discover the Top <span className="text-primary">Universities</span>
               </h2>
-              <p className="mt-6 max-w-3xl text-[22px] font-medium leading-relaxed text-slate-500 antialiased">
+              <p className="mt-4 max-w-3xl text-[15px] sm:text-[18px] lg:text-[22px] font-medium leading-relaxed text-slate-500">
                 Filter through thousands of institutions worldwide based on your
                 specific academic preferences and career goals.
               </p>
             </div>
-
             <div className="lg:col-span-4">
               <AdCard ads={ads} className="mx-auto max-w-[440px] lg:ml-auto lg:mr-0" />
             </div>
           </div>
         </FadeIn>
 
-        <div className="mb-12 flex items-center justify-between gap-4">
-          <div className="group relative flex h-[51.8px] flex-1 max-w-[800px] overflow-hidden rounded-[5px] border border-slate-200 bg-white shadow-[0_2px_8px_rgba(15,23,42,0.06)] transition-all hover:shadow-md">
+        <div className="mb-8 flex items-center gap-3 flex-col sm:flex-row">
+          <div className="group relative flex h-[48px] w-full sm:flex-1 sm:max-w-[800px] overflow-hidden rounded-[5px] border border-slate-200 bg-white shadow-sm">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -163,26 +162,21 @@ export default function TopUniversities({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search your college, universities, courses..."
+              placeholder="Search colleges, universities..."
               suppressHydrationWarning
-              className="h-[51.8px] flex-1 bg-[#FFFFFF] pl-12 text-[20px] font-normal text-[#6C6C6CA1] placeholder:text-[#6C6C6CA1] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(15,23,42,0.03)] focus:outline-none"
+              className="h-full flex-1 bg-white pl-12 text-[14px] sm:text-[16px] font-normal text-[#6C6C6C] placeholder:text-[#6C6C6CA1] focus:outline-none"
             />
-            <button className="flex h-[51.8px] min-w-[170px] items-center justify-center bg-[#FF3C3C] px-12 text-base font-semibold whitespace-nowrap text-white transition-colors hover:bg-[#E63636]">
+            <button className="flex h-full min-w-[80px] sm:min-w-[120px] items-center justify-center bg-[#FF3C3C] px-4 sm:px-8 text-sm font-semibold text-white hover:bg-[#E63636]">
               Search
             </button>
           </div>
-
           <button
             onClick={() => setSortBy(sortBy === "rank" ? null : "rank")}
-            className={`h-[51.8px] rounded-[5px] border px-6 text-sm font-medium shadow-sm transition-all active:scale-95 hover:shadow-md ${
-              sortBy === "rank"
-                ? "border-[#FF3C3C] bg-[#FF3C3C] text-white"
-                : "border-slate-200 bg-white text-slate-600"
+            className={`h-[48px] w-full sm:w-auto rounded-[5px] border px-4 sm:px-6 text-sm font-medium shadow-sm transition-all ${
+              sortBy === "rank" ? "border-[#FF3C3C] bg-[#FF3C3C] text-white" : "border-slate-200 bg-white text-slate-600"
             } flex items-center justify-center gap-2`}
           >
-            <span className="material-symbols-rounded text-[20px]">
-              swap_vert
-            </span>
+            <span className="material-symbols-rounded text-[20px]">swap_vert</span>
             Sort By: rank
           </button>
         </div>
@@ -246,7 +240,7 @@ export default function TopUniversities({
 
                      <div className="flex flex-1 flex-col p-5">
                       <div className="mb-4 flex items-start justify-between">
-                        <h3 className="line-clamp-2 leading-snug transition-colors group-hover:text-primary" style={{ fontWeight: 700, fontSize: '22px', color: 'rgba(108, 108, 108, 1)' }}>
+                        <h3 className="line-clamp-2 leading-snug transition-colors group-hover:text-primary" style={{ fontWeight: 700, fontSize: '16px', color: 'rgba(108, 108, 108, 1)' }}>
                           {uni.name}
                         </h3>
                       </div>

@@ -421,33 +421,57 @@ export default function Header({ theme }: HeaderProps) {
       {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="fixed inset-x-0 top-[88px] z-40 mx-auto w-[95%] max-w-6xl left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-xl border border-slate-100 rounded-3xl shadow-2xl lg:hidden">
-            <div className="px-6 py-8 space-y-1">
-              {navLinks.map((item, i) => {
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/40 z-[98] lg:hidden backdrop-blur-sm"
+            />
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed inset-y-0 right-0 z-[99] w-[85%] max-w-sm bg-white shadow-2xl lg:hidden h-full"
+            >
+              <div className="absolute inset-0 flex flex-col">
+                <div className="flex items-center justify-between p-5 border-b border-slate-100 shrink-0 bg-white z-10">
+                  <span className="text-lg font-bold text-slate-800 tracking-tight">Menu</span>
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="h-9 w-9 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-50 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">close</span>
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-6 pb-28 space-y-1">
+              {navLinks.map((item) => {
                 const isExpanded = expandedMobileItem === item.label;
                 return (
-                  <motion.div key={item.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
-                    <div className="flex flex-col">
+                  <div key={item.label} className="flex flex-col">
                       <div className="flex items-center justify-between py-3">
-                        <Link
-                          href={item.href}
-                          className="text-[16px] font-medium text-slate-800 uppercase tracking-tight"
-                          onClick={() => {
-                            if (!item.subItems) setMobileMenuOpen(false);
-                            else setExpandedMobileItem(isExpanded ? null : item.label);
-                          }}
-                        >
-                          {item.label}
-                        </Link>
-                        {item.subItems && (
+                        {item.subItems ? (
                           <button
+                            className="flex-1 text-left text-[16px] font-medium text-slate-800 uppercase tracking-tight flex items-center justify-between"
                             onClick={() => setExpandedMobileItem(isExpanded ? null : item.label)}
-                            className="p-1 hover:bg-slate-50 rounded-[10px] transition-colors"
                           >
-                            <span className={`material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>
+                            {item.label}
+                            <span className={`material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 p-1 hover:bg-slate-50 rounded-[10px] ${isExpanded ? "rotate-180" : ""}`}>
                               expand_more
                             </span>
                           </button>
+                        ) : (
+                          <Link
+                            href={item.href}
+                            className="flex-1 text-[16px] font-medium text-slate-800 uppercase tracking-tight"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {item.label}
+                          </Link>
                         )}
                       </div>
 
@@ -482,7 +506,6 @@ export default function Header({ theme }: HeaderProps) {
                         </AnimatePresence>
                       )}
                     </div>
-                  </motion.div>
                 );
               })}
 
@@ -514,26 +537,67 @@ export default function Header({ theme }: HeaderProps) {
               ) : (
                 <div className="space-y-4 pt-2">
                   <div className="grid grid-cols-2 gap-3">
-                    <Link
-                      href="/login/student"
-                      className="flex items-center justify-center py-3.5 rounded-[10px] bg-slate-50 text-slate-800 text-[16px] font-medium border border-slate-100 shadow-sm"
-                      onClick={() => setMobileMenuOpen(false)}
+                    <button
+                      onClick={() => {
+                        setMobileLoginOpen(!mobileLoginOpen);
+                        if (mobileSignupOpen) setMobileSignupOpen(false);
+                      }}
+                      className="flex items-center justify-center gap-1 py-3.5 rounded-[10px] bg-slate-50 text-slate-800 text-[16px] font-medium border border-slate-100 shadow-sm"
                     >
                       Login
-                    </Link>
-                    <Link
-                      href="/signup/student"
-                      className="flex items-center justify-center py-3.5 rounded-[5px] text-white text-[16px] font-medium shadow-md"
+                      <span className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${mobileLoginOpen ? "rotate-180" : ""}`}>expand_more</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileSignupOpen(!mobileSignupOpen);
+                        if (mobileLoginOpen) setMobileLoginOpen(false);
+                      }}
+                      className="flex items-center justify-center gap-1 py-3.5 rounded-[5px] text-white text-[16px] font-medium shadow-md"
                       style={{ backgroundColor: 'rgba(34, 34, 34, 1)' }}
-                      onClick={() => setMobileMenuOpen(false)}
                     >
                       Sign Up
-                    </Link>
+                      <span className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${mobileSignupOpen ? "rotate-180" : ""}`}>expand_more</span>
+                    </button>
                   </div>
+
+                  <AnimatePresence>
+                    {(mobileLoginOpen || mobileSignupOpen) && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden bg-slate-50/50 rounded-2xl"
+                      >
+                        <div className="py-2 px-3 space-y-1">
+                          {(mobileLoginOpen ? loginOptions : signupOptions).map((opt) => (
+                            <Link
+                              key={opt.label}
+                              href={opt.href}
+                              className="flex items-center gap-3 px-3 py-3 text-[16px] font-normal text-slate-600 hover:text-primary transition-colors"
+                              onClick={() => {
+                                setMobileMenuOpen(false);
+                                setMobileLoginOpen(false);
+                                setMobileSignupOpen(false);
+                              }}
+                            >
+                              {mounted && (
+                                <span className="material-symbols-outlined text-[18px] text-slate-400">
+                                  {opt.icon}
+                                </span>
+                              )}
+                              {opt.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               )}
-            </div>
-          </motion.div>
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>

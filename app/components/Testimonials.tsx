@@ -48,12 +48,12 @@ export default function Testimonials({ testimonials: dynamicTestimonials }: Test
     <section className="w-full py-24 lg:py-32 bg-white overflow-hidden">
       <div className="home-page-shell">
         
-        <div className="mb-16 flex flex-col justify-between gap-8 md:flex-row md:items-start">
+        <div className="mb-10 sm:mb-16 flex flex-col justify-between gap-6 sm:gap-8 md:flex-row md:items-start">
             <div className="max-w-2xl">
-                <h2 className="text-[40px] font-semibold tracking-tight leading-[1.1] mb-4">
+                <h2 className="text-[26px] sm:text-[32px] lg:text-[40px] font-semibold tracking-tight leading-[1.1] mb-3 sm:mb-4">
                   <span className="text-[#0F182A]">Unfiltered</span> <span className="text-primary">Student Voices</span>
                 </h2>
-                <p className="text-slate-500 font-normal text-lg">
+                <p className="text-slate-500 font-normal text-[14px] sm:text-[16px] lg:text-lg">
                   Get the real story about campus life, professors, and placements from people who&apos;ve actually been there.
                 </p>
             </div>

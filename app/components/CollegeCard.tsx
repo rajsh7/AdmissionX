@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
+import AskQueryModal from "@/app/college/[slug]/components/AskQueryModal";
 
 interface CollegeCardProps {
   college: CollegeResult;
@@ -97,10 +98,10 @@ export default function CollegeCard({
         delay: Math.min(index * 0.05, 0.24),
       }}
     >
-      <Link
-        href={`/college/${slug}`}
-        className="group flex flex-col bg-white rounded-[5px] border border-neutral-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden h-full"
+      <div
+        className="group relative flex flex-col bg-white rounded-[5px] border border-neutral-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden h-full"
       >
+        <Link href={`/college/${slug}`} className="absolute inset-0 z-10" aria-label={`View ${name}`} />
         {/* ── Image ── */}
         <div className="relative aspect-[4/3] overflow-hidden bg-neutral-50 flex-shrink-0">
           {image && image !== "" ? (
@@ -131,55 +132,56 @@ export default function CollegeCard({
 
         {/* ── Body ── */}
         <div className="px-5 pt-4 pb-5 flex flex-col flex-1">
-          <div className="flex justify-between items-start mb-4">
-            <h3 className="text-[22px] font-bold text-[#6C6C6C] leading-snug group-hover:text-[#FF3C3C] transition-colors line-clamp-2">
+          <div className="flex justify-between items-start mb-3">
+            <h3 className="text-[16px] sm:text-[18px] lg:text-[22px] font-bold text-[#6C6C6C] leading-snug group-hover:text-[#FF3C3C] transition-colors line-clamp-2">
               {name}
             </h3>
           </div>
 
-          <div className="flex items-center gap-1.5 text-[#6C6C6C] mb-4">
-            <span className="material-symbols-rounded text-[20px]">
-              location_on
-            </span>
-            <span className="text-[16px] font-medium truncate">
+          <div className="flex items-center gap-1.5 text-[#6C6C6C] mb-3">
+            <span className="material-symbols-rounded text-[18px]">location_on</span>
+            <span className="text-[13px] sm:text-[15px] lg:text-[16px] font-medium truncate">
               {location || "India"}
             </span>
           </div>
 
-          {/* Courses offered */}
-          <div className="mb-6 flex flex-wrap gap-2">
-            {(streams.length > 0 ? streams : ["Engineering"]).slice(0, 3).map((course) => (
-              <span
-                key={course}
-                className="inline-flex items-center rounded-[5px] border border-slate-400 bg-[#F8FAFC] px-3 py-1.5 text-[13px] font-semibold text-[#6C6C6C] leading-none"
-              >
-                {course}
-              </span>
-            ))}
-            {streams.length > 3 && (
-              <span className="inline-flex items-center rounded-[5px] border border-slate-400 bg-[#F8FAFC] px-3 py-1.5 text-[13px] font-semibold text-[#6C6C6C] leading-none">
-                +{streams.length - 3} More
-              </span>
-            )}
-          </div>
-
-          <div className="mt-auto flex items-center justify-between pt-5 border-t border-slate-200">
-            <div className="text-[16px] font-medium text-[#6C6C6C]">
-              Avg. Package: <span className="font-bold text-[#FF3C3C]">
-                {college.avg_package || (min_fees
-                  ? `₹${(min_fees / 100000).toFixed(1)} LPA`
-                  : max_fees
-                    ? `₹${(max_fees / 100000).toFixed(1)} LPA`
-                    : "N/A")}
-              </span>
-            </div>
-            <span className="inline-flex items-center gap-1 text-[#FF3C3C] font-bold text-[14px] group-hover:translate-x-1 transition-transform">
-              View Details
-              <span className="material-symbols-rounded text-[18px]">arrow_forward</span>
+          {/* Course Fees */}
+          <div className="mb-6 flex flex-col">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Starting Fees</span>
+            <span className="text-[18px] font-black text-[#FF3C3C]">
+              {feesLabel} <span className="text-[12px] font-bold text-slate-400 uppercase">/ year</span>
             </span>
           </div>
+
+          {/* Action Buttons */}
+          <div className="mt-auto flex flex-row items-center gap-2 pt-4 border-t border-slate-200 relative z-20">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = `/college/${slug}`;
+              }}
+              className="flex-1 flex items-center justify-center gap-1 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-[11px] lg:text-[12px] font-bold px-1.5 py-2.5 rounded-[5px] transition-all duration-300 whitespace-nowrap"
+            >
+              <span className="material-symbols-outlined text-[14px]">edit_document</span>
+              Apply Now
+            </button>
+            <AskQueryModal 
+              slug={slug} 
+              collegeName={name} 
+              renderTrigger={(onClick) => (
+                <button
+                  onClick={onClick}
+                  className="flex-1 flex items-center justify-center gap-1 bg-white border border-[#FF3C3C] hover:bg-red-50 text-[#FF3C3C] text-[11px] lg:text-[12px] font-bold px-1.5 py-2.5 rounded-[5px] transition-all duration-300 whitespace-nowrap"
+                >
+                  <span className="material-symbols-outlined text-[14px]">help</span>
+                  Ask Query
+                </button>
+              )}
+            />
+          </div>
         </div>
-      </Link>
+      </div>
     </motion.div>
   );
 }

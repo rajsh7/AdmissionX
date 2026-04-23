@@ -9,11 +9,11 @@ export default function FieldsOfStudy() {
       </div>
 
       <div className="home-page-shell relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-white text-[45px] font-bold leading-tight tracking-tight">
+        <div className="text-center mb-10 sm:mb-16">
+          <h2 className="text-white text-[26px] sm:text-[36px] lg:text-[45px] font-bold leading-tight tracking-tight">
             See How AdmissionX Works
           </h2>
-          <p className="text-white/50 text-[18px] font-normal mt-4 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-white/50 text-[14px] sm:text-[16px] lg:text-[18px] font-normal mt-3 sm:mt-4 max-w-2xl mx-auto leading-relaxed">
             Watch how we help students find their dream college and simplify the entire admission journey.
           </p>
         </div>

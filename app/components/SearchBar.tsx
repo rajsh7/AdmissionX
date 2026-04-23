@@ -105,8 +105,8 @@ export default function SearchBar({
         onSubmit={handleSearch}
         className="flex w-full items-stretch rounded-[5px] shadow-2xl transition-all duration-300 focus-within:ring-4 focus-within:ring-[#FF3C3C]/10"
       >
-        <div className="flex h-[50px] min-w-0 flex-1 items-center gap-3 px-6 bg-white/40 backdrop-blur-md border border-white/30 border-r-0 rounded-l-[5px] focus-within:border-[#FF3C3C]">
-          <span className="material-symbols-outlined text-[20px] text-white flex-shrink-0">search</span>
+        <div className="flex h-[46px] sm:h-[50px] min-w-0 flex-1 items-center gap-2 sm:gap-3 px-3 sm:px-6 bg-white/40 backdrop-blur-md border border-white/30 border-r-0 rounded-l-[5px] focus-within:border-[#FF3C3C]">
+          <span className="material-symbols-outlined text-[18px] sm:text-[20px] text-white flex-shrink-0">search</span>
           <input
             type="text"
             value={searchQuery}
@@ -114,15 +114,15 @@ export default function SearchBar({
             onFocus={() => searchQuery.length >= 2 && setShowDropdown(true)}
             placeholder={placeholder}
             suppressHydrationWarning
-            className="min-w-0 flex-1 bg-transparent text-[20px] font-normal text-white placeholder:text-white/80 outline-none"
+            className="min-w-0 flex-1 bg-transparent text-[14px] sm:text-[18px] lg:text-[20px] font-normal text-white placeholder:text-white/80 outline-none"
           />
         </div>
         <button
           type="submit"
           suppressHydrationWarning
-          className="h-[50px] min-w-max flex-shrink-0 bg-[#FF3C3C] px-10 text-[20px] font-normal text-white transition-colors hover:bg-[#E63636] rounded-r-[5px]"
+          className="h-[46px] sm:h-[50px] flex-shrink-0 bg-[#FF3C3C] px-4 sm:px-8 lg:px-10 text-[13px] sm:text-[16px] lg:text-[20px] font-normal text-white transition-colors hover:bg-[#E63636] rounded-r-[5px] whitespace-nowrap"
         >
-          {isLoading ? "Searching..." : "Search Now"}
+          {isLoading ? "..." : <><span className="hidden sm:inline">Search Now</span><span className="sm:hidden">Search</span></>}
         </button>
       </form>
 

@@ -1,6 +1,5 @@
 "use client";
 import { useState, useMemo } from "react";
-import Image from "next/image";
 import ExploreCards from "@/app/components/ExploreCards";
 
 interface CourseRow {
@@ -12,174 +11,272 @@ interface CourseRow {
   courseduration: string | null;
   twelvemarks?: string | null;
   description?: string | null;
+  admission_start?: string | null;
+  admission_end?: string | null;
+  last_date?: string | null;
 }
 
 interface CoursesTabProps {
   courses: CourseRow[];
+  slug: string;
 }
 
-export default function CoursesTab({ courses }: CoursesTabProps) {
-  const [activeLevel, setActiveLevel] = useState("Undergraduate");
-  
-  const filteredCourses = useMemo(() => {
-    return courses.filter(course => {
-      if (!course.degree_name) return activeLevel === "Undergraduate"; // Default to UG if null
-      return course.degree_name.toLowerCase().includes(activeLevel.toLowerCase());
-    });
-  }, [courses, activeLevel]);
+function formatFees(fees: string | null): string {
+  if (!fees) return "—";
+  const n = parseInt(fees);
+  if (isNaN(n) || n === 0) return "—";
+  if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L / yr`;
+  if (n >= 1000) return `₹${(n / 1000).toFixed(0)}K / yr`;
+  return `₹${n} / yr`;
+}
 
-  // Hardcoded sub-tabs to match UI
-  const subTabs = ["Undergraduate", "Postgraduate", "Phd", "Diploma", "Certificate Programs"];
-  const instructors = [
-    { name: "Meet Our Instructor", role: "Teacher", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400" },
-    { name: "Meet Our Instructor", role: "Teacher", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400" },
-    { name: "Meet Our Instructor", role: "Teacher", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400" },
-    { name: "Meet Our Instructor", role: "Teacher", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400" },
-  ];
+function formatDate(d: string | null | undefined): string | null {
+  if (!d) return null;
+  try { return new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }); }
+  catch { return d; }
+}
+
+// Use actual degree name as tab key — most reliable approach
+function getTabKey(degreeName: string | null): string {
+  if (!degreeName) return "Other";
+  const d = degreeName.toLowerCase().trim();
+  // Group common UG patterns
+  if (d.includes("bachelor") || d.startsWith("b.") || d === "be" || d === "bba" || d === "bca" || d === "bsc" || d === "bcom" || d === "ba")
+    return "Undergraduate";
+  // Group common PG patterns
+  if (d.includes("master") || d.startsWith("m.") || d === "me" || d === "mba" || d === "mca" || d === "msc" || d === "mcom" || d === "ma" || d.includes("pg") || d.includes("post"))
+    return "Postgraduate";
+  if (d.includes("phd") || d.includes("ph.d") || d.includes("doctor"))
+    return "PhD";
+  if (d.includes("diploma"))
+    return "Diploma";
+  if (d.includes("certificate"))
+    return "Certificate";
+  // For anything else, use the actual degree name as its own tab
+  return degreeName;
+}
+
+const STREAM_COLORS = [
+  { border: "border-red-100",     badge: "bg-red-100 text-red-700",       dot: "bg-red-500",     header: "bg-red-50"     },
+  { border: "border-blue-100",    badge: "bg-blue-100 text-blue-700",     dot: "bg-blue-500",    header: "bg-blue-50"    },
+  { border: "border-emerald-100", badge: "bg-emerald-100 text-emerald-700", dot: "bg-emerald-500", header: "bg-emerald-50" },
+  { border: "border-amber-100",   badge: "bg-amber-100 text-amber-700",   dot: "bg-amber-500",   header: "bg-amber-50"   },
+  { border: "border-purple-100",  badge: "bg-purple-100 text-purple-700", dot: "bg-purple-500",  header: "bg-purple-50"  },
+  { border: "border-pink-100",    badge: "bg-pink-100 text-pink-700",     dot: "bg-pink-500",    header: "bg-pink-50"    },
+];
+
+export default function CoursesTab({ courses, slug }: CoursesTabProps) {
+  const [activeTab, setActiveTab] = useState("All");
+
+  // Build dynamic tabs from actual degree data
+  const filterTabs = useMemo(() => {
+    const cats = new Set<string>();
+    courses.forEach(c => cats.add(getTabKey(c.degree_name)));
+    const ORDER = ["Undergraduate", "Postgraduate", "PhD", "Diploma", "Certificate"];
+    const sorted = [...cats].sort((a, b) => {
+      const ai = ORDER.indexOf(a), bi = ORDER.indexOf(b);
+      if (ai === -1 && bi === -1) return a.localeCompare(b);
+      if (ai === -1) return 1; if (bi === -1) return -1;
+      return ai - bi;
+    });
+    return ["All", ...sorted];
+  }, [courses]);
+
+  const filtered = useMemo(() =>
+    activeTab === "All" ? courses : courses.filter(c => getTabKey(c.degree_name) === activeTab),
+    [courses, activeTab]
+  );
+
+  // Group by stream
+  const byStream = useMemo(() => {
+    const map = new Map<string, CourseRow[]>();
+    filtered.forEach(c => {
+      const k = c.stream_name || "General";
+      if (!map.has(k)) map.set(k, []);
+      map.get(k)!.push(c);
+    });
+    return map;
+  }, [filtered]);
 
   return (
     <div className="w-full bg-white pb-24">
       <div className="max-w-[1920px] mx-auto px-4 md:px-10 lg:px-12 py-12">
 
-        {/* --- PHASE 1: SUB-TABS FILTERS - Unified Block --- */}
-        <div className="mb-10 inline-flex items-center bg-white border border-neutral-200 rounded-[5px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-          {subTabs.map((tab, idx) => (
-            <button
-              key={idx}
-              onClick={() => setActiveLevel(tab)}
-              className={`px-8 py-3.5 text-xs font-black whitespace-nowrap transition-all duration-300 uppercase tracking-widest border-r border-neutral-100 last:border-r-0 ${activeLevel === tab
-                  ? 'text-[#FF3C3C]'
-                  : 'bg-white text-slate-400 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              style={activeLevel === tab ? { backgroundColor: 'rgba(255, 60, 60, 0.2)' } : {}}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        {/* ─── PHASE 2: COURSES LISTING GRID ─── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-          <div className="space-y-6">
-            {filteredCourses.length > 0 ? filteredCourses.slice(0, 3).map((course, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-[5px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100 overflow-hidden transition-all hover:border-[#FF3C3C] hover:-translate-y-1"
-              >
-                {/* Course Header */}
-                <div className="p-8 border-b border-neutral-100 flex justify-between items-start">
-                  <div>
-                    <h3 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight">
-                      Top courses in 2025
-                    </h3>
-                    <h4 className="text-xl font-black text-slate-900 leading-tight mb-2 uppercase tracking-tight">
-                      {course.course_name}
-                    </h4>
-                    <span className="inline-block px-3 py-1 bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-widest rounded-[5px]">
-                      {course.courseduration || "4 Years"} {course.degree_name || 'Undergraduate'}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[#FF3C3C] text-[14px] font-medium tracking-[0.3em] uppercase block mb-3">TEACHER</span>
-                    <span className="text-lg font-black text-slate-900">
-                      {course.fees ? `₹ ${course.fees}` : '₹ 1,35,000'} <span className="text-xs text-slate-400">/ annual</span>
-                    </span>
-                  </div>
-                </div>
-
-                {/* Course Footer Info */}
-                <div className="px-8 py-4 bg-slate-50/50 flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-rounded text-[#FF3C3C] text-xl">verified</span>
-                    <span className="text-sm font-black text-slate-600">Placement – {idx === 0 ? '85%' : '80%'}</span>
-                  </div>
-                  <button className="px-10 py-3 bg-[#FF3C3C] text-white font-black text-xs uppercase tracking-widest rounded-[5px] transition-all hover:bg-slate-900 shadow-lg shadow-red-500/20 active:scale-95">
-                    Apply Now
-                  </button>
-                </div>
-              </div>
-            )) : (
-              <div className="text-slate-400 py-20 text-center font-bold">No courses available for this selection.</div>
-            )}
-
-            <div className="pt-4">
-              <button className="px-12 py-3 bg-slate-900 text-white font-black text-sm uppercase tracking-widest rounded-[5px] shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] transition-all hover:bg-[#FF3C3C] hover:shadow-red-500/20">
-                View All Courses
-              </button>
-            </div>
+        {/* Header + Filter tabs */}
+        <div className="flex flex-col gap-4 mb-8">
+          <div>
+            <h2 className="text-[22px] sm:text-[28px] font-black text-slate-900">Courses Offered</h2>
+            <p className="text-slate-400 text-sm mt-0.5">
+              {courses.length} course{courses.length !== 1 ? "s" : ""} available
+            </p>
           </div>
 
-          {/* Right side placeholder or decorative element to match 2-column layout in design */}
-          <div className="hidden lg:block">
-            <div className="relative h-full min-h-[500px] w-full bg-slate-100 rounded-[5px] overflow-hidden shadow-inner flex items-center justify-center border-2 border-dashed border-slate-200">
-              <span className="material-symbols-rounded text-6xl text-slate-300">school</span>
+          {/* Filter tabs — scrollable on mobile */}
+          <div className="overflow-x-auto hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="inline-flex items-center bg-white border border-neutral-200 rounded-[5px] shadow-sm min-w-max">
+              {filterTabs.map((tab) => {
+                const count = tab === "All" ? courses.length : courses.filter(c => getTabKey(c.degree_name) === tab).length;
+                const isActive = activeTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 sm:px-5 py-2.5 sm:py-3 text-[10px] sm:text-[11px] font-black whitespace-nowrap transition-all uppercase tracking-widest border-r border-neutral-100 last:border-r-0 flex items-center gap-1 sm:gap-1.5 ${
+                      isActive
+                        ? "text-[#FF3C3C] bg-[#FF3C3C]/10"
+                        : "bg-white text-slate-400 hover:text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    {tab}
+                    <span className={`text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0.5 rounded-full font-bold ${
+                      isActive ? "bg-[#FF3C3C]/20 text-[#FF3C3C]" : "bg-slate-100 text-slate-400"
+                    }`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        {/* --- PHASE 3: INSTRUCTORS SECTION --- */}
-        <div className="bg-slate-500 rounded-[5px] overflow-hidden p-12 lg:p-20 relative shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-          {/* Section Header */}
-          <div className="flex flex-col lg:flex-row justify-between items-end gap-10 mb-16 relative z-10">
-            <div>
-              <div className="flex items-center gap-3 text-[#FF3C3C] text-[24px] font-bold uppercase tracking-[0.3em] mb-4">
-                <span className="w-10 h-[2px] bg-[#FF3C3C]" />
-                TEACHER
-              </div>
-              <h3 className="font-bold leading-tight tracking-tight whitespace-nowrap" style={{ fontSize: '45px', color: 'rgba(255, 255, 255, 1)' }}>
-                Meet Our Instructor
-              </h3>
-            </div>
-            <button className="px-12 py-3 bg-[#FF3C3C] text-white font-black text-sm uppercase tracking-widest rounded-[5px] shadow-[0_10px_60px_-15px_rgba(0,0,0,0.25)] transition-all hover:bg-white hover:text-slate-900 active:scale-95">
-              View All
+        {/* No courses */}
+        {filtered.length === 0 ? (
+          <div className="bg-slate-50 border border-slate-200 rounded-[5px] py-20 text-center">
+            <span className="material-symbols-outlined text-5xl text-slate-300 block mb-3">school</span>
+            <p className="text-slate-500 font-bold">No courses found for this category.</p>
+            <button onClick={() => setActiveTab("All")} className="mt-3 text-[#FF3C3C] font-bold text-sm hover:underline">
+              Show all courses
             </button>
           </div>
-
-          {/* Background Decorative Pattern */}
-          <div className="absolute top-0 right-0 w-1/3 h-full opacity-10 pointer-events-none">
-            <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <defs>
-                <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-                  <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.5" />
-                </pattern>
-              </defs>
-              <rect width="100" height="100" fill="url(#grid)" />
-            </svg>
-          </div>
-
-          {/* Instructor Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
-            {instructors.map((inst, idx) => (
-              <div key={idx} className="bg-white rounded-[5px] overflow-hidden flex flex-col group relative shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-500 hover:-translate-y-3">
-                <div className="h-[320px] relative bg-slate-100 overflow-hidden">
-                  {/* Design's Header Pattern */}
-                  <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-br from-yellow-400 to-amber-600 opacity-90 transition-all duration-500 group-hover:h-full group-hover:opacity-100 z-0" />
-
-                  {/* Avatar */}
-                  <div className="relative w-full h-full flex items-end justify-center z-10 p-4">
-                    <div className="relative w-full h-[85%] rounded-[5px] overflow-hidden shadow-2xl group-hover:scale-110 transition-transform duration-700">
-                      <Image
-                        src={inst.image}
-                        alt={inst.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+        ) : (
+          <div className="space-y-12">
+            {[...byStream.entries()].map(([streamName, streamCourses], si) => {
+              const color = STREAM_COLORS[si % STREAM_COLORS.length];
+              return (
+                <div key={streamName}>
+                  {/* Stream heading */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <span className={`w-3 h-3 rounded-full shrink-0 ${color.dot}`} />
+                    <h3 className="text-[13px] font-black text-slate-600 uppercase tracking-widest">{streamName}</h3>
+                    <div className="flex-1 h-px bg-slate-100" />
+                    <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${color.badge}`}>
+                      {streamCourses.length} course{streamCourses.length !== 1 ? "s" : ""}
+                    </span>
                   </div>
 
-                  {/* Share/Action Button */}
-                  <button className="absolute bottom-6 right-6 w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-2xl border-2 border-white/20 transition-all hover:bg-[#FF3C3C] hover:rotate-12 active:scale-90 z-20">
-                    <span className="material-symbols-rounded text-xl font-black">share</span>
-                  </button>
-                </div>
+                  {/* Course cards grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                    {streamCourses.map((course, idx) => (
+                      <div
+                        key={idx}
+                        className={`bg-white rounded-[5px] border ${color.border} shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden flex flex-col`}
+                      >
+                        {/* Card header */}
+                        <div className={`px-5 py-4 ${color.header} border-b ${color.border}`}>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0 flex-1">
+                              <h4 className="font-black text-slate-900 text-[15px] leading-snug">
+                                {course.course_name}
+                              </h4>
+                              {course.degree_name && (
+                                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                                  {course.degree_name}
+                                </span>
+                              )}
+                            </div>
+                            {course.courseduration && (
+                              <span className="shrink-0 text-[11px] font-black text-white bg-slate-700 px-2 py-1 rounded-[3px] whitespace-nowrap">
+                                {course.courseduration}
+                              </span>
+                            )}
+                          </div>
+                        </div>
 
-                <div className="p-8 text-left bg-white border-t border-neutral-50 relative z-20">
-                  <h5 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-[#FF3C3C] transition-colors">{inst.name}</h5>
-                  <span className="text-xs text-[#FF3C3C] font-medium uppercase tracking-widest">{inst.role}</span>
+                        {/* Card body */}
+                        <div className="px-5 py-4 space-y-3 flex-1">
+                          {/* Fees + Seats */}
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Annual Fees</p>
+                              <p className="text-[20px] font-black text-[#FF3C3C] leading-tight">
+                                {formatFees(course.fees)}
+                              </p>
+                            </div>
+                            {course.seats && (
+                              <div className="text-right">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Seats</p>
+                                <p className="text-[20px] font-black text-slate-800 leading-tight">{course.seats}</p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Eligibility */}
+                          {course.twelvemarks && parseInt(course.twelvemarks) > 0 && (
+                            <div className="flex items-center gap-1.5 text-[12px] text-slate-500 font-semibold">
+                              <span className="material-symbols-outlined text-[14px] text-slate-400">school</span>
+                              Min. {course.twelvemarks}% in 12th
+                            </div>
+                          )}
+
+                          {/* Dates */}
+                          {(course.admission_start || course.admission_end || course.last_date) && (
+                            <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                              {course.admission_start && (
+                                <div className="flex items-center justify-between text-[11px]">
+                                  <span className="text-slate-400 font-semibold">Opens</span>
+                                  <span className="font-bold text-emerald-600">{formatDate(course.admission_start)}</span>
+                                </div>
+                              )}
+                              {course.admission_end && (
+                                <div className="flex items-center justify-between text-[11px]">
+                                  <span className="text-slate-400 font-semibold">Closes</span>
+                                  <span className="font-bold text-slate-700">{formatDate(course.admission_end)}</span>
+                                </div>
+                              )}
+                              {course.last_date && (
+                                <div className="flex items-center justify-between text-[11px]">
+                                  <span className="text-slate-400 font-semibold">Last Date</span>
+                                  <span className={`font-bold ${new Date(course.last_date) < new Date() ? "text-red-500" : "text-amber-600"}`}>
+                                    {formatDate(course.last_date)}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Description */}
+                          {course.description && (
+                            <p className="text-[12px] text-slate-500 leading-relaxed line-clamp-2 pt-1 border-t border-slate-100">
+                              {course.description}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Apply button */}
+                        <div className="px-5 pb-4">
+                          <a
+                            href={`/apply/${slug}`}
+                            className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#FF3C3C] hover:bg-red-700 text-white font-black text-[12px] uppercase tracking-widest rounded-[5px] transition-colors"
+                          >
+                            Apply Now
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
+        )}
+
+        {/* Info note */}
+        <div className="mt-10 flex items-center gap-2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-[5px]">
+          <span className="material-symbols-outlined text-[16px] text-slate-400">info</span>
+          <p className="text-[12px] text-slate-500 font-medium">
+            Fees and seats are indicative. Please contact the college for the latest information.
+          </p>
         </div>
       </div>
 

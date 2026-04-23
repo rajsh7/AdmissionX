@@ -7,7 +7,7 @@ export default function CareerGuidance() {
     <section className="w-full py-16 lg:py-24 bg-white overflow-hidden">
       <div className="home-page-shell">
         <div
-          className="relative rounded-[5px] pt-8 px-8 lg:pt-16 lg:px-16 pb-0 flex flex-col lg:flex-row items-center lg:items-stretch gap-12 border border-slate-300 overflow-hidden bg-white"
+          className="relative rounded-[5px] pt-8 px-5 sm:pt-10 sm:px-8 lg:pt-16 lg:px-16 pb-0 flex flex-col lg:flex-row items-center lg:items-stretch gap-8 sm:gap-12 border border-slate-300 overflow-hidden bg-white"
           style={{ boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.25)' }}
         >
 
@@ -25,48 +25,47 @@ export default function CareerGuidance() {
 
           {/* ── Left Content (60% width) ─────────────────────────────────── */}
           <div className="flex-[1.2] text-center lg:text-left z-10 pb-8 lg:pb-16 flex flex-col justify-center">
-            <h2 className="text-[#1F2937] leading-[1.2] mb-6 tracking-tight" style={{ fontSize: '45px', fontWeight: 600 }}>
+            <h2 className="text-[#1F2937] leading-[1.2] mb-4 sm:mb-6 tracking-tight text-[26px] sm:text-[36px] lg:text-[45px]" style={{ fontWeight: 600 }}>
               Confused about your <span className="text-[#FF3C3C]">career path?</span>
             </h2>
             <p
-              className="leading-relaxed mb-8 mx-auto lg:mx-0 w-full"
-              style={{ maxWidth: '773px', fontSize: '25px', fontWeight: 500, color: '#222222' }}
+              className="leading-relaxed mb-6 sm:mb-8 mx-auto lg:mx-0 w-full text-[15px] sm:text-[18px] lg:text-[22px]"
+              style={{ maxWidth: '773px', fontWeight: 500, color: '#222222' }}
             >
               Filter through thousands of institutions worldwide based on your specific academic preferences and career goals.
             </p>
 
-            {/* Features List (Mockup bullets) */}
             <ul
-              className="mb-10 flex flex-col gap-4"
-              style={{ fontSize: '25px', fontWeight: 500, color: '#222222' }}
+              className="mb-8 sm:mb-10 flex flex-col gap-3 text-[14px] sm:text-[18px] lg:text-[22px]"
+              style={{ fontWeight: 500, color: '#222222' }}
             >
-              <li className="flex items-center gap-4 justify-center lg:justify-start">
-                <span style={{ minWidth: '10px', height: '10px', backgroundColor: '#222222', borderRadius: '50%', display: 'block' }} />
+              <li className="flex items-center gap-3 justify-center lg:justify-start">
+                <span style={{ minWidth: '10px', height: '10px', backgroundColor: '#222222', borderRadius: '50%', display: 'block', flexShrink: 0 }} />
                 Helps up to finds the talent
               </li>
-              <li className="flex items-center gap-4 justify-center lg:justify-start">
-                <span style={{ minWidth: '10px', height: '10px', backgroundColor: '#222222', borderRadius: '50%', display: 'block' }} />
+              <li className="flex items-center gap-3 justify-center lg:justify-start">
+                <span style={{ minWidth: '10px', height: '10px', backgroundColor: '#222222', borderRadius: '50%', display: 'block', flexShrink: 0 }} />
                 Save your time
               </li>
-              <li className="flex items-center gap-4 justify-center lg:justify-start">
-                <span style={{ minWidth: '10px', height: '10px', backgroundColor: '#222222', borderRadius: '50%', display: 'block' }} />
-                self assessment
+              <li className="flex items-center gap-3 justify-center lg:justify-start">
+                <span style={{ minWidth: '10px', height: '10px', backgroundColor: '#222222', borderRadius: '50%', display: 'block', flexShrink: 0 }} />
+                Self assessment
               </li>
             </ul>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start">
               <Link
                 href="/counselling"
-                className="flex h-[45px] w-full items-center justify-center rounded-[5px] bg-[#FF3C3C] px-8 text-center text-white shadow-lg shadow-[#FF3C3C]/20 transition-all hover:brightness-105 sm:w-auto"
-                style={{ fontSize: '24px', fontWeight: 600 }}
+                className="flex h-[44px] sm:h-[50px] w-full items-center justify-center rounded-[5px] bg-[#FF3C3C] px-6 sm:px-8 text-center text-white shadow-lg shadow-[#FF3C3C]/20 transition-all hover:brightness-105 sm:w-auto text-[15px] sm:text-[18px] lg:text-[20px]"
+                style={{ fontWeight: 600 }}
               >
                 Start Free Assessment
               </Link>
               <button
-                className="flex h-[45px] w-full items-center justify-center rounded-[5px] bg-neutral-800 px-8 text-center text-white shadow-lg shadow-black/10 transition-all hover:bg-neutral-900 sm:w-auto"
-                style={{ fontSize: '24px', fontWeight: 600 }}
+                className="flex h-[44px] sm:h-[50px] w-full items-center justify-center rounded-[5px] bg-neutral-800 px-6 sm:px-8 text-center text-white shadow-lg shadow-black/10 transition-all hover:bg-neutral-900 sm:w-auto text-[15px] sm:text-[18px] lg:text-[20px]"
+                style={{ fontWeight: 600 }}
               >
-                Watch how its work
+                Watch how it works
               </button>
             </div>
           </div>
