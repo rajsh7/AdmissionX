@@ -64,6 +64,7 @@ export default async function PlacementsPage({ params }: { params: Promise<{ slu
 
   return (
     <PlacementsTab
+      slug={slug}
       collegeName={collegeName}
       location={location}
       placementRatio={fmt(placement?.numberofplacementlastyear, "%", "—")}

@@ -38,11 +38,30 @@ export async function POST(req: NextRequest) {
     documents?: { type: string; url: string }[];
     personal_info?: {
       name?: string;
+      email?: string;
       phone?: string;
       dob?: string;
       gender?: string;
       city?: string;
       state?: string;
+      address?: string;
+      preferredStartDate?: string;
+      countryCode?: string;
+    };
+    academic_info?: {
+      qualification?: string;
+      board?: string;
+      stream?: string;
+      percentage?: string;
+      yearOfPassing?: string;
+      entranceExam?: string;
+      entrancePercentage?: string;
+      yearOfExam?: string;
+    };
+    payment_info?: {
+      method?: string;
+      cardName?: string;
+      expiry?: string;
     };
   };
 
@@ -52,7 +71,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { collegeprofile_id, collegemaster_id, college_name, course_name, degree_name, stream_name, fees, notes, documents, personal_info } = body;
+  const { collegeprofile_id, collegemaster_id, college_name, course_name, degree_name, stream_name, fees, notes, documents, personal_info, academic_info, payment_info } = body;
 
   const REQUIRED_DOC_TYPES = ["10th Marksheet", "12th Marksheet", "ID Proof"];
   if (!documents || !Array.isArray(documents)) {
@@ -68,10 +87,18 @@ export async function POST(req: NextRequest) {
 
   const db = await getDb();
 
+  // Resolve slug to actual _id if needed
+  let resolvedCollegeId: unknown = collegeprofile_id;
+  const collegeDoc = await db.collection("collegeprofile").findOne(
+    { slug: String(collegeprofile_id) },
+    { projection: { _id: 1 } }
+  );
+  if (collegeDoc) resolvedCollegeId = collegeDoc._id;
+
   // Guard: one active application per college per student
   const existing = await db.collection("applications").findOne({
     studentId,
-    collegeId: collegeprofile_id,
+    collegeId: resolvedCollegeId,
     status: { $ne: "rejected" },
   });
   if (existing) {
@@ -85,7 +112,7 @@ export async function POST(req: NextRequest) {
   let resolvedCollegeName = college_name?.trim() || null;
   if (!resolvedCollegeName) {
     const cp = await db.collection("collegeprofile").aggregate([
-      { $match: { _id: collegeprofile_id } },
+      { $match: { _id: resolvedCollegeId } },
       { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
       { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
       { $project: { cname: { $ifNull: [{ $trim: { input: "$u.firstname" } }, "$slug"] } } },
@@ -130,8 +157,17 @@ export async function POST(req: NextRequest) {
   const result = await db.collection("applications").insertOne({
     applicationRef,
     studentId,
-    collegeId: collegeprofile_id,
+    collegeId: resolvedCollegeId,
+    collegeName: resolvedCollegeName,
     courseId: collegemaster_id ?? null,
+    courseName: resolvedCourseName,
+    degreeName: resolvedDegreeName,
+    streamName: resolvedStreamName,
+    fees: resolvedFees,
+    notes: notes ?? null,
+    personal_info: personal_info ?? null,
+    academic_info: academic_info ?? null,
+    payment_info: payment_info ?? null,
     status: "submitted",
     createdAt: new Date(),
   });
@@ -147,7 +183,7 @@ export async function POST(req: NextRequest) {
     const pi = personal_info;
     const baseUpdate: Record<string, unknown> = { updated_at: new Date() };
     if (pi.name?.trim()) baseUpdate.name = pi.name.trim();
-    if (pi.phone !== undefined) baseUpdate.phone = pi.phone.trim();
+    if (pi.phone?.trim()) baseUpdate.phone = pi.phone.trim();
     await db.collection("next_student_signups").updateOne(
       { email: payload.email },
       { $set: baseUpdate }

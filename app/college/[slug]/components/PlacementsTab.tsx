@@ -2,6 +2,7 @@ import Image from "next/image";
 import ExploreCards from "@/app/components/ExploreCards";
 
 interface PlacementsTabProps {
+  slug: string;
   collegeName: string;
   location: string;
   placementRatio?: string;
@@ -28,6 +29,7 @@ const TOP_RECRUITERS = [
 ];
 
 export default function PlacementsTab({
+  slug,
   collegeName,
   location,
   placementRatio = "—",
@@ -134,7 +136,7 @@ export default function PlacementsTab({
               Join thousands of graduates placed at top companies worldwide.
             </p>
             <a
-              href={`/apply`}
+              href={`/apply/${slug}`}
               className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-[5px] bg-slate-900 text-white font-black text-xs uppercase tracking-widest hover:bg-[#FF3C3C] transition-colors whitespace-nowrap"
             >
               Apply Now
