@@ -1,0 +1,127 @@
+"use client";
+
+import Link from "next/link";
+import { motion } from "framer-motion";
+import type { DbBlog } from "../api/home/latest-blogs/route";
+
+interface NewsSectionProps {
+  dbBlogs?: DbBlog[];
+}
+
+const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
+const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100";
+
+function buildImageUrl(raw: string | null | undefined): string {
+  if (!raw || !raw.trim()) return "";
+  if (raw.startsWith("http")) return `/api/image-proxy?url=${encodeURIComponent(raw)}`;
+  if (raw.startsWith("/")) return `/api/image-proxy?url=${encodeURIComponent(raw)}`;
+  return `/api/image-proxy?url=${encodeURIComponent(IMAGE_BASE + raw)}`;
+}
+
+interface BlogWithAuthor extends DbBlog {
+  author_name?: string;
+  author_image?: string;
+  fullimage?: string | null;
+  image?: string | null;
+  read_time?: string;
+}
+
+function getBlogImage(blog: BlogWithAuthor): string {
+  return buildImageUrl(blog.featimage) || buildImageUrl(blog.fullimage) || buildImageUrl(blog.image) || "https://images.unsplash.com/photo-1523240715627-5d0b541f8d9c?q=80&w=800&auto=format&fit=crop";
+}
+
+function formatDate(dateStr: string): string {
+  try {
+    return new Date(dateStr).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+  } catch {
+    return "";
+  }
+}
+
+function stripHtml(html: string | null | undefined): string {
+  if (!html) return "";
+  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+export default function NewsSection({ dbBlogs }: NewsSectionProps) {
+  const blogs = dbBlogs && dbBlogs.length > 0 ? dbBlogs.slice(0, 8) : [];
+
+  return (
+    <section className="w-full py-16 lg:py-24 bg-white">
+      <div className="home-page-shell">
+        <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-start">
+           <div className="flex-1">
+               <h2 className="text-3xl lg:text-4xl font-black tracking-tight">Student <span style={{ color: '#FF3C3C' }}>Life & Beyond</span></h2>
+              <p className="mt-3 text-slate-500 font-medium max-w-lg">
+                Explore our latest articles, guides, and student stories to stay ahead in your academic journey.
+              </p>
+           </div>
+<Link 
+              href="/blogs" 
+              className="group/btn inline-flex h-[45px] items-center justify-center rounded-[5px] border border-slate-200 bg-white px-8 font-medium transition-all hover:bg-slate-50 shadow-sm hover:shadow-md"
+              style={{ color: "#475569" }}
+            >
+              Explore All Articles
+              <span className="ml-2 material-symbols-rounded transition-transform group-hover/btn:translate-x-1">arrow_right_alt</span>
+            </Link>
+        </div>
+
+        {blogs.length === 0 ? (
+          <p className="text-slate-400 text-sm font-normal">No articles available yet.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {blogs.map((blog, i) => (
+              <motion.div
+                key={blog.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="border border-slate-200 rounded-[5px] bg-white"
+              >
+                <Link href={`/blogs/${blog.slug}`} className="group block">
+                  <div className="relative aspect-[16/10] rounded-t-[5px] overflow-hidden">
+                    <img
+                      src={getBlogImage(blog)}
+                      alt={blog.topic}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute top-4 left-4">
+                      <span className="px-3 py-1.5 rounded-[5px] bg-white/90 backdrop-blur-md text-[10px] font-normal uppercase tracking-widest text-[#FF3C3C]">
+                        Related Blogs
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 p-4">
+                    <div className="flex items-center justify-between">
+                      <span style={{ fontWeight: 600, fontSize: '18px', color: '#FF3C3C' }}>STUDENT LIFE</span>
+                      <span style={{ fontWeight: 500, fontSize: '14px', color: '#6C6C6C' }}>{blog.read_time || '5 min read'}</span>
+                    </div>
+                    <h3 className="text-[20px] font-bold text-[#3E3E3E] leading-tight group-hover:text-[#FF3C3C] transition-colors line-clamp-2">
+                      {blog.topic}
+                    </h3>
+                    <p className="text-[16px] font-medium text-[#6C6C6C] line-clamp-2 leading-relaxed mt-2">
+                      {stripHtml(blog.description)}
+                    </p>
+
+                    <div className="pt-4 flex items-center gap-2">
+                      <img 
+                        src={blog.author_image ? buildImageUrl(blog.author_image) : DEFAULT_AVATAR} 
+                        alt={blog.author_name || "Author"}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                      <span className="text-[14px] font-semibold text-[#6C6C6C]">
+                        {blog.author_name || "Admin"}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
