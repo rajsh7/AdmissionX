@@ -494,6 +494,14 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
 
         setCompleted(true);
         localStorage.removeItem(storageKey);
+        // Redirect to student dashboard applications tab after 2s
+        const meRes = await fetch("/api/auth/me");
+        const meData = await meRes.json();
+        if (meData?.user?.id) {
+          setTimeout(() => {
+            window.location.href = `/dashboard/student/${meData.user.id}?tab=app-all`;
+          }, 2000);
+        }
       } catch {
         setError("Network error. Please check your connection and try again.");
       } finally {
@@ -758,19 +766,19 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
             <div className="mt-4 flex items-center justify-between rounded-[4px] border border-[#ececec] bg-[#f7f7f7] px-3 py-2">
               <div className="flex min-w-0 items-center gap-2">
                 <div className="flex h-7 w-7 items-center justify-center rounded bg-[#ef4444] text-[10px] font-bold text-white">
-                  PDF
+                  {form.documents[field].split('.').pop()?.toUpperCase().slice(0,3) || 'FILE'}
                 </div>
                 <div className="min-w-0">
                   <p className="truncate text-[12px] font-semibold text-[#4b5563]">
-                    {form.documents[field]}
+                    {form.documents[field].split('/').pop()}
                   </p>
-                  <p className="text-[10px] text-[#b0b0b0]">456 KB. Uploaded just now</p>
+                  <p className="text-[10px] text-[#b0b0b0]">Uploaded successfully</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  onClick={() => { const url = docUrls[field]; if (url) window.open(url, "_blank"); }}
+                  onClick={() => window.open(form.documents[field], "_blank")}
                   className="flex h-6 w-6 items-center justify-center rounded border border-[#d7d7d7] bg-white text-[#6b7280] hover:border-[#ff5757] hover:text-[#ff5757] transition-colors"
                   title="View"
                 >
@@ -1215,7 +1223,7 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
             ) : null}
 
             <div className="border-t border-[#ececec] pt-5">
-              <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="flex items-center justify-between gap-3">
                 <button
                   type="button"
                   onClick={currentStep === 0 ? handleSaveAndExit : () => setCurrentStep((previous) => previous - 1)}

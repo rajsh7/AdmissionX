@@ -38,5 +38,15 @@ export async function POST(
     { upsert: true }
   );
 
+  try {
+    const { ObjectId } = require("mongodb");
+    await db.collection("next_student_signups").updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { avatar: photoUrl } }
+    );
+  } catch (e) {
+    console.error("Error updating avatar in signups collection:", e);
+  }
+
   return NextResponse.json({ success: true, photo: photoUrl });
 }

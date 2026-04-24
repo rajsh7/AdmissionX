@@ -130,7 +130,8 @@ export default function SearchBar({
       {showDropdown && (
         <div
           ref={dropdownRef}
-          className="absolute top-full left-0 right-0 mt-3 bg-white rounded-[5px] shadow-2xl overflow-hidden border border-slate-100 z-[100] animate-in fade-in slide-in-from-top-2 duration-200"
+          className="absolute top-full left-0 right-0 mt-3 bg-white rounded-[5px] shadow-2xl overflow-hidden border border-slate-100 animate-in fade-in slide-in-from-top-2 duration-200"
+          style={{ zIndex: 999999, maxHeight: '400px', overflowY: 'auto' }}
         >
           {suggestions.length > 0 ? (
             <div className="py-2">

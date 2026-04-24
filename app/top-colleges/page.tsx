@@ -106,9 +106,9 @@ const getFilterData = unstable_cache(
 
 async function fetchTopColleges(opts: {
   q: string; stream: string; degree: string; cityId: string; stateId: string; countryId: string;
-  feesMax: string; sort: string; page: number; limit: number;
+  feesMax: string; feesRanges: string[]; ratingRanges: string[]; ownerships: string[]; sort: string; page: number; limit: number;
 }): Promise<{ colleges: CollegeResult[]; total: number; totalPages: number }> {
-  const { q, stream, degree, cityId, stateId, countryId, feesMax, sort, page, limit } = opts;
+  const { q, stream, degree, cityId, stateId, countryId, feesMax, feesRanges, ratingRanges, ownerships, sort, page, limit } = opts;
   const db = await getDb();
 
   const match: Record<string, unknown> = { isShowOnTop: 1 };
@@ -129,9 +129,21 @@ async function fetchTopColleges(opts: {
     match.registeredAddressCountryId = Number(countryId);
   }
 
+  const feeConditions = [];
   if (feesMax && !isNaN(Number(feesMax))) {
+    feeConditions.push({ fees: { $gt: 0, $lte: Number(feesMax) } });
+  }
+  if (feesRanges && feesRanges.length > 0) {
+    for (const rangeStr of feesRanges) {
+      const [minStr, maxStr] = rangeStr.split("-");
+      const min = parseInt(minStr) || 0;
+      const max = parseInt(maxStr) || 999999999;
+      feeConditions.push({ fees: { $gt: min, $lte: max } });
+    }
+  }
+  if (feeConditions.length > 0) {
     const feeIds = await db.collection("collegemaster")
-      .find({ fees: { $gt: 0, $lte: Number(feesMax) } }, { projection: { collegeprofile_id: 1 } })
+      .find({ $or: feeConditions }, { projection: { collegeprofile_id: 1 } })
       .limit(5000).toArray().then((r) => [...new Set(r.map((x) => x.collegeprofile_id))]);
     const existing = (match.id as { $in: unknown[] } | undefined)?.$in;
     match.id = { $in: existing ? existing.filter((id) => feeIds.includes(id)) : feeIds };
@@ -157,6 +169,22 @@ async function fetchTopColleges(opts: {
   if (degreeIds) {
     const existing = (match.id as { $in: unknown[] } | undefined)?.$in;
     match.id = { $in: existing ? existing.filter((id) => degreeIds.includes(id)) : degreeIds };
+  }
+
+  if (ownerships && ownerships.length > 0) {
+    const ownershipRegexes = ownerships.map(o => {
+      if (o === 'Public / Government') return new RegExp('government|public', 'i');
+      return new RegExp(o, 'i');
+    });
+    match.universityType = { $in: ownershipRegexes };
+  }
+
+  if (ratingRanges && ratingRanges.length > 0) {
+    const ratingOr = ratingRanges.map(r => {
+      const [min, max] = r.split("-");
+      return { rating: { $gt: parseFloat(min), $lte: parseFloat(max) } };
+    });
+    match.$or = ratingOr;
   }
 
   const sortStage: Record<string, 1 | -1> =
@@ -215,8 +243,18 @@ async function fetchTopColleges(opts: {
     },
   ]).toArray();
 
-  const orderMap = new Map(topIds.map((id, i) => [String(id), i]));
-  dataRows.sort((a, b) => (orderMap.get(String(a._id)) ?? 0) - (orderMap.get(String(b._id)) ?? 0));
+  // Re-sort by original order UNLESS sorting by fees
+  if (sort !== "fees") {
+    const orderMap = new Map(topIds.map((id, i) => [String(id), i]));
+    dataRows.sort((a, b) => (orderMap.get(String(a._id)) ?? 0) - (orderMap.get(String(b._id)) ?? 0));
+  } else {
+    // Sort by min_fees ascending, nulls last
+    dataRows.sort((a, b) => {
+      const aFee = a.min_fees ?? Infinity;
+      const bFee = b.min_fees ?? Infinity;
+      return aFee - bFee;
+    });
+  }
 
   const colleges: CollegeResult[] = dataRows.map((row) => ({
     id: String(row._id),
@@ -273,13 +311,16 @@ export default async function TopCollegesPage({ searchParams }: PageProps) {
   const stateId = getString("state_id");
   const countryId = getString("country_id");
   const feesMax = getString("fees_max");
+  const feesRanges = getString("fees_ranges") ? getString("fees_ranges").split(",") : [];
+  const ratingRanges = getString("rating_ranges") ? getString("rating_ranges").split(",") : [];
+  const ownerships = getString("ownerships") ? getString("ownerships").split(",") : [];
   const sort = getString("sort", "rating");
   const page = Math.max(1, parseInt(getString("page", "1")));
   const limit = 12;
 
   const [{ colleges, total, totalPages }, { streamRows, degreeRows, cityRows, stateRows, countryRows }] =
     await Promise.all([
-      fetchTopColleges({ q, stream, degree, cityId, stateId, countryId, feesMax, sort, page, limit }),
+      fetchTopColleges({ q, stream, degree, cityId, stateId, countryId, feesMax, feesRanges, ratingRanges, ownerships, sort, page, limit }),
       getFilterData(),
     ]);
 

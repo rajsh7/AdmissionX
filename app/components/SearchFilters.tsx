@@ -38,6 +38,9 @@ export interface ActiveFilters {
   sort: string;
   q?: string;
   ranking?: string;
+  fees_ranges?: string;
+  rating_ranges?: string;
+  ownerships?: string;
 }
 
 const RANKING_OPTIONS = [
@@ -53,6 +56,26 @@ const FEES_OPTIONS = [
   { label: "Up to ₹5 Lakhs", value: "500000" },
   { label: "Up to ₹10 Lakhs", value: "1000000" },
   { label: "Up to ₹20 Lakhs", value: "2000000" },
+];
+
+const TOTAL_FEES_OPTIONS = [
+  { label: "< 1 Lakh", value: "0-100000" },
+  { label: "1 - 2 Lakh", value: "100000-200000" },
+  { label: "2 - 3 Lakh", value: "200000-300000" },
+  { label: "3 - 5 Lakh", value: "300000-500000" },
+  { label: "> 5 Lakh", value: "500000-999999999" },
+];
+
+const RATING_OPTIONS = [
+  { label: "> 4 - 5 Star", value: "4-5" },
+  { label: "> 3 - 4 Star", value: "3-4" },
+  { label: "> 2 - 3 Star", value: "2-3" },
+];
+
+const OWNERSHIP_OPTIONS = [
+  { label: "Private", value: "Private" },
+  { label: "Public / Government", value: "Public / Government" },
+  { label: "Public Private", value: "Public Private" },
 ];
 
 export default function SearchFilters({
@@ -71,7 +94,10 @@ export default function SearchFilters({
   totalResults,
   onFilterChange,
   entityNamePlural = "Colleges",
-}: SearchFiltersProps) {
+  activeFeesRanges = "",
+  activeRatingRanges = "",
+  activeOwnerships = "",
+}: SearchFiltersProps & { activeFeesRanges?: string; activeRatingRanges?: string; activeOwnerships?: string; }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -84,11 +110,14 @@ export default function SearchFilters({
   const [feesMax, setFeesMax] = useState(activeFeesMax);
   const [sort] = useState(activeSort || "rating");
   const [ranking, setRanking] = useState("");
+  const [feesRanges, setFeesRanges] = useState<string[]>(activeFeesRanges ? activeFeesRanges.split(',') : []);
+  const [ratingRanges, setRatingRanges] = useState<string[]>(activeRatingRanges ? activeRatingRanges.split(',') : []);
+  const [ownerships, setOwnerships] = useState<string[]>(activeOwnerships ? activeOwnerships.split(',') : []);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [citySearch, setCitySearch] = useState("");
   const [cityDropOpen, setCityDropOpen] = useState(false);
 
-  const activeCount = [stream, degree, cityId, stateId, countryId, feesMax, ranking].filter(Boolean).length;
+  const activeCount = [stream, degree, cityId, stateId, countryId, feesMax, ranking].filter(Boolean).length + feesRanges.length + ratingRanges.length + ownerships.length;
 
   const applyFilters = useCallback(
     (overrides: Partial<ActiveFilters> = {}) => {
@@ -102,6 +131,9 @@ export default function SearchFilters({
         sort: overrides.sort !== undefined ? overrides.sort : sort,
         q: overrides.q !== undefined ? overrides.q : undefined,
         ranking: overrides.ranking !== undefined ? overrides.ranking : ranking,
+        fees_ranges: overrides.fees_ranges !== undefined ? overrides.fees_ranges : feesRanges.join(","),
+        rating_ranges: overrides.rating_ranges !== undefined ? overrides.rating_ranges : ratingRanges.join(","),
+        ownerships: overrides.ownerships !== undefined ? overrides.ownerships : ownerships.join(","),
       };
       const params = new URLSearchParams(searchParams.toString());
       Object.entries(next).forEach(([key, val]) => {
@@ -113,8 +145,16 @@ export default function SearchFilters({
       router.push(`${pathname}?${params.toString()}`);
       if (onFilterChange) onFilterChange(next);
     },
-    [stream, degree, cityId, stateId, countryId, feesMax, sort, ranking, searchParams, router, pathname, onFilterChange, activeSort]
+    [stream, degree, cityId, stateId, countryId, feesMax, sort, ranking, feesRanges, ratingRanges, ownerships, searchParams, router, pathname, onFilterChange, activeSort]
   );
+
+  const toggleArrayItem = (setter: React.Dispatch<React.SetStateAction<string[]>>, item: string, filterKey: keyof ActiveFilters) => {
+    setter(prev => {
+      const nextArr = prev.includes(item) ? prev.filter(x => x !== item) : [...prev, item];
+      applyFilters({ [filterKey]: nextArr.join(",") });
+      return nextArr;
+    });
+  };
 
   const resetAll = () => {
     router.push(pathname);
@@ -125,6 +165,9 @@ export default function SearchFilters({
     setCountryId("");
     setFeesMax("");
     setRanking("");
+    setFeesRanges([]);
+    setRatingRanges([]);
+    setOwnerships([]);
     setCitySearch("");
     setCityDropOpen(false);
     if (onFilterChange) onFilterChange({} as ActiveFilters);
@@ -402,6 +445,75 @@ export default function SearchFilters({
                 </div>
                 <span className={`text-sm font-medium transition-colors ${ranking === opt.id ? "text-[#FF3C3C]" : "text-neutral-500 group-hover:text-neutral-800"}`}>
                   {opt.name}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Total Fees */}
+        <div>
+          <label className="text-[16px] font-semibold text-[#6C6C6C] block mb-2">Total Fees</label>
+          <div className="space-y-1 px-1">
+            {TOTAL_FEES_OPTIONS.map((opt) => (
+              <label key={opt.value} className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative flex items-center">
+                  <input type="checkbox" checked={feesRanges.includes(opt.value)}
+                    onChange={() => toggleArrayItem(setFeesRanges, opt.value, "fees_ranges")}
+                    className="w-5 h-5 border-2 border-neutral-200 rounded bg-white checked:bg-[#FF3C3C] checked:border-[#FF3C3C] appearance-none transition-all cursor-pointer"
+                  />
+                  {feesRanges.includes(opt.value) && (
+                    <span className="material-symbols-outlined absolute inset-0 text-white text-[16px] flex items-center justify-center pointer-events-none">check</span>
+                  )}
+                </div>
+                <span className={`text-sm font-medium transition-colors ${feesRanges.includes(opt.value) ? "text-[#FF3C3C]" : "text-neutral-500 group-hover:text-neutral-800"}`}>
+                  {opt.label}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Rating */}
+        <div>
+          <label className="text-[16px] font-semibold text-[#6C6C6C] block mb-2">Rating</label>
+          <div className="space-y-1 px-1">
+            {RATING_OPTIONS.map((opt) => (
+              <label key={opt.value} className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative flex items-center">
+                  <input type="checkbox" checked={ratingRanges.includes(opt.value)}
+                    onChange={() => toggleArrayItem(setRatingRanges, opt.value, "rating_ranges")}
+                    className="w-5 h-5 border-2 border-neutral-200 rounded bg-white checked:bg-[#FF3C3C] checked:border-[#FF3C3C] appearance-none transition-all cursor-pointer"
+                  />
+                  {ratingRanges.includes(opt.value) && (
+                    <span className="material-symbols-outlined absolute inset-0 text-white text-[16px] flex items-center justify-center pointer-events-none">check</span>
+                  )}
+                </div>
+                <span className={`text-sm font-medium transition-colors ${ratingRanges.includes(opt.value) ? "text-[#FF3C3C]" : "text-neutral-500 group-hover:text-neutral-800"}`}>
+                  {opt.label}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Ownership */}
+        <div>
+          <label className="text-[16px] font-semibold text-[#6C6C6C] block mb-2">Ownership</label>
+          <div className="space-y-1 px-1">
+            {OWNERSHIP_OPTIONS.map((opt) => (
+              <label key={opt.value} className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative flex items-center">
+                  <input type="checkbox" checked={ownerships.includes(opt.value)}
+                    onChange={() => toggleArrayItem(setOwnerships, opt.value, "ownerships")}
+                    className="w-5 h-5 border-2 border-neutral-200 rounded bg-white checked:bg-[#FF3C3C] checked:border-[#FF3C3C] appearance-none transition-all cursor-pointer"
+                  />
+                  {ownerships.includes(opt.value) && (
+                    <span className="material-symbols-outlined absolute inset-0 text-white text-[16px] flex items-center justify-center pointer-events-none">check</span>
+                  )}
+                </div>
+                <span className={`text-sm font-medium transition-colors ${ownerships.includes(opt.value) ? "text-[#FF3C3C]" : "text-neutral-500 group-hover:text-neutral-800"}`}>
+                  {opt.label}
                 </span>
               </label>
             ))}

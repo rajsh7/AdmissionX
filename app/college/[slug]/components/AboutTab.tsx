@@ -1,7 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import ExploreCards from "@/app/components/ExploreCards";
 import AskQueryModal from "./AskQueryModal";
+import ApplyAuthModal from "@/app/components/ApplyAuthModal";
+import { useApplyGuard } from "@/app/hooks/useApplyGuard";
 
 interface Stat { label: string; value: string; }
 
@@ -36,6 +40,7 @@ export default function AboutTab({
   mosaic1, mosaic2, mosaic3, mosaic4, bannerimage,
   aboutPara1, aboutPara2, missionText, visionText, descriptionText, paragraphs,
 }: AboutTabProps) {
+  const { handleApply, modalSlug, closeModal } = useApplyGuard();
   return (
     <div className="w-full bg-white pt-4 pb-6">
       <div className="w-full px-4 md:px-10 lg:px-12 mx-auto max-w-[1920px]">
@@ -72,10 +77,10 @@ export default function AboutTab({
 
               {/* Action buttons — stack on mobile */}
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-1">
-                <a href={`/apply/${slug}`}
+                <button onClick={() => handleApply(slug)}
                   className="w-full sm:w-auto px-6 py-3 bg-[#FF3C3C] text-white font-bold text-[15px] sm:text-[18px] rounded-[5px] shadow-lg shadow-red-500/20 hover:bg-red-700 transition-colors text-center">
                   Apply Now
-                </a>
+                </button>
                 <AskQueryModal slug={slug} collegeName={collegeName} />
                 <Link
                   href={`/compare?colleges=${slug}`}
@@ -145,13 +150,13 @@ export default function AboutTab({
                 </div>
               </div>
 
-              <a href={`/apply/${slug}`}
+              <button onClick={() => handleApply(slug)}
                 className="inline-flex items-center gap-3 px-6 py-3 bg-[#D40C11] text-white rounded-[5px] font-bold text-sm uppercase tracking-widest hover:bg-red-700 transition-colors group">
                 Apply
                 <svg className="w-8 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 60 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M56 8l4 4m0 0l-4 4m4-4H0" />
                 </svg>
-              </a>
+              </button>
             </div>
           </div>
 
@@ -177,6 +182,9 @@ export default function AboutTab({
       <section className="w-full px-4 md:px-10 lg:px-12 mx-auto max-w-[1920px] pb-10">
         <ExploreCards />
       </section>
+      {modalSlug && (
+        <ApplyAuthModal redirectTo={`/apply/${modalSlug}`} onClose={closeModal} />
+      )}
     </div>
   );
 }

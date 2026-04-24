@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useRef, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import OverviewTab from "./tabs/OverviewTab";
 import ProfileTab from "./tabs/ProfileTab";
@@ -40,7 +40,45 @@ export default function StudentDashboardClient({ user, activated }: Props) {
   const [sidebarOpen, setSidebarOpen]     = useState(false);
   const [showActivatedBanner, setShowActivatedBanner] = useState(!!activated);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const tab = searchParams.get("tab") as TabId | null;
+    if (tab) setActiveTab(tab);
+  }, [searchParams]);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    setUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append("photo", file);
+
+      const res = await fetch(`/api/student/${user.id}/photo`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Upload failed");
+      }
+
+      router.refresh();
+    } catch (err: any) {
+      alert(err.message || "Failed to upload avatar");
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -87,8 +125,8 @@ export default function StudentDashboardClient({ user, activated }: Props) {
       <div className="flex flex-col h-full bg-[#333333] text-white font-sans">
         {/* Profile Card */}
         <div className="p-5 space-y-4">
-          <div className="bg-white rounded-xl overflow-hidden shadow-2xl p-4 flex flex-col items-center">
-            <div className="w-28 h-28 rounded-full border-[8px] border-[#f5f5f5] flex items-center justify-center bg-white mb-4 overflow-hidden">
+          <div className="bg-[#333333] rounded-xl overflow-hidden shadow-2xl p-4 flex flex-col items-center">
+            <div className={`w-28 h-28 rounded-full flex items-center justify-center mb-4 overflow-hidden ${user?.avatar ? "" : "border-[8px] border-[#f5f5f5] bg-white"}`}>
               {user?.avatar ? (
                 <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               ) : (
@@ -102,9 +140,20 @@ export default function StudentDashboardClient({ user, activated }: Props) {
               {user?.email ?? ""}
             </p>
           </div>
-          <button className="w-full py-2.5 bg-[#8b8b8b] text-white text-[12px] font-medium rounded-[6px] hover:bg-[#777] transition-colors uppercase tracking-wider shadow-md">
-            Upload New Profile image
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingAvatar}
+            className="w-full py-2.5 bg-[#8b8b8b] text-white text-[12px] font-medium rounded-[6px] hover:bg-[#777] transition-colors uppercase tracking-wider shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {uploadingAvatar ? "Uploading..." : "Upload New Profile image"}
           </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleAvatarUpload}
+            className="hidden"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+          />
         </div>
 
         {/* Main Menu Label */}

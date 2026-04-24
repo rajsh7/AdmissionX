@@ -150,7 +150,7 @@ export default function SearchClient({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [colleges, setColleges] = useState<CollegeResult[]>(initialColleges);
   const [total, setTotal] = useState(initialTotal);
   const [totalPages, setTotalPages] = useState(initialTotalPages);
@@ -175,6 +175,9 @@ export default function SearchClient({
   const feesMax = searchParams.get("fees_max") ?? initFeesMax;
   const sort = searchParams.get("sort") ?? initSort;
   const page = parseInt(searchParams.get("page") ?? String(initPage));
+  const feesRanges = searchParams.get("fees_ranges") ? searchParams.get("fees_ranges")!.split(",") : [];
+  const ratingRanges = searchParams.get("rating_ranges") ? searchParams.get("rating_ranges")!.split(",") : [];
+  const ownerships = searchParams.get("ownerships") ? searchParams.get("ownerships")!.split(",") : [];
 
   // ── Sync state when the server delivers fresh initialColleges after a
   //    router.push() navigation (new SSR render completes) ───────────────────
@@ -240,14 +243,14 @@ export default function SearchClient({
     [searchParams, router, pathname],
   );
 
-  const isFiltered = !!(q || stream || degree || cityId || stateId || countryId || feesMax);
+  const isFiltered = !!(q || stream || degree || cityId || stateId || countryId || feesMax || feesRanges.length > 0 || ratingRanges.length > 0 || ownerships.length > 0);
 
   const showingText = loading
     ? "Loading..."
     : `Showing ${colleges.length > 0 ? (page - 1) * 12 + 1 : 0}–${Math.min(page * 12, total)} of ${total.toLocaleString()} ${entityNamePlural.toLowerCase()}`;
 
   return (
-    <div suppressHydrationWarning className="min-h-screen bg-neutral-50 flex flex-col relative overflow-x-hidden">
+    <div suppressHydrationWarning className="min-h-screen bg-neutral-50 flex flex-col relative">
       <Header />
       <div className="relative w-full z-20" style={{ height: heroHeight }}>
         <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
@@ -302,9 +305,9 @@ export default function SearchClient({
       <div className="relative z-10 flex-1 flex flex-col min-h-screen">
         {/* -- Main content -- */}
         <div className="mx-auto max-w-[1920px] w-full px-0 pt-8 pb-8">
-          <div className="flex gap-5">
+          <div className="flex gap-5 items-start">
             {/* ── Filters sidebar ── */}
-            <div className="hidden lg:flex flex-col gap-6 flex-shrink-0 lg:sticky lg:top-[72px] lg:self-start" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
+            <div className="hidden lg:block flex-shrink-0 sticky top-[72px] self-start" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
               <SearchFilters
                 key={`${stream}|${degree}|${cityId}|${stateId}|${countryId}|${feesMax}|${sort}`}
                 streams={streams}
@@ -318,6 +321,9 @@ export default function SearchClient({
                 activeStateId={stateId}
                 activeCountryId={countryId}
                 activeFeesMax={feesMax}
+                activeFeesRanges={searchParams.get("fees_ranges") ?? ""}
+                activeRatingRanges={searchParams.get("rating_ranges") ?? ""}
+                activeOwnerships={searchParams.get("ownerships") ?? ""}
                 activeSort={sort}
                 totalResults={total}
                 entityNamePlural={entityNamePlural}
@@ -384,7 +390,40 @@ export default function SearchClient({
                           <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("fees_max"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
                         </div>
                       )}
-                      {!stream && !degree && !cityId && !stateId && !countryId && !feesMax && (
+                      {feesRanges.map(fr => (
+                        <div key={`fr-${fr}`} className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
+                          Fees: {fr}
+                          <button onClick={() => { 
+                            const p = new URLSearchParams(searchParams.toString()); 
+                            const newArr = feesRanges.filter(x => x !== fr);
+                            if (newArr.length > 0) p.set("fees_ranges", newArr.join(",")); else p.delete("fees_ranges");
+                            p.delete("page"); router.push(`${pathname}?${p.toString()}`); 
+                          }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                        </div>
+                      ))}
+                      {ratingRanges.map(rr => (
+                        <div key={`rr-${rr}`} className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
+                          Rating: {rr}
+                          <button onClick={() => { 
+                            const p = new URLSearchParams(searchParams.toString()); 
+                            const newArr = ratingRanges.filter(x => x !== rr);
+                            if (newArr.length > 0) p.set("rating_ranges", newArr.join(",")); else p.delete("rating_ranges");
+                            p.delete("page"); router.push(`${pathname}?${p.toString()}`); 
+                          }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                        </div>
+                      ))}
+                      {ownerships.map(ow => (
+                        <div key={`ow-${ow}`} className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
+                          {ow}
+                          <button onClick={() => { 
+                            const p = new URLSearchParams(searchParams.toString()); 
+                            const newArr = ownerships.filter(x => x !== ow);
+                            if (newArr.length > 0) p.set("ownerships", newArr.join(",")); else p.delete("ownerships");
+                            p.delete("page"); router.push(`${pathname}?${p.toString()}`); 
+                          }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                        </div>
+                      ))}
+                      {!stream && !degree && !cityId && !stateId && !countryId && !feesMax && feesRanges.length === 0 && ratingRanges.length === 0 && ownerships.length === 0 && (
                         <span className="text-xs text-neutral-400 bg-neutral-50 px-3 py-1.5 rounded-[10px] border border-neutral-100 border-dashed">No filters applied</span>
                       )}
                     </div>
@@ -425,16 +464,16 @@ export default function SearchClient({
                     {/* View Toggle */}
                     <div className="flex items-center bg-white border border-neutral-200 rounded-[5px] p-1 shadow-sm">
                       <button
-                        onClick={() => setViewMode("grid")}
-                        className={`p-1.5 rounded-[5px] transition-all ${viewMode === 'grid' ? 'bg-[#FF3C3C] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
-                      >
-                        <span className="material-symbols-outlined text-[20px]">grid_view</span>
-                      </button>
-                      <button
                         onClick={() => setViewMode("list")}
                         className={`p-1.5 rounded-[5px] transition-all ${viewMode === 'list' ? 'bg-[#FF3C3C] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
                       >
                         <span className="material-symbols-outlined text-[20px]">view_headline</span>
+                      </button>
+                      <button
+                        onClick={() => setViewMode("grid")}
+                        className={`p-1.5 rounded-[5px] transition-all ${viewMode === 'grid' ? 'bg-[#FF3C3C] text-white shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
+                      >
+                        <span className="material-symbols-outlined text-[20px]">grid_view</span>
                       </button>
                     </div>
                   </div>

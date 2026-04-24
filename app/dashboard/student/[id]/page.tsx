@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getDb } from "@/lib/db";
 import { ObjectId } from "mongodb";
 import StudentDashboardClient from "../StudentDashboardClient";
+import { Suspense } from "react";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -52,5 +53,9 @@ export default async function StudentDashboardPage({ params, searchParams }: Pag
     avatar,
   };
 
-  return <StudentDashboardClient user={user} activated={activated === "1"} />;
+  return (
+    <Suspense fallback={null}>
+      <StudentDashboardClient user={user} activated={activated === "1"} />
+    </Suspense>
+  );
 }

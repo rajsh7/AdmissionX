@@ -43,6 +43,9 @@ export async function GET(req: NextRequest) {
   const degree = (sp.get("degree") ?? "").trim();
   const cityId = sp.get("city_id") || null;
   const feesMax = sp.get("fees_max") ? parseInt(sp.get("fees_max")!) : null;
+  const feesRanges = sp.get("fees_ranges") ? sp.get("fees_ranges")!.split(",") : [];
+  const ratingRanges = sp.get("rating_ranges") ? sp.get("rating_ranges")!.split(",") : [];
+  const ownerships = sp.get("ownerships") ? sp.get("ownerships")!.split(",") : [];
   const sort = sp.get("sort") ?? "rating";
   const type = (sp.get("type") ?? "").trim();
   const page = Math.max(1, parseInt(sp.get("page") ?? "1"));
@@ -70,10 +73,24 @@ export async function GET(req: NextRequest) {
       db.collection("collegemaster").find({ degree_id: degDoc.id }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
         .then((r) => [...new Set(r.map((c) => c.collegeprofile_id))])
     );
-    if (feesMax != null && !isNaN(feesMax)) cmFilters.push(
-      db.collection("collegemaster").find({ fees: { $gt: 0, $lte: feesMax } }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
-        .then((r) => [...new Set(r.map((c) => c.collegeprofile_id))])
-    );
+    const feeConditions = [];
+    if (feesMax != null && !isNaN(feesMax)) {
+      feeConditions.push({ fees: { $gt: 0, $lte: feesMax } });
+    }
+    if (feesRanges.length > 0) {
+      for (const rangeStr of feesRanges) {
+        const [minStr, maxStr] = rangeStr.split("-");
+        const min = parseInt(minStr) || 0;
+        const max = parseInt(maxStr) || 999999999;
+        feeConditions.push({ fees: { $gt: min, $lte: max } });
+      }
+    }
+    if (feeConditions.length > 0) {
+      cmFilters.push(
+        db.collection("collegemaster").find({ $or: feeConditions }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
+          .then((r) => [...new Set(r.map((c) => c.collegeprofile_id))])
+      );
+    }
 
     const resolvedIds = await Promise.all(cmFilters);
 
@@ -92,6 +109,22 @@ export async function GET(req: NextRequest) {
     if (type === "top") match.isShowOnTop = 1;
     else if (type === "university") match.isTopUniversity = 1;
     else if (type === "abroad") match.registeredAddressCountryId = { $ne: 1 };
+
+    if (ownerships.length > 0) {
+      const ownershipRegexes = ownerships.map(o => {
+        if (o === 'Public / Government') return new RegExp('government|public', 'i');
+        return new RegExp(o, 'i');
+      });
+      match.universityType = { $in: ownershipRegexes };
+    }
+    
+    if (ratingRanges.length > 0) {
+      const ratingOr = ratingRanges.map(r => {
+        const [min, max] = r.split("-");
+        return { rating: { $gt: parseFloat(min), $lte: parseFloat(max) } };
+      });
+      match.$or = ratingOr;
+    }
 
     // ── Build aggregation pipeline ───────────────────────────────────────────
     const basePipeline: object[] = [
@@ -130,7 +163,6 @@ export async function GET(req: NextRequest) {
         { $unwind: { path: "$city", preserveNullAndEmptyArrays: true } },
         { $lookup: { from: "placement", localField: "id", foreignField: "collegeprofile_id", as: "placement" } },
         { $unwind: { path: "$placement", preserveNullAndEmptyArrays: true } },
-        // Inline stream/fees enrichment — avoids a separate round trip
         { $lookup: { from: "collegemaster", localField: "id", foreignField: "collegeprofile_id", as: "cm" } },
         { $lookup: { from: "functionalarea", localField: "cm.functionalarea_id", foreignField: "id", as: "fa" } },
         {
@@ -146,6 +178,8 @@ export async function GET(req: NextRequest) {
             avg_package: "$placement.ctcaverage",
           },
         },
+        // Sort by fees AFTER computing min_fees
+        ...(sort === "fees" ? [{ $sort: { min_fees: 1 as const } }] : []),
       ]).toArray(),
     ]);
 
