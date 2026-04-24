@@ -16,9 +16,7 @@ interface CollegeListItemProps {
 
 function formatFees(fees: number | null): string {
   if (!fees || fees <= 0) return "";
-  if (fees >= 100000) return `₹${(fees / 100000).toFixed(1)}L`;
-  if (fees >= 1000) return `₹${(fees / 1000).toFixed(0)}K`;
-  return `₹${fees}`;
+  return `₹${fees.toLocaleString("en-IN")}`;
 }
 
 function StarRating({ rating, count }: { rating: number; count: number }) {
@@ -40,9 +38,7 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
   const { slug, name, location, image, rating, totalRatingUser, ranking, isTopUniversity, topUniversityRank, universityType, estyear, verified, streams, min_fees, max_fees } = college;
 
   const displayRank = topUniversityRank ?? ranking;
-  const minF = formatFees(min_fees);
-  const maxF = formatFees(max_fees);
-  const feesLabel = minF && maxF && minF !== maxF ? `${minF} – ${maxF}` : (minF || maxF || null);
+  const feesLabel = formatFees(max_fees) || null;
 
   const isGovt = universityType
     ? universityType.toLowerCase().includes("government") || universityType.toLowerCase().includes("govt") || universityType.toLowerCase().includes("public")
@@ -54,7 +50,7 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: Math.min(index * 0.05, 0.3) }}
     >
-      <div className="group relative flex flex-col sm:flex-row items-start justify-between gap-4 bg-white rounded-[5px] border border-neutral-100 hover:border-[#FF3C3C]/20 hover:shadow-xl hover:shadow-[#FF3C3C]/5 transition-all duration-300 p-4 sm:p-5 pr-6 sm:pr-8">
+      <div className="group relative flex flex-col sm:flex-row items-start justify-between gap-4 bg-white rounded-[5px] border border-neutral-100 hover:border-[#FF3C3C]/20 hover:shadow-xl hover:shadow-[#FF3C3C]/5 transition-all duration-300 p-4 sm:p-5 pr-6 sm:pr-8 pb-16">
         <Link href={`/college/${slug}`} className="absolute inset-0 z-0" aria-label={`View ${name}`} />
 
         <div className="flex items-start gap-4 flex-1 min-w-0">
@@ -92,6 +88,22 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
             <div className="flex flex-wrap items-center gap-2 mb-2.5">
               <StarRating rating={rating} count={totalRatingUser} />
               <div className="w-px h-3 bg-neutral-200" />
+              
+              {/* Money */}
+              <div className="flex items-center mt-5 mb-4 gap-1.5">
+                <span className="material-symbols-outlined text-[13px] text-neutral-400">currency_rupee</span>
+                <span className="text-sm text-neutral-500 font-medium">Starting Fees:</span>
+                {feesLabel ? (
+                  <>
+                    <span className="text-md font-black text-[#FF3C3C]">{feesLabel}</span>
+                    <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tight">/ year</span>
+                  </>
+                ) : (
+                  <span className="text-[12px] font-semibold text-slate-400 italic">Contact college</span>
+                )}
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pointer-events-none">
               {universityType && (
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${isGovt ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-blue-50 text-blue-700 border border-blue-200"}`}>
                   {isGovt ? "Govt." : "Private"}
@@ -110,8 +122,6 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
                   Top University
                 </span>
               ) : null}
-            </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pointer-events-none">
               {streams.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {streams.slice(0, 4).map((s) => (
@@ -126,8 +136,10 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
                   <span className="text-[10px] text-neutral-400 font-bold">Est. {estyear}</span>
                 </div>
               )}
+              
             </div>
-            <div className="flex items-center mt-5 gap-1.5">
+            {/* money */}
+            {/* <div className="flex items-center mt-5 gap-1.5">
               <span className="material-symbols-outlined text-[13px] text-neutral-400">currency_rupee</span>
               <span className="text-sm text-neutral-500 font-medium">Starting Fees:</span>
               {feesLabel ? (
@@ -138,15 +150,15 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
               ) : (
                 <span className="text-[12px] font-semibold text-slate-400 italic">Contact college</span>
               )}
-            </div>
+            </div> */}
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-row sm:flex-col justify-end  item-end gap-2 relative z-20 w-full sm:w-[130px] shrink-0 mt-2 sm:mt-0">
+        {/* Action Buttons - bottom right */}
+        <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2 z-20">
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleApply(slug); }}
-            className="flex items-center justify-center gap-1.5 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-xs font-bold px-3 py-2 rounded-[8px] transition-all duration-300 flex-1 sm:w-full cursor-pointer whitespace-nowrap shadow-sm"
+            className="flex items-center justify-center gap-1.5 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-xs font-bold px-3 py-2 rounded-[8px] transition-all duration-300 cursor-pointer whitespace-nowrap shadow-sm"
           >
             <span className="material-symbols-outlined text-[15px]">edit_document</span>
             Apply Now
@@ -154,7 +166,7 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
           <AskQueryModal slug={slug} collegeName={name}   
             renderTrigger={(onClick) => (
               <button onClick={onClick}
-                className="flex items-center justify-center gap-1.5 bg-white border border-[#FF3C3C] hover:bg-red-50 text-[#FF3C3C] text-xs font-bold px-3 py-2 rounded-[8px] transition-all duration-300 flex-1 sm:w-full cursor-pointer whitespace-nowrap shadow-sm">
+                className="flex items-center justify-center gap-1.5 bg-white border border-[#FF3C3C] hover:bg-red-50 text-[#FF3C3C] text-xs font-bold px-3 py-2 rounded-[8px] transition-all duration-300 cursor-pointer whitespace-nowrap shadow-sm">
                 <span className="material-symbols-outlined text-[15px]">help</span>
                 Ask Query
               </button>
