@@ -249,17 +249,7 @@ async function fetchColleges(opts: {
   else if (type === "abroad") match.registeredAddressCountryId = { $ne: 1 };
 
   if (cityId) {
-    const cityDoc = await db.collection("city").findOne({ id: Number(cityId) }, { projection: { name: 1 } });
-    const cityNameForMatch = String(cityDoc?.name ?? "").trim();
-    const cityOrConditions: Record<string, unknown>[] = [
-      { registeredAddressCityId: Number(cityId) },
-    ];
-    if (cityNameForMatch) {
-      cityOrConditions.push({ registeredSortAddress: { $regex: cityNameForMatch, $options: "i" } });
-      cityOrConditions.push({ registeredFullAddress: { $regex: cityNameForMatch, $options: "i" } });
-      cityOrConditions.push({ campusSortAddress: { $regex: cityNameForMatch, $options: "i" } });
-    }
-    match.$and = [...((match.$and as any[]) ?? []), { $or: cityOrConditions }];
+    match.$and = [...((match.$and as any[]) ?? []), { registeredAddressCityId: Number(cityId) }];
   } else if (stateId) {
     const stateCities = await db.collection("city").find({ state_id: Number(stateId) }, { projection: { _id: 0, id: 1 } }).toArray();
     match.registeredAddressCityId = { $in: stateCities.map((c: any) => Number(c.id)) };

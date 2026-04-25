@@ -53,7 +53,7 @@ export async function generateMetadata({
     : `Get complete information on ${exam.title} — exam dates, eligibility, syllabus, admit card, results and more.`;
 
   return {
-    title: `${exam.title} 2024-25 — Dates, Syllabus, Eligibility | AdmissionX`,
+    title: `${exam.title} 2026 — Dates, Syllabus, Eligibility | AdmissionX`,
     description: desc,
     openGraph: { title: exam.title, description: desc },
   };

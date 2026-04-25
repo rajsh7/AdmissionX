@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const streamName = fa?.name ?? slugToName(streamSlug);
   const degreeName = deg?.name ?? slugToName(degreeSlug);
   return {
-    title: `Top ${degreeName} Colleges in ${streamName} 2024 | AdmissionX`,
+    title: `Top ${degreeName} Colleges in ${streamName} 2026 | AdmissionX`,
     description: `Find the best ${degreeName} colleges in ${streamName}. Compare fees, placements, ratings, and facilities.`,
   };
 }

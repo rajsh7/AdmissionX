@@ -41,7 +41,8 @@ export async function GET(req: NextRequest) {
   const q = (sp.get("q") ?? "").trim();
   const stream = (sp.get("stream") ?? "").trim();
   const degree = (sp.get("degree") ?? "").trim();
-  const cityId = sp.get("city_id") || null;
+  const cityIdRaw = sp.get("city_id") || null;
+  const cityText = (sp.get("city") ?? "").trim();
   const feesMax = sp.get("fees_max") ? parseInt(sp.get("fees_max")!) : null;
   const feesRanges = sp.get("fees_ranges") ? sp.get("fees_ranges")!.split(",") : [];
   const ratingRanges = sp.get("rating_ranges") ? sp.get("rating_ranges")!.split(",") : [];
@@ -54,9 +55,15 @@ export async function GET(req: NextRequest) {
 
   try {
     const db = await getDb();
-
-    // ── Resolve all filter IDs in parallel ──────────────────────────────────
-    const cityIntId = cityId ? (isNaN(parseInt(cityId)) ? null : parseInt(cityId)) : null;
+    let resolvedCityId = cityIdRaw;
+    if (!resolvedCityId && cityText) {
+      const cityDoc = await db.collection("city").findOne(
+        { name: { $regex: `^${cityText}$`, $options: "i" } },
+        { projection: { id: 1 } }
+      );
+      if (cityDoc) resolvedCityId = String(cityDoc.id);
+    }
+    const cityIntId = resolvedCityId ? (isNaN(parseInt(resolvedCityId)) ? null : parseInt(resolvedCityId)) : null;
 
     const [faDoc, degDoc] = await Promise.all([
       stream ? db.collection("functionalarea").findOne({ pageslug: stream }, { projection: { id: 1 } }) : null,
@@ -133,17 +140,7 @@ export async function GET(req: NextRequest) {
       { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
     ];
 
-    if (q.length >= 2) {
-      basePipeline.push({
-        $match: {
-          $or: [
-            { "user.firstname": { $regex: q, $options: "i" } },
-            { registeredSortAddress: { $regex: q, $options: "i" } },
-            { slug: { $regex: q, $options: "i" } },
-          ],
-        },
-      });
-    }
+
 
     const sortStage: Record<string, 1 | -1> =
       sort === "ranking" ? { ranking: 1 } :
