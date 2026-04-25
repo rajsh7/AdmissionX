@@ -240,7 +240,7 @@ interface PageProps {
 }
 
 export const metadata: Metadata = {
-  title: "Top Universities in India 2024 | AdmissionX",
+  title: "Top Universities in India 2026 | AdmissionX",
   description: "Explore India's top universities ranked by academic excellence, placements, and infrastructure.",
 };
 

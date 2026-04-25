@@ -17,7 +17,7 @@ const HERO_BG = encodeURI(
 );
 
 export const metadata: Metadata = {
-  title: "Entrance Exams 2024–25 | Dates, Syllabus & Results – AdmissionX",
+  title: "Entrance Exams 2026 | Dates, Syllabus & Results – AdmissionX",
   description:
     "Explore all entrance exams — JEE, NEET, CAT, GATE and more. Get exam dates, eligibility, syllabus, admit cards, results and preparation tips.",
 };

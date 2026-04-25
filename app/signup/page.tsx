@@ -174,7 +174,7 @@ export default function SignupPage() {
       {/* Footer */}
       <footer className="w-full py-8 px-6 text-center text-slate-400 text-xs max-w-7xl mx-auto">
         <p>
-          © 2024 AdmissionX Inc. All rights reserved.
+          © 2026 AdmissionX Inc. All rights reserved.
           <a href="#" className="hover:text-primary mx-2">
             Privacy Policy
           </a>

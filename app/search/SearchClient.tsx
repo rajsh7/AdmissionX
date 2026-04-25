@@ -203,6 +203,10 @@ export default function SearchClient({
       const params = new URLSearchParams(searchParams.toString());
       params.set("limit", "48");
       params.delete("page");
+      // Ensure city_id is always sent (URL may only have ?city=text resolved server-side)
+      if (cityId && !params.get("city_id")) params.set("city_id", cityId);
+      // Remove the text-based city param so API doesn't get confused
+      params.delete("city");
       const res = await fetch(`/api/search/colleges?${params.toString()}`);
       const data = await res.json();
       if (data.success && data.colleges.length > 0) {
@@ -216,7 +220,7 @@ export default function SearchClient({
     } finally {
       setLoadingMore(false);
     }
-  }, [visibleCount, colleges.length, searchParams]);
+  }, [visibleCount, colleges.length, searchParams, cityId]);
 
   // Loading state cleanly aligns with Next.js router transitions
   useEffect(() => {

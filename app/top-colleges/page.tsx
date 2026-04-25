@@ -296,7 +296,7 @@ interface PageProps {
 }
 
 export const metadata: Metadata = {
-  title: "Top Colleges in India 2024 | AdmissionX",
+  title: "Top Colleges in India 2026 | AdmissionX",
   description: "Explore India's top colleges ranked by rating, placement, and student reviews.",
 };
 
@@ -373,7 +373,7 @@ export default async function TopCollegesPage({ searchParams }: PageProps) {
       initSort={sort}
       initPage={page}
       initType="top"
-      pageTitle="Top Colleges in India"
+      pageTitle="Top Colleges in India 2026"
       pageSubtitle={pageSubtitle}
       gridCols={4}
       heroImage="/Background-images/student-hero-bg.png"
