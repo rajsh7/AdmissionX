@@ -18,21 +18,168 @@ interface AuthUser {
   role: string;
 }
 
-const navLinks = [
+interface MegaCategory {
+  label: string;
+  icon: string;
+  links: { label: string; href: string }[];
+}
+
+interface NavLink {
+  label: string;
+  href: string;
+  mega?: MegaCategory[];
+}
+
+const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
-  { label: "Colleges", href: "/top-colleges" },
-  { label: "Top University", href: "/top-university" },
-  { label: "Top Courses", href: "/careers-courses" },
+  {
+    label: "Colleges",
+    href: "/top-colleges",
+    mega: [
+      {
+        label: "By Stream",
+        icon: "school",
+        links: [
+          { label: "Engineering", href: "/top-colleges?stream=engineering" },
+          { label: "MBA / Management", href: "/top-colleges?stream=management" },
+          { label: "Medical", href: "/top-colleges?stream=medical" },
+          { label: "Law", href: "/top-colleges?stream=law" },
+          { label: "Arts & Science", href: "/top-colleges?stream=arts-science" },
+          { label: "Commerce", href: "/top-colleges?stream=commerce" },
+          { label: "Design", href: "/top-colleges?stream=design" },
+          { label: "Pharmacy", href: "/top-colleges?stream=pharmacy" },
+        ],
+      },
+      {
+        label: "By Type",
+        icon: "apartment",
+        links: [
+          { label: "Top Colleges", href: "/top-colleges" },
+          { label: "Top Universities", href: "/top-university" },
+          { label: "Government Colleges", href: "/top-colleges?ownerships=Public+%2F+Government" },
+          { label: "Private Colleges", href: "/top-colleges?ownerships=Private" },
+          { label: "Deemed Universities", href: "/top-university?type=deemed" },
+          { label: "Central Universities", href: "/top-university?type=central" },
+        ],
+      },
+      {
+        label: "Tools",
+        icon: "build",
+        links: [
+          { label: "Compare Colleges", href: "/compare" },
+          { label: "Compare Courses", href: "/compare-course" },
+          { label: "College Predictor", href: "/counselling" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Courses",
+    href: "/careers-courses",
+    mega: [
+      {
+        label: "By Level",
+        icon: "layers",
+        links: [
+          { label: "UG Courses", href: "/careers-courses?level=ug" },
+          { label: "PG Courses", href: "/careers-courses?level=pg" },
+          { label: "Diploma Courses", href: "/careers-courses?level=diploma" },
+          { label: "Certificate Courses", href: "/careers-courses?level=certificate" },
+          { label: "PhD / Doctorate", href: "/careers-courses?level=phd" },
+        ],
+      },
+      {
+        label: "Popular Courses",
+        icon: "trending_up",
+        links: [
+          { label: "B.Tech", href: "/careers-courses/btech" },
+          { label: "MBA", href: "/careers-courses/mba" },
+          { label: "MBBS", href: "/careers-courses/mbbs" },
+          { label: "BCA", href: "/careers-courses/bca" },
+          { label: "BBA", href: "/careers-courses/bba" },
+          { label: "B.Com", href: "/careers-courses/bcom" },
+          { label: "LLB", href: "/careers-courses/llb" },
+          { label: "B.Sc", href: "/careers-courses/bsc" },
+        ],
+      },
+      {
+        label: "By Career",
+        icon: "work",
+        links: [
+          { label: "Popular Careers", href: "/popular-careers" },
+          { label: "Career Guidance", href: "/counselling" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Exams",
+    href: "/examination",
+    mega: [
+      {
+        label: "Engineering",
+        icon: "engineering",
+        links: [
+          { label: "JEE Main", href: "/examination/engineering" },
+          { label: "JEE Advanced", href: "/examination/engineering" },
+          { label: "BITSAT", href: "/examination/engineering" },
+          { label: "VITEEE", href: "/examination/engineering" },
+        ],
+      },
+      {
+        label: "Management",
+        icon: "business_center",
+        links: [
+          { label: "CAT", href: "/examination/management" },
+          { label: "MAT", href: "/examination/management" },
+          { label: "XAT", href: "/examination/management" },
+          { label: "SNAP", href: "/examination/management" },
+        ],
+      },
+      {
+        label: "Medical",
+        icon: "medical_services",
+        links: [
+          { label: "NEET UG", href: "/examination/medical" },
+          { label: "NEET PG", href: "/examination/medical" },
+          { label: "AIIMS", href: "/examination/medical" },
+        ],
+      },
+      {
+        label: "Law & Others",
+        icon: "gavel",
+        links: [
+          { label: "CLAT", href: "/examination/law" },
+          { label: "LSAT", href: "/examination/law" },
+          { label: "All Exams", href: "/examination" },
+        ],
+      },
+    ],
+  },
   { label: "Study Abroad", href: "/study-abroad" },
   {
     label: "More",
     href: "#",
-    subItems: [
-      { label: "Counselling", href: "/counselling", icon: "support_agent" },
-      { label: "Examination", href: "/examination", icon: "engineering" },
-      { label: "News & Articles", href: "/news", icon: "newspaper" },
-      { label: "Latest Blogs", href: "/blogs", icon: "article" },
-    ]
+    mega: [
+      {
+        label: "Resources",
+        icon: "library_books",
+        links: [
+          { label: "News & Articles", href: "/news" },
+          { label: "Latest Blogs", href: "/blogs" },
+          { label: "Boards", href: "/boards" },
+        ],
+      },
+      {
+        label: "Help",
+        icon: "support_agent",
+        links: [
+          { label: "Counselling", href: "/counselling" },
+          { label: "Help Center", href: "/help-center" },
+          { label: "Contact Us", href: "/contact-us" },
+        ],
+      },
+    ],
   },
 ];
 
@@ -197,6 +344,7 @@ export default function Header({ theme }: HeaderProps) {
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [hoveredCat, setHoveredCat] = useState<Record<string, string>>({});
 
   const loginRef = useRef<HTMLDivElement>(null);
   const signupRef = useRef<HTMLDivElement>(null);
@@ -322,45 +470,96 @@ export default function Header({ theme }: HeaderProps) {
 
           {/* Right Side: Nav + Actions */}
           <div className="hidden lg:flex items-center gap-10">
-            {/* Nav Links Area */}
+          {/* Nav Links Area */}
             <nav className="flex items-center gap-1">
-              {navLinks.map((link) => (
-                <div key={link.label} className="relative group/nav">
-                  <Link
-                    href={link.href}
-                    prefetch={true}
-                    className={`flex items-center gap-1.5 px-4 py-2 text-[16px] font-medium transition-colors relative text-slate-700 hover:text-primary`}
+              {navLinks.map((link) => {
+                const activeCat = hoveredCat[link.label] ?? link.mega?.[0]?.label ?? "";
+                const activeCatData = link.mega?.find(c => c.label === activeCat) ?? link.mega?.[0];
+                return (
+                  <div
+                    key={link.label}
+                    className="relative group/nav"
+                    onMouseLeave={() => setHoveredCat(p => ({ ...p, [link.label]: link.mega?.[0]?.label ?? "" }))}
                   >
-                    {link.label}
-                    {link.subItems && mounted && (
-                      <span className="material-symbols-outlined text-[18px] transition-colors text-slate-300 group-hover/nav:text-primary">
-                        expand_more
-                      </span>
-                    )}
-                  </Link>
+                    <Link
+                      href={link.href}
+                      prefetch={true}
+                      className="flex items-center gap-1 px-4 py-2 text-[15px] font-medium transition-colors text-slate-700 hover:text-primary"
+                    >
+                      {link.label}
+                      {link.mega && mounted && (
+                        <span className="material-symbols-outlined text-[17px] text-slate-300 group-hover/nav:text-primary transition-transform duration-200 group-hover/nav:rotate-180">
+                          expand_more
+                        </span>
+                      )}
+                    </Link>
 
-                  {link.subItems && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-56 pt-3 opacity-0 translate-y-2 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:pointer-events-auto transition-all duration-200 z-50">
-                      <div className="bg-white rounded-[10px] shadow-2xl shadow-black/10 border border-slate-50 overflow-hidden py-1.5">
-                        {link.subItems.map((sub) => (
-                          <Link
-                            key={sub.label}
-                            href={sub.href}
-                            className="flex items-center gap-3 px-4 py-2.5 text-[16px] font-normal text-slate-600 hover:bg-primary/5 hover:text-primary transition-colors"
-                          >
-                            {mounted && (
-                              <span className="material-symbols-outlined text-[18px] text-slate-400">
-                                {sub.icon}
-                              </span>
-                            )}
-                            {sub.label}
-                          </Link>
-                        ))}
+                    {link.mega && (
+                      <div
+                        className="fixed left-0 right-0 pt-1 opacity-0 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:pointer-events-auto transition-all duration-200 z-50"
+                        style={{ top: isScrolled ? '54px' : '60px' }}
+                      >
+                        <div className="max-w-[1200px] mx-auto px-4">
+                          <div className="bg-white rounded-[12px] shadow-2xl shadow-black/10 border border-slate-100 overflow-hidden flex min-h-[200px]">
+                            {/* Left: Categories */}
+                            <div className="w-[200px] shrink-0 bg-slate-50 border-r border-slate-100 py-3">
+                              {link.mega.map((cat) => {
+                                const isActive = activeCat === cat.label;
+                                return (
+                                  <div
+                                    key={cat.label}
+                                    onMouseEnter={() => setHoveredCat(p => ({ ...p, [link.label]: cat.label }))}
+                                    className={`flex items-center gap-2.5 px-4 py-2.5 cursor-default transition-colors ${
+                                      isActive ? "bg-white border-l-2 border-primary" : "hover:bg-white border-l-2 border-transparent"
+                                    }`}
+                                  >
+                                    {mounted && (
+                                      <span className={`material-symbols-outlined text-[17px] transition-colors ${
+                                        isActive ? "text-primary" : "text-slate-400"
+                                      }`}>
+                                        {cat.icon}
+                                      </span>
+                                    )}
+                                    <span className={`text-[13px] font-semibold transition-colors ${
+                                      isActive ? "text-primary" : "text-slate-600"
+                                    }`}>
+                                      {cat.label}
+                                    </span>
+                                    <span className="material-symbols-outlined text-[14px] text-slate-300 ml-auto">chevron_right</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            {/* Right: Only active category links */}
+                            <div className="flex-1 p-5">
+                              {activeCatData && (
+                                <>
+                                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">
+                                    {activeCatData.label}
+                                  </p>
+                                  <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                                    {activeCatData.links.map((lnk) => (
+                                      <Link
+                                        key={lnk.label}
+                                        href={lnk.href}
+                                        className="flex items-center gap-2 px-3 py-2 rounded-[6px] text-[13px] font-medium text-slate-600 hover:bg-primary/5 hover:text-primary transition-colors"
+                                      >
+                                        <span className="w-1 h-1 rounded-full bg-slate-300 shrink-0" />
+                                        {lnk.label}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                );
+              })}
             </nav>
 
             {/* Right Area (Actions) */}
@@ -449,61 +648,57 @@ export default function Header({ theme }: HeaderProps) {
                 <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-6 pb-28 space-y-1">
               {navLinks.map((item) => {
                 const isExpanded = expandedMobileItem === item.label;
+                const allSubLinks = item.mega?.flatMap(cat => cat.links) ?? [];
                 return (
                   <div key={item.label} className="flex flex-col">
-                      <div className="flex items-center justify-between py-3">
-                        {item.subItems ? (
-                          <button
-                            className="flex-1 text-left text-[16px] font-medium text-slate-800 uppercase tracking-tight flex items-center justify-between"
-                            onClick={() => setExpandedMobileItem(isExpanded ? null : item.label)}
-                          >
-                            {item.label}
-                            <span className={`material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 p-1 hover:bg-slate-50 rounded-[10px] ${isExpanded ? "rotate-180" : ""}`}>
-                              expand_more
-                            </span>
-                          </button>
-                        ) : (
-                          <Link
-                            href={item.href}
-                            className="flex-1 text-[16px] font-medium text-slate-800 uppercase tracking-tight"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            {item.label}
-                          </Link>
-                        )}
-                      </div>
-
-                      {item.subItems && (
-                        <AnimatePresence>
-                          {isExpanded && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              className="overflow-hidden bg-slate-50/50 rounded-2xl"
-                            >
-                              <div className="py-2 px-3 space-y-1">
-                                  {item.subItems.map((sub) => (
-                                    <Link
-                                      key={sub.label}
-                                      href={sub.href}
-                                      className="flex items-center gap-3 px-3 py-3 text-[16px] font-normal text-slate-600 hover:text-primary transition-colors"
-                                      onClick={() => setMobileMenuOpen(false)}
-                                    >
-                                      {mounted && (
-                                        <span className="material-symbols-outlined text-[18px] text-slate-400">
-                                          {sub.icon}
-                                        </span>
-                                      )}
-                                      {sub.label}
-                                    </Link>
-                                  ))}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                    <div className="flex items-center justify-between py-3">
+                      {item.mega ? (
+                        <button
+                          className="flex-1 text-left text-[16px] font-medium text-slate-800 uppercase tracking-tight flex items-center justify-between"
+                          onClick={() => setExpandedMobileItem(isExpanded ? null : item.label)}
+                        >
+                          {item.label}
+                          <span className={`material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 p-1 hover:bg-slate-50 rounded-[10px] ${isExpanded ? "rotate-180" : ""}`}>
+                            expand_more
+                          </span>
+                        </button>
+                      ) : (
+                        <Link
+                          href={item.href}
+                          className="flex-1 text-[16px] font-medium text-slate-800 uppercase tracking-tight"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {item.label}
+                        </Link>
                       )}
                     </div>
+                    {item.mega && (
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden bg-slate-50/50 rounded-2xl"
+                          >
+                            <div className="py-2 px-3 space-y-1">
+                              {allSubLinks.map((sub) => (
+                                <Link
+                                  key={sub.label}
+                                  href={sub.href}
+                                  className="flex items-center gap-3 px-3 py-2.5 text-[14px] font-normal text-slate-600 hover:text-primary transition-colors"
+                                  onClick={() => setMobileMenuOpen(false)}
+                                >
+                                  <span className="w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0" />
+                                  {sub.label}
+                                </Link>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    )}
+                  </div>
                 );
               })}
 
