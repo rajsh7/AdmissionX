@@ -31,23 +31,25 @@ export async function POST(req: NextRequest) {
     const hashed = await bcrypt.hash(password, 12);
     const email = record.email.toLowerCase();
 
-    // Update password in the correct new collection
+    // Update password in the correct collection
     const collectionMap: Record<string, string> = {
       student: "next_student_signups",
       college: "next_college_signups",
       admin: "next_admin_users",
     };
 
-    const newColResult = await db.collection(collectionMap[record.role]).updateOne(
+    await db.collection(collectionMap[record.role]).updateOne(
       { email },
       { $set: { password_hash: hashed, updated_at: new Date() } }
     );
 
-    // Also update legacy users table if it exists there (migrated data)
-    await db.collection("users").updateOne(
-      { email: { $regex: `^${email}$`, $options: "i" } },
-      { $set: { password: hashed, updated_at: new Date() } }
-    ).catch(() => { /* non-fatal */ });
+    // For non-admin roles also update legacy users table
+    if (record.role !== "admin") {
+      await db.collection("users").updateOne(
+        { email: { $regex: `^${email}$`, $options: "i" } },
+        { $set: { password: hashed, updated_at: new Date() } }
+      ).catch(() => { /* non-fatal */ });
+    }
 
     // Mark token as used
     await db.collection("password_reset_tokens").updateOne(

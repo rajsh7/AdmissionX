@@ -7,8 +7,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { NAV_GROUPS } from "./nav-config";
 import { Admin, SidebarSkeleton, ICO } from "./Sidebar";
-import { canAccess, ROLE_LABELS, ROLE_BADGE_COLORS } from "@/lib/permissions";
-import type { AdminRole } from "@/lib/permissions";
+import { canAccessWithConfig, ROLE_LABELS, ROLE_BADGE_COLORS, SYSTEM_ROLES } from "@/lib/permissions";
+import type { AdminRole, RoleConfig } from "@/lib/permissions";
+import AdminNotifications from "./AdminNotifications";
 
 function AvatarDropdown({ admin, onLogout }: { admin: Admin; onLogout: () => void }) {
   const [open, setOpen] = useState(false);
@@ -76,7 +77,7 @@ export default function AdminShell({
   admin,
 }: {
   children: React.ReactNode;
-  admin: Admin & { adminRole?: AdminRole };
+  admin: Admin & { adminRole?: AdminRole; roleCfg?: RoleConfig };
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -104,7 +105,8 @@ export default function AdminShell({
   }, []);
 
   const adminRole = admin.adminRole ?? "super_admin";
-  const hasAccess = canAccess(adminRole, pathname);
+  const roleCfg   = admin.roleCfg ?? SYSTEM_ROLES.find(s => s.value === adminRole);
+  const hasAccess = canAccessWithConfig(roleCfg, pathname);
 
   async function handleLogout() {
     try {
@@ -193,14 +195,7 @@ export default function AdminShell({
           <div className="flex items-center gap-5 flex-shrink-0 pr-2 ml-auto">
             
             {/* Action Icons */}
-            <div className="flex items-center gap-3 text-slate-600">
-              <button className="hover:text-slate-900 transition-colors p-1" suppressHydrationWarning>
-                <span className="material-symbols-rounded text-[24px]" style={ICO}>chat_bubble_outline</span>
-              </button>
-              <button className="hover:text-slate-900 transition-colors p-1" suppressHydrationWarning>
-                <span className="material-symbols-rounded text-[24px]" style={ICO}>notifications</span>
-              </button>
-            </div>
+            <AdminNotifications />
 
             {/* Divider */}
             <div className="w-px h-6 bg-slate-300" />

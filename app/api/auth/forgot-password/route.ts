@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { getDb } from "@/lib/db";
 import { sendPasswordResetEmail } from "@/lib/email";
 
-const EXPIRES_IN_MS = 15 * 60 * 1000;
+const EXPIRES_IN_MS = 60 * 60 * 1000; // 1 hour
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,14 +17,23 @@ export async function POST(req: NextRequest) {
     const db = await getDb();
     let found: { name: string; role: "student" | "college" | "admin" } | null = null;
 
-    // 1. Check new student signups
-    const student = await db.collection("next_student_signups").findOne(
+    // 1. Check admin users first (is_active can be true, 1, or missing for super admin)
+    const adminFirst = await db.collection("next_admin_users").findOne(
       { email },
-      { projection: { name: 1 } }
+      { projection: { name: 1, is_active: 1 } }
     );
-    if (student) found = { name: student.name, role: "student" };
+    if (adminFirst) found = { name: adminFirst.name || email, role: "admin" };
 
-    // 2. Check new college signups
+    // 2. Check new student signups
+    if (!found) {
+      const student = await db.collection("next_student_signups").findOne(
+        { email },
+        { projection: { name: 1 } }
+      );
+      if (student) found = { name: student.name, role: "student" };
+    }
+
+    // 3. Check new college signups
     if (!found) {
       const college = await db.collection("next_college_signups").findOne(
         { email },
@@ -33,7 +42,7 @@ export async function POST(req: NextRequest) {
       if (college) found = { name: college.college_name, role: "college" };
     }
 
-    // 3. Check legacy users table (old college/student accounts from MySQL migration)
+    // 4. Check legacy users table (old college/student accounts from MySQL migration)
     if (!found) {
       const legacyUser = await db.collection("users").findOne(
         { email: { $regex: `^${email}$`, $options: "i" } },
@@ -44,15 +53,6 @@ export async function POST(req: NextRequest) {
         const role = legacyUser.type_of_user === "COLLEGE" ? "college" : "student";
         found = { name, role };
       }
-    }
-
-    // 4. Check admin users
-    if (!found) {
-      const admin = await db.collection("next_admin_users").findOne(
-        { email, is_active: true },
-        { projection: { name: 1 } }
-      );
-      if (admin) found = { name: admin.name, role: "admin" };
     }
 
     // Always return success to prevent email enumeration
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
       created_at: new Date(),
     });
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+    const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000").replace(/\/+$/, "");
     const resetLink = `${baseUrl}/reset-password/${token}`;
 
     await sendPasswordResetEmail(email, found.name, resetLink, found.role);

@@ -7,7 +7,7 @@ const ICO      = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz
 
 export default async function ReportsManagementPage() {
   return (
-    <div className="p-6 space-y-6 max-w-[1200px]">
+    <div className="p-6 space-y-6 max-w-[1200px] mx-auto w-full">
       <div>
         <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
           <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>analytics</span>

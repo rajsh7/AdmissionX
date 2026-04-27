@@ -1,9 +1,10 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifyAdminToken } from "@/lib/auth";
-import { canAccess } from "@/lib/permissions";
-import type { AdminRole } from "@/lib/permissions";
+import { canAccessWithConfig, SYSTEM_ROLES } from "@/lib/permissions";
+import type { AdminRole, RoleConfig } from "@/lib/permissions";
 import AdminShell from "./_components/AdminShell";
+import { getDb } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,28 @@ export default async function AdminLayout({
 
   const adminRole: AdminRole = (payload.adminRole as AdminRole) ?? "super_admin";
 
+  // Load role config from DB for accurate access checks
+  let roleCfg: RoleConfig | undefined;
+  try {
+    const db = await getDb();
+    const doc = await db.collection("admin_roles").findOne({ value: adminRole });
+    if (doc) {
+      roleCfg = {
+        value:        doc.value,
+        label:        doc.label,
+        desc:         doc.desc ?? "",
+        badgeColor:   doc.badgeColor ?? "bg-slate-100 text-slate-600",
+        accessMode:   doc.accessMode ?? "blacklist",
+        blockedPaths: doc.blockedPaths ?? [],
+        allowedPaths: doc.allowedPaths ?? [],
+        is_system:    doc.is_system === true,
+      };
+    }
+  } catch {
+    // fallback to static
+  }
+  if (!roleCfg) roleCfg = SYSTEM_ROLES.find(s => s.value === adminRole);
+
   return (
     <AdminShell
       admin={{
@@ -34,6 +57,7 @@ export default async function AdminLayout({
         name: payload.name,
         email: payload.email,
         adminRole,
+        roleCfg,
       }}
     >
       {children}

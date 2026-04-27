@@ -17,8 +17,10 @@ export interface CourseResult {
 
 function buildImageUrl(raw: string | null): string | null {
   if (!raw) return null;
-  if (raw.startsWith("http") || raw.startsWith("/")) return raw;
-  return `/uploads/${raw}`;
+  const trimmed = raw.trim();
+  if (!trimmed || trimmed.toUpperCase() === "NULL") return null;
+  if (trimmed.startsWith("http") || trimmed.startsWith("/")) return trimmed;
+  return `/uploads/courses/${trimmed}`;
 }
 
 export async function GET(req: NextRequest) {
@@ -34,10 +36,10 @@ export async function GET(req: NextRequest) {
     const db = await getDb();
 
     // Resolve level/stream slugs
-    let elId: unknown = null;
+    let degreeId: unknown = null;
     if (level) {
-      const el = await db.collection("educationlevel").findOne({ pageslug: level }, { projection: { id: 1 } });
-      elId = el?.id ?? null;
+      const d = await db.collection("degree").findOne({ pageslug: level }, { projection: { id: 1 } });
+      degreeId = d?.id ?? null;
     }
     let faId: unknown = null;
     if (stream) {
@@ -45,47 +47,46 @@ export async function GET(req: NextRequest) {
       faId = fa?.id ?? null;
     }
 
-    const filter: Record<string, unknown> = { slug: { $exists: true, $ne: "" } };
+    const filter: Record<string, unknown> = { pageslug: { $exists: true, $ne: "" } };
     if (q.length >= 2) {
-      filter.$or = [{ title: { $regex: q, $options: "i" } }, { description: { $regex: q, $options: "i" } }];
+      filter.$or = [{ name: { $regex: q, $options: "i" } }, { pagedescription: { $regex: q, $options: "i" } }];
     }
-    if (elId) filter.educationlevel_id = elId;
+    if (degreeId) filter.degree_id = degreeId;
     if (faId) filter.functionalarea_id = faId;
 
     const [rows, total] = await Promise.all([
-      db.collection("counseling_courses_details").aggregate([
+      db.collection("course").aggregate([
         { $match: filter },
         { $sort: { _id: -1 } },
         { $skip: offset },
         { $limit: limit },
-        { $lookup: { from: "educationlevel", localField: "educationlevel_id", foreignField: "id", as: "el" } },
+        { $lookup: { from: "degree", localField: "degree_id", foreignField: "id", as: "deg" } },
         { $lookup: { from: "functionalarea", localField: "functionalarea_id", foreignField: "id", as: "fa" } },
-        { $unwind: { path: "$el", preserveNullAndEmptyArrays: true } },
+        { $unwind: { path: "$deg", preserveNullAndEmptyArrays: true } },
         { $unwind: { path: "$fa", preserveNullAndEmptyArrays: true } },
         {
           $project: {
-            title: 1, slug: 1, image: 1, description: 1,
-            bestChoiceOfCourse: 1, jobsCareerOpportunityDesc: 1,
-            level_name: "$el.name", level_slug: "$el.pageslug",
+            id: 1, name: 1, pageslug: 1, image: 1, pagedescription: 1,
+            level_name: "$deg.name", level_slug: "$deg.pageslug",
             stream_name: "$fa.name", stream_slug: "$fa.pageslug",
           },
         },
       ]).toArray(),
-      db.collection("counseling_courses_details").countDocuments(filter),
+      db.collection("course").countDocuments(filter),
     ]);
 
     const courses = rows.map((row) => ({
-      id: row._id,
-      title: row.title,
-      slug: row.slug,
+      id: row.id,
+      title: row.name,
+      slug: row.pageslug,
       image: buildImageUrl(row.image),
-      description: row.description,
+      description: row.pagedescription,
       level_name: row.level_name,
       level_slug: row.level_slug,
       stream_name: row.stream_name,
       stream_slug: row.stream_slug,
-      bestChoiceOfCourse: row.bestChoiceOfCourse,
-      jobsCareerOpportunityDesc: row.jobsCareerOpportunityDesc,
+      bestChoiceOfCourse: null,
+      jobsCareerOpportunityDesc: null,
     }));
 
     return NextResponse.json({ success: true, courses, total, page, totalPages: Math.ceil(total / limit), limit });

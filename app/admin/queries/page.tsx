@@ -73,7 +73,7 @@ export default async function QueriesDashboardPage() {
   ];
 
   return (
-    <div className="p-6 space-y-6 max-w-[1300px]">
+    <div className="p-6 space-y-6 max-w-[1300px] mx-auto w-full">
 
       {/* Header */}
       <div>

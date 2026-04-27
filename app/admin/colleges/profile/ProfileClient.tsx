@@ -54,11 +54,15 @@ interface ProfileClientProps {
 
 const IMAGE_BASE = "/uploads/";
 
-function buildImageUrl(raw: string | null): string {
+function buildImageUrl(raw: string | null, slug?: string): string {
   if (!raw) return "";
-  if (raw.startsWith("http")) return raw;
-  if (raw.startsWith("/")) return raw;
-  return `${IMAGE_BASE}${raw}`;
+  const trimmed = raw.trim();
+  if (!trimmed || trimmed.toUpperCase() === "NULL") return "";
+  if (trimmed.startsWith("http")) return trimmed;
+  if (trimmed.startsWith("/")) return trimmed;
+  // Old format: bare filename like "1703673727-19538.jpg"
+  if (slug) return `/uploads/college/${slug}/${trimmed}`;
+  return `/uploads/college/${trimmed}`;
 }
 
 function formatDate(val: string | null): string {
@@ -483,9 +487,9 @@ export default function ProfileClient({
                     <div className="flex items-center gap-2.5">
                       {/* Thumbnail */}
                       <div className="w-11 h-8 rounded-[5px] overflow-hidden bg-slate-100 flex-shrink-0 border border-slate-200">
-                        {p.bannerimage ? (
+                        {buildImageUrl(p.bannerimage, p.slug) ? (
                           <img
-                            src={buildImageUrl(p.bannerimage)}
+                            src={buildImageUrl(p.bannerimage, p.slug)}
                             alt=""
                             className="w-full h-full object-cover"
                             onError={(e) => {
@@ -497,7 +501,7 @@ export default function ProfileClient({
                         ) : null}
                         <div
                           className="w-full h-full items-center justify-center bg-[#FF3C3C]/10 text-[#FF3C3C] font-black text-sm"
-                          style={{ display: p.bannerimage ? "none" : "flex" }}
+                          style={{ display: buildImageUrl(p.bannerimage, p.slug) ? "none" : "flex" }}
                         >
                           {(p.name || p.slug).charAt(0).toUpperCase()}
                         </div>

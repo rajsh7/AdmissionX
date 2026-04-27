@@ -150,23 +150,31 @@ const getHomePageData = unstable_cache(
 
       const statCounts = [collegeCount, studentCount, countryCount, courseCount];
 
-      // 7. Reviews — fetched separately to avoid Turbopack parser issues
-      const rawReviews = await db.collection("college_reviews")
+      // 7. Testimonials from admin-managed testimonials collection
+      const rawTestimonials = await db.collection("testimonials")
         .find({ description: { $exists: true, $ne: "" } })
         .sort({ created_at: -1 })
         .limit(8)
-        .project({ _id: 0, description: 1, academic: 1, faculty: 1, placement: 1, infrastructure: 1, users_id: 1, collegeprofile_id: 1 })
+        .project({ _id: 0, author: 1, title: 1, misc: 1, description: 1, featuredimage: 1 })
         .toArray();
 
-      const reviewRows = rawReviews.map((r: any) => {
-        const avg = [r.academic, r.faculty, r.placement, r.infrastructure]
-          .map((v: any) => parseFloat(String(v ?? "4").trim()) || 4)
-          .reduce((a: number, b: number) => a + b, 0) / 4;
+      const reviewRows = rawTestimonials.map((r: any) => {
+        const img = String(r.featuredimage ?? "").trim();
+        // Only use image if it's a new-format upload (contains 'testimonial_')
+        // Old images (bare timestamps like -1492689535.jpg) no longer exist on disk
+        const isNewUpload = img && (img.startsWith("http") || img.startsWith("/") || img.includes("testimonial_"));
+        const avatar = isNewUpload
+          ? img.startsWith("http") || img.startsWith("/")
+            ? img
+            : `/uploads/testimonials/${img}`
+          : undefined;
+
         return {
-          name: "Student",
-          college: "Verified College",
-          text: String(r.description ?? "").trim(),
-          rating: Math.min(5, Math.max(1, Math.round(avg))),
+          name:    String(r.author ?? "Student").trim(),
+          college: String(r.title ?? r.misc ?? "AdmissionX User").trim(),
+          text:    String(r.description ?? "").trim(),
+          rating:  5,
+          avatar,
         };
       });
 
@@ -189,7 +197,7 @@ const getHomePageData = unstable_cache(
       };
     }
   },
-  ["homepage-data-v11"],
+  ["homepage-data-v13"],
   { revalidate: 300 },
 );
 

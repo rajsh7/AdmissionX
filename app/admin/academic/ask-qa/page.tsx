@@ -29,7 +29,7 @@ export default async function AskQaIndexPage() {
   ];
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 max-w-[1400px] mx-auto w-full">
       {/* Header */}
       <div>
         <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">

@@ -12,9 +12,11 @@ export const metadata: Metadata = {
 };
 
 function buildImageUrl(raw: string | null | undefined): string | null {
-  if (!raw || !raw.trim()) return null;
-  if (raw.startsWith("http") || raw.startsWith("/")) return raw;
-  return `/uploads/${raw}`;
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if (!trimmed || trimmed.toUpperCase() === "NULL") return null;
+  if (trimmed.startsWith("http") || trimmed.startsWith("/")) return trimmed;
+  return `/uploads/courses/${trimmed}`;
 }
 
 interface FilterOption {
@@ -105,7 +107,7 @@ export default async function CareerCoursesPage({ searchParams }: PageProps) {
       { $unwind: { path: "$fa", preserveNullAndEmptyArrays: true } },
       {
         $project: {
-          id: 1, name: 1, pageslug: 1, logoimage: 1, pagedescription: 1,
+          id: 1, name: 1, pageslug: 1, image: 1, logoimage: 1, pagedescription: 1,
           level_name: "$deg.name", level_slug: "$deg.pageslug",
           stream_name: "$fa.name", stream_slug: "$fa.pageslug",
         },
@@ -120,7 +122,7 @@ export default async function CareerCoursesPage({ searchParams }: PageProps) {
     id: row.id,
     title: row.name,
     slug: row.pageslug,
-    image: buildImageUrl(row.logoimage),
+    image: buildImageUrl(row.image ?? row.logoimage),
     description: row.pagedescription,
     level_name: row.level_name ?? null,
     level_slug: row.level_slug ?? null,

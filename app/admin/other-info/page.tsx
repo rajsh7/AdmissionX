@@ -41,7 +41,7 @@ export default async function OtherInformationPage() {
   ];
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-6 space-y-6 max-w-[1400px] mx-auto w-full">
       <div>
         <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
           <span className="material-symbols-rounded text-blue-600 text-[22px]" style={ICO_FILL}>info</span>

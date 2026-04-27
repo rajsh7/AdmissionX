@@ -14,8 +14,6 @@ interface TestimonialsProps {
   testimonials?: Testimonial[];
 }
 
-const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=60&w=150&h=150";
-
 function TestimonialStars({ rating }: { rating: number }) {
   return (
     <div className="flex text-yellow-400 gap-1">
@@ -86,7 +84,24 @@ export default function Testimonials({ testimonials: dynamicTestimonials }: Test
                   {/* Avatar with Circular Border */}
                   <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-[#FF3C3C] p-0.5 shrink-0 bg-white shadow-sm">
                     <div className="w-full h-full rounded-full overflow-hidden relative">
-                      <img src={t.avatar || DEFAULT_AVATAR} alt={t.name} className="w-full h-full object-cover" />
+                      {t.avatar ? (
+                        <img
+                          src={t.avatar}
+                          alt={t.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                            const fb = e.currentTarget.nextElementSibling as HTMLElement;
+                            if (fb) fb.style.display = "flex";
+                          }}
+                        />
+                      ) : null}
+                      <div
+                        className="w-full h-full bg-[#FF3C3C] text-white font-black text-lg items-center justify-center"
+                        style={{ display: t.avatar ? "none" : "flex" }}
+                      >
+                        {t.name.charAt(0).toUpperCase()}
+                      </div>
                     </div>
                   </div>
                   <div>

@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { NavItem, NavGroup, NAV_GROUPS } from "./nav-config";
-import { canAccess, ROLE_LABELS, ROLE_BADGE_COLORS } from "@/lib/permissions";
-import type { AdminRole } from "@/lib/permissions";
+import { canAccessWithConfig, ROLE_LABELS, ROLE_BADGE_COLORS, SYSTEM_ROLES } from "@/lib/permissions";
+import type { AdminRole, RoleConfig } from "@/lib/permissions";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface Admin {
@@ -12,6 +12,7 @@ export interface Admin {
   name: string;
   email: string;
   adminRole?: AdminRole;
+  roleCfg?: RoleConfig;
 }
 
 export type { NavItem, NavGroup };
@@ -36,21 +37,22 @@ export function UnifiedSidebarV3({
 }) {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const adminRole = admin.adminRole ?? "super_admin";
+  const roleCfg   = admin.roleCfg ?? SYSTEM_ROLES.find(s => s.value === adminRole);
+  const roleLabel = roleCfg?.label ?? ROLE_LABELS[adminRole] ?? adminRole;
+  const roleBadge = roleCfg?.badgeColor ?? ROLE_BADGE_COLORS[adminRole] ?? "bg-slate-100 text-slate-600";
 
   // Filter nav groups based on role
   const filteredGroups = NAV_GROUPS.map((group) => ({
     ...group,
     items: group.items
       .map((item) => {
-        // Filter sub-items
-        const filteredSubs = item.subItems?.filter((sub) => canAccess(adminRole, sub.href));
+        const filteredSubs = item.subItems?.filter((sub) => canAccessWithConfig(roleCfg, sub.href));
         return { ...item, subItems: filteredSubs };
       })
       .filter((item) => {
-        // Keep item if it has accessible sub-items or its own href is accessible
         if (item.subItems && item.subItems.length > 0) return true;
         if (item.subItems !== undefined && item.subItems.length === 0) return false;
-        return canAccess(adminRole, item.href);
+        return canAccessWithConfig(roleCfg, item.href);
       }),
   })).filter((group) => group.items.length > 0);
 
@@ -75,9 +77,9 @@ export function UnifiedSidebarV3({
       {/* Role badge */}
       {!collapsed && (
         <div className="px-3 pb-2">
-          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${ROLE_BADGE_COLORS[adminRole]}`}>
+          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${roleBadge}`}>
             <span className="material-symbols-rounded text-[12px]" style={ICO}>shield</span>
-            {ROLE_LABELS[adminRole]}
+            {roleLabel}
           </span>
         </div>
       )}

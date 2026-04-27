@@ -17,7 +17,7 @@ async function main() {
   await client.connect();
   const db = client.db(DB_NAME);
 
-  const email = "admin@admissionx.in";
+  const email = "chairmanseg@gmail.com";
   const password = "Admin@1234";
   const name = "Super Admin";
 
