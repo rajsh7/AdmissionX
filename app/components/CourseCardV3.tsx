@@ -84,19 +84,13 @@ export default function CourseCardV3({
 </div>
           <div className="border-b border-[#6C6C6C]/20" />
 
-          {/* View details + Compare */}
+          {/* View details */}
           <div className="flex gap-2">
             <Link
               href={`/careers-courses/${slug}`}
               className="flex-1 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-[16px] font-medium py-2 rounded-[6px] transition-all text-center"
             >
               View details
-            </Link>
-            <Link
-              href={`/compare-course?courses=${slug}`}
-              className="flex-1 bg-white border border-neutral-300 text-[#6C6C6C] hover:bg-neutral-50 text-[16px] font-medium py-2 rounded-[6px] transition-all text-center"
-            >
-              Compare
             </Link>
           </div>
         </div>

@@ -18,10 +18,10 @@ function slugToName(slug: string): string {
 }
 
 function buildImageUrl(raw: string | null | undefined): string | null {
-  if (!raw) return null;
-  if (raw.startsWith("http") || raw.startsWith("/")) return raw;
-  // Legacy bare filenames from old PHP admin server
-  return `https://admin.admissionx.in/uploads/${raw}`;
+  if (!raw || String(raw).trim().toLowerCase() === "null") return null;
+  const s = String(raw).trim();
+  if (s.startsWith("http")) return s;
+  return s.startsWith("/") ? s : `https://admin.admissionx.in/uploads/${s}`;
 }
 
 // ── Filter data ───────────────────────────────────────────────────────────────
@@ -102,6 +102,14 @@ const getFilterData = unstable_cache(
   { revalidate: 600 },
 );
 
+// collegetype_id: 1=Private College, 2=Government College, 3=Government University, 4=Private University
+const OWNERSHIP_MAP: Record<string, number[]> = {
+  "Private College":       [1],
+  "Government College":    [2],
+  "Government University": [3],
+  "Private University":    [4],
+};
+
 // ── Core fetch ────────────────────────────────────────────────────────────────
 
 async function fetchTopColleges(opts: {
@@ -172,11 +180,8 @@ async function fetchTopColleges(opts: {
   }
 
   if (ownerships && ownerships.length > 0) {
-    const ownershipRegexes = ownerships.map(o => {
-      if (o === 'Public / Government') return new RegExp('government|public', 'i');
-      return new RegExp(o, 'i');
-    });
-    match.universityType = { $in: ownershipRegexes };
+    const typeIds = ownerships.flatMap((o) => OWNERSHIP_MAP[o] ?? []);
+    if (typeIds.length > 0) match.collegetype_id = { $in: typeIds };
   }
 
   if (ratingRanges && ratingRanges.length > 0) {
@@ -225,7 +230,7 @@ async function fetchTopColleges(opts: {
     {
       $project: {
         slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, ranking: 1,
-        isTopUniversity: 1, topUniversityRank: 1, universityType: 1, estyear: 1,
+        isTopUniversity: 1, topUniversityRank: 1, universityType: 1, collegetype_id: 1, estyear: 1,
         verified: 1, totalStudent: 1, registeredSortAddress: 1,
         name: {
           $cond: [
@@ -248,12 +253,7 @@ async function fetchTopColleges(opts: {
     const orderMap = new Map(topIds.map((id, i) => [String(id), i]));
     dataRows.sort((a, b) => (orderMap.get(String(a._id)) ?? 0) - (orderMap.get(String(b._id)) ?? 0));
   } else {
-    // Sort by min_fees ascending, nulls last
-    dataRows.sort((a, b) => {
-      const aFee = a.min_fees ?? Infinity;
-      const bFee = b.min_fees ?? Infinity;
-      return aFee - bFee;
-    });
+    dataRows.sort((a, b) => (a.min_fees ?? Infinity) - (b.min_fees ?? Infinity));
   }
 
   const colleges: CollegeResult[] = dataRows.map((row) => ({
@@ -270,6 +270,7 @@ async function fetchTopColleges(opts: {
     isTopUniversity: row.isTopUniversity ?? 0,
     topUniversityRank: row.topUniversityRank ? parseInt(String(row.topUniversityRank)) : null,
     universityType: row.universityType ?? null,
+    collegetype_id: row.collegetype_id ? parseInt(String(row.collegetype_id)) : null,
     estyear: row.estyear ?? null,
     verified: row.verified ?? 0,
     totalStudent: row.totalStudent ? parseInt(String(row.totalStudent)) : null,
@@ -384,3 +385,5 @@ export default async function TopCollegesPage({ searchParams }: PageProps) {
     />
   );
 }
+
+

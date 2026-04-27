@@ -35,14 +35,13 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
 
 export default function CollegeListItem({ college, index = 0, entityName = "College" }: CollegeListItemProps) {
   const { handleApply, modalSlug, closeModal } = useApplyGuard();
-  const { slug, name, location, image, rating, totalRatingUser, ranking, isTopUniversity, topUniversityRank, universityType, estyear, verified, streams, min_fees, max_fees } = college;
+  const { slug, name, location, image, rating, totalRatingUser, ranking, isTopUniversity, topUniversityRank, universityType, collegetype_id, estyear, verified, streams, min_fees, max_fees } = college;
 
   const displayRank = topUniversityRank ?? ranking;
   const feesLabel = formatFees(max_fees) || null;
 
-  const isGovt = universityType
-    ? universityType.toLowerCase().includes("government") || universityType.toLowerCase().includes("govt") || universityType.toLowerCase().includes("public")
-    : false;
+  // collegetype_id: 2=Government College, 3=Government University
+  const isGovt = collegetype_id === 2 || collegetype_id === 3;
 
   return (
     <motion.div
@@ -50,12 +49,12 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: Math.min(index * 0.05, 0.3) }}
     >
-      <div className="group relative flex flex-col sm:flex-row items-start justify-between gap-4 bg-white rounded-[5px] border border-neutral-100 hover:border-[#FF3C3C]/20 hover:shadow-xl hover:shadow-[#FF3C3C]/5 transition-all duration-300 p-4 sm:p-5 pr-6 sm:pr-8 pb-16">
+      <div className="group relative flex  flex-col sm:flex-row items-start justify-between gap-4 bg-white rounded-[5px] border border-neutral-100 hover:border-[#FF3C3C]/20 hover:shadow-xl hover:shadow-[#FF3C3C]/5 transition-all duration-300 p-4 sm:p-5 pr-6 sm:pr-8 pb-16">
         <Link href={`/college/${slug}`} className="absolute inset-0 z-0" aria-label={`View ${name}`} />
 
-        <div className="flex items-start gap-4 flex-1 min-w-0">
+        <div className="flex items-start  gap-4 flex-1  min-w-0">
           {/* Thumbnail */}
-          <div className="relative z-10 w-24 h-20 sm:w-32 sm:h-24 flex-shrink-0 rounded-[5px] overflow-hidden bg-neutral-100 flex items-center justify-center">
+          <div className="relative z-10 w-24 h-20 sm:w-40 sm:h-40 flex-shrink-0 rounded-[5px]  overflow-hidden bg-neutral-100 flex items-center justify-center">
             {image && image !== "" ? (
               <Image src={image} alt={name} fill sizes="150px" className="object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none" />
             ) : (
@@ -77,7 +76,7 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
           {/* Main Info */}
           <div className="flex-1 min-w-0 z-10 relative">
             <div className="flex items-start justify-between gap-2 mb-1.5">
-              <Link href={`/college/${slug}`} className="text-sm sm:text-base font-extrabold text-[#333333] group-hover:text-[#FF3C3C] transition-colors leading-snug line-clamp-2">
+              <Link href={`/college/${slug}`} className="text-xl sm:text-[20px] font-extrabold text-[#333333] group-hover:text-[#FF3C3C] transition-colors leading-snug line-clamp-2">
                 {name}
               </Link>
             </div>
@@ -90,18 +89,9 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
               <div className="w-px h-3 bg-neutral-200" />
               
               {/* Money */}
-              <div className="flex items-center mt-5 mb-4 gap-1.5">
-                <span className="material-symbols-outlined text-[13px] text-neutral-400">currency_rupee</span>
-                <span className="text-sm text-neutral-500 font-medium">Starting Fees:</span>
-                {feesLabel ? (
-                  <>
-                    <span className="text-md font-black text-[#FF3C3C]">{feesLabel}</span>
-                    <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tight">/ year</span>
-                  </>
-                ) : (
-                  <span className="text-[12px] font-semibold text-slate-400 italic">Contact college</span>
-                )}
-              </div>
+              
+             
+              
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pointer-events-none">
               {universityType && (
@@ -155,14 +145,30 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
         </div>
 
         {/* Action Buttons - bottom right */}
-        <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2 z-20">
-          <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleApply(slug); }}
-            className="flex items-center justify-center gap-1.5 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-xs font-bold px-3 py-2 rounded-[8px] transition-all duration-300 cursor-pointer whitespace-nowrap shadow-sm"
-          >
-            <span className="material-symbols-outlined text-[15px]">edit_document</span>
-            Apply Now
-          </button>
+        <div className="absolute bottom-4  h-full right-4 flex flex-col items-start justify-evenly  gap-2 z-20">
+          <div className="flex items-center mt-5 mb-4 pt-3 gap-1.5">
+                <span className="material-symbols-outlined text-[13px] text-neutral-400">currency_rupee</span>
+                <span className="text-xl text-neutral-500 font-medium"> Fees:</span>
+                {feesLabel ? (
+                  <>
+                    <span className="text-xl font-black  text-[#FF3C3C]">{feesLabel}</span>
+                    <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tight">/ year</span>
+                  </>
+                ) : (
+                  <span className="text-[12px] font-semibold text-slate-400 italic">Contact college</span>
+                )}
+          </div>
+         
+         <div className="flex gap-3 mt-10">
+           {!isGovt && (
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleApply(slug); }}
+              className="flex items-center justify-center gap-1.5 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-sl font-bold px-3 py-2 rounded-[8px] transition-all duration-300 cursor-pointer whitespace-nowrap shadow-sm"
+            >
+              <span className="material-symbols-outlined text-[15px]">edit_document</span>
+              Apply Now
+            </button>
+          )}
           <AskQueryModal slug={slug} collegeName={name}   
             renderTrigger={(onClick) => (
               <button onClick={onClick}
@@ -172,6 +178,8 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
               </button>
             )}
           />
+         </div>
+          
         </div>
       </div>
 

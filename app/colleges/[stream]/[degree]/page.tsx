@@ -123,8 +123,8 @@ export default async function CollegesByStreamDegreePage({ params, searchParams 
       ranking: row.ranking ? parseInt(String(row.ranking)) : null,
       isTopUniversity: row.isTopUniversity ?? 0,
       topUniversityRank: row.topUniversityRank ? parseInt(String(row.topUniversityRank)) : null,
-      universityType: row.universityType || null, estyear: row.estyear || null,
-      verified: row.verified ?? 0,
+      universityType: row.universityType || null, collegetype_id: row.collegetype_id ? parseInt(String(row.collegetype_id)) : null,
+      estyear: row.estyear || null, verified: row.verified ?? 0,
       totalStudent: row.totalStudent ? parseInt(String(row.totalStudent)) : null,
       streams: [], min_fees: null, max_fees: null, avg_package: null,
     }));

@@ -46,7 +46,7 @@ export default async function CollegesPage({
       { $limit: 20 },
       { $project: {
         id: 1, slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, ranking: 1,
-        isTopUniversity: 1, topUniversityRank: 1, universityType: 1, estyear: 1, verified: 1, totalStudent: 1,
+        isTopUniversity: 1, topUniversityRank: 1, universityType: 1, collegetype_id: 1, estyear: 1, verified: 1, totalStudent: 1,
         registeredSortAddress: 1,
         name: "$u.firstname",
         city_name: "$c.name",
@@ -72,6 +72,7 @@ export default async function CollegesPage({
         isTopUniversity: row.isTopUniversity ?? 0,
         topUniversityRank: row.topUniversityRank ? parseInt(String(row.topUniversityRank)) : null,
         universityType: row.universityType || null,
+        collegetype_id: row.collegetype_id ? parseInt(String(row.collegetype_id)) : null,
         estyear: row.estyear || null,
         verified: row.verified ?? 0,
         totalStudent: row.totalStudent ? parseInt(String(row.totalStudent)) : null,

@@ -313,7 +313,7 @@ export default function SearchClient({
             {/* ── Filters sidebar ── */}
             <div className="hidden lg:block flex-shrink-0 sticky top-[72px] self-start" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
               <SearchFilters
-                key={`${stream}|${degree}|${cityId}|${stateId}|${countryId}|${feesMax}|${sort}`}
+                key={`${stream}|${degree}|${cityId}|${stateId}|${countryId}|${feesMax}|${sort}|${searchParams.get("fees_ranges")}|${searchParams.get("rating_ranges")}|${searchParams.get("ownerships")}`}
                 streams={streams}
                 degrees={degrees}
                 cities={cities}

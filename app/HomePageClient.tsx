@@ -69,67 +69,49 @@ export default function HomePageClient({
         <HeroSection />
 
         {/* 2. Stats Bar */}
-        <div data-gsap="fade-up">
-          <StatsBar />
-        </div>
+        <StatsBar />
 
         {/* Divider */}
         <hr className="border-t border-slate-200" />
 
         {/* 3. Discover the Top Universities */}
-        <div data-gsap="fade-up">
-          <TopUniversities
-            universities={universities}
-            initialStreamColleges={initialStreamColleges}
-            ads={tickerAds}
-          />
-        </div>
+        <TopUniversities
+          universities={universities}
+          initialStreamColleges={initialStreamColleges}
+          ads={tickerAds}
+        />
 
         {/* 3b. Ticker Ad Strip */}
         <HomeTicker ads={tickerAds} />
 
         {/* 4. Discover the Top Course */}
-        <div data-gsap="fade-up">
-          <TopCourse />
-        </div>
+        <TopCourse />
 
         <hr className="border-t border-slate-200" />
 
         {/* 5. Career Guidance */}
-        <div data-gsap="fade-up">
-          <CareerGuidance />
-        </div>
+        <CareerGuidance />
 
         {/* 6. Article Grid */}
-        <div data-gsap="fade-up">
-          <FieldsOfStudy />
-        </div>
+        <FieldsOfStudy />
 
         <hr className="border-t border-slate-200" />
 
         {/* 7. Student Life & Beyond (Blogs) */}
-        <div data-gsap="fade-up">
-          <NewsSection dbBlogs={dbBlogs} />
-        </div>
+        <NewsSection dbBlogs={dbBlogs} />
 
         <hr className="border-t border-slate-200" />
 
         {/* 8. Unfiltered Student Voices */}
-        <div data-gsap="fade-up">
-          <Testimonials testimonials={testimonials} />
-        </div>
+        <Testimonials testimonials={testimonials} />
 
         {/* 9. Latest News */}
-        <div data-gsap="fade-up">
-          <LatestNews />
-        </div>
+        <LatestNews />
 
         <hr className="border-t border-slate-200" />
 
         {/* 10. Get in Touch */}
-        <div data-gsap="fade-up">
-          <ContactSection />
-        </div>
+        <ContactSection />
       </main>
 
       <Footer />

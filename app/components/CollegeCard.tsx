@@ -35,26 +35,24 @@ function formatFees(fees: number | null): string {
   return `₹${fees}`;
 }
 
-function FeesDisplay({ min_fees, max_fees }: { min_fees: number | null; max_fees: number | null }) {
-  const minF = formatFees(min_fees);
+function FeesDisplay({ max_fees }: { max_fees: number | null }) {
   const maxF = formatFees(max_fees);
-
-  if (!minF && !maxF) {
+  if (!maxF) {
     return <span className="text-[13px] font-semibold text-slate-400 italic">Contact college for fees</span>;
   }
-
-  const label = minF && maxF && minF !== maxF ? `${minF} – ${maxF}` : (minF || maxF);
   return (
     <span className="text-[18px] font-black text-[#FF3C3C]">
-      {label} <span className="text-[12px] font-bold text-slate-400 uppercase">/ year</span>
+      {maxF} <span className="text-[12px] font-bold text-slate-400 uppercase">/ year</span>
     </span>
   );
 }
 
 export default function CollegeCard({ college, index = 0, entityName = "College" }: CollegeCardProps) {
   const { handleApply, modalSlug, closeModal } = useApplyGuard();
-  const { slug, name, location, image, rating, totalRatingUser, ranking, topUniversityRank, min_fees, max_fees } = college;
+  const { slug, name, location, image, rating, totalRatingUser, ranking, topUniversityRank, min_fees, max_fees, universityType, collegetype_id } = college;
   const displayRank = topUniversityRank ?? ranking;
+  // collegetype_id: 2=Government College, 3=Government University
+  const isGovt = collegetype_id === 2 || collegetype_id === 3;
 
   return (
     <motion.div
@@ -96,18 +94,20 @@ export default function CollegeCard({ college, index = 0, entityName = "College"
           </div>
           <div className="mb-6 flex flex-col">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Starting Fees</span>
-            <FeesDisplay min_fees={min_fees} max_fees={max_fees} />
+            <FeesDisplay max_fees={max_fees} />
           </div>
 
           {/* Action Buttons */}
           <div className="mt-auto flex flex-row items-center gap-2 pt-4 border-t border-slate-200 relative z-20">
-            <button
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleApply(slug); }}
-              className="flex-1 flex items-center justify-center gap-1 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-[11px] lg:text-[12px] font-bold px-1.5 py-2.5 rounded-[5px] transition-all duration-300 whitespace-nowrap"
-            >
-              <span className="material-symbols-outlined text-[14px]">edit_document</span>
-              Apply Now
-            </button>
+            {!isGovt && (
+              <button
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleApply(slug); }}
+                className="flex-1 flex items-center justify-center gap-1 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-[11px] lg:text-[12px] font-bold px-1.5 py-2.5 rounded-[5px] transition-all duration-300 whitespace-nowrap"
+              >
+                <span className="material-symbols-outlined text-[14px]">edit_document</span>
+                Apply Now
+              </button>
+            )}
             <AskQueryModal slug={slug} collegeName={name}
               renderTrigger={(onClick) => (
                 <button onClick={onClick}

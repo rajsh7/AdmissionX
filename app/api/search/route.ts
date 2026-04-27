@@ -16,7 +16,31 @@ export async function GET(request: NextRequest) {
   try {
     const db = await getDb();
     const { subject, location } = parseQuery(q);
-    const subjectRegex = { $regex: subject, $options: "i" };
+
+    // Alias map — same as fetchColleges
+    const ALIASES: Record<string, string> = {
+      "btech": "b.tech|be/b.tech|b tech",
+      "b.tech": "b.tech|be/b.tech",
+      "mtech": "m.tech|me/m.tech|m tech",
+      "m.tech": "m.tech|me/m.tech",
+      "bsc": "b.sc|bachelor of science",
+      "msc": "m.sc|master of science",
+      "bca": "bca", "mca": "mca", "bba": "bba", "mba": "mba", "mbbs": "mbbs",
+      "bcom": "b.com|bachelor of commerce",
+      "mcom": "m.com|master of commerce",
+      "llb": "ll.b|bachelor of laws",
+      "llm": "ll.m|master of laws",
+      "barch": "b.arch|bachelor of architecture",
+      "phd": "ph.d|doctor of philosophy",
+      "pgdm": "pgdm",
+      "bpharma": "b.pharma", "mpharma": "m.pharma",
+      "engineering": "engineering|be/b.tech|b.tech",
+      "medical": "mbbs|medical|bds|bams",
+      "management": "mba|bba|management|pgdm",
+    };
+    const subjectLower = subject.toLowerCase().replace(/\s+/g, "");
+    const aliasPattern = ALIASES[subjectLower] ?? subject;
+    const subjectRegex = { $regex: aliasPattern, $options: "i" };
     const locationRegex = location ? { $regex: location, $options: "i" } : null;
 
     // Resolve city

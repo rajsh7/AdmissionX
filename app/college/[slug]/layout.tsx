@@ -56,9 +56,12 @@ const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 const DEFAULT_BANNER = "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=1200";
 
 function buildImageUrl(raw: string | null | undefined): string {
-  if (!raw || String(raw).toLowerCase() === "null") return DEFAULT_BANNER;
-  if (typeof raw === "string" && (raw.startsWith("http") || raw.startsWith("/"))) return raw;
-  return `${IMAGE_BASE}${raw}`;
+  if (!raw || String(raw).trim().toLowerCase() === "null") return DEFAULT_BANNER;
+  const s = String(raw).trim();
+  if (s.startsWith("http")) return s;
+  if (s.startsWith("/uploads/")) return `https://admin.admissionx.in${s}`;
+  if (s.startsWith("/")) return s;
+  return `https://admin.admissionx.in/uploads/${s}`;
 }
 
 function slugToName(slug: string): string {

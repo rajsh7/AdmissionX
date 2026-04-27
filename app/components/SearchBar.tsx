@@ -68,13 +68,8 @@ export default function SearchBar({
     setShowDropdown(false);
     if (item.type === "college") {
       router.push(`/college/${item.slug}`);
-    } else if (item.type === "course") {
-      router.push(`/careers-courses?q=${encodeURIComponent(item.name)}`);
-    } else if (item.type === "stream") {
-      const params = new URLSearchParams();
-      if (item.slug) params.set("stream", item.slug);
-      if ((item as any).cityId) params.set("city_id", String((item as any).cityId));
-      router.push(`/top-colleges?${params.toString()}`);
+    } else if (item.type === "course" || item.type === "stream") {
+      router.push(`/search?q=${encodeURIComponent(item.name)}`);
     } else if (item.type === "city") {
       router.push(`/top-colleges?city_id=${item.id}`);
     } else {

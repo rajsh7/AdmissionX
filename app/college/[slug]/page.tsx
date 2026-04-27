@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import AboutTab from "./components/AboutTab";
 import TrackCollegeView from "@/app/components/TrackCollegeView";
+import CollegeGallery from "@/app/components/college/CollegeGallery";
 
 export const dynamic = "force-dynamic";
 
@@ -153,6 +154,9 @@ export default async function CollegeOverviewPage({
       descriptionText={descriptionText}
       paragraphs={paragraphs}
     />
+      <div className="max-w-[1920px] mx-auto px-6 lg:px-12 pb-12">
+        <CollegeGallery slug={slug} />
+      </div>
     </>
   );
 }

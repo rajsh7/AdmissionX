@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { Filter, Document } from "mongodb";
 
 export interface CollegeResult {
   id: string | number;
@@ -16,6 +15,7 @@ export interface CollegeResult {
   isTopUniversity: number;
   topUniversityRank: number | null;
   universityType: string | null;
+  collegetype_id: number | null;
   estyear: string | null;
   verified: number;
   totalStudent: number | null;
@@ -25,10 +25,29 @@ export interface CollegeResult {
   avg_package: string | null;
 }
 
+// collegetype_id: 1=Private College, 2=Government College, 3=Government University, 4=Private University
+const OWNERSHIP_MAP: Record<string, number[]> = {
+  "Private College":       [1],
+  "Government College":    [2],
+  "Government University": [3],
+  "Private University":    [4],
+};
+
+const ALIASES: Record<string, string> = {
+  "btech": "b.tech|be/b.tech|b tech", "b.tech": "b.tech|be/b.tech",
+  "mtech": "m.tech|me/m.tech|m tech", "mba": "mba", "bba": "bba",
+  "mbbs": "mbbs", "bca": "bca", "mca": "mca",
+  "bcom": "b.com|bachelor of commerce", "mcom": "m.com|master of commerce",
+  "engineering": "engineering|be/b.tech|b.tech",
+  "medical": "mbbs|medical|bds|bams",
+  "management": "mba|bba|management|pgdm",
+};
+
 function buildImageUrl(raw: string | null): string | null {
-  if (!raw) return null;
-  if (raw.startsWith("http") || raw.startsWith("/")) return raw;
-  return `/uploads/${raw}`;
+  if (!raw || String(raw).trim().toLowerCase() === "null") return null;
+  const s = String(raw).trim();
+  if (s.startsWith("http")) return s;
+  return s.startsWith("/") ? s : `https://admin.admissionx.in/uploads/${s}`;
 }
 
 function slugToName(slug: string): string {
@@ -41,8 +60,7 @@ export async function GET(req: NextRequest) {
   const q = (sp.get("q") ?? "").trim();
   const stream = (sp.get("stream") ?? "").trim();
   const degree = (sp.get("degree") ?? "").trim();
-  const cityIdRaw = sp.get("city_id") || null;
-  const cityText = (sp.get("city") ?? "").trim();
+  const cityId = sp.get("city_id") || null;
   const feesMax = sp.get("fees_max") ? parseInt(sp.get("fees_max")!) : null;
   const feesRanges = sp.get("fees_ranges") ? sp.get("fees_ranges")!.split(",") : [];
   const ratingRanges = sp.get("rating_ranges") ? sp.get("rating_ranges")!.split(",") : [];
@@ -53,24 +71,19 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(48, Math.max(6, parseInt(sp.get("limit") ?? "12")));
   const offset = (page - 1) * limit;
 
+  let queryDegreeIds: number[] = [];
+  let queryStreamIds: number[] = [];
+
   try {
     const db = await getDb();
-    let resolvedCityId = cityIdRaw;
-    if (!resolvedCityId && cityText) {
-      const cityDoc = await db.collection("city").findOne(
-        { name: { $regex: `^${cityText}$`, $options: "i" } },
-        { projection: { id: 1 } }
-      );
-      if (cityDoc) resolvedCityId = String(cityDoc.id);
-    }
-    const cityIntId = resolvedCityId ? (isNaN(parseInt(resolvedCityId)) ? null : parseInt(resolvedCityId)) : null;
+    const cityIntId = cityId ? (isNaN(parseInt(cityId)) ? null : parseInt(cityId)) : null;
 
     const [faDoc, degDoc] = await Promise.all([
       stream ? db.collection("functionalarea").findOne({ pageslug: stream }, { projection: { id: 1 } }) : null,
       degree ? db.collection("degree").findOne({ pageslug: degree }, { projection: { id: 1 } }) : null,
     ]);
 
-    // ── Resolve collegemaster IDs for stream/degree/fees in parallel ─────────
+    // Resolve collegemaster IDs for stream/degree/fees filters
     const cmFilters: Promise<unknown[]>[] = [];
     if (faDoc?.id != null) cmFilters.push(
       db.collection("collegemaster").find({ functionalarea_id: faDoc.id }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
@@ -80,16 +93,12 @@ export async function GET(req: NextRequest) {
       db.collection("collegemaster").find({ degree_id: degDoc.id }, { projection: { collegeprofile_id: 1 } }).limit(5000).toArray()
         .then((r) => [...new Set(r.map((c) => c.collegeprofile_id))])
     );
-    const feeConditions = [];
-    if (feesMax != null && !isNaN(feesMax)) {
-      feeConditions.push({ fees: { $gt: 0, $lte: feesMax } });
-    }
+    const feeConditions: object[] = [];
+    if (feesMax != null && !isNaN(feesMax)) feeConditions.push({ fees: { $gt: 0, $lte: feesMax } });
     if (feesRanges.length > 0) {
       for (const rangeStr of feesRanges) {
         const [minStr, maxStr] = rangeStr.split("-");
-        const min = parseInt(minStr) || 0;
-        const max = parseInt(maxStr) || 999999999;
-        feeConditions.push({ fees: { $gt: min, $lte: max } });
+        feeConditions.push({ fees: { $gt: parseInt(minStr) || 0, $lte: parseInt(maxStr) || 999999999 } });
       }
     }
     if (feeConditions.length > 0) {
@@ -100,8 +109,6 @@ export async function GET(req: NextRequest) {
     }
 
     const resolvedIds = await Promise.all(cmFilters);
-
-    // Intersect all id sets
     let filteredIds: unknown[] | null = null;
     for (const ids of resolvedIds) {
       filteredIds = filteredIds
@@ -109,7 +116,22 @@ export async function GET(req: NextRequest) {
         : ids;
     }
 
-    // ── Build match ──────────────────────────────────────────────────────────
+    // Resolve q → degree/stream IDs for course-specific fees
+    if (q.length >= 2) {
+      const qLower = q.toLowerCase().replace(/\s+/g, "");
+      const aliasPattern = ALIASES[qLower] ?? q;
+      const courseRegex = { $regex: aliasPattern, $options: "i" };
+      const [qDegrees, qStreams] = await Promise.all([
+        db.collection("degree").find({ name: courseRegex }).project({ id: 1 }).toArray(),
+        db.collection("functionalarea").find({ name: courseRegex }).project({ id: 1 }).toArray(),
+      ]);
+      queryDegreeIds = qDegrees.map((d: any) => d.id).filter(Boolean);
+      queryStreamIds = qStreams.map((s: any) => s.id).filter(Boolean);
+    }
+    if (queryDegreeIds.length === 0 && degDoc?.id != null) queryDegreeIds = [degDoc.id];
+    if (queryStreamIds.length === 0 && faDoc?.id != null) queryStreamIds = [faDoc.id];
+
+    // Build match
     const match: Record<string, unknown> = {};
     if (filteredIds) match.id = { $in: filteredIds };
     if (cityIntId) match.registeredAddressCityId = cityIntId;
@@ -118,65 +140,99 @@ export async function GET(req: NextRequest) {
     else if (type === "abroad") match.registeredAddressCountryId = { $ne: 1 };
 
     if (ownerships.length > 0) {
-      const ownershipRegexes = ownerships.map(o => {
-        if (o === 'Public / Government') return new RegExp('government|public', 'i');
-        return new RegExp(o, 'i');
-      });
-      match.universityType = { $in: ownershipRegexes };
+      const typeIds = ownerships.flatMap((o) => OWNERSHIP_MAP[o] ?? []);
+      if (typeIds.length > 0) match.collegetype_id = { $in: typeIds };
     }
-    
     if (ratingRanges.length > 0) {
-      const ratingOr = ratingRanges.map(r => {
+      match.$or = ratingRanges.map((r) => {
         const [min, max] = r.split("-");
         return { rating: { $gt: parseFloat(min), $lte: parseFloat(max) } };
       });
-      match.$or = ratingOr;
     }
 
-    // ── Build aggregation pipeline ───────────────────────────────────────────
+    // When searching a course with no explicit sort, default to fees
+    const effectiveSort = (q.length >= 2 && (queryDegreeIds.length > 0 || queryStreamIds.length > 0) && sort === "rating") ? "fees" : sort;
+    const isFeeSort = effectiveSort === "fees";
+
     const basePipeline: object[] = [
       { $match: match },
       { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
       { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
     ];
 
+    if (q.length >= 2) {
+      basePipeline.push({
+        $match: {
+          $or: [
+            { "user.firstname": { $regex: q, $options: "i" } },
+            { registeredSortAddress: { $regex: q, $options: "i" } },
+            { slug: { $regex: q, $options: "i" } },
+          ],
+        },
+      });
+    }
 
-
-    const sortStage: Record<string, 1 | -1> =
-      sort === "ranking" ? { ranking: 1 } :
-      sort === "newest" ? { created_at: -1 } :
+    const preSortStage: Record<string, 1 | -1> =
+      effectiveSort === "ranking" ? { ranking: 1 } :
+      effectiveSort === "newest" ? { created_at: -1 } :
       { rating: -1, totalRatingUser: -1 };
 
-    basePipeline.push({ $sort: sortStage });
+    basePipeline.push({ $sort: preSortStage });
 
-    // ── Run count + data fetch in parallel, with enrichment inside pipeline ──
+    // For fees sort: fetch large pool so aggregation can sort by computed min_fees
+    const fetchLimit = isFeeSort ? Math.max(limit * 20, 240) : limit;
+    const fetchOffset = isFeeSort ? 0 : offset;
+
+    const filteredCmExpr = (queryDegreeIds.length > 0 || queryStreamIds.length > 0)
+      ? {
+          $filter: {
+            input: "$cm", as: "c",
+            cond: {
+              $and: [
+                { $gt: ["$$c.fees", 0] },
+                { $or: [
+                  ...(queryDegreeIds.length > 0 ? [{ $in: ["$$c.degree_id", queryDegreeIds] }] : []),
+                  ...(queryStreamIds.length > 0 ? [{ $in: ["$$c.functionalarea_id", queryStreamIds] }] : []),
+                ]},
+              ],
+            },
+          },
+        }
+      : { $filter: { input: "$cm", as: "c", cond: { $gt: ["$$c.fees", 0] } } };
+
     const [countResult, dataRows] = await Promise.all([
       db.collection("collegeprofile").aggregate([...basePipeline, { $count: "total" }]).toArray(),
       db.collection("collegeprofile").aggregate([
         ...basePipeline,
-        { $skip: offset },
-        { $limit: limit },
+        { $skip: fetchOffset },
+        { $limit: fetchLimit },
         { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "city" } },
         { $unwind: { path: "$city", preserveNullAndEmptyArrays: true } },
         { $lookup: { from: "placement", localField: "id", foreignField: "collegeprofile_id", as: "placement" } },
         { $unwind: { path: "$placement", preserveNullAndEmptyArrays: true } },
         { $lookup: { from: "collegemaster", localField: "id", foreignField: "collegeprofile_id", as: "cm" } },
         { $lookup: { from: "functionalarea", localField: "cm.functionalarea_id", foreignField: "id", as: "fa" } },
+        { $addFields: { filtered_cm: filteredCmExpr } },
         {
           $project: {
             slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, ranking: 1,
-            isTopUniversity: 1, topUniversityRank: 1, universityType: 1, estyear: 1,
+            isTopUniversity: 1, topUniversityRank: 1, universityType: 1, collegetype_id: 1, estyear: 1,
             verified: 1, totalStudent: 1, registeredSortAddress: 1, id: 1,
             name: { $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"] },
             city_name: "$city.name",
             streams: { $setUnion: ["$fa.name", []] },
-            min_fees: { $min: { $filter: { input: "$cm.fees", as: "f", cond: { $gt: ["$$f", 0] } } } },
-            max_fees: { $max: { $filter: { input: "$cm.fees", as: "f", cond: { $gt: ["$$f", 0] } } } },
+            min_fees: { $min: "$filtered_cm.fees" },
+            max_fees: { $max: "$filtered_cm.fees" },
             avg_package: "$placement.ctcaverage",
           },
         },
-        // Sort by fees AFTER computing min_fees
-        ...(sort === "fees" ? [{ $sort: { min_fees: 1 as const } }] : []),
+        // Only filter to colleges with fees when sorting by fees
+        ...(isFeeSort ? [{ $match: { min_fees: { $gt: 0 } } }] : []),
+        ...(isFeeSort ? [
+          { $sort: { min_fees: 1 as const } },
+          { $skip: offset },
+          { $limit: limit },
+        ] : []),
       ]).toArray(),
     ]);
 
@@ -197,6 +253,7 @@ export async function GET(req: NextRequest) {
         isTopUniversity: row.isTopUniversity ?? 0,
         topUniversityRank: row.topUniversityRank ? parseInt(String(row.topUniversityRank)) : null,
         universityType: row.universityType || null,
+        collegetype_id: row.collegetype_id ? parseInt(String(row.collegetype_id)) : null,
         estyear: row.estyear || null,
         verified: row.verified ?? 0,
         totalStudent: row.totalStudent ? parseInt(String(row.totalStudent)) : null,
@@ -213,3 +270,4 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: false, colleges: [], total: 0, page: 1, totalPages: 0, limit }, { status: 500 });
   }
 }
+

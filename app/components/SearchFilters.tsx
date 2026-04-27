@@ -73,9 +73,10 @@ const RATING_OPTIONS = [
 ];
 
 const OWNERSHIP_OPTIONS = [
-  { label: "Private", value: "Private" },
-  { label: "Public / Government", value: "Public / Government" },
-  { label: "Public Private", value: "Public Private" },
+  { label: "Private College", value: "Private College" },
+  { label: "Government College", value: "Government College" },
+  { label: "Government University", value: "Government University" },
+  { label: "Private University", value: "Private University" },
 ];
 
 export default function SearchFilters({

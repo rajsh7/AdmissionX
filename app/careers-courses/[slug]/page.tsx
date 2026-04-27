@@ -31,21 +31,43 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   const { slug } = await params;
   const db = await getDb();
 
-  // Fetch the course by pageslug
-  const course = await db.collection("course").findOne({ pageslug: slug });
-  if (!course) notFound();
+  // Fetch the course by pageslug — check course collection first, then degree
+  let course = await db.collection("course").findOne({ pageslug: slug });
+  let isDegreePage = false;
+
+  if (!course) {
+    // Try degree collection (e.g. MBBS, BE/B.Tech)
+    const degree = await db.collection("degree").findOne({ pageslug: slug });
+    if (!degree) notFound();
+    // Build a synthetic course object from degree data
+    course = {
+      ...degree,
+      name: degree.name,
+      pagetitle: degree.name,
+      pagedescription: degree.pagedescription || degree.description || "",
+      degree_id: degree.id,
+      functionalarea_id: degree.functionalarea_id || null,
+      bannerimage: degree.bannerimage || degree.logoimage || null,
+      logoimage: degree.logoimage || null,
+    };
+    isDegreePage = true;
+  }
 
   // Fetch degree and stream in parallel
-  const [degree, stream, cmRows] = await Promise.all([
+  const [degreeDoc, stream, cmRows] = await Promise.all([
     course.degree_id ? db.collection("degree").findOne({ id: course.degree_id }, { projection: { name: 1 } }) : null,
     course.functionalarea_id ? db.collection("functionalarea").findOne({ id: course.functionalarea_id }, { projection: { name: 1 } }) : null,
-    // Get collegemaster rows for this course to derive stats
     db.collection("collegemaster")
-      .find({ functionalarea_id: course.functionalarea_id, degree_id: course.degree_id })
+      .find(isDegreePage
+        ? { degree_id: course.degree_id }
+        : { functionalarea_id: course.functionalarea_id, degree_id: course.degree_id }
+      )
       .limit(200)
       .project({ fees: 1, courseduration: 1 })
       .toArray(),
   ]);
+
+  const degree = isDegreePage ? course : degreeDoc;
 
   // Derive stats from collegemaster
   const fees = cmRows.map((r) => Number(r.fees)).filter((f) => f > 0);
@@ -62,10 +84,13 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
   // Fetch related courses in the same stream (specializations)
   const relatedCourses = await db.collection("course")
-    .find({
-      functionalarea_id: course.functionalarea_id,
-      pageslug: { $nin: [slug, ""], $exists: true },
-    })
+    .find(isDegreePage
+      ? { degree_id: course.degree_id, pageslug: { $exists: true, $ne: "" } }
+      : {
+          functionalarea_id: course.functionalarea_id,
+          pageslug: { $nin: [slug, ""], $exists: true },
+        }
+    )
     .limit(6)
     .project({ name: 1, pageslug: 1, logoimage: 1, bannerimage: 1 })
     .toArray();

@@ -36,6 +36,7 @@ interface CollegeRow {
   isTopUniversity: number;
   topUniversityRank: string | null;
   universityType: string | null;
+  collegetype_id: number | null;
   estyear: string | null;
   verified: number;
   totalStudent: string | null;
@@ -148,6 +149,7 @@ function buildColleges(rows: CollegeRow[]): CollegeResult[] {
         ? parseInt(String(row.topUniversityRank))
         : null,
       universityType: row.universityType || null,
+      collegetype_id: row.collegetype_id ?? null,
       estyear: row.estyear || null,
       verified: row.verified ?? 0,
       totalStudent: row.totalStudent
