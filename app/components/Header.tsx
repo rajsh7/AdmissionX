@@ -24,6 +24,7 @@ interface MegaCategory {
   links: { label: string; href: string }[];
 }
 
+
 interface NavLink {
   label: string;
   href: string;
@@ -34,7 +35,7 @@ const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "Colleges", href: "/top-colleges" },
   { label: "University", href: "/top-university" },
-  { label: "Courses", href: "/careers-courses" },
+  { label: "Stream", href: "/careers-courses" },
   { label: "Exams", href: "/examination" },
 ];
 
@@ -202,45 +203,94 @@ const secondNavLinks: SecondNavItem[] = [
     href: "/top-colleges?stream=engineering",
     mega: [
       {
-        label: "By Stream",
-        icon: "school",
+        label: "Top Ranked Colleges",
+        icon: "emoji_events",
         links: [
-          { label: "Engineering", href: "/top-colleges?stream=engineering" },
-          { label: "MBA / Management", href: "/top-colleges?stream=management" },
-          { label: "Medical", href: "/top-colleges?stream=medical" },
-          { label: "Law", href: "/top-colleges?stream=law" },
-          { label: "Arts & Science", href: "/top-colleges?stream=arts-science" },
-          { label: "Commerce", href: "/top-colleges?stream=commerce" },
-          { label: "Design", href: "/top-colleges?stream=design" },
-          { label: "Pharmacy", href: "/top-colleges?stream=pharmacy" },
+          { label: "Top Engineering Colleges in India", href: "/top-colleges?stream=engineering" },
+          { label: "Top Private Engineering Colleges", href: "/top-colleges?stream=engineering&ownerships=Private+College" },
+          { label: "Top Government Engineering Colleges", href: "/top-colleges?stream=engineering&ownerships=Government+College" },
+          { label: "Top IITs in India", href: "/top-colleges?stream=engineering&q=IIT" },
+          { label: "Top NITs in India", href: "/top-colleges?stream=engineering&q=NIT" },
+          { label: "Top Engineering Colleges in Bangalore", href: "/top-colleges?stream=engineering&q=Bangalore" },
+          { label: "Top Engineering Colleges in Delhi", href: "/top-colleges?stream=engineering&q=Delhi" },
+          { label: "Top Engineering Colleges in Mumbai", href: "/top-colleges?stream=engineering&q=Mumbai" },
+          { label: "Top Engineering Colleges in Hyderabad", href: "/top-colleges?stream=engineering&q=Hyderabad" },
+          { label: "Top Engineering Colleges in Pune", href: "/top-colleges?stream=engineering&q=Pune" },
+          { label: "Top Engineering Colleges in Chennai", href: "/top-colleges?stream=engineering&q=Chennai" },
+          { label: "Top Engineering Colleges in Kerala", href: "/top-colleges?stream=engineering&q=Kerala" },
         ],
       },
       {
-        label: "By Type",
-        icon: "apartment",
+        label: "Popular Courses",
+        icon: "menu_book",
         links: [
-          { label: "Top Colleges", href: "/top-colleges" },
-          { label: "Top Universities", href: "/top-university" },
-          { label: "Government Colleges", href: "/top-colleges?ownerships=Public+%2F+Government" },
-          { label: "Private Colleges", href: "/top-colleges?ownerships=Private" },
-          { label: "Deemed Universities", href: "/top-university?type=deemed" },
-          { label: "Central Universities", href: "/top-university?type=central" },
+          { label: "B.Tech / BE", href: "/careers-courses/be-b-tech" },
+          { label: "M.Tech", href: "/careers-courses?stream=engineering&level=pg" },
+          { label: "Diploma in Engineering", href: "/careers-courses?stream=engineering&level=diploma" },
+          { label: "B.Tech Computer Science", href: "/careers-courses?stream=engineering" },
+          { label: "B.Tech Mechanical", href: "/careers-courses?stream=engineering" },
+          { label: "B.Tech Civil", href: "/careers-courses?stream=engineering" },
+          { label: "B.Tech Electronics", href: "/careers-courses?stream=engineering" },
+          { label: "B.Tech Electrical", href: "/careers-courses?stream=engineering" },
         ],
       },
       {
-        label: "Tools",
-        icon: "build",
+        label: "Popular Specializations",
+        icon: "science",
         links: [
-          { label: "Compare Colleges", href: "/compare" },
+          { label: "Computer Science Engineering", href: "/careers-courses?stream=engineering" },
+          { label: "Mechanical Engineering", href: "/careers-courses?stream=engineering" },
+          { label: "Civil Engineering", href: "/careers-courses?stream=engineering" },
+          { label: "Electrical Engineering", href: "/careers-courses?stream=engineering" },
+          { label: "Electronics & Communication", href: "/careers-courses?stream=engineering" },
+          { label: "Information Technology", href: "/careers-courses?stream=engineering" },
+          { label: "Chemical Engineering", href: "/careers-courses?stream=engineering" },
+          { label: "Aerospace Engineering", href: "/careers-courses?stream=engineering" },
+        ],
+      },
+      {
+        label: "Exams",
+        icon: "assignment",
+        links: [
+          { label: "JEE Main", href: "/examination/engineering" },
+          { label: "JEE Advanced", href: "/examination/engineering" },
+          { label: "BITSAT", href: "/examination/engineering" },
+          { label: "VITEEE", href: "/examination/engineering" },
+          { label: "SRMJEEE", href: "/examination/engineering" },
+          { label: "MHT CET", href: "/examination/engineering" },
+          { label: "KCET", href: "/examination/engineering" },
+          { label: "All Engineering Exams", href: "/examination/engineering" },
+        ],
+      },
+      {
+        label: "Colleges By Location",
+        icon: "location_on",
+        links: [
+          { label: "Engineering Colleges in Bangalore", href: "/top-colleges?stream=engineering&q=Bangalore" },
+          { label: "Engineering Colleges in Delhi", href: "/top-colleges?stream=engineering&q=Delhi" },
+          { label: "Engineering Colleges in Mumbai", href: "/top-colleges?stream=engineering&q=Mumbai" },
+          { label: "Engineering Colleges in Hyderabad", href: "/top-colleges?stream=engineering&q=Hyderabad" },
+          { label: "Engineering Colleges in Pune", href: "/top-colleges?stream=engineering&q=Pune" },
+          { label: "Engineering Colleges in Chennai", href: "/top-colleges?stream=engineering&q=Chennai" },
+          { label: "Engineering Colleges in Kolkata", href: "/top-colleges?stream=engineering&q=Kolkata" },
+          { label: "Engineering Colleges in Jaipur", href: "/top-colleges?stream=engineering&q=Jaipur" },
+        ],
+      },
+      {
+        label: "Compare Colleges",
+        icon: "compare",
+        links: [
+          { label: "Compare Engineering Colleges", href: "/compare" },
           { label: "Compare Courses", href: "/compare-course" },
           { label: "College Predictor", href: "/counselling" },
+          { label: "Career Guidance", href: "/counselling" },
         ],
       },
     ],
   },
   {
-    label: "Medical",
-    href: "/top-colleges?stream=medical",
+    label: "Courses",
+    href: "/careers-courses",
     mega: [
       {
         label: "By Level",
@@ -248,8 +298,8 @@ const secondNavLinks: SecondNavItem[] = [
         links: [
           { label: "UG Courses", href: "/careers-courses?level=ug" },
           { label: "PG Courses", href: "/careers-courses?level=pg" },
-          { label: "Diploma Courses", href: "/careers-courses?level=diploma" },
-          { label: "Certificate Courses", href: "/careers-courses?level=certificate" },
+          { label: "Diploma", href: "/careers-courses?level=diploma" },
+          { label: "Certificate", href: "/careers-courses?level=certificate" },
           { label: "PhD / Doctorate", href: "/careers-courses?level=phd" },
         ],
       },
@@ -268,11 +318,14 @@ const secondNavLinks: SecondNavItem[] = [
         ],
       },
       {
-        label: "By Career",
-        icon: "work",
+        label: "By Stream",
+        icon: "category",
         links: [
+          { label: "Engineering", href: "/careers-courses?stream=engineering" },
+          { label: "Medical", href: "/careers-courses?stream=medical" },
+          { label: "Commerce", href: "/careers-courses?stream=commerce" },
+          { label: "Arts", href: "/careers-courses?stream=arts" },
           { label: "Popular Careers", href: "/popular-careers" },
-          { label: "Career Guidance", href: "/counselling" },
         ],
       },
     ],
@@ -282,41 +335,33 @@ const secondNavLinks: SecondNavItem[] = [
     href: "/top-colleges?stream=management",
     mega: [
       {
-        label: "Engineering",
-        icon: "engineering",
+        label: "Courses",
+        icon: "menu_book",
         links: [
-          { label: "JEE Main", href: "/examination/engineering" },
-          { label: "JEE Advanced", href: "/examination/engineering" },
-          { label: "BITSAT", href: "/examination/engineering" },
-          { label: "VITEEE", href: "/examination/engineering" },
+          { label: "MBA", href: "/careers-courses/mba" },
+          { label: "BBA", href: "/careers-courses/bba" },
+          { label: "PGDM", href: "/careers-courses?stream=management" },
+          { label: "Executive MBA", href: "/careers-courses?stream=management" },
         ],
       },
       {
-        label: "Management",
-        icon: "business_center",
+        label: "Top Colleges",
+        icon: "apartment",
+        links: [
+          { label: "Top MBA Colleges", href: "/top-colleges?stream=management" },
+          { label: "IIMs", href: "/top-colleges?stream=management" },
+          { label: "Private B-Schools", href: "/top-colleges?stream=management" },
+          { label: "Government B-Schools", href: "/top-colleges?stream=management" },
+        ],
+      },
+      {
+        label: "Exams",
+        icon: "assignment",
         links: [
           { label: "CAT", href: "/examination/management" },
           { label: "MAT", href: "/examination/management" },
           { label: "XAT", href: "/examination/management" },
           { label: "SNAP", href: "/examination/management" },
-        ],
-      },
-      {
-        label: "Medical",
-        icon: "medical_services",
-        links: [
-          { label: "NEET UG", href: "/examination/medical" },
-          { label: "NEET PG", href: "/examination/medical" },
-          { label: "AIIMS", href: "/examination/medical" },
-        ],
-      },
-      {
-        label: "Law & Others",
-        icon: "gavel",
-        links: [
-          { label: "CLAT", href: "/examination/law" },
-          { label: "LSAT", href: "/examination/law" },
-          { label: "All Exams", href: "/examination" },
         ],
       },
     ],
@@ -420,35 +465,36 @@ const secondNavLinks: SecondNavItem[] = [
 
 function SecondNav() {
   const [hoveredCat, setHoveredCat] = useState<Record<string, string>>({});
-  const navRef = useRef<HTMLDivElement>(null);
-  const firstItemRef = useRef<HTMLDivElement>(null);
-  const [navRect, setNavRect] = useState<{ left: number; right: number; bottom: number } | null>(null);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const [barRect, setBarRect] = useState<{ left: number; right: number; bottom: number } | null>(null);
 
   useEffect(() => {
     const update = () => {
-      if (navRef.current && firstItemRef.current) {
-        const navR = navRef.current.getBoundingClientRect();
-        const firstR = firstItemRef.current.getBoundingClientRect();
-        setNavRect({ left: firstR.left, right: navR.right, bottom: navR.bottom });
+      if (barRef.current) {
+        const r = barRef.current.getBoundingClientRect();
+        setBarRect({ left: r.left, right: r.right, bottom: r.bottom });
       }
     };
     update();
     window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
+    window.addEventListener('scroll', update);
+    return () => { window.removeEventListener('resize', update); window.removeEventListener('scroll', update); };
   }, []);
 
   return (
-    <div className="home-page-shell ">
-      <div ref={navRef} className="relative   flex items-center gap-0 justify-center">
-        {secondNavLinks.map((item, index) => {
+    <div className="home-page-shell flex justify-end ">
+      <div ref={barRef} className="inline-flex mr-8  items-center gap-0">
+        {secondNavLinks.map((item) => {
           const activeCat = hoveredCat[item.label] ?? item.mega?.[0]?.label ?? "";
           const activeCatData = item.mega?.find(c => c.label === activeCat) ?? item.mega?.[0];
+          const isHov = hoveredItem === item.label;
           return (
             <div
               key={item.label}
-              ref={index === 0 ? firstItemRef : undefined}
-              className="relative group/snav "
-              onMouseLeave={() => setHoveredCat(p => ({ ...p, [item.label]: item.mega?.[0]?.label ?? "" }))}
+              className="relative"
+              onMouseEnter={() => setHoveredItem(item.label)}
+              onMouseLeave={() => { setHoveredItem(null); setHoveredCat(p => ({ ...p, [item.label]: item.mega?.[0]?.label ?? "" })); }}
             >
               <Link
                 href={item.href}
@@ -456,20 +502,19 @@ function SecondNav() {
               >
                 {item.label}
                 {item.mega && (
-                  <span className="material-symbols-outlined text-[14px] text-slate-400 transition-transform duration-200 group-hover/snav:rotate-180">
+                  <span className={`material-symbols-outlined text-[14px] text-slate-400 transition-transform duration-200 ${isHov ? 'rotate-180' : ''}`}>
                     expand_more
                   </span>
                 )}
               </Link>
 
-              {item.mega && navRect && (
+              {item.mega && isHov && barRect && (
                 <div
-                  className="fixed opacity-0 pointer-events-none group-hover/snav:opacity-100 group-hover/snav:pointer-events-auto transition-all duration-200 z-50"
-                  style={{ top: navRect.bottom, left: navRect.left, width: navRect.right - navRect.left }}
+                  className="fixed z-50"
+                  style={{ top: barRect.bottom, left: barRect.left, width: barRect.right - barRect.left }}
                 >
-                  <div>
-                    <div className="bg-white rounded-[12px] shadow-2xl shadow-black/10 border border-slate-100 overflow-hidden flex min-h-[200px]">
-                      {/* Left: Categories */}
+                  <div className="bg-white rounded-[12px] shadow-2xl shadow-black/10 border border-slate-100 overflow-hidden flex min-h-[200px]">
+                      {/* Left categories column */}
                       {item.mega.length > 1 && (
                         <div className="w-[200px] shrink-0 bg-slate-50 border-r border-slate-100 py-3">
                           {item.mega.map((cat) => {
@@ -479,7 +524,9 @@ function SecondNav() {
                                 key={cat.label}
                                 onMouseEnter={() => setHoveredCat(p => ({ ...p, [item.label]: cat.label }))}
                                 className={`flex items-center gap-2.5 px-4 py-2.5 cursor-default transition-colors ${
-                                  isActive ? "bg-white border-l-2 border-primary" : "hover:bg-white border-l-2 border-transparent"
+                                  isActive
+                                    ? "bg-white border-l-2 border-primary"
+                                    : "hover:bg-white border-l-2 border-transparent"
                                 }`}
                               >
                                 <span className={`material-symbols-outlined text-[17px] transition-colors ${
@@ -492,14 +539,16 @@ function SecondNav() {
                                 }`}>
                                   {cat.label}
                                 </span>
-                                <span className="material-symbols-outlined text-[14px] text-slate-300 ml-auto">chevron_right</span>
+                                <span className="material-symbols-outlined text-[14px] text-slate-300 ml-auto">
+                                  chevron_right
+                                </span>
                               </div>
                             );
                           })}
                         </div>
                       )}
 
-                      {/* Right: Active category links */}
+                      {/* Right links panel */}
                       <div className="flex-1 p-5">
                         {activeCatData && (
                           <>
@@ -522,7 +571,6 @@ function SecondNav() {
                         )}
                       </div>
                     </div>
-                  </div>
                 </div>
               )}
             </div>
@@ -700,7 +748,7 @@ export default function Header({ theme }: HeaderProps) {
                     {link.mega && (
                       <div
                         className="fixed left-0  right-0 pt-1 opacity-0 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:pointer-events-auto transition-all duration-200 z-50"
-                        style={{ top: isScrolled ? '54px' : '60px' }}
+                        style={{ top: isScrolled ? '54px' : '100px' }}
                       >
                         <div className="max-w-[1200px] mx-auto px-4">
                           <div className="bg-white rounded-[12px]  shadow-2xl shadow-black/10 border border-slate-100 overflow-hidden flex min-h-[200px]">
@@ -819,7 +867,7 @@ export default function Header({ theme }: HeaderProps) {
       </motion.header>
 
       {/* ── Second Navigation Bar ── */}
-      <div className={`fixed left-0 right-0 z-[99] bg-white border-b border-slate-200 shadow-sm hidden lg:block transition-all duration-300 ${isScrolled ? 'opacity-0 pointer-events-none -translate-y-full' : 'opacity-100 translate-y-0'}`} style={{ top: isScrolled ? '54px' : '60px' }}>
+      <div className="fixed left-0 right-0 z-[99] bg-white border-b border-slate-200 shadow-sm hidden lg:block" style={{ top: isScrolled ? '54px' : '60px' }}>
         <SecondNav />
       </div>
 
