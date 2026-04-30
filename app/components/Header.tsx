@@ -32,155 +32,10 @@ interface NavLink {
 
 const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
-  {
-    label: "Colleges",
-    href: "/top-colleges",
-    mega: [
-      {
-        label: "By Stream",
-        icon: "school",
-        links: [
-          { label: "Engineering", href: "/top-colleges?stream=engineering" },
-          { label: "MBA / Management", href: "/top-colleges?stream=management" },
-          { label: "Medical", href: "/top-colleges?stream=medical" },
-          { label: "Law", href: "/top-colleges?stream=law" },
-          { label: "Arts & Science", href: "/top-colleges?stream=arts-science" },
-          { label: "Commerce", href: "/top-colleges?stream=commerce" },
-          { label: "Design", href: "/top-colleges?stream=design" },
-          { label: "Pharmacy", href: "/top-colleges?stream=pharmacy" },
-        ],
-      },
-      {
-        label: "By Type",
-        icon: "apartment",
-        links: [
-          { label: "Top Colleges", href: "/top-colleges" },
-          { label: "Top Universities", href: "/top-university" },
-          { label: "Government Colleges", href: "/top-colleges?ownerships=Public+%2F+Government" },
-          { label: "Private Colleges", href: "/top-colleges?ownerships=Private" },
-          { label: "Deemed Universities", href: "/top-university?type=deemed" },
-          { label: "Central Universities", href: "/top-university?type=central" },
-        ],
-      },
-      {
-        label: "Tools",
-        icon: "build",
-        links: [
-          { label: "Compare Colleges", href: "/compare" },
-          { label: "Compare Courses", href: "/compare-course" },
-          { label: "College Predictor", href: "/counselling" },
-        ],
-      },
-    ],
-  },
-  {
-    label: "Courses",
-    href: "/careers-courses",
-    mega: [
-      {
-        label: "By Level",
-        icon: "layers",
-        links: [
-          { label: "UG Courses", href: "/careers-courses?level=ug" },
-          { label: "PG Courses", href: "/careers-courses?level=pg" },
-          { label: "Diploma Courses", href: "/careers-courses?level=diploma" },
-          { label: "Certificate Courses", href: "/careers-courses?level=certificate" },
-          { label: "PhD / Doctorate", href: "/careers-courses?level=phd" },
-        ],
-      },
-      {
-        label: "Popular Courses",
-        icon: "trending_up",
-        links: [
-          { label: "B.Tech", href: "/careers-courses/be-b-tech" },
-          { label: "MBA", href: "/careers-courses/mba" },
-          { label: "MBBS", href: "/careers-courses/mbbs" },
-          { label: "BCA", href: "/careers-courses/bca" },
-          { label: "BBA", href: "/careers-courses/bba" },
-          { label: "B.Com", href: "/careers-courses/b-com" },
-          { label: "LLB", href: "/careers-courses/llb" },
-          { label: "B.Sc", href: "/careers-courses/bsc" },
-        ],
-      },
-      {
-        label: "By Career",
-        icon: "work",
-        links: [
-          { label: "Popular Careers", href: "/popular-careers" },
-          { label: "Career Guidance", href: "/counselling" },
-        ],
-      },
-    ],
-  },
-  {
-    label: "Exams",
-    href: "/examination",
-    mega: [
-      {
-        label: "Engineering",
-        icon: "engineering",
-        links: [
-          { label: "JEE Main", href: "/examination/engineering" },
-          { label: "JEE Advanced", href: "/examination/engineering" },
-          { label: "BITSAT", href: "/examination/engineering" },
-          { label: "VITEEE", href: "/examination/engineering" },
-        ],
-      },
-      {
-        label: "Management",
-        icon: "business_center",
-        links: [
-          { label: "CAT", href: "/examination/management" },
-          { label: "MAT", href: "/examination/management" },
-          { label: "XAT", href: "/examination/management" },
-          { label: "SNAP", href: "/examination/management" },
-        ],
-      },
-      {
-        label: "Medical",
-        icon: "medical_services",
-        links: [
-          { label: "NEET UG", href: "/examination/medical" },
-          { label: "NEET PG", href: "/examination/medical" },
-          { label: "AIIMS", href: "/examination/medical" },
-        ],
-      },
-      {
-        label: "Law & Others",
-        icon: "gavel",
-        links: [
-          { label: "CLAT", href: "/examination/law" },
-          { label: "LSAT", href: "/examination/law" },
-          { label: "All Exams", href: "/examination" },
-        ],
-      },
-    ],
-  },
-  { label: "Study Abroad", href: "/study-abroad" },
-  {
-    label: "More",
-    href: "#",
-    mega: [
-      {
-        label: "Resources",
-        icon: "library_books",
-        links: [
-          { label: "News & Articles", href: "/news" },
-          { label: "Latest Blogs", href: "/blogs" },
-          { label: "Boards", href: "/boards" },
-        ],
-      },
-      {
-        label: "Help",
-        icon: "support_agent",
-        links: [
-          { label: "Counselling", href: "/counselling" },
-          { label: "Help Center", href: "/help-center" },
-          { label: "Contact Us", href: "/contact-us" },
-        ],
-      },
-    ],
-  },
+  { label: "Colleges", href: "/top-colleges" },
+  { label: "University", href: "/top-university" },
+  { label: "Courses", href: "/careers-courses" },
+  { label: "Exams", href: "/examination" },
 ];
 
 const loginOptions = [
@@ -299,9 +154,9 @@ function UserMenuDropdown({
               key={item.label}
               href={item.href}
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 text-[16px] font-normal text-neutral-700 hover:bg-primary/5 hover:text-primary transition-colors"
+              className="flex items-center  gap-3 px-4 py-3 text-[16px] font-normal text-neutral-700 hover:bg-primary/5 hover:text-primary transition-colors"
             >
-              <span className="material-symbols-outlined text-[20px] text-neutral-400">
+              <span className="material-symbols-outlined text-[20px]  text-neutral-400">
                 {item.icon}
               </span>
               {item.label}
@@ -326,6 +181,355 @@ function UserMenuDropdown({
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+interface SecondNavCategory {
+  label: string;
+  icon: string;
+  links: { label: string; href: string }[];
+}
+
+interface SecondNavItem {
+  label: string;
+  href: string;
+  mega?: SecondNavCategory[];
+}
+
+const secondNavLinks: SecondNavItem[] = [
+  {
+    label: "Engineering",
+    href: "/top-colleges?stream=engineering",
+    mega: [
+      {
+        label: "By Stream",
+        icon: "school",
+        links: [
+          { label: "Engineering", href: "/top-colleges?stream=engineering" },
+          { label: "MBA / Management", href: "/top-colleges?stream=management" },
+          { label: "Medical", href: "/top-colleges?stream=medical" },
+          { label: "Law", href: "/top-colleges?stream=law" },
+          { label: "Arts & Science", href: "/top-colleges?stream=arts-science" },
+          { label: "Commerce", href: "/top-colleges?stream=commerce" },
+          { label: "Design", href: "/top-colleges?stream=design" },
+          { label: "Pharmacy", href: "/top-colleges?stream=pharmacy" },
+        ],
+      },
+      {
+        label: "By Type",
+        icon: "apartment",
+        links: [
+          { label: "Top Colleges", href: "/top-colleges" },
+          { label: "Top Universities", href: "/top-university" },
+          { label: "Government Colleges", href: "/top-colleges?ownerships=Public+%2F+Government" },
+          { label: "Private Colleges", href: "/top-colleges?ownerships=Private" },
+          { label: "Deemed Universities", href: "/top-university?type=deemed" },
+          { label: "Central Universities", href: "/top-university?type=central" },
+        ],
+      },
+      {
+        label: "Tools",
+        icon: "build",
+        links: [
+          { label: "Compare Colleges", href: "/compare" },
+          { label: "Compare Courses", href: "/compare-course" },
+          { label: "College Predictor", href: "/counselling" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Medical",
+    href: "/top-colleges?stream=medical",
+    mega: [
+      {
+        label: "By Level",
+        icon: "layers",
+        links: [
+          { label: "UG Courses", href: "/careers-courses?level=ug" },
+          { label: "PG Courses", href: "/careers-courses?level=pg" },
+          { label: "Diploma Courses", href: "/careers-courses?level=diploma" },
+          { label: "Certificate Courses", href: "/careers-courses?level=certificate" },
+          { label: "PhD / Doctorate", href: "/careers-courses?level=phd" },
+        ],
+      },
+      {
+        label: "Popular Courses",
+        icon: "trending_up",
+        links: [
+          { label: "B.Tech", href: "/careers-courses/be-b-tech" },
+          { label: "MBA", href: "/careers-courses/mba" },
+          { label: "MBBS", href: "/careers-courses/mbbs" },
+          { label: "BCA", href: "/careers-courses/bca" },
+          { label: "BBA", href: "/careers-courses/bba" },
+          { label: "B.Com", href: "/careers-courses/b-com" },
+          { label: "LLB", href: "/careers-courses/llb" },
+          { label: "B.Sc", href: "/careers-courses/bsc" },
+        ],
+      },
+      {
+        label: "By Career",
+        icon: "work",
+        links: [
+          { label: "Popular Careers", href: "/popular-careers" },
+          { label: "Career Guidance", href: "/counselling" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Management",
+    href: "/top-colleges?stream=management",
+    mega: [
+      {
+        label: "Engineering",
+        icon: "engineering",
+        links: [
+          { label: "JEE Main", href: "/examination/engineering" },
+          { label: "JEE Advanced", href: "/examination/engineering" },
+          { label: "BITSAT", href: "/examination/engineering" },
+          { label: "VITEEE", href: "/examination/engineering" },
+        ],
+      },
+      {
+        label: "Management",
+        icon: "business_center",
+        links: [
+          { label: "CAT", href: "/examination/management" },
+          { label: "MAT", href: "/examination/management" },
+          { label: "XAT", href: "/examination/management" },
+          { label: "SNAP", href: "/examination/management" },
+        ],
+      },
+      {
+        label: "Medical",
+        icon: "medical_services",
+        links: [
+          { label: "NEET UG", href: "/examination/medical" },
+          { label: "NEET PG", href: "/examination/medical" },
+          { label: "AIIMS", href: "/examination/medical" },
+        ],
+      },
+      {
+        label: "Law & Others",
+        icon: "gavel",
+        links: [
+          { label: "CLAT", href: "/examination/law" },
+          { label: "LSAT", href: "/examination/law" },
+          { label: "All Exams", href: "/examination" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Examination",
+    href: "/examination",
+    mega: [
+      {
+        label: "Engineering",
+        icon: "engineering",
+        links: [
+          { label: "JEE Main", href: "/examination/engineering" },
+          { label: "JEE Advanced", href: "/examination/engineering" },
+          { label: "BITSAT", href: "/examination/engineering" },
+          { label: "VITEEE", href: "/examination/engineering" },
+        ],
+      },
+      {
+        label: "Management",
+        icon: "business_center",
+        links: [
+          { label: "CAT", href: "/examination/management" },
+          { label: "MAT", href: "/examination/management" },
+          { label: "XAT", href: "/examination/management" },
+          { label: "SNAP", href: "/examination/management" },
+        ],
+      },
+      {
+        label: "Medical",
+        icon: "medical_services",
+        links: [
+          { label: "NEET UG", href: "/examination/medical" },
+          { label: "NEET PG", href: "/examination/medical" },
+          { label: "AIIMS", href: "/examination/medical" },
+        ],
+      },
+      {
+        label: "Law & Others",
+        icon: "gavel",
+        links: [
+          { label: "CLAT", href: "/examination/law" },
+          { label: "LSAT", href: "/examination/law" },
+          { label: "All Exams", href: "/examination" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Study Abroad",
+    href: "/study-abroad",
+    mega: [
+      {
+        label: "Destinations",
+        icon: "flight",
+        links: [
+          { label: "USA", href: "/study-abroad" },
+          { label: "UK", href: "/study-abroad" },
+          { label: "Canada", href: "/study-abroad" },
+          { label: "Australia", href: "/study-abroad" },
+          { label: "All Destinations", href: "/study-abroad" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Counselling",
+    href: "/counselling",
+    mega: [
+      {
+        label: "Help",
+        icon: "support_agent",
+        links: [
+          { label: "College Predictor", href: "/counselling" },
+          { label: "Career Guidance", href: "/counselling" },
+          { label: "Admission Help", href: "/counselling" },
+          { label: "Help Center", href: "/help-center" },
+          { label: "Contact Us", href: "/contact-us" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "More",
+    href: "#",
+    mega: [
+      {
+        label: "Resources",
+        icon: "library_books",
+        links: [
+          { label: "News & Articles", href: "/news" },
+          { label: "Latest Blogs", href: "/blogs" },
+          { label: "Boards", href: "/boards" },
+          { label: "Compare Colleges", href: "/compare" },
+          { label: "Compare Courses", href: "/compare-course" },
+        ],
+      },
+    ],
+  },
+];
+
+function SecondNav() {
+  const [hoveredCat, setHoveredCat] = useState<Record<string, string>>({});
+  const navRef = useRef<HTMLDivElement>(null);
+  const firstItemRef = useRef<HTMLDivElement>(null);
+  const [navRect, setNavRect] = useState<{ left: number; right: number; bottom: number } | null>(null);
+
+  useEffect(() => {
+    const update = () => {
+      if (navRef.current && firstItemRef.current) {
+        const navR = navRef.current.getBoundingClientRect();
+        const firstR = firstItemRef.current.getBoundingClientRect();
+        setNavRect({ left: firstR.left, right: navR.right, bottom: navR.bottom });
+      }
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  return (
+    <div className="home-page-shell ">
+      <div ref={navRef} className="relative   flex items-center gap-0 justify-center">
+        {secondNavLinks.map((item, index) => {
+          const activeCat = hoveredCat[item.label] ?? item.mega?.[0]?.label ?? "";
+          const activeCatData = item.mega?.find(c => c.label === activeCat) ?? item.mega?.[0];
+          return (
+            <div
+              key={item.label}
+              ref={index === 0 ? firstItemRef : undefined}
+              className="relative group/snav "
+              onMouseLeave={() => setHoveredCat(p => ({ ...p, [item.label]: item.mega?.[0]?.label ?? "" }))}
+            >
+              <Link
+                href={item.href}
+                className="flex items-center gap-1 px-4 py-2.5 text-[13px] font-medium text-slate-600 whitespace-nowrap"
+              >
+                {item.label}
+                {item.mega && (
+                  <span className="material-symbols-outlined text-[14px] text-slate-400 transition-transform duration-200 group-hover/snav:rotate-180">
+                    expand_more
+                  </span>
+                )}
+              </Link>
+
+              {item.mega && navRect && (
+                <div
+                  className="fixed opacity-0 pointer-events-none group-hover/snav:opacity-100 group-hover/snav:pointer-events-auto transition-all duration-200 z-50"
+                  style={{ top: navRect.bottom, left: navRect.left, width: navRect.right - navRect.left }}
+                >
+                  <div>
+                    <div className="bg-white rounded-[12px] shadow-2xl shadow-black/10 border border-slate-100 overflow-hidden flex min-h-[200px]">
+                      {/* Left: Categories */}
+                      {item.mega.length > 1 && (
+                        <div className="w-[200px] shrink-0 bg-slate-50 border-r border-slate-100 py-3">
+                          {item.mega.map((cat) => {
+                            const isActive = activeCat === cat.label;
+                            return (
+                              <div
+                                key={cat.label}
+                                onMouseEnter={() => setHoveredCat(p => ({ ...p, [item.label]: cat.label }))}
+                                className={`flex items-center gap-2.5 px-4 py-2.5 cursor-default transition-colors ${
+                                  isActive ? "bg-white border-l-2 border-primary" : "hover:bg-white border-l-2 border-transparent"
+                                }`}
+                              >
+                                <span className={`material-symbols-outlined text-[17px] transition-colors ${
+                                  isActive ? "text-primary" : "text-slate-400"
+                                }`}>
+                                  {cat.icon}
+                                </span>
+                                <span className={`text-[13px] font-semibold transition-colors ${
+                                  isActive ? "text-primary" : "text-slate-600"
+                                }`}>
+                                  {cat.label}
+                                </span>
+                                <span className="material-symbols-outlined text-[14px] text-slate-300 ml-auto">chevron_right</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Right: Active category links */}
+                      <div className="flex-1 p-5">
+                        {activeCatData && (
+                          <>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">
+                              {activeCatData.label}
+                            </p>
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                              {activeCatData.links.map((lnk) => (
+                                <Link
+                                  key={lnk.label}
+                                  href={lnk.href}
+                                  className="flex items-center gap-2 px-3 py-2 rounded-[6px] text-[13px] font-medium text-slate-600 hover:bg-primary/5 hover:text-primary transition-colors"
+                                >
+                                  <span className="w-1 h-1 rounded-full bg-slate-300 shrink-0" />
+                                  {lnk.label}
+                                </Link>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -460,18 +664,17 @@ export default function Header({ theme }: HeaderProps) {
             : "bg-white/95 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.05)] py-3"
         }`}
       >
-        <div className="home-page-shell flex w-full items-center justify-between">
+        <div className="home-page-shell  flex w-full  items-center justify-between">
           {/* Logo Area */}
           <div className="shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
-              <img src="/admissionx-logo.png" alt="AdmissionX" className="h-6 sm:h-7 w-auto object-contain bg-transparent mix-blend-multiply" />
+              <img src="/admissionx-logo.png" alt="AdmissionX" className="h-6 sm:h-7 w-auto object-contain" />
             </Link>
           </div>
 
-          {/* Right Side: Nav + Actions */}
-          <div className="hidden lg:flex items-center gap-10">
-          {/* Nav Links Area */}
-            <nav className="flex items-center gap-1">
+          {/* Nav + Actions — right aligned */}
+          <div className="hidden lg:flex items-center  mr-6 ml-auto">
+          <nav className="flex  items-center  mr-12  gap-7">
               {navLinks.map((link) => {
                 const activeCat = hoveredCat[link.label] ?? link.mega?.[0]?.label ?? "";
                 const activeCatData = link.mega?.find(c => c.label === activeCat) ?? link.mega?.[0];
@@ -484,7 +687,7 @@ export default function Header({ theme }: HeaderProps) {
                     <Link
                       href={link.href}
                       prefetch={true}
-                      className="flex items-center gap-1 px-4 py-2 text-[15px] font-medium transition-colors text-slate-700 hover:text-primary"
+                      className="flex items-center gap-1 px-4 py-2 text-[15px] font-medium text-slate-700"
                     >
                       {link.label}
                       {link.mega && mounted && (
@@ -496,13 +699,13 @@ export default function Header({ theme }: HeaderProps) {
 
                     {link.mega && (
                       <div
-                        className="fixed left-0 right-0 pt-1 opacity-0 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:pointer-events-auto transition-all duration-200 z-50"
+                        className="fixed left-0  right-0 pt-1 opacity-0 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:pointer-events-auto transition-all duration-200 z-50"
                         style={{ top: isScrolled ? '54px' : '60px' }}
                       >
                         <div className="max-w-[1200px] mx-auto px-4">
-                          <div className="bg-white rounded-[12px] shadow-2xl shadow-black/10 border border-slate-100 overflow-hidden flex min-h-[200px]">
+                          <div className="bg-white rounded-[12px]  shadow-2xl shadow-black/10 border border-slate-100 overflow-hidden flex min-h-[200px]">
                             {/* Left: Categories */}
-                            <div className="w-[200px] shrink-0 bg-slate-50 border-r border-slate-100 py-3">
+                            <div className="w-[200px] shrink-0  border-r border-slate-100 py-3">
                               {link.mega.map((cat) => {
                                 const isActive = activeCat === cat.label;
                                 return (
@@ -560,10 +763,10 @@ export default function Header({ theme }: HeaderProps) {
                   </div>
                 );
               })}
-            </nav>
+          </nav>
 
-            {/* Right Area (Actions) */}
-            <div className="flex items-center gap-3">
+          {/* Right Area (Actions) */}
+          <div className="flex  items-center gap-3 ml-6">
               {(!mounted || !authChecked) ? (
                 <div className="h-9 w-24 bg-slate-100 rounded-full animate-pulse" />
               ) : authUser ? (
@@ -606,7 +809,7 @@ export default function Header({ theme }: HeaderProps) {
                    </div>
                 </div>
               )}
-            </div>
+          </div>
           </div>
 
           <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden h-10 w-10 flex items-center justify-center rounded-full transition-all text-slate-700 hover:bg-slate-50">
@@ -614,6 +817,11 @@ export default function Header({ theme }: HeaderProps) {
           </button>
         </div>
       </motion.header>
+
+      {/* ── Second Navigation Bar ── */}
+      <div className={`fixed left-0 right-0 z-[99] bg-white border-b border-slate-200 shadow-sm hidden lg:block transition-all duration-300 ${isScrolled ? 'opacity-0 pointer-events-none -translate-y-full' : 'opacity-100 translate-y-0'}`} style={{ top: isScrolled ? '54px' : '60px' }}>
+        <SecondNav />
+      </div>
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -646,26 +854,43 @@ export default function Header({ theme }: HeaderProps) {
                   </button>
                 </div>
                 <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-6 pb-28 space-y-1">
-              {navLinks.map((item) => {
+              {/* First Nav Links */}
+              {navLinks.map((item) => (
+                <div key={item.label} className="flex flex-col">
+                  <Link
+                    href={item.href}
+                    className="py-3 text-[15px] font-medium text-slate-800 uppercase tracking-tight border-b border-slate-50"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                </div>
+              ))}
+
+              <div className="h-px bg-slate-200 my-3" />
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 pb-1">Explore</p>
+
+              {/* Second Nav Links */}
+              {secondNavLinks.map((item) => {
                 const isExpanded = expandedMobileItem === item.label;
                 const allSubLinks = item.mega?.flatMap(cat => cat.links) ?? [];
                 return (
                   <div key={item.label} className="flex flex-col">
-                    <div className="flex items-center justify-between py-3">
+                    <div className="flex items-center justify-between py-3 border-b border-slate-50">
                       {item.mega ? (
                         <button
-                          className="flex-1 text-left text-[16px] font-medium text-slate-800 uppercase tracking-tight flex items-center justify-between"
+                          className="flex-1 text-left text-[15px] font-medium text-slate-700 flex items-center justify-between"
                           onClick={() => setExpandedMobileItem(isExpanded ? null : item.label)}
                         >
                           {item.label}
-                          <span className={`material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 p-1 hover:bg-slate-50 rounded-[10px] ${isExpanded ? "rotate-180" : ""}`}>
+                          <span className={`material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>
                             expand_more
                           </span>
                         </button>
                       ) : (
                         <Link
                           href={item.href}
-                          className="flex-1 text-[16px] font-medium text-slate-800 uppercase tracking-tight"
+                          className="flex-1 text-[15px] font-medium text-slate-700"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           {item.label}
