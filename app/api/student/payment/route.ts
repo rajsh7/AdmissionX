@@ -43,9 +43,9 @@ export async function POST(req: NextRequest) {
   if (!payload) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
 
   const db = await getDb();
-  const app = await db.collection("next_student_applications").findOne({
+  const app = await db.collection("applications").findOne({
     _id: application_id,
-    student_id: String(student_id),
+    studentId: String(student_id),
   });
 
   if (!app) return NextResponse.json({ error: "Application not found or does not belong to this student." }, { status: 404 });
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
 
   const transactionId = `ADX-TXN-${Date.now()}-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
 
-  await db.collection("next_student_applications").updateOne(
+  await db.collection("applications").updateOne(
     { _id: application_id },
     { $set: { payment_status: "paid", transaction_id: transactionId, amount_paid: amountNum, updated_at: new Date() } }
   );

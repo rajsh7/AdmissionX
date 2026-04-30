@@ -35,15 +35,14 @@ export async function POST(req: NextRequest) {
 
     const db = await getDb();
     await db.collection("page_views").insertOne({
-      path:      path || "/",
-      referrer:  referrer || null,
-      sessionId: sessionId || null,
+      path:      (path || "/").slice(0, 500),
+      referrer:  referrer ? String(referrer).slice(0, 500) : null,
+      sessionId: sessionId ? String(sessionId).slice(0, 100) : null,
       ip,
       country,
       city,
       device,
       browser,
-      userAgent,
       createdAt: new Date(),
     });
 

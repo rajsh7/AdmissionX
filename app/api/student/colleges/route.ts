@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     filteredCpIds = [...new Set(cms.map((c) => c.collegeprofile_id))];
   }
 
-  const matchFilter: Record<string, unknown> = { verified: 1 };
+  const matchFilter: Record<string, unknown> = { $or: [{ verified: 1 }, { verified: true }] };
   if (filteredCpIds) matchFilter.id = { $in: filteredCpIds };
 
   const pipeline: object[] = [
@@ -46,11 +46,12 @@ export async function GET(req: NextRequest) {
   ];
 
   if (q) {
+    const escapedQ = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     pipeline.push({
       $match: {
         $or: [
-          { "u.firstname": { $regex: q, $options: "i" } },
-          { slug: { $regex: q, $options: "i" } },
+          { "u.firstname": { $regex: escapedQ, $options: "i" } },
+          { slug: { $regex: escapedQ, $options: "i" } },
         ],
       },
     });

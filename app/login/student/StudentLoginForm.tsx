@@ -55,8 +55,8 @@ export default function StudentLoginForm() {
       });
       const data = await res.json();
       if (res.ok) {
-        router.push(data.user?.id ? `/dashboard/student/${data.user.id}` : redirectTo);
-        router.refresh();
+        // Full page reload so cookie is read fresh by SSR
+        window.location.href = data.user?.id ? `/dashboard/student/${data.user.id}` : redirectTo;
       } else if (res.status === 403) {
         setError(data.error || "Please verify your email before logging in.");
         setUnverifiedEmail(email);

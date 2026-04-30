@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { join } from "path";
+import { join, resolve, normalize } from "path";
 import { readFile } from "fs/promises";
 import { existsSync } from "fs";
 
 export async function GET(req: NextRequest, context: { params: Promise<{ dir: string[] }> }) {
   const params = await context.params;
-  const filePath = join(process.cwd(), "public", "uploads", ...params.dir);
+
+  // Sanitize: prevent path traversal
+  const uploadsRoot = resolve(process.cwd(), "public", "uploads");
+  const filePath = resolve(uploadsRoot, ...params.dir);
+  if (!filePath.startsWith(uploadsRoot + "/") && filePath !== uploadsRoot) {
+    return new NextResponse("Forbidden", { status: 403 });
+  }
 
   if (!existsSync(filePath)) {
     return new NextResponse("Not found", { status: 404 });

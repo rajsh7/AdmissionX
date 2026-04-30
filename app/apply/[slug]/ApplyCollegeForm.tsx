@@ -421,9 +421,9 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
     }
 
     if (stepIndex === 3) {
-      const { method, cardName, cardNumber, expiry, cvv } = form.payment;
-      if (method === "card" && (!cardName || !cardNumber || !expiry || !cvv)) {
-        return "Please complete your card details before continuing.";
+      // Payment method selection only — no card details collected
+      if (!form.payment.method) {
+        return "Please select a payment method before continuing.";
       }
     }
 
@@ -887,8 +887,12 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
     return (
       <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="space-y-5">
+          <div className="rounded-[4px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <p className="font-semibold">Application Fee: ₹499</p>
+            <p className="mt-1 text-xs">Payment will be collected by the college admission office after your application is reviewed. No card details required at this stage.</p>
+          </div>
           <div className="space-y-3">
-            <FieldLabel>Payment Method</FieldLabel>
+            <FieldLabel>Preferred Payment Method</FieldLabel>
             <div className="flex flex-wrap gap-3">
               {["card", "upi", "netbanking"].map((method) => (
                 <button
@@ -901,61 +905,16 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
                       : "border-[#e5e7eb] bg-white text-[#4b5563]"
                   }`}
                 >
-                  {method === "card"
-                    ? "Credit / Debit Card"
-                    : method === "upi"
-                      ? "UPI"
-                      : "Net Banking"}
+                  {method === "card" ? "Credit / Debit Card" : method === "upi" ? "UPI" : "Net Banking"}
                 </button>
               ))}
             </div>
           </div>
-
-          <div className="grid gap-5 md:grid-cols-2">
-            <div className="space-y-2 md:col-span-2">
-              <FieldLabel>Name on Card</FieldLabel>
-              <FieldInput
-                value={form.payment.cardName}
-                onChange={(value) => updatePayment("cardName", value)}
-                placeholder="Enter card holder name"
-              />
-            </div>
-            <div className="space-y-2 md:col-span-2">
-              <FieldLabel>Card Number</FieldLabel>
-              <FieldInput
-                value={form.payment.cardNumber}
-                onChange={(value) => updatePayment("cardNumber", value)}
-                placeholder="0000 0000 0000 0000"
-              />
-            </div>
-            <div className="space-y-2">
-              <FieldLabel>Expiry Date</FieldLabel>
-              <FieldInput
-                value={form.payment.expiry}
-                onChange={(value) => updatePayment("expiry", value)}
-                placeholder="MM/YY"
-              />
-            </div>
-            <div className="space-y-2">
-              <FieldLabel>CVV</FieldLabel>
-              <FieldInput
-                value={form.payment.cvv}
-                onChange={(value) => updatePayment("cvv", value)}
-                placeholder="123"
-              />
-            </div>
-          </div>
         </div>
-
         <div className="rounded-[4px] border border-[#e5e7eb] bg-[#fafafa] p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff5757]">
-            Payment Summary
-          </p>
-          <h3 className="mt-3 text-xl font-semibold text-[#111827]">
-            {college.collegeName}
-          </h3>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff5757]">Payment Summary</p>
+          <h3 className="mt-3 text-xl font-semibold text-[#111827]">{college.collegeName}</h3>
           <p className="mt-1 text-sm text-[#6b7280]">{college.location}</p>
-
           <div className="mt-6 space-y-3 border-t border-[#e5e7eb] pt-5 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-[#6b7280]">Application Fee</span>

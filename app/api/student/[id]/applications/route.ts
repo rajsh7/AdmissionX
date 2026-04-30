@@ -23,7 +23,7 @@ export async function GET(
   const db = await getDb();
 
   const rows = await db.collection("applications").aggregate([
-    { $match: { studentId: id } },
+    { $match: { $or: [{ studentId: id }, { studentId: payload.id }] } },
     { $lookup: { from: "collegeprofile", localField: "collegeId", foreignField: "_id", as: "cp" } },
     { $unwind: { path: "$cp", preserveNullAndEmptyArrays: true } },
     { $lookup: { from: "users", localField: "cp.users_id", foreignField: "id", as: "u" } },

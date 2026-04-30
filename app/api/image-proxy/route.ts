@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import https from "https";
+import http from "http";
 import { join } from "path";
 import { readFile } from "fs/promises";
 import { existsSync } from "fs";
@@ -54,8 +54,6 @@ export async function GET(req: NextRequest) {
     const cleanUrl = url.replace(/\/uploads\/\/uploads\//g, "/uploads/");
 
     const buffer = await new Promise<Buffer>((resolve, reject) => {
-      const http = require("http");
-
       function fetchWithRedirects(targetUrl: string, redirectsLeft = 5) {
         const fetchUrl = targetUrl.replace("https://", "http://");
         http.get(fetchUrl, { timeout: 10000 }, (res: any) => {

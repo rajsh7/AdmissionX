@@ -20,8 +20,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${baseUrl}/signup/student?error=invalid_token`);
   }
 
-  if (student.is_active) {
-    return NextResponse.redirect(`${baseUrl}/dashboard/student`);
+  if (student.is_active === 1 || student.is_active === true) {
+    // Already active — just log them in and redirect
+    const jwtToken = await signStudentToken({
+      id: student._id.toString(),
+      name: student.name,
+      email: student.email,
+      role: "student",
+    });
+    const response = NextResponse.redirect(`${baseUrl}/dashboard/student/${student._id.toString()}`);
+    response.cookies.set(STUDENT_COOKIE, jwtToken, COOKIE_OPTIONS);
+    return response;
   }
 
   if (new Date() > new Date(student.activation_token_exp)) {
@@ -40,7 +49,7 @@ export async function GET(req: NextRequest) {
     role: "student",
   });
 
-  const response = NextResponse.redirect(`${baseUrl}/dashboard/student?activated=1`);
+  const response = NextResponse.redirect(`${baseUrl}/dashboard/student/${student._id.toString()}?activated=1`);
   response.cookies.set(STUDENT_COOKIE, jwtToken, COOKIE_OPTIONS);
   return response;
 }

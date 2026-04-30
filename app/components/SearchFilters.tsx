@@ -118,7 +118,7 @@ export default function SearchFilters({
   const [citySearch, setCitySearch] = useState("");
   const [cityDropOpen, setCityDropOpen] = useState(false);
 
-  const activeCount = [stream, degree, cityId, stateId, countryId, feesMax, ranking].filter(Boolean).length + feesRanges.length + ratingRanges.length + ownerships.length;
+  const activeCount = [stream, degree, cityId, stateId, countryId, feesMax].filter(Boolean).length + feesRanges.length + ratingRanges.length + ownerships.length;
 
   const applyFilters = useCallback(
     (overrides: Partial<ActiveFilters> = {}) => {

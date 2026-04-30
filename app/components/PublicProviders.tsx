@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import SmoothScrollProvider from "./SmoothScrollProvider";
 import PageTransition from "./PageTransition";
+import SignupNudge from "./SignupNudge";
 
 export default function PublicProviders({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -14,6 +15,7 @@ export default function PublicProviders({ children }: { children: React.ReactNod
   return (
     <SmoothScrollProvider>
       <PageTransition>{children}</PageTransition>
+      <SignupNudge />
     </SmoothScrollProvider>
   );
 }

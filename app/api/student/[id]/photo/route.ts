@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { verifyStudentToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { saveUpload } from "@/lib/upload-utils";
-import { Filter, Document } from "mongodb";
+import { Filter, Document, ObjectId } from "mongodb";
 
 async function checkAuth(studentId: string) {
   const cookieStore = await cookies();
@@ -39,7 +39,6 @@ export async function POST(
   );
 
   try {
-    const { ObjectId } = require("mongodb");
     await db.collection("next_student_signups").updateOne(
       { _id: new ObjectId(id) },
       { $set: { avatar: photoUrl } }

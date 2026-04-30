@@ -94,7 +94,7 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
               
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pointer-events-none">
-              {universityType && (
+              {(universityType || isGovt !== undefined) && (
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${isGovt ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-blue-50 text-blue-700 border border-blue-200"}`}>
                   {isGovt ? "Govt." : "Private"}
                 </span>

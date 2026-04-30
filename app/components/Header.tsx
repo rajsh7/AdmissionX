@@ -607,10 +607,7 @@ export default function Header({ theme }: HeaderProps) {
   // ── Auth check ────────────────────────────────────────────────────────────
   const checkAuth = useCallback(async () => {
     try {
-      const res = await fetch("/api/auth/me", {
-        cache: "default",
-        headers: { "Cache-Control": "max-age=30" },
-      });
+      const res = await fetch("/api/auth/me", { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         setAuthUser(data.user ?? null);
@@ -647,8 +644,7 @@ export default function Header({ theme }: HeaderProps) {
       /* ignore */
     }
     setAuthUser(null);
-    router.push("/");
-    router.refresh();
+    window.location.href = "/";
   };
 
   // ── Dropdown helpers ──────────────────────────────────────────────────────
