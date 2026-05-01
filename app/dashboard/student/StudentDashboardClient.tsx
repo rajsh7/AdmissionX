@@ -17,6 +17,7 @@ import QATab from "./tabs/QATab";
 import CounsellingFormsTab from "./tabs/CounsellingFormsTab";
 import CounselingTab from "./tabs/CounselingTab";
 import HelpDeskTab from "./tabs/HelpDeskTab";
+import AIRecommendTab from "./tabs/AIRecommendTab";
 
 interface Props {
   user: { id: string | number; name: string; email: string; avatar?: string } | null;
@@ -31,7 +32,7 @@ type TabId =
   | "queries-replied" | "queries-pending" | "queries-all"
   | "bookmark-courses" | "bookmark-colleges" | "bookmark-blogs"
   | "qa-questions" | "qa-answers" | "qa-comments" | "qa-reviews"
-  | "counselling-forms" | "counseling" | "help-desk";
+  | "counselling-forms" | "counseling" | "help-desk" | "ai-recommend";
 
 interface NavItem { id: TabId; label: string; icon: string }
 
@@ -105,6 +106,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
       case "qa-questions":           return <QATab                user={user} type="questions" />;
       case "counselling-forms":      return <CounsellingFormsTab  user={user} />;
       case "help-desk":              return <HelpDeskTab          user={user} />;
+      case "ai-recommend":           return <AIRecommendTab        user={user} navigate={navigate} />;
       default:                       return <OverviewTab          user={user} navigate={(t) => navigate(t as TabId)} />;
     }
   }
@@ -113,6 +115,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
     const MENU_ITEMS: NavItem[] = [
       { id: "overview",          label: "Dashboard",                  icon: "bar_chart"    },
       { id: "account-details",   label: "Student Details",            icon: "person"       },
+      { id: "ai-recommend",      label: "AI Recommendations",         icon: "auto_awesome" },
       { id: "app-all",           label: "Application",                icon: "description"  },
       { id: "queries-all",       label: "Queries",                    icon: "forum"        },
       { id: "bookmark-colleges", label: "Bookmarks",                  icon: "bookmarks"    },
@@ -311,6 +314,7 @@ function MobileBottomNav({ activeTab, navigate }: { activeTab: TabId; navigate: 
     { id: "qa-questions",          label: "Q&A",         icon: "forum"             },
     { id: "counselling-forms",     label: "Counselling", icon: "assignment"        },
     { id: "help-desk",             label: "Help",        icon: "help_center"       },
+    { id: "ai-recommend",          label: "AI Match",    icon: "auto_awesome"      },
   ];
 
   return (

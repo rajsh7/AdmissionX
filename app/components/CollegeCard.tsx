@@ -29,7 +29,7 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
 }
 
 function formatFees(fees: number | null): string {
-  if (!fees || fees <= 0) return "";
+  if (!fees || fees < 500) return "";
   if (fees >= 100000) return `₹${(fees / 100000).toFixed(1)}L`;
   if (fees >= 1000) return `₹${(fees / 1000).toFixed(0)}K`;
   return `₹${fees}`;

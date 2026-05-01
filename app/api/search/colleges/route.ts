@@ -151,11 +151,20 @@ export async function GET(req: NextRequest) {
     if (cityIntId) {
       const cityDoc = await db.collection("city").findOne({ id: cityIntId }, { projection: { name: 1 } });
       const cityName = String(cityDoc?.name ?? "").trim();
-      const cityOr: Record<string, unknown>[] = [{ registeredAddressCityId: cityIntId }];
+      // Collect all sibling city IDs (e.g. New Delhi, Central Delhi, South Delhi for "Delhi")
+      const siblingCities = cityName
+        ? await db.collection("city")
+            .find({ name: { $regex: cityName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" } })
+            .project({ id: 1 })
+            .toArray()
+        : [];
+      const allCityIds = [...new Set([cityIntId, ...siblingCities.map((c: any) => Number(c.id))])];
+      // Do NOT use registeredFullAddress — causes false positives (e.g. "Mathura-Delhi Highway")
+      const cityOr: Record<string, unknown>[] = [{ registeredAddressCityId: { $in: allCityIds } }];
       if (cityName) {
-        cityOr.push({ registeredSortAddress: { $regex: cityName, $options: "i" } });
-        cityOr.push({ registeredFullAddress: { $regex: cityName, $options: "i" } });
-        cityOr.push({ campusSortAddress: { $regex: cityName, $options: "i" } });
+        const escapedCity = cityName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        cityOr.push({ registeredSortAddress: { $regex: `^\\s*${escapedCity}`, $options: "i" } });
+        cityOr.push({ campusSortAddress: { $regex: `^\\s*${escapedCity}`, $options: "i" } });
       }
       match.$and = [{ $or: cityOr }];
     }
@@ -215,7 +224,7 @@ export async function GET(req: NextRequest) {
             input: "$cm", as: "c",
             cond: {
               $and: [
-                { $gt: ["$$c.fees", 0] },
+                { $gte: ["$$c.fees", 500] },
                 { $or: [
                   ...(queryDegreeIds.length > 0 ? [{ $in: ["$$c.degree_id", queryDegreeIds] }] : []),
                   ...(queryStreamIds.length > 0 ? [{ $in: ["$$c.functionalarea_id", queryStreamIds] }] : []),
@@ -224,7 +233,7 @@ export async function GET(req: NextRequest) {
             },
           },
         }
-      : { $filter: { input: "$cm", as: "c", cond: { $gt: ["$$c.fees", 0] } } };
+      : { $filter: { input: "$cm", as: "c", cond: { $gte: ["$$c.fees", 500] } } };
 
     const [countResult, dataRows] = await Promise.all([
       db.collection("collegeprofile").aggregate([...basePipeline, { $count: "total" }]).toArray(),
@@ -253,7 +262,7 @@ export async function GET(req: NextRequest) {
           },
         },
         // Only filter to colleges with fees when sorting by fees
-        ...(isFeeSort ? [{ $match: { min_fees: { $gt: 0 } } }] : []),
+        ...(isFeeSort ? [{ $match: { min_fees: { $gte: 500 } } }] : []),
         ...(isFeeSort ? [
           { $sort: { min_fees: 1 as const } },
           { $skip: offset },

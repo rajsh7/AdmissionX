@@ -15,7 +15,7 @@ interface CollegeListItemProps {
 }
 
 function formatFees(fees: number | null): string {
-  if (!fees || fees <= 0) return "";
+  if (!fees || fees < 500) return "";
   return `₹${fees.toLocaleString("en-IN")}`;
 }
 
