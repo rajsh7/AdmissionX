@@ -251,7 +251,9 @@ export default function SearchClient({
 
   const showingText = loading
     ? "Loading..."
-    : `Showing ${colleges.length > 0 ? (page - 1) * 12 + 1 : 0}–${Math.min(page * 12, total)} of ${total.toLocaleString()} ${entityNamePlural.toLowerCase()}`;
+    : total === 0
+    ? "No results found"
+    : `Showing ${(page - 1) * 12 + 1}–${Math.min(page * 12, total)} of ${total.toLocaleString()} ${entityNamePlural.toLowerCase()}`;
 
   return (
     <div suppressHydrationWarning className="min-h-screen bg-neutral-50 flex flex-col relative">

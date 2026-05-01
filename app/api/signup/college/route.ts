@@ -22,12 +22,22 @@ export async function POST(req: NextRequest) {
     const phoneTrimmed = phone.trim();
     const db = await getDb();
 
-    const existingEmail = await db.collection("next_college_signups").findOne({ email: emailLower });
-    if (existingEmail) {
-      return NextResponse.json(
-        { error: "An account with this email already exists. Please login or use a different email." },
-        { status: 409 }
-      );
+    // Check email uniqueness across ALL collections
+    const [existingCollege, existingStudent, existingLegacy, existingAdmin] = await Promise.all([
+      db.collection("next_college_signups").findOne({ email: emailLower }, { projection: { _id: 1 } }),
+      db.collection("next_student_signups").findOne({ email: emailLower }, { projection: { _id: 1 } }),
+      db.collection("users").findOne({ email: { $regex: `^${emailLower.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" } }, { projection: { _id: 1 } }),
+      db.collection("next_admin_users").findOne({ email: emailLower }, { projection: { _id: 1 } }),
+    ]);
+
+    if (existingCollege) {
+      return NextResponse.json({ error: "A college account with this email already exists. Please login or use a different email." }, { status: 409 });
+    }
+    if (existingStudent) {
+      return NextResponse.json({ error: "This email is already registered as a student account. Please use a different email." }, { status: 409 });
+    }
+    if (existingLegacy || existingAdmin) {
+      return NextResponse.json({ error: "An account with this email already exists. Please login or use a different email." }, { status: 409 });
     }
 
     if (phoneTrimmed) {

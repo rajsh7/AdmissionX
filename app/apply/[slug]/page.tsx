@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import { getDb } from "@/lib/db";
+import { verifyStudentToken, STUDENT_COOKIE } from "@/lib/auth";
 import ApplyCollegeForm from "./ApplyCollegeForm";
 
 interface ApplyCollegeData {
@@ -49,13 +51,13 @@ async function fetchApplyCollegeData(slug: string): Promise<ApplyCollegeData | n
     const [user, city] = await Promise.all([
       college.users_id
         ? db.collection("users").findOne(
-            { _id: college.users_id },
+            { id: college.users_id },
             { projection: { firstname: 1, profileimage: 1 } },
           )
         : null,
       college.registeredAddressCityId
         ? db.collection("city").findOne(
-            { _id: college.registeredAddressCityId },
+            { id: college.registeredAddressCityId },
             { projection: { name: 1 } },
           )
         : null,
@@ -95,8 +97,16 @@ export default async function ApplyCollegePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const college = await fetchApplyCollegeData(slug);
 
+  // Guard: must be a logged-in student
+  const cookieStore = await cookies();
+  const token = cookieStore.get(STUDENT_COOKIE)?.value;
+  const student = token ? await verifyStudentToken(token) : null;
+  if (!student) {
+    redirect(`/college/${slug}?apply=1`);
+  }
+
+  const college = await fetchApplyCollegeData(slug);
   if (!college) notFound();
 
   return (

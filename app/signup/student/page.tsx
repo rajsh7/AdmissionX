@@ -51,7 +51,9 @@ export default function StudentSignupPage() {
     });
     setLoading(false);
     if (res.ok) {
-      router.push("/signup/student/success");
+      const data = await res.json();
+      // Full page reload so cookie is read fresh by SSR
+      window.location.href = "/signup/student/success";
     } else {
       const data = await res.json();
       setErrorMsg(data.error || "Signup failed");

@@ -45,8 +45,9 @@ export async function POST(req: NextRequest) {
 
     // For non-admin roles also update legacy users table
     if (record.role !== "admin") {
+      const escapedEmail = email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       await db.collection("users").updateOne(
-        { email: { $regex: `^${email}$`, $options: "i" } },
+        { email: { $regex: `^${escapedEmail}$`, $options: "i" } },
         { $set: { password: hashed, updated_at: new Date() } }
       ).catch(() => { /* non-fatal */ });
     }

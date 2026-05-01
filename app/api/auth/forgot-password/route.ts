@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { getDb } from "@/lib/db";
 import { sendPasswordResetEmail } from "@/lib/email";
 
-const EXPIRES_IN_MS = 60 * 60 * 1000; // 1 hour
+const EXPIRES_IN_MS = 15 * 60 * 1000; // 15 minutes
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,8 +44,9 @@ export async function POST(req: NextRequest) {
 
     // 4. Check legacy users table (old college/student accounts from MySQL migration)
     if (!found) {
+      const escapedEmail = email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const legacyUser = await db.collection("users").findOne(
-        { email: { $regex: `^${email}$`, $options: "i" } },
+        { email: { $regex: `^${escapedEmail}$`, $options: "i" } },
         { projection: { firstname: 1, lastname: 1, type_of_user: 1 } }
       );
       if (legacyUser) {

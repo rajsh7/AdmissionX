@@ -53,8 +53,9 @@ export default function ApplyAuthModal({ redirectTo, onClose }: Props) {
       });
       const data = await res.json();
       if (!res.ok) { setSignupError(data.error || "Signup failed."); return; }
-      onClose();
-      router.push(redirectTo);
+      // Cookie is set — wait a moment then redirect
+      await new Promise(resolve => setTimeout(resolve, 100));
+      window.location.href = redirectTo;
     } catch {
       setSignupError("Network error. Please try again.");
     } finally {
@@ -74,8 +75,9 @@ export default function ApplyAuthModal({ redirectTo, onClose }: Props) {
       });
       const data = await res.json();
       if (res.ok) {
-        onClose();
-        router.push(redirectTo);
+        // Cookie is set — wait a moment then redirect
+        await new Promise(resolve => setTimeout(resolve, 100));
+        window.location.href = redirectTo;
       } else if (res.status === 403) {
         setLoginError(data.error || "Please verify your email before logging in.");
         setUnverifiedEmail(loginEmail);
@@ -89,10 +91,10 @@ export default function ApplyAuthModal({ redirectTo, onClose }: Props) {
     }
   }
 
-  // Google OAuth — store redirect in sessionStorage so callback can use it
+  // Google OAuth — pass redirect as URL param so callback can use it
   function handleGoogle() {
-    sessionStorage.setItem("apply_redirect", redirectTo);
-    window.location.href = "/api/auth/google";
+    const params = new URLSearchParams({ redirect: redirectTo });
+    window.location.href = `/api/auth/google?${params}`;
   }
 
   if (!mounted) return null;

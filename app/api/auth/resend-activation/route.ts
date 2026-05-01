@@ -17,7 +17,8 @@ export async function POST(req: NextRequest) {
     );
 
     // Always return success to prevent email enumeration
-    if (!student || student.is_active) {
+    const isAlreadyActive = student.is_active === 1 || student.is_active === true || student.is_active === "1";
+    if (!student || isAlreadyActive) {
       return NextResponse.json({ success: true });
     }
 

@@ -127,14 +127,38 @@ export async function GET(req: NextRequest) {
       ]);
       queryDegreeIds = qDegrees.map((d: any) => d.id).filter(Boolean);
       queryStreamIds = qStreams.map((s: any) => s.id).filter(Boolean);
+
+      if (queryDegreeIds.length > 0 || queryStreamIds.length > 0) {
+        const cmFilter: Record<string, unknown>[] = [];
+        if (queryDegreeIds.length > 0) cmFilter.push({ degree_id: { $in: queryDegreeIds } });
+        if (queryStreamIds.length > 0) cmFilter.push({ functionalarea_id: { $in: queryStreamIds } });
+        const qCpIds = await db.collection("collegemaster")
+          .find(cmFilter.length === 1 ? cmFilter[0] : { $or: cmFilter }, { projection: { collegeprofile_id: 1 } })
+          .limit(10000).toArray()
+          .then((r) => [...new Set(r.map((x: any) => Number(x.collegeprofile_id)))]);
+        // Intersect with existing filteredIds if any
+        filteredIds = filteredIds
+          ? filteredIds.filter((id) => qCpIds.includes(Number(id)))
+          : qCpIds;
+      }
     }
     if (queryDegreeIds.length === 0 && degDoc?.id != null) queryDegreeIds = [degDoc.id];
     if (queryStreamIds.length === 0 && faDoc?.id != null) queryStreamIds = [faDoc.id];
 
     // Build match
     const match: Record<string, unknown> = {};
-    if (filteredIds) match.id = { $in: filteredIds };
-    if (cityIntId) match.registeredAddressCityId = cityIntId;
+    if (filteredIds && (filteredIds as unknown[]).length > 0) match.id = { $in: filteredIds };
+    if (cityIntId) {
+      const cityDoc = await db.collection("city").findOne({ id: cityIntId }, { projection: { name: 1 } });
+      const cityName = String(cityDoc?.name ?? "").trim();
+      const cityOr: Record<string, unknown>[] = [{ registeredAddressCityId: cityIntId }];
+      if (cityName) {
+        cityOr.push({ registeredSortAddress: { $regex: cityName, $options: "i" } });
+        cityOr.push({ registeredFullAddress: { $regex: cityName, $options: "i" } });
+        cityOr.push({ campusSortAddress: { $regex: cityName, $options: "i" } });
+      }
+      match.$and = [{ $or: cityOr }];
+    }
     if (type === "top") match.isShowOnTop = 1;
     else if (type === "university") match.isTopUniversity = 1;
     else if (type === "abroad") match.registeredAddressCountryId = { $ne: 1 };
@@ -160,7 +184,9 @@ export async function GET(req: NextRequest) {
       { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
     ];
 
-    if (q.length >= 2) {
+    // Note: course-based q (e.g. "Btech") is already resolved to filteredIds above.
+    // Only apply text match for non-course queries (no degree/stream match found).
+    if (q.length >= 2 && queryDegreeIds.length === 0 && queryStreamIds.length === 0) {
       basePipeline.push({
         $match: {
           $or: [

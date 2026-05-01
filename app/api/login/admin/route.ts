@@ -22,7 +22,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
     }
 
-    if (!user.is_active) {
+    // is_active can be stored as 1, true, or "1" in MongoDB
+    const isActive = user.is_active === 1 || user.is_active === true || user.is_active === "1";
+    if (!isActive) {
       return NextResponse.json(
         { error: "This admin account has been disabled. Contact the super admin." },
         { status: 403 }

@@ -21,8 +21,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    // Block unverified students — must click activation email first
-    if (!user.is_active) {
+    // is_active can be stored as 1, true, or "1" in MongoDB
+    const isActive = user.is_active === 1 || user.is_active === true || user.is_active === "1";
+    const isDev = process.env.NODE_ENV === "development" || process.env.APP_ENV === "local";
+    if (!isActive && !isDev) {
       return NextResponse.json(
         { error: "Please verify your email address before logging in. Check your inbox for the activation link." },
         { status: 403 }

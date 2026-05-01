@@ -103,7 +103,7 @@ export default function QATab({ user, type }: Props) {
   const canSubmit = type === "questions" || type === "reviews";
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 max-w-4xl mx-auto w-full">
 
       {/* ── Page header ── */}
       <div className="flex items-center justify-between flex-wrap gap-4">

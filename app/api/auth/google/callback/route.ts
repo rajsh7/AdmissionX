@@ -115,7 +115,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // 4. Sign JWT and redirect to dashboard
+    // 4. Sign JWT and redirect — honour apply_redirect if set via sessionStorage
     const jwtToken = await signStudentToken({
       id:    student!._id.toString(),
       name:  student!.name,
@@ -123,9 +123,14 @@ export async function GET(req: NextRequest) {
       role:  "student",
     });
 
-    const response = NextResponse.redirect(
-      `${baseUrl}/dashboard/student/${student!._id.toString()}`
-    );
+    // The client stores apply_redirect in sessionStorage before OAuth.
+    // We pass it as a state param via the OAuth URL so the callback can use it.
+    const applyRedirect = req.nextUrl.searchParams.get("state");
+    const destination = applyRedirect && applyRedirect.startsWith("/")
+      ? `${baseUrl}${applyRedirect}`
+      : `${baseUrl}/dashboard/student/${student!._id.toString()}`;
+
+    const response = NextResponse.redirect(destination);
     response.cookies.set(STUDENT_COOKIE, jwtToken, COOKIE_OPTIONS);
     return response;
 
