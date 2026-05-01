@@ -69,9 +69,9 @@ export default function HeroSection() {
               <div className="mt-8 sm:mt-14 flex items-center gap-4 sm:gap-6">
                 <div className="flex -space-x-3 sm:-space-x-5 items-center">
                   {[
-                    "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=100&h=100&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&h=100&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=100&h=100&auto=format&fit=crop"
+                    "/images/real_1.jpg",
+                    "/images/real_2.jpg",
+                    "/images/real_3.jpg"
                   ].map((src, i) => (
                     <div key={i} className="w-10 h-10 sm:w-14 sm:h-14 rounded-full border-4 border-white overflow-hidden bg-slate-100 shadow-lg">
                       <img src={src} alt="student" className="w-full h-full object-cover" />

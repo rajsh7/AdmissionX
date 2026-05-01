@@ -369,6 +369,7 @@ export default function TopCourse() {
                   placeholder="Search your course"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  suppressHydrationWarning
                   className="h-16 w-full rounded-[5px] pl-10 pr-4 outline-none transition-all"
                   style={{
                     backgroundColor: "rgba(244, 244, 244, 1)",
@@ -393,6 +394,7 @@ export default function TopCourse() {
                     onClick={() =>
                       router.push(`/careers-courses?stream=${course.slug}`)
                     }
+                    suppressHydrationWarning
                     className={`group flex items-center gap-4 border-b p-4 text-left transition-all duration-300 ${isActive
                         ? "border-l-[10px] bg-[#fff5f5] text-slate-900"
                         : "bg-white text-slate-900 hover:bg-slate-50"

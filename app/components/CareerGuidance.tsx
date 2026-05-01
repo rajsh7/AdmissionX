@@ -62,6 +62,7 @@ export default function CareerGuidance() {
                 Start Free Assessment
               </Link>
               <button
+                suppressHydrationWarning
                 className="flex h-[44px] sm:h-[50px] w-full items-center justify-center rounded-[5px] bg-neutral-800 px-6 sm:px-8 text-center text-white shadow-lg shadow-black/10 transition-all hover:bg-neutral-900 sm:w-auto text-[15px] sm:text-[18px] lg:text-[20px]"
                 style={{ fontWeight: 600 }}
               >

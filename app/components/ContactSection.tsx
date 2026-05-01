@@ -83,6 +83,7 @@ export default function ContactSection() {
                   <div>
                     <label className="block mb-2 px-1" style={{ fontSize: '18px', fontWeight: '700', color: '#6C6C6C' }}>Name</label>
                     <input
+                      suppressHydrationWarning
                       type="text"
                       placeholder="Your name"
                       value={form.name}
@@ -93,6 +94,7 @@ export default function ContactSection() {
                   <div>
                     <label className="block mb-2 px-1" style={{ fontSize: '18px', fontWeight: '700', color: '#6C6C6C' }}>Email</label>
                     <input
+                      suppressHydrationWarning
                       type="email"
                       placeholder="your.email@example.com"
                       value={form.email}
@@ -105,6 +107,7 @@ export default function ContactSection() {
                 <div>
                   <label className="block mb-2 px-1" style={{ fontSize: '18px', fontWeight: '700', color: '#6C6C6C' }}>Subject</label>
                   <input
+                    suppressHydrationWarning
                     type="text"
                     placeholder="How can we help you?"
                     value={form.subject}
@@ -126,6 +129,7 @@ export default function ContactSection() {
  
                 <div className="flex justify-center pt-4">
                   <button
+                    suppressHydrationWarning
                     type="submit"
                     disabled={status === "loading"}
                     className="w-full sm:w-auto rounded-[5px] bg-primary text-white tracking-wider hover:brightness-105 transition-all shadow-xl shadow-primary/20 disabled:opacity-60 px-8 h-[45px] sm:h-[50px] text-[16px] sm:text-[18px] lg:text-[20px]"

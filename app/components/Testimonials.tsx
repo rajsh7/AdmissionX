@@ -56,6 +56,7 @@ export default function Testimonials({ testimonials: dynamicTestimonials }: Test
                 </p>
             </div>
             <button 
+              suppressHydrationWarning
               className="hidden sm:flex h-[45px] items-center justify-center rounded-[5px] border border-slate-200 bg-white px-6 whitespace-nowrap transition-all shadow-sm"
               style={{ fontSize: '16px', fontWeight: 500, color: '#475569' }}
             >

@@ -169,11 +169,12 @@ export default function TopUniversities({
               suppressHydrationWarning
               className="h-full flex-1 bg-white pl-12 text-[14px] sm:text-[16px] font-normal text-[#6C6C6C] placeholder:text-[#6C6C6CA1] focus:outline-none"
             />
-            <button className="flex h-full min-w-[80px] sm:min-w-[120px] items-center justify-center bg-[#FF3C3C] px-4 sm:px-8 text-sm font-semibold text-white hover:bg-[#E63636]">
+            <button suppressHydrationWarning className="flex h-full min-w-[80px] sm:min-w-[120px] items-center justify-center bg-[#FF3C3C] px-4 sm:px-8 text-sm font-semibold text-white hover:bg-[#E63636]">
               Search
             </button>
           </div>
           <button
+            suppressHydrationWarning
             onClick={() => setSortBy(sortBy === "rank" ? null : "rank")}
             className={`h-[48px] w-full sm:w-auto rounded-[5px] border px-4 sm:px-6 text-sm font-medium shadow-sm transition-all ${
               sortBy === "rank" ? "border-[#FF3C3C] bg-[#FF3C3C] text-white" : "border-slate-200 bg-white text-slate-600"
@@ -187,6 +188,7 @@ export default function TopUniversities({
         <div className="mb-8 flex gap-2 overflow-x-auto pb-4 hide-scrollbar">
           {categories.map((cat) => (
             <button
+              suppressHydrationWarning
               key={cat}
               onClick={() => handleTabClick(cat)}
               className={`whitespace-nowrap rounded-[5px] px-6 py-2.5 text-sm font-normal transition-all active:scale-95 ${
@@ -258,25 +260,14 @@ export default function TopUniversities({
                       </div>
 
                       <div className="mb-5 flex flex-wrap gap-3">
-                        {(uni.offeredCourses?.length ? uni.offeredCourses : [activeTab])
-                          .slice(0, 4)
-                          .map((course) => (
-                            <span
-                              key={`${uni.name}-${course}`}
-                              className="inline-flex items-center rounded-[5px] border border-slate-400 bg-[#F8FAFC] px-4 py-2 text-[16px] font-semibold leading-none text-[#6C6C6C]"
-                            >
-                              {course}
-                            </span>
-                          ))}
-                        {(uni.offeredCourses?.length ?? 0) > 4 && (
-                          <span className="inline-flex items-center rounded-[5px] border border-slate-400 bg-[#F8FAFC] px-4 py-2 text-[16px] font-semibold leading-none text-[#6C6C6C]">
-                            +{(uni.offeredCourses?.length ?? 0) - 4} More
-                          </span>
-                        )}
+                        <span className="inline-flex items-center rounded-[5px] border border-slate-400 bg-[#F8FAFC] px-4 py-2 text-[16px] font-semibold leading-none text-[#6C6C6C]">
+                          {activeTab}
+                        </span>
                       </div>
 
                       <div className="mt-auto flex flex-row items-center gap-2 border-t border-slate-200 pt-4 relative z-20">
                         <button
+                          suppressHydrationWarning
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleApply(uni.href.replace('/college/', '')); }}
                           className="flex-1 flex items-center justify-center gap-1 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-[11px] lg:text-[12px] font-bold px-1.5 py-2.5 rounded-[5px] transition-all whitespace-nowrap"
                         >

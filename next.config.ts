@@ -36,26 +36,19 @@ const nextConfig: NextConfig = {
   images: {
     loader: "custom",
     loaderFile: "./lib/image-loader.ts",
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    unoptimized: false,
     remotePatterns: [
-      {
-        protocol: "http",
-        hostname: "admin.admissionx.in",
-        pathname: "/uploads/**",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "**.admissionx.in",
-      },
+      { protocol: "http", hostname: "admin.admissionx.in", pathname: "/uploads/**" },
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "**.admissionx.in" },
+      { protocol: "https", hostname: "**" },
+      { protocol: "http", hostname: "**" },
     ],
-    // Serve modern formats automatically; fall back to original for old browsers.
     formats: ["image/avif", "image/webp"],
-    // Keep optimised images in the disk cache for 7 days before re-generating.
     minimumCacheTTL: 60 * 60 * 24 * 7,
-    // Allow reasonably large hero / banner images.
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
