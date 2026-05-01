@@ -45,6 +45,7 @@ export default function StatsBar() {
       style={{
         backgroundImage:
           "url('/Background-images/a869d11c-8380-4a53-ae65-09c5a674b54f.png')",
+        zIndex: 0,
       }}
     >
       {/* Gradient overlay */}

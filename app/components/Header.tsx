@@ -37,6 +37,7 @@ const navLinks: NavLink[] = [
   { label: "University", href: "/top-university" },
   { label: "Stream", href: "/careers-courses" },
   { label: "Exams", href: "/examination" },
+  { label: "Blogs", href: "/blogs" },
 ];
 
 const loginOptions = [
@@ -483,7 +484,7 @@ function SecondNav() {
   }, []);
 
   return (
-    <div className="home-page-shell flex justify-end ">
+    <div className="home-page-shell flex bg-white justify-end ">
       <div ref={barRef} className="inline-flex mr-8  items-center gap-0">
         {secondNavLinks.map((item) => {
           const activeCat = hoveredCat[item.label] ?? item.mega?.[0]?.label ?? "";
@@ -702,19 +703,15 @@ export default function Header({ theme }: HeaderProps) {
     <>
       {/* Scroll Progress Bar — CSS only, no framer-motion overhead */}
       {mounted && (
-        <div className="scroll-progress-bar fixed top-0 left-0 right-0 z-[60] h-[3px]" />
+        <div className="scroll-progress-bar fixed top-0  left-0 right-0 z-[60] h-[3px]" />
       )}
 
-      <motion.header 
-        className={`site-header fixed top-0 left-0 right-0 z-[100] w-full flex items-center transition-all duration-300 min-h-[58px] ${
-          isScrolled
-            ? "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.08)] py-2 border-b border-neutral-100"
-            : "bg-white/95 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.05)] py-3"
-        }`}
+      <motion.header
+        className="site-header fixed top-0 left-0 right-0 z-[100] w-full flex items-center h-[58px] bg-white border-b border-neutral-100"
       >
-        <div className="home-page-shell  flex w-full  items-center justify-between">
+        <div className="home-page-shell flex w-full items-center justify-between">
           {/* Logo Area */}
-          <div className="shrink-0">
+          <div className="shrink-0 lg:mt-10">
             <Link href="/" className="flex items-center gap-3 group">
               <img src="/admissionx-logo.png" alt="AdmissionX" className="h-6 sm:h-7 w-auto object-contain" />
             </Link>
@@ -867,7 +864,7 @@ export default function Header({ theme }: HeaderProps) {
       </motion.header>
 
       {/* ── Second Navigation Bar ── */}
-      <div className="fixed left-0 right-0 z-[99] bg-white border-b border-slate-200 shadow-sm hidden lg:block" style={{ top: isScrolled ? '54px' : '60px' }}>
+      <div className="fixed left-0 right-0 z-[99] bg-white border-b border-slate-200 shadow-sm hidden lg:block" style={{ top: '58px' }}>
         <SecondNav />
       </div>
 

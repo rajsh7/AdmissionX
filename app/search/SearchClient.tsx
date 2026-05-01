@@ -257,7 +257,7 @@ export default function SearchClient({
     <div suppressHydrationWarning className="min-h-screen bg-neutral-50 flex flex-col relative">
       <Header />
       <div className="relative w-full z-20" style={{ height: heroHeight }}>
-        <div className="absolute top-0 left-0 w-full h-full z-0 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full z-0">
           <Image
             src={heroImage}
             alt="Campus Background"

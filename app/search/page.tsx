@@ -400,6 +400,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       initType={type}
       pageTitle={pageTitle}
       pageSubtitle={pageSubtitle}
+      heroImage="/Background-images/student-hero-bg.png"
     />
   );
 }

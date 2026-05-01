@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import AskQueryModal from "@/app/college/[slug]/components/AskQueryModal";
+import ApplyAuthModal from "@/app/components/ApplyAuthModal";
+import { useApplyGuard } from "@/app/hooks/useApplyGuard";
 import type { FilterCollegeResult } from "@/lib/college-filter";
 import type { AdItem } from "./AdsSection";
 import AdCard from "./AdCard";
@@ -45,6 +47,7 @@ export default function TopUniversities({
   initialStreamColleges = [],
   ads = [],
 }: TopUniversitiesProps) {
+  const { handleApply, modalSlug, closeModal } = useApplyGuard();
   const [activeTab, setActiveTab] = useState("Engineering");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentUniversities, setCurrentUniversities] = useState<University[]>(
@@ -272,20 +275,23 @@ export default function TopUniversities({
                         )}
                       </div>
 
-                      <div className="mt-auto flex items-center justify-between border-t border-slate-200 pt-4">
-                        <div className="text-[16px] font-semibold text-[#6C6C6C]">
-                          Avg. Package:{" "}
-                          <span className="font-bold text-primary">
-                            {uni.avgPackage || "Rs 4.5 LPA"}
-                          </span>
-                        </div>
-                        <Link
-                          href={uni.href}
-                          className="inline-flex items-center gap-1 text-[#FF3C3C] font-bold text-[14px] group-hover:translate-x-1 transition-transform"
+                      <div className="mt-auto flex flex-row items-center gap-2 border-t border-slate-200 pt-4 relative z-20">
+                        <button
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleApply(uni.href.replace('/college/', '')); }}
+                          className="flex-1 flex items-center justify-center gap-1 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-[11px] lg:text-[12px] font-bold px-1.5 py-2.5 rounded-[5px] transition-all whitespace-nowrap"
                         >
-                          View Details
-                          <span className="material-symbols-rounded text-[18px]">arrow_forward</span>
-                        </Link>
+                          <span className="material-symbols-outlined text-[14px]">edit_document</span>
+                          Apply Now
+                        </button>
+                        <AskQueryModal slug={uni.href.replace('/college/', '')} collegeName={uni.name}
+                          renderTrigger={(onClick) => (
+                            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); onClick(e); }}
+                              className="flex-1 flex items-center justify-center gap-1 bg-white border border-[#FF3C3C] hover:bg-red-50 text-[#FF3C3C] text-[11px] lg:text-[12px] font-bold px-1.5 py-2.5 rounded-[5px] transition-all whitespace-nowrap">
+                              <span className="material-symbols-outlined text-[14px]">help</span>
+                              Ask Query
+                            </button>
+                          )}
+                        />
                       </div>
                     </div>
                   </div>
@@ -323,6 +329,7 @@ export default function TopUniversities({
       <div className="home-page-shell">
         <hr className="mt-12 border-t border-slate-200" />
       </div>
+      {modalSlug && <ApplyAuthModal redirectTo={`/apply/${modalSlug}`} onClose={closeModal} />}
     </section>
   );
 }

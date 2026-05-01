@@ -175,7 +175,7 @@ export default async function BlogsListingPage({
   }
 
   return (
-    <div className="min-h-screen bg-white font-poppins">
+    <div className="min-h-screen bg-white">
       <Header />
 
       <main className="pt-[72px] sm:pt-20 pb-16 w-full">

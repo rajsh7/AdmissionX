@@ -26,7 +26,7 @@ export default function HeroSection() {
   if (!isMounted) return <div className="min-h-[650px] bg-[#181C35]" />;
 
   return (
-    <section className="relative w-full min-h-[100svh]">
+    <section className="relative w-full min-h-[100svh]" style={{ zIndex: 10 }}>
       {/* Animated Background Slider */}
       <div className="absolute inset-0 z-0 bg-[#181C35]">
         <AnimatePresence>
@@ -61,7 +61,7 @@ export default function HeroSection() {
                 The world&apos;s most comprehensive academic discovery platform. Search 50,000+ universities, get exam guidance, and read unfiltered student reviews.
               </p>
 
-              <div className="mt-8 sm:mt-12 w-full max-w-4xl relative" style={{ zIndex: 9999 }}>
+              <div className="mt-8 sm:mt-12 w-full max-w-4xl" style={{ zIndex: 9999, position: 'relative' }}>
                 <SearchBar />
               </div>
 
