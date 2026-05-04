@@ -18,6 +18,7 @@ import SearchFilters from "@/app/components/SearchFilters";
 import PaginationFixed from "@/app/components/PaginationFixed";
 import SearchBar from "@/app/components/SearchBar";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
+import SearchAIBanner from "./SearchAIBanner";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -499,6 +500,9 @@ export default function SearchClient({
                   </p>
                 </div>
               </div>
+
+              {/* ── AI Recommendations Banner (logged-in students only) ── */}
+              <SearchAIBanner cityId={cityId} q={q} />
 
               {/* ── College grid / list ── */}
               {loading ? (

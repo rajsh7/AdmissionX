@@ -246,6 +246,21 @@ export default function OverviewTab({ user, navigate }: Props) {
                  Live Chat Now
               </button>
            </div>
+
+           {/* AI Recommendation CTA */}
+           <div className="bg-gradient-to-br from-[#FF3C3C] to-orange-500 rounded-[10px] p-6 text-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 opacity-10 p-4">
+                <span className="material-symbols-outlined text-[80px]">auto_awesome</span>
+              </div>
+              <span className="material-symbols-outlined text-[28px] mb-3 block" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+              <h4 className="text-[16px] font-bold mb-1">AI College Match</h4>
+              <p className="text-[12px] text-white/80 mb-4 leading-relaxed">
+                Get personalised top-2 college picks based on your marks & stream.
+              </p>
+              <button onClick={() => navigate("ai-recommend")} className="w-full py-2.5 bg-white/20 hover:bg-white/30 text-white text-[13px] font-bold rounded-lg transition-all border border-white/20">
+                See My Matches
+              </button>
+           </div>
         </div>
       </div>
     </div>

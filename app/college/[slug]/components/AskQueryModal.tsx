@@ -7,10 +7,11 @@ interface Props {
   slug: string;
   collegeName: string;
   renderTrigger?: (onClick: (e: React.MouseEvent) => void) => React.ReactNode;
+  autoOpen?: boolean;
 }
 
-export default function AskQueryModal({ slug, collegeName, renderTrigger }: Props) {
-  const [open, setOpen] = useState(false);
+export default function AskQueryModal({ slug, collegeName, renderTrigger, autoOpen }: Props) {
+  const [open, setOpen] = useState(!!autoOpen);
   const [mounted, setMounted] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

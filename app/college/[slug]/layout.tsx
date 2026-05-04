@@ -10,6 +10,7 @@ import CollegeTabs from "@/app/components/college/CollegeTabs";
 import type { CollegeHeroData } from "@/app/components/college/CollegeHero";
 import { ObjectId } from "mongodb";
 import AutoApplyTrigger from "./components/AutoApplyTrigger";
+import AutoQueryTrigger from "./components/AutoQueryTrigger";
 import { Suspense } from "react";
 
 interface CollegeBase {
@@ -355,6 +356,7 @@ export default async function CollegeLayout({
     <div className="min-h-screen bg-white">
       <Header />
       <Suspense fallback={null}><AutoApplyTrigger slug={slug} /></Suspense>
+      <Suspense fallback={null}><AutoQueryTrigger slug={slug} collegeName={collegeName} /></Suspense>
       <CollegeHero college={heroData} />
       <CollegeTabs
         slug={slug}

@@ -1,4 +1,3 @@
-import pool from "@/lib/db";
 import { getDb } from "@/lib/db";
 import SearchClient from "./SearchClient";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
@@ -51,6 +50,10 @@ const ALIASES: Record<string, string> = {
   "nursing": "nursing", "bams": "bams|ayurved",
 };
 
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 async function fetchColleges(opts: {
   q: string; stream: string; degree: string; cityId: string; stateId: string;
   countryId: string; feesMax: string; sort: string; type: string; page: number; limit: number;
@@ -85,9 +88,9 @@ async function fetchColleges(opts: {
       match.$and = [...((match.$and as any[]) ?? []), { id: { $in: cpIds } }];
     } else {
       match.$or = [
-        { slug: { $regex: q, $options: "i" } },
-        { registeredSortAddress: { $regex: q, $options: "i" } },
-        { college_name: { $regex: q, $options: "i" } },
+        { slug: { $regex: escapeRegex(q), $options: "i" } },
+        { registeredSortAddress: { $regex: escapeRegex(q), $options: "i" } },
+        { college_name: { $regex: escapeRegex(q), $options: "i" } },
       ];
     }
   }
@@ -99,11 +102,21 @@ async function fetchColleges(opts: {
   if (cityId) {
     const cityDoc = await db.collection("city").findOne({ id: Number(cityId) }, { projection: { name: 1 } });
     const cityNameForMatch = String(cityDoc?.name ?? "").trim();
-    const cityOrConditions: Record<string, unknown>[] = [{ registeredAddressCityId: Number(cityId) }];
+    // Expand to all sibling city IDs (e.g. "Delhi" → New Delhi, Central Delhi, South Delhi…)
+    // This prevents false positives from registeredFullAddress (e.g. "Mathura–Delhi Highway")
+    const siblingCities = cityNameForMatch
+      ? await db.collection("city")
+          .find({ name: { $regex: escapeRegex(cityNameForMatch), $options: "i" } })
+          .project({ id: 1 })
+          .toArray()
+      : [];
+    const allCityIds = [...new Set([Number(cityId), ...siblingCities.map((c: any) => Number(c.id))])];
+    const cityOrConditions: Record<string, unknown>[] = [
+      { registeredAddressCityId: { $in: allCityIds } },
+    ];
     if (cityNameForMatch) {
-      cityOrConditions.push({ registeredSortAddress: { $regex: cityNameForMatch, $options: "i" } });
-      cityOrConditions.push({ registeredFullAddress: { $regex: cityNameForMatch, $options: "i" } });
-      cityOrConditions.push({ campusSortAddress: { $regex: cityNameForMatch, $options: "i" } });
+      cityOrConditions.push({ registeredSortAddress: { $regex: `^\\s*${escapeRegex(cityNameForMatch)}`, $options: "i" } });
+      cityOrConditions.push({ campusSortAddress: { $regex: `^\\s*${escapeRegex(cityNameForMatch)}`, $options: "i" } });
     }
     match.$and = [...((match.$and as any[]) ?? []), { $or: cityOrConditions }];
   } else if (stateId) {
@@ -137,12 +150,11 @@ async function fetchColleges(opts: {
 
   if (feesMax && !isNaN(Number(feesMax))) {
     const feeIds = await db.collection("collegemaster")
-      .find({ fees: { $gt: 0, $lte: Number(feesMax) } }, { projection: { collegeprofile_id: 1 } })
+      .find({ fees: { $gte: 500, $lte: Number(feesMax) } }, { projection: { collegeprofile_id: 1 } })
       .limit(5000).toArray().then((r) => [...new Set(r.map((x: any) => Number(x.collegeprofile_id)))]);
     match.$and = [...((match.$and as any[]) ?? []), { id: { $in: feeIds } }];
   }
 
-  // When searching a course with no explicit sort, default to fees
   const effectiveSort = (q.length >= 2 && (queryDegreeIds.length > 0 || queryStreamIds.length > 0) && sort === "rating") ? "fees" : sort;
   const isFeeSort = effectiveSort === "fees";
 
@@ -153,7 +165,6 @@ async function fetchColleges(opts: {
 
   const total = await db.collection("collegeprofile").countDocuments(match);
 
-  // For fees sort: fetch a large pool so aggregation can sort by computed min_fees
   const fetchLimit = isFeeSort ? Math.max(limit * 20, 240) : limit;
   const fetchSkip = isFeeSort ? 0 : (page - 1) * limit;
 
@@ -170,7 +181,7 @@ async function fetchColleges(opts: {
           input: "$cm", as: "c",
           cond: {
             $and: [
-              { $gt: ["$$c.fees", 0] },
+              { $gte: ["$$c.fees", 500] },
               { $or: [
                 ...(queryDegreeIds.length > 0 ? [{ $in: ["$$c.degree_id", queryDegreeIds] }] : []),
                 ...(queryStreamIds.length > 0 ? [{ $in: ["$$c.functionalarea_id", queryStreamIds] }] : []),
@@ -179,7 +190,7 @@ async function fetchColleges(opts: {
           },
         },
       }
-    : { $filter: { input: "$cm", as: "c", cond: { $gt: ["$$c.fees", 0] } } };
+    : { $filter: { input: "$cm", as: "c", cond: { $gte: ["$$c.fees", 500] } } };
 
   const dataRows = await db.collection("collegeprofile").aggregate([
     { $match: { _id: { $in: topIds } } },
@@ -201,8 +212,7 @@ async function fetchColleges(opts: {
       min_fees: { $min: "$filtered_cm.fees" },
       max_fees: { $max: "$filtered_cm.fees" },
     }},
-    // Only filter to colleges with fees when sorting by fees
-    ...(isFeeSort ? [{ $match: { min_fees: { $gt: 0 } } }] : []),
+    ...(isFeeSort ? [{ $match: { min_fees: { $gte: 500 } } }] : []),
     ...(isFeeSort ? [
       { $sort: { min_fees: 1 as const } },
       { $skip: (page - 1) * limit },
@@ -259,17 +269,24 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const page = Math.max(1, parseInt(getString("page", "1")));
   const limit = 12;
 
+  // Resolve ?city=text to a city ID — try exact match first, then partial
   let resolvedCityId = cityId;
   let resolvedCityName = "";
   if (!cityId && cityText) {
     const db = await getDb();
-    const cityDoc = await db.collection("city").findOne(
-      { name: { $regex: cityText, $options: "i" } },
-      { projection: { id: 1, name: 1 } }
-    );
+    const escaped = escapeRegex(cityText);
+    const cityDoc =
+      await db.collection("city").findOne(
+        { name: { $regex: `^\\s*${escaped}\\s*$`, $options: "i" } },
+        { projection: { id: 1, name: 1 } }
+      ) ??
+      await db.collection("city").findOne(
+        { name: { $regex: escaped, $options: "i" } },
+        { projection: { id: 1, name: 1 } }
+      );
     if (cityDoc) {
       resolvedCityId = String(cityDoc.id);
-      resolvedCityName = String(cityDoc.name);
+      resolvedCityName = String(cityDoc.name).trim();
     } else {
       resolvedCityName = cityText;
     }
@@ -404,4 +421,3 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     />
   );
 }
-
