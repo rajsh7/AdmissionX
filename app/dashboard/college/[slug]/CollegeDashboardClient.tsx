@@ -9,28 +9,16 @@ import BannerTab from "./tabs/BannerTab";
 import AboutImagesTab from "./tabs/AboutImagesTab";
 import CoursesTab from "./tabs/CoursesTab";
 import GalleryTab from "./tabs/GalleryTab";
-import FacultyTab from "./tabs/FacultyTab";
-import PlacementTab from "./tabs/PlacementTab";
 import FacilitiesTab from "./tabs/FacilitiesTab";
-import ManagementTab from "./tabs/ManagementTab";
 import ScholarshipsTab from "./tabs/ScholarshipsTab";
-import ApplicationsTab from "./tabs/ApplicationsTab";
 import CutoffsTab from "./tabs/CutoffsTab";
 import SportsTab from "./tabs/SportsTab";
-import SettingsTab from "./tabs/SettingsTab";
-import QueriesTab from "./tabs/QueriesTab";
 import AddressTab from "./tabs/AddressTab";
 import AchievementsTab from "./tabs/AchievementsTab";
 import LettersTab from "./tabs/LettersTab";
 import EventsTab from "./tabs/EventsTab";
-import SocialLinksTab from "./tabs/SocialLinksTab";
-import ReviewsTab from "./tabs/ReviewsTab";
-import TransactionsTab from "./tabs/TransactionsTab";
-import FAQsTab from "./tabs/FAQsTab";
-import QATab from "./tabs/QATab";
-import HelpdeskTab from "./tabs/HelpdeskTab";
-import AgreementTab from "./tabs/AgreementTab";
-import TermsTab from "./tabs/TermsTab";
+import PlacementTab from "./tabs/PlacementTab";
+import SettingsTab from "./tabs/SettingsTab";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface CollegeUser {
@@ -57,18 +45,7 @@ export type TabId =
   | "letters"
   | "sports"
   | "cutoffs"
-  | "faculty"
-  | "social_links"
-  | "applications"
-  | "queries"
-  | "reviews"
-  | "transactions"
-  | "faqs"
-  | "qa"
-  | "helpdesk"
   | "public_view"
-  | "agreement"
-  | "terms"
   | "logout"
   | "settings";
 
@@ -99,18 +76,7 @@ const TABS: Tab[] = [
   { id: "sports", label: "Sports & Activity", icon: "sports_soccer", mobileLabel: "Spo", group: "info" },
   { id: "cutoffs", label: "Cut Offs", icon: "trending_down", mobileLabel: "Cut", group: "info" },
 
-  { id: "faculty", label: "Our faculties", icon: "groups", mobileLabel: "Faculty" },
-  { id: "social_links", label: "Social Link Management", icon: "share", mobileLabel: "Social" },
-  { id: "applications", label: "Application", icon: "forum", mobileLabel: "Apps" },
-  { id: "queries", label: "Queries", icon: "help", mobileLabel: "Queries" },
-  { id: "reviews", label: "Reviews", icon: "rate_review", mobileLabel: "Reviews" },
-  { id: "transactions", label: "Transaction Details", icon: "payments", mobileLabel: "Trans." },
-  { id: "faqs", label: "College Faqs", icon: "question_answer", mobileLabel: "FAQs" },
-  { id: "qa", label: "Question/ Answer / Comment", icon: "chat", mobileLabel: "Q&A" },
-  { id: "helpdesk", label: "Help Desk", icon: "support_agent", mobileLabel: "Help" },
   { id: "public_view", label: "Public View", icon: "visibility", mobileLabel: "Public" },
-  { id: "agreement", label: "College Partner Agreement", icon: "handshake", mobileLabel: "Agr." },
-  { id: "terms", label: "Terms and conditions", icon: "gavel", mobileLabel: "Terms" },
   { id: "settings", label: "Account Settings", icon: "settings", mobileLabel: "Settings" },
   { id: "logout", label: "Logout", icon: "logout", mobileLabel: "Logout" },
 ];

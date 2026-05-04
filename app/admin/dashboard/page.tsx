@@ -1,4 +1,5 @@
 import { getDb } from "@/lib/db";
+import pool from "@/lib/db";
 import DashboardClient from "../_components/DashboardClient";
 
 // Cache dashboard data briefly to avoid expensive DB work on every request
@@ -20,7 +21,15 @@ export default async function AdminDashboardPage() {
     collegeMonthlyAgg,
   ] = await Promise.all([
     Promise.all([
-      db.collection("users").estimatedDocumentCount(),
+      (async () => {
+        try {
+          const db = await getDb();
+          const [mysqlRows] = await (pool as any).query("SELECT COUNT(*) AS total FROM next_student_signups");
+          const mysqlCount = Number((mysqlRows as any)[0]?.total ?? 0);
+          const mongoCount = await db.collection("studentprofile").estimatedDocumentCount();
+          return mysqlCount + mongoCount;
+        } catch { return 0; }
+      })(),
       db.collection("collegeprofile").estimatedDocumentCount(),
       db.collection("next_admin_users").estimatedDocumentCount(),
       db.collection("chatbot_sessions").countDocuments({ status: "open" }),

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import AdminModal from "@/app/admin/_components/AdminModal";
 import { NAV_GROUPS } from "@/app/admin/_components/nav-config";
@@ -186,10 +187,10 @@ export default function RoleDefinitionList({ roles, createRole, updateRole, dele
     <>
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm text-slate-500">{roles.length} role{roles.length !== 1 ? "s" : ""} defined</p>
-        <button onClick={openCreate} className="bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-colors flex items-center gap-2 shadow-sm">
+        <Link href="/admin/members/roles/create-role" className="bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-colors flex items-center gap-2 shadow-sm">
           <span className="material-symbols-rounded text-[20px]">add</span>
           Add New Role
-        </button>
+        </Link>
       </div>
 
       {/* Info banner */}

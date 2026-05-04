@@ -39,20 +39,6 @@ export const NAV_GROUPS: NavGroup[] = [
         subItems: [
           { href: "/admin/colleges/contact", label: "College Contact Card", icon: "contact_mail" },
           { href: "/admin/colleges/profile", label: "Profile information", icon: "info" },
-          { href: "/admin/colleges/management", label: "College Management Information", icon: "manage_accounts" },
-          { href: "/admin/colleges/courses", label: "College Course", icon: "menu_book" },
-          { href: "/admin/colleges/events", label: "College Events", icon: "event" },
-          { href: "/admin/colleges/facilities", label: "College Facilities", icon: "apartment" },
-          { href: "/admin/colleges/faculty", label: "College Faculty", icon: "groups" },
-          { href: "/admin/colleges/placements", label: "College Placement", icon: "work" },
-          { href: "/admin/colleges/scholarships", label: "College Scholarship", icon: "workspace_premium" },
-          { href: "/admin/colleges/cut-offs", label: "College Cut Offs", icon: "trending_up" },
-          { href: "/admin/colleges/sports", label: "College Sports & Activity", icon: "sports_basketball" },
-          { href: "/admin/colleges/admission", label: "College Admission Procedure", icon: "assignment" },
-          { href: "/admin/colleges/reviews", label: "College Reviews", icon: "reviews" },
-          { href: "/admin/colleges/faqs", label: "College Faqs", icon: "help_outline" },
-          { href: "/admin/colleges/gallery", label: "College Gallery", icon: "photo_library" },
-          { href: "/admin/colleges/achievements", label: "College Achievements", icon: "emoji_events" },
         ]
       },
       {
