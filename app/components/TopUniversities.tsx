@@ -224,16 +224,12 @@ export default function TopUniversities({
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                       />
 
-                       <div className="absolute top-3 right-0 bg-white px-2.5 py-1 flex items-center gap-1.5 shadow-md rounded-l-[5px] border border-r-0 border-neutral-100 z-10">
-                         <span className="material-symbols-rounded text-[#FF3C3C] text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                           star
+                       <div className="absolute top-3 right-0 bg-white px-3 py-2 flex flex-row shadow-md rounded-l-[5px] border border-r-0 border-neutral-100 z-10">
+                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block pr-1">Fees:</span>
+                         <span className="text-[13px] font-black text-[#FF3C3C] block leading-tight">
+                           {uni.tuition && uni.tuition !== "Contact for fees" ? uni.tuition : "N/A"}
                          </span>
-                         <span className="font-semibold" style={{ fontSize: "13px", color: "#3E3E3E" }}>
-                           {uni.rating.toFixed(1)}
-                           <span className="ml-1 font-medium">
-                             ( {uni.totalRatingUser >= 1000 ? `${(uni.totalRatingUser / 1000).toFixed(1)}k` : uni.totalRatingUser} Reviews )
-                           </span>
-                         </span>
+                         <span className="text-[10px] font-medium text-slate-400 block">/ year</span>
                        </div>
 
                       <div className="absolute bottom-4 left-4">

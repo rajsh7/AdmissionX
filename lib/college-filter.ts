@@ -127,6 +127,7 @@ export async function fetchCollegesForSlug(
             totalRatingUser: 1,
             avgPackage: "$placement.ctcaverage",
             streams: { $setUnion: ["$fa.name", []] },
+            min_fees: { $min: { $filter: { input: "$cm.fees", as: "f", cond: { $gt: ["$$f", 0] } } } },
           },
         },
       ])
@@ -150,6 +151,10 @@ export async function fetchCollegesForSlug(
           : `https://admin.admissionx.in/uploads/${rawImage}`
         : FALLBACK;
 
+      const fees = row.min_fees && Number(row.min_fees) > 0
+        ? `₹${Number(row.min_fees).toLocaleString('en-IN')}`
+        : "Contact for fees";
+
       return {
         name,
         location: (row.location || "India").trim(),
@@ -159,7 +164,7 @@ export async function fetchCollegesForSlug(
         abbr,
         abbrBg: "bg-primary",
         tags: ["Featured", "Top Ranked"],
-        tuition: "View Fees",
+        tuition: fees,
         href: `/college/${row.slug || ""}`,
         avgPackage: row.avgPackage ? `₹ ${row.avgPackage} LPA` : "₹ 4.5 LPA",
         offeredCourses: Array.isArray(row.streams) ? row.streams.filter(Boolean).slice(0, 4) : [],

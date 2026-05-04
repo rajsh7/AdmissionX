@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import AdminModal from "@/app/admin/_components/AdminModal";
 import type { AdminUserRow, RoleDefinition } from "./page";
@@ -53,10 +55,10 @@ export default function AdminUserList({ users, roles, offset, createAdminUser, u
     <>
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm text-slate-500">{users.length} admin account{users.length !== 1 ? "s" : ""}</p>
-        <button onClick={openCreate} className="bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-colors flex items-center gap-2 shadow-sm">
+        <Link href="/admin/members/roles/create" className="bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-colors flex items-center gap-2 shadow-sm">
           <span className="material-symbols-rounded text-[20px]">add</span>
           Create Admin User
-        </button>
+        </Link>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
