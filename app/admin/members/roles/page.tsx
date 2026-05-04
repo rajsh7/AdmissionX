@@ -158,7 +158,7 @@ export default async function MembersRolesPage({
   const db = await getDb();
 
   // Fetch admin users
-  const userFilter: Record<string, unknown> = {};
+  const userFilter: Record<string, unknown> = { is_hidden: { $ne: true } };
   if (q) userFilter.$or = [
     { name:  { $regex: q, $options: "i" } },
     { email: { $regex: q, $options: "i" } },

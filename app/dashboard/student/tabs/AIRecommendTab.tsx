@@ -4,9 +4,19 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+type TabId =
+  | "overview"
+  | "account-details" | "address" | "academic-details"
+  | "academic-certificates" | "projects" | "account-settings"
+  | "app-accepted" | "app-pending" | "app-rejected" | "app-all"
+  | "queries-replied" | "queries-pending" | "queries-all"
+  | "bookmark-courses" | "bookmark-colleges" | "bookmark-blogs"
+  | "qa-questions" | "qa-answers" | "qa-comments" | "qa-reviews"
+  | "counselling-forms" | "counseling" | "help-desk" | "ai-recommend";
+
 interface Props {
   user: { id: string | number; name: string; email: string } | null;
-  navigate?: (tab: string) => void;
+  navigate?: (tab: TabId) => void;
 }
 
 interface CollegeRec {

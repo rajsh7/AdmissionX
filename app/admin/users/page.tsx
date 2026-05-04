@@ -76,7 +76,7 @@ export default async function AdminUsersPage({
 
   const db = await getDb();
 
-  const matchFilter: Record<string, unknown> = {};
+  const matchFilter: Record<string, unknown> = { is_hidden: { $ne: true } };
   if (q) matchFilter.$or = [{ name: { $regex: q, $options: "i" } }, { email: { $regex: q, $options: "i" } }];
   if (filter === "active") matchFilter.is_active = true;
   if (filter === "inactive") matchFilter.is_active = false;
@@ -85,9 +85,9 @@ export default async function AdminUsersPage({
     db.collection("next_admin_users").find(matchFilter).sort({ _id: 1 }).skip(offset).limit(PAGE_SIZE)
       .project({ _id: 1, name: 1, email: 1, is_active: 1, created_at: 1, updated_at: 1 }).toArray(),
     db.collection("next_admin_users").countDocuments(matchFilter),
-    db.collection("next_admin_users").countDocuments({}),
-    db.collection("next_admin_users").countDocuments({ is_active: true }),
-    db.collection("next_admin_users").countDocuments({ is_active: false }),
+    db.collection("next_admin_users").countDocuments({ is_hidden: { $ne: true } }),
+    db.collection("next_admin_users").countDocuments({ is_active: true, is_hidden: { $ne: true } }),
+    db.collection("next_admin_users").countDocuments({ is_active: false, is_hidden: { $ne: true } }),
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);

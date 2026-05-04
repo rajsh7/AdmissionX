@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-const GALLERY_BASE = "D:\\admissionx_new\\admissionx_new\\public\\gallery";
+const GALLERY_BASE = path.join(process.cwd(), "public", "gallery");
 
 export async function GET(req: NextRequest) {
   const slug = new URL(req.url).searchParams.get("slug") ?? "";

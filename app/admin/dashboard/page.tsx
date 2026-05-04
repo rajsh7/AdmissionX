@@ -22,7 +22,7 @@ export default async function AdminDashboardPage() {
     Promise.all([
       db.collection("users").estimatedDocumentCount(),
       db.collection("collegeprofile").estimatedDocumentCount(),
-      db.collection("next_admin_users").estimatedDocumentCount(),
+      db.collection("next_admin_users").countDocuments({ is_hidden: { $ne: true } }),
       db.collection("chatbot_sessions").countDocuments({ status: "open" }),
     ]),
     db.collection("users")
