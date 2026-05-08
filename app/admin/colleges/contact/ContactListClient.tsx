@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import DeleteButton from "@/app/admin/_components/DeleteButton";
 import ContactActions from "./ContactActions";
@@ -17,7 +17,7 @@ interface ContactRow {
   state: string;
   pincode: string;
   college_type: string;
-  _source: "old" | "new";
+  _source: "old" | "new" | "profile";
 }
 
 interface Props {
@@ -37,12 +37,13 @@ const STEP = 15;
 export default function ContactListClient({
   rows, total, page, totalPages, offset, pageSize, q, onDelete,
 }: Props) {
-  const [visibleCount, setVisibleCount] = useState(STEP);
+  return <ContactListContent key={rows[0]?._id ?? "empty"} rows={rows} total={total} page={page} totalPages={totalPages} offset={offset} pageSize={pageSize} q={q} onDelete={onDelete} />;
+}
 
-  // Reset when page changes (rows change)
-  useEffect(() => {
-    setVisibleCount(STEP);
-  }, [rows[0]?._id]);
+function ContactListContent({
+  rows, total, page, totalPages, offset, pageSize, q, onDelete,
+}: Props) {
+  const [visibleCount, setVisibleCount] = useState(STEP);
 
   const showMore = visibleCount < rows.length;
   const showPagination = !showMore && totalPages > 1;
@@ -136,11 +137,15 @@ export default function ContactListClient({
                     )}
                   </div>
 
-                  <ContactActions email={c.email} collegeName={c.college_name} contactName={c.contact_name} />
+                  {c.email && (
+                    <ContactActions email={c.email} collegeName={c.college_name} contactName={c.contact_name} />
+                  )}
 
-                  <div className="mt-3 flex justify-center">
-                    <DeleteButton action={onDelete.bind(null, c._id, c._source)} size="sm" />
-                  </div>
+                  {c._source !== "profile" && (
+                    <div className="mt-3 flex justify-center">
+                      <DeleteButton action={onDelete.bind(null, c._id, c._source)} size="sm" />
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

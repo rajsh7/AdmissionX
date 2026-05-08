@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Users, Building2, UserCog, MessageSquare, ChevronDown } from "lucide-react";
@@ -45,13 +46,19 @@ export default function DashboardClient({
   studentTransactionPie, collegeTransactionPie,
   recentStudents, recentActivity,
 }: DashboardClientProps) {
-  const [isMounted, setIsMounted]   = useState(false);
+  const router = useRouter();
   const [monthFilter, setMonthFilter] = useState("All");
   const [openMenu, setOpenMenu]     = useState<"student" | "college" | null>(null);
   const studentMonthRef = useRef<HTMLDivElement>(null);
   const collegeMonthRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setIsMounted(true); }, []);
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      router.refresh();
+    }, 30000);
+
+    return () => window.clearInterval(intervalId);
+  }, [router]);
 
   useEffect(() => {
     if (!openMenu) return;
@@ -101,8 +108,6 @@ export default function DashboardClient({
     { title: "Admin Users",    value: stats.totalAdmins?.toLocaleString()   || "0", subtext: "active admins",                                  icon: <UserCog className="w-5 h-5" />,      href: "/admin/members/roles" },
     { title: "Applications",   value: stats.activeQueries?.toLocaleString() || "0", subtext: `${stats.activeBlogs ?? 0} active blogs`,          icon: <MessageSquare className="w-5 h-5" />, href: "/admin/applications" },
   ];
-
-  if (!isMounted) return <div className="min-h-screen bg-slate-50/50 animate-pulse" />;
 
   return (
     <div className="space-y-8 pb-10">

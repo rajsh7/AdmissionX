@@ -4,443 +4,413 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Help Center — FAQs & Support | AdmissionX",
+  title: "Help Center | AdmissionX",
   description:
-    "Find answers to common questions about AdmissionX — student registration, college signups, applications, technical issues, and billing.",
-  keywords:
-    "AdmissionX help, FAQs, support, student questions, college questions, account help",
+    "Find answers, browse help topics, and get support for applications, payments, exams, and more on AdmissionX.",
 };
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+const quickTags = [
+  { label: "Application Help", icon: "description", color: "text-rose-600", bg: "bg-rose-50", border: "border-rose-100" },
+  { label: "Payments", icon: "payments", color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100" },
+  { label: "Study Abroad", icon: "travel", color: "text-violet-600", bg: "bg-violet-50", border: "border-violet-100" },
+  { label: "Exams", icon: "school", color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100" },
+  { label: "Scholarships", icon: "workspace_premium", color: "text-sky-600", bg: "bg-sky-50", border: "border-sky-100" },
+];
 
-interface FAQ {
-  q: string;
-  a: string;
-}
-
-interface Category {
-  id: string;
-  icon: string;
-  label: string;
-  color: string;
-  bg: string;
-  border: string;
-  faqs: FAQ[];
-}
-
-// ─── FAQ Data ─────────────────────────────────────────────────────────────────
-
-const CATEGORIES: Category[] = [
+const topicCards = [
   {
-    id: "students",
+    title: "Admissions",
+    description: "Application process, eligibility, documents, and deadlines.",
     icon: "school",
-    label: "For Students",
-    color: "text-sky-600",
-    bg: "bg-sky-50",
-    border: "border-sky-200",
-    faqs: [
-      {
-        q: "How do I create a student account on AdmissionX?",
-        a: "Click the 'Sign Up' button in the top navigation and select 'Student'. Fill in your name, email address, and a secure password. You will receive a confirmation email — click the link inside to activate your account and complete your profile.",
-      },
-      {
-        q: "Is student registration free?",
-        a: "Yes. Creating a student account, browsing colleges, exploring exams, and reading all content on AdmissionX is completely free for students. There are no hidden charges for any student-facing features.",
-      },
-      {
-        q: "How do I search and filter colleges?",
-        a: "Visit the 'Search Colleges' page and use the filter panel on the left to narrow results by stream, degree, city, state, fees range, college type, and more. You can also sort results by rating, ranking, or number of students.",
-      },
-      {
-        q: "How do I apply to a college through AdmissionX?",
-        a: "Navigate to the college's profile page and click 'Apply Now'. You will need to complete your student profile first (including academic marks and documents), then fill in the application form and submit. You can track your application status from your dashboard under 'My Applications'.",
-      },
-      {
-        q: "Can I save colleges I am interested in?",
-        a: "Yes — click the bookmark icon on any college card or profile page to save it. All bookmarked colleges appear in your student dashboard under the 'Bookmarks' tab for easy reference.",
-      },
-      {
-        q: "How do I update my academic information and documents?",
-        a: "Log in and go to your Student Dashboard. Under the 'Profile' tab, you can update personal details and academic marks. Under the 'Documents' tab, you can upload mark sheets, certificates, and identity documents that are shared with colleges when you apply.",
-      },
-      {
-        q: "I forgot my password. How do I reset it?",
-        a: "Click 'Login', then 'Forgot Password'. Enter the email address linked to your account and we will send a password-reset link. The link is valid for 1 hour. Check your spam folder if you do not receive the email within a few minutes.",
-      },
-      {
-        q: "Can I apply to multiple colleges at the same time?",
-        a: "Yes, there is no limit on the number of colleges you can apply to. All your applications appear in your dashboard with individual status tracking so you can monitor each one independently.",
-      },
-      {
-        q: "How will I know if a college responds to my application?",
-        a: "Your application status is updated in real time in your dashboard. Colleges can update the status to 'Reviewing', 'Accepted', 'Rejected', or 'Waitlisted'. We recommend checking your dashboard regularly during the admission season.",
-      },
-      {
-        q: "Is my personal information shared without my consent?",
-        a: "No. Your personal information is only shared with a college when you explicitly submit an application to that college. Please read our Privacy Policy for full details on how your data is handled.",
-      },
-    ],
+    color: "text-rose-600",
+    bg: "bg-rose-50",
+    border: "border-rose-100",
   },
   {
-    id: "colleges",
-    icon: "apartment",
-    label: "For Colleges",
-    color: "text-violet-600",
-    bg: "bg-violet-50",
-    border: "border-violet-200",
-    faqs: [
-      {
-        q: "How does a college register on AdmissionX?",
-        a: "Visit the 'College Sign Up' page and fill in your institution's details — name, email, phone number, and basic college information. Our team will review your application and approve or contact you within 2–3 business days. You will receive login credentials once approved.",
-      },
-      {
-        q: "What information can a college add to its profile?",
-        a: "Colleges can add their full profile including banner image, description, establishment year, campus address, website, accreditation, courses offered, fee structure, facilities, faculty details, gallery images, placements data, scholarships, and more. A complete profile significantly improves visibility to students.",
-      },
-      {
-        q: "How do college subscription packages work?",
-        a: "AdmissionX offers tiered subscription packages for colleges that include profile visibility, student application access, analytics, and promotional placement. Package pricing and duration details are shared during the approval process. You can view your current package in the college dashboard under Settings.",
-      },
-      {
-        q: "Can a college update its own profile after it is live?",
-        a: "Yes. Once logged in, college administrators can edit all sections of their profile at any time through the College Dashboard. Changes are reflected on the live listing within minutes.",
-      },
-      {
-        q: "How does a college receive and manage student applications?",
-        a: "All incoming applications appear in the 'Applications' section of the College Dashboard. You can view the student's profile, academic records, and submitted documents, then update the application status (Reviewing / Accepted / Rejected / Waitlisted).",
-      },
-      {
-        q: "What happens if my college's signup is rejected?",
-        a: "Our admin team may reject a signup if the submitted information is incomplete, unverifiable, or does not meet our listing criteria. You will receive an email explaining the reason. You may resubmit after correcting the issues, or contact our support team for clarification.",
-      },
-      {
-        q: "How can I add courses and fee details to my college profile?",
-        a: "Go to College Dashboard → Courses section. Click 'Add Course' and fill in the course name, degree type, duration, fees, and eligibility criteria. You can add multiple courses. Detailed fee information helps students make informed decisions and improves application quality.",
-      },
-      {
-        q: "How do I contact AdmissionX support as a college partner?",
-        a: "You can reach us at colleges@admissionx.in or through the Contact Us page. College partners with active subscriptions receive priority support with a dedicated response within 24 hours on business days.",
-      },
-    ],
-  },
-  {
-    id: "technical",
-    icon: "build",
-    label: "Technical Issues",
-    color: "text-amber-600",
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    faqs: [
-      {
-        q: "I can't log in to my account. What should I do?",
-        a: "First, ensure you are using the correct email address and that Caps Lock is off. Try resetting your password via 'Forgot Password'. If you still cannot log in after resetting, clear your browser cache and cookies, then try again. If the problem persists, contact us at support@admissionx.in with your registered email.",
-      },
-      {
-        q: "The website is not loading properly. How do I fix this?",
-        a: "Try a hard refresh (Ctrl + Shift + R on Windows, Cmd + Shift + R on Mac). If that does not help, clear your browser cache, disable any browser extensions, and try again. AdmissionX works best on the latest versions of Chrome, Firefox, Safari, and Edge.",
-      },
-      {
-        q: "My profile changes are not being saved. What is wrong?",
-        a: "Make sure all required fields are filled in correctly before clicking 'Save'. If you see an error message, address the highlighted fields and try again. If the issue continues, log out, log back in, and retry. Contact support if the problem is persistent.",
-      },
-      {
-        q: "I uploaded a document but it is not appearing. What should I do?",
-        a: "Check that your file meets the requirements: PDF or image format (JPG/PNG), and no larger than 5 MB. Uploading very large files may time out on slower connections. Try compressing the file and re-uploading. If the issue continues, try a different browser.",
-      },
-      {
-        q: "I received an error message during application submission. Was it submitted?",
-        a: "If you see a clear error message, your application was likely not submitted. Check the 'My Applications' section in your dashboard — if it does not appear there, the submission did not go through. Try submitting again. If you continue to see errors, take a screenshot and email it to support@admissionx.in.",
-      },
-      {
-        q: "Is AdmissionX available as a mobile app?",
-        a: "AdmissionX is currently available as a fully responsive web application accessible from any smartphone browser. A dedicated mobile app is planned for a future release. You can add the website to your home screen for an app-like experience.",
-      },
-      {
-        q: "How do I change the email address on my account?",
-        a: "Email address changes must be verified for security. Go to Dashboard → Settings, click 'Change Email', and enter your new email address. A verification link will be sent to the new address. Confirm it to complete the change.",
-      },
-      {
-        q: "How do I delete my account?",
-        a: "Account deletion requests can be submitted through the Contact Us page or by emailing privacy@admissionx.in. Please note that deleting your account will permanently remove all your data, applications, and bookmarks. We process deletion requests within 7 business days.",
-      },
-    ],
-  },
-  {
-    id: "billing",
-    icon: "payments",
-    label: "Billing & Payments",
+    title: "Payments",
+    description: "Refunds, invoices, payment methods, and billing support.",
+    icon: "account_balance_wallet",
     color: "text-emerald-600",
     bg: "bg-emerald-50",
-    border: "border-emerald-200",
-    faqs: [
-      {
-        q: "Is AdmissionX free for students?",
-        a: "Yes, completely. Students can register, search colleges, explore exams, read blogs, and submit applications at no cost. AdmissionX will always remain free for students.",
-      },
-      {
-        q: "What payment methods are accepted for college subscriptions?",
-        a: "We accept all major credit and debit cards, UPI (GPay, PhonePe, Paytm), net banking, and NEFT/RTGS bank transfers for college subscription payments. All transactions are secured by industry-standard SSL encryption.",
-      },
-      {
-        q: "Where can I find my payment receipts and invoices?",
-        a: "College administrators can access all payment history, receipts, and GST invoices from the College Dashboard under Settings → Billing. Receipts are also emailed to the registered college email address after each successful transaction.",
-      },
-      {
-        q: "What is the cancellation and refund policy for college packages?",
-        a: "College subscription packages can be cancelled within 7 days of purchase for a full refund, provided the college profile has not been published live. After 7 days or once the profile is live, a partial refund may be available on a pro-rated basis for the unused period. Please read our full Cancellation & Refunds Policy for complete details.",
-      },
-      {
-        q: "My payment was deducted but my package is not active. What do I do?",
-        a: "Payments occasionally take up to 2 hours to reflect due to bank processing times. If your package is still not activated after 2 hours, please email billing@admissionx.in with your transaction ID, payment date, and amount. We will resolve it within 1 business day.",
-      },
-      {
-        q: "Does AdmissionX charge GST on college subscription packages?",
-        a: "Yes, GST at 18% is applicable on all college subscription packages as per Indian tax regulations. The GST amount is displayed clearly during checkout and is included in the invoice issued after payment.",
-      },
-      {
-        q: "Can I upgrade or downgrade my college subscription package?",
-        a: "Yes. Contact our team at colleges@admissionx.in or through the Contact Us page to request a package change. Upgrades take effect immediately with a pro-rated charge. Downgrades take effect at the end of your current billing cycle.",
-      },
-      {
-        q: "What happens when my college subscription expires?",
-        a: "Your college profile will remain visible in search results but will be deprioritised in ranking. You will not receive new student applications until the subscription is renewed. Your profile data and application history are preserved for 90 days, after which they may be archived.",
-      },
-    ],
+    border: "border-emerald-100",
+  },
+  {
+    title: "Study Abroad",
+    description: "Universities, visa help, applications, and counselling.",
+    icon: "public",
+    color: "text-violet-600",
+    bg: "bg-violet-50",
+    border: "border-violet-100",
+  },
+  {
+    title: "Applications",
+    description: "Track applications, status updates, and submission issues.",
+    icon: "assignment_turned_in",
+    color: "text-orange-600",
+    bg: "bg-orange-50",
+    border: "border-orange-100",
+  },
+  {
+    title: "Exams & Results",
+    description: "Exam info, admit cards, result updates, and notifications.",
+    icon: "emoji_events",
+    color: "text-blue-600",
+    bg: "bg-blue-50",
+    border: "border-blue-100",
   },
 ];
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+const popularQuestions = [
+  "How do I apply to a college on AdmissionX?",
+  "How can I download the brochure of a university?",
+  "How can I track my application status?",
+  "What payment methods do you accept?",
+  "How do I reset my account password?",
+];
+
+const supportCards = [
+  {
+    title: "Ask AI Assistant",
+    description: "Get instant answers to your questions 24/7 with our virtual guide.",
+    cta: "Start Chat",
+    href: "/contact-us",
+    bg: "from-rose-50 via-white to-rose-100/80",
+    border: "border-rose-100",
+    accent: "text-rose-600",
+    icon: "smart_toy",
+  },
+  {
+    title: "Talk to an Expert",
+    description: "Chat, email, or call our support team for personalized help.",
+    cta: "Contact Support",
+    href: "/contact-us",
+    bg: "from-sky-50 via-white to-sky-100/80",
+    border: "border-sky-100",
+    accent: "text-sky-600",
+    icon: "support_agent",
+  },
+];
+
+const resourceCards = [
+  {
+    title: "Application Guide",
+    description: "Step-by-step help for filling applications correctly and faster.",
+    icon: "book_2",
+    color: "text-rose-600",
+    bg: "bg-rose-50",
+    border: "border-rose-100",
+  },
+  {
+    title: "Scholarship Guide",
+    description: "Find scholarships, eligibility rules, and tips to apply better.",
+    icon: "workspace_premium",
+    color: "text-emerald-600",
+    bg: "bg-emerald-50",
+    border: "border-emerald-100",
+  },
+  {
+    title: "Study Abroad Guide",
+    description: "Universities, visas, documents, and application timelines.",
+    icon: "travel_explore",
+    color: "text-violet-600",
+    bg: "bg-violet-50",
+    border: "border-violet-100",
+  },
+  {
+    title: "Exam Preparation",
+    description: "Preparation tips, syllabus links, and important exam updates.",
+    icon: "edit_note",
+    color: "text-orange-600",
+    bg: "bg-orange-50",
+    border: "border-orange-100",
+  },
+];
+
+function SectionCard({
+  title,
+  description,
+  icon,
+  color,
+  bg,
+  border,
+}: {
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  bg: string;
+  border: string;
+}) {
+  return (
+    <div
+      className={`rounded-[28px] border ${border} bg-white p-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.22)] transition-transform duration-200 hover:-translate-y-1`}
+    >
+      <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${bg} ${color}`}>
+        <span className="material-symbols-outlined text-[24px]">{icon}</span>
+      </div>
+      <h3 className="text-[18px] font-extrabold text-slate-900">{title}</h3>
+      <p className="mt-2 text-[13px] leading-6 text-slate-500">{description}</p>
+      <div className={`mt-4 inline-flex items-center gap-2 text-[13px] font-bold ${color}`}>
+        Learn more
+        <span className="material-symbols-outlined text-[18px]">arrow_right_alt</span>
+      </div>
+    </div>
+  );
+}
 
 export default function HelpCenterPage() {
-  const totalFaqs = CATEGORIES.reduce((s, c) => s + c.faqs.length, 0);
-
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-[#f5f2ee]">
       <Header />
 
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <div className="bg-neutral-900 pt-24 pb-14">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
-            <Link href="/" className="hover:text-white transition-colors">
-              Home
-            </Link>
-            <span className="material-symbols-outlined text-[14px]">
-              chevron_right
-            </span>
-            <span className="text-neutral-300">Help Center</span>
-          </nav>
+      <main className="relative overflow-hidden pt-24 lg:pt-[116px]">
+        <div className="absolute inset-x-0 top-0 h-[360px] bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.96),_rgba(245,242,238,0.92)_50%,_rgba(245,242,238,0)_100%)]" />
+        <div className="absolute left-[-80px] top-32 h-48 w-48 rounded-full bg-rose-100/60 blur-3xl" />
+        <div className="absolute right-[-60px] top-28 h-44 w-44 rounded-full bg-sky-100/70 blur-3xl" />
 
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-            <div className="max-w-2xl">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="inline-flex items-center gap-1.5 bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-                  <span className="material-symbols-outlined text-[13px]">
-                    help
-                  </span>
-                  Support
-                </span>
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-3">
-                Help{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-400">
-                  Center
-                </span>
+        <div className="relative w-full pb-20">
+          <section className="w-full border-y border-white/70 bg-white/85 px-6 py-10 shadow-[0_32px_80px_-48px_rgba(15,23,42,0.28)] backdrop-blur sm:px-10 sm:py-14">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-[11px] font-black uppercase tracking-[0.35em] text-rose-500">
+                Help Center
+              </p>
+              <h1 className="mt-5 text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">
+                How can we help you today?
               </h1>
-              <p className="text-neutral-400 text-sm leading-relaxed max-w-lg">
-                Find answers to frequently asked questions. Can't find what
-                you're looking for?{" "}
+              <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-500 sm:text-[15px]">
+                Search our articles or browse by category to find the help you need for
+                admissions, payments, applications, exams, and support.
+              </p>
+
+              <form className="mx-auto mt-8 flex max-w-2xl flex-col gap-3 rounded-[24px] border border-slate-200 bg-white p-3 shadow-[0_16px_40px_-30px_rgba(15,23,42,0.3)] sm:flex-row">
+                <div className="flex flex-1 items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+                  <span className="material-symbols-outlined text-[20px] text-slate-400">
+                    search
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Search applications, colleges, exams, payments..."
+                    className="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="rounded-2xl bg-rose-500 px-7 py-3 text-sm font-bold text-white transition-colors hover:bg-rose-600"
+                >
+                  Search
+                </button>
+              </form>
+
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                {quickTags.map((tag) => (
+                  <span
+                    key={tag.label}
+                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold ${tag.color} ${tag.bg} ${tag.border}`}
+                  >
+                    <span className="material-symbols-outlined text-[16px]">{tag.icon}</span>
+                    {tag.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <section className="mt-14">
+              <div className="mb-6 flex items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-[24px] font-black text-slate-900">Browse Help Topics</h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Pick a category and jump straight to the support you need.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
+                {topicCards.map((card) => (
+                  <SectionCard key={card.title} {...card} />
+                ))}
+              </div>
+            </section>
+
+            <section className="mt-14 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+              <div className="rounded-[30px] border border-slate-100 bg-white p-6 shadow-[0_18px_60px_-40px_rgba(15,23,42,0.25)] sm:p-8">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-[24px] font-black text-slate-900">Popular Questions</h2>
+                    <p className="mt-1 text-sm text-slate-500">
+                      Quick answers to the things students ask us most often.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6 space-y-3">
+                  {popularQuestions.map((question) => (
+                    <Link
+                      key={question}
+                      href="/contact-us"
+                      className="flex items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-4 text-sm font-semibold text-slate-700 transition-colors hover:border-rose-100 hover:bg-rose-50/40"
+                    >
+                      <span>{question}</span>
+                      <span className="material-symbols-outlined text-[18px] text-slate-400">
+                        chevron_right
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+
                 <Link
                   href="/contact-us"
-                  className="text-sky-400 hover:text-sky-300 underline underline-offset-2"
+                  className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-rose-500"
                 >
-                  Contact our support team
+                  View all FAQs
+                  <span className="material-symbols-outlined text-[18px]">arrow_right_alt</span>
                 </Link>
-                .
-              </p>
-            </div>
+              </div>
 
-            {/* Stats */}
-            <div className="flex gap-4 flex-shrink-0">
-              <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-center min-w-[90px]">
-                <p className="text-2xl font-black text-white">{CATEGORIES.length}</p>
-                <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wide mt-0.5">
-                  Topics
+              <div className="rounded-[30px] border border-slate-100 bg-white p-6 shadow-[0_18px_60px_-40px_rgba(15,23,42,0.25)] sm:p-8">
+                <h2 className="text-[24px] font-black text-slate-900">Get Instant Support</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Choose the support option that works best for you.
                 </p>
-              </div>
-              <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-center min-w-[90px]">
-                <p className="text-2xl font-black text-white">{totalFaqs}</p>
-                <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wide mt-0.5">
-                  FAQs
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* ── Category quick-jump strip ──────────────────────────────────────── */}
-      <div className="bg-white border-b border-neutral-100 sticky top-0 z-10 shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="flex items-center gap-1 overflow-x-auto py-3 scrollbar-none">
-            {CATEGORIES.map((cat) => (
-              <a
-                key={cat.id}
-                href={`#${cat.id}`}
-                className={`flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full border transition-colors hover:shadow-sm ${cat.bg} ${cat.color} ${cat.border}`}
-              >
-                <span className="material-symbols-outlined text-[15px]">
-                  {cat.icon}
-                </span>
-                {cat.label}
-              </a>
-            ))}
-            <a
-              href="/contact-us"
-              className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full border border-neutral-200 bg-neutral-50 text-neutral-600 hover:bg-neutral-100 transition-colors ml-2"
-            >
-              <span className="material-symbols-outlined text-[15px]">
-                support_agent
-              </span>
-              Contact Support
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Main content ──────────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12 space-y-16">
-        {CATEGORIES.map((cat) => (
-          <section key={cat.id} id={cat.id} className="scroll-mt-20">
-            {/* Section header */}
-            <div className="flex items-center gap-3 mb-6">
-              <div
-                className={`w-10 h-10 rounded-xl ${cat.bg} ${cat.color} flex items-center justify-center flex-shrink-0`}
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  {cat.icon}
-                </span>
-              </div>
-              <div>
-                <h2 className="text-lg font-black text-neutral-900">
-                  {cat.label}
-                </h2>
-                <p className="text-xs text-neutral-400 font-medium">
-                  {cat.faqs.length} questions
-                </p>
-              </div>
-            </div>
-
-            {/* Accordion list */}
-            <div className="space-y-2">
-              {cat.faqs.map((faq, idx) => (
-                <details
-                  key={idx}
-                  className="group bg-white border border-neutral-100 rounded-2xl overflow-hidden hover:border-neutral-200 transition-colors"
-                >
-                  <summary
-                    className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none select-none"
-                    // Remove default browser triangle
-                  >
-                    <span className="text-sm font-semibold text-neutral-800 leading-snug">
-                      {faq.q}
-                    </span>
-                    {/* Plus/minus icon via CSS group-open */}
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-neutral-100 group-open:bg-red-100 flex items-center justify-center transition-colors">
-                      <span className="material-symbols-outlined text-[16px] text-neutral-500 group-open:text-red-600 transition-colors group-open:[content:'remove'] ">
-                        add
-                      </span>
-                    </span>
-                  </summary>
-                  <div className="px-5 pb-5">
-                    <div className="pt-1 border-t border-neutral-100">
-                      <p className="text-sm text-neutral-600 leading-relaxed pt-3">
-                        {faq.a}
-                      </p>
+                <div className="mt-6 space-y-4">
+                  {supportCards.map((card) => (
+                    <div
+                      key={card.title}
+                      className={`rounded-[26px] border ${card.border} bg-gradient-to-br ${card.bg} p-5`}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm">
+                          <span className={`material-symbols-outlined text-[28px] ${card.accent}`}>
+                            {card.icon}
+                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-[17px] font-extrabold text-slate-900">{card.title}</h3>
+                          <p className="mt-2 text-[13px] leading-6 text-slate-500">{card.description}</p>
+                          <Link
+                            href={card.href}
+                            className={`mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold shadow-sm ${card.accent}`}
+                          >
+                            {card.cta}
+                            <span className="material-symbols-outlined text-[16px]">
+                              arrow_forward
+                            </span>
+                          </Link>
+                        </div>
+                      </div>
                     </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="mt-14 rounded-[30px] border border-slate-100 bg-white p-6 shadow-[0_18px_60px_-40px_rgba(15,23,42,0.25)] sm:p-8">
+              <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+                <div>
+                  <h2 className="text-[24px] font-black text-slate-900">Track Your Support Ticket</h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Enter your ticket number and email address to see your latest support updates.
+                  </p>
+                </div>
+
+                <form className="grid gap-3 sm:grid-cols-3">
+                  <input
+                    type="text"
+                    placeholder="Ticket ID"
+                    className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                  />
+                  <button
+                    type="submit"
+                    className="rounded-2xl bg-rose-500 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-rose-600"
+                  >
+                    Track Ticket
+                  </button>
+                </form>
+              </div>
+            </section>
+
+            <section className="mt-14">
+              <div className="mb-6">
+                <h2 className="text-[24px] font-black text-slate-900">Help & Resources</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Guides and resources to help you move faster with confidence.
+                </p>
+              </div>
+
+              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                {resourceCards.map((card) => (
+                  <SectionCard key={card.title} {...card} />
+                ))}
+              </div>
+            </section>
+
+            <section className="mt-14 rounded-[30px] border border-violet-100 bg-gradient-to-r from-violet-50 via-white to-violet-50 p-6 shadow-[0_18px_60px_-40px_rgba(15,23,42,0.25)] sm:p-8">
+              <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm">
+                    <span className="material-symbols-outlined text-[28px] text-violet-600">
+                      groups
+                    </span>
                   </div>
-                </details>
-              ))}
-            </div>
+                  <div>
+                    <h2 className="text-[22px] font-black text-slate-900">
+                      Ask the Student Community
+                    </h2>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                      Join discussions, discover useful advice, and learn from students who
+                      have already been through the same process.
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  href="/contact-us"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-violet-200 bg-white px-5 py-3 text-sm font-bold text-violet-700 shadow-sm"
+                >
+                  Visit Community
+                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </Link>
+              </div>
+            </section>
+
+            <section className="mt-6 rounded-[30px] border border-rose-100 bg-gradient-to-r from-white via-rose-50/60 to-white p-6 shadow-[0_18px_60px_-40px_rgba(15,23,42,0.25)] sm:p-8">
+              <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50">
+                    <span className="material-symbols-outlined text-[28px] text-rose-600">
+                      contact_support
+                    </span>
+                  </div>
+                  <div>
+                    <h2 className="text-[22px] font-black text-slate-900">
+                      Can&apos;t find what you&apos;re looking for?
+                    </h2>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                      Our support team is here to help with any issue related to your account,
+                      application, payments, or college discovery journey.
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  href="/contact-us"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-rose-500 px-5 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-rose-600"
+                >
+                  Contact Us
+                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </Link>
+              </div>
+            </section>
           </section>
-        ))}
-
-        {/* ── Still need help? ─────────────────────────────────────────────── */}
-        <div className="bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-3xl p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-          <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0">
-            <span className="material-symbols-outlined text-[28px] text-white">
-              support_agent
-            </span>
-          </div>
-          <div className="flex-1">
-            <h3 className="text-lg font-black text-white mb-1">
-              Still can't find what you're looking for?
-            </h3>
-            <p className="text-sm text-neutral-400 leading-relaxed">
-              Our support team is available Monday–Saturday, 10 AM–6 PM IST.
-              Average response time is under 4 hours on business days.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
-            <Link
-              href="/contact-us"
-              className="inline-flex items-center gap-2 bg-white text-neutral-900 hover:bg-neutral-100 font-bold text-sm px-5 py-3 rounded-xl transition-colors shadow-sm whitespace-nowrap"
-            >
-              <span className="material-symbols-outlined text-[17px]">
-                mail
-              </span>
-              Contact Us
-            </Link>
-            <a
-              href="mailto:support@admissionx.in"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-sm px-5 py-3 rounded-xl transition-colors whitespace-nowrap"
-            >
-              <span className="material-symbols-outlined text-[17px]">
-                email
-              </span>
-              Email Support
-            </a>
-          </div>
         </div>
-
-        {/* ── Quick links ───────────────────────────────────────────────────── */}
-        <div>
-          <h3 className="text-sm font-black text-neutral-500 uppercase tracking-wider mb-4">
-            Quick Links
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {[
-              { label: "Search Colleges",      href: "/search",              icon: "search"           },
-              { label: "Browse Exams",         href: "/examination",         icon: "quiz"             },
-              { label: "Explore Streams",      href: "/stream",              icon: "category"         },
-              { label: "Popular Careers",      href: "/popular-careers",     icon: "work"             },
-              { label: "Education Blogs",      href: "/blogs",     icon: "article"          },
-              { label: "Latest News",          href: "/news",                icon: "newspaper"        },
-              { label: "Student Signup",       href: "/signup/student",      icon: "person_add"       },
-              { label: "College Signup",       href: "/signup/college",      icon: "apartment"        },
-              { label: "Privacy Policy",       href: "/privacy-policy",      icon: "policy"           },
-            ].map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="flex items-center gap-2.5 bg-white border border-neutral-100 rounded-xl px-4 py-3 text-xs font-semibold text-neutral-700 hover:border-red-200 hover:text-red-600 hover:bg-red-50/50 transition-all group"
-              >
-                <span className="material-symbols-outlined text-[16px] text-neutral-400 group-hover:text-red-500 transition-colors">
-                  {link.icon}
-                </span>
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
+      </main>
 
       <Footer />
     </div>
   );
 }
-
-
-
-

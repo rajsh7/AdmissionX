@@ -17,8 +17,8 @@ export default function TermsAndConditionsPage() {
       <Header />
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <div className="bg-neutral-900 pt-24 pb-14">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6">
+      <div className="bg-neutral-900 pt-24 pb-14 lg:pt-[116px]">
+        <div className="w-full px-6 sm:px-8 lg:px-10">
           <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
             <Link href="/" className="hover:text-white transition-colors">
               Home
@@ -27,7 +27,7 @@ export default function TermsAndConditionsPage() {
             <span className="text-neutral-300">Terms &amp; Conditions</span>
           </nav>
 
-          <div className="flex items-start gap-4">
+          <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
             <div className="bg-blue-500/10 border border-blue-500/20 p-3 rounded-2xl flex-shrink-0">
               <span
                 className="material-symbols-outlined text-blue-400 text-[28px]"
@@ -36,11 +36,11 @@ export default function TermsAndConditionsPage() {
                 gavel
               </span>
             </div>
-            <div>
+            <div className="mt-4">
               <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-2">
                 Terms &amp; Conditions
               </h1>
-              <p className="text-neutral-400 text-sm leading-relaxed max-w-xl">
+              <p className="mx-auto max-w-xl text-sm leading-relaxed text-neutral-400">
                 Please read these terms carefully before using the AdmissionX
                 platform. By accessing or using our services, you agree to be
                 bound by these terms.
@@ -57,8 +57,8 @@ export default function TermsAndConditionsPage() {
       </div>
 
       {/* ── Quick nav ─────────────────────────────────────────────────────── */}
-      <div className="bg-white border-b border-neutral-100 sticky top-0 z-20">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 py-3 overflow-x-auto">
+      <div className="bg-white border-b border-neutral-100 sticky top-[58px] z-20 lg:top-[116px]">
+        <div className="w-full overflow-x-auto px-6 py-3 sm:px-8 lg:px-10">
           <div className="flex items-center gap-1 text-xs font-semibold whitespace-nowrap">
             {[
               ["#acceptance", "Acceptance"],
@@ -83,8 +83,8 @@ export default function TermsAndConditionsPage() {
       </div>
 
       {/* ── Content ───────────────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12">
-        <div className="bg-white rounded-3xl border border-neutral-100 shadow-sm overflow-hidden">
+      <div className="w-full py-12">
+        <div className="overflow-hidden border-y border-neutral-100 bg-white shadow-sm">
           {/* Alert banner */}
           <div className="bg-blue-50 border-b border-blue-100 px-8 py-4 flex items-start gap-3">
             <span
@@ -545,7 +545,3 @@ function NumberedList({ items }: { items: string[] }) {
 function Divider() {
   return <hr className="border-neutral-100" />;
 }
-
-
-
-

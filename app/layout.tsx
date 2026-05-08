@@ -12,6 +12,11 @@ export const metadata: Metadata = {
     "Discover top universities and courses that match your career goals. Explore over 500+ institutes worldwide.",
   keywords:
     "college admissions, university rankings, entrance exams, study abroad, courses",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

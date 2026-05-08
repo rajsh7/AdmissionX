@@ -1,4 +1,4 @@
-import { getDb } from "@/lib/db";
+import pool, { getDb } from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import StudentsTableClient from "./StudentsTableClient";

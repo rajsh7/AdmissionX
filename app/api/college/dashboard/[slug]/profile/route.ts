@@ -156,7 +156,7 @@ export async function PUT(
     { $set }
   );
 
-  revalidateTag("college-base");
+  revalidateTag("college-base", "max");
   return NextResponse.json({ success: true, message: "Profile updated successfully." });
 }
 
@@ -207,7 +207,7 @@ export async function PATCH(
       { $set: { [fieldName]: publicUrl, updated_at: new Date() } }
     );
 
-    revalidateTag("college-base");
+    revalidateTag("college-base", "max");
     return NextResponse.json({ success: true, url: publicUrl, field: fieldName });
   } catch (e) {
     console.error("[profile PATCH] upload error:", e);

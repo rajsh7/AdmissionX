@@ -2,8 +2,41 @@ import { getDb } from "@/lib/db";
 import pool from "@/lib/db";
 import DashboardClient from "../_components/DashboardClient";
 
-// Cache dashboard data briefly to avoid expensive DB work on every request
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+
+interface CountRow {
+  total?: number | string;
+}
+
+interface PaymentStatusRow {
+  id: number | string;
+  name?: string;
+}
+
+interface TransactionAggRow {
+  _id: string | null;
+  count?: number;
+  amount?: number;
+}
+
+interface MonthlyAggRow {
+  _id?: {
+    year?: number;
+    month?: number;
+  };
+  count?: number;
+}
+
+interface RecentStudentRow {
+  _id: { toString(): string };
+  firstname?: string;
+  lastname?: string;
+  email?: string;
+  course?: string;
+  college?: string;
+  status?: number;
+  created_at?: string | Date;
+}
 
 export default async function AdminDashboardPage() {
   const db = await getDb();
@@ -24,8 +57,8 @@ export default async function AdminDashboardPage() {
       (async () => {
         try {
           const db = await getDb();
-          const [mysqlRows] = await (pool as any).query("SELECT COUNT(*) AS total FROM next_student_signups");
-          const mysqlCount = Number((mysqlRows as any)[0]?.total ?? 0);
+          const [mysqlRows] = await pool.query("SELECT COUNT(*) AS total FROM next_student_signups") as [CountRow[], null];
+          const mysqlCount = Number(mysqlRows[0]?.total ?? 0);
           const mongoCount = await db.collection("studentprofile").estimatedDocumentCount();
           return mysqlCount + mongoCount;
         } catch { return 0; }
@@ -56,7 +89,7 @@ export default async function AdminDashboardPage() {
       .limit(3)
       .toArray(),
     Promise.all([
-      db.collection("paymentstatus").find({}, { projection: { id: 1, name: 1 } }).toArray(),
+      db.collection<PaymentStatusRow>("paymentstatus").find({}, { projection: { id: 1, name: 1 } }).toArray(),
       // Student transactions — from transaction collection grouped by payment status
       db.collection("transaction").aggregate([
         {
@@ -92,7 +125,7 @@ export default async function AdminDashboardPage() {
             amount: { $sum: "$amount" },
           },
         },
-      ]).toArray(),
+      ]).toArray() as Promise<TransactionAggRow[]>,
       // College transactions — from application grouped by paymentstatus
       db.collection("application").aggregate([
         {
@@ -122,7 +155,7 @@ export default async function AdminDashboardPage() {
             amount: { $sum: "$amount" },
           },
         },
-      ]).toArray(),
+      ]).toArray() as Promise<TransactionAggRow[]>,
     ]),
     db.collection("users").aggregate([
       {
@@ -145,7 +178,7 @@ export default async function AdminDashboardPage() {
         },
       },
       { $sort: { "_id.year": 1, "_id.month": 1 } },
-    ]).toArray(),
+    ]).toArray() as Promise<MonthlyAggRow[]>,
     db.collection("collegeprofile").aggregate([
       {
         $addFields: {
@@ -167,16 +200,16 @@ export default async function AdminDashboardPage() {
         },
       },
       { $sort: { "_id.year": 1, "_id.month": 1 } },
-    ]).toArray(),
+    ]).toArray() as Promise<MonthlyAggRow[]>,
   ]);
 
   const statusNameMap = new Map(
-    paymentStatuses.map((s: any) => [String(s.id), s.name || String(s.id)])
+    paymentStatuses.map((s) => [String(s.id), s.name || String(s.id)])
   );
 
-  const processTransactionData = (data: any[]) => {
+  const processTransactionData = (data: TransactionAggRow[]) => {
     const raw = data
-      .map((t: any) => {
+      .map((t) => {
         const id = t._id ? String(t._id) : "not_paid";
         const name = id === "not_paid"
           ? "Not Paid"
@@ -187,10 +220,10 @@ export default async function AdminDashboardPage() {
           count: Number(t.count ?? 0),
         };
       })
-      .filter((p: any) => p.count > 0);
+      .filter((p) => p.count > 0);
 
-    const totalAmount = raw.reduce((sum: number, p: any) => sum + p.amount, 0);
-    return raw.map((p: any) => ({
+    const totalAmount = raw.reduce((sum, p) => sum + p.amount, 0);
+    return raw.map((p) => ({
       name: p.name,
       amount: p.amount,
       count: p.count,
@@ -218,12 +251,12 @@ export default async function AdminDashboardPage() {
     .sort((a, b) => new Date(b.time || 0).getTime() - new Date(a.time || 0).getTime())
     .slice(0, 10);
 
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
 
   const studentGraphData = buildMonthlySeries(studentMonthlyAgg, startMonth, monthsBack);
   const collegeGraphData = buildMonthlySeries(collegeMonthlyAgg, startMonth, monthsBack);
 
-  function buildMonthlySeries(source: any[], start: Date, months: number) {
+  function buildMonthlySeries(source: MonthlyAggRow[], start: Date, months: number) {
     const monthlyMap = new Map<string, number>();
     for (const agg of source) {
       const year = agg._id?.year ?? 0;
@@ -231,7 +264,7 @@ export default async function AdminDashboardPage() {
       if (!year) continue;
       monthlyMap.set(`${year}-${String(month).padStart(2, "0")}`, agg.count ?? 0);
     }
-    const series = [];
+    const series: Array<{ key: string; label: string; year: number; month: number; uv: number }> = [];
     for (let i = 0; i < months; i++) {
       const d = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + i, 1));
       const y = d.getUTCFullYear();
@@ -262,7 +295,7 @@ export default async function AdminDashboardPage() {
         collegeGraphData={collegeGraphData}
         studentTransactionPie={studentTransactionPie}
         collegeTransactionPie={collegeTransactionPie}
-        recentStudents={recentStudentsRaw.map(s => ({
+        recentStudents={(recentStudentsRaw as RecentStudentRow[]).map(s => ({
           id: s._id.toString(),
           name: [s.firstname, s.lastname].filter(Boolean).join(" ") || s.email || "Unknown",
           course: s.course || "B.Tech",

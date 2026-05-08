@@ -201,10 +201,9 @@ export default function BulkImagesClient({ colleges, total, page, totalPages, q 
                       isUploaded ? "bg-blue-50/40" : isDirty ? "bg-amber-50/40" : "hover:bg-slate-50/60"
                     }`}
                   >
-                    <input type="hidden" name={`slug__${c.slug}`} value={c.slug} />
-
                     {/* S.No */}
                     <td className="px-3 py-2 text-center">
+                      <input type="hidden" name={`slug__${c.slug}`} value={c.slug} />
                       <span className="text-[11px] font-black text-slate-400">
                         {(page - 1) * 50 + idx + 1}
                       </span>

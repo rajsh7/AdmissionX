@@ -101,6 +101,7 @@ const footerLinks = {
     { label: "About Us", href: "/about" },
     { label: "Privacy Policy", href: "/privacy-policy" },
     { label: "Terms & Conditions", href: "/terms-and-conditions" },
+    { label: "Cancellation & Refunds", href: "/cancellation-refunds" },
     { label: "FAQ", href: "/faq" },
     { label: "Site Map", href: "/site-map" },
   ],
@@ -271,7 +272,8 @@ export default function Footer() {
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
                 <Link href="/privacy-policy" className="text-[12px] text-slate-600 hover:text-white transition-colors">Privacy Policy</Link>
-                <Link href="/terms-and-conditions" className="text-[12px] text-slate-600 hover:text-white transition-colors">Terms of Service</Link>
+                <Link href="/terms-and-conditions" className="text-[12px] text-slate-600 hover:text-white transition-colors">Terms & Conditions</Link>
+                <Link href="/cancellation-refunds" className="text-[12px] text-slate-600 hover:text-white transition-colors">Cancellation & Refunds</Link>
                 <Link href="/contact-us" className="text-[12px] text-slate-600 hover:text-white transition-colors">Contact Us</Link>
               </div>
             </div>

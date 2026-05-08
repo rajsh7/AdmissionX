@@ -1,19 +1,16 @@
 import pool from "@/lib/db";
-import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
-import ExploreCards from "@/app/components/ExploreCards";
 
 export const metadata: Metadata = {
-  title: "About Us — AdmissionX | India's College Discovery Platform",
+  title: "About Us - AdmissionX | India's College Discovery Platform",
   description:
-    "Learn about AdmissionX — our mission to democratise access to quality education information, our story, and the team behind India's trusted college admissions platform.",
+    "AdmissionX is a first of its kind platform based in New Delhi that connects students and institutions for admissions across courses, colleges, and cities.",
   keywords:
     "about admissionx, college admissions platform, education technology india, admissionx team, college discovery",
 };
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function safeCount(sql: string): Promise<number> {
   try {
@@ -24,7 +21,47 @@ async function safeCount(sql: string): Promise<number> {
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+const values = [
+  {
+    title: "Student First",
+    description:
+      "We make every decision with student success, clarity, and confidence in mind.",
+    icon: "favorite",
+    color: "text-rose-500",
+    bg: "bg-rose-50",
+  },
+  {
+    title: "Truth & Transparency",
+    description:
+      "Clear information and trustworthy guidance are at the center of our platform.",
+    icon: "verified_user",
+    color: "text-emerald-500",
+    bg: "bg-emerald-50",
+  },
+  {
+    title: "Innovation",
+    description:
+      "We blend technology with human insight to make college discovery simpler.",
+    icon: "lightbulb",
+    color: "text-violet-500",
+    bg: "bg-violet-50",
+  },
+  {
+    title: "Empowerment",
+    description:
+      "Students should feel informed, supported, and ready for what comes next.",
+    icon: "workspace_premium",
+    color: "text-amber-500",
+    bg: "bg-amber-50",
+  },
+];
+
+const journey = [
+  { year: "2019", title: "Idea born", description: "Started with a simple mission to simplify admissions." },
+  { year: "2020", title: "Platform launch", description: "Built the first version of our college discovery platform." },
+  { year: "2022", title: "Nationwide growth", description: "Expanded reach across streams, cities, and counselling needs." },
+  { year: "2024", title: "Trusted brand", description: "Serving students with verified data and admission support." },
+];
 
 export default async function AboutPage() {
   const [colleges, students, exams, courses] = await Promise.all([
@@ -34,333 +71,221 @@ export default async function AboutPage() {
     safeCount("SELECT COUNT(*) AS cnt FROM course WHERE name IS NOT NULL AND name != ''"),
   ]);
 
-  const STATS = [
-    { value: Math.max(colleges, 100),  suffix: "+", label: "Partner Colleges",     icon: "account_balance" },
-    { value: Math.max(students, 500),  suffix: "+", label: "Students Registered",  icon: "group"           },
-    { value: Math.max(exams, 50),      suffix: "+", label: "Entrance Exams Listed",icon: "quiz"            },
-    { value: Math.max(courses, 200),   suffix: "+", label: "Courses Available",    icon: "menu_book"       },
-  ];
-
-  const FEATURES = [
+  const stats = [
     {
-      icon: "search",
-      title: "Smart College Search",
-      desc: "Filter by stream, degree, location, fees, and ranking to find colleges that match exactly what you're looking for.",
-      color: "bg-red-50 text-red-600",
+      value: `${Math.max(students, 12000).toLocaleString("en-IN")}+`,
+      label: "Trusted Students",
+      icon: "school",
+      color: "text-rose-500",
+      bg: "bg-rose-50",
     },
     {
-      icon: "quiz",
-      title: "Entrance Exam Hub",
-      desc: "Comprehensive exam guides covering eligibility, syllabus, important dates, admit cards, and results — all in one place.",
-      color: "bg-blue-50 text-blue-600",
+      value: `${Math.max(colleges, 300)}+`,
+      label: "College Partners",
+      icon: "apartment",
+      color: "text-emerald-500",
+      bg: "bg-emerald-50",
     },
     {
-      icon: "description",
-      title: "Online Applications",
-      desc: "Apply to multiple colleges through a single unified application process, track your status in real time.",
-      color: "bg-emerald-50 text-emerald-600",
+      value: `${Math.max(exams, 50)}+`,
+      label: "Entrance Exams",
+      icon: "workspace_premium",
+      color: "text-violet-500",
+      bg: "bg-violet-50",
     },
     {
-      icon: "travel_explore",
-      title: "Study Abroad",
-      desc: "Explore top international universities across the US, UK, Australia, Canada, Germany, and more.",
-      color: "bg-violet-50 text-violet-600",
-    },
-    {
-      icon: "work",
-      title: "Career Guidance",
-      desc: "Discover career paths matched to your interests — with salary insights, skill requirements, and top colleges for each role.",
-      color: "bg-amber-50 text-amber-600",
-    },
-    {
-      icon: "newspaper",
-      title: "Education News & Blogs",
-      desc: "Stay updated with the latest admission notifications, policy changes, scholarship announcements, and expert articles.",
-      color: "bg-teal-50 text-teal-600",
-    },
-  ];
-
-  const VALUES = [
-    {
-      icon: "diversity_3",
-      title: "Accessibility First",
-      desc: "Every student, regardless of background or location, deserves clear, accurate information about their educational options.",
-    },
-    {
-      icon: "verified",
-      title: "Accuracy & Trust",
-      desc: "We work directly with institutions to verify college profiles, fees, and admission data before publishing.",
-    },
-    {
-      icon: "bolt",
-      title: "Student-Centric Speed",
-      desc: "Deadlines don't wait. Our platform surfaces the most time-sensitive information — exam dates, application windows, results — at a glance.",
-    },
-    {
-      icon: "open_source",
-      title: "Transparency",
-      desc: "No hidden rankings, no paid placements in search results. Our listings are ordered on merit and relevance to the student.",
+      value: `${Math.max(courses, 80)}+`,
+      label: "Areas of Interest",
+      icon: "trophy",
+      color: "text-amber-500",
+      bg: "bg-amber-50",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-[#f7f3ef]">
       <Header />
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <div className="bg-neutral-900 pt-24 pb-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-8">
-            <Link href="/" className="hover:text-white transition-colors">
-              Home
-            </Link>
-            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-            <span className="text-neutral-300">About Us</span>
-          </nav>
-
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide mb-5">
-              <span className="material-symbols-outlined text-[13px]">info</span>
-              Our Story
-            </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight mb-5">
-              Helping Every Student Find{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400">
-                Their Right College
-              </span>
-            </h1>
-            <p className="text-neutral-400 text-base leading-relaxed max-w-2xl">
-              AdmissionX is India&apos;s trusted college discovery and admissions platform.
-              We connect ambitious students with the right institutions, exams, and career
-              paths — simplifying one of the most important decisions of their lives.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Stats strip ──────────────────────────────────────────────────── */}
-      <div className="bg-white border-b border-neutral-100">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-neutral-100">
-            {STATS.map((stat) => (
-              <div key={stat.label} className="flex flex-col items-center justify-center gap-1.5 py-8 px-4 text-center">
-                <span
-                  className="material-symbols-outlined text-[28px] text-red-500 mb-1"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  {stat.icon}
-                </span>
-                <p className="text-3xl font-black text-neutral-900">
-                  {stat.value.toLocaleString("en-IN")}{stat.suffix}
-                </p>
-                <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wide">
-                  {stat.label}
+      <main className="pt-24 lg:pt-[116px]">
+        <div className="w-full border-y border-[#ece5de] bg-white">
+          <section className="px-5 py-8 sm:px-8 lg:px-10">
+            <div className="grid gap-8 lg:grid-cols-[1fr_520px] lg:items-start">
+              <div className="text-center lg:text-left">
+                <h1 className="text-[34px] font-black tracking-tight text-slate-900 sm:text-[42px]">
+                  About AdmissionX
+                </h1>
+                <p className="mx-auto mt-4 max-w-xl text-[14px] leading-7 text-slate-500 lg:mx-0">
+                  AdmissionX is your trusted gateway to smarter college discovery,
+                  seamless admissions, and brighter academic futures. We help students
+                  explore colleges, courses, exams, and career opportunities with greater
+                  clarity and confidence. Our platform brings together reliable
+                  information, practical guidance, and student-focused tools in one place.
+                  From discovering the right path to understanding eligibility, fees, and
+                  admission updates, we make every step easier to navigate. AdmissionX is
+                  built to simplify decisions, reduce confusion, and help every student
+                  move closer to the future they want to build.
                 </p>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
 
-      {/* ── Mission & Vision ─────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-
-          {/* Mission */}
-          <div className="bg-white rounded-3xl border border-neutral-100 shadow-sm p-8 lg:p-10">
-            <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-5">
-              <span
-                className="material-symbols-outlined text-[26px] text-red-500"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                target
-              </span>
-            </div>
-            <h2 className="text-xl font-black text-neutral-900 mb-3">Our Mission</h2>
-            <p className="text-neutral-600 leading-relaxed mb-4">
-              To democratise access to quality education information for every student in
-              India — regardless of geography, background, or resources. We believe that
-              choosing the right college should be driven by knowledge, not guesswork.
-            </p>
-            <p className="text-neutral-600 leading-relaxed">
-              We aggregate, verify, and present college, exam, and career data in a format
-              that is actionable and easy to understand — so students can make confident,
-              well-informed decisions.
-            </p>
-          </div>
-
-          {/* Vision */}
-          <div className="bg-neutral-900 rounded-3xl border border-neutral-800 p-8 lg:p-10">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-5">
-              <span
-                className="material-symbols-outlined text-[26px] text-amber-400"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                visibility
-              </span>
-            </div>
-            <h2 className="text-xl font-black text-white mb-3">Our Vision</h2>
-            <p className="text-neutral-400 leading-relaxed mb-4">
-              To become the definitive starting point for every student&apos;s higher
-              education journey — from discovering the right stream in Class 11 to
-              enrolling in a college that sets them up for a fulfilling career.
-            </p>
-            <p className="text-neutral-400 leading-relaxed">
-              We envision a future where every Indian student has a personalised, data-driven
-              roadmap for their academic and professional life — and AdmissionX is the
-              platform that makes it possible.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── What We Offer ─────────────────────────────────────────────────── */}
-      <div className="bg-white border-y border-neutral-100 py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-neutral-100 text-neutral-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide mb-4">
-              <span className="material-symbols-outlined text-[13px]">apps</span>
-              Platform Features
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 mb-3">
-              Everything You Need, In One Place
-            </h2>
-            <p className="text-neutral-500 text-sm max-w-xl mx-auto leading-relaxed">
-              AdmissionX brings together all the tools a student needs to research, apply,
-              and secure admission — without switching between multiple platforms.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {FEATURES.map((f) => (
-              <div
-                key={f.title}
-                className="group bg-white rounded-2xl border border-neutral-100 hover:border-neutral-200 hover:shadow-md transition-all duration-300 p-6"
-              >
-                <div className={`w-11 h-11 rounded-xl ${f.color} flex items-center justify-center mb-4`}>
-                  <span
-                    className="material-symbols-outlined text-[22px]"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    {f.icon}
-                  </span>
+              <div className="rounded-[22px] border border-[#efe7e0] bg-white p-3 shadow-[0_24px_60px_-42px_rgba(15,23,42,0.28)]">
+                <div className="relative h-[290px] overflow-hidden rounded-[18px] bg-[#f7f9fb]">
+                  <Image
+                    src="/assets/img/bg/19.jpg"
+                    alt="AdmissionX about us"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 520px"
+                    priority
+                  />
                 </div>
-                <h3 className="text-sm font-bold text-neutral-900 mb-2">{f.title}</h3>
-                <p className="text-xs text-neutral-500 leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Our Values ───────────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-neutral-100 text-neutral-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide mb-4">
-            <span className="material-symbols-outlined text-[13px]">favorite</span>
-            What We Stand For
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 mb-3">
-            Our Core Values
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {VALUES.map((v) => (
-            <div
-              key={v.title}
-              className="flex items-start gap-5 bg-white rounded-2xl border border-neutral-100 p-6 shadow-sm"
-            >
-              <div className="w-11 h-11 rounded-xl bg-neutral-900 flex items-center justify-center flex-shrink-0">
-                <span
-                  className="material-symbols-outlined text-[20px] text-white"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  {v.icon}
-                </span>
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-neutral-900 mb-1.5">{v.title}</h3>
-                <p className="text-xs text-neutral-500 leading-relaxed">{v.desc}</p>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* ── Our Story ────────────────────────────────────────────────────── */}
-      <div className="bg-white border-y border-neutral-100 py-16">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
-          <div className="inline-flex items-center gap-2 bg-neutral-100 text-neutral-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide mb-5">
-            <span className="material-symbols-outlined text-[13px]">history</span>
-            How We Started
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 mb-6">
-            Built by Students, for Students
-          </h2>
-          <div className="space-y-4 text-neutral-600 text-sm leading-relaxed text-left">
-            <p>
-              AdmissionX was founded after witnessing firsthand the confusion students face
-              when navigating the college admission process in India. With hundreds of
-              colleges, dozens of entrance exams, and ever-changing cutoffs, the process is
-              overwhelming — especially for students from smaller cities and towns who lack
-              access to professional counselling.
-            </p>
-            <p>
-              We started by building a simple college search tool. As more students began
-              using the platform, we expanded into exam information, career guidance, and
-              eventually a full admissions management system that lets colleges and students
-              connect directly.
-            </p>
-            <p>
-              Today, AdmissionX serves students across India, with partner colleges spanning
-              engineering, medical, management, law, arts, and sciences — offering a
-              comprehensive view of the Indian higher education landscape under one roof.
-            </p>
-          </div>
-        </div>
-      </div>
+            <div className="mt-6 grid gap-4 md:grid-cols-[1.15fr_1fr]">
+              <div className="rounded-[20px] border border-[#efe7e0] bg-white p-5 shadow-[0_18px_40px_-34px_rgba(15,23,42,0.22)]">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-50">
+                    <span className="material-symbols-outlined text-[20px] text-rose-500">
+                      account_balance
+                    </span>
+                  </div>
+                  <div>
+                    <h2 className="text-[13px] font-bold text-slate-900">About AdmissionX</h2>
+                    <p className="mt-1 text-[12px] leading-6 text-slate-500">
+                      Our portal is a repository of reliable data covering over 31100
+                      colleges, more than 50200 courses, and opportunities across 4000+
+                      cities. Students can explore important admission details, compare
+                      options with confidence, and stay updated with the latest
+                      information, all from one trusted platform.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-      {/* ── CTA ──────────────────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
-        <div className="bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-3xl p-10 lg:p-14 text-center border border-neutral-700">
-          <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">
-            Ready to find your ideal college?
-          </h2>
-          <p className="text-neutral-400 text-sm max-w-lg mx-auto mb-8 leading-relaxed">
-            Join thousands of students who have used AdmissionX to discover colleges,
-            prepare for exams, and take the next step in their academic journey.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/search"
-              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors shadow-sm whitespace-nowrap"
-            >
-              <span className="material-symbols-outlined text-[17px]">search</span>
-              Search Colleges
-            </Link>
-            <Link
-              href="/contact-us"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-sm px-6 py-3 rounded-xl transition-colors whitespace-nowrap"
-            >
-              <span className="material-symbols-outlined text-[17px]">mail</span>
-              Get in Touch
-            </Link>
-          </div>
-        </div>
-      </div>
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {stats.map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="rounded-[20px] border border-[#efe7e0] bg-white p-5 shadow-[0_18px_40px_-34px_rgba(15,23,42,0.22)]"
+                  >
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${stat.bg}`}>
+                      <span className={`material-symbols-outlined text-[18px] ${stat.color}`}>
+                        {stat.icon}
+                      </span>
+                    </div>
+                    <p className="mt-4 text-[24px] font-black text-slate-900">{stat.value}</p>
+                    <p className="mt-1 text-[11px] font-medium text-slate-500">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
 
-      {/* Explore Cards */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 pb-16">
-        <ExploreCards />
-      </div>
+          <section className="border-t border-[#f2ebe5] px-5 py-8 sm:px-8 lg:px-10">
+            <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+              <div>
+                <h2 className="text-[22px] font-black text-slate-900">About AdmissionX</h2>
+                <p className="mt-4 text-[13px] leading-7 text-slate-500">
+                  AdmissionX is a first of its kind platform that helps connect students
+                  and institutions for the purpose of admission in different courses. Our
+                  portal is a repository of reliable data covering over 31100 colleges,
+                  more than 50200 courses, and opportunities across 4000+ cities. We are
+                  building a platform where students can discover the right academic path
+                  with greater confidence, clarity, and convenience. From diploma programs
+                  to undergraduate and postgraduate courses, AdmissionX brings together a
+                  wide range of options for students from different streams and interests.
+                  Our goal is to make the search process simpler, more transparent, and
+                  easier to understand for every learner.
+                </p>
+                <p className="mt-4 text-[13px] leading-7 text-slate-500">
+                  Whether it is a Diploma course in Computing, a Bachelor&apos;s course in
+                  Engineering, or a Master&apos;s course in Management, Science, or IT, we
+                  have it all in one place. With the help of the information provided on
+                  our platform, students can easily access detailed insights on colleges,
+                  admission criteria, eligibility, fees, scholarships, and the latest
+                  updates without having to search across multiple sources. We believe that
+                  better information leads to better decisions, and better decisions create
+                  stronger futures. AdmissionX is designed to support students at every
+                  step of their educational journey by making college discovery and
+                  admissions more accessible, organised, and student-friendly.
+                </p>
+              </div>
+
+              <div>
+                <h2 className="text-[22px] font-black text-slate-900">Our Motto</h2>
+                <p className="mt-2 text-[13px] leading-7 text-slate-500">
+                  We stand for &quot;admission for all&quot; and are developing an online
+                  platform where students from all over the country can connect with
+                  different institutions and take admission in courses of their choice.
+                </p>
+                <p className="mt-3 text-[13px] leading-7 text-slate-500">
+                  We realize that students and institutes both spend a considerable amount
+                  of time and money on the admission process. Our aim is to make this
+                  process less time-consuming as well economical for them. We are trying to
+                  transform the way students take admission in our country, by making the
+                  process of admission as easy as we can.
+                </p>
+
+                <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  {values.map((value) => (
+                    <div
+                      key={value.title}
+                      className="rounded-[20px] border border-[#efe7e0] bg-white p-4 shadow-[0_16px_36px_-34px_rgba(15,23,42,0.22)]"
+                    >
+                      <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${value.bg}`}>
+                        <span className={`material-symbols-outlined text-[18px] ${value.color}`}>
+                          {value.icon}
+                        </span>
+                      </div>
+                      <h3 className="mt-4 text-[13px] font-bold text-slate-900">{value.title}</h3>
+                      <p className="mt-2 text-[11px] leading-6 text-slate-500">
+                        {value.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="border-t border-[#f2ebe5] px-5 py-8 sm:px-8 lg:px-10">
+            <h2 className="text-[22px] font-black text-slate-900">Our Vision</h2>
+
+            <p className="mt-4 max-w-4xl text-[13px] leading-7 text-slate-500">
+              We want every student that leaves school to have access to higher education
+              in an efficient and affordable manner. We are trying to bridge the gap
+              between colleges and students and bringing college admission within the reach
+              of every student.
+            </p>
+            <p className="mt-3 max-w-4xl text-[13px] leading-7 text-slate-500">
+              With an aim to cut down the role of the long admission process, the long
+              line and hustle for admission in colleges and other marketing channels which
+              lead to high student acquisition cost, we are here trying to make admission
+              accessible, affordable and incredible.
+            </p>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-4">
+              {journey.map((item, index) => (
+                <div key={item.year} className="relative">
+                  <div className="mb-4 hidden h-[2px] w-full bg-[#ebe2db] md:block" />
+                  <div className="absolute left-0 top-[-6px] hidden h-3 w-3 rounded-full bg-[#ff5a3d] md:block" />
+                  <p className="text-[12px] font-black text-[#ff5a3d]">{item.year}</p>
+                  <h3 className="mt-2 text-[13px] font-bold text-slate-900">{item.title}</h3>
+                  <p className="mt-2 max-w-[220px] text-[11px] leading-6 text-slate-500">
+                    {item.description}
+                  </p>
+                  {index < journey.length - 1 && (
+                    <div className="mt-4 h-px w-full bg-[#ebe2db] md:hidden" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+        </div>
+      </main>
 
       <Footer />
     </div>
   );
 }
-
-
-
-

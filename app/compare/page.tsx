@@ -39,31 +39,68 @@ interface Suggestion {
 }
 
 function formatFees(val: number | null): string {
-  if (!val || val === 0) return "—";
-  if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L/yr`;
-  if (val >= 1000) return `₹${(val / 1000).toFixed(0)}K/yr`;
-  return `₹${val}/yr`;
+  if (!val || val === 0) return "-";
+  if (val >= 100000) return `Rs ${Number(val / 100000).toFixed(1)}L/yr`;
+  if (val >= 1000) return `Rs ${Number(val / 1000).toFixed(0)}K/yr`;
+  return `Rs ${val}/yr`;
 }
 
 function Cell({ value, sub }: { value: string; sub?: string }) {
   return (
     <div>
-      <p className="text-[16px] font-semibold text-[#3e3e3e]">{value || "—"}</p>
-      {sub && <p className="text-[13px] font-semibold text-[#3e3e3e]/60 mt-0.5">{sub}</p>}
+      <p className="text-[16px] font-semibold text-slate-800">{value || "-"}</p>
+      {sub && <p className="mt-0.5 text-[13px] font-semibold text-slate-500">{sub}</p>}
     </div>
   );
 }
 
 const METRICS = [
-  { label: "Global Ranking", key: "ranking", render: (c: CollegeData) => <Cell value={c.ranking ? `#${c.ranking}` : "—"} sub="QS World 2026" /> },
-  { label: "Tuition Fees/yr", key: "fees", render: (c: CollegeData) => <Cell value={c.min_fees ? `${formatFees(c.min_fees)} – ${formatFees(c.max_fees)}` : "—"} sub={c.universityType ?? undefined} /> },
-  { label: "Rating", key: "rating", render: (c: CollegeData) => <Cell value={c.rating ? `${c.rating.toFixed(1)} ★` : "—"} sub={`${c.totalRatingUser} reviews`} /> },
-  { label: "Placement Rate", key: "placement", render: (c: CollegeData) => <Cell value={c.placement_last_year || "—"} sub={c.placement_companies ? `${c.placement_companies} companies` : undefined} /> },
-  { label: "Highest CTC", key: "ctc_highest", render: (c: CollegeData) => <Cell value={c.ctc_highest || "—"} /> },
-  { label: "Average CTC", key: "ctc_average", render: (c: CollegeData) => <Cell value={c.ctc_average || "—"} /> },
-  { label: "Total Courses", key: "courses", render: (c: CollegeData) => <Cell value={c.total_courses ? String(c.total_courses) : "—"} sub={c.total_streams ? `${c.total_streams} streams` : undefined} /> },
-  { label: "Established", key: "estyear", render: (c: CollegeData) => <Cell value={c.estyear || "—"} /> },
-  { label: "University Type", key: "type", render: (c: CollegeData) => <Cell value={c.universityType || "—"} /> },
+  {
+    label: "Global Ranking",
+    key: "ranking",
+    render: (c: CollegeData) => <Cell value={c.ranking ? `#${c.ranking}` : "-"} sub="QS World 2026" />,
+  },
+  {
+    label: "Tuition Fees/yr",
+    key: "fees",
+    render: (c: CollegeData) => (
+      <Cell
+        value={c.min_fees ? `${formatFees(c.min_fees)} - ${formatFees(c.max_fees)}` : "-"}
+        sub={c.universityType ?? undefined}
+      />
+    ),
+  },
+  {
+    label: "Rating",
+    key: "rating",
+    render: (c: CollegeData) => (
+      <Cell
+        value={c.rating ? `${c.rating.toFixed(1)} / 5` : "-"}
+        sub={`${c.totalRatingUser} reviews`}
+      />
+    ),
+  },
+  {
+    label: "Placement Rate",
+    key: "placement",
+    render: (c: CollegeData) => (
+      <Cell
+        value={c.placement_last_year || "-"}
+        sub={c.placement_companies ? `${c.placement_companies} companies` : undefined}
+      />
+    ),
+  },
+  { label: "Highest CTC", key: "ctc_highest", render: (c: CollegeData) => <Cell value={c.ctc_highest || "-"} /> },
+  { label: "Average CTC", key: "ctc_average", render: (c: CollegeData) => <Cell value={c.ctc_average || "-"} /> },
+  {
+    label: "Total Courses",
+    key: "courses",
+    render: (c: CollegeData) => (
+      <Cell value={c.total_courses ? String(c.total_courses) : "-"} sub={c.total_streams ? `${c.total_streams} streams` : undefined} />
+    ),
+  },
+  { label: "Established", key: "estyear", render: (c: CollegeData) => <Cell value={c.estyear || "-"} /> },
+  { label: "University Type", key: "type", render: (c: CollegeData) => <Cell value={c.universityType || "-"} /> },
 ];
 
 function ComparePageInner() {
@@ -80,56 +117,70 @@ function ComparePageInner() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dropdownStyle, setDropdownStyle] = useState<{ top: number; left: number; width: number } | null>(null);
 
-  // Update dropdown position when suggestions change
+  function updateDropdownPosition() {
+    if (!searchRef.current) return;
+    const rect = searchRef.current.getBoundingClientRect();
+    setDropdownStyle({
+      top: rect.bottom + window.scrollY + 8,
+      left: rect.left + window.scrollX,
+      width: rect.width,
+    });
+  }
+
   useEffect(() => {
-    if (suggestions.length > 0 && searchRef.current) {
-      const rect = searchRef.current.getBoundingClientRect();
-      setDropdownStyle({
-        top: rect.bottom + window.scrollY + 8,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-      });
-    }
+    if (suggestions.length > 0) updateDropdownPosition();
   }, [suggestions]);
 
-  // Load from URL params
+  useEffect(() => {
+    if (!suggestions.length) return;
+    const syncPosition = () => updateDropdownPosition();
+    window.addEventListener("resize", syncPosition);
+    window.addEventListener("scroll", syncPosition, true);
+    return () => {
+      window.removeEventListener("resize", syncPosition);
+      window.removeEventListener("scroll", syncPosition, true);
+    };
+  }, [suggestions.length]);
+
   useEffect(() => {
     const slugs = searchParams.get("colleges")?.split(",").filter(Boolean) ?? [];
     if (!slugs.length) return;
-    setLoading(true);
     fetch(`/api/compare?slugs=${slugs.join(",")}`)
       .then((r) => r.json())
       .then((data) => {
         const filled: (CollegeData | null)[] = [null, null, null];
-        data.colleges.forEach((c: CollegeData, i: number) => { filled[i] = c; });
+        data.colleges.forEach((c: CollegeData, i: number) => {
+          filled[i] = c;
+        });
         setColleges(filled);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [searchParams]);
 
-  // Hero search suggestions
   useEffect(() => {
-    if (searchQ.length < 2) { setSuggestions([]); return; }
+    if (searchQ.length < 2) return;
     const t = setTimeout(() => {
       fetch(`/api/search?q=${encodeURIComponent(searchQ)}`)
         .then((r) => r.json())
-        .then((d) => setSuggestions((d.suggestions ?? []).filter((s: Suggestion) => s.type === "college").slice(0, 6)));
+        .then((d) =>
+          setSuggestions((d.suggestions ?? []).filter((s: Suggestion) => s.type === "college").slice(0, 6)),
+        );
     }, 300);
     return () => clearTimeout(t);
   }, [searchQ]);
 
-  // Inline search suggestions
   useEffect(() => {
-    if (inlineSearchQ.length < 2) { setInlineSuggestions([]); return; }
+    if (inlineSearchQ.length < 2) return;
     const t = setTimeout(() => {
       fetch(`/api/search?q=${encodeURIComponent(inlineSearchQ)}`)
         .then((r) => r.json())
-        .then((d) => setInlineSuggestions((d.suggestions ?? []).filter((s: Suggestion) => s.type === "college").slice(0, 6)));
+        .then((d) =>
+          setInlineSuggestions((d.suggestions ?? []).filter((s: Suggestion) => s.type === "college").slice(0, 6)),
+        );
     }, 300);
     return () => clearTimeout(t);
   }, [inlineSearchQ]);
 
-  // Close suggestions on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (
@@ -165,7 +216,7 @@ function ComparePageInner() {
           router.replace(`/compare?colleges=${slugs.join(",")}`, { scroll: false });
         }
       })
-      .catch(err => console.error("Add college error:", err))
+      .catch((err) => console.error("Add college error:", err))
       .finally(() => {
         setLoading(false);
         setSearchQ("");
@@ -204,122 +255,201 @@ function ComparePageInner() {
   const filledCount = colleges.filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB] font-display">
+    <div className="min-h-screen bg-[linear-gradient(180deg,#fff7f6_0%,#f8fafc_26%,#f8fafc_100%)] font-display">
       <Header theme="dark" />
 
-      <main className="pt-20 pb-20">
-        {/* Hero Section */}
-        <section
-          className="w-full py-20 lg:py-28 pb-32 relative mb-0 overflow-visible z-30"
-          style={{
-            backgroundImage: "url('/Background-images/f0b10acfd1d98e25c40741fa92c81454f3557e55.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          <div className="absolute inset-0 bg-white/10" />
-          <div className="relative z-30 max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-24">
-            <div className="max-w-4xl">
-              <h1 className="text-[48px] font-bold text-slate-900 leading-[1.1] tracking-tight mb-4">
-                Compare College
-              </h1>
-              <p className="text-[20px] font-medium leading-relaxed mb-10 text-slate-600 max-w-2xl">
-                Evaluate multiple institution side by side to find your perfect match based on fees, placement, and academic quality.
-              </p>
+      <main className="pb-20 pt-20 lg:pt-[116px]">
+        <section className="relative z-30 w-full overflow-visible px-6 py-12 sm:px-12 lg:px-24 lg:py-16">
+          <div className="absolute inset-x-0 top-0 h-[340px] bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.98),_rgba(255,243,242,0.86)_48%,_rgba(248,250,252,0)_100%)]" />
+          <div className="relative mx-auto max-w-[1920px]">
+            <div className="overflow-hidden rounded-[28px] border border-rose-100/80 bg-white/85 shadow-[0_30px_80px_-48px_rgba(15,23,42,0.28)] backdrop-blur">
+              <div className="grid gap-8 px-6 py-8 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:px-12 lg:py-12">
+                <div className="max-w-4xl">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-rose-100 bg-rose-50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-rose-500">
+                    <span className="material-symbols-outlined text-[14px]">compare_arrows</span>
+                    College Compare
+                  </div>
+                  <h1 className="mb-4 mt-5 text-[38px] font-black leading-[1.05] tracking-tight text-slate-900 sm:text-[48px]">
+                    Compare colleges side by side with clarity
+                  </h1>
+                  <p className="mb-8 max-w-2xl text-[16px] font-medium leading-8 text-slate-600 sm:text-[18px]">
+                    Evaluate institutions across fees, rankings, ratings, placements, and
+                    course depth so you can spot the best fit faster.
+                  </p>
 
-              {/* Search Layout */}
-              <div ref={searchRef} className="flex flex-col sm:flex-row max-w-2xl relative shadow-lg shadow-red-200/20 rounded-[5px] overflow-hidden">
-                <div className="flex-1 flex items-center gap-3 bg-white border border-slate-200 sm:border-r-0 rounded-t-[5px] sm:rounded-t-none sm:rounded-l-[5px] sm:rounded-r-none px-5 py-3.5 focus-within:border-[#FF3C3C] transition-all duration-300">
-                  <span className="material-symbols-outlined text-[#FF3C3C] text-[24px]">school</span>
-                  <input
-                    ref={inputRef}
-                    value={searchQ}
-                    onChange={(e) => setSearchQ(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") handleAddButton(); }}
-                    placeholder="Search universities, colleges..."
-                    className="flex-1 text-[16px] text-slate-700 placeholder:text-slate-400 bg-transparent outline-none font-semibold"
-                  />
-                </div>
-                <button
-                  onClick={handleAddButton}
-                  disabled={loading}
-                  className="bg-[#FF3C3C] text-white text-[16px] font-bold px-8 py-3.5 rounded-b-[5px] sm:rounded-b-none sm:rounded-r-[5px] rounded-l-none hover:bg-red-600 transition-all active:scale-95 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[150px]"
-                >
-                  {loading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                  {loading ? "Adding..." : "Add College"}
-                </button>
-
-                {suggestions.length > 0 && dropdownStyle && createPortal(
                   <div
-                    style={{ position: "absolute", top: dropdownStyle.top, left: dropdownStyle.left, width: dropdownStyle.width, zIndex: 9999 }}
-                    className="compare-suggestions-dropdown bg-white rounded-[5px] shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
+                    ref={searchRef}
+                    className="relative flex max-w-2xl flex-col overflow-hidden rounded-[20px] border border-slate-200 bg-white shadow-[0_18px_40px_-30px_rgba(244,63,94,0.28)] sm:flex-row"
                   >
-                    <div className="py-1">
-                      {suggestions.map((s) => (
-                        <button
-                          key={s.slug}
-                          onClick={() => {
-                            const slot = addingSlot !== null ? addingSlot : colleges.findIndex((c) => !c);
-                            if (slot !== -1) addCollege(s.slug, slot);
-                          }}
-                          className="w-full flex items-center gap-4 px-5 py-4 hover:bg-rose-50 text-left border-b border-slate-50 last:border-0 transition-colors group"
-                        >
-                          <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center shrink-0 group-hover:bg-white transition-colors">
-                            <span className="material-symbols-outlined text-slate-400 text-[22px] group-hover:text-primary">school</span>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[15px] font-bold text-slate-800 line-clamp-1">{s.name}</p>
-                            <p className="text-[12px] text-slate-500 font-medium flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[14px]">location_on</span>
-                              {s.location}
-                            </p>
-                          </div>
-                        </button>
-                      ))}
+                    <div className="flex flex-1 items-center gap-3 px-5 py-4 transition-all duration-300 focus-within:bg-rose-50/30">
+                      <span className="material-symbols-outlined text-[24px] text-[#FF3C3C]">school</span>
+                      <input
+                        ref={inputRef}
+                        value={searchQ}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setSearchQ(value);
+                          if (value.length < 2) setSuggestions([]);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleAddButton();
+                        }}
+                        placeholder="Search universities, colleges..."
+                        className="flex-1 bg-transparent text-[16px] font-semibold text-slate-700 placeholder:text-slate-400 outline-none"
+                      />
                     </div>
-                  </div>,
-                  document.body
-                )}
+                    <button
+                      onClick={handleAddButton}
+                      disabled={loading}
+                      className="flex min-w-[150px] items-center justify-center gap-2 whitespace-nowrap bg-[#FF3C3C] px-8 py-4 text-[16px] font-bold text-white transition-all hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {loading && (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      )}
+                      {loading ? "Adding..." : "Add College"}
+                    </button>
+
+                    {suggestions.length > 0 &&
+                      dropdownStyle &&
+                      createPortal(
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: dropdownStyle.top,
+                            left: dropdownStyle.left,
+                            width: dropdownStyle.width,
+                            zIndex: 9999,
+                          }}
+                          className="compare-suggestions-dropdown overflow-hidden rounded-[18px] border border-slate-100 bg-white shadow-2xl"
+                        >
+                          <div className="py-1">
+                            {suggestions.map((s) => (
+                              <button
+                                key={s.slug}
+                                onClick={() => {
+                                  const slot =
+                                    addingSlot !== null
+                                      ? addingSlot
+                                      : colleges.findIndex((c) => !c);
+                                  if (slot !== -1) addCollege(s.slug, slot);
+                                }}
+                                className="group flex w-full items-center gap-4 border-b border-slate-50 px-5 py-4 text-left transition-colors last:border-0 hover:bg-rose-50"
+                              >
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-50 transition-colors group-hover:bg-white">
+                                  <span className="material-symbols-outlined text-[22px] text-slate-400 group-hover:text-primary">
+                                    school
+                                  </span>
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="line-clamp-1 text-[15px] font-bold text-slate-800">
+                                    {s.name}
+                                  </p>
+                                  <p className="flex items-center gap-1 text-[12px] font-medium text-slate-500">
+                                    <span className="material-symbols-outlined text-[14px]">
+                                      location_on
+                                    </span>
+                                    {s.location}
+                                  </p>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>,
+                        document.body,
+                      )}
+                  </div>
+                </div>
+
+                <div className="grid content-start items-start gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+                  {[
+                    { value: "3", label: "Colleges at once", icon: "view_week" },
+                    { value: "9+", label: "Key metrics", icon: "analytics" },
+                    { value: "Fast", label: "Decision making", icon: "bolt" },
+                  ].map((item) => (
+                    <div
+                      key={item.label}
+                      className="self-start rounded-[22px] border border-slate-100 bg-[linear-gradient(180deg,#ffffff,#fff8f7)] px-5 py-4 shadow-[0_18px_40px_-34px_rgba(15,23,42,0.18)]"
+                    >
+                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-50 text-rose-500">
+                        <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
+                      </div>
+                      <p className="mt-3 text-[24px] font-black leading-none text-slate-900">{item.value}</p>
+                      <p className="mt-1 text-[12px] leading-5 font-medium text-slate-500">{item.label}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <div className="max-w-[1920px] mx-auto px-6 sm:px-12 lg:px-24 relative z-40 -mt-10">
-          <div className="bg-white rounded-[5px] border border-[#E0E0E0] overflow-hidden" style={{ boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)" }}>
+        <div className="relative z-40 mx-auto max-w-[1920px] px-6 sm:px-12 lg:px-24">
+          <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_28px_80px_-52px_rgba(15,23,42,0.35)]">
+            <div className="border-b border-slate-100 bg-[linear-gradient(90deg,#fff8f7,#ffffff)] px-6 py-5 sm:px-8">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-rose-500">
+                    Side By Side Comparison
+                  </p>
+                  <h2 className="mt-1 text-[24px] font-black text-slate-900">
+                    Compare metrics that matter
+                  </h2>
+                </div>
+                <p className="max-w-xl text-[13px] leading-6 text-slate-500">
+                  Add up to three colleges and review rankings, fees, ratings,
+                  placements, and course breadth in one clean table.
+                </p>
+              </div>
+            </div>
+
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    <th className="w-[300px] bg-[#F5F5F5] px-10 py-10 text-left border-b border-r border-[#E0E0E0] align-middle">
-                      <h2 className="text-[32px] font-bold text-slate-900 leading-[1.1]">Comparing<br />Metrics</h2>
+                    <th className="sticky left-0 z-20 w-[260px] border-b border-r border-slate-200 bg-[#fff8f7] px-8 py-8 text-left align-middle">
+                      <h2 className="text-[28px] font-black leading-[1.1] text-slate-900">
+                        Comparing
+                        <br />
+                        Metrics
+                      </h2>
                     </th>
 
                     {colleges.map((college, i) => (
-                      <th key={i} className="relative px-8 py-8 border-b border-r border-[#E0E0E0] last:border-r-0 min-w-[320px] align-top bg-white group">
+                      <th
+                        key={i}
+                        className="group relative min-w-[320px] border-b border-r border-slate-200 bg-white px-8 py-8 align-top last:border-r-0"
+                      >
                         {college ? (
-                          <div className="flex flex-col h-full">
+                          <div className="flex h-full flex-col">
                             <button
                               onClick={() => removeCollege(i)}
-                              className="absolute top-0 right-0 w-10 h-8 bg-[#FFA8A8] text-white flex items-center justify-center hover:bg-red-500 transition-colors z-20"
+                              className="absolute right-0 top-0 z-20 flex h-9 w-10 items-center justify-center rounded-bl-xl bg-rose-200 text-white transition-colors hover:bg-red-500"
                             >
                               <span className="material-symbols-outlined text-[18px]">close</span>
                             </button>
 
-                            <div className="flex items-center gap-4 mb-8 pt-2">
-                              <div className="w-14 h-14 rounded-[5px] overflow-hidden bg-white border border-slate-100 flex-shrink-0 flex items-center justify-center p-1.5 shadow-sm">
+                            <div className="mb-8 flex items-center gap-4 pt-2">
+                              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-100 bg-white p-1.5 shadow-sm">
                                 {college.image ? (
-                                  <img src={college.image} alt={college.name} className="w-full h-full object-contain" />
+                                  <img
+                                    src={college.image}
+                                    alt={college.name}
+                                    className="h-full w-full object-contain"
+                                  />
                                 ) : (
-                                  <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-black text-xl rounded-[5px]">
+                                  <div className="flex h-full w-full items-center justify-center rounded-xl bg-primary/10 text-xl font-black text-primary">
                                     {college.name.charAt(0)}
                                   </div>
                                 )}
                               </div>
-                              <div className="text-left flex-1 min-w-0">
-                                <p className="text-[18px] font-bold text-slate-900 leading-tight truncate mb-1">{college.name}</p>
-                                <p className="text-[14px] text-slate-500 font-semibold flex items-center gap-1">
-                                  <span className="material-symbols-outlined text-[15px]">location_on</span>
+                              <div className="min-w-0 flex-1 text-left">
+                                <p className="mb-1 truncate text-[18px] font-bold leading-tight text-slate-900">
+                                  {college.name}
+                                </p>
+                                <p className="flex items-center gap-1 text-[14px] font-semibold text-slate-500">
+                                  <span className="material-symbols-outlined text-[15px]">
+                                    location_on
+                                  </span>
                                   {college.location}
                                 </p>
                               </div>
@@ -327,59 +457,81 @@ function ComparePageInner() {
 
                             <Link
                               href={`/college/${college.slug}`}
-                              className="w-full bg-[#424242] text-white text-[16px] font-bold py-3.5 rounded-[5px] hover:bg-black transition-all active:scale-95 text-center mt-auto shadow-lg shadow-black/10"
+                              className="mt-auto w-full rounded-2xl bg-slate-900 py-3.5 text-center text-[15px] font-bold text-white shadow-lg shadow-slate-900/10 transition-all hover:bg-black"
                             >
                               Apply
                             </Link>
                           </div>
                         ) : addingSlot === i ? (
-                           <div className="w-full min-h-[160px] p-4 flex flex-col justify-center relative">
-                             <div className="relative mb-2">
-                               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">search</span>
-                               <input
-                                 autoFocus
-                                 value={inlineSearchQ}
-                                 onChange={(e) => setInlineSearchQ(e.target.value)}
-                                 placeholder="Search college..."
-                                 className="w-full pl-9 pr-9 py-2.5 text-sm border border-[#FF3C3C] rounded-[5px] outline-none focus:ring-2 focus:ring-red-100"
-                               />
-                               <button
-                                 onClick={() => { setAddingSlot(null); setInlineSearchQ(""); setInlineSuggestions([]); }}
-                                 className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                               >
-                                 <span className="material-symbols-outlined text-[18px]">close</span>
-                               </button>
-                             </div>
-                             {inlineSuggestions.length > 0 && (
-                               <div className="inline-suggestions-dropdown absolute left-4 right-4 top-[72px] z-50 bg-white rounded-[5px] border border-[#E0E0E0] shadow-xl overflow-hidden">
-                                 {inlineSuggestions.map((s) => (
-                                   <button
-                                     key={s.slug}
-                                     onClick={() => { addCollege(s.slug, i); setInlineSearchQ(""); setInlineSuggestions([]); }}
-                                     className="w-full text-left px-4 py-3 hover:bg-red-50 text-sm font-medium text-slate-800 border-b border-slate-50 last:border-0 transition-colors"
-                                   >
-                                     <p className="font-semibold text-slate-800 truncate">{s.name}</p>
-                                     <p className="text-xs text-slate-400 mt-0.5">{s.location}</p>
-                                   </button>
-                                 ))}
-                               </div>
-                             )}
-                             {inlineSearchQ.length >= 2 && inlineSuggestions.length === 0 && (
-                               <p className="text-xs text-slate-400 text-center mt-2">No results found</p>
-                             )}
-                           </div>
+                          <div className="relative flex min-h-[160px] w-full flex-col justify-center p-4">
+                            <div className="relative mb-2">
+                              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">
+                                search
+                              </span>
+                              <input
+                                autoFocus
+                                value={inlineSearchQ}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  setInlineSearchQ(value);
+                                  if (value.length < 2) setInlineSuggestions([]);
+                                }}
+                                placeholder="Search college..."
+                                className="w-full rounded-2xl border border-[#FF3C3C] py-3 pl-9 pr-9 text-sm outline-none focus:ring-2 focus:ring-red-100"
+                              />
+                              <button
+                                onClick={() => {
+                                  setAddingSlot(null);
+                                  setInlineSearchQ("");
+                                  setInlineSuggestions([]);
+                                }}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                              >
+                                <span className="material-symbols-outlined text-[18px]">
+                                  close
+                                </span>
+                              </button>
+                            </div>
+                            {inlineSuggestions.length > 0 && (
+                              <div className="inline-suggestions-dropdown absolute left-4 right-4 top-[72px] z-50 overflow-hidden rounded-[18px] border border-slate-200 bg-white shadow-xl">
+                                {inlineSuggestions.map((s) => (
+                                  <button
+                                    key={s.slug}
+                                    onClick={() => {
+                                      addCollege(s.slug, i);
+                                      setInlineSearchQ("");
+                                      setInlineSuggestions([]);
+                                    }}
+                                    className="w-full border-b border-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-800 transition-colors last:border-0 hover:bg-red-50"
+                                  >
+                                    <p className="truncate font-semibold text-slate-800">{s.name}</p>
+                                    <p className="mt-0.5 text-xs text-slate-400">{s.location}</p>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                            {inlineSearchQ.length >= 2 && inlineSuggestions.length === 0 && (
+                              <p className="mt-2 text-center text-xs text-slate-400">No results found</p>
+                            )}
+                          </div>
                         ) : (
-                           <div className="h-full flex items-center justify-center min-h-[160px] pt-2">
-                             <button
-                               onClick={() => { setAddingSlot(i); setInlineSearchQ(""); setInlineSuggestions([]); }}
-                               className="w-full h-full min-h-[160px] flex flex-col items-center justify-center gap-3 border-2 border-dashed border-slate-300 hover:border-[#FF3C3C] hover:bg-[#FF3C3C]/5 rounded-[5px] transition-all group"
-                             >
-                               <div className="w-12 h-12 rounded-full bg-slate-50 group-hover:bg-white flex items-center justify-center text-slate-400 group-hover:text-[#FF3C3C] transition-colors">
-                                 <span className="material-symbols-outlined text-[24px]">add</span>
-                               </div>
-                               <span className="text-[15px] font-bold text-slate-400 group-hover:text-[#FF3C3C] transition-colors">Add College</span>
-                             </button>
-                           </div>
+                          <div className="flex h-full min-h-[160px] items-center justify-center pt-2">
+                            <button
+                              onClick={() => {
+                                setAddingSlot(i);
+                                setInlineSearchQ("");
+                                setInlineSuggestions([]);
+                              }}
+                              className="group flex h-full min-h-[160px] w-full flex-col items-center justify-center gap-3 rounded-[22px] border-2 border-dashed border-slate-300 transition-all hover:border-[#FF3C3C] hover:bg-[#FF3C3C]/5"
+                            >
+                              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition-colors group-hover:bg-white group-hover:text-[#FF3C3C]">
+                                <span className="material-symbols-outlined text-[24px]">add</span>
+                              </div>
+                              <span className="text-[15px] font-bold text-slate-400 transition-colors group-hover:text-[#FF3C3C]">
+                                Add College
+                              </span>
+                            </button>
+                          </div>
                         )}
                       </th>
                     ))}
@@ -388,25 +540,28 @@ function ComparePageInner() {
 
                 <tbody>
                   {METRICS.map((metric) => (
-                    <tr key={metric.key} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-10 py-8 border-r border-b border-[#E0E0E0]">
+                    <tr key={metric.key} className="transition-colors hover:bg-rose-50/30">
+                      <td className="sticky left-0 z-10 border-b border-r border-slate-200 bg-white px-8 py-7">
                         <span className="text-[17px] font-bold text-slate-800">{metric.label}</span>
                       </td>
                       {colleges.map((college, ci) => (
-                        <td key={ci} className="px-8 py-8 border-r border-b border-[#E0E0E0] last:border-r-0">
+                        <td
+                          key={ci}
+                          className="border-b border-r border-slate-200 px-8 py-7 last:border-r-0"
+                        >
                           {college ? (
                             loading ? (
                               <div className="space-y-2">
-                                <div className="h-5 bg-slate-100 rounded-[5px] animate-pulse w-24" />
-                                <div className="h-3 bg-slate-100/50 rounded-[5px] animate-pulse w-16" />
+                                <div className="h-5 w-24 animate-pulse rounded-[5px] bg-slate-100" />
+                                <div className="h-3 w-16 animate-pulse rounded-[5px] bg-slate-100/50" />
                               </div>
                             ) : (
                               metric.render(college)
                             )
                           ) : (
                             <div className="flex flex-col gap-1.5 opacity-20">
-                              <div className="h-1 bg-slate-200 w-12 rounded-full" />
-                              <div className="h-1 bg-slate-100 w-8 rounded-full" />
+                              <div className="h-1 w-12 rounded-full bg-slate-200" />
+                              <div className="h-1 w-8 rounded-full bg-slate-100" />
                             </div>
                           )}
                         </td>
@@ -418,17 +573,23 @@ function ComparePageInner() {
             </div>
 
             {filledCount === 0 && (
-              <div className="py-24 text-center bg-white/50 backdrop-blur-sm">
-                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="material-symbols-outlined text-[40px] text-slate-200">compare</span>
+              <div className="bg-[linear-gradient(180deg,#fffdfd,#fff7f6)] py-24 text-center">
+                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-rose-50">
+                  <span className="material-symbols-outlined text-[40px] text-rose-200">
+                    compare
+                  </span>
                 </div>
-                <h3 className="text-[20px] font-bold text-slate-900 mb-2">No colleges selected</h3>
-                <p className="text-slate-500 font-medium max-w-sm mx-auto px-6">Search and add colleges above to see a detailed side-by-side comparison.</p>
+                <h3 className="mb-2 text-[22px] font-black text-slate-900">
+                  No colleges selected
+                </h3>
+                <p className="mx-auto max-w-sm px-6 font-medium leading-7 text-slate-500">
+                  Search and add colleges above to unlock a cleaner side-by-side
+                  comparison experience.
+                </p>
               </div>
             )}
           </div>
 
-          {/* Explore Cards */}
           <div className="mt-16">
             <ExploreCards />
           </div>
@@ -442,11 +603,13 @@ function ComparePageInner() {
 
 export default function ComparePage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-slate-50">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        </div>
+      }
+    >
       <ComparePageInner />
     </Suspense>
   );

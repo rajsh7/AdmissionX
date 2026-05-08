@@ -6,384 +6,330 @@ import Footer from "@/app/components/Footer";
 export const metadata: Metadata = {
   title: "Privacy Policy | AdmissionX",
   description:
-    "Learn how AdmissionX collects, uses, and protects your personal information. Our privacy policy is aligned with the Information Technology Act, 2000.",
+    "Read the Privacy Policy explaining how AdmissionX collects, uses, shares, and protects your personal information.",
 };
 
-const LAST_UPDATED = "June 1, 2025";
-
-// ─── Section component ────────────────────────────────────────────────────────
-
-function Section({
-  num,
-  title,
-  children,
-}: {
-  num: string;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section id={`s${num}`} className="scroll-mt-24">
-      <h2 className="flex items-baseline gap-3 text-lg font-black text-neutral-900 mb-4">
-        <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-red-50 border border-red-100 flex items-center justify-center text-xs font-black text-red-600">
-          {num}
-        </span>
-        {title}
-      </h2>
-      <div className="pl-11 space-y-3 text-sm text-neutral-600 leading-relaxed">
-        {children}
-      </div>
-    </section>
-  );
-}
-
-function P({ children }: { children: React.ReactNode }) {
-  return <p>{children}</p>;
-}
-
-function Ul({ items }: { items: string[] }) {
-  return (
-    <ul className="space-y-1.5 list-none">
-      {items.map((item, i) => (
-        <li key={i} className="flex items-start gap-2">
-          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" />
-          <span>{item}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-// ─── TOC entries ──────────────────────────────────────────────────────────────
-
-const TOC = [
-  { num: "1",  title: "Introduction" },
-  { num: "2",  title: "Information We Collect" },
-  { num: "3",  title: "How We Use Your Information" },
-  { num: "4",  title: "Information Sharing & Disclosure" },
-  { num: "5",  title: "Cookies & Tracking Technologies" },
-  { num: "6",  title: "Data Security" },
-  { num: "7",  title: "Data Retention" },
-  { num: "8",  title: "Your Rights & Choices" },
-  { num: "9",  title: "Children's Privacy" },
-  { num: "10", title: "Third-Party Links" },
-  { num: "11", title: "Changes to This Policy" },
-  { num: "12", title: "Grievance Officer & Contact" },
-];
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
+const LAST_UPDATED = "July 4, 2017";
 
 export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-neutral-50">
       <Header />
 
-      {/* ── Hero ── */}
-      <div className="bg-neutral-900 pt-24 pb-14">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <nav className="flex items-center gap-2 text-xs text-neutral-500 mb-6">
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
-            <span className="material-symbols-outlined text-[13px]">chevron_right</span>
-            <span className="text-neutral-300">Privacy Policy</span>
-          </nav>
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+      <div className="bg-neutral-900 pb-14 pt-24 lg:pt-[116px]">
+        <div className="w-full px-6 sm:px-8 lg:px-10">
+          <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
+            <div className="flex-shrink-0 rounded-2xl border border-red-500/20 bg-red-500/10 p-3">
               <span
-                className="material-symbols-outlined text-red-400 text-[22px]"
+                className="material-symbols-outlined text-[28px] text-red-400"
                 style={{ fontVariationSettings: "'FILL' 1" }}
               >
                 shield
               </span>
             </div>
-            <div>
-              <h1 className="text-3xl font-black text-white leading-tight mb-2">
+            <div className="mt-4">
+              <h1 className="mb-2 text-3xl font-black leading-tight text-white sm:text-4xl">
                 Privacy Policy
               </h1>
-              <p className="text-neutral-400 text-sm">
-                Last updated: <span className="text-neutral-300 font-semibold">{LAST_UPDATED}</span>
-                &ensp;·&ensp;Effective immediately upon publication
+              <p className="mx-auto max-w-2xl text-sm leading-relaxed text-neutral-400">
+                This Privacy Policy applies to admissionx.info. AdmissionX
+                recognizes the importance of maintaining your privacy, values
+                your trust, and describes how we treat user information
+                collected on our website and through related offline sources.
+              </p>
+              <p className="mt-3 text-xs text-neutral-500">
+                Last updated:{" "}
+                <span className="font-semibold text-neutral-300">{LAST_UPDATED}</span>
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Body ── */}
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8 items-start">
+      <div className="sticky top-[58px] z-20 border-b border-neutral-100 bg-white lg:top-[116px]">
+        <div className="w-full overflow-x-auto px-6 py-3 sm:px-8 lg:px-10">
+          <div className="flex items-center gap-1 whitespace-nowrap text-xs font-semibold">
+            {[
+              ["#overview", "Overview"],
+              ["#collect", "Information Collected"],
+              ["#collection-methods", "Collection Methods"],
+              ["#usage", "Use of Information"],
+              ["#sharing", "Information Sharing"],
+              ["#optout", "Email Opt-Out"],
+              ["#updates", "Updates"],
+              ["#jurisdiction", "Jurisdiction"],
+            ].map(([href, label]) => (
+              <a
+                key={href}
+                href={href}
+                className="rounded-lg px-3 py-1.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-800"
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
 
-          {/* Sticky TOC */}
-          <aside className="hidden lg:block sticky top-24">
-            <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm p-5">
-              <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-3">
-                On this page
-              </p>
-              <nav className="space-y-1">
-                {TOC.map((item) => (
+      <div className="w-full py-12">
+        <div className="overflow-hidden border-y border-neutral-100 bg-white shadow-sm">
+          <div className="flex items-start gap-3 border-b border-blue-100 bg-blue-50 px-8 py-4">
+            <span
+              className="material-symbols-outlined mt-0.5 flex-shrink-0 text-[18px] text-blue-500"
+              style={{ fontVariationSettings: "'FILL' 1" }}
+            >
+              info
+            </span>
+            <p className="text-sm text-blue-800">
+              By visiting and/or using our website, you agree to this Privacy
+              Policy. This page applies to current and former visitors to our
+              website and to our online customers.
+            </p>
+          </div>
+
+          <div className="space-y-12 px-8 py-10 sm:px-12">
+            <section id="overview">
+              <SectionHeading title="Privacy Policy" />
+              <Prose>
+                This Privacy Policy applies to admissionx.info. AdmissionX
+                recognizes the importance of maintaining your privacy. We value
+                your privacy and appreciate your trust in us. This Policy
+                describes how we treat user information we collect on
+                https://www.admissionx.com and other offline sources.
+              </Prose>
+              <Prose>
+                By visiting and/or using our website, you agree to this Privacy
+                Policy. This Privacy Policy applies to current and former
+                visitors to our website and to our online customers.
+              </Prose>
+              <Prose>
+                Admissionx.info is a property of Yuvi Aviation Pvt. Ltd., an
+                Indian company registered under the Companies Act, 2013 having
+                its registered office at L-5, Lajpat Nagar 2, New Delhi -
+                110024.
+              </Prose>
+            </section>
+
+            <Divider />
+
+            <section id="collect">
+              <SectionHeading title="Information We Collect" />
+              <SubHeading>Contact information</SubHeading>
+              <Prose>
+                We might collect your name, email, mobile number, phone number,
+                street, city, state, pin code, country, and IP address.
+              </Prose>
+
+              <SubHeading>Payment and billing information</SubHeading>
+              <Prose>
+                We might collect your billing name, billing address, and
+                payment method when you register for admission. We never collect
+                your credit card number, credit card expiry date, or other
+                credit card details on our website. Credit card information is
+                obtained and processed by our online payment partner, PayU
+                Money.
+              </Prose>
+
+              <SubHeading>Information you post</SubHeading>
+              <Prose>
+                We collect information you post in a public space on our
+                website or on a third-party social media site belonging to
+                admissionx.info.
+              </Prose>
+
+              <SubHeading>Demographic information</SubHeading>
+              <Prose>
+                We may collect demographic information about you, educational
+                institutions and courses you like, events you intend to
+                participate in, or any other information provided by you during
+                the use of our website. We might collect this as a part of a
+                survey also.
+              </Prose>
+
+              <SubHeading>Other information</SubHeading>
+              <Prose>
+                If you use our website, we may collect information about your
+                IP address and the browser you&apos;re using. We might look at
+                what site you came from, duration of time spent on our website,
+                pages accessed, or what site you visit when you leave us. We
+                might also collect the type of mobile device you are using, or
+                the version of the operating system your computer or device is
+                running.
+              </Prose>
+            </section>
+
+            <Divider />
+
+            <section id="collection-methods">
+              <SectionHeading title="We Collect Information In Different Ways" />
+              <SubHeading>We collect information directly from you</SubHeading>
+              <Prose>
+                We collect information directly from you when you register on
+                the website or book admission. We also collect information if
+                you post comments on our websites or ask us a question through
+                phone or email.
+              </Prose>
+
+              <SubHeading>We collect information from you passively</SubHeading>
+              <Prose>
+                We use tracking tools like Google Analytics, Google Webmaster,
+                browser cookies, and web beacons for collecting information
+                about your usage of our website.
+              </Prose>
+
+              <SubHeading>We get information about you from third parties</SubHeading>
+              <Prose>
+                For example, if you use an integrated social media feature on
+                our websites, the third-party social media site will give us
+                certain information about you. This could include your name and
+                email address.
+              </Prose>
+            </section>
+
+            <Divider />
+
+            <section id="usage">
+              <SectionHeading title="Use of Your Personal Information" />
+              <BulletList
+                items={[
+                  "We use information to contact you for confirmation of a purchase on our website or for other promotional purposes.",
+                  "We use information to respond to your requests or questions and to confirm your registration for admission or associated services and events.",
+                  "We use information to improve our products and services and to customize your experience with us.",
+                  "We use information to look at site trends and customer interests and may combine information we get from you with information we get from third parties.",
+                  "We use information for security purposes to protect our company, our customers, or our websites.",
+                  "We use information for marketing purposes, including special promotions, offers, new features, and third-party products or services we think you may find interesting.",
+                  "We use information to send transactional communications such as emails or SMS about your account or transactions.",
+                  "We use information as otherwise permitted by law.",
+                ]}
+              />
+            </section>
+
+            <Divider />
+
+            <section id="sharing">
+              <SectionHeading title="Sharing of Information with Third Parties" />
+              <BulletList
+                items={[
+                  "We will share information with third parties who perform services on our behalf, including vendors who help manage our online registration process, payment processors, or transactional message processors. Some vendors may be located outside India.",
+                  "We will share information with educational institutions and service providers responsible for fulfilling the purchase obligation. They may use the information we give them as described in their privacy policies.",
+                  "We will share information with our business partners, who use the information as described in their privacy policies.",
+                  "We may share information if we think we have to in order to comply with the law or to protect ourselves, including responding to a court order, subpoena, government agency, investigatory body, or when investigating potential fraud.",
+                  "We may share information with any successor to all or part of our business, for example if part of our business is sold and the customer list forms part of that transaction.",
+                  "We may share your information for reasons not described in this policy, but we will tell you before we do this.",
+                ]}
+              />
+            </section>
+
+            <Divider />
+
+            <section id="optout">
+              <SectionHeading title="Email Opt-Out" />
+              <Prose>
+                You can opt out of receiving our marketing emails. To stop
+                receiving our promotional emails, please email
+                unsubscribe@admissionx.com. It may take about ten days to
+                process your request.
+              </Prose>
+              <Prose>
+                Even if you opt out of marketing messages, we will still send
+                transactional messages through email and SMS about your
+                purchases.
+              </Prose>
+            </section>
+
+            <Divider />
+
+            <section>
+              <SectionHeading title="Third Party Sites" />
+              <Prose>
+                If you click on one of the links to third-party websites, you
+                may be taken to websites we do not control. This policy does not
+                apply to the privacy practices of those websites. Read the
+                privacy policy of other websites carefully. We are not
+                responsible for these third-party sites.
+              </Prose>
+            </section>
+
+            <Divider />
+
+            <section id="updates">
+              <SectionHeading title="Updates to This Policy" />
+              <Prose>
+                This Privacy Policy was last updated on 04/07/2017. From time
+                to time we may change our privacy practices. We will notify you
+                of any material changes to this policy as required by law. We
+                will also post an updated copy on our website. Please check our
+                site periodically for updates.
+              </Prose>
+            </section>
+
+            <Divider />
+
+            <section id="jurisdiction">
+              <SectionHeading title="Jurisdiction" />
+              <Prose>
+                If you choose to visit the website, your visit and any dispute
+                over privacy are subject to this Policy and the website&apos;s
+                terms of use. In addition to the foregoing, any disputes arising
+                under this Policy shall be governed by the laws of India.
+              </Prose>
+              <Prose>
+                If you have any questions about this Policy or other privacy
+                concerns, you can email us at support@admissionx.com.
+              </Prose>
+            </section>
+
+            <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
+              <h3 className="mb-3 text-sm font-bold text-neutral-800">
+                Contact for Privacy Concerns
+              </h3>
+              <div className="space-y-2 text-sm text-neutral-600">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[16px] text-neutral-400">
+                    business
+                  </span>
+                  <span>Yuvi Aviation Pvt. Ltd.</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[16px] text-neutral-400">
+                    location_on
+                  </span>
+                  <span>L-5, Lajpat Nagar 2, New Delhi - 110024</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[16px] text-neutral-400">
+                    mail
+                  </span>
                   <a
-                    key={item.num}
-                    href={`#s${item.num}`}
-                    className="flex items-center gap-2 text-xs font-medium text-neutral-500 hover:text-red-600 transition-colors py-1"
+                    href="mailto:support@admissionx.com"
+                    className="text-red-600 hover:underline"
                   >
-                    <span className="text-[10px] font-black text-neutral-300 w-5 text-right">
-                      {item.num}.
-                    </span>
-                    {item.title}
+                    support@admissionx.com
                   </a>
-                ))}
-              </nav>
-            </div>
-          </aside>
-
-          {/* Document */}
-          <article className="bg-white rounded-2xl border border-neutral-100 shadow-sm p-7 sm:p-10 space-y-10">
-
-            {/* Preamble */}
-            <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-5 text-sm text-neutral-600 leading-relaxed">
-              AdmissionX (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;) operates the website{" "}
-              <strong className="text-neutral-800">admissionx.in</strong> and related mobile applications
-              (collectively, the &ldquo;Platform&rdquo;). This Privacy Policy describes how we collect,
-              use, store, share, and protect your personal information when you use our Platform.
-              By accessing or using the Platform, you agree to the terms of this Privacy Policy.
-              Please read this document carefully.
-            </div>
-
-            <Section num="1" title="Introduction">
-              <P>
-                AdmissionX is an education technology platform that connects students with colleges,
-                universities, and career guidance resources across India. We are committed to protecting
-                your privacy and processing your personal data in accordance with applicable Indian laws,
-                including the Information Technology Act, 2000 (&ldquo;IT Act&rdquo;), the Information
-                Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or
-                Information) Rules, 2011 (&ldquo;SPDI Rules&rdquo;), and the Digital Personal Data
-                Protection Act, 2023 (&ldquo;DPDPA&rdquo;).
-              </P>
-              <P>
-                This Policy applies to all users of our Platform, including prospective students, enrolled
-                students, college partners, and visitors. If you do not agree with this Policy, please
-                discontinue use of the Platform immediately.
-              </P>
-            </Section>
-
-            <Section num="2" title="Information We Collect">
-              <P>We collect the following categories of personal information:</P>
-              <p className="font-semibold text-neutral-800 !mt-4">A. Information You Provide Directly</p>
-              <Ul items={[
-                "Account registration details: name, email address, mobile number, date of birth, and gender.",
-                "Academic information: board results, entrance exam scores, stream preferences, degree interests, and target colleges.",
-                "Profile information: profile photo, address, state of residence, and educational background.",
-                "Application data: documents uploaded as part of college admission applications.",
-                "Communications: messages sent to us via contact forms, support queries, or email.",
-                "College partner information: institution name, authorised representative details, college registration documents.",
-              ]} />
-              <p className="font-semibold text-neutral-800 !mt-4">B. Information Collected Automatically</p>
-              <Ul items={[
-                "Log data: IP address, browser type and version, pages visited, referring URL, and access timestamps.",
-                "Device information: device type, operating system, screen resolution, and unique device identifiers.",
-                "Usage data: search queries entered, colleges viewed, exams explored, and interactions with content.",
-                "Location data: coarse location derived from IP address (we do not collect precise GPS location without explicit consent).",
-                "Cookies and similar technologies (see Section 5).",
-              ]} />
-              <p className="font-semibold text-neutral-800 !mt-4">C. Information from Third Parties</p>
-              <Ul items={[
-                "Social login providers (Google, Facebook) if you choose to sign in through them.",
-                "Payment processors for college partner subscription transactions.",
-                "Analytics partners for aggregated and anonymised usage insights.",
-              ]} />
-            </Section>
-
-            <Section num="3" title="How We Use Your Information">
-              <P>We use the information we collect for the following purposes:</P>
-              <Ul items={[
-                "To create, maintain, and authenticate your account on the Platform.",
-                "To personalise college and course recommendations based on your academic profile.",
-                "To facilitate admission applications and connect you with partner colleges.",
-                "To send transactional notifications such as application status updates, exam alerts, and deadline reminders.",
-                "To send promotional communications about new features, colleges, scholarships, and events (with your consent; you may opt out at any time).",
-                "To process payments for college partner subscriptions and issue receipts.",
-                "To improve Platform performance, fix bugs, conduct A/B testing, and develop new features.",
-                "To generate anonymised and aggregated statistics about Platform usage.",
-                "To comply with legal obligations, resolve disputes, and enforce our Terms & Conditions.",
-                "To detect and prevent fraud, abuse, and security incidents.",
-              ]} />
-              <P>
-                We process your data on the legal basis of <strong>contract performance</strong> (to provide
-                services you requested), <strong>legitimate interests</strong> (platform security, fraud
-                prevention, and analytics), <strong>legal obligation</strong> (compliance with applicable law),
-                and <strong>consent</strong> (marketing communications and optional features).
-              </P>
-            </Section>
-
-            <Section num="4" title="Information Sharing & Disclosure">
-              <P>
-                We do not sell your personal information. We share your data only in the following
-                limited circumstances:
-              </P>
-              <Ul items={[
-                "College partners: When you submit an admission enquiry or application, your name, contact details, and academic profile are shared with the relevant college(s) to process your application.",
-                "Service providers: We engage third-party vendors for hosting, payment processing, email delivery, analytics, and customer support. These parties access your data only to perform services on our behalf and are bound by confidentiality obligations.",
-                "Legal compliance: We may disclose your information if required by law, court order, or government authority, or to protect the rights, property, or safety of AdmissionX, our users, or others.",
-                "Business transfers: In the event of a merger, acquisition, or asset sale, your information may be transferred to the acquiring entity, which will be bound by this Privacy Policy.",
-                "With your consent: We may share your information for other purposes with your explicit prior consent.",
-              ]} />
-            </Section>
-
-            <Section num="5" title="Cookies & Tracking Technologies">
-              <P>
-                We use cookies, web beacons, and similar tracking technologies to operate the Platform,
-                analyse usage patterns, and improve user experience. The types of cookies we use include:
-              </P>
-              <Ul items={[
-                "Essential cookies: required for core Platform functionality such as login sessions and security.",
-                "Preference cookies: remember your language, theme, and personalisation settings.",
-                "Analytics cookies: collect anonymised data about page views and navigation patterns (e.g., via Google Analytics).",
-                "Marketing cookies: used to deliver relevant advertisements on third-party platforms (only where you have consented).",
-              ]} />
-              <P>
-                You can manage cookie preferences through your browser settings. Disabling essential cookies
-                may impair Platform functionality. A Cookie Consent Manager is available on the Platform for
-                more granular control.
-              </P>
-            </Section>
-
-            <Section num="6" title="Data Security">
-              <P>
-                We implement appropriate technical and organisational security measures to protect your
-                personal data against unauthorised access, disclosure, alteration, and destruction. These
-                measures include:
-              </P>
-              <Ul items={[
-                "HTTPS/TLS encryption for all data transmitted between your browser and our servers.",
-                "Passwords stored using industry-standard one-way hashing algorithms (bcrypt).",
-                "Role-based access controls limiting employee access to personal data on a need-to-know basis.",
-                "Regular security audits and vulnerability assessments.",
-                "Data backup and disaster recovery procedures.",
-              ]} />
-              <P>
-                Despite our best efforts, no system is completely secure. In the event of a data breach
-                that is likely to result in a high risk to your rights and freedoms, we will notify you
-                and the appropriate regulatory authority as required by applicable law.
-              </P>
-            </Section>
-
-            <Section num="7" title="Data Retention">
-              <P>
-                We retain your personal data for as long as your account is active or as necessary to
-                provide services and comply with our legal obligations. Specifically:
-              </P>
-              <Ul items={[
-                "Active accounts: data is retained throughout the lifetime of your account.",
-                "Deleted accounts: most personal data is deleted within 90 days of account deletion. Certain data (e.g., transaction records) may be retained longer to comply with financial and tax laws.",
-                "Application data: retained for a minimum of 3 years to facilitate admission history and dispute resolution.",
-                "Server logs: retained for up to 12 months for security and debugging purposes.",
-                "Anonymised analytics data: retained indefinitely in aggregate form.",
-              ]} />
-            </Section>
-
-            <Section num="8" title="Your Rights & Choices">
-              <P>
-                Subject to applicable law, you have the following rights with respect to your personal data:
-              </P>
-              <Ul items={[
-                "Right of access: request a copy of the personal data we hold about you.",
-                "Right to correction: request that inaccurate or incomplete data be rectified.",
-                "Right to erasure: request deletion of your personal data (subject to legal retention requirements).",
-                "Right to data portability: receive your data in a structured, machine-readable format.",
-                "Right to withdraw consent: withdraw consent for marketing communications at any time via the unsubscribe link in emails or account settings.",
-                "Right to object: object to processing based on our legitimate interests.",
-                "Right to grievance redressal: lodge a complaint with our Grievance Officer (see Section 12).",
-              ]} />
-              <P>
-                To exercise any of these rights, please contact our Grievance Officer at the details in
-                Section 12. We will respond within 30 days of receipt of a verifiable request.
-              </P>
-            </Section>
-
-            <Section num="9" title="Children's Privacy">
-              <P>
-                Our Platform is not directed at children under the age of 13. We do not knowingly collect
-                personal information from children under 13 without verifiable parental consent. If you
-                believe we have inadvertently collected data from a child under 13, please contact us
-                immediately and we will take steps to delete such information promptly.
-              </P>
-              <P>
-                Students aged 13–18 may use the Platform with parental or guardian consent. Colleges
-                and institutions should ensure that any information submitted on behalf of minor
-                applicants has been authorised by a parent or legal guardian.
-              </P>
-            </Section>
-
-            <Section num="10" title="Third-Party Links">
-              <P>
-                Our Platform may contain links to third-party websites, including college websites,
-                government portals, and scholarship platforms. We are not responsible for the privacy
-                practices or content of these external sites. We encourage you to review the privacy
-                policies of any third-party sites you visit.
-              </P>
-            </Section>
-
-            <Section num="11" title="Changes to This Policy">
-              <P>
-                We may update this Privacy Policy from time to time to reflect changes in our practices,
-                technology, legal requirements, or other factors. When we make material changes, we will:
-              </P>
-              <Ul items={[
-                "Update the &ldquo;Last updated&rdquo; date at the top of this page.",
-                "Display a prominent notice on the Platform or send a notification to your registered email address.",
-                "Where required by law, seek your fresh consent.",
-              ]} />
-              <P>
-                Your continued use of the Platform after the effective date of any changes constitutes
-                your acceptance of the updated Policy.
-              </P>
-            </Section>
-
-            <Section num="12" title="Grievance Officer & Contact">
-              <P>
-                In accordance with the Information Technology Act, 2000 and the SPDI Rules, 2011,
-                we have designated a Grievance Officer to address your privacy-related concerns:
-              </P>
-              <div className="!mt-4 bg-neutral-50 border border-neutral-200 rounded-xl p-5 space-y-2">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="material-symbols-outlined text-[16px] text-neutral-400">person</span>
-                  <span className="text-neutral-700 font-semibold">Grievance Officer, AdmissionX</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="material-symbols-outlined text-[16px] text-neutral-400">mail</span>
-                  <a href="mailto:privacy@admissionx.in" className="text-red-600 hover:underline">
-                    privacy@admissionx.in
-                  </a>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="material-symbols-outlined text-[16px] text-neutral-400">location_on</span>
-                  <span className="text-neutral-600">AdmissionX, India</span>
                 </div>
               </div>
-              <P>
-                We will acknowledge your grievance within 48 hours and aim to resolve it within
-                30 days of receipt. If you are dissatisfied with our response, you may approach
-                the relevant data protection authority under applicable Indian law.
-              </P>
-            </Section>
+            </div>
 
-            {/* Footer strip */}
-            <div className="border-t border-neutral-100 pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col items-start justify-between gap-4 border-t border-neutral-100 pt-8 sm:flex-row sm:items-center">
               <p className="text-xs text-neutral-400">
                 © 2025 AdmissionX. All rights reserved.
               </p>
               <div className="flex items-center gap-4 text-xs">
-                <Link href="/terms-and-conditions" className="text-neutral-500 hover:text-red-600 transition-colors">
+                <Link
+                  href="/terms-and-conditions"
+                  className="text-neutral-500 transition-colors hover:text-red-600"
+                >
                   Terms &amp; Conditions
                 </Link>
-                <Link href="/disclaimer" className="text-neutral-500 hover:text-red-600 transition-colors">
-                  Disclaimer
-                </Link>
-                <Link href="/contact-us" className="text-neutral-500 hover:text-red-600 transition-colors">
+                <Link
+                  href="/contact-us"
+                  className="text-neutral-500 transition-colors hover:text-red-600"
+                >
                   Contact Us
                 </Link>
               </div>
             </div>
-          </article>
+          </div>
         </div>
       </div>
 
@@ -392,6 +338,31 @@ export default function PrivacyPolicyPage() {
   );
 }
 
+function SectionHeading({ title }: { title: string }) {
+  return <h2 className="mb-4 text-lg font-black text-neutral-900">{title}</h2>;
+}
 
+function SubHeading({ children }: { children: React.ReactNode }) {
+  return <h3 className="mb-2 mt-5 text-sm font-bold text-neutral-700">{children}</h3>;
+}
 
+function Prose({ children }: { children: React.ReactNode }) {
+  return <p className="mb-3 text-sm leading-relaxed text-neutral-600">{children}</p>;
+}
 
+function BulletList({ items }: { items: string[] }) {
+  return (
+    <ul className="mb-4 space-y-2">
+      {items.map((item) => (
+        <li key={item} className="flex items-start gap-2.5 text-sm text-neutral-600">
+          <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-400" />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Divider() {
+  return <hr className="border-neutral-100" />;
+}

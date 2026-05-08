@@ -2,8 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { getDb } from "@/lib/db";
 import { signCollegeToken, COLLEGE_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
+import { enforceRateLimit, rejectUntrustedOrigin } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
+  const originError = rejectUntrustedOrigin(req);
+  if (originError) return originError;
+
+  const rateLimitError = enforceRateLimit(req, "login-college", 8, 10 * 60 * 1000);
+  if (rateLimitError) return rateLimitError;
+
   try {
     const { email, password } = await req.json();
 

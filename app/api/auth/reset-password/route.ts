@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { getDb } from "@/lib/db";
+import { enforceRateLimit, rejectUntrustedOrigin } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
+  const originError = rejectUntrustedOrigin(req);
+  if (originError) return originError;
+
+  const rateLimitError = enforceRateLimit(req, "reset-password", 5, 15 * 60 * 1000);
+  if (rateLimitError) return rateLimitError;
+
   try {
     const body = await req.json();
     const token: string = (body.token ?? "").trim();

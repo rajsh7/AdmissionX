@@ -4,8 +4,15 @@ import crypto from "crypto";
 import { getDb } from "@/lib/db";
 import { sendStudentActivationEmail } from "@/lib/email";
 import { signStudentToken, STUDENT_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
+import { enforceRateLimit, rejectUntrustedOrigin } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
+  const originError = rejectUntrustedOrigin(req);
+  if (originError) return originError;
+
+  const rateLimitError = enforceRateLimit(req, "signup-student", 5, 15 * 60 * 1000);
+  if (rateLimitError) return rateLimitError;
+
   try {
     const body = await req.json();
     const { name, email, phone, password, captchaOk } = body;
@@ -106,9 +113,15 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json({ success: true });
     response.cookies.set(STUDENT_COOKIE, token, COOKIE_OPTIONS);
     return response;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error("Unknown signup error");
+    const errorCode = typeof err === "object" && err !== null && "code" in err ? (err as { code?: number }).code : undefined;
+    const keyPattern = typeof err === "object" && err !== null && "keyPattern" in err
+      ? (err as { keyPattern?: { email?: unknown } }).keyPattern
+      : undefined;
+
     // SELF-HEALING: If "not primary" error, force reconnect and retry once
-    if (err.code === 10107 || err.message?.includes("not primary")) {
+    if (errorCode === 10107 || error.message?.includes("not primary")) {
       console.warn("♻️ [Signup] Detected 'not primary' error. Attempting self-healing reconnection...");
       const { forceReconnect } = await import("@/lib/db");
       await forceReconnect();
@@ -126,14 +139,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.error("[Signup Internal Error]:", err);
+    console.error("[Signup Internal Error]:", error);
     // MongoDB duplicate key error
-    if (err.code === 11000) {
-      const field = err.keyPattern?.email ? "email" : "mobile number";
+    if (errorCode === 11000) {
+      const field = keyPattern?.email ? "email" : "mobile number";
       return NextResponse.json({ error: `An account with this ${field} already exists.` }, { status: 409 });
     }
     return NextResponse.json(
-      { error: err.message || "Internal server error. Please try again." }, 
+      { error: error.message || "Internal server error. Please try again." }, 
       { status: 500 }
     );
   }

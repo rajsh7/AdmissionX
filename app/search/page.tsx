@@ -279,6 +279,9 @@ async function fetchColleges(opts: {
   }));
 
   return { colleges, total, totalPages: Math.ceil(total / limit) };
+}
+
+interface SearchPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
