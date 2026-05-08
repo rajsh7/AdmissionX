@@ -207,6 +207,13 @@ export default function ProfileClient({
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <Link
+            href="/admin/colleges/bulk-images"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-sm font-bold hover:border-[#008080] hover:text-[#008080] transition-colors"
+          >
+            <span className="material-symbols-outlined text-[18px]">photo_library</span>
+            Bulk Images
+          </Link>
           <div className="flex items-center gap-2 bg-[#008080]/10 px-4 py-2 rounded-xl">
             <span className="material-symbols-outlined text-[18px] text-[#008080]">account_balance</span>
             <span className="text-sm font-black text-[#008080]">{total.toLocaleString()} Total</span>

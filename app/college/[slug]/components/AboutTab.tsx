@@ -47,7 +47,19 @@ export default function AboutTab({
 
         {/* STATS BANNER */}
         <section className="relative w-full overflow-hidden rounded-[5px] shadow-sm bg-black">
-          <div className="absolute inset-0 z-0 bg-black" />
+          <div className="absolute inset-0 z-0">
+            {bannerimage ? (
+              <Image
+                src={buildImageUrl(bannerimage)}
+                alt={collegeName}
+                fill
+                unoptimized
+                priority
+                className="object-cover"
+              />
+            ) : null}
+            <div className="absolute inset-0 bg-black/60" />
+          </div>
           <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 flex flex-col justify-center min-h-[320px] sm:min-h-[400px] lg:min-h-[489px]">
             <div className="flex flex-col gap-5 max-w-full">
 

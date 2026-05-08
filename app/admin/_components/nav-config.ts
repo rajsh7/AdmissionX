@@ -37,7 +37,22 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Colleges Profile",
         subItems: [
           { href: "/admin/colleges/contact", label: "College Contact Card", icon: "contact_mail" },
-          { href: "/admin/colleges/profile", label: "Profile information", icon: "info" },
+          { href: "/admin/colleges/profile", label: "Profile Information", icon: "info" },
+          { href: "/admin/colleges/courses", label: "Courses", icon: "book" },
+          { href: "/admin/colleges/placements", label: "Placements", icon: "work" },
+          { href: "/admin/colleges/facilities", label: "Facilities", icon: "apartment" },
+          { href: "/admin/colleges/faculty", label: "Faculty", icon: "person_pin" },
+          { href: "/admin/colleges/achievements", label: "Achievements", icon: "emoji_events" },
+          { href: "/admin/colleges/admission", label: "Admission", icon: "how_to_reg" },
+          { href: "/admin/colleges/cut-offs", label: "Cut-offs", icon: "tune" },
+          { href: "/admin/colleges/events", label: "Events", icon: "event" },
+          { href: "/admin/colleges/faqs", label: "FAQs", icon: "help_outline" },
+          { href: "/admin/colleges/gallery", label: "Gallery", icon: "photo_library" },
+          { href: "/admin/colleges/management", label: "Management", icon: "groups" },
+          { href: "/admin/colleges/reviews", label: "Reviews", icon: "star_rate" },
+          { href: "/admin/colleges/scholarships", label: "Scholarships", icon: "school" },
+          { href: "/admin/colleges/sports", label: "Sports", icon: "sports" },
+          { href: "/admin/colleges/bulk-images", label: "Bulk Images", icon: "burst_mode" },
         ]
       },
       {
