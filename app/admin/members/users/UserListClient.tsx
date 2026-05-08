@@ -16,7 +16,7 @@ interface Status {
 }
 
 interface User {
-  id: number;
+  id: number | string;
   firstname: string;
   lastname: string;
   email: string;
@@ -36,7 +36,7 @@ interface UserListClientProps {
   offset: number;
   createUser: (formData: FormData) => Promise<void>;
   updateUser: (formData: FormData) => Promise<void>;
-  deleteUser: (id: number) => Promise<void>;
+  deleteUser: (id: number | string) => Promise<void>;
 }
 
 export default function UserListClient({

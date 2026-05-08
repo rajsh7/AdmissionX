@@ -205,11 +205,11 @@ export default function CollegeDashboardClient({
     <div className="min-h-screen bg-[#f8f6f6] dark:bg-[#0f1623] font-poppins">
       <Header theme="light" />
 
-      <div className="flex pt-[60px]">
+      <div className="flex pt-[96px]">
         {/* Sidebar (Desktop) */}
         <aside
           suppressHydrationWarning
-          style={{ backgroundColor: '#313131', top: '60px', bottom: '0' }}
+          style={{ backgroundColor: '#313131', top: '96px', bottom: '0' }}
           className="hidden md:flex flex-col w-[260px] fixed left-0 text-white  z-30"
         >
           {/* Logo / College branding */}

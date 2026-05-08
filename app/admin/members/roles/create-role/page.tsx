@@ -17,35 +17,13 @@ const BADGE_OPTIONS = [
 ];
 
 // Only show specific paths as per requirement
-const PATH_GROUPS = [
-  {
-    label: "Main Menu",
-    paths: [
-      { label: "Home", href: "/admin/dashboard" },
-      { label: "Profile Information", href: "/admin/colleges/profile" },
-      { label: "Student Profile", href: "/admin/students" },
-      { label: "Profile Information (Student)", href: "/admin/students/profile" },
-    ],
-  },
-  {
-    label: "Examination Management",
-    paths: [
-      { label: "AIEA Exam", href: "/admin/exams/aiea" },
-    ],
-  },
-  {
-    label: "Queries & User Interaction",
-    paths: [
-      { label: "Query", href: "/admin/queries" },
-    ],
-  },
-  {
-    label: "Account",
-    paths: [
-      { label: "My Profile", href: "/admin/profile" },
-    ],
-  },
-];
+const PATH_GROUPS = NAV_GROUPS.map(g => ({
+  label: g.label ?? "Other",
+  paths: g.items.flatMap(item => [
+    { label: item.label, href: item.href },
+    ...(item.subItems ?? []).map(sub => ({ label: `  ${sub.label}`, href: sub.href })),
+  ]),
+}));
 
 const ICO = { fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" };
 
