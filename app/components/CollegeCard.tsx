@@ -12,6 +12,7 @@ interface CollegeCardProps {
   college: CollegeResult;
   index?: number;
   entityName?: string;
+  sortMode?: string;
 }
 
 function StarRating({ rating, count }: { rating: number; count: number }) {
@@ -35,19 +36,22 @@ function formatFees(fees: number | null): string {
   return `₹${fees}`;
 }
 
-function FeesDisplay({ max_fees }: { max_fees: number | null }) {
-  const maxF = formatFees(max_fees);
-  if (!maxF) {
+function FeesDisplay({ min_fees, max_fees, sortMode }: { min_fees: number | null; max_fees: number | null; sortMode?: string }) {
+  const fees = sortMode === "fees_high"
+    ? ((max_fees && max_fees >= 1000) ? max_fees : null)
+    : ((min_fees && min_fees >= 1000) ? min_fees : (max_fees && max_fees >= 1000) ? max_fees : null);
+  const f = formatFees(fees);
+  if (!f) {
     return <span className="text-[13px] font-semibold text-slate-400 italic">Contact college for fees</span>;
   }
   return (
     <span className="text-[18px] font-black text-[#FF3C3C]">
-      {maxF} <span className="text-[12px] font-bold text-slate-400 uppercase">/ year</span>
+      {f} <span className="text-[12px] font-bold text-slate-400 uppercase">/ year</span>
     </span>
   );
 }
 
-export default function CollegeCard({ college, index = 0, entityName = "College" }: CollegeCardProps) {
+export default function CollegeCard({ college, index = 0, entityName = "College", sortMode }: CollegeCardProps) {
   const { handleApply, modalSlug, closeModal } = useApplyGuard();
   const { slug, name, location, image, rating, totalRatingUser, ranking, topUniversityRank, min_fees, max_fees, universityType, collegetype_id } = college;
   const displayRank = topUniversityRank ?? ranking;
@@ -94,7 +98,7 @@ export default function CollegeCard({ college, index = 0, entityName = "College"
           </div>
           <div className="mb-6 flex flex-col">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Starting Fees</span>
-            <FeesDisplay max_fees={max_fees} />
+            <FeesDisplay min_fees={min_fees} max_fees={max_fees} sortMode={sortMode} />
           </div>
 
           {/* Action Buttons */}

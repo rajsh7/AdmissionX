@@ -1,4 +1,4 @@
-import pool from "@/lib/db";
+import { getDb } from "@/lib/db";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import StudentsTableClient from "./StudentsTableClient";
@@ -9,9 +9,21 @@ async function toggleStudentAction(formData: FormData): Promise<void> {
   const cur = parseInt(formData.get("cur") as string, 10);
   if (isNaN(id)) return;
   try {
-    await pool.query("UPDATE next_student_signups SET is_active = ? WHERE id = ?", [cur ? 0 : 1, id]);
+    const db = await getDb();
+    await db.collection("next_student_signups").updateOne({ id }, { $set: { is_active: cur ? 0 : 1 } });
   } catch (e) {
     console.error("[admin/students toggleStudent]", e);
+  }
+  revalidatePath("/admin/students");
+}
+
+async function deleteStudentAction(id: number): Promise<void> {
+  "use server";
+  try {
+    const db = await getDb();
+    await db.collection("next_student_signups").deleteOne({ id });
+  } catch (e) {
+    console.error("[admin/students deleteStudent]", e);
   }
   revalidatePath("/admin/students");
 }
@@ -207,6 +219,7 @@ export default async function AdminStudentsPage({
             totalPages={totalPages}
             offset={offset}
             PAGE_SIZE={PAGE_SIZE}
+            onDelete={deleteStudentAction}
           />
         )}
       </div>

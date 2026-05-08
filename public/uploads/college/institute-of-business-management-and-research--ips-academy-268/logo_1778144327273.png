@@ -1,0 +1,1255 @@
+ 
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8"/>
+	<title>IBMR | IPS ACADEMY INDORE</title>
+	<link rel="shortcut icon" href="assets/favico.png" type="image/x-icon">
+	<meta name="description" content="The Institute was established in the year 1994. Since then it has been our endeavour to impart quality education and practical training that help moulding an amateur into a professional.">
+	<meta name="keywords" content="IBMR, IPS Academy, Indore, Management, Business management, Research, MBA, Economics">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Theme Starz">
+
+    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <link href="assets/css/font-awesome.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.css" type="text/css">
+    <link rel="stylesheet" href="assets/css/selectize.css" type="text/css">
+    <link rel="stylesheet" href="assets/css/owl.carousel.css" type="text/css">
+    <link rel="stylesheet" href="assets/css/vanillabox/vanillabox.css" type="text/css">
+    <link rel="stylesheet" href="assets/css/layerslider.css" type="text/css">
+    <link rel="stylesheet" href="assets/css/flexslider.css" type="text/css">
+
+    <link rel="stylesheet" href="assets/css/style.css" type="text/css">
+
+    
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	 <link href="https://vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
+	<script src="https://vjs.zencdn.net/4.12/video.js"></script>
+	<style>
+	    .float {
+    position: fixed;
+    width: 40px;
+    height: 120px;
+    bottom: 40%;
+    right: 0px;
+    background-color: #0c4da2;
+    color: #fff !important;
+    text-align: center;
+    box-shadow: 3px 0px 5px 5px #999;
+    padding: 10px;
+    font-size: 14px;
+    writing-mode: vertical-rl; 
+    width: 40px;
+    height: 120px;
+    text-decoration: none;
+    z-index: 9;
+}
+	</style>
+</head>
+
+<body class="page-homepage-courses">
+    
+    <script type="text/javascript"> var s=document.createElement("script"); s.type="text/javascript"; s.async=true; s.src="https://widgets.nopaperforms.com/emwgts.js"; document.body.appendChild(s); </script>
+
+<a href="#" data-toggle="modal" data-target="#myModal" class="float">
+		Enquire Now
+	   </a>
+
+<!-- The Modal -->
+<div class="modal" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+       
+
+      <!-- Modal body -->
+      <div class="modal-body">
+       <div class="npf_wgts" data-height="400px" data-w="305774d4ffb6c3aa79fbe7a5562cad08"></div>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.9";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
+<!-- Wrapper -->
+<div class="wrapper">
+<!-- Header -->
+<div class="navigation-wrapper">
+    <div class="secondary-navigation-wrapper" style="background:white;color:#052C52;">
+        
+        <div class="container">
+            <div class="navigation-contact pull-left">
+			<a href="mailto:office.ibmr@ipsacademy.org" style="color:#042B52;"><i class="fa fa-envelope"></i>  <span class="opacity-70">office.ibmr@ipsacademy.org</span></a> &nbsp;|&nbsp;<a href="tel:07314014776" style="color:#042B52;"> <i class="fa fa-phone"></i>  <span class="opacity-70">+0731-4014776</span></a> &nbsp;|&nbsp; <i class="fa fa-map-marker"></i><a href="https://www.google.co.in/maps/place/Institute+of+Business+Management+and+Research/@22.6563951,75.8242235,18.25z/data=!4m13!1m7!3m6!1s0x3962fc094c9eb805:0x55a28b6191174c75!2sIBMR,+IPS+Academy+Parking,+Rajendra+Nagar,+Indore,+Madhya+Pradesh+452012!3b1!8m2!3d22.6560983!4d75.8232304!3m4!1s0x3962fc0bfe4c8baf:0x9b0aca91488786fe!8m2!3d22.6560926!4d75.8244335" target="_blank" style="color:#042B52;text-decoration:none;font-size:12px;">  <span class="opacity-70">IPS Academy, Institute of Business Management & Research, Rajendra Nagar, A.B. Road, Indore-452012.</span></a>
+			
+			</div>
+			        </div>
+    </div><!-- /.secondary-navigation -->
+	<div class="" style="background:white;padding:15px 0px;">
+	    <img src="assets/download__10_-removebg-preview.png" style="position: absolute;
+    right: 0;
+    width: 140px;
+    top: 0;"><br><br>
+		<div class="container" >
+                        <a href="https://ibmr.ipsacademy.org/"  ><img src="assets/logo_2.jpg" width="75%" alt="brand" id="mylogo"></a>
+    <!--                    <h5 style="color: #262f48;-->
+    <!--position: absolute;-->
+    <!--top: 95px;font-weight:bold;-->
+    <!--left: 170px;">(IBMR, NAAC Accredited, A++ UGC Approved Autonomous College)</h5>-->
+						<!--<small style="color: black;display: block;margin-bottom: -70px;font-weight:bold;cursor:pointer;" onclick="window.open('http://www.dauniv.ac.in/','_blank')"> <br>Affiliated to Devi Ahilya Vishwavidyalaya , Indore.</small>-->
+						<div class=" pull-right" style="padding-top:10px;">
+                    <form action="search.php" method="post">
+					<div class="input-group">
+                        <input type="text" required class="form-control" placeholder="Search" name="search">
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn"><i class="fa fa-search"></i></button>
+                    </span>
+                    
+                    </div><!-- /input-group -->
+					</form>
+                </div><!-- /.pull-right -->
+                    </div>
+					
+		</div>
+    <div class="primary-navigation-wrapper">
+        <header class="navbar" id="top" role="banner">
+		
+            <div class="container" style="width:100%;">
+                <div class="navbar-header">
+                    <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    
+                </div>
+                 
+<nav class="collapse navbar-collapse bs-navbar-collapse " role="navigation">
+<ul class="nav navbar-nav">
+<li><a href="http://ibmr.ipsacademy.org/">HOME</a></li>
+<li><a href="about-us.php" class="has-child no-link">ABOUT US</a>
+<ul class="list-unstyled child-navigation" style="z-index:111;">
+                                
+                                <li><a href="about-us.php">ABOUT IBMR</a></li>
+                                <li><a href="about-society.php">ABOUT SOCIETY</a></li>
+                                <li><a href="affiliation-recognition.php">AFFILIATION & RECOGNITION</a></li>
+								<li><a href="objectives.php">OBJECTIVES</a></li>
+								<li><a href="quality-policy.php">QUALITY POLICY</a></li>
+								
+								<!--<li><a href="assets/mandatory_pdf/Application_Deficiency_Report_2018_19.PDF" target="_blank">MANDATORY DISCLOSURE</a></li>-->
+								<li><a href="MANDATORY-DISCLOSURE.php">MANDATORY DISCLOSURE</a></li>
+								<li><a href="future-plans.php">FUTURE PLANS</a></li>
+								<li><a href="presidents-message.php">PRESIDENT'S MESSAGE</a></li>
+								<li><a href="directors-message.php">DIRECTOR'S MESSAGE</a></li>
+								<li><a href="faculty-profiles.php">FACULTY PROFILES</a></li>
+								<!--<li><a href="faculty-profiles-1.php">FACULTY PROFILES</a></li>-->
+								<li><a href="admin-staff.php" >ADMINISTRATIVE STAFF</a></li>
+								<li><a href="differentlyabled.php" >FACILITIES FOR DIFFERENTLY-ABLED</a></li>
+								
+								 
+        
+								<li><a href="contact-us.php">CONTACT US</a></li>
+								
+                            </ul>
+
+</li>
+<li><a href="#" class="has-child no-link">ADMISSIONS</a>
+<ul class="list-unstyled child-navigation">
+                                <li><a href="admission-rules.php">ADMISSION PROCESS</a></li>
+								<li><a href="student-intake.php">STUDENT INTAKE</a></li>
+                                <li><a href="assets/Student-code-of-conduct-pdf.pdf" target="_blank">STUDENT CODE OF CONDUCT</a></li>	
+                                <!--<li><a href="http://wowapps.in/ibmr/careers" target="_blank">CAREERS</a></li>-->							
+                            </ul>
+</li>
+<li><a href="#" class="has-child no-link">ACADEMIC PROGRAMS</a>
+<ul class="list-unstyled child-navigation">
+                                <li><a href="academic-calendar.php">ACADEMIC CALENDAR</a></li>
+								<li><a href="courses.php">PROGRAM OFFERED</a></li>
+                                
+								</li>								
+                            </ul>
+</li>
+<li><a href="#">ACCOLADES</a>
+<ul class="list-unstyled child-navigation">
+                                <!--<li><a href="nirf-ranking.php">NIRF RANKING</a></li>-->
+								<!--<li><a href="other-ranking.php">OTHER RANKING</a></li>-->
+								<li><a href="csr-activity.php">CSR ACTIVITY</a></li>
+								<li><a target="_blank" href="assets/Certificate of appreciation 2022 NAAC Grade A++.pdf">Certificate of appreciation 2022 NAAC Grade A++</a></li>
+                                </ul>
+</li>
+<!--<li><a href="#">E-LEARNING</a>
+<ul class="list-unstyled child-navigation">
+                               
+                                </ul>
+</li>-->
+<li><a href="#">PLACEMENT</a>
+<ul class="list-unstyled child-navigation">
+     <li><a href="placement-overview.php">PLACEMENT OVERVIEW</a></li>                         
+								<li><a href="our-recruiters.php">OUR RECRUITERS</a></li>
+                                </ul>
+</li>
+<li><a href="#">RESEARCH</a>
+<ul class="list-unstyled child-navigation">
+    
+<li><a href="expdfs/Research and Development Cell.pdf" target="_blank">Research &amp; Development Cell</a></li>
+<li><a href="" target="_blank">Consultancy Projects</a></li>
+<li><a href="" target="_blank">Incubation Centre</a></li>
+                               
+								<li><a href="http://unnayan.ipsacademy.org/" target="_blank">UNNAYAN</a></li> <li><a href="list-of-publication.php">LIST OF PUBLICATION</a></li>								
+                            <li><a href="phd-center.php">Ph.D Center</a></li>
+                            </ul>
+</li>
+<!--<li><a href="#">STTP/FDP</a>
+<ul class="list-unstyled child-navigation">
+                               	
+                            </ul>
+</li>
+<li><a href="#">E-Conference</a>
+<ul class="list-unstyled child-navigation">
+                               
+									
+                            </ul>
+</li>-->
+<li><a href="#"    class="has-child no-link">STUDENT CORNER</a>
+    <ul class="list-unstyled child-navigation">
+        <li><a href="notice.php">NOTICE</a></li>
+<li><a href="syllabus.php">SYLLABUS</a></li>
+    </ul>
+</li>
+
+<!--
+<li><a href="#">PRAKALP</a>
+<ul class="list-unstyled child-navigation">
+     	
+</ul>
+
+</li>
+
+<li><a href="#">FLAMES & BLOSSOMS</a>
+<ul class="list-unstyled child-navigation">
+    	 	
+</ul>
+
+</li>-->
+
+<!--<li><a href="naac-2021.php">NAAC 2021</a></li>-->
+
+<li><a href="#"    class="has-child no-link">NAAC</a>
+    <ul class="list-unstyled child-navigation">
+        <li><a href="expdfs/IQAC.pdf" target="_blank">IQAC</a></li>
+        <li><a href="expdfs/2022-2023.pdf" target="_blank">AQAR </a></li>
+        <li><a href="assets/IIQA.pdf" target="_blank">IIQA</a></li> 
+         <li><a href="assets/SSR.pdf" target="_blank">SSR</a></li> 
+         <li><a href="naac-visits.php">NAAC Visit Photograps</a></li> 
+         <li><a href="https://youtu.be/35uKE0_Uv-Q" target="_blank">NAAC Visit Video</a></li> 
+         <li><a href="committee.php">COMMITTEE</a></li>
+    </ul>
+</li>
+
+<li><a href="#"    class="has-child no-link">Events</a>
+    <ul class="list-unstyled child-navigation">
+        <!--<li><a href="IBMR IMC 2026 Conference Brochure.pdf"  target="_blank">International Conference IBMR IMC 2026.</a></li>-->
+                                <li><a href="assets/guest poster (3).pdf" target="_blank">Alumni Talk Series 2024</a></li>
+                                <li><a href="Atal-FDP.php">ATAL FDP</a></li>
+								<li><a href="Econometrics.php">Econometrics</a></li>
+								<li><a href="Management_4_0.php">Management 4.0</a></li>	
+								<li><a href="Financial_Analytics.php">Financial Analytics</a></li>
+								
+								<!--<li><a href="about-econf.php">About conference</a></li>
+								<li><a href="best-paper-award.php">Best paper award</a></li>-->	
+								<!--<li><a href="download-econf-brochure.php">Download Brochure</a></li>	-->
+							<!--	<li><a href="best-phd-award.php">Best Ph.D. Award</a></li>	
+								<li><a href="about-indore-econf.php">About Indore</a></li>	
+								<li><a href="contact-details-econf.php">Contact Details</a></li>
+								<li><a href="prakalp2021.php">PRAKALP 2021</a></li>
+                                <li><a href="prakalp2022.php">PRAKALP 2022</a></li>	
+                                <li><a href="prakalp2023.php">PRAKALP 2023</a></li>
+                                <li><a href="prakalp2024.php">PRAKALP 2024</a></li>-->
+                                <li><a href="gallery-news.php">NEWS</a></li>
+                                <li>    <a href="prakalp2025.php">PRAKALP </a>
+   
+      <li><a href="https://ibmr.ipsacademy.org/assets/IBMR-Prakalp-Promotional-Flyer-A4-Judge-Flyer.pdf" target="_blank">Brochure Prakalp</a></li>
+          
+    
+    <li><a href="flames-blossoms-2022.php">Annual Cultural Fest</a></li>
+     <li><a href="https://www.youtube.com/channel/UC-PSepm7Zpu5-dyQYK-40pA/videos" target="_blank">Virtual Sessions</a></li>
+							 
+    </ul>
+</li>
+<li><a href="https://ipsacademy.net" target="_blank">Student Login</a></li>
+<!--<li><a href="assets/Brochure IBMR-IMC 2025.pdf" target="_blank">IBMRC2025</a></li>-->
+
+<li><a href="#" class="has-child no-link">INTERNATIONAL CONFERENCE</a>
+<ul class="list-unstyled child-navigation">
+    <li><a href="assets/Brochure IBMR-IMC 2025.pdf">2025</a></li>
+    <li><a href="IBMR IMC 2026 Conference Brochure.pdf">2026</a></li>
+</ul>
+</li>
+<li><a href="#"    class="has-child no-link">Life @ IBMR</a>
+    <ul class="list-unstyled child-navigation">
+        
+<li><a href="" target="_blank">Sports Facilities</a></li>
+<li><a href="" target="_blank">NCC/NSS</a></li>
+<li><a href="" target="_blank">Hostel Facilities</a></li>
+<li><a href="" target="_blank">Health Facilities</a></li>
+<li><a href="expdfs/differentlyabled.php" target="_blank">Facilities for Differently abled</a></li>
+<li><a href="https://drive.google.com/drive/folders/1NJB-j8vwWEHv1aaFDiCItj7zJQrEX-KR?usp=sharing" target="_blank">Alumni Speak</a></li>
+<li><a href="gallery.php">GALLERY</a></li>
+<li><a href="library.php">LIBRARY</a>
+    </ul>
+</li>
+<!--<li class="dropdown mega-parent">
+
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        About Us <span class="caret"></span>
+    </a>
+
+    <ul class="dropdown-menu mega-menu">
+        <li>
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-sm-4">
+                        <h4>Institute</h4>
+                        <a href="about-us.php">About IBMR</a><br>
+                        <a href="#">Vision</a><br>
+                        <a href="#">Mission</a>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <h4>Governance</h4>
+                        <a href="#">Committee</a><br>
+                        <a href="#">Objectives</a>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <h4>Accreditation</h4>
+                        <a href="#">NAAC</a><br>
+                        <a href="#">Affiliation</a>
+                    </div>
+
+                </div>
+            </div>
+        </li>-->
+    </ul>
+
+</li>
+</ul>
+</nav><!-- /.navbar collapse-->            </div><!-- /.container -->
+        </header><!-- /.navbar -->
+    </div><!-- /.primary-navigation -->
+    <div class="background">
+        <img src="assets/img/background-city.png"  alt="background">
+    </div>
+</div>
+<!-- end Header -->
+<style> 
+<!--my custom css-->
+.carousel-indicators{ bottom:-5px; } 
+.carousel-inner{ box-shadow:0px 3px 8px #e6e6e6, 
+-4px 3px 8px #e6e6e6, 4px 3px 8px #e6e6e6;   min-height: 200px; border:1px solid #c7c7c7; border-radius:15px; }
+.item p{padding:10px; }
+.ab{ font-size:20px; padding:10px;  margin:5px; border:2px solid grey; border-radius:5px; font-weight:bold; display:inline-block; }
+.ab:hover {background: #032A51; color:white; border:2px solid #032A51; }
+<!--my custom css-->
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.theme.min.css">
+ 
+
+
+
+</style>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.js"></script>
+<script> 
+$(document).ready(function(){
+    $("#testimonial-slider").owlCarousel({
+        items:2,
+        itemsDesktop:[1000,2],
+        itemsDesktopSmall:[979,2],
+        itemsTablet:[768,1],
+        pagination:false,
+        navigation:true,
+        navigationText:["",""],
+        autoPlay:true
+    });
+});
+</script>
+<!-- Homepage Slider -->
+<section id="homepage-slider" style="height:auto;">
+    <div class="flexslider" style="background:#F5F5F5;">
+        <ul class="slides">
+            
+            
+            
+            <li class="slide">                
+                <img src="assets/slider/IPS103025_IBMR IMC 2025 - Slider 1900x786 px1.jpg">
+            </li>
+            <!--  <li class="slide">                
+                <img src="assets/slider/Slider IBMR-IMC 2025.jpg">
+            </li>  -->
+            
+        <!--<li class="slide">                
+                <img src="assets/slider/fdp flyer.jpg">
+            </li>-->
+            <li class="slide">                
+              <!--<a href="https://www.nirfindia.org/2021/ManagementRanking150.html" target="_blank"> -->
+              <img src="assets/slider/1.jpeg">
+              <!--</a>-->
+            </li>
+            <!--<li class="slide">                -->
+            <!--  <a href="https://www.nirfindia.org/2021/ManagementRanking150.html" target="_blank">  <img src="assets/slider/Ranked (5).png"></a>-->
+            <!--</li>-->
+            
+            <li class="slide">                
+                <img src="assets/slider/IPS banner 1.png">
+            </li>
+            <li class="slide">                
+                <img src="assets/slider/2.png">
+            </li>
+            
+        <!--<li class="slide">                -->
+        <!--        <img src="assets/banner-prakalp.jpg">-->
+        <!--    </li>-->
+        <!--    <li class="slide">                -->
+        <!--        <img src="assets/slider/sttp1.jpg">-->
+        <!--    </li>-->
+        <!--    <li class="slide">                -->
+        <!--        <img src="assets/slider/sttp2.jpg">-->
+        <!--    </li>-->
+        <!--    <li class="slide">                -->
+        <!--        <img src="assets/slider/sttp3.jpg">-->
+        <!--    </li>-->
+            <!--<li class="slide">                
+                <img src="assets/slider/final_poster_judges.jpg">
+            </li>-->
+		    <li class="slide">                
+                <img src="assets/slider/3.jpg">
+            </li>
+            <li class="slide">                
+                <img src="assets/slider/2.jpg">
+            </li>
+			<li class="slide">                
+                <img src="assets/slider/1.jpg">
+            </li>       
+            </ul>
+    </div>
+</section>
+<!-- end Homepage Slider -->
+
+<div class="block" style="background:#F5F5F5;padding:75px 0px;">
+<div class="container">
+        <div class="row">            
+			<div class="col-md-8">
+			<header><h1>About IBMR</h1></header>
+			<p>The need for managers in organization is continuously increasing as well as the expectations from managers are continuously changing. IBMR, IPS Academy is meant for those who want to shape their career in business management and excel in it.</p>
+			<p>The Institute was established in the year 1994. Since then it has been our endeavour to impart quality education and practical training that help moulding an amateur into a professional. The emphasis is on cultivating a mind-set that helps students to become proactive learners and positive catalyst to change.</p>
+<p>The illiterate of the 21st century will not be those who cannot read and write, but those who cannot learn, unlearn and relearn. This statement by Alvin Toffler has inspired to think beyond the realms of university education and focus on programs, which empowers the students and the institute to constantly innovate.</p>
+			</div>
+			<div class="col-md-4 text-center" style="padding-top:75px;">
+			
+			  <div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <!-- Indicators -->
+    <ol class="carousel-indicators">
+      <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+      <li data-target="#myCarousel" data-slide-to="1"></li>
+      <li data-target="#myCarousel" data-slide-to="2"></li>
+	  <li data-target="#myCarousel" data-slide-to="3"></li>
+	  <li data-target="#myCarousel" data-slide-to="4"></li>
+	  <li data-target="#myCarousel" data-slide-to="5"></li>
+	  
+    </ol>
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner">
+        
+        <div class="item active">
+	  <h3>Vision</h3>
+        <p>IPS academy, Institute of Business Management and Research, aims to be a global Business School striving academic and professional excellence nurturing value driven professionals who can rise to the expectations of corporate world and society. <a href="">...</a></p>
+      </div>
+      
+      <div class="item ">
+	  <h3>Mission</h3>
+        <p>To provide innovative and socially responsible manager leaders who are capable of managing change in a competitive environment, can fulfill the current and future demands of industry and to foster research culture in close interaction with the corporate world. <a href="">...</a></p>
+      </div>
+
+      
+    
+      <div class="item">
+        <h3>Objectives</h3>
+        <p><br>
+		To provide quality education in the management discipline<a href="">...</a><br>
+
+
+</p>
+      </div>
+	  <div class="item">
+        <h3>Objectives</h3>
+        <p>
+<br>
+To nurture creative and innovative abilities of the students and faculty<a href="">...</a><br>
+
+
+</p>
+      </div>
+	  <div class="item">
+        <h3>Objectives</h3>
+        <p>
+		<br>
+To develop entrepreneurial spirit among the students<a href="">...</a><br>
+
+</p>
+      </div>
+	  <div class="item">
+	  <h3>Quality Policy</h3>
+        <p>The institute is committed to provide full organizational support for achieving quality at all levels involving and empowering all in the task of continuous improvement. The institute aims to maximize the satisfaction level of all its stake holders- students, faculty, <a href="">...</a></p>
+      </div>	  
+    </div>    
+  </div>
+</div>
+			</div>
+		</div>
+	</div>
+	
+<div class="block" style="padding:75px 0px;">
+<div class="container">
+        <div class="row">
+            
+			<div class="col-md-12 text-center">
+			<header><h1>Program  Offered</h1></header><br>
+					<div class="section-content">
+			<a href="mba-core.php" class="ab">MBA (FT)</a> <a href="mba-mm.php" class="ab">MBA (Marketing Management)</a>
+			<a href="mba-ib.php" class="ab">MBA (International Business)</a>
+			<br>
+			<!--<a href="mba-be.php" class="ab">MBA (Business Economics)</a>-->
+			<!--<a href="mba-tm.php" class="ab">MBA (Tourism Management)</a>-->
+			<a href="mba-fa.php" class="ab">MBA (Financial Administration)</a>
+			<br>
+			<!-- <a href="pgdm.php" class="ab">PGDM</a>
+			<br> 
+			<a href="ba-hn.php" class="ab">BA ECONOMICS</a>
+			<a href="bba-ha.php" class="ab">BBA (Hospital Administration)</a>-->
+			<br>
+			<a href="bba-ft.php" class="ab">BBA (Foreign Trade)</a>
+			<a href="bba.php" class="ab">BBA</a>
+			<br>
+			<!--<a href="mba-we.php" class="ab">MBA (Working Executive)</a>-->
+			<br>
+			<a href="phdm.php" class="ab">Ph.D (Management)</a>
+			<a href="phde.php" class="ab">Ph.D (Economics)</a>			</div>
+			</div>			
+		</div>
+	</div>
+</div>		
+		
+<div class="block" style="background:#F5F5F5;padding:75px 0px;">
+<div class="container">
+        <div class="row">
+            
+			<div class="col-md-6">
+			<header>
+                        <h1>Campus Life</h1>
+                        
+                    </header>
+<video id="MY_VIDEO_1" class="video-js vjs-default-skin" controls
+ preload="auto" width="550" height="320" poster="assets/ibmr.jpg"
+ data-setup="{}">
+ <source src="assets/Video_HD.mp4" type='video/mp4'>
+ <source src="assets/Video_HD.webm" type='video/webm'>
+ 
+</video>				
+</div>
+
+<!---->
+<div class="col-md-6" style="padding-top:10%;line-height:30px;">
+<div class="flexslider abcf" style="">
+<style>.abc{ padding:50px; } .abcf a.flex-next,.abcf a.flex-prev{ display:none; }</style>
+        <ul class="slides">
+            
+<li class="slide abc">           AICTE sponsored <b>Short Term Training Program on Management 4.0 </b>is organized
+virtually on 22-27 Mar 2021(Phase II).</li>
+<li class="slide abc">    AICTE sponsored <b>Short Term Training Program on Financial Analytics</b> is organized
+virtually on 15-20 March 2021(Phase II).</li>
+<li class="slide abc">    AICTE sponsored <b>Short Term Training Program on Econometrics</b> is organized
+virtually on 01-06 March 2021(Phase II).</li>
+<li class="slide abc">    AICTE sponsored <b>Short Term Training Program on Financial Analytics</b> is organized
+virtually on 22-27 February 2021(Phase I).</li>
+<li class="slide abc">    AICTE sponsored <b>Short Term Training Program on Management 4.0</b> is organized
+virtually on 15-20 February 2021(Phase I).</li>
+<li class="slide abc">    AICTE sponsored <b>Short Term Training Program on Econometrics</b> is organized
+virtually on 08-13 February 2021(Phase I).</li>
+<li class="slide abc">   <b> Guest Session</b> held on 4 th , 5 th and 6 th Jan 2021 on <b>Happiness Management</b> by Shri
+Krishnapad Das Ji (Youth Mentor &amp; Life skill Coach: Hare Krishna Movement, The
+Akshaya Patra Foundation).</li>
+<li class="slide abc">    <b>E-conference- IBMR International Management e-conference (IBMR-IMC)</b> on
+theme <b>INDUSTRY 4.0</b> "Transforming Economy through Innovative Management
+Practices", held on 11 th - 12 th December 2020.</li>
+<li class="slide abc">    <b>MBA INDUCTION- EMBARK-2020 </b>organized virtually
+on 19 th - 20 th November 2020.Guest Speakers for the program were; Ms. Aryana Sanyal,
+CA Vikas Jajoo (Head, Internal Audit, Volkswagen Finance Private Limited) and Mr.
+Vipin Sharma (Consultant at Coldwell Banker, Dubai and Managing Director/Co-
+Founder Veracity World, Dubai).</li>
+<li class="slide abc">    <b>BBA INDUCTION - DEEKSHARAMBH- 2020</b> organized virtually
+on 27 th - 28 th October 2020. Guest Speaker for the program - Mr. Amber S. Arondekar.</li>
+
+<li class="slide abc">   <b> A JNIBM ALUMNI EXCLUSIVE</b> webinar on Corporate Life Transformation through
+Fitness was held on 1 st Aug, 2020. Guest Speaker for the session; Mr Saurabh Roy
+(General Manager , Tata Motors), Mr. Rajeev Shukla (Director Career Management, IPS
+Academy, IBMR) and Mr. Sandeep Kakkar ( Author, Motivational Coach).</li>
+<li class="slide abc">    <b>PRAKALP 2020</b>- First International Virtual Internship and Research Project
+Presentation Competition was held virtually on 25 th July 2020.</li>
+<li class="slide abc">   <b> Guest Session</b> on 'How to Get Job', held on 17 th Feb 2020. Guest Speaker for the
+session: Mr. Amitabh Tiwari ( Regional Head, TCS).</li>
+<li class="slide abc">    <b>Guest Session</b> on 'Union Budget 2020' held on 12 th Feb 2020, Guest Speaker for the
+session: Dr. Sachin Mittal (Associate Prof. IBMR, IPS Academy).</li>
+<li class="slide abc">    <b>Guest session</b> by Dr. S.K Vyas held virtually on 08 th Feb 2020.</li>
+<li class="slide abc">    <b>'Union Budget 2020'</b> was Live telecasted in Classrooms on 31 st Jan 2020.</li>
+<li class="slide abc">    <b>Guest Session</b> on Life Management, held on 15 th Nov 2019. Guest Speaker for the
+session: Mr. Amit Shah ( Speaker of Indore Management Association ).</li>
+
+
+           <!-- <li class="slide abc">                
+                Consecutively for two years,Institute of Business Management & Research has been the only private college of MP, to be placed in the rank band of 76 - 100 of best Management colleges of the country by MHRD (Ministry of Human Resource & Development)
+            </li>-->
+            <li class="slide abc">                
+               Institute of Business Management &amp; Research is the only private college of MP to be placed in
+the rank band of 51 - 75 of best colleges of the country by MHRD (Ministry of Human Resource
+&amp; Development). - 2017
+            </li>
+			<li class="slide abc">                
+                4 th ranked in GHRDC-CSR B-SCHOOL SURVEY DATASHEET 2017 for Private B Schools in MP. - 2017
+            </li>
+			<li class="slide abc">The Week Hansa Research Survey 2015- IBMR ranked 30 in West Zone Top, All India Level. - 2015</li>
+			<li class="slide abc">Global Human Resource Development Centre B-School Survey 2015- IBMR ranked 18 th for East &amp;
+Central Zone, All India Level and 2 nd in Madhya Pradesh. - 2015</li>
+			<li class="slide abc">Go Getter Education B- Schools Survey 2015 - IBMR ranked A+ at All India Level. - 2015</li>
+			<li class="slide abc">Career 360 Magazine (The education hub) survey 2014 - IBMR ranked A++ in Excellence Group
+ranking in the Top 100 Best Private B-School of India. - 2014</li>
+			<li class="slide abc">Chronicle India 2014 All India B-School Survey - IBMR scored B++ at All India Level. - 2014</li>
+			<li class="slide abc">Times B-School Survey 2014- IBMR ranked 47 in the Top 150 B-School of India. - 2014</li>
+			<li class="slide abc">Business Standard Best B School Survey 2014 - IBMR has been Rank 36. - 2014</li>
+			<li class="slide abc"> Go Getter Education B-School Survey 2014 - IBMR ranked A+. - 2014</li>
+			<li class="slide abc">Euvidya.com IBMR has been ranked in 1 st in Madhya Pradesh Scoring 5. - 2014</li>
+			<li class="slide abc">
+                                Shiksha Education Survey 2 nd Ranked in Indore. - 2014
+                                
+                            </div>
+                         </li>
+        </ul>
+    </div>
+
+
+
+
+</div></div></div>
+
+<div class="block" style="padding:50px 0px;">
+<div class="container">
+<div class="row">
+<div class="col-md-12">
+<header><h1>Activities</h1></header>
+<div class="image-carousel" style="padding:50px 50px;box-shadow:0px 3px 8px #e6e6e6, 
+-4px 3px 8px #e6e6e6, 4px 3px 8px #e6e6e6;">
+     
+     
+<div class="image-carousel-slide">
+    <h3>The Health Champ was held on March 14, 2024 as a part of Women’s Day celebration by  IPS Academy, IBMR, 2024. </h3></div>
+
+<div class="image-carousel-slide">
+    <h3>Mera Pehla Vote Desh Ke Liye Initiative: Poster Making Competition was organised on April 23, 2024.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>VOTATHON ( A walk to create voting awareness )was organized by IPS Academy, Indore on May 4,2024.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>Three days Research Development Program on the topic “Crafting Research Excellence”  was organized by the Research Committee, IPS Academy, IBMR, Indore from  July 4, 2024 to                       July 6, 2024.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>Virtual demo session on Outcome-Based Education (OBE) Qnsmart I and ‘deW OBE’, innovative tools designed to enhance our educational practices on  August 5, 2024 by Dr Merdus Jacob.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>Guest Session was organised on the topic of Financial Awareness on August 10,  2024  by Mr. Bhupesh Bhardwaj and Ms. Vijaya Bhardwaj by IPS Academy, IBMR, Indore.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>BBA Induction  Program Deeksharambh- 2024 was organised by IPS Academy,IBMR,Indore on August 21, 2024 to Aug 22, 2024.</h3></div>
+
+
+<div class="image-carousel-slide">
+    <h3>3 Days Free Medical Check-Up Camp was organized by department of NSS/IPSSR, IPS Academy,Indore on September 04,05,06 ,2024.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>MBA Induction Program “Embark 2024” was organised by IPS Academy, IBMR, Indore from September 11, 2024 to September 13, 2024.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>International Internship /Research Project Presentation Competition, PRAKALP-2024, was organized by the Research Committee, IPS Academy, IBMR, Indore from  September 23 2024 to September 25 2024.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>Expert session on the topic “HR Trend & Campus to Cooperate Connect”   was Organized by Oct 3, 2024- Oct 4, 2024.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>Alumni Talk Series for the students was held on October 16, 2024 by the alumina team.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>IPSA Celebrates Navratri on October 20,2024.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>AICTE ATAL – sponsored Faculty Development Program (FDP) on the topic  “Entrepreneurship on Wheels: Navigating the Mobile Business Landscape “ from October  21, 2024 – October 26, 2024 by IPS Academy, IBMR, Indore.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>Expert Talk on : Expanding your Business Beyond Borders : “Entrepreneurship on Wheels: Navigating the Mobile Business Landscape” by Mr. Anubhav Dubey ( co-founder of Chai Dutta Bar & Maatea) was organized on October 21, 2024.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>Tashanbaaz was organised on  October 30 , 2024 by Red FM.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>Logo Designing and Slogan Writing Competition for postgraduate students was held on  November 15, 2024 by Marketing Club, IPS Academy, IBMR, Indore.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>BBA career related coaching session was organised on  November 27, 2024 by Ms.Sonali Naidu .</h3></div>
+
+<div class="image-carousel-slide">
+    <h3>World Mediation Day was celebrated on December 21, 2024 by Art of Living.</h3></div>
+
+        
+<div class="image-carousel-slide">
+    <h3>    AICTE sponsored <b>Short Term Training Program on Management 4.0</b> is organized
+virtually on 22-27 Mar 2021(Phase II).</h3></div>
+<div class="image-carousel-slide">
+    <h3> AICTE sponsored <b>Short Term Training Program on Financial Analytics</b> is organized
+virtually on 15-20 March 2021(Phase II).</h3></div>
+<div class="image-carousel-slide">
+    <h3> AICTE sponsored <b>Short Term Training Program on Econometrics</b> is organized
+virtually on 01-06 March 2021(Phase II).</h3></div>
+<div class="image-carousel-slide">
+    <h3> AICTE sponsored <b>Short Term Training Program on Financial Analytics</b> is organized
+virtually on 22-27 February 2021(Phase I).</h3></div>
+<div class="image-carousel-slide">
+    <h3> AICTE sponsored <b>Short Term Training Program on Management 4.0</b> is organized
+virtually on 15-20 February 2021(Phase I).</h3></div>
+<div class="image-carousel-slide">
+    <h3> AICTE sponsored <b>Short Term Training Program on Econometrics</b> is organized
+virtually on 08-13 February 2021(Phase I).</h3></div>
+<div class="image-carousel-slide">
+    <h3> <b>Guest Session</b> held on 4 th , 5 th and 6 th Jan 2021 on Happiness Management by Shri
+Krishnapad Das Ji (Youth Mentor &amp; Life skill Coach: Hare Krishna Movement, The
+Akshaya Patra Foundation).</h3></div>
+<div class="image-carousel-slide">
+    <h3> E-conference- IBMR International Management e-conference (IBMR-IMC) on
+theme INDUSTRY 4.0 "Transforming Economy through Innovative Management
+Practices", held on 11th - 12th December 2020.</h3></div>
+<div class="image-carousel-slide">
+    <h3> MBA INDUCTION- EMBARK-2020 organized virtually
+on 19 th - 20 th November 2020. Guest Speakers for the program were; Ms. Aryana Sanyal,
+CA Vikas Jajoo (Head, Internal Audit, Volkswagen Finance Private Limited) and Mr.
+Vipin Sharma (Consultant at Coldwell Banker, Dubai and Managing Director/Co-
+Founder Veracity World, Dubai).</h3></div>
+<div class="image-carousel-slide">
+    <h3> BBA INDUCTION - DEEKSHARAMBH- 2020 organized virtually
+on 27 th - 28 th October 2020. Guest Speaker for the program - Mr. Amber S. Arondekar.</h3></div>
+
+<div class="image-carousel-slide">
+    <h3> A JNIBM ALUMNI EXCLUSIVE webinar on Corporate Life Transformation through
+Fitness was held on 1 st Aug, 2020. Guest Speaker for the session; Mr Saurabh Roy
+(General Manager , Tata Motors), Mr. Rajeev Shukla (Director Career Management, IPS
+Academy, IBMR) and Mr. Sandeep Kakkar ( Author, Motivational Coach).</h3></div>
+<div class="image-carousel-slide">
+    <h3> PRAKALP 2020- First International Virtual Internship and Research Project
+Presentation Competition was held virtually on 25 th July 2020.</h3></div>
+<div class="image-carousel-slide">
+    <h3> Guest Session on 'How to Get Job', held on 17 th Feb 2020. Guest Speaker for the
+session: Mr. Amitabh Tiwari ( Regional Head, TCS).</h3></div>
+<div class="image-carousel-slide">
+    <h3> Guest Session on 'Union Budget 2020' held on 12 th Feb 2020, Guest Speaker for the
+session: Dr. Sachin Mittal (Associate Prof. IBMR, IPS Academy).</h3></div>
+<div class="image-carousel-slide">
+    <h3> Guest session by Dr. S.K Vyas held virtually on 08 th Feb 2020.</h3></div>
+<div class="image-carousel-slide">
+    <h3> 'Union Budget 2020' was Live telecasted in Classrooms on 31 st Jan 2020.</h3></div>
+<div class="image-carousel-slide">
+    <h3> Guest Session on Life Management, held on 15 th Nov 2019. Guest Speaker for the
+session: Mr. Amit Shah ( Speaker of Indore Management Association ).</h3></div>
+<div class="image-carousel-slide">
+    <h3>Guest session held on 9th Sep 2019 by Mr. Prashant Sharma (Sales
+Training Coach-ITC) on Real Life Market Conditions.</h3></div>
+<div class="image-carousel-slide">
+<h3>Guest session held on 9th Sept, 2019, Saturday, DSP Umakant Chowdhary
+with team (Traffic Police Indore) on Traffic Rules, for the safety of students
+and others.</h3></div>
+
+<div class="image-carousel-slide">
+<h3>Guest session held on 11 th Sept, 2019, Monday, Dr. Subodh Shrivastava,
+(CEO Intred Pvt. Ltd.)</h3></div>
+
+<div class="image-carousel-slide">
+<h3>Guest session held on 14 th Sept, 2019, Saturday, Shri Yashwant Sinhaji
+(Former Minister for Finance India), on current Economic condition of the
+Country.</h3></div>
+
+<div class="image-carousel-slide">
+<h3>Guest session held on 16 th Sept, 2019, Saturday, Mr. Sanjeev Verma,
+(General Manager, CONCOR India Ltd.), overview on the Port Operations
+and EXIM Logistics.</h3></div>
+
+<div class="image-carousel-slide">
+<h3>Guest session held on 17 th Sept, 2019, Saturday, Mr. Sunil Kumar, (Senior
+Executive, CONCOR India Ltd.) on EXIM Documents &amp; Procedures.</h3></div>
+
+<div class="image-carousel-slide">
+<h3>Guest session held on 24 th Sept, 2019, Saturday, Mr. Gaurav Warman, (a
+Social Activist, a Cyclist, Life Coach &amp; Motivational Speaker), on how to
+live a happy and depression-free life, how to spread awareness and combat
+Depression in our society.</h3></div>
+
+<div class="image-carousel-slide">
+<h3>Guest session held on 26 th Sept, 2019, Thursday, Mr. Akhilesh Sengar, (HR
+Manager MP/Chhattisgarh, Vodafone Idea Ltd.) on how to appear for
+interviews during placements.</h3></div>
+
+<div class="image-carousel-slide">
+<h3>Guest session held on 26 th Sept, 2019, Thursday, Mr. Pranshu Gupta, (MD,
+Marks ReTech), on how to face interviews during placements.</h3></div>
+
+<div class="image-carousel-slide">
+<h3>Guest session held on 28 th Sept, 2019, Saturday, Mr. Shashank Shekhar
+Shukla, (Branch Head, Shivalik Mercantile Co-Op Bank Ltd.) on Job
+Opportunities in the Banking Sector.</h3></div>
+
+<div class="image-carousel-slide">
+<h3>Guest session held on 5 th Oct, 2019, Saturday, Mr. Mayank Bajpeyi, (HR
+Head, Panasonic Energy India Co Ltd.), on the Recruitment process in
+companies, requirements and various job opportunities.</h3></div>
+
+<div class="image-carousel-slide">
+<h3>Guest session held on 12 th Oct, 2019, Saturday, Mr. Ashish Kumar, (Vice
+President, GraphRoots, Mumbai.), on how to unleash the unheard
+Companies for jobs.</h3></div>
+<div class="image-carousel-slide">
+<h3>Guest session held on 9 th Sep2019 by Mr. Prashant Sharma (Sales Training Coach-ITC) on Real Life Market Conditions.</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Guest session held on 9th Sept, 2019, Saturday, DSP Umakant Chowdhary with team (Traffic Police Indore) on Traffic Rules, for the safety of students
+and others.</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Guest session held on 11 th Sept, 2019, Monday, Dr. Subodh Shrivastava,(CEO Intred Pvt. Ltd.)</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Guest session held on 14 th Sept, 2019, Saturday, Shri Yashwant Sinhaji (Former Minister for Finance India), on current Economic condition of the
+Country.</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Guest session held on 16 th Sept, 2019, Saturday, Mr. Sanjeev Verma, (General Manager, CONCOR India Ltd.), overview on the Port Operations and EXIM Logistics.</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Guest session held on 17 th Sept, 2019, Saturday, Mr. Sunil Kumar, (Senior Executive, CONCOR India Ltd.) on EXIM Documents &amp; Procedures.</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Guest session held on 24 th Sept, 2019, Saturday, Mr. Gaurav Warman, (a Social Activist, a Cyclist, Life Coach &amp; Motivational Speaker), on how to
+live a happy and depression-free life, how to spread awareness and combat Depression in our society.</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Guest session held on 26 th Sept, 2019, Thursday, Mr. Akhilesh Sengar, (HR Manager MP/Chhattisgarh, Vodafone Idea Ltd.) on how to appear for interviews during placements.</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Guest session held on 26 th Sept, 2019, Thursday, Mr. Pranshu Gupta, (MD, Marks ReTech), on how to face interviews during placements.</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Guest session held on 28 th Sept, 2019, Saturday, Mr. Shashank Shekhar Shukla, (Branch Head, Shivalik Mercantile Co-Op Bank Ltd.) on Job Opportunities in the Banking Sector.</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Guest session held on 5 th Oct, 2019, Saturday, Mr. Mayank Bajpeyi, (HR Head, Panasonic Energy India Co Ltd.), on the Recruitment process in companies, requirements and various job opportunities.</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Guest session held on 12 th Oct, 2019, Saturday, Mr. Ashish Kumar, (Vice President, GraphRoots, Mumbai.), on how to unleash the unheard Companies for jobs.</h3>
+</div>
+<!--
+<div class="image-carousel-slide">
+<h3>An interactive session on "Start-up Funding & Being an Entrepreneur " by Mr.Jitendra Verma & Mr.Himanshu Goyal was held on 01 Apr'2019"</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Syllabus Revision Workshop organised in association with Board of Studies, DAVV was held on 23 Feb'2019</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Indoctrination of MBA 2018-20 Batch held on 16/08/18 at Auditorium ,IPS Academy was endorsed
+by the presence of eminent Guest Speakers namely: <b>Ar. Achal K. Choudhary</b> - President IPS Group
+of Institutions, <b>Dr. Narendra Dhakad</b> - Vice Chancellor ,DAVV, <b>Mr. Deepak Joshi</b> - Minister of State -
+Technical Education and Skill Development &amp; <b>Mr. Vikram Agnihotri</b> - A Motivational Speaker.</h3>
+</div>
+<div class="image-carousel-slide"> 
+<h3>Second day of MBA Induction Program has been full of thrilling activities like Human Foosball,
+Finding Fanny, Campus Hunt, etc.</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>BBA Induction Programme has marked a phenomenal fervour, welcoming the new members of
+IBMR, IPS Academy on 8 August2018, with lots of fun activities like Masti ki Paathshala, Talent Hunt
+&amp; Matki Fod Competition .</h3>
+</div>
+<div class="image-carousel-slide">
+<h3>Workshop conducted on topic "Quality Publication: Research Papers and Cases" on 18 May'2018 with Resource Person being Dr.Vinay Goyal (Professor, IIM Raipur).</h3>
+</div> 
+<div class="image-carousel-slide">
+	<h3>IBMR, IPS Academy, hosted <b>Western Regional Meeting of AIMS (Madhya Pradesh Chapter) and Round Table of Deans / Directors of Management Institutions</b> on theme <b>Future of Management Education in India: Challenges and Opportunities</b>, @ 12 May2018. </h3>
+	</div>                     
+	<div class="image-carousel-slide">
+	<h3>Awareness about <b>"Digital Marketing"</b> by Digital Marketing trainer Mr. Pushpendra Singh.</h3>
+	</div>
+	
+	<div class="image-carousel-slide">
+	<h3>
+	A motivational Session on title  <b>Wings to Future for Young Minds </b> by motivational Speaker and trainer Mr. Amber Arondekar
+	</h3>
+	</div>
+	
+	<div class="image-carousel-slide">
+	<h3>
+	An interactive Session by Ms. Priya Kumar under <b>IMA </b>  Student Chapter .
+	</h3>
+	</div>
+	
+	<div class="image-carousel-slide">
+	<h3>
+	A session on  <b>Learn EBSCO </b> to impart training for using EBSCO Software, by Lakhpat Singh.
+	</h3>
+	</div>
+	
+	<div class="image-carousel-slide">
+	<h3>
+	An interactive Session by Mr.Ronit Garg, on  <b>Being Entrepreneur. </b>
+	</h3>
+	</div>
+	
+	<div class="image-carousel-slide">
+	<h3>
+	A Session on  <b>Positive Virtues in Life </b> by eminent speaker Ms. Tapti Roy.
+	</h3>
+	</div>
+	
+	<div class="image-carousel-slide">
+	<h3>
+	An Interactive Session on  <b>Awareness about Insurance </b> conducted by Mr. Ramashish Vishwakarma
+	</h3>
+	</div>
+	
+	<div class="image-carousel-slide">
+	<h3>
+	An enlightening session on  <b>Issues in Financial Management </b>  by Mr. Vinit Rathi
+	</h3>
+	</div>
+	
+	<div class="image-carousel-slide">
+	<h3>
+	A workshop on  <b>Knowledge of Stock Market & SEBI </b> by renowned speaker Mr. Aniket Kumar.
+	</h3>
+	</div>
+	
+	<div class="image-carousel-slide">
+	<h3>
+	A Seminar on  <b>Awareness about Financial Literacy </b>  by Mr. Chintaman Shintre.
+	</h3>
+	</div>
+	
+	<div class="image-carousel-slide">
+	<h3>
+	 Inter Collegiate Management Fest  <b>Flames & Blossoms. </b>
+	</h3>
+	</div>-->
+	
+						
+</div>
+</div>
+
+
+
+
+</div>
+</div>	
+</div>	
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+			<p style="text-align:center;"><a href="alumnispeak.php" class="ab">Alumni Speak</a><br><br></p>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Slider -->
+<section id="sponsors" style="padding:50px 0px;background:#FAFAFA;margin-bottom:-20px;" class="homerecruiter">
+<div class="container">
+<div class="col-md-12 text-center">
+<header><h1>Our Recruiters</h1></header>
+<div class="section-content">
+<div class="logos">
+<marquee direction="left" onmouseover="this.stop();" onmouseout="this.start();">
+<div class="logo">
+<a href=""><img src="assets/recruiters/1.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/2.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/3.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/4.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/5.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/6.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/7.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/8.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/9.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/10.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/11.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/12.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/13.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/14.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/15.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/16.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/17.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/18.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/19.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/20.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/21.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/22.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/23.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/24.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/25.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/26.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/27.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/28.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/29.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/30.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/31.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/32.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/33.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/34.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/35.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/36.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/37.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/38.png" alt="" width="100"></a>
+</div>	
+<div class="logo">
+<a href=""><img src="assets/recruiters/39.png" alt="" width="100"></a>
+</div>	
+</marquee>
+</div>
+</div>
+<a href="our-recruiters.php" style="float:right;" class="read-more stick-to-top">&nbsp;&nbsp;View More</a>
+</div>
+</div>
+</section><!-- /#sponsors -->
+
+
+
+ 
+<!-- Footer -->
+<footer id="page-footer">
+
+
+    <section id="footer-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-sm-12">
+                    <aside class="logo">
+                        <img src="assets/logo_white.png" width="250" ><br>
+						<!--<a href="https://www.ipsacademy.org/nirf/" target="_blank"><img src="https://www.ipsacademy.org/wp-content/uploads/2015/05/nirf-logo_1.png"></a>-->
+                    <br>
+					<span style="text-align:center;">For more information email us at nirf.ibmr@ipsacademy.org</span>
+					</aside>
+
+                </div><!-- /.col-md-3 -->
+                <div class="col-md-3 col-sm-4">
+                    <aside>
+                        <header><h4>Contact Us</h4></header>
+                        <address>
+                            <strong>Institute of Business Management & Research, IPS Academy Knowledge Village, Rajendra Nagar A.B. Road, Indore-452012.</strong>
+                            
+                            <br><br>
+                            <a href="tel:07314014776"><i class="fa fa-phone"></i>  +0731-4014776</a>
+                            <br><br>
+                            <a href="mailto:office.ibmr@ipsacademy.org"><i class="fa fa-envelope"></i> office.ibmr@ipsacademy.org</a>
+                        </address>
+                    </aside>
+                </div><!-- /.col-md-3 -->
+                <div class="col-md-3 col-sm-4">
+                    <aside>
+					<header><h4>Important Links</h4></header>
+					<ul class="list-links">
+                            <li><a href="https://www.aicte-india.org/" target="_blank">AICTE</a></li>
+                            <li><a href="http://www.mptechedu.org/" target="_blank">DTE</a></li>
+                            <li><a href="http://www.highereducation.mp.gov.in/" target="_blank">Higher Education</a></li>
+                            <li><a href="http://www.dauniv.ac.in/" target="_blank">DAVV</a></li>
+                            <li><a href="http://mponline.gov.in" target="_blank">MP Online</a></li>
+							<li><a href="http://search.ebscohost.com/" target="_blank">EBSCO</a></li>
+                            <li><a href="alumini.php">Alumni</a></li>
+						<!--	<li><a href="http://ibmr.ipsacademy.org/assets/mandatory_pdf/Application_Deficiency_Report_2018_19.PDF" target="_blank">Mandatory Disclosure</a></li>-->
+						<li><a href="MANDATORY-DISCLOSURE.php">Mandatory Disclosure</a></li>
+							<!--<li><a href="naac.php" >NAAC</a></li>-->
+							<!--http://ibmr.ipsacademy.org/assets/NAAC.pdf-->
+							<li><a href="nirf.php"  >NIRF</a></li>
+							
+							<li><a href="grievance-redressal.php" >Grievance Redressal</a></li>
+							
+                        </ul>
+                        <!--<br><a class="btn" href="alumini.php">Alumni</a>-->
+                    </aside>
+                </div><!-- /.col-md-3 -->
+                <div class="col-md-3 col-sm-4">
+                    <aside>
+                        <header><h4>Follow Us</h4></header>
+                        <div class="fb-page" data-href="https://www.facebook.com/IBMRIPSAcademyIndore/" data-tabs="" data-width="280" data-height="300" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"></div>
+
+                        <div>
+                            
+                            <br>
+                            <a href="https://www.facebook.com/watch/IBMRIPSAcademyIndore/" target="_blank"><img src="assets/img/facebook.png" width="46"></a>
+                            <a href="https://www.instagram.com/ibmr_ipsacademy/" target="_blank"><img src="assets/img/instagram.png" width="50"></a>
+                           <a href="https://www.youtube.com/channel/UC-PSepm7Zpu5-dyQYK-40pA" target="_blank"><img src="assets/img/youtube.png" width="50"></a>
+                           <a href="https://www.linkedin.com/in/ibmr-ips-academy-2079a41b6/"><img src="assets/img/Iinkedin.png" width="50"></a>
+                        </div>
+                    </aside>
+                </div><!-- /.col-md-3 -->
+				
+            </div><!-- /.row -->
+        </div><!-- /.container -->
+        <div class="background"><img src="assets/img/background-city.png" class="" alt=""></div>
+    </section><!-- /#footer-content -->
+
+    <section id="footer-bottom">
+        <div class="container">
+            <div class="footer-inner">
+                <div class="copyright">© IPS Academy, IBMR, Indore, All rights reserved</div><!-- /.copyright -->
+            </div><!-- /.footer-inner -->
+        </div><!-- /.container -->
+    </section><!-- /#footer-bottom -->
+
+</footer>
+<!-- end Footer -->
+
+</div>
+<!-- end Wrapper -->
+
+<script type="text/javascript" src="assets/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="assets/js/jquery-migrate-1.2.1.min.js"></script>
+<script type="text/javascript" src="assets/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="assets/js/selectize.min.js"></script>
+<script type="text/javascript" src="assets/js/owl.carousel.min.js"></script>
+<script type="text/javascript" src="assets/js/jquery.validate.min.js"></script>
+<script type="text/javascript" src="assets/js/jquery.placeholder.js"></script>
+<script type="text/javascript" src="assets/js/jQuery.equalHeights.js"></script>
+<script type="text/javascript" src="assets/js/icheck.min.js"></script>
+<script type="text/javascript" src="assets/js/jquery.vanillabox-0.1.5.min.js"></script>
+<script type="text/javascript" src="assets/js/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="assets/js/greensock.js"></script>
+<script type="text/javascript" src="assets/js/layerslider.transitions.js"></script>
+<script type="text/javascript" src="assets/js/layerslider.kreaturamedia.jquery.js"></script>
+<script type="text/javascript" src="assets/js/jquery.flexslider-min.js"></script>
+<script type="text/javascript" src="assets/js/retina-1.1.0.min.js"></script>
+
+<script type="text/javascript" src="assets/js/custom.js"></script>
+
+</body>
+</html><div style="display:NONE;position:fixed;bottom:10px; right: 25%; background:white;width:50%;z-index:1111111111; border-radius: 20px; border: 5px solid #ccc; padding: 20px; " id="dismiss">
+<a style="position: absolute;right: 20px;top: 20px;font-size: 20px;cursor:pointer;" onclick="dismiss();">X</a>
+ <center><h2>ADMISSIONS OPEN FOR 2024-25 </h2>
+ 
+ 
+<div class="row">
+<div class="col-md-12 text-center pt-5"><h4>For Admissions please call -</h4> 
+9111009161<br>
+9926676161<br>
+0731-4014784<br><br>
+ </div>
+ <script>
+        function dismiss(){
+        $('#dismiss').remove();
+        }
+        </script>

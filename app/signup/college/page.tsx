@@ -39,6 +39,14 @@ export default function CollegeSignupPage() {
       setError("Please fill in all required fields.");
       return;
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.toLowerCase())) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (!/^[6-9]\d{9}$/.test(phone.replace(/[\s\-+]/g, ""))) {
+      setError("Please enter a valid 10-digit mobile number.");
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/signup/college", {

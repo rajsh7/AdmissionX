@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <link rel="stylesheet" href="/assets/css/preloader.css" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" href="/assets/images/favicon.png" />
+    <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+    <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" />
+    <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+    <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+    <link rel="preload stylesheet" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@100;200;300;400;500;600;700;800&display=swap" />
+    <link rel="preload stylesheet" as="style" href="/assets/css/style.css" />
+    <link rel="preload stylesheet" as="style" href="/assets/css/juic-stylesheet.css" />
+    <link rel="preload stylesheet" as="style" href="/assets/css/responsive.css" />
+    <style>
+        .enquire-form {
+            display: none;
+        }
+
+            .enquire-form .default-form input {
+                padding: 8px 15px !important;
+            }
+
+            .enquire-form .default-form button[type="submit"] {
+                height: 46px;
+                line-height: normal;
+            }
+
+            .enquire-form .form-heading h3 {
+                font-size: 23px;
+            }
+
+            .enquire-form .btn-otp {
+                border: none;
+                background: none;
+                font-size: 12px;
+                color: var(--bs-primary);
+                display: none;
+            }
+            .enquire-form #MobileNumber.valid + div > .btn-otp {
+                display: inherit;
+            }
+    </style>
+    
+    
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-KDFFBNXW');</script>
+    <!-- End Google Tag Manager -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EZCFHY58P2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-EZCFHY58P2');
+    </script>
+    <!-- End Google tag (gtag.js) -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "EducationalOrganization",
+            "name": "Jagannath University Jaipur",
+            "url": "https://www.jagannathuniversity.org/",
+            "logo": "https://www.jagannathuniversity.org/assets/images/UNIVERSITY%20NEW%20LOGO.png",
+            "description": "Get Enroll in UG and PG courses with JU Jaipur, NAAC 'A' Grade university in Rajasthan. Quality education and great placements. Apply today!",
+            "foundingDate": "2008",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "NH-12, Chaksu Bypass, Tonk Road, Jaipur",
+                "addressLocality": "Jaipur",
+                "addressRegion": "Rajasthan",
+                "postalCode": "303901",
+                "addressCountry": "India"
+            },
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+91 6377991003",
+                "email": "info@jagannathuniversity.org",
+                "contactType": "Customer Service"
+            },
+            "sameAs": [
+                "https://www.facebook.com/JaganNathUniversity/",
+                "https://twitter.com/JaganNathJaipur",
+                "https://www.linkedin.com/school/jagannath-university-jaipur/",
+                "https://www.youtube.com/@JaganNathjaipur",
+                "https://www.instagram.com/jagannathuniversityjaipur/"
+            ]
+        }
+    </script> 
+</head>
+<body> 
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDFFBNXW"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div class="preloader"><div class="lds-ripple"><div></div><div></div></div></div>
+    <div class="offcanvas offcanvas-start" data-bs-backdrop="static" tabindex="-1" id="sideMenubar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="staticBackdropLabel">Menu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul>
+                <li>
+                    <a href="/about">About Us</a>
+                    <ul>
+                        <li><a href="/about/the-university">The University</a></li>
+                        <li><a href="/about/organisation-structure">Organisation Structure</a></li>
+                        <li><a href="/about/sponsoring-body">Sponsoring Body</a></li>
+                        <li><a href="/about/vision-and-mission">Vision & Mission</a></li>
+                        <li><a href="/about/recognitions-and-accreditations">Recognitions & Accreditations</a></li>
+                        <li><a href="/about/chairman-s-message">Chairman's Message</a></li>
+                        <li><a href="/about/presidents-message">President's Message</a></li>
+                        <li><a href="/about/officers">Officers of the University</a></li>
+                        <li><a href="/about/administration">Administration</a></li>
+                        <li><a href="/about/statutory-committees">Statutory Committees</a></li>
+                        <li><a href="/Iqac/iqac">IQAC</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/admissions">Admissions</a>
+                    <ul>
+                        <li><a href="https://cdn.jagannathuniversity.org/docs/admissions/Program-List-2026-27.pdf" target="_blank">List of Programs 2026-27</a></li>
+                        <li><a href="/admissions/office-for-international-affairs">Office for International Affairs</a></li>
+                        <li><a href="/admissions/cuet">CUET 2026-27</a></li>
+                        <li><a href="/admissions/apply">Apply Now</a></li>
+                        <li><a href="/admissions/fee-payment">Online Fee Payment</a></li>
+                        <li><a href="/admissions/brochure">Download Brochure</a></li>
+                        <li><a href="/admissions/admission-form">Download Admission Form</a></li>
+                        <li><a href="/admissions/scholarship">Scholarship</a></li>
+                        <li><a data-bs-toggle="modal" data-bs-target="#loanEnquiryModal">Loan Enquiry</a></li>
+                        <li><a href="/admissions/faqs">FAQ's</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/faculties">Faculties</a>
+                    <ul>
+                        <li>
+                            <a href="/faculties/engineering">Engineering & Technology</a>
+                            <ul>
+                                <li><a href="/faculties/engineering/bachelor-of-technology">B.Tech</a></li>
+                                <li><a href="/faculties/engineering/master-of-technology">M.Tech</a></li>
+                                <li><a href="/faculties/engineering/bachelor-of-computer-applications">BCA</a></li>
+                                <li><a href="/faculties/engineering/master-of-computer-applications">MCA</a></li>
+                                <li><a href="/faculties/engineering/msc-in-computer-science">M.Sc. in CS</a></li>
+                                <li><a href="/faculties/engineering/msc-in-data-science">M.Sc. in DS</a></li>
+                                <li><a href="/faculties/engineering/msc-mathematics">M.Sc. in Mathematics</a></li>
+                                <li><a href="/faculties/engineering/msc-in-chemistry">M.Sc. in Chemistry</a></li>
+                                <li><a href="/faculties/engineering/msc-physics">M.Sc. in Physics</a></li>
+                                <li><a href="/faculties/engineering/diploma-in-engineering">Diploma</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="/faculties/agriculture">Agriculture</a>
+                            <ul>
+                                <li><a href="/faculties/agriculture/bsc-hons-agriculture">B. Sc.- Agriculture</a></li>
+                                <li><a href="/faculties/agriculture/bsc-agribusiness">B.Sc. Agribusiness</a></li>
+                                <li><a href="/faculties/agriculture/bsc-pcm">B.Sc. Agribusiness</a></li>
+                                <li><a href="/faculties/agriculture/diaes">DIAES</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="/faculties/law">Law</a>
+                            <ul>
+                                <li><a href="/faculties/law/ba-llb-bba-llb-integrated">B.A.-LL.B. / B.B.A.-LL.B.</a></li>
+                                <li><a href="/faculties/law/master-of-law">LLM</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="/faculties/management">Management Studies</a>
+                            <ul>
+                                <li><a href="/faculties/management/bachelor-of-business-administration">BBA</a></li>
+                                <li><a href="/faculties/management/master-of-business-administration">MBA</a></li>
+                                <li><a href="/faculties/management/bachelor-of-commerce">B. Com.</a></li>
+                                <li><a href="/faculties/management/ba-journalism-and-mass-communication">BA (JMC)</a></li>
+                                <li><a href="/faculties/management/ma-journalism-and-mass-communication">MA (JMC)</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="/faculties/education">Education</a>
+                            <ul>
+                                <li><a href="/faculties/education/bachelor-of-education">B. Ed. </a></li>
+                                <li><a href="/faculties/education/bachelor-of-arts">BA</a></li>
+                                <li><a href="/faculties/education/bachelor-of-library-and-information-science">B. Lib. & Info. Sc.</a></li>
+                                <li><a href="/faculties/education/master-of-library-and-information-science">M. Lib. & Info. Sc.</a></li>
+                                <li><a href="/faculties/education/diploma-in-library-and-information-science">D. Lib. & Info. Sc.</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="/faculties/architecture">Architecture, Planning<br /> & Design</a>
+                            <ul>
+                                <li><a href="/faculties/architecture/b-des-in-interior-design">B. Des (Interior Design)</a></li>
+                                <li><a href="/faculties/architecture/master-of-planning-urban-planning">M. Plan. (Urban Planning)</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="/faculties/medical">Paramedical & AHS</a>
+                            <ul>
+                                <li><a href="/faculties/medical/bachelor-of-physiotherapy">BPT</a></li>
+                                <li><a href="/faculties/medical/master-of-physiotherapy">MPT</a></li>
+                                <li><a href="/faculties/medical/diploma-in-pharmacy">D. Pharma</a></li>
+                                <li><a href="/faculties/medical/bachelor-of-pharmacy">B. Pharma</a></li>
+                                <li><a href="/faculties/medical/bnys">BNYS</a></li>
+                                <li><a href="/faculties/medical/department-of-allied-health-science">B. Sc. in MRIT/MLT/OTT/ICT/PA</a></li>
+                                <li><a href="/faculties/medical/bsc-health-information-management">B.Sc. HIM</a></li>
+                                <li><a href="/faculties/medical/msc-health-information-management">M.Sc. HIM</a></li>
+                                
+                            </ul>
+                        </li>  
+                        <li>
+                            <a href="/faculties/phd">Ph. D</a>
+                            <ul>
+                                <li><a href="/faculty/education/phd">Ph. D</a></li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </li>
+                <li>
+                    <a href="/life-at-ju">Life @ JU</a>
+                    <ul>
+                        <li><a href="/life-at-ju/library">Library</a></li>
+                        <li><a href="/life-at-ju/infrastructure">Infrastructure</a></li>
+                        <li><a href="/life-at-ju/sports">Sports</a></li>
+                        <li><a href="/life-at-ju/transport">Transport</a></li>
+                        <li><a href="/life-at-ju/dsw-activities">DSW Activities</a></li>
+                        <li><a href="/life-at-ju/green-initiatives">Green Initiatives</a></li>
+                        <li><a href="https://cdn.jagannathuniversity.org/docs/life-at-ju/green-audit-report.pdf" target="_blank">Green Audit Report</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/student-zone">Student Zone</a>
+                    <ul>
+                        <li><a href="/student-zone/ju-cosmos-newsletter">JU-COSMOS Newsletter</a></li>
+                        <li><a href="/student-zone/syllabus">Syllabus</a></li>
+                        <li><a href="/student-zone/academic-calendars">Academic Calenders</a></li>
+                        <li><a href="/student-zone/different-committees">Different Committees</a></li>
+                        <li><a href="/student-zone/student-council">Student Council</a></li>
+                        <li><a href="/student-zone/forms">Forms</a></li>
+                        <li><a href="https://samadhaan.ugc.ac.in/" target="_blank">E-Samadhan</a></li>
+                        <li><a href="https://result.jagannathuniversity.org/exams/registration.php" target="_blank">Registration Slip</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/examination">Examination</a>
+                    <ul>
+                        <li><a href="https://cdn.jagannathuniversity.org/docs/examination/Examination-Policy-2025.pdf" target="_blank">Examination Policy</a></li>
+                        <li><a href="https://result.jagannathuniversity.org/exams/">Admit Cards for ET Exams, May-2026</a></li>
+                        <li><a href="/examination/schedule">Examination Schedule</a></li>
+                        <li><a href="/examination/grievance">Examination Grievance</a></li>
+                        <li><a target="_blank" a href="https://result.jagannathuniversity.org/results/">Results</a></li>
+                        <li><a href="/examination/question-papers">Question Papers</a></li>
+                        <li><a href="/examination/abc">Academic Bank of Credits (ABC)</a></li>
+                        <li><a target="_blank" href="https://nad.digilocker.gov.in">National Academic Depository (NAD)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/placements">Placements</a>
+                    <ul>
+                        <li><a href="/placements/placement-cell">Placement Cell</a></li>
+                        <li><a href="/placements/center-for-guidance">Center for Guidance</a></li>
+                        <li><a href="/placements/student-speaks">Student's Speak</a></li>
+                        <li><a href="/placements/testimonials">Testimonials</a></li>
+                        <li><a href="/placements/recruit-from-us">Recruit From Us</a></li>
+                        <li><a href="https://www.mhrdnats.gov.in/" target="_blank">NATS</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/research-and-innovation">Research</a>
+                    <ul>
+                        <li><a href="/research-and-innovation/promotion-policy">Research Promotion Policies</a></li>
+                        <li><a href="/research-and-innovation/consultancy">Consultancy</a></li>
+                        <li><a href="/research-and-innovation/phd-guidlines">Ph. D Guidlines</a></li>
+                        <li><a href="/research-and-innovation/phd-candidates">Ph.D. Candidates</a></li>
+                        <li><a href="https://jurj.jagannathuniversity.org/" target="_blank">Research Journal (JURJ)</a></li>
+                        <li><a href="/assets/docs/research/patents-published.pdf" target="_blank">Patent & Copyright</a></li>
+                        <li><a href="/research-and-innovation/publications">Research Publications & Books</a></li>
+                        <li><a href="/research-and-innovation/download-forms">Download Forms (Ph.D)</a></li>
+                        <li><a href="/research-and-innovation/committee">Committee</a></li>
+                        <li><a target="_blank" href="https://cdn.jagannathuniversity.org/docs/jurj/Public-Notice-CARE-Journals.pdf">Suggestive Parameters <br /> for choosing Peer-Reviewed Journals</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a title="Jagannath University Incubation Center (JUIC)" href="/juic">JUIC</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/others/juee">JUEE-2026</a>
+                </li>
+                <li class="nav-item">
+                    <a href="https://erp.jagannathuniversity.org" target="_blank">ERP</a>
+                </li>            
+                
+            </ul>
+        </div>
+    </div>
+    <header>
+        <section class="topbar" id="topbar">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="text-md-start text-center">
+                            <li>
+                                <a href="tel:00919620619966?utm_source=website&utm_medium=home_page&utm_campaign=call_mobile&utm_content=header" class="">
+                                    <i class="bi bi-telephone-inbound"></i> 08044187326
+                                </a>
+                            </li>
+                            <li class="d-lg-none">
+                                <a href="/admissions/apply?utm_source=website&utm_medium=home_page&utm_campaign=apply_now&utm_content=header">
+                                    <i class="bi bi-mouse"></i> Apply Now
+                                </a>
+                            </li>
+                            <li class="d-none d-lg-inline-block">
+                                <a href="mailto:info@jagannathuniversity.org" class="">
+                                    <i class="bi bi-envelope-open"></i>
+                                    info@jagannathuniversity.org
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6 d-none d-md-block">
+                        <ul class="text-md-end text-center">
+                            <li>
+                                <a href="">
+                                    <i class="bi bi-person"></i> Admissions 2026-27
+                                </a>
+                            </li>
+                            <li class="me-0">
+                                <a href="/contact-us?utm_source=website&utm_medium=home_page&utm_campaign=contact_us&utm_content=header">
+                                    <i class="bi bi-headset"></i> Contact Us
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <a href="/" class="d-block">
+                            <img src="/assets/images/UNIVERSITY NEW LOGO.png" class="logo" alt="Jagan Nath University, Jaipur Logo with NAAC Grade A" />
+                            <img src="/assets/images/agrade.png" class="logo" alt="Jagan Nath University, Jaipur Logo with NAAC Grade A" /><br />
+                            <span style="font-size:x-small; font-weight:700; color:var(--primary-color)">Accredited by NAAC "A" Grade Granted l2-B status by UGC</span>
+                        </a>
+                    </div>
+                    <div class="col d-lg-none d-block text-end">
+                        <div class="navbar-toggle">
+                            <button type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenubar" aria-controls="sideMenubar" title="Toggle Navbar"><i class="bi bi-list"></i></button>
+                        </div>
+                    </div>
+                    <div class="col d-none d-lg-block">
+
+                        <div class="d-flex flex-row-reverse">
+                            <div class="info">
+                                <a class="btn btn-primary" style="height:50px; line-height:50px;" title="Apply Now" href="/admissions/apply?utm_source=website&utm_medium=home_page&utm_campaign=apply_now&utm_content=header">Apply Now!</a>
+                            </div>
+                            &nbsp;
+                            <div class="info">
+                                <a class="btn btn-primary" style="height:50px; line-height:50px;" title="ERP" href="https://erp.jagannathuniversity.org" target="_blank">ERP</a>
+                            </div>
+                            &nbsp;
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="menubar d-none d-lg-block">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg">
+                    <div class="collapse navbar-collapse">
+                        <ul class="navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="/about">About Us</a>
+                                <ul class="dropdown-menu">
+                                    <li class="mt-2"><a href="/about/the-university">The University</a></li>
+                                    <li><a href="/about/organisation-structure">Organisation Structure</a></li>
+                                    <li><a href="/about/sponsoring-body">Sponsoring Body</a></li>
+                                    <li><a href="/about/vision-and-mission">Vision & Mission</a></li>
+                                    <li><a href="/about/recognitions-and-accreditations">Recognitions & Accreditations</a></li>
+                                    <li><a href="/about/chairman-s-message">Chairman's Message</a></li>
+                                    <li><a href="/about/presidents-message">President's Message</a></li>
+                                    <li><a href="/about/officers">Officers of the University</a></li>
+                                    <li><a href="/about/administration">Administration</a></li>
+                                    <li><a href="/about/statutory-committees">Statutory Committees</a></li>
+                                    <li><a href="/Iqac/iqac">IQAC</a></li>
+
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="/admissions">Admissions</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="https://cdn.jagannathuniversity.org/docs/admissions/Program-List-2026-27.pdf" target="_blank">List of Programs 2026-27</a></li>
+                                    <li><a href="/admissions/office-for-international-affairs">Office for International Affairs</a></li>
+                                    <li><a href="/admissions/cuet">CUET 2026-27</a></li>
+                                    <li><a href="/admissions/apply">Apply Now</a></li>
+                                    <li><a href="/admissions/fee-payment">Online Fee Payment</a></li>
+                                    <li><a href="/admissions/brochure">Download Brochure</a></li>
+                                    <li><a href="/admissions/admission-form">Download Admission Form</a></li>
+                                    <li><a href="/admissions/scholarship">Scholarship</a></li>
+                                    <li><a href="#" data-bs-toggle="modal" data-bs-target="#loanEnquiryModal">Loan Enquiry</a></li>
+                                    <li><a href="/admissions/faqs">FAQ's</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="/faculties">Faculties</a>
+                                <div class="mega-menu dropdown-menu p-3">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <a href="/faculties/engineering"><h6>Engineering &<br /> Technology</h6></a>
+                                            <ul class="mb-3">
+                                                <li><a href="/faculties/engineering/bachelor-of-technology">B.Tech</a></li>
+                                                <li><a href="/faculties/engineering/master-of-technology">M.Tech</a></li>
+                                                <li><a href="/faculties/engineering/bachelor-of-computer-applications">BCA</a></li>
+                                                <li><a href="/faculties/engineering/master-of-computer-applications">MCA</a></li>
+                                                <li><a href="/faculties/engineering/msc-in-computer-science">M.Sc. in CS</a></li>
+                                                <li><a href="/faculties/engineering/msc-in-data-science">M.Sc. in DS</a></li>
+                                                <li><a href="/faculties/engineering/msc-mathematics">M.Sc. in Mathematics</a></li>
+                                                <li><a href="/faculties/engineering/msc-in-chemistry">M.Sc. in Chemistry</a></li>
+                                                <li><a href="/faculties/engineering/msc-physics">M.Sc. in Physics</a></li>
+                                                <li><a href="/faculties/engineering/diploma-in-engineering">Diploma</a></li>
+                                            </ul>                                            
+                                        </div>
+                                        <div class="col-md-3">
+                                            <a href="/faculties/education"><h6>Education</h6></a>
+                                            <ul class="mb-3">
+                                                <li><a href="/faculties/education/bachelor-of-education">B. Ed. </a></li>
+                                                <li><a href="/faculties/education/bachelor-of-arts">BA</a></li>
+                                                <li><a href="/faculties/education/bachelor-of-library-and-information-science">B. Lib. & Info. Sc.</a></li>
+                                                <li><a href="/faculties/education/master-of-library-and-information-science">M. Lib. & Info. Sc.</a></li>
+                                                <li><a href="/faculties/education/diploma-in-library-and-information-science">D. Lib. & Info. Sc.</a></li>
+                                            </ul>
+
+                                            <a href="/faculties/management"><h6>Management Studies</h6></a>
+                                            <ul class="mb-3">
+                                                <li><a href="/faculties/management/bachelor-of-business-administration">BBA</a></li>
+                                                <li><a href="/faculties/management/master-of-business-administration">MBA</a></li>
+                                                <li><a href="/faculties/management/bachelor-of-commerce">B. Com.</a></li>
+                                                <li><a href="/faculties/management/ba-journalism-and-mass-communication">BA (JMC)</a></li>
+                                                <li><a href="/faculties/management/ma-journalism-and-mass-communication">MA (JMC)</a></li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            
+
+                                            <a href="/faculties/architecture"><h6>Architecture, Planning<br /> & Design</h6></a>
+                                            <ul class="mb-3">
+                                                <li><a href="/faculties/architecture/b-des-in-interior-design">B. Des (Interior Design)</a></li>
+                                                <li><a href="/faculties/architecture/master-of-planning-urban-planning">M. Plan. (Urban Planning)</a></li>
+                                            </ul>
+
+
+                                            <a href="/faculties/law"><h6>Law</h6></a>
+                                            <ul class="mb-3">
+                                                <li><a href="/faculties/law/ba-llb-bba-llb-integrated">B.A.-LL.B. / B.B.A.-LL.B.</a></li>
+                                                <li><a href="/faculties/law/master-of-law">LLM</a></li>
+                                            </ul>
+
+                                            <a href="/faculties/agriculture"><h6>Agriculture</h6></a>
+                                            <ul class="mb-3">
+                                                <li><a href="/faculties/agriculture/bsc-hons-agriculture">B. Sc.- Agriculture</a></li>
+                                                <li><a href="/faculties/agriculture/bsc-agribusiness">B.Sc. Agribusiness</a></li>
+                                                <li><a href="/faculties/agriculture/diaes">DIAES</a></li>
+                                            </ul>
+
+
+                                        </div>
+                                        <div class="col-md-3">
+                                            <a href="/faculties/medical"><h6>Paramedical & AHS</h6></a>
+                                            <ul class="mb-3">
+                                                <li><a href="/faculties/medical/bachelor-of-physiotherapy">BPT</a></li>
+                                                <li><a href="/faculties/medical/master-of-physiotherapy">MPT</a></li>
+                                                <li><a href="/faculties/medical/diploma-in-pharmacy">D. Pharma</a></li>
+                                                <li><a href="/faculties/medical/bachelor-of-pharmacy">B. Pharma</a></li>
+                                                <li><a href="/faculties/medical/bnys">BNYS</a></li>
+                                                <li><a href="/faculties/medical/department-of-allied-health-science">B. Sc. in MRIT/MLT/OTT<br />/ICT/PA</a></li>
+                                                <li><a href="/faculties/medical/bsc-health-information-management">B.Sc. HIM</a></li>
+                                                <li><a href="/faculties/medical/msc-health-information-management">M.Sc. HIM</a></li>
+                                            </ul>
+
+                                            <h6>Ph. D</h6>
+                                            <ul class="mb-3">
+                                                <li><a href="/faculties/phd/phd">Ph. D</a></li>
+                                            </ul>
+
+                                            
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="/life-at-ju">Life @ JU</a>
+                                <ul class="dropdown-menu">
+                                    <li class="mt-2"><a href="/life-at-ju/library">Library</a></li>
+                                    <li><a href="/life-at-ju/infrastructure">Infrastructure</a></li>
+                                    <li><a href="/life-at-ju/sports">Sports</a></li>
+                                    <li><a href="/life-at-ju/transport">Transport</a></li>
+                                    <li><a href="/life-at-ju/dsw-activities">DSW Activities</a></li>
+                                    <li><a href="/life-at-ju/green-initiatives">Green Initiatives</a></li>
+                                    <li><a href="https://cdn.jagannathuniversity.org/docs/life-at-ju/green-audit-report.pdf" target="_blank">Green Audit Report</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Student Zone</a>
+                                <ul class="dropdown-menu">
+                                    <li class="mt-2"><a href="/student-zone/ju-cosmos-newsletter">JU-COSMOS Newsletter</a></li>
+                                    <li><a href="/student-zone/syllabus">Syllabus</a></li>
+                                    <li><a href="/student-zone/academic-calendars">Academic Calenders</a></li>
+                                    <li><a href="/student-zone/different-committees">Different Committees</a></li>
+                                    <li><a href="/student-zone/student-council">Student Council</a></li>
+                                    <li><a href="/student-zone/forms">Forms</a></li>
+                                    <li><a href="https://samadhaan.ugc.ac.in/" target="_blank">E-Samadhan</a></li>
+                                    <li><a href="https://result.jagannathuniversity.org/exams/registration.php" target="_blank">Registration Slip</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="/examination">
+                                    Examination
+                                </a>
+                                <ul class="dropdown-menu">
+                                    
+                                    <li><a href="https://cdn.jagannathuniversity.org/docs/examination/Examination-Policy-2025.pdf" target="_blank">Examination Policy</a></li>
+                                    <li><a href="https://result.jagannathuniversity.org/exams/">Admit Cards for ET Exams, May-2026</a></li>
+                                    <li><a href="/examination/schedule">Examination Schedule</a></li>
+                                    <li><a href="/examination/grievance">Examination Grievance</a></li>
+                                    <li><a target="_blank" a href="https://result.jagannathuniversity.org/results/">Results</a></li>
+                                    <li><a href="/examination/question-papers">Question Papers</a></li>
+                                    <li><a href="/examination/abc">Academic Bank of Credits (ABC)</a></li>
+                                    <li><a target="_blank" href="https://nad.digilocker.gov.in">National Academic Depository (NAD)</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="/placements">Placements</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/placements/placement-cell">Placement Cell</a></li>
+                                    <li><a href="/placements/center-for-guidance">Center for Guidance</a></li>
+                                    <li><a href="/placements/student-speaks">Student's Speak</a></li>
+                                    <li><a href="/placements/testimonials">Testimonials</a></li>
+                                    <li><a href="/placements/recruit-from-us">Recruit From Us</a></li>
+                                    <li><a href="https://www.mhrdnats.gov.in/" target="_blank">NATS</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Research</a>
+                                <ul class="dropdown-menu">
+                                    <li class="mt-2"><a href="/research-and-innovation/promotion-policy">Research Promotion Policies</a></li>
+                                    <li><a href="/research-and-innovation/consultancy">Consultancy</a></li>
+                                    <li><a href="/research-and-innovation/phd-guidlines">Ph. D Guidlines</a></li>
+                                    <li><a href="/research-and-innovation/phd-candidates">Ph.D. Candidates</a></li>
+                                    <li><a href="https://jurj.jagannathuniversity.org/" target="_blank">Research Journal (JURJ)</a></li>
+                                    <li><a href="/assets/docs/research/patents-published.pdf" target="_blank">Patent & Copyright</a></li>
+                                    <li><a href="/research-and-innovation/publications">Research Publications & Books</a></li>
+                                    <li><a href="/research-and-innovation/download-forms">Download Forms (Ph.D)</a></li>
+                                    <li><a href="/research-and-innovation/committee">Committee</a></li>
+                                    <li><a target="_blank" href="https://cdn.jagannathuniversity.org/docs/jurj/Public-Notice-CARE-Journals.pdf">Suggestive Parameters <br /> for choosing Peer-Reviewed Journals</a></li>
+                                </ul>
+                            </li>
+                            
+
+                            <li class="nav-item">
+                                <a class="nav-link" title="Jagannath University Incubation Center (JUIC)" href="/juic">JUIC</a>
+                            </li>
+                             <li class="nav-item">
+                                <a class="nav-link" href="/others/juee">JUEE-2026</a>
+                            </li> 
+                            
+                            <!-- <li class="nav-item">
+                                <a class="nav-link" asp-controller="Aedp" asp-action="Index" alt="Apprenticeship Embedded Degree Programme" title="Apprenticeship Embedded Degree Programme"> AEDP</a>
+                            </li>-->
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </section>
+    </header>
+    <section class="enquire-form">
+        <div class="default-form">
+            <div class="form-heading py-2">
+                <h3 class="text-center">Admission 2026 - 2027</h3>
+            </div>
+            <form action="/home" method="post">
+                <input type="hidden" value="5ae5ad79-3ade-4c2b-a10a-33e0f2704252" data-val="true" data-val-required="The FormId field is required." id="FormId" name="FormId" />
+                <input class="form-control mb-3" placeholder="Name *" type="text" data-val="true" data-val-maxlength="The field Name must be a string or array type with a maximum length of &#x27;50&#x27;." data-val-maxlength-max="50" data-val-required="The Name field is required." id="Name" maxlength="50" name="Name" value="" />
+                <input class="form-control mb-3" placeholder="Email *" type="email" data-val="true" data-val-email="The Email field is not a valid e-mail address." data-val-required="The Email field is required." id="Email" name="Email" value="" />
+                <input class="form-control" placeholder="Mobile Number (10 digits) *" type="text" data-val="true" data-val-regex="The field MobileNumber must match the regular expression &#x27;^[6-9][0-9]{9}$&#x27;." data-val-regex-pattern="^[6-9][0-9]{9}$" data-val-required="The MobileNumber field is required." id="MobileNumber" name="MobileNumber" value="" />
+                <div class="text-end mb-3">
+                    <button type="button" class="text-end btn-otp">Generate Otp</button>
+                </div>
+                <input class="form-control mb-3" placeholder="6 digit otp" data-val-required="The Otp field is required." type="text" data-val="true" data-val-regex="The field Otp must match the regular expression &#x27;^[0-9]{6}$&#x27;." data-val-regex-pattern="^[0-9]{6}$" id="Otp" name="Otp" value="" />
+                <button type="submit" class="btn btn-primary w-100">Submit <i class="bi bi-arrow-right"></i></button>
+            </form>
+        </div>
+    </section>
+    <section class="enquire-now">
+        <div class="apply-now">
+            <a href="javascript:void(0);" id="apply-now">Enquire Now</a>
+        </div>
+    </section>
+    <main>
+        <section class="errors 404 page-title">
+    <div class="container">
+        <h2>
+            Page not Found
+        </h2>
+        <ul>
+            <li><a href="/">Home</a></li>
+        </ul>
+    </div>
+</section>
+<section class="examination abc page-body">
+    <div class="container">
+    </div>
+</section>
+    </main>
+    <footer>
+        <div class="container pt-5">
+            <div class="row">
+                <div class="col-md-3">
+                    <img src="/assets/images/logo-white-bg.webp" class="logo mt-3" alt="Jagan nath University, Jaipur Logo" />
+                    <h3>Jagan Nath University</h3>
+                    <p>
+                        NH-12, Chaksu Bypass<br /> Tonk Road, Jaipur<br />Rajasthan - 303901
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <h3 class="mt-3 mb-2">Student Helpline</h3>
+                    <ul>
+                        <li><a href="/student-zone/committee-for-sc-st-obc">Committee for SC/ST/OBC</a></li>
+                        <li><a href="/student-zone/minority-cell">Minority Cell</a></li>
+                        <li><a href="/student-zone/grievance-redressal">Student's Grievance Redressal Committee</a></li>
+                        <li><a href="/student-zone/internal-complaint-committee">Internal Complaint Committee</a></li>
+                        <li><a href="/student-zone/anti-ragging">Anti Ragging Committee</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h3 class="mt-3 mb-2">Important Links</h3>
+                    <ul>
+                        <li><a href="/self-disclosure/components">UGC Public Self-Disclosure</a></li>
+                        <li><a href="/others/nirf">NIRF</a></li>
+                        <li><a href="/others/new-iniatives">New Initiatives</a></li>
+                        <li><a href="/others/icar-documents">ICAR Documents</a></li>
+                        <li><a href="/others/pio-and-appellate-authority">PIO & Appellate Authority</a></li>
+                        <li><a target="_blank" href="https://cdn.jagannathuniversity.org/docs/others/public_notice.pdf">Public Notices</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h3 class="mt-3 mb-2">Quick Links</h3>
+                    <ul>
+                        <li><a href="/contact-us">Contact Us</a></li>
+                        <li><a href="/others/career">Career</a></li>
+                        <li><a href="https://alumni.jagannathuniversity.org/" target="_blank">Alumni</a></li>
+                        <li><a href="/admissions/fee-payment">Online Fee Payment</a></li>
+                        <li><a href="/admissions/apply">Apply Online</a></li>
+                        <li><a href="/contact-us">How to Reach</a></li>
+                        <li><a href="/blogs">Blogs</a></li>
+                        <!--<li><a asp-controller="Videos" asp-action="AnilSharma">Videos</a></li>-->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="container py-3 text-center">
+            <ul class="social">
+                <li><a href="https://www.facebook.com/JaganNathUniversity/" title="Jagan Nath University, Jaipur Facebook Page"><i class="bi bi-facebook"></i></a></li>
+                <li><a href="https://twitter.com/JaganNathJaipur" title="Jagan Nath University, Jaipur Twitter i.e. X Page"><i class="bi bi-twitter"></i></a></li>
+                <li><a href="https://www.instagram.com/jagannathuniversityjaipur/" title="Jagan Nath University, Jaipur Instagram Page"><i class="bi bi-instagram"></i></a></li>
+                <li><a href="/"><i class="bi bi-whatsapp" title="Jagan Nath University, Jaipur Whatsapp Link"></i></a></li>
+            </ul>
+        </div>
+        <hr class="m-0" />
+        <div class="container py-3 text-md-start text-center">
+            <div class="row">
+                <div class="col-md-6">Copyright @ 2026. All rights reserved.</div>
+                <div class="col-md-6 text-md-end text-center">
+                    <a href="/others/disclaimer">Disclaimer</a> |
+                    <a href="/others/privacy-policy">Privacy Policy</a> |
+                    <a href="/others/terms-and-conditions">Terms</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <form action="/forms/loan-enquiry" method="post">
+    <div class="modal" tabindex="-1" id="loanEnquiryModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Loan Enquiry</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input class="form-control mb-3" placeholder="Name *" type="text" data-val="true" data-val-maxlength="The field Name must be a string or array type with a maximum length of &#x27;50&#x27;." data-val-maxlength-max="50" data-val-required="The Name field is required." id="Name" maxlength="50" name="Name" value="" />
+                    <input class="form-control mb-3" placeholder="Email *" type="email" data-val="true" data-val-email="The Email field is not a valid e-mail address." data-val-maxlength="The field Email must be a string or array type with a maximum length of &#x27;100&#x27;." data-val-maxlength-max="100" data-val-required="The Email field is required." id="Email" maxlength="100" name="Email" value="" />
+                    <input class="form-control mb-3" placeholder="Mobile Number (10 digits) *" type="text" data-val="true" data-val-maxlength="The field MobileNumber must be a string or array type with a maximum length of &#x27;15&#x27;." data-val-maxlength-max="15" data-val-regex="The field MobileNumber must match the regular expression &#x27;^[6-9][0-9]{9}$&#x27;." data-val-regex-pattern="^[6-9][0-9]{9}$" data-val-required="The MobileNumber field is required." id="MobileNumber" maxlength="15" name="MobileNumber" value="" />
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" style="height:50px; line-height:50px">Send Enquiry</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<input name="__RequestVerificationToken" type="hidden" value="CfDJ8PRRA0gqLtJFq7Wq5_l7FIsi7ITOLI02V2vEwlWca3DE28eyohikqiIVaXaZ3sRqk9wM-vbVrWWvdB-sXA__pCVDSgmCNR9xU770C50uJ-YSkgtgafBsW2nA5Mw9gI3RMamNuVAzABG9drSCeIF_QkU" /></form>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script src="/assets/js/main.js"></script>
+    
+
+    <!--Start of Tawk.to Script-->
+    <script type="text/javascript">
+        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+        (function(){
+        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+        s1.async=true;
+        s1.src='https://embed.tawk.to/5f1553647258dc118bee9123/1gn1tab96';
+        //s1.charset='UTF-8';
+        s1.setAttribute('crossorigin','*');
+        s0.parentNode.insertBefore(s1,s0);
+        })();
+    </script>
+    <!--End of Tawk.to Script-->
+
+    <script>
+        $(window).scroll(function(){
+        var sticky = $('header'),scroll = $(window).scrollTop();
+        let topbar; 
+        if (scroll >= 100) 
+        {
+            sticky.addClass('fixed');
+            //topbar = document.getElementById('topbar').addClass('hide');
+            // topbar.hidden="true";            
+         }
+        else 
+            {
+                sticky.removeClass('fixed');
+                //topbar = document.getElementById('topbar').removeClass('hide');
+                // topbar.hidden="false";
+            }
+        });
+    </script>
+    <script>
+        $('.btn-otp').click(function(e){
+            e.preventDefault();
+            const data = {
+                formId: $(this).parent().siblings('input#FormId').val(),
+                mobileNumber: $(this).parent().siblings('input#MobileNumber').val()
+            };
+        $.ajax({
+            type: 'POST',
+            url: '/generate-otp',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            });
+        });
+    </script>
+    <script>console.log('92, 0')</script>
+
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", () => {
+            const marquee = document.querySelector(".marquee-inner");
+            const speed = 1; // Scrolling Speed
+            let scrollAmount = 0;
+            let isHovered = false;
+
+            // Duplicates the content
+            const marqueeContent = marquee.innerHTML;
+            marquee.innerHTML += marqueeContent;
+
+            const startScrolling = () => {
+                if (!isHovered) {
+                    scrollAmount -= speed;
+                    if (Math.abs(scrollAmount) >= marquee.scrollWidth / 2) {
+                        scrollAmount = 0;
+                    }
+                    marquee.style.transform = `translateX(${scrollAmount}px)`;
+                }
+                requestAnimationFrame(startScrolling);
+            };
+
+            marquee.addEventListener("mouseover", () => {
+                isHovered = true;
+            });
+
+            marquee.addEventListener("mouseout", () => {
+                isHovered = false;
+            });
+
+            startScrolling();
+        });
+
+    </script>
+</body>
+</html>

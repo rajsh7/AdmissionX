@@ -1,0 +1,3975 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Head -->
+<head>
+	<!-- Meta Tags -->
+	<meta charset="utf-8">
+	<meta name="theme-color" content="#23394c">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="description" content="Sharda University is the Best Private University in Delhi NCR. The University offers a plethora of courses in different streams at UG, PG, and doctoral levels." />
+	<meta name="keywords" content="Best Private University in Delhi NCR, Top Private University in Delhi NCR" />
+	<title>Sharda University - Best Private University in Delhi, NCR</title>
+	<meta name="google-site-verification" content="sbVFguFpP3xdCZAbd7HhPZCJc1E9ANOVu9x4BDj5Kb0" />
+	<meta name="google-site-verification" content="6rr7whbWQRsjdZpLZ_TsvI-5TL-q6t-6bI97QiDPUAo" />
+	<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website">
+	<meta property="og:url" content="URL" url="https://www.sharda.ac.in//">
+	<meta property="og:title" content="Sharda University - Best Private University in Delhi, NCR">
+	<meta property="og:description" content="Sharda University is the Best Private University in Delhi NCR. The University offers a plethora of courses in different streams at UG, PG, and doctoral levels.">
+	<meta property="og:image" content="https://media.sharda.ac.in/sharda.ac.in/sharda-assets/imgs/virutal-tour_1200x628.jpg">
+	<!-- Twitter -->
+	<meta property="twitter:card" content="summary_large_image">
+	<meta property="twitter:url" content="URL" url="https://www.sharda.ac.in//">
+	<meta property="twitter:title" content="Sharda University - Best Private University in Delhi, NCR">
+	<meta property="twitter:description" content="Sharda University is the Best Private University in Delhi NCR. The University offers a plethora of courses in different streams at UG, PG, and doctoral levels.">
+	<meta property="twitter:image" content="https://media.sharda.ac.in/sharda.ac.in/sharda-assets/imgs/virutal-tour_1200x628.jpg">
+    		<link rel="canonical" href="https://www.sharda.ac.in/" />
+	
+		<!-- Page Title & Favicon @ Visitor Count 999192  -->
+
+			<link rel="shortcut icon" type="image/png" href="https://media.sharda.ac.in/sharda.ac.in/sharda-assets/imgs/favi-icon.png" />
+	<link rel="icon" type="image/png" href="https://media.sharda.ac.in/sharda.ac.in/sharda-assets/imgs/favi-icon.png" />
+	<!-- Stylesheets -->
+	<link href="https://media.sharda.ac.in/sharda.ac.in/sharda-assets/css/bootstrap-3.3.7.min.css" rel="stylesheet">
+	<link href="https://www.sharda.ac.in/assets/sharda_latest_css/font-awesome.min.css" rel="stylesheet">
+	<link href="https://www.sharda.ac.in/assets/sharda_latest_css/sharda_common_style_min.css?v1.10.90.8.9.09" rel="stylesheet">
+	<script src="https://media.sharda.ac.in/sharda.ac.in/sharda-assets/js/jquery-1.12.2.min.js"></script>
+	<script src="https://www.sharda.ac.in/assets/js/sharda_speak.js"></script>
+			<script>
+			(function(w, d, s, l, i) {
+				w[l] = w[l] || [];
+				w[l].push({
+					'gtm.start': new Date().getTime(),
+					event: 'gtm.js'
+				});
+				var f = d.getElementsByTagName(s)[0],
+					j = d.createElement(s),
+					dl = l != 'dataLayer' ? '&l=' + l : '';
+				j.async = true;
+				j.src =
+					'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+				f.parentNode.insertBefore(j, f);
+			})(window, document, 'script', 'dataLayer', 'GTM-MB7Z4W');
+		</script>
+	<style>
+a { word-break:break-word !important;}
+#main-navigation .dropdown .sub-menu li .sub-menu-listing li { margin-bottom:15px; }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "url": "https://www.sharda.ac.in/",
+  "logo": "https://www.sharda.ac.in/attachments/site_logo/logo22.png"
+}
+</script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollegeOrUniversity",
+      "@id": "https://www.sharda.ac.in/#organization",
+      "name": "Sharda University",
+      "alternateName": "Sharda University Greater Noida",
+      "url": "https://www.sharda.ac.in/",
+      "description": "Sharda University is a NAAC A+ accredited, UGC-approved private university in Greater Noida, Delhi-NCR, offering globally recognized programs in Engineering, Management, and Medical Sciences.",
+      "foundingDate": "2009",
+      "award": ["NAAC A+ Accredited University", "Top Ranked Private University in NCR", "Best Private University in NCR for Global Exposure"],
+      "hasCredential": [
+        {
+          "@type": "EducationalOccupationalCredential",
+          "credentialCategory": "NAAC A+ Accreditation"
+        }
+      ],
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.sharda.ac.in/attachments/site_logo/logo22.png"
+      },
+      "image": "https://www.sharda.ac.in/attachments/site_logo/logo22.png",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Plot No. 32-34, Knowledge Park III",
+        "addressLocality": "Greater Noida",
+        "addressRegion": "Uttar Pradesh (Delhi-NCR)",
+        "postalCode": "201310",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "28.4744",
+        "longitude": "77.4820"
+      },
+      "telephone": "+91-120-4570000",
+      "email": "admissions@sharda.ac.in",
+      "sameAs": [
+        "https://www.facebook.com/ShardaUniversity/",
+        "https://www.instagram.com/sharda_university/",
+        "https://x.com/sharda_uni",
+        "https://www.linkedin.com/school/sharda-university/",
+        "https://www.youtube.com/user/ShardaUniversity",
+        "https://en.wikipedia.org/wiki/Sharda_University"
+      ],
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "telephone": "+91-120-4570000",
+          "contactType": "customer service",
+          "areaServed": "IN",
+          "availableLanguage": ["en", "hi"]
+        }
+      ],
+      "department": [
+        { "@type": "EducationalOrganization", "name": "Sharda School of Computing Science & Engineering" },
+        { "@type": "EducationalOrganization", "name": "Sharda School of Business Studies" },
+        { "@type": "EducationalOrganization", "name": "Sharda School of Engineering & Science" },
+        { "@type": "EducationalOrganization", "name": "Sharda School of Bio-Science & Technology" },
+        { "@type": "EducationalOrganization", "name": "Sharda School of Design" },
+        { "@type": "EducationalOrganization", "name": "Sharda School of Media, Film and Entertainment" },
+        { "@type": "EducationalOrganization", "name": "Sharda School of Law" },
+        { "@type": "EducationalOrganization", "name": "Sharda School of Humanities & Social Sciences" },
+        { "@type": "EducationalOrganization", "name": "Sharda School of Dental Sciences" },
+        { "@type": "EducationalOrganization", "name": "Sharda School of Pharmacy" },
+        { "@type": "EducationalOrganization", "name": "Sharda School of Nursing Science & Research" },
+        { "@type": "EducationalOrganization", "name": "Sharda School of Allied Health Sciences" },
+        { "@type": "EducationalOrganization", "name": "Sharda School of Medical Sciences & Research" }
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.sharda.ac.in/#website",
+      "url": "https://www.sharda.ac.in/",
+      "name": "Sharda University",
+      "publisher": { "@id": "https://www.sharda.ac.in/#organization" },
+      "inLanguage": "en-IN"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://www.sharda.ac.in/#webpage",
+      "url": "https://www.sharda.ac.in/",
+      "name": "Sharda University | Best Private University in NCR",
+      "description": "Ranked among the best private universities in NCR, Sharda University offers NAAC A+ accredited programs with 100% placement support and global exposure.",
+      "isPartOf": { "@id": "https://www.sharda.ac.in/#website" },
+      "about": { "@id": "https://www.sharda.ac.in/#organization" },
+      "inLanguage": "en-IN"
+    }
+  ]
+}
+</script>     
+<!--JS for banner content-->
+    <script>
+    jQuery(document).ready(function($){
+	//set animation timing
+	var animationDelay = 2500,
+		//loading bar effect
+		barAnimationDelay = 3800,
+		barWaiting = barAnimationDelay - 3000, //3000 is the duration of the transition on the loading bar - set in the scss/css file
+		//letters effect
+		lettersDelay = 50,
+		//type effect
+		typeLettersDelay = 150,
+		selectionDuration = 500,
+		typeAnimationDelay = selectionDuration + 800,
+		//clip effect 
+		revealDuration = 600,
+		revealAnimationDelay = 1500;
+	
+	initHeadline();
+	
+
+	function initHeadline() {
+		//insert <i> element for each letter of a changing word
+		singleLetters($('.cd-headline.letters').find('b'));
+		//initialise headline animation
+		animateHeadline($('.cd-headline'));
+	}
+
+	function singleLetters($words) {
+		$words.each(function(){
+			var word = $(this),
+				letters = word.text().split(''),
+				selected = word.hasClass('is-visible');
+			for (i in letters) {
+				if(word.parents('.rotate-2').length > 0) letters[i] = '<em>' + letters[i] + '</em>';
+				letters[i] = (selected) ? '<i class="in">' + letters[i] + '</i>': '<i>' + letters[i] + '</i>';
+			}
+		    var newLetters = letters.join('');
+		    word.html(newLetters).css('opacity', 1);
+		});
+	}
+
+	function animateHeadline($headlines) {
+		var duration = animationDelay;
+		$headlines.each(function(){
+			var headline = $(this);
+			
+			if(headline.hasClass('loading-bar')) {
+				duration = barAnimationDelay;
+				setTimeout(function(){ headline.find('.cd-words-wrapper').addClass('is-loading') }, barWaiting);
+			} else if (headline.hasClass('clip')){
+				var spanWrapper = headline.find('.cd-words-wrapper'),
+					newWidth = spanWrapper.width() + 10
+				spanWrapper.css('width', newWidth);
+			} else if (!headline.hasClass('type') ) {
+				//assign to .cd-words-wrapper the width of its longest word
+				var words = headline.find('.cd-words-wrapper b'),
+					width = 0;
+				words.each(function(){
+					var wordWidth = $(this).width();
+				    if (wordWidth > width) width = wordWidth;
+				});
+				headline.find('.cd-words-wrapper').css('width', width);
+			};
+
+			//trigger animation
+			setTimeout(function(){ hideWord( headline.find('.is-visible').eq(0) ) }, duration);
+		});
+	}
+
+	function hideWord($word) {
+		var nextWord = takeNext($word);
+		
+		if($word.parents('.cd-headline').hasClass('type')) {
+			var parentSpan = $word.parent('.cd-words-wrapper');
+			parentSpan.addClass('selected').removeClass('waiting');	
+			setTimeout(function(){ 
+				parentSpan.removeClass('selected'); 
+				$word.removeClass('is-visible').addClass('is-hidden').children('i').removeClass('in').addClass('out');
+			}, selectionDuration);
+			setTimeout(function(){ showWord(nextWord, typeLettersDelay) }, typeAnimationDelay);
+		
+		} else if($word.parents('.cd-headline').hasClass('letters')) {
+			var bool = ($word.children('i').length >= nextWord.children('i').length) ? true : false;
+			hideLetter($word.find('i').eq(0), $word, bool, lettersDelay);
+			showLetter(nextWord.find('i').eq(0), nextWord, bool, lettersDelay);
+
+		}  else if($word.parents('.cd-headline').hasClass('clip')) {
+			$word.parents('.cd-words-wrapper').animate({ width : '2px' }, revealDuration, function(){
+				switchWord($word, nextWord);
+				showWord(nextWord);
+			});
+
+		} else if ($word.parents('.cd-headline').hasClass('loading-bar')){
+			$word.parents('.cd-words-wrapper').removeClass('is-loading');
+			switchWord($word, nextWord);
+			setTimeout(function(){ hideWord(nextWord) }, barAnimationDelay);
+			setTimeout(function(){ $word.parents('.cd-words-wrapper').addClass('is-loading') }, barWaiting);
+
+		} else {
+			switchWord($word, nextWord);
+			setTimeout(function(){ hideWord(nextWord) }, animationDelay);
+		}
+	}
+
+	function showWord($word, $duration) {
+		if($word.parents('.cd-headline').hasClass('type')) {
+			showLetter($word.find('i').eq(0), $word, false, $duration);
+			$word.addClass('is-visible').removeClass('is-hidden');
+
+		}  else if($word.parents('.cd-headline').hasClass('clip')) {
+			$word.parents('.cd-words-wrapper').animate({ 'width' : $word.width() + 10 }, revealDuration, function(){ 
+				setTimeout(function(){ hideWord($word) }, revealAnimationDelay); 
+			});
+		}
+	}
+
+	function hideLetter($letter, $word, $bool, $duration) {
+		$letter.removeClass('in').addClass('out');
+		
+		if(!$letter.is(':last-child')) {
+		 	setTimeout(function(){ hideLetter($letter.next(), $word, $bool, $duration); }, $duration);  
+		} else if($bool) { 
+		 	setTimeout(function(){ hideWord(takeNext($word)) }, animationDelay);
+		}
+
+		if($letter.is(':last-child') && $('html').hasClass('no-csstransitions')) {
+			var nextWord = takeNext($word);
+			switchWord($word, nextWord);
+		} 
+	}
+
+	function showLetter($letter, $word, $bool, $duration) {
+		$letter.addClass('in').removeClass('out');
+		
+		if(!$letter.is(':last-child')) { 
+			setTimeout(function(){ showLetter($letter.next(), $word, $bool, $duration); }, $duration); 
+		} else { 
+			if($word.parents('.cd-headline').hasClass('type')) { setTimeout(function(){ $word.parents('.cd-words-wrapper').addClass('waiting'); }, 200);}
+			if(!$bool) { setTimeout(function(){ hideWord($word) }, animationDelay) }
+		}
+	}
+
+	function takeNext($word) {
+		return (!$word.is(':last-child')) ? $word.next() : $word.parent().children().eq(0);
+	}
+
+	function takePrev($word) {
+		return (!$word.is(':first-child')) ? $word.prev() : $word.parent().children().last();
+	}
+
+	function switchWord($oldWord, $newWord) {
+		$oldWord.removeClass('is-visible').addClass('is-hidden');
+		$newWord.removeClass('is-hidden').addClass('is-visible');
+	}
+});
+    </script>
+<!--JS for banner content-->
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=DC-12289010"></script>
+	<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'DC-12289010');
+
+// Installation script generated by Spotify Ads Manager
+	(function(w, d){
+	var id='spdt-capture', n='script';
+	if (!d.getElementById(id)) {
+		w.spdt =
+		w.spdt ||
+		function() {
+			(w.spdt.q = w.spdt.q || []).push(arguments);
+		};
+		var e = d.createElement(n); e.id = id; e.async=1;
+		e.src = 'https://pixel.byspotify.com/ping.min.js';
+		var s = d.getElementsByTagName(n)[0];
+		s.parentNode.insertBefore(e, s);
+	}
+	w.spdt('conf', { key: '1ae88b41a59140dcbff99b84749c60d8' });
+	w.spdt('view');
+	})(window, document);
+</script>
+
+<!-- Start of global snippet: Please do not remove. Place this snippet between the <head> and </head> tags on every page of your site.-->
+
+<!-- Google tag (gtag.js) -->
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=DC-16858386"></script>
+
+<script>
+
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag(){dataLayer.push(arguments);}
+
+  gtag('js', new Date());
+
+
+
+  gtag('config', 'DC-16858386');
+
+</script>
+
+<!-- End of global snippet: Please do not remove -->
+
+<!--Event snippet for Sharda University - DV360 Account Floodlight on : Please do not remove.
+ Place this snippet on pages with events you’re tracking.  Creation date: 05/04/2026-->
+
+<script>
+
+  gtag('event', 'conversion', {
+
+    'allow_custom_scripts': true,
+
+    'send_to': 'DC-16858386/invmedia/shard0+standard'
+
+  });
+
+</script>
+
+<noscript>
+
+<img src="https://ad.doubleclick.net/ddm/activity/src=16858386;type=invmedia;cat=shard0;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;npa=;gdpr=${GDPR};gdpr_consent=${GDPR_CONSENT_755};ord=1?" width="1" height="1" alt=""/>
+
+</noscript>
+
+<!-- End of event snippet: Please do not remove -->
+
+</head>
+<!-- /Head -->
+
+
+<!-- Body -->
+
+
+<body data-base-url="https://www.sharda.ac.in/" class="home" id="divContent">
+	<!-- Google Tag Manager (noscript) -->
+	<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MB7Z4W" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	<!-- End Google Tag Manager (noscript) -->
+
+
+
+	<!-- Chat Bot -->
+	<!-- <div class="floating-action-btn" id="fab">
+        	<img src="https://www.sharda.ac.in/assets/imgs/speech-bubble.svg">
+    	</div>
+
+
+		<div class="chat-bot" id="cb" style="display: none">
+        <div class="chat-bot-inner">
+            <div class="chat-header">
+                <div class="chat-name">
+                    <div class="chat-img">
+                        <img src="https://www.sharda.ac.in/assets/imgs/eva_256.png">
+                    </div>
+                    <div class="chat-status">
+                        <h4>Eva</h4>
+                        <p>Online</p>
+                    </div>
+                </div>
+                <img id="cl" src="https://flaticons.net/gd/makefg.php?i=icons/Mobile%20Application/Close.png&r=255&g=255&b=255" class="close-chat">
+            </div>
+            <div class="chat-container" id="chatContainer">
+
+
+
+            </div>
+
+            <div class="chat-input">
+                <input type="text" maxlength="32" id="chatInput">
+                <img src="https://image.flaticon.com/icons/png/512/60/60525.png" onclick="sendChatMessage()">
+            </div>
+            <p class="powered-by"><img src="https://www.sharda.ac.in/assets/imgs/flash.svg"> Powered by <a href="http://www.shardatech.org/" target="_blank">Sharda Tech</a></p>
+        </div>
+    </div> -->
+
+
+	<!-- End Chat Bot -->
+	
+	<!-- home popup -->
+	
+	     
+
+	<!-- Container Wrap -->
+	<div id="container-wrap" class="left-container">
+		<!-- Strip -->
+		<div id="strip" class="container-fluid">
+		<div class="row">
+			
+		<div class="innet-content col-sm-5">
+			<div class="su-header-tops">
+				<!--<span>Admission Open</span>-->
+				<div class="strip-slider imag-sec">
+									<div class="slide">
+						<div class="imag-sec1"> Applications Open for the Academic Session 2026-27
+</div>  <a href="https://www.sharda.ac.in/apply/?utm_source=SU_Website&utm_medium=Header_Ticker&utm_campaign=SU_Admissions_2026" target="_blank" tabindex="0">Apply Now</a>					</div>
+								   
+			</div>
+		  </div>
+		</div>
+			   
+		<!--<div class="col-sm-3 col-xs-12">-->
+	
+			<div class="innet-content col-sm-4">
+                <div class="su-header-tops">
+                	<div class="imag-sec" style="width:auto;">
+					
+					   
+						<div class="slide">
+							<div class="imag-sec1" style="width:270px; margin-right:10px;"> MBA Admissions Open
+</div>  <a href="https://admissions.shardauniversity.com/?utm_source=SU_Website&utm_medium=Header_Ticker&utm_campaign=SU_Admissions_2026" target="_blank" tabindex="0">Apply Now</a>						</div>
+									
+					  <!--<div> <a href="https://slotbooking.sharda.ac.in/sucst-result-2024/" target="_blank" tabindex="0" >Scholarship Phase 2 Result</a></div> -->
+					   <!--<div> <a href="https://www.sharda.ac.in/admissions/credittransfer" target="_blank" tabindex="0" >Credit Transfer Programme</a></div> -->
+					  <!-- <div> <a href="https://admissions.sharda.ac.in/apply/?utm_source=SU_Website&utm_medium=Header_Ticker&utm_campaign=SU_Admissions_2024" target="_blank" tabindex="0" >CUET Scholarship Upto 100%</a></div> -->
+						<div class="imag-sec1" style="width:180px; display:none;" >Medical | Dental </div> <a  style="display:none;"  href="https://medical.sharda.ac.in/?utm_source=SU_Website&utm_medium=Header_Ticker&utm_campaign=SU_Admissions_2026" target="_blank" tabindex="0">Apply Now</a>
+					   <div style=" display:none;">
+							<div class="imag-sec1" style="width:270px; " > Ph.D. Applications Open- Jan 2026 </div> 
+							<a href="https://admissions.sharda.ac.in/phd/?utm_source=SU_Website&utm_medium=Header_Strip_&utm_campaign=PhD_Admissions_Jan_2026" target="_blank" tabindex="0">Apply Now</a>
+							
+						</div>
+						</div>
+				    
+
+              </div>
+			</div> 
+			
+		<!--<div class="innet-content col-sm-3">
+                <div class="su-header-tops">
+                	<div class="imag-sec" style="width:auto;">
+					   <div> <a href="https://www.sharda.ac.in/orientation/view-schedule" target="_blank" tabindex="0" >Student Orientation 2023-24</a></div> 
+				    </div>
+              </div>
+			</div> -->
+		<!--<div class="innet-content col-sm-3">
+                <div class="su-header-tops">
+                	<div class="strip-slider imag-sec">
+					    <div class="slide">
+							<div class="imag-sec1">SUSAT Result 2023 <a href="https://slotbooking.sharda.ac.in/susat-result-2023/?utm_source=SU_Website&utm_medium=Header_Strip_&utm_campaign=susat_results_2023" target="_blank" tabindex="0" style="background-color:#e45c46;text-align:center;">Click here</a></div> 
+						</div>
+				    </div>
+              </div>
+			</div> -->
+		<!--<div class="innet-content col-sm-4">
+                <div class="su-header-tops">
+                	<div class="strip-slider imag-sec">
+					    <div class="slide">
+							<div class="imag-sec1">Ph.D. Applications Open- July 2022 Batch</div> <a href="https://admissions.sharda.ac.in/phd/?utm_source=SU_Website&utm_medium=Header_Strip_&utm_campaign=PhD_Admissions_July_2022" target="_blank" tabindex="0" style="background-color:#e45c46;">Apply Now</a>
+						</div>
+				    </div>
+              </div>
+			</div>-->
+			<!--<div class="innet-content col-sm-4">
+                <div class="su-header-tops">
+                	
+                    <div class="strip-slider imag-sec">
+					
+						<div class="slide">
+							<div class="imag-sec1">Ph.D Applications Closing on 23rd July 2021</div>   <a href="https://admissions.sharda.ac.in/phd/?utm_source=SU_Website&utm_medium=Header_Ticker&utm_campaign=PhD_Admissions_July_2021" target="_blank" tabindex="0">Apply Now</a> 
+						</div>
+					
+				       
+				</div>
+              </div>
+			</div>-->
+	<!--		<div class="innet-content col-sm-4">
+                <div class="su-header-tops">
+                	
+                    <div class="strip-slider imag-sec">
+					
+						<div class="slide">
+							<div class="imag-sec1">UG, PG Medical & Dental | 2022</div>  <a href="https://medical.sharda.ac.in/" target="_blank" tabindex="0">Apply Now</a></div>
+						</div>
+					
+				       
+				</div>
+              </div>-->
+			
+			<div class="col-sm-3 col-xs-12">
+			 <a href="javascript:void(0)" class="header-audio" id="music-on"><i class="fa fa-volume-off" aria-hidden="true"></i></a>
+				<script>
+					$(document).ready(function(){
+						$("#music-on").click(function(){
+							$(".header-audio .fa").toggleClass("fa-volume-up");
+							if($(".header-audio .fa").hasClass('fa-volume-up')){
+								enableSpeakVerification();
+							} else {
+								disableSpeakVerification();
+							}
+						});
+						
+					});
+				</script>
+			
+				<ul class="header-asize">
+					<li><a href="javascript:void(0)" id="linkIncrease" title="Increase font size">A+</a></li>
+					<li><a href="javascript:void(0)" id="linkDecrease" title="Decrease Font Size">A-</a></li>
+					<li class="active"><a href="javascript:void(0)" title="Reset Font Size" id="linkReset">A</a></li> 
+				</ul>
+				<!--<ul class="strip-links">
+					<!--<li><span class="blinking">New</span><a href="https://convocation.sharda.ac.in/" target="_blank">7th Convocation Ceremony</a></li>-->
+					<!--<li><!--<span class="blinking">New</span>--><!--<a href="https://www.sharda.ac.in/orientation/" target="_blank">REGISTRATION 2021</a>--></li>
+					<!--<li><span class="blinking">New</span><a href="https://admissions.sharda.ac.in/phd/?utm_source=SU_Website&utm_medium=Header_Ticker_Phd&utm_campaign=SU_Admissions_2021" target="_blank">Ph.D. Admissions Open 2021</a></li>-->
+					<!--<li><a href="https://customer.grayquest.com/" target="_blank">Fee Payment (EMI)</a></li>
+					<!--<li><a href="https://dental.sharda.ac.in" target="_blank" title="MDS Registration 2021">MDS Registration 2021</a></li>-->
+				<!--</ul>-->
+				
+				<div class="emi-fee"> <span>Fee Payment (EMI) </span>
+					<div class="emi-feeoption"> 
+						<a href="https://customer.grayquest.com/" target="_blank"> GrayQuest</a>
+						<a href="https://propelld.com/" target="_blank"> Propelld</a>
+					</div>
+				</div>
+				   <div class="amrit" style="display:none;">
+                	<!--<img src="https://www.sharda.ac.in/assets/imgs/flag.png">-->
+                    <style>
+					<!--.strip-links { float:right; padding:0; }
+                    .amrit { float:right;  }
+					.amrit img { width:100%;height:33px; margin:0px 10px 0 0; }
+					 -->
+					   
+                    </style>
+                </div>
+			</div>
+			</div>
+		</div> 
+		</div> 
+		<!-- /Strip -->
+		<!-- Header -->
+		<header id="header" class="fixed dark">
+			<div class="strip-for-mobile slide" style="width:100%; float:left;">
+			  <!--<span class="blinkingText" style="font-size: 12px;" >New</span>--> <!--<a href="https://www.sharda.ac.in/apply/?utm_source=SU_Website&utm_medium=Header_Ticker&utm_campaign=SU_Admissions_2021" target="_blank">--> <!--Admissions Open 2021-22 <a href="https://dental.sharda.ac.in/?utm_source=SU_Website&amp;utm_medium=Header_Ticker_Dental&amp;utm_campaign=SU_Admissions_2021" class="btn button1" target="_blank" tabindex="0" style="background: #00c1a1;color: #fff !important; padding: 2px 8px;">Apply Now</a>-->
+			  <!--<p style="width:100%; float:left;"><marquee behavior="scroll"><strong>Admission open only against vacant/lapsed seats. Apply online or call 0120-4570000.</strong></marquee></p> -->
+			  <!--<p style="width:100%; float:left;"><marquee behavior="scroll"><strong>Admission 2021 closed except Medical/Dental</strong></marquee></p> -->
+			
+ 		
+			  <!--<span class="blinkingText" style="font-size: 12px;" >New</span> <a href="https://www.sharda.ac.in/payment-procedure.html" target="_blank">Fee Payment (EMI)</a>-->
+			</div>
+			<div class="container-fluid">
+				<!-- Logo -->
+				<div class="logo">
+					<a href="https://www.sharda.ac.in/">
+													<img src="https://www.sharda.ac.in/attachments/site_logo/logo111.png" class="home-logo" alt="logo"></img>
+							<img src="https://www.sharda.ac.in/attachments/site_logo/logo22.png" class="fixed-header-logo" alt="logo" style="didplay:none;"></img>
+											</a>
+                    
+				</div>
+				<!-- /Logo -->
+
+								<!-- National International -->
+				<!-- Main Navigation -->
+								<nav id="main-navigation">
+					<button type="button" class="menu-btn">
+						<span class="line"></span>
+						<span class="line"></span>
+						<span class="line"></span>
+					</button>
+					<ul>
+													<li class="academics ">
+																										
+																<a class="nav-path-selected accordion" href="javascript:void(0)">Academic</a>
+								<!-- Dropdown -->
+								<div class="dropdown">
+									<ul class="sub-menu">
+																					<li>
+												<h3>Programme 2026-27</h3>
+												<!-- Sub-menu-listing -->
+												<ul class="sub-menu-listing">
+																											<li>
+															<a href="https://www.sharda.ac.in/academics/graduate">Graduate</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/academics/post-graduate">Post Graduate</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/academics/doctoral">Doctoral</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/academics/diploma">Diploma</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/academics/integrated">Integrated</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/academics/short-term">Certificate</a>
+														</li>
+																									</ul>
+												<!-- /Sub-menu-listing -->
+											</li>
+											<li class="no-margin">
+												<h3 style='text-transform: none;'>Schools </h3>
+												<!-- Sub-menu-listing -->
+												<ul class="sub-menu-listing">
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/business-studies">Sharda School of Business Studies</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/computing-science-engineering">Sharda School of Computing Science & Engineering</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/engineering-science">Sharda School of Engineering & Science</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/engineering-and-basic-science">Sharda School of Bio-Science & Technology</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/architecture-planning">Sharda School of Design</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/media-film-and-entertainment">Sharda School of Media, Film and Entertainment</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/law-school">Sharda School of Law</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/language-culture">Sharda School of Humanities & Social Sciences</a>
+														</li>
+																										<li>
+														<a href="https://shardaonline.ac.in" target="_blank" title ="Sharda Online" >Sharda Online</a>
+													</li>
+												</ul>
+												<!-- /Sub-menu-listing -->
+											</li>
+
+											<li>
+												<h3 class="hidden-xs">&nbsp;  </h3>
+												<!-- Sub-menu-listing -->
+												<ul class="sub-menu-listing">
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/dental-sciences">School of Dental Sciences</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/allied-health-sciences">Sharda School of Allied Health Sciences</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/school-of-medical-sciences-and-research">Sharda School of Medical Sciences & Research</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/nursing-science-research">Sharda School of Nursing Science & Research</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/school-of-pharmacy">School of Pharmacy</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/education">School of Education</a>
+														</li>
+																											<li>
+															<a href="https://www.sharda.ac.in/schools/school-of-agricultural-sciences">Sharda School of Agricultural Sciences</a>
+														</li>
+																									</ul>
+												<!-- /Sub-menu-listing -->
+											</li>
+
+																							<li>
+													<h3>Academic Info</h3>
+													<!-- Sub-menu-listing -->
+													<ul class="sub-menu-listing">
+																													<li>
+																<a href="https://www.sharda.ac.in/exam-result">Exam Results</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/examination-schedule">Examination Schedule</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/academics/examination-annual-report">Examination Annual Report</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/academic-calendar">Academic Calendar</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/system-of-grading">System of Grading</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/academics/degreeverification">Degree Verification</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/academics/national-academic-depository">National Academic Depository(NAD)</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/academics/academic-bank-of-credits">Academic Bank of Credits (ABC)</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/academics/programme-curricula">Programme Curricula</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/academics/curricula-feedback">Curricula Feedback</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/academics/university-brochure">University Brochure</a>
+															</li>
+														
+													</ul>
+													<!-- /Sub-menu-listing -->
+
+												</li>
+																																	<li>&nbsp;</li>
+
+										
+																					<li class="quick-links">
+												<h3>Quick Links</h3>
+												<!-- Sub-menu-listing -->
+												<ul class="sub-menu-listing">
+																												<li>
+																<a href="https://www.sharda.ac.in/student-testimonial" ><i class="icon-arrow-right icons"></i> Testimonials</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/connect/news" ><i class="icon-arrow-right icons"></i> What's Happening</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/contact" ><i class="icon-arrow-right icons"></i> Contact Us</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/connect/gallery" ><i class="icon-arrow-right icons"></i> Image Gallery</a>
+															</li>
+																													<li>
+																<a href="https://app.edumarshal.com/TranscriptRequest?guid=e21d58ea-1109-4558-af84-546a5786e93c"  target="_blank" ><i class="icon-arrow-right icons"></i> Student Service Request</a>
+															</li>
+																										</ul>
+												<!-- /Sub-menu-listing -->
+																									
+
+											</li>
+																			</ul> 
+
+								</div>
+								<!-- /Dropdown -->
+							</li>
+													<li class="admissions ">
+																										
+																<a class="nav-path-selected accordion" href="javascript:void(0)">Admissions</a>
+								<!-- Dropdown -->
+								<div class="dropdown">
+									<ul class="sub-menu">
+																							<li class="no-margin">
+														<h3>Applying to Sharda</h3>
+														<!-- Sub-menu-listing -->
+														<ul class="sub-menu-listing">
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions">Overview</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions/vtour">Campus Virtual Tour</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions/admission-criteria">Admission Criteria</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions/admission-flow">Admission Flow</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/course-fee">Programme Fee</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions/hostel-fee">Hostel Fee</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions/transportation-fee">Transportation Fee</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/scholarship">Scholarship</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions/innovative-idea-scholarship">Innovative Idea Scholarship</a>
+																</li>
+																													</ul>
+														<!-- /Sub-menu-listing -->
+													</li>
+
+													<li>
+														<h3 class="hidden-xs">&nbsp;</h3>
+														<!-- Sub-menu-listing -->
+														<ul class="sub-menu-listing">
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions/fee-structure-for-previous-year-students"  >Fee Structure for Previous Year Students</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions/education-loan-assistance"  >Education Loan Assistance</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions/how-to-apply"  >How to Apply</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/contact"  >Counseling Centres</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/payment-procedure.html"  >Payment Procedure</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions/refund-policy"  >Refund Policy</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions/sharda-benefits"  >Avenues for success@sharda</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions/lateral-entry"  >Lateral Entry/Migration</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/admissions/faq"  >FAQs</a>
+																</li>
+																													</ul>
+														<!-- /Sub-menu-listing -->
+
+													</li>
+																										<li>
+															<h3>SUAT 2026</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://suat.sharda.ac.in/"  target = "_blank" >About SUAT</a>
+																	</li>
+																																	<li>
+																		<a href="https://slotbooking.sharda.ac.in/?utm_source=su_website&utm_medium=menu&utm_campaign=admissions_2025"  target = "_blank" >SUAT Exam Slot Booking</a>
+																	</li>
+																																	<li>
+																		<a href="https://suat.sharda.ac.in/test-process"  target = "_blank" >Test Process</a>
+																	</li>
+																																	<li>
+																		<a href="https://suat.sharda.ac.in/exam-centres"  target = "_blank" >Exam Centre</a>
+																	</li>
+																																	<li>
+																		<a href="https://suat.sharda.ac.in/exam-rules"  target = "_blank" >SUAT Exam Guidelines</a>
+																	</li>
+																																	<li>
+																		<a href="https://suat.sharda.ac.in/sample-paper"  target = "_blank" >Sample Papers</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+																											<li>
+															<h3>Study Abroad</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://www.sharda.ac.in/admissions/global-overview" >Overview</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/admissions/programs" >Programs</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/admissions/global-how-to-apply" >Application Procedure</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/admissions/international-tie-ups" >International Academic Tie-Ups</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/admissions/global-knowledge-seekers" >Global Knowledge Seekers</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/admissions/global-newsletter" >Newsletter</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/admissions/study-abroad-office" >Study Abroad Office</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/admissions/study-abroad-faqs" >FAQs</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+																											<li>
+															<h3>Placements</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://www.sharda.ac.in/placements" >Overview</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/admissions/top-placement" >Top Placement</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/placements#placement-highlights" >Placement Highlights</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/admissions/placement-policy" >Placement Policy</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/placements#our-recruiters" >Our Recruiters</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/placements#contact-placement" >Contact Placement Cell</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+													
+																			</ul> 
+
+								</div>
+								<!-- /Dropdown -->
+							</li>
+													<li class="campuslife ">
+																										
+																<a class="nav-path-selected accordion" href="javascript:void(0)">Campus Life</a>
+								<!-- Dropdown -->
+								<div class="dropdown">
+									<ul class="sub-menu">
+																							<li class="no-margin">
+														<h3>Campus Facilities</h3>
+														<!-- Sub-menu-listing -->
+														<ul class="sub-menu-listing">
+																															<li>
+																	<a href="https://www.sharda.ac.in/campuslife/infrastructure">Infrastructure</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/campuslife/academic-facilities">Academic Facilities</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/campuslife/campus-facilities">Campus Facilities</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/campuslife/transportation">Transportation</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/campuslife/residential-facilities">Residential Facilities</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/library">Library</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/campuslife/schools">Schools</a>
+																</li>
+																													</ul>
+														<!-- /Sub-menu-listing -->
+													</li>
+
+													<li>
+														<h3 class="hidden-xs">&nbsp;</h3>
+														<!-- Sub-menu-listing -->
+														<ul class="sub-menu-listing">
+																															<li>
+																	<a href="https://www.sharda.ac.in/campuslife/auditorium"  >Auditorium</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/dsw"  >Student Welfare</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/campuslife/itservices"  >IT Services</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/campuslife/banking-and-postal-services"  >Banking And Postal Services</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/campuslife/art-and-culture"  >Art And Culture</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/campuslife/jainstudycenter"  >Jain Study Center</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/campuslife/gender-sensitization"  >Gender Sensitization</a>
+																</li>
+																													</ul>
+														<!-- /Sub-menu-listing -->
+
+													</li>
+																										<li>
+															<h3>Event Gallery</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://www.sharda.ac.in/campuslife/gallery" >Image Gallery</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/campuslife/video-gallery" >Video Gallery</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+													
+																					<li class="quick-links">
+												<h3>Quick Links</h3>
+												<!-- Sub-menu-listing -->
+												<ul class="sub-menu-listing">
+																												<li>
+																<a href="https://www.sharda.ac.in/student-testimonial" ><i class="icon-arrow-right icons"></i> Testimonials</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/contact" ><i class="icon-arrow-right icons"></i> Contact Us</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/connect/events" ><i class="icon-arrow-right icons"></i> Event Calendar</a>
+															</li>
+																										</ul>
+												<!-- /Sub-menu-listing -->
+																									
+
+											</li>
+																			</ul> 
+
+								</div>
+								<!-- /Dropdown -->
+							</li>
+													<li class="about ">
+																										
+																<a class="nav-path-selected accordion" href="javascript:void(0)">About</a>
+								<!-- Dropdown -->
+								<div class="dropdown">
+									<ul class="sub-menu">
+																							<li class="no-margin">
+														<h3>Get to know sharda</h3>
+														<!-- Sub-menu-listing -->
+														<ul class="sub-menu-listing">
+																															<li>
+																	<a href="https://www.sharda.ac.in/about/sharda-group">Sharda Group</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/about/jain-ideals">Jain Ideals</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/about-us">Overview & Identity</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/about/core-values">Core Values</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/about/mission-and-vision">Vision & Mission</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/about/perspectiveplan">Perspective Plan</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/about/leadership/chancellor">Leadership</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/faculty">Faculty</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/about/history">History</a>
+																</li>
+																													</ul>
+														<!-- /Sub-menu-listing -->
+													</li>
+
+													<li>
+														<h3 class="hidden-xs">&nbsp;</h3>
+														<!-- Sub-menu-listing -->
+														<ul class="sub-menu-listing">
+																															<li>
+																	<a href="https://www.sharda.ac.in/about/advisoryboard"  >Advisory Board</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/about/career"  >Work at Sharda</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/about/government-affiliations"  >Government Affiliations</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/about/university-authorities"  >Statutory Bodies of the University</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/about/tenders"  >Sharda Tenders</a>
+																</li>
+																															<li>
+																	<a href="https://www.sharda.ac.in/about/aiintegratedprogram"  >AI Integrated Program</a>
+																</li>
+																															<li>
+																	<a href="https://ipfc.sharda.ac.in/"  target = "_blank"  >Intellectual Property Facilitation Center</a>
+																</li>
+																															<li>
+																	<a href="https://sustainability.sharda.ac.in/"  target = "_blank"  >Sustainability in Sharda</a>
+																</li>
+																													</ul>
+														<!-- /Sub-menu-listing -->
+
+													</li>
+																										<li>
+															<h3>Info About</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://www.sharda.ac.in/website-links" >Public Self Disclosure</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/about/ordinances" >Act, Statutes and Ordinances</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/about/oganizational-structure" >Organizational Structure</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/about/rti" >RTI</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/about/best-practice" >Best Practice</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/about/thrust-areas" >Thrust Areas</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/about/covid-19" >COVID19</a>
+																	</li>
+																																	<li>
+																		<a href="https://psycounselling.sharda.ac.in/"  target = "_blank" >Psychological Counselling Cell</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/about/analytical-center" >Analytical center</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+																											<li>
+															<h3>Capacity Development & Skill Enhancement</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://skills.sharda.ac.in/"  target = "_blank" >Language and Communication Skill Initiatives: Sharda Skills</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/ccdc"  target = "_blank" >Soft Skill Initiatives : Career Counseling and Development Center</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/dsw/sports/lifeskills"  target = "_blank" >Life Skill Initiatives</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/iic"  target = "_blank" >Awareness of Trends in Technology : IIC</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+																											<li>
+															<h3>Entrepreneurship</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://launchpad.sharda.ac.in/"  target = "_blank" >Sharda Launchpad</a>
+																	</li>
+																																	<li>
+																		<a href="https://startup.sharda.ac.in/"  target = "_blank" >Sharda Startup</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/innovation-and-entrepreneurship" >Innovation and Entrepreneurship</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+																											<li>
+															<h3>Experience @ Sharda</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://www.sharda.ac.in/about/success-stories" >Success Stories</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/student-testimonial" >Student Testimonials</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/awards-and-achievements" >Awards and Achievements</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/about/teaching-learning-centre" >Teaching Learning Centre</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+													
+																			</ul> 
+
+								</div>
+								<!-- /Dropdown -->
+							</li>
+													<li class="connect ">
+																										
+																<a class="nav-path-selected accordion" href="javascript:void(0)">Connect</a>
+								<!-- Dropdown -->
+								<div class="dropdown">
+									<ul class="sub-menu">
+																								<li>
+															<h3>Whats happening</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://shardaevents.com/"  target = "_blank" >Event Calendar</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/connect/upcoming-events" >Upcoming Events</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/happenings" >Announcements</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/connect/news" >News</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/connect/media-coverage" >Media Coverage</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/connect/radiofm" >FM Radio: Suno Sharda-90.8FM</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+																											<li>
+															<h3>Alumni</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://alumni.sharda.ac.in/"  target = "_blank" >Alumni Connect</a>
+																	</li>
+																																	<li>
+																		<a href="https://alumni.sharda.ac.in/"  target = "_blank" >Alumni Overview</a>
+																	</li>
+																																	<li>
+																		<a href="https://alumni.sharda.ac.in/page/contact-us.dz"  target = "_blank" >Alumni Office Contacts</a>
+																	</li>
+																																	<li>
+																		<a href="https://alumni.sharda.ac.in/user/login.dz"  target = "_blank" >Become a Mentor</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/attachments/common_files/Student_Database.pdf"  target = "_blank" >Student Database</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+																											<li>
+															<h3>Downloads</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://www.sharda.ac.in/connect/brochure" >Brochure</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/connect/registration-form" >Registration Form</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/connect/migration-policy" >Migration Policy</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/connect/sops" >SOPs</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/connect/guidelines" >Guidelines</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/connect/academic-progression-rule" >Academic Progression Rule</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/connect/newsletter" >Newsletter</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/connect/the-shardans" >The Shardans</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/connect/nba" >nba</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+													
+																					<li class="quick-links">
+												<h3>Quick Links</h3>
+												<!-- Sub-menu-listing -->
+												<ul class="sub-menu-listing">
+																												<li>
+																<a href="https://www.sharda.ac.in/student-testimonial" ><i class="icon-arrow-right icons"></i> Testimonials</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/connect/news" ><i class="icon-arrow-right icons"></i> What's Happening</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/contact" ><i class="icon-arrow-right icons"></i> Contact Us</a>
+															</li>
+																													<li>
+																<a href="https://www.sharda.ac.in/connect/gallery" ><i class="icon-arrow-right icons"></i> Image Gallery</a>
+															</li>
+																										</ul>
+												<!-- /Sub-menu-listing -->
+																									
+
+											</li>
+																			</ul> 
+
+								</div>
+								<!-- /Dropdown -->
+							</li>
+													<li class="international ">
+																										
+																<a class="nav-path-selected accordion" href="https://sharda.ac.in/international">International</a>
+								<!-- Dropdown -->
+								<div class="dropdown">
+									<ul class="sub-menu">
+																								<li>
+															<h3>International Admissions</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/why-choose-sharda" >Why Choose Sharda</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/global-course-fee" >Programme Fee</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/accommodation-fee" >Accommodation Fee</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/guidelines" >How to apply</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/admission-rules" >Admission Rules</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/global-payment-procedure" >Payment Procedure</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/globalscholarship" >Scholarship</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/admission-faqs" >FAQs</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/admission-flow" >Admission Flow</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+																											<li>
+															<h3>Student Information</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/notification" >Student Notification</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/pre-arrival-information" >Pre-Arrival Information</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/post-arrival-information" >Post-Arrival Information</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/guidelines-for-visa" >Guidelines for Visa and FRO/FRRO</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/international-medical-insurance" >Guidelines for Medical Insurance</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/examination-instructions" >Examination Instructions</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/international-hostel-rules" >Hostel Rules Manual</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/general-faqs" >FAQs</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/students-speak" >Student's Speak</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+																											<li>
+															<h3>Study Abroad</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/global-overview" >Overview</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/programs" >Programs</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/global-how-to-apply" >Application Procedure</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/international-tie-ups" >International Tie-ups</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/global-newsletter" >Newsletter</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/study-abroad-office" >Study Abroad Office</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/study-abroad-faqs" >FAQs</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+																											<li>
+															<h3>Short Term Programmes</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/short-term-programmes" >Certificate Programmes</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/observership-programmes" >Observership Programmes</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/erasmus" >Erasmus</a>
+																	</li>
+																
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+																											<li>
+															<h3>Info About</h3>
+															<!-- Sub-menu-listing -->
+															<ul class="sub-menu-listing">
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/help-and-support" >Help & Support</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/admission-offices" >Admission Offices</a>
+																	</li>
+																																	<li>
+																		<a href="https://www.sharda.ac.in/international/world-is-here" >World is Here</a>
+																	</li>
+																
+																																	<a href="https://www.sharda.ac.in/international/apply/?utm_source=SU_Website&utm_medium=Apply_Button&utm_campaign=SU_Admissions_2026" class="btn button14 apply-btn apply_now" target="_blank">Apply Now</a> 
+																	
+																	
+																	<!--<a href="https://www.sharda.ac.in/chat-with-a-student-ambassador" class="btn button14 apply-btn">Chat with a Student Ambassador </a> -->
+													
+													
+																															</ul>
+															<!-- /Sub-menu-listing -->
+														</li>
+													
+																			</ul> 
+
+								</div>
+								<!-- /Dropdown -->
+							</li>
+												<li class="admissions research ">
+								<a href="https://www.sharda.ac.in/research" class="nav-path-selected">Research</a>
+						</li>
+						<li class="academics iqac ">
+								<a href="https://www.sharda.ac.in/iqac/" target="_blank" class="nav-path-selected">IQAC</a>
+						</li>		   
+					</ul>
+				</nav>
+				<!-- /Main Navigation -->
+
+				<!-- User Area -->
+				<div class="user-area">
+					<ul>
+						<!--
+						<li class="category-menu">
+								<a href="javascript:void(0)">International</a>
+								<div class="category-content">
+								  <h6>For International Students</h6>
+								  <ul>
+									<li><a href="https://www.sharda.ac.in/international" target="_blank">Overview</a></li>
+									<li><a href="https://www.sharda.ac.in/admissions/internationaluniversitiestieups" target="_blank">Global Academic Tie-Ups</a></li>
+									<li><a href="https://www.sharda.ac.in/placements#center-excellence">Center Of Excellence</a></li>
+									<li><a href="https://www.sharda.ac.in/international#president-msg">Persident's Message</a></li>
+									<li><a href="https://www.sharda.ac.in/international#scholarship">Scholarship</a></li>
+									<li><a href="https://www.sharda.ac.in/international#how-to-apply">How to Apply</a></li>
+
+								  </ul>
+							</div>
+							</li> -->
+					<li class="category-menu">
+						<a href="#">Apply <svg width="46px" height="46px" viewBox="0 0 46 46" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+									<g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+										<circle class="circle-stroke" id="Oval" stroke-width="4" fill-rule="nonzero" cx="23" cy="23" r="20"></circle>
+										<circle class="circle-color" id="Oval" fill-rule="nonzero" cx="12" cy="23" r="3"></circle>
+										<circle class="circle-color" id="Oval-Copy" fill-rule="nonzero" cx="23" cy="23" r="3"></circle>
+										<circle class="circle-color" id="Oval-Copy-2" fill-rule="nonzero" cx="34" cy="23" r="3"></circle>
+									</g>
+
+								</svg></a>
+							<div class="category-content category-contentnes">
+							<style>
+							#header .user-area .category-menu:hover a { color:#000 !important; }
+							.category-contentnes li a {  font-size:14px !important; padding: 7px 0 !important;  }
+							.category-contentnes li a:hover { color:#00bfe7 !important; } 
+							</style>
+							<ul>
+									<li>
+						   							<a href="https://www.sharda.ac.in/apply/?utm_source=SU_Website&utm_medium=Apply_Header&utm_campaign=SU_Admissions_2026" class="apply_now"><i class="fa fa-angle-right" aria-hidden="true"></i> National Students</a>
+
+							</li>
+							<li><a href="https://www.sharda.ac.in/international/apply/?utm_source=SU_Website&utm_medium=Apply_National&utm_campaign=SU_Admissions_2026" target="_blank"><i class="fa fa-angle-right" aria-hidden="true"></i> International Students</a></li>
+							<li><a href="https://admissions.shardauniversity.com/?utm_source=SU_Website&utm_medium=Apply_Menu&utm_campaign=MBA_Admissions" rel="nofollow" target="_blank"><i class="fa fa-angle-right" aria-hidden="true"></i> MBA Admissions</a></li>
+							</div>
+
+								 
+							 
+						</li>
+						
+						<li class="category-menu">
+							<a href="#"><svg width="46px" height="46px" viewBox="0 0 46 46" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+									<g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+
+										<circle class="circle-stroke" id="Oval" stroke-width="4" fill-rule="nonzero" cx="23" cy="23" r="20"></circle>
+
+										<circle class="circle-color" id="Oval" fill-rule="nonzero" cx="12" cy="23" r="3"></circle>
+
+										<circle class="circle-color" id="Oval-Copy" fill-rule="nonzero" cx="23" cy="23" r="3"></circle>
+
+										<circle class="circle-color" id="Oval-Copy-2" fill-rule="nonzero" cx="34" cy="23" r="3"></circle>
+
+									</g>
+
+								</svg></a>
+							<div class="category-content">
+
+								<h6>For Students</h6>
+								<ul>
+									<li><a href="https://nad.digitallocker.gov.in" target="_blank">Digilocker</a></li>
+									<li><a href="https://alumni.sharda.ac.in/user/login.dz" target="_blank">Alumni Portal Login</a></li>
+									<!--<li><a href="http://sharda.vattendance.in/" target="_blank">Sharda vAttendance Portal</a></li>-->
+									<li><a href="https://student.esharda.net/psp/CSPRD/?cmd=login&languageCd=ENG&" rel="nofollow" target="_blank">Student Login</a></li>
+									<!--<li><a href="http://sulms.sharda.ac.in/" target="_blank">LMS Login</a></li>-->
+									<li><a href="https://shardaevents.com/" target="_blank">Event Calendar</a></li>
+									<li><a href="https://mail.google.com/" rel="nofollow" target="_blank">Webmail</a></li>
+					<li><a href="https://examination.sharda.ac.in/service-request.html" target="_blank">Student Service Request</a></li>								
+	<li><a href="https://app.edumarshal.com/TranscriptRequest?guid=e21d58ea-1109-4558-af84-546a5786e93c" rel="nofollow" target="_blank">No Dues Form</a></li>
+								</ul>
+
+
+								<h6> For Employees</h6>
+
+								<ul>
+									<li><a href="https://employee.esharda.net/psp/HRPRD/?cmd=login" target="_blank">Employee Login</a></li>
+									<li><a href="https://ezone.sharda.ac.in/ezone-2022/" target="_blank">Ezone Login</a></li>
+									<li><a href="https://paramarsh.sharda.ac.in/" target="_blank">Paramarsh- Our Mentoring Portal</a></li>
+									<!--<li><a href="http://sharda.vattendance.in/" target="_blank">Sharda vAttendance Portal</a></li>-->
+									<!--<li><a href="http://14.139.238.51/" target="_blank">Manager Attendance Portal</a></li> -->
+									<li><a href="https://shardaevents.com/" target="_blank">Event Calender</a></li>
+									<li><a href="https://finance.esharda.net/psp/FSPRD/?cmd=login&languageCd=ENG&" target="_blank">Accounts Login</a></li>
+									<li><a href="https://mail.google.com/" rel="nofollow" target="_blank">Webmail</a></li>
+								</ul>
+								<!-- Menu Quick Links -->
+								<div class="menu-quick-links"> 
+									<ul>
+										<li>
+											<a href="https://www.sharda.ac.in/library" target="_blank"><i class="fa fa-book" aria-hidden="true"></i>Teaching Learning Portal</a>
+										</li>
+										<li>
+											<a href="https://grievance.sharda.ac.in/" target="_blank"><i class="fa fa-users" aria-hidden="true"></i> Grievance Portal</a>
+										</li>
+										<li>
+											<a href="https://www.sharda.ac.in/about/career" target="_blank"><i class="fa fa-briefcase" aria-hidden="true"></i> Jobs At Sharda</a>
+										</li>
+										<!--<li>
+											<a href="https://fccs.sharda.ac.in" target="_blank"><i class="fa fa-handshake-o" aria-hidden="true"></i>Family Counselling Portal</a>
+										</li>-->
+										<li>
+											<a href="https://www.sharda.ac.in/contact" target="_blank"><i class="fa fa-envelope" aria-hidden="true"></i> Contact</a>
+										</li>
+									</ul>
+								</div>
+								<!-- /Menu Quick Links -->
+							</div>
+						</li>
+						<!--<li>
+							<a href="https://www.sharda.ac.in/search" class="search"><i class="fa fa-search" aria-hidden="true"></i></a>
+						</li>-->
+					</ul>
+				</div>
+				<!-- /User Area -->
+
+			</div>
+
+		</header>
+<!-- <img src="https://www.sharda.ac.in/assets/imgs/maintenance.png" width="100%" />-->
+
+<style>
+
+#banner:after { display:none; }
+.jainslider { padding-top:90px;overflow:hidden; }
+.jainslider img { width:100%; }
+.dotes .slick-arrow { display:none !important; }
+.dotes .slick-dots {	display: flex; justify-content: center; margin: 0; padding: 1rem 0;	list-style-type: none; position:absolute; left:0px; bottom:20px; width:100%; padding:0px; }	
+.dotes .slick-dots li { padding:0; margin:0 5px; }
+.dotes .slick-dots li:last-child { margin-bottom:0px; }
+.dotes .slick-dots li:first-child {   }
+.dotes .slick-dots li button { display: block; width: 11px; height: 11px; padding: 0; border: none;		border-radius: 50%; background:#fafafa; text-indent: -9999px; b  margin:0px 10px; }
+.dotes .slick-dots li.slick-active button { background-color: #3051a0;  }
+
+</style>
+			<!-- Banner -->
+			<!--<div id="banner" >-->
+					<div class="jainslider dotes">
+																	<a href="https://www.sharda.ac.in/apply/?utm_source=SU_Website&utm_medium=home_banner&utm_campaign=SU_Admissions_2026" target="_blank">
+															<img class="lazy" data-src="https://www.sharda.ac.in/attachments/banner_images/applications_open_2026-27(1).jpg" alt="Hero Banner 1"></img>
+							</a>
+					<a> 								<img class="lazy" data-src="https://www.sharda.ac.in/attachments/banner_images/banner_collage.jpg" alt="Home Banner New"></img>
+							</a>
+										</div>
+               <script>
+				 $(document).ready(function() {
+				$('.jainslider').slick({
+				  dots: true,
+				  infinite: true,
+				  speed: 500,
+				  autoplay: true,
+				  slidesToShow: 1,
+				  arrows: false,
+			
+				});
+				});
+				</script>						
+			<!-- Banner -->
+		<!--	<div id="banner" >
+				<video class="banner-video" loop autoplay preload="auto"  muted playsinline>
+					<source src="https://www.sharda.ac.in/attachments/common_files/home-banner-vid3.mp4" data-image='' type="video/mp4" >
+				</video> -->
+
+<!--				<div class="container">
+					<div class="inner-content">
+                        <h1>Sharda University</h1>
+					<section class="cd-intro">
+						 <h2 class="cd-headline loading-bar">
+							
+							<span class="cd-words-wrapper">
+								<b class="is-visible">The World is Here, Where Are You</b>
+								<b>Students From 95+ Countries</b>
+								<b>330+ Functional MOUs</b>
+							</span>
+						</h2>
+					</section> -->
+                     
+						<!--<a class="search-box" href="https://www.sharda.ac.in/search">Find Programme<i class="fa fa-search"></i></a> -->
+                        <!--<a class="search-box" href="<?//=base_url('admissions')?>">Admissions</a>-->
+			<!--	</div>
+				</div>
+
+				<div class="playpause">
+					<a href="javascript:void(0);">
+					<i class="fa fa-pause" aria-hidden="true"></i>
+					<i class="fa fa-play" aria-hidden="true"></i>
+					</a>
+				</div>
+				<a class="scroll-down section-scroll" href="#featured-list" rel="nofollow"><i class="fa fa-angle-double-down" aria-hidden="true"></i></a>
+			</div> -->
+			<!-- /Banner -->
+
+			<!-- Featured List -->
+			<section id="featured-list">   
+				<div class="container">
+				<div class="scrolling">
+					<ul class="clearfix">
+													<li class="apply online">
+								<a href="https://www.sharda.ac.in/apply/?utm_source=SU_Website&utm_medium=quick_link&utm_campaign=SU_Admissions_2026" title="Apply Online" >
+									<div class="inner">
+										 <i class="fa fa-check" aria-hidden="true"></i>									</div>
+									<h6>Apply Online</h6>
+								</a>
+							</li>
+														<li class="schools">
+								<a href="https://www.sharda.ac.in/campuslife/schools" title="Schools" >
+									<div class="inner">
+										   <div class="round-icon"><i class="fa fa-university icons" aria-hidden="true"></i></div>									</div>
+									<h6>Schools</h6>
+								</a>
+							</li>
+														<li class="leadership">
+								<a href="https://www.sharda.ac.in/about/leadership/chancellor" title="Leadership" >
+									<div class="inner">
+										     <div class="round-icon"><i class="fa fa-trophy icons" aria-hidden="true"></i></div>									</div>
+									<h6>Leadership</h6>
+								</a>
+							</li>
+														<li class="scholarship">
+								<a href="https://www.sharda.ac.in/admissions/scholarship" title="Scholarship" >
+									<div class="inner">
+										<i class="fa fa-graduation-cap" aria-hidden="true"></i>									</div>
+									<h6>Scholarship</h6>
+								</a>
+							</li>
+														<li class="contact us">
+								<a href="https://www.sharda.ac.in/contact" title="Contact Us" >
+									<div class="inner">
+										   <div class="round-icon"><i class="fa fa-map-o icons" aria-hidden="true"></i></div>									</div>
+									<h6>Contact Us</h6>
+								</a>
+							</li>
+														<li class="placements">
+								<a href="https://www.sharda.ac.in/placements" title="Placements" >
+									<div class="inner">
+										     <div class="round-icon"><i class="fa fa-briefcase" aria-hidden="true"></i></div>									</div>
+									<h6>Placements</h6>
+								</a>
+							</li>
+							
+						</ul>
+				</div>
+				</div>
+			</section>
+			<!-- /Featured List -->
+
+			<!-- Campus Short Info -->
+			<section id="campus-short-info">
+				<div class="row">
+                    
+					
+						
+				<!-- /Campus Gallery -->
+                
+				
+					<div class="col-sm-8 column section">
+						<!-- Campus Gallery -->
+						<div id="campus-gallery" class="slick-slider1">
+
+
+																	<div>
+										<figure>
+																					<a href="https://www.sharda.ac.in/apply/?utm_source=website&utm_medium=nxtgenJEEMains&utm_campaign=100%Scholarship2026" target="_blank">
+																					<img class="lazy" data-src="https://www.sharda.ac.in/attachments/banner_images/nxt_gen.webp" alt="100% Scholarship for Women"></img>
+					 					</a>
+										</figure>
+									</div>
+																		<div>
+										<figure>
+										<a> 											<img class="lazy" data-src="https://www.sharda.ac.in/attachments/banner_images/placement_new.webp" alt="Placement Banner"></img>
+					 					</a>
+										</figure>
+									</div>
+																		<div>
+										<figure>
+										<a> 											<img class="lazy" data-src="https://www.sharda.ac.in/attachments/banner_images/rising_stars-new.jpg" alt="Rising Stars"></img>
+					 					</a>
+										</figure>
+									</div>
+																		<div>
+										<figure>
+																					<a href="https://www.sharda.ac.in/apply/?utm_source=SU_Website&utm_medium=Apply_home_big_banner_Padmashri&utm_campaign=SU_Admissions_2026" target="_blank">
+																					<img class="lazy" data-src="https://www.sharda.ac.in/attachments/banner_images/Padmashri_Awarded_Scientists1.webp" alt="Padmashri_Awarded_Scientists"></img>
+					 					</a>
+										</figure>
+									</div>
+									
+
+
+						</div>
+						<!-- /Campus Gallery -->
+
+					</div>
+					
+					<div class="col-sm-4 column section">
+                    <div class="newsevent-slider">
+													<!-- Banner  -->
+								<div class="slide-events">
+								 
+								<a href="https://www.sharda.ac.in/connect/news-details/enhancing-research-practices-fdp-data-analysis-ai-insights"><div class="banner" data-src="https://www.sharda.ac.in/attachments/happening_images/enhancing-research-practices-fdp-data-analysis-ai-insights.png" style="background-image:url(https://www.sharda.ac.in/attachments/happening_images/enhancing-research-practices-fdp-data-analysis-ai-insights.png);"></div></a>
+								 
+								<div class="content">
+									<span class="title">17 Apr <br>2026</span>
+									<h5><a href="https://www.sharda.ac.in/connect/news-details/enhancing-research-practices-fdp-data-analysis-ai-insights">Enhancing Research Practices: SSHSS Hosts FDP on Data Analysis and AI-Driven Insights</a></h5>
+									
+								</div>
+								</div>						
+														<!-- Banner  -->
+								<div class="slide-events">
+								 
+								<a href="https://www.sharda.ac.in/connect/news-details/jashn-e-riwayat-farewell-celebration-sshss"><div class="banner" data-src="https://www.sharda.ac.in/attachments/happening_images/jashn-e-riwayat-farewell-celebration-sshss-new-1.png" style="background-image:url(https://www.sharda.ac.in/attachments/happening_images/jashn-e-riwayat-farewell-celebration-sshss-new-1.png);"></div></a>
+								 
+								<div class="content">
+									<span class="title">17 Apr <br>2026</span>
+									<h5><a href="https://www.sharda.ac.in/connect/news-details/jashn-e-riwayat-farewell-celebration-sshss">Jashn-e-Riwayat: A Heartfelt Farewell Celebration Honoring Tradition and Legacy</a></h5>
+									
+								</div>
+								</div>						
+														<!-- Banner  -->
+								<div class="slide-events">
+								 
+								<a href="https://www.sharda.ac.in/connect/news-details/innovate-bharat-hackathon-2026"><div class="banner" data-src="https://www.sharda.ac.in/attachments/happening_images/innovate-bharat-hackathon-2026.webp" style="background-image:url(https://www.sharda.ac.in/attachments/happening_images/innovate-bharat-hackathon-2026.webp);"></div></a>
+								 
+								<div class="content">
+									<span class="title">10 Apr <br>2026</span>
+									<h5><a href="https://www.sharda.ac.in/connect/news-details/innovate-bharat-hackathon-2026">INNOVATE BHARAT 2026: National Hackathon for Real-World Innovation</a></h5>
+									
+								</div>
+								</div>						
+														<!-- Banner  -->
+								<div class="slide-events">
+								 
+								<a href="https://www.sharda.ac.in/connect/news-details/belliatus-cultura-2026-northeast-cultural-fest-sharda-university"><div class="banner" data-src="https://www.sharda.ac.in/attachments/happening_images/belliatus-cultura-2026-n1.webp" style="background-image:url(https://www.sharda.ac.in/attachments/happening_images/belliatus-cultura-2026-n1.webp);"></div></a>
+								 
+								<div class="content">
+									<span class="title">18 Mar <br>2026</span>
+									<h5><a href="https://www.sharda.ac.in/connect/news-details/belliatus-cultura-2026-northeast-cultural-fest-sharda-university">Belliatus Cultura 2026 &ndash; 9th Northeast Cultural Fest</a></h5>
+									
+								</div>
+								</div>						
+						                        
+                        </div>
+                        
+                        <script>
+						 $(document).ready(function() {
+                        $('.newsevent-slider').slick({
+						  dots: true,
+						  infinite: true,
+						  speed: 500,
+						  autoplay: true,
+						  slidesToShow: 1,
+						  arrows: false,
+					
+						});
+						});
+                        </script>
+					</div>
+					
+					
+					
+				<!--	<div class="col-sm-4 column section">
+										<a> 							<figure class="image">
+								<img class="poster-image lazy" data-src="https://www.sharda.ac.in/attachments/banner_images/ARIIA_Web_25_jan_A.jpg" alt="icon"></img>
+							</figure>
+						</a>
+										</div> -->
+					
+                    						<div class="col-sm-4 column women-offer">
+						<!-- Campus Gallery -->
+						<div id="img-gallery" class="slick-slider1 slick-dotted2">
+																<div>
+										<figure>
+										<a> 											<img class="lazy" data-src="https://www.sharda.ac.in/attachments/banner_images/scientist_web_post_banner_(1).webp" alt="world 2% percent"></img>
+					 					</a>
+										</figure>
+									</div>
+																		<div>
+										<figure>
+										<a> 											<img class="lazy" data-src="https://www.sharda.ac.in/attachments/banner_images/scientist_web_post_banner.webp" alt="world 2 percent"></img>
+					 					</a>
+										</figure>
+									</div>
+															</div>
+						
+						</div>
+                    
+										<div class="col-sm-4 column our-offer">
+						<figure class="image">
+														<a href="https://www.sharda.ac.in/" ><img class="lazy" data-src="https://www.sharda.ac.in/attachments/banner_images/nba-new.jpg"></img></a>
+						</figure>
+						<div class="inner-content1" style="text-align:center;">
+						<p style="text-align:center;"></p>
+												</div>
+					</div>
+											<div class="col-sm-4 column women-offer">
+						<!-- Campus Gallery -->
+						<div id="img-gallery-home" class="slick-slider1 slick-dotted2">
+																<div>
+										<figure>
+										<a> 											<img class="lazy" data-src="https://www.sharda.ac.in/attachments/banner_images/notable-alumni-new.jpg" alt="Notable Alumni"></img>
+					 					</a>
+										</figure>
+									</div>
+																		<div>
+										<figure>
+										<a> 											<img class="lazy" data-src="https://www.sharda.ac.in/attachments/banner_images/notable-alumni-new2.jpg" alt="Notable Alumni 2"></img>
+					 					</a>
+										</figure>
+									</div>
+															</div>
+						
+						</div>
+						
+				
+
+				
+				</div>
+			</section>
+			<!-- /Campus Short Info -->
+						<!-- IMPACT -->
+
+			<section id="impact" class="section numbers-slider impect-desktop" data-background="">
+					<div class="container">
+
+					<div class="content">
+					   <div class="row">
+						<div class="col-sm-6">
+							<div class="shape">
+							<div>
+							  <div class="backgrounds">
+								<div data-background="background-1" data-position="top"></div>
+								<div data-background="background-2" data-position="top"></div>
+								<div data-background="background-3" data-position="top"></div>
+								<div data-background="background-4" data-position="top"></div>
+								<div data-background="background-5" data-position="top"></div>
+								<div data-background="background-1" data-position="bottom"></div>
+								<div data-background="background-2" data-position="bottom"></div>
+								<div data-background="background-3" data-position="bottom"></div>
+								<div data-background="background-4" data-position="bottom"></div>
+								<div data-background="background-5" data-position="bottom"></div>
+							  </div>
+							  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 483.4 483.4">
+								<path d="M483.4 483.4V0H0v483.4h483.4zm-3.7-241.7c0 63.6-24.8 123.3-69.7 168.3s-104.7 69.7-168.3 69.7S118.3 454.9 73.4 410 3.7 305.3 3.7 241.7 28.4 118.3 73.4 73.4 178.1 3.7 241.7 3.7v50c-103.7 0-188 84.3-188 188s84.3 188 188 188 188-84.3 188-188h50z"/>
+							  </svg>
+							</div>
+						  </div>
+						  <div class="slider-arrows"></div>
+						  <div class="slider-dots morph" data-total-slides="6" role="toolbar"></div>
+						</div>
+					  <div class="col-sm-6">
+						<h2>Sharda Impact</h2>
+						 <div class="numbers-container">
+						 <div class="numbers-container">
+						 <div>
+						 						  <div class="numbers slide1 active">
+							<div class="impact-num">330+</div>
+						  </div>
+						  						  <div class="numbers slide2 inactive">
+							<div class="impact-num">63</div>
+						  </div>
+						  						  <div class="numbers slide3 inactive">
+							<div class="impact-num">95+</div>
+						  </div>
+						  						  <div class="numbers slide4 inactive">
+							<div class="impact-num">19200+</div>
+						  </div>
+						  						  <div class="numbers slide5 inactive">
+							<div class="impact-num">1047+</div>
+						  </div>
+						  						  <div class="numbers slide6 inactive">
+							<div class="impact-num">135+</div>
+						  </div>
+						  						</div>
+					  </div>
+					  </div>
+						  <div class="slider-container">
+							<div class="slider">
+							  							  <div class="slide impact-330+" data-thumb="330+">
+								<div class="callout">
+								<h3>Collaborations</h3>
+								<p>Sharda University has almost 330+ Functional MOUs which are beneficial for students and faculty.</p>
+
+								</div>
+							  </div>
+							  							  <div class="slide impact-63" data-thumb="63">
+								<div class="callout">
+								<h3>Acres Campus</h3>
+								<p>Not less than a town! Sharda University has each and every facility within the campus so there is no need of visiting outside the campus, you can enjoy within the campus with lots of facilities.</p>
+
+								</div>
+							  </div>
+							  							  <div class="slide impact-95+" data-thumb="95+">
+								<div class="callout">
+								<h3>Nationalities</h3>
+								<p>We have students from over 95+ countries other than India and has thus become a melting pot of diverse cultures, backgrounds, and ethnicities.</p>
+
+								</div>
+							  </div>
+							  							  <div class="slide impact-19200+" data-thumb="19200+">
+								<div class="callout">
+								<h3>Students on Campus</h3>
+								<p>It is the largest educational group based in Uttar Pradesh, having 19,200+ students from different cultures and nationalities.</p>
+
+								</div>
+							  </div>
+							  							  <div class="slide impact-1047+" data-thumb="1047+">
+								<div class="callout">
+								<h3>Faculty</h3>
+								<p>Sharda University offers around 1047+ faculty with highly qualified and these faculty members ensure the students to achieve their goals. These faculty are also provided with proper training.</p>
+
+								</div>
+							  </div>
+							  							  <div class="slide impact-135+" data-thumb="135+">
+								<div class="callout">
+								<h3>Programmes</h3>
+								<p>The university offers programmes at the undergraduate and postgraduate level. In each and every course they provide well educated faculty.</p>
+
+								</div>
+							  </div>
+							  
+							</div>
+						</div>
+					</div>
+			</div>
+		</div>
+			</section>
+			
+			   <section id="impact" class="section numbers-slider impect-mobile" data-background="">
+				<div class="container">
+					<div class="content">
+					  	<div class="row">
+                       		<div class="col-sm-12">
+                             	<h2>Sharda Impact</h2>
+                                
+                                <div id="slider-imp">
+									<ul>
+													
+											<li> <h4>330+</h4>
+											<h3>Collaborations</h3>
+											<p>Sharda University has almost 330+ Functional MOUs which are beneficial for students and faculty.</p></li>
+													
+											<li> <h4>63</h4>
+											<h3>Acres Campus</h3>
+											<p>Not less than a town! Sharda University has each and every facility within the campus so there is no need of visiting outside the campus, you can enjoy within the campus with lots of facilities.</p></li>
+													
+											<li> <h4>95+</h4>
+											<h3>Nationalities</h3>
+											<p>We have students from over 95+ countries other than India and has thus become a melting pot of diverse cultures, backgrounds, and ethnicities.</p></li>
+													
+											<li> <h4>19200+</h4>
+											<h3>Students on Campus</h3>
+											<p>It is the largest educational group based in Uttar Pradesh, having 19,200+ students from different cultures and nationalities.</p></li>
+													
+											<li> <h4>1047+</h4>
+											<h3>Faculty</h3>
+											<p>Sharda University offers around 1047+ faculty with highly qualified and these faculty members ensure the students to achieve their goals. These faculty are also provided with proper training.</p></li>
+													
+											<li> <h4>135+</h4>
+											<h3>Programmes</h3>
+											<p>The university offers programmes at the undergraduate and postgraduate level. In each and every course they provide well educated faculty.</p></li>
+																			  
+									</ul>
+							   </div>
+                                
+                            	 
+                            </div>
+                    	</div>
+           			</div>
+           		</div>
+           </section>
+		   <script>
+	$(document).ready(function(){	
+		$("#slider-imp").easySlider({
+			numeric: true
+		});
+		 
+	});	
+</script>
+			<!-- /Impact -->
+			<!-- Global Students -->
+			<section id="global-students" class="section">
+				<div class="container">
+					<div class="row">
+						<div class="col-sm-8">
+							<h6>The World is Here @ Sharda University</h6>
+							<h2>WE HAVE STUDENTS FROM 95<sup>+</sup> COUNTRIES</h2>
+							<!-- Global Map -->
+							<div class="global-map mobile">
+								<img class="lazy" data-src="https://www.sharda.ac.in/assets/imgs/world-map-mobile.jpg" alt="map"></img>
+							</div>
+							<div class="global-map">
+								<img class="lazy" data-src="https://www.sharda.ac.in/assets/imgs/world-map.jpg" alt="map"></img>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Bangladesh" class="round bgd"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Aruba" class="round abw"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Afghanistan" class="round afg"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Angola" class="round ago"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Andorra" class="round and"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="United Arab Emirates" class="round are"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Argentina" class="round arg"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Australia " class="round aus"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Burundi" class="round bdi"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Benin" class="round ben"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Burkina Faso" class="round bfa"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Bahrain" class="round bhr"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Bhutan" class="round btnn"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Botswana" class="round bwa"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Central African Republic" class="round caf"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Canada" class="round can"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="China" class="round chn"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Cote D'Ivoire" class="round civ"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Cameroon" class="round cmr"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Congo" class="round cod"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Comoros" class="round com"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Algeria" class="round dza"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Ecuador" class="round ecu"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Spain" class="round esp"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Ethiopia" class="round eth"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="France" class="round fra"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Gabon" class="round gab"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Ghana" class="round gha"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Guinea" class="round gin"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Gambia" class="round gmb"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Guinea-Bissau" class="round gnb"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Greece" class="round grc"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Indonesia" class="round idn"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="India" class="round ind"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Ireland" class="round irl"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Iran" class="round irn"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Iraq" class="round irq"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Italy" class="round ita"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Jordan" class="round jor"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Kazakhstan" class="round kaz"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Kenya" class="round ken"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Korea" class="round kor"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Kuwait" class="round kwt"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Liberia" class="round lbr"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Sri Lanka" class="round lka"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Lesotho" class="round lso"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Latvia" class="round lva"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Maldives" class="round mdv"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Maldives" class="round mex"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Mexico" class="round mex"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Mali" class="round mli"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Myanmar" class="round mmr"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Mongolia" class="round mng"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Mozambique" class="round moz"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Malaysia" class="round mys"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Nigeria" class="round nga"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Nepal" class="round npl"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="New Zealand" class="round nzl"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Oman" class="round omn"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Poland" class="round pol"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Palestinian" class="round pse"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Qatar" class="round qat"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Russia" class="round rus"> &nbsp; </a> 
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Saudi Arabia" class="round sau"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Sudan" class="round sdn"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Somalia" class="round som"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Swaziland" class="round swz"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Syrian" class="round syr"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Thailand" class="round tha"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Tibet" class="round tib"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Turkey" class="round tur"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Uganda" class="round uga"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="United States" class="round usa"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Viet Nam" class="round vnm"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Yemen" class="round yem"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="South Africa" class="round zaf"> &nbsp; </a>
+								<a href="JavaScript:Void(0);"  rel="nofollow" data-toggle="tooltip" data-placement="right" title="Zimbabwe" class="round zwe"> &nbsp; </a>
+							</div>
+							<!-- /Global Map -->
+						</div>
+						<div class="col-sm-4">
+							<!-- Help List -->
+							<ul class="help-list">
+
+																	<li>
+										<a href="https://www.sharda.ac.in/course-fee" class="clearfix"  >
+											<!-- Round Icon -->
+											 <div class="round-icon color-theme2"><i class="icon-wallet icons"></i></div>											<!-- /Round Icon -->
+											<!-- Inner -->
+											<div class="inner">
+												<p>Programme Fee</p>
+											</div>
+											<!-- /Inner -->
+										</a>
+									</li>
+																	<li>
+										<a href="https://www.sharda.ac.in/about/career" class="clearfix"  >
+											<!-- Round Icon -->
+											 <div class="round-icon color-theme3"><i class="icon-briefcase icons"></i></div>											<!-- /Round Icon -->
+											<!-- Inner -->
+											<div class="inner">
+												<p>Job Openings</p>
+											</div>
+											<!-- /Inner -->
+										</a>
+									</li>
+																	<li>
+										<a href="https://www.sharda.ac.in/connect/gallery" class="clearfix"  >
+											<!-- Round Icon -->
+											  <div class="round-icon color-theme5"><i class="icon-camera icons" aria-hidden="true"></i></div>											<!-- /Round Icon -->
+											<!-- Inner -->
+											<div class="inner">
+												<p>Image Gallery</p>
+											</div>
+											<!-- /Inner -->
+										</a>
+									</li>
+															</ul>
+							<!-- /Help List -->
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- /Global Students -->
+			<!-- Featured Section  -->
+			<section id="featured-section" class="section">
+				<div class="container">
+					<div class="tabs1">
+						<div class="scrolling">
+						  <!-- Nav tabs -->
+						  <ul class="nav nav-tabs" role="tablist">
+							<li role="presentation" class="active"><a href="#top-faculties" aria-controls="top-faculties" role="tab" data-toggle="tab">Top Faculties</a></li>
+							<li role="presentation"><a href="#research-spotlights" aria-controls="research-spotlights" role="tab" data-toggle="tab">Awards & Achievements</a></li>
+							<li role="presentation"><a href="#success-stories" aria-controls="success-stories" role="tab" data-toggle="tab">Success Stories</a></li>
+						  </ul>
+						</div>
+					  <!-- Tab panes -->
+					  <div class="tab-content">
+						<div role="tabpanel" class="tab-pane active" id="top-faculties">
+							<!-- Slider2 -->
+							<div class="slider2">
+								<div class="slides">
+									<div class="row">
+										<ul>
+																							<li class="col-sm-3">
+													<!-- User Box -->
+													<div class="user-box">
+														<figure>
+															<a href="https://www.sharda.ac.in/faculty/details/dr-anviti-gupta" target="_blank"><img class="lazy" data-src="https://www.sharda.ac.in/attachments/faculty_images/thumbnail/dr-anviti-gupta-1.jpg" alt="icon"></img></a>
+														</figure>
+														<h5><a href="https://www.sharda.ac.in/faculty/details/dr-anviti-gupta" target="_blank">Prof. (Dr.) Anviti Gupta</a></h5>
+														<p><i class="icon-user icons"></i><span>Professor & Dean, Sharda School of Humanities & Social Sciences																												</span>
+                                                    
+                                                    
+                                                    </p>
+														<!--<p><i class="icon-envelope icons"></i><a class="email" href="mailto:dean.shss@sharda.ac.in, anviti.gupta@sharda.ac.in">dean.shss@sharda.ac.in, anviti.gupta@sharda.ac.in</a>
+														</p>-->
+														<a href="https://www.sharda.ac.in/faculty/details/dr-anviti-gupta" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+													</div>
+													<!-- /User Box -->
+												</li>
+																							<li class="col-sm-3">
+													<!-- User Box -->
+													<div class="user-box">
+														<figure>
+															<a href="https://www.sharda.ac.in/faculty/details/prem-kumar-malhotra" target="_blank"><img class="lazy" data-src="https://www.sharda.ac.in/attachments/faculty_images/thumbnail/P_K_Malhotra_(2).jpg" alt="icon"></img></a>
+														</figure>
+														<h5><a href="https://www.sharda.ac.in/faculty/details/prem-kumar-malhotra" target="_blank">Prof. Prem Kumar Malhotra</a></h5>
+														<p><i class="icon-user icons"></i><span>Professor, Sharda School of Law																												</span>
+                                                    
+                                                    
+                                                    </p>
+														<!--<p><i class="icon-envelope icons"></i><a class="email" href="mailto:NA">NA</a>
+														</p>-->
+														<a href="https://www.sharda.ac.in/faculty/details/prem-kumar-malhotra" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+													</div>
+													<!-- /User Box -->
+												</li>
+																							<li class="col-sm-3">
+													<!-- User Box -->
+													<div class="user-box">
+														<figure>
+															<a href="https://www.sharda.ac.in/faculty/details/prof-dr-debasis-mallik" target="_blank"><img class="lazy" data-src="https://www.sharda.ac.in/attachments/faculty_images/thumbnail/prof-dr-debasis-mallik.png" alt="icon"></img></a>
+														</figure>
+														<h5><a href="https://www.sharda.ac.in/faculty/details/prof-dr-debasis-mallik" target="_blank">Prof. (Dr.) Debasis Mallik</a></h5>
+														<p><i class="icon-user icons"></i><span>Dean, Sharda School of Business Studies																												</span>
+                                                    
+                                                    
+                                                    </p>
+														<!--<p><i class="icon-envelope icons"></i><a class="email" href="mailto:debasis.mallik@sharda.ac.in">debasis.mallik@sharda.ac.in</a>
+														</p>-->
+														<a href="https://www.sharda.ac.in/faculty/details/prof-dr-debasis-mallik" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+													</div>
+													<!-- /User Box -->
+												</li>
+																							<li class="col-sm-3">
+													<!-- User Box -->
+													<div class="user-box">
+														<figure>
+															<a href="https://www.sharda.ac.in/faculty/details/prof-dr-rhishikesh-dave" target="_blank"><img class="lazy" data-src="https://www.sharda.ac.in/attachments/faculty_images/thumbnail/164.jpg" alt="icon"></img></a>
+														</figure>
+														<h5><a href="https://www.sharda.ac.in/faculty/details/prof-dr-rhishikesh-dave" target="_blank">Prof. (Dr.) Rhishikesh Dave</a></h5>
+														<p><i class="icon-user icons"></i><span>Dean, Sharda School of Law																												</span>
+                                                    
+                                                    
+                                                    </p>
+														<!--<p><i class="icon-envelope icons"></i><a class="email" href="mailto:rhishikesh.dave@sharda.ac.in">rhishikesh.dave@sharda.ac.in</a>
+														</p>-->
+														<a href="https://www.sharda.ac.in/faculty/details/prof-dr-rhishikesh-dave" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+													</div>
+													<!-- /User Box -->
+												</li>
+																							<li class="col-sm-3">
+													<!-- User Box -->
+													<div class="user-box">
+														<figure>
+															<a href="https://www.sharda.ac.in/faculty/details/dr-piyush-mittal" target="_blank"><img class="lazy" data-src="https://www.sharda.ac.in/attachments/faculty_images/thumbnail/dr-piyush-mittal.jpg" alt="icon"></img></a>
+														</figure>
+														<h5><a href="https://www.sharda.ac.in/faculty/details/dr-piyush-mittal" target="_blank">Dr. Piyush Mittal</a></h5>
+														<p><i class="icon-user icons"></i><span>Professor & Dean, School of Pharmacy																												</span>
+                                                    
+                                                    
+                                                    </p>
+														<!--<p><i class="icon-envelope icons"></i><a class="email" href="mailto:piyush.mittal@sharda.ac.in">piyush.mittal@sharda.ac.in</a>
+														</p>-->
+														<a href="https://www.sharda.ac.in/faculty/details/dr-piyush-mittal" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+													</div>
+													<!-- /User Box -->
+												</li>
+																							<li class="col-sm-3">
+													<!-- User Box -->
+													<div class="user-box">
+														<figure>
+															<a href="https://www.sharda.ac.in/faculty/details/sanjeev-sood" target="_blank"><img class="lazy" data-src="https://www.sharda.ac.in/attachments/faculty_images/thumbnail/Sanjeev_Sood_2-min.jpg" alt="icon"></img></a>
+														</figure>
+														<h5><a href="https://www.sharda.ac.in/faculty/details/sanjeev-sood" target="_blank">Sanjeev Sood</a></h5>
+														<p><i class="icon-user icons"></i><span>Professor, Sharda School of Media, Film and Entertainment																												</span>
+                                                    
+                                                    
+                                                    </p>
+														<!--<p><i class="icon-envelope icons"></i><a class="email" href="mailto:sanjeev.sood@sharda.ac.in">sanjeev.sood@sharda.ac.in</a>
+														</p>-->
+														<a href="https://www.sharda.ac.in/faculty/details/sanjeev-sood" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+													</div>
+													<!-- /User Box -->
+												</li>
+																							<li class="col-sm-3">
+													<!-- User Box -->
+													<div class="user-box">
+														<figure>
+															<a href="https://www.sharda.ac.in/faculty/details/michail-barmpas" target="_blank"><img class="lazy" data-src="https://www.sharda.ac.in/attachments/faculty_images/thumbnail/Michail.jpeg" alt="icon"></img></a>
+														</figure>
+														<h5><a href="https://www.sharda.ac.in/faculty/details/michail-barmpas" target="_blank">Prof. (Dr.) Michail Barmpas</a></h5>
+														<p><i class="icon-user icons"></i><span>Professor, Sharda School of Business Studies																												</span>
+                                                    
+                                                    
+                                                    </p>
+														<!--<p><i class="icon-envelope icons"></i><a class="email" href="mailto:michail.barmpas@sharda.ac.in">michail.barmpas@sharda.ac.in</a>
+														</p>-->
+														<a href="https://www.sharda.ac.in/faculty/details/michail-barmpas" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+													</div>
+													<!-- /User Box -->
+												</li>
+																							<li class="col-sm-3">
+													<!-- User Box -->
+													<div class="user-box">
+														<figure>
+															<a href="https://www.sharda.ac.in/faculty/details/seyed-ehtesham-hasnain" target="_blank"><img class="lazy" data-src="https://www.sharda.ac.in/attachments/faculty_images/thumbnail/fp151.jpg" alt="icon"></img></a>
+														</figure>
+														<h5><a href="https://www.sharda.ac.in/faculty/details/seyed-ehtesham-hasnain" target="_blank">Prof. Seyed Ehtesham Hasnain</a></h5>
+														<p><i class="icon-user icons"></i><span>Distinguished Professor, Sharda School of Bio-Science & Technology																												</span>
+                                                    
+                                                    
+                                                    </p>
+														<!--<p><i class="icon-envelope icons"></i><a class="email" href="mailto:seyed.hasnain@sharda.ac.in">seyed.hasnain@sharda.ac.in</a>
+														</p>-->
+														<a href="https://www.sharda.ac.in/faculty/details/seyed-ehtesham-hasnain" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+													</div>
+													<!-- /User Box -->
+												</li>
+																							<li class="col-sm-3">
+													<!-- User Box -->
+													<div class="user-box">
+														<figure>
+															<a href="https://www.sharda.ac.in/faculty/details/ashok-kumar" target="_blank"><img class="lazy" data-src="https://www.sharda.ac.in/attachments/faculty_images/thumbnail/ashok.jpg" alt="icon"></img></a>
+														</figure>
+														<h5><a href="https://www.sharda.ac.in/faculty/details/ashok-kumar" target="_blank">Prof. (Dr.) Ashok Kumar</a></h5>
+														<p><i class="icon-user icons"></i><span>Professor, Sharda School of Engineering & Science																												</span>
+                                                    
+                                                    
+                                                    </p>
+														<!--<p><i class="icon-envelope icons"></i><a class="email" href="mailto:ashok.kumar6@sharda.ac.in">ashok.kumar6@sharda.ac.in</a>
+														</p>-->
+														<a href="https://www.sharda.ac.in/faculty/details/ashok-kumar" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+													</div>
+													<!-- /User Box -->
+												</li>
+																							<li class="col-sm-3">
+													<!-- User Box -->
+													<div class="user-box">
+														<figure>
+															<a href="https://www.sharda.ac.in/faculty/details/prof-dr-geetha-ganesan" target="_blank"><img class="lazy" data-src="https://www.sharda.ac.in/attachments/faculty_images/thumbnail/prof-dr-geetha-ganesan.jpg" alt="icon"></img></a>
+														</figure>
+														<h5><a href="https://www.sharda.ac.in/faculty/details/prof-dr-geetha-ganesan" target="_blank">Prof. (Dr.) Geetha Ganesan</a></h5>
+														<p><i class="icon-user icons"></i><span>Dean, Sharda School of Computing Science & Engineering																												</span>
+                                                    
+                                                    
+                                                    </p>
+														<!--<p><i class="icon-envelope icons"></i><a class="email" href="mailto:geetha.1@sharda.ac.in">geetha.1@sharda.ac.in</a>
+														</p>-->
+														<a href="https://www.sharda.ac.in/faculty/details/prof-dr-geetha-ganesan" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+													</div>
+													<!-- /User Box -->
+												</li>
+																							<li class="col-sm-3">
+													<!-- User Box -->
+													<div class="user-box">
+														<figure>
+															<a href="https://www.sharda.ac.in/faculty/details/baishnab-charan-tripathy" target="_blank"><img class="lazy" data-src="https://www.sharda.ac.in/attachments/faculty_images/thumbnail/Dr__Baishnab_Charan_Tripathi_2-min.jpg" alt="icon"></img></a>
+														</figure>
+														<h5><a href="https://www.sharda.ac.in/faculty/details/baishnab-charan-tripathy" target="_blank">Dr. Baishnab Charan Tripathy</a></h5>
+														<p><i class="icon-user icons"></i><span>Distinguished Professor, Sharda School of Bio-Science & Technology																												</span>
+                                                    
+                                                    
+                                                    </p>
+														<!--<p><i class="icon-envelope icons"></i><a class="email" href="mailto:baishnab.tripathy@sharda.ac.in">baishnab.tripathy@sharda.ac.in</a>
+														</p>-->
+														<a href="https://www.sharda.ac.in/faculty/details/baishnab-charan-tripathy" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+													</div>
+													<!-- /User Box -->
+												</li>
+											
+										</ul>
+									</div>
+									<a href="javascript:void(0);" class="previous-btn" rel="nofollow">
+									<i class="icon-arrow-left icons"></i>
+								</a>
+								<a href="javascript:void(0);" class="next-btn" rel="nofollow">
+									<i class="icon-arrow-right icons"></i>
+								</a>
+								</div>
+								<div class="text-center">
+									<a href="https://www.sharda.ac.in/faculty" class="button3 btn btn-lg" target="_blank">View all Faculties</a>
+								</div>
+							</div>
+							<!-- /Slider2 -->
+						</div>
+						<div role="tabpanel" class="tab-pane" id="research-spotlights">
+							<!-- Slider2 -->
+							<div class="slider2">
+								<div class="slides">
+									<div class="row">
+										<ul>
+																							<li class="col-sm-3">
+												<!-- Story Box -->
+												<div class="story-box">
+													<!-- Banner -->
+													<div class="banner lazy" data-src="https://www.sharda.ac.in/attachments/awards_images/thumbnail/times_higher_education4.jpg" style="background-image:url(https://www.sharda.ac.in/attachments/awards_images/thumbnail/times_higher_education4.jpg)">
+													</div>
+													<!-- /Banner -->
+													<!-- Content -->
+													<div class="content">
+														<div class="inner-content">
+															<p>The Times Higher Education 59th in India</p>
+														</div>
+													  </div>
+													<!-- /Content -->
+												</div>
+												<!-- /Story Box -->
+											</li>
+										 												<li class="col-sm-3">
+												<!-- Story Box -->
+												<div class="story-box">
+													<!-- Banner -->
+													<div class="banner lazy" data-src="https://www.sharda.ac.in/attachments/awards_images/thumbnail/nirf.jpg" style="background-image:url(https://www.sharda.ac.in/attachments/awards_images/thumbnail/nirf.jpg)">
+													</div>
+													<!-- /Banner -->
+													<!-- Content -->
+													<div class="content">
+														<div class="inner-content">
+															<p>NIRF University Rank 87 in University Category</p>
+														</div>
+													  </div>
+													<!-- /Content -->
+												</div>
+												<!-- /Story Box -->
+											</li>
+										 												<li class="col-sm-3">
+												<!-- Story Box -->
+												<div class="story-box">
+													<!-- Banner -->
+													<div class="banner lazy" data-src="https://www.sharda.ac.in/attachments/awards_images/thumbnail/times_b_school.jpg" style="background-image:url(https://www.sharda.ac.in/attachments/awards_images/thumbnail/times_b_school.jpg)">
+													</div>
+													<!-- /Banner -->
+													<!-- Content -->
+													<div class="content">
+														<div class="inner-content">
+															<p>Times B School Management Ranking 2026</p>
+														</div>
+													  </div>
+													<!-- /Content -->
+												</div>
+												<!-- /Story Box -->
+											</li>
+										 												<li class="col-sm-3">
+												<!-- Story Box -->
+												<div class="story-box">
+													<!-- Banner -->
+													<div class="banner lazy" data-src="https://www.sharda.ac.in/attachments/awards_images/thumbnail/Sharda_NAAC_Certificate_2023.jpg" style="background-image:url(https://www.sharda.ac.in/attachments/awards_images/thumbnail/Sharda_NAAC_Certificate_2023.jpg)">
+													</div>
+													<!-- /Banner -->
+													<!-- Content -->
+													<div class="content">
+														<div class="inner-content">
+															<p>A+ Grade accreditation by NAAC</p>
+														</div>
+													  </div>
+													<!-- /Content -->
+												</div>
+												<!-- /Story Box -->
+											</li>
+										 												<li class="col-sm-3">
+												<!-- Story Box -->
+												<div class="story-box">
+													<!-- Banner -->
+													<div class="banner lazy" data-src="https://www.sharda.ac.in/attachments/awards_images/thumbnail/Certificate_of_Excellence_A_Rated_Institute_page-0001.jpg" style="background-image:url(https://www.sharda.ac.in/attachments/awards_images/thumbnail/Certificate_of_Excellence_A_Rated_Institute_page-0001.jpg)">
+													</div>
+													<!-- /Banner -->
+													<!-- Content -->
+													<div class="content">
+														<div class="inner-content">
+															<p>Certificate of Excellence</p>
+														</div>
+													  </div>
+													<!-- /Content -->
+												</div>
+												<!-- /Story Box -->
+											</li>
+										 										</ul>
+									</div>
+
+									<a href="javascript:void(0);" class="previous-btn">
+									<i class="icon-arrow-left icons"></i>
+								</a>
+								<a href="javascript:void(0);" class="next-btn">
+									<i class="icon-arrow-right icons"></i>
+								</a>
+								</div>
+								<div class="text-center">
+									<a href="https://www.sharda.ac.in/awards-and-achievements" class="button3 btn btn-lg" target="_blank">View all Awards</a>
+								</div>
+							</div>
+							<!-- /Slider2 -->
+
+						</div>
+						<div role="tabpanel" class="tab-pane" id="success-stories">
+							<!-- Slider2 -->
+							<div class="slider2">
+								<div class="slides">
+									<div class="row">
+										<ul>
+										
+										
+												<li class="col-sm-3">
+												<!-- Story Box -->
+												<div class="story-box">
+													<!-- Banner -->
+													
+													<div class="banner lazy" data-src="" onclick="redirectUrl('http://www.youtube.com/watch?v=LE5TELfoypE')" style="background-image:url(https://img.youtube.com/vi/LE5TELfoypE/default.jpg)"></div>
+													 <!-- <div class="banner">
+														 <iframe width="80%" height="410"  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+													 </div> -->
+													
+													<!-- /Banner -->
+													<!-- Content -->
+													<div class="content">
+														<div class="inner-content">
+															<h5>Amartya Mehrotr...</h5>
+
+																<p><p>Amartya Mehrotra, a B. Tech alumni from Sharda University describes his time at the University at par with the global universities. He says that the faculty helped him identify his strengths and helped him explore his true academic passions. The diverse range of international students on campus meant a real cultural experience for him.</p>
+
+<p> </p></p>
+														</div>
+													  </div>
+													<!-- /Content -->
+												</div>
+												<!-- /Story Box -->
+											</li>
+										
+												<li class="col-sm-3">
+												<!-- Story Box -->
+												<div class="story-box">
+													<!-- Banner -->
+													
+													<div class="banner lazy" data-src="" onclick="redirectUrl('http://www.youtube.com/watch?v=0WIbjwM3RUo')" style="background-image:url(https://img.youtube.com/vi/0WIbjwM3RUo/default.jpg)"></div>
+													 <!-- <div class="banner">
+														 <iframe width="80%" height="410"  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+													 </div> -->
+													
+													<!-- /Banner -->
+													<!-- Content -->
+													<div class="content">
+														<div class="inner-content">
+															<h5>Nilisha Pokhrel</h5>
+
+																<p><p style="text-align: justify;">Sharda University alumni are making a mark not only in India but also globally. Our alumni Ms. Nilisha Pokhrel, who is currently working as Postdoctoral Research Scholar at New England Biolabs Inc, Ipswich, MA, USA; expresses how choosing Sharda University helped her develop ample competence along with helping her in her professional journey in the field of biotechnology.</p></p>
+														</div>
+													  </div>
+													<!-- /Content -->
+												</div>
+												<!-- /Story Box -->
+											</li>
+										
+												<li class="col-sm-3">
+												<!-- Story Box -->
+												<div class="story-box">
+													<!-- Banner -->
+													
+													<div class="banner lazy" data-src="" onclick="redirectUrl('http://www.youtube.com/watch?v=EB32kWVrvsg')" style="background-image:url(https://img.youtube.com/vi/EB32kWVrvsg/default.jpg)"></div>
+													 <!-- <div class="banner">
+														 <iframe width="80%" height="410"  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+													 </div> -->
+													
+													<!-- /Banner -->
+													<!-- Content -->
+													<div class="content">
+														<div class="inner-content">
+															<h5>Aditya Vardhan</h5>
+
+																<p><p>Aditya Vardhan, a B.tech (Mechanical) student at Sharda University shares how the university offers a perfect blend of opportunities, challenges, and ambiance that has been a great learning experience and helped him explore new dimensions in his field of study.</p></p>
+														</div>
+													  </div>
+													<!-- /Content -->
+												</div>
+												<!-- /Story Box -->
+											</li>
+										
+												<li class="col-sm-3">
+												<!-- Story Box -->
+												<div class="story-box">
+													<!-- Banner -->
+													
+													<div class="banner lazy" data-src="" onclick="redirectUrl('http://www.youtube.com/watch?v=WrWXTvVKtgw')" style="background-image:url(https://img.youtube.com/vi/WrWXTvVKtgw/default.jpg)"></div>
+													 <!-- <div class="banner">
+														 <iframe width="80%" height="410"  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+													 </div> -->
+													
+													<!-- /Banner -->
+													<!-- Content -->
+													<div class="content">
+														<div class="inner-content">
+															<h5>Khyolamo Kikon</h5>
+
+																<p><p>Khyolamo Kikon, B.Tech (Civil Engineering) alumni of Sharda University shares that the inculcation of discipline at the university and the culture of value based education proved to be the keys that helped him open up his career path and helped him in his further studies. He says that he has a deep sense of gratitude for the knowledge and confidence the university imparted, and the friendships he formed during his time.</p></p>
+														</div>
+													  </div>
+													<!-- /Content -->
+												</div>
+												<!-- /Story Box -->
+											</li>
+										
+												<li class="col-sm-3">
+												<!-- Story Box -->
+												<div class="story-box">
+													<!-- Banner -->
+													
+													<div class="banner lazy" data-src="" onclick="redirectUrl('http://www.youtube.com/watch?v=Z7K9fRCnAck')" style="background-image:url(https://img.youtube.com/vi/Z7K9fRCnAck/default.jpg)"></div>
+													 <!-- <div class="banner">
+														 <iframe width="80%" height="410"  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+													 </div> -->
+													
+													<!-- /Banner -->
+													<!-- Content -->
+													<div class="content">
+														<div class="inner-content">
+															<h5>Atul Saxena</h5>
+
+																<p><p>Mr. Atul Saxena, a B.Tech (ECE) alumni from Sharda University shares that his experience at Sharda has been a constant evolution of learning, perseverance and seizing opportunities. He shares that the faculty was really supportive and he is grateful for their guidance and support.</p></p>
+														</div>
+													  </div>
+													<!-- /Content -->
+												</div>
+												<!-- /Story Box -->
+											</li>
+																				</ul>
+									</div>
+									<a href="javascript:void(0);" class="previous-btn" rel="nofollow">
+									<i class="icon-arrow-left icons"></i>
+								</a>
+								<a href="javascript:void(0);" class="next-btn" rel="nofollow">
+									<i class="icon-arrow-right icons"></i>
+								</a>
+								</div>
+								<div class="text-center">
+									<a href="https://www.sharda.ac.in/about/success-stories" class="button3 btn btn-lg" target="_blank">View all Success Stories</a>
+								</div>
+							</div>
+							<!-- /Slider2 -->
+						</div>
+					  </div>
+
+					</div>
+				</div>
+			</section>
+			<!-- /Featured Section  -->
+			<!-- Latest News  -->
+			<section id="latest-news" class="section">
+				<div class="container">
+				<div id="sharda-live" class="slider2">
+
+					<h3>What’s Happening in Sharda</h3>
+					<div class="slider2">
+					<div class="slides">
+					<div class="row">
+
+					<ul>
+												<li class="col-sm-6 col-xs-12 col-md-3">
+							<!-- News Box  -->
+							<div class="news-box">
+								<!-- Banner  -->
+								<div class="banner lazy" data-src="https://www.sharda.ac.in/attachments/happening_images/enhancing-research-practices-fdp-data-analysis-ai-insights.png" ><img src="https://www.sharda.ac.in/attachments/happening_images/enhancing-research-practices-fdp-data-analysis-ai-insights.png" /></div>
+								<!-- /Banner  -->
+								<!-- Content  -->
+								<div class="content">
+									<span class="title color-theme1"><span>17 Apr <br>2026</span></span>
+									<!--<h4><?//=date('d M Y', strtotime($details->news_date))?></h4>-->
+									<h5><a href="https://www.sharda.ac.in/connect/news-details/enhancing-research-practices-fdp-data-analysis-ai-insights">Enhancing Research Practices: SSHSS Hosts FDP on Data Analysis and AI-Driven Insights</a></h5>
+									
+									<a href="https://www.sharda.ac.in/connect/news-details/enhancing-research-practices-fdp-data-analysis-ai-insights" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+								</div>
+								<!-- /Content  -->
+							</div>
+							<!-- /News Box  -->
+						</li>
+												<li class="col-sm-6 col-xs-12 col-md-3">
+							<!-- News Box  -->
+							<div class="news-box">
+								<!-- Banner  -->
+								<div class="banner lazy" data-src="https://www.sharda.ac.in/attachments/happening_images/jashn-e-riwayat-farewell-celebration-sshss-new-1.png" ><img src="https://www.sharda.ac.in/attachments/happening_images/jashn-e-riwayat-farewell-celebration-sshss-new-1.png" /></div>
+								<!-- /Banner  -->
+								<!-- Content  -->
+								<div class="content">
+									<span class="title color-theme2"><span>17 Apr <br>2026</span></span>
+									<!--<h4><?//=date('d M Y', strtotime($details->news_date))?></h4>-->
+									<h5><a href="https://www.sharda.ac.in/connect/news-details/jashn-e-riwayat-farewell-celebration-sshss">Jashn-e-Riwayat: A Heartfelt Farewell Celebration Honoring Tradition and Legacy</a></h5>
+									
+									<a href="https://www.sharda.ac.in/connect/news-details/jashn-e-riwayat-farewell-celebration-sshss" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+								</div>
+								<!-- /Content  -->
+							</div>
+							<!-- /News Box  -->
+						</li>
+												<li class="col-sm-6 col-xs-12 col-md-3">
+							<!-- News Box  -->
+							<div class="news-box">
+								<!-- Banner  -->
+								<div class="banner lazy" data-src="https://www.sharda.ac.in/attachments/happening_images/innovate-bharat-hackathon-2026.webp" ><img src="https://www.sharda.ac.in/attachments/happening_images/innovate-bharat-hackathon-2026.webp" /></div>
+								<!-- /Banner  -->
+								<!-- Content  -->
+								<div class="content">
+									<span class="title color-theme3"><span>10 Apr <br>2026</span></span>
+									<!--<h4><?//=date('d M Y', strtotime($details->news_date))?></h4>-->
+									<h5><a href="https://www.sharda.ac.in/connect/news-details/innovate-bharat-hackathon-2026">INNOVATE BHARAT 2026: National Hackathon for Real-World Innovation</a></h5>
+									
+									<a href="https://www.sharda.ac.in/connect/news-details/innovate-bharat-hackathon-2026" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+								</div>
+								<!-- /Content  -->
+							</div>
+							<!-- /News Box  -->
+						</li>
+												<li class="col-sm-6 col-xs-12 col-md-3">
+							<!-- News Box  -->
+							<div class="news-box">
+								<!-- Banner  -->
+								<div class="banner lazy" data-src="https://www.sharda.ac.in/attachments/happening_images/belliatus-cultura-2026-n1.webp" ><img src="https://www.sharda.ac.in/attachments/happening_images/belliatus-cultura-2026-n1.webp" /></div>
+								<!-- /Banner  -->
+								<!-- Content  -->
+								<div class="content">
+									<span class="title color-theme4"><span>18 Mar <br>2026</span></span>
+									<!--<h4><?//=date('d M Y', strtotime($details->news_date))?></h4>-->
+									<h5><a href="https://www.sharda.ac.in/connect/news-details/belliatus-cultura-2026-northeast-cultural-fest-sharda-university">Belliatus Cultura 2026 &ndash; 9th Northeast Cultural Fest</a></h5>
+									
+									<a href="https://www.sharda.ac.in/connect/news-details/belliatus-cultura-2026-northeast-cultural-fest-sharda-university" class="clearfix" target="_blank"><i class="icon-arrow-right-circle icons"></i></a>
+								</div>
+								<!-- /Content  -->
+							</div>
+							<!-- /News Box  -->
+						</li>
+												</ul>
+
+					</div>
+					<a href="javascript:void(0);" class="previous-btn" rel="nofollow">
+							<i class="icon-arrow-left icons"></i>
+						</a>
+						<a href="javascript:void(0);" class="next-btn" rel="nofollow">
+							<i class="icon-arrow-right icons"></i>
+						</a>
+					</div>
+
+					<div class="text-center">
+						<a href="https://www.sharda.ac.in/connect/news" class="button2 btn btn-lg" target="_blank">View More...</a>
+					</div>
+					</div>
+					</div>
+					
+					<!-- Announcements -->
+					<div id="announcements" class="slider3">
+						<h5>Announcements</h5>
+						<div class="row">
+							<ul>
+
+															<li class="col-sm-4">
+									<a href="https://www.sharda.ac.in/happenings/notification-24-chancellors-gold-medal-regulations-revised" class="clearfix">
+									<div class="box clearfix">
+										<span class="date color-theme1">04 May 2026</span>
+										<div class="details">
+											<p>Notification no. 24  Regulations for the Award of the Chancellors Gold Medal (Be...</p>
+										</div>
+									</div>
+									</a>
+								</li>
+															<li class="col-sm-4">
+									<a href="https://www.sharda.ac.in/happenings/office-order-29-appointment-hod-biotechnology-ssbt-dr-monika-jain" class="clearfix">
+									<div class="box clearfix">
+										<span class="date color-theme2">04 May 2026</span>
+										<div class="details">
+											<p>OFFICE ORDER No. 29 Appointment of Head of Department of Biotechnology, SSBT– ...</p>
+										</div>
+									</div>
+									</a>
+								</li>
+															<li class="col-sm-4">
+									<a href="https://www.sharda.ac.in/happenings/appointment-cvo-prof-dr-shajee-mohan-sscse" class="clearfix">
+									<div class="box clearfix">
+										<span class="date color-theme3">02 May 2026</span>
+										<div class="details">
+											<p>Appointment of Chief Vigilance Officer (CVO) - Prof. (Dr.) Shajee Mohan, SSCSE</p>
+										</div>
+									</div>
+									</a>
+								</li>
+															<li class="col-sm-4">
+									<a href="https://www.sharda.ac.in/happenings/appointment-advisor-lrc-prof-dr-anil-sagar-sscse" class="clearfix">
+									<div class="box clearfix">
+										<span class="date color-theme4">02 May 2026</span>
+										<div class="details">
+											<p>Appointment of Advisor, Learning Resource Centre (LRC) - Prof. (Dr.) Anil Sagar,...</p>
+										</div>
+									</div>
+									</a>
+								</li>
+															<li class="col-sm-4">
+									<a href="https://www.sharda.ac.in/happenings/extension-of-term-associate-dean-ssd-dr-dipti-parashar" class="clearfix">
+									<div class="box clearfix">
+										<span class="date color-theme5">30 Apr 2026</span>
+										<div class="details">
+											<p>Extension of term as Associate Dean, SSD - Prof. (Dr.) Dipti Parashar</p>
+										</div>
+									</div>
+									</a>
+								</li>
+															<li class="col-sm-4">
+									<a href="https://www.sharda.ac.in/happenings/policy-for-differently-abled" class="clearfix">
+									<div class="box clearfix">
+										<span class="date color-theme6">30 Apr 2026</span>
+										<div class="details">
+											<p>Policy for Differently Abled 2026</p>
+										</div>
+									</div>
+									</a>
+								</li>
+							
+							</ul>
+						</div>
+						<a href="javascript:void(0);" class="previous-btn" rel="nofollow">
+							<i class="icon-arrow-left-circle icons"></i>
+						</a>
+						<a href="javascript:void(0);" class="next-btn" rel="nofollow">
+							<i class="icon-arrow-right-circle icons"></i>
+						</a>
+					</div>
+					<!-- /Announcements -->
+
+				</div>
+			</section>
+			<!-- /Latest News  -->
+			<!-- Testimonials -->
+			<section id="testimonials2" class="section slider2">
+					<div class="container">
+						<h4 class="text-center">Testimonials</h4>
+						<div class="slides">
+							<div class="row">
+								<ul>
+																	<li class="col-sm-4">
+										<!-- Testimonials Box -->
+										<div class="testimonial-box">
+											<div class=" color color-theme1"></div>
+											<figure class="image">
+																										<img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/thumbnail/sonam-tomar.jpg" />
+																								</figure>
+											<h5 class="text-center">Sonam Tomar</h5>
+												<!-- Star Rating -->
+												<div class="star-rating" title="100%">
+													<div class="back-stars clearfix">
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+
+														<div class="front-stars clearfix" style="width:100%;">
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+														</div>
+													</div>
+												</div>
+												<!-- /Star Rating -->
+											<blockquote>
+												<p><p>My MCA journey at Sharda University has been truly rewarding. Securing a 100% scholarship and being the batch topper motivated me to achieve excellence.&nbsp;The well-structured curriculum, expert faculty, and hands-on exposure to modern technologies strengthened my technical expertise and professional readiness. Along with academics, Sharda also instilled in me valuable life lessons that shaped my overall growth.</p></p>
+											</blockquote>
+											<cite>
+											<p>
+											MCA, 2023–2025												</p>
+												<p><strong>Placed In :</strong> Ultragenic Research and Technol... </p>
+											</cite>
+										</div>
+										<!-- Testimonials Box -->
+									</li>
+								  									<li class="col-sm-4">
+										<!-- Testimonials Box -->
+										<div class="testimonial-box">
+											<div class=" color color-theme2"></div>
+											<figure class="image">
+																										<img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/thumbnail/ritika-singh.jpg" />
+																								</figure>
+											<h5 class="text-center">Ritika Singh</h5>
+												<!-- Star Rating -->
+												<div class="star-rating" title="100%">
+													<div class="back-stars clearfix">
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+
+														<div class="front-stars clearfix" style="width:100%;">
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+														</div>
+													</div>
+												</div>
+												<!-- /Star Rating -->
+											<blockquote>
+												<p><p>My master's in Physics at Department of Physics, Sharda University provided me with a strong foundation in research and critical thinking. The guidance at each step of the way helped me grow in terms of research and in general too. The supportive faculty and enriching academic environment played a pivotal role in helping me secure a PhD position at Federal University of Mato grosso do sul, Brazil.</p></p>
+											</blockquote>
+											<cite>
+											<p>
+											M.Sc. Physics, 2021-23												</p>
+												<p>&nbsp;</p>
+											</cite>
+										</div>
+										<!-- Testimonials Box -->
+									</li>
+								  									<li class="col-sm-4">
+										<!-- Testimonials Box -->
+										<div class="testimonial-box">
+											<div class=" color color-theme3"></div>
+											<figure class="image">
+																										<img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/thumbnail/asizo-sekhose.jpg" />
+																								</figure>
+											<h5 class="text-center">Asizo Sekhose</h5>
+												<!-- Star Rating -->
+												<div class="star-rating" title="100%">
+													<div class="back-stars clearfix">
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+
+														<div class="front-stars clearfix" style="width:100%;">
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+														</div>
+													</div>
+												</div>
+												<!-- /Star Rating -->
+											<blockquote>
+												<p><p>Environmental Science Department in Sharda gave me an exposure to experience various workshops, field trips laboratory experiments, and real-world projects, which are crucial for environmental science studies.</p></p>
+											</blockquote>
+											<cite>
+											<p>
+											M.Sc. Environmental Science, 2022-24												</p>
+												<p><strong>Placed In :</strong> Wayspire Ed Tech Pvt Limited </p>
+											</cite>
+										</div>
+										<!-- Testimonials Box -->
+									</li>
+								  									<li class="col-sm-4">
+										<!-- Testimonials Box -->
+										<div class="testimonial-box">
+											<div class=" color color-theme4"></div>
+											<figure class="image">
+																										<img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/thumbnail/aastha-daryani.jpeg" />
+																								</figure>
+											<h5 class="text-center">Aastha Daryani</h5>
+												<!-- Star Rating -->
+												<div class="star-rating" title="100%">
+													<div class="back-stars clearfix">
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+
+														<div class="front-stars clearfix" style="width:80%;">
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+														</div>
+													</div>
+												</div>
+												<!-- /Star Rating -->
+											<blockquote>
+												<p><p>I am extremely grateful and proud to share that I have been selected at HCLTech through campus placement at Sharda University.</p>
+
+<p>This achievement marks a significant milestone in my academic and professional journey. Being a student of Sharda University has provided me with the right learning environment, exposure, and opportunities to grow both technically and personally. The constant guidance, training sessions, and placement support played a crucial role in helping me secure this opportunity.</p>
+
+<p>I would like to express my sincere gratitude to Anand Pandey, our Placement Head, for his continuous support, motivation, and efforts in bringing such reputed companies to our campus. His dedication towards student placements truly makes a difference, and I am thankful for his guidance throughout the recruitment process.</p>
+
+<p>I am excited to begin this new chapter with HCLTech and look forward to learning, growing, and contributing to the organization.</p>
+
+<p>Thankful and proud to be a part of this journey.</p></p>
+											</blockquote>
+											<cite>
+											<p>
+											BCA, 2023												</p>
+												<p><strong>Placed In :</strong> HCLTech </p>
+											</cite>
+										</div>
+										<!-- Testimonials Box -->
+									</li>
+								  									<li class="col-sm-4">
+										<!-- Testimonials Box -->
+										<div class="testimonial-box">
+											<div class=" color color-theme5"></div>
+											<figure class="image">
+																										<img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/thumbnail/bishnu-saud.jpg" />
+																								</figure>
+											<h5 class="text-center">Bishnu Saud</h5>
+												<!-- Star Rating -->
+												<div class="star-rating" title="100%">
+													<div class="back-stars clearfix">
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+														<i class="fa fa-star" aria-hidden="true"></i>
+
+														<div class="front-stars clearfix" style="width:100%;">
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+															<i class="fa fa-star" aria-hidden="true"></i>
+														</div>
+													</div>
+												</div>
+												<!-- /Star Rating -->
+											<blockquote>
+												<p><p>The B.Tech IT program at Sharda University's CSA Department offered a perfect blend of theoretical knowledge and practical skills. With strong faculty support and industry-aligned curriculum, we were well-prepared for real-world challenges in the tech field</p></p>
+											</blockquote>
+											<cite>
+											<p>
+											B.Tech IT, 2026												</p>
+												<p>&nbsp;</p>
+											</cite>
+										</div>
+										<!-- Testimonials Box -->
+									</li>
+								  							</ul>
+						</div>
+						<a href="javascript:void(0);" class="previous-btn" rel="nofollow">
+							<i class="icon-arrow-left icons"></i>
+						</a>
+						<a href="javascript:void(0);" class="next-btn" rel="nofollow">
+							<i class="icon-arrow-right icons"></i>
+						</a>
+
+				</div>
+				<div class="text-center">
+					<a href="https://www.sharda.ac.in/student-testimonial" class="button3 btn btn-lg" target="_blank">View More...</a>
+				</div>
+				</div>
+			</section>
+			<!-- /Testimonials -->
+			<!-- Android App -->
+			<!--<section id="android-app" class="section">
+				<div class="container">
+					<div class="row">
+						<div class="col-sm-3">
+							<figure class="image">
+										<img class="lazy" data-src="https://www.sharda.ac.in/assets/imgs/mobile-app.png" alt="app"></img>
+							</figure>
+						</div>
+						<div class="col-sm-9">
+							<div class="inner-content">
+								<h3>Check out the One-stop-shop for all the Campus related needs.</h3>
+								<p>Search for 'Sharda University' in Google Play and App Store to DOWNLOAD THE APP.</p>
+								<a href="https://play.google.com/store/apps/details?id=com.shardatech.shardauniversity&hl=en" class="google-play-btn" target="_blank">
+									<img class="lazy" data-src="https://www.sharda.ac.in/assets/imgs/google-play.png" alt="app"></img>
+
+								</a>
+								<a href="https://itunes.apple.com/in/app/sharda-university/id1441100996?mt=8" class="google-play-btn" target="_blank">
+									<img class="lazy" data-src="https://www.sharda.ac.in/assets/imgs/ios.png" alt="app"></img>
+
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section> -->
+			<!-- /Android App -->
+
+			<!-- Company Hiring -->
+			<section id="company-hiring" class="section">
+				<div class="container">
+					<a href="https://www.sharda.ac.in/campuslife/overview#our-recruiters" class="btn button3 view-all">View all companies...</a>
+					<h2>Companies Hiring</h2>
+					<p class="lead">Top companies are hiring from sharda</p>
+						<div class="stats-bg clearfix">
+						<div class="animate">
+						<ul class="clearfix">
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/hcl.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/amarujala1.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/syntel2.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/Vodafone_logo.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/cmc-logo_0.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/ultipa.jpg" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/FutureGroup.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/sleepwell.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/Tech_Mahindra_New_Logo1.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/Amazon.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/zenpact.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/adani_wilmar.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/Dish_TV_2.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/niit_logo_03.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/icici_securities.png" alt="logo"></li >
+													<li><img class="lazy" data-src="https://www.sharda.ac.in/attachments/testimonial_images/Pepsi.png" alt="logo"></li >
+												</ul>
+						</div>
+						<div class="round round1">
+							<span class="sm-round"></span>
+							<div class="content">
+								<figure>
+									<img class="lazy" data-src="https://www.sharda.ac.in/assets/imgs/icon2.png" alt="icon">
+								</figure>
+								<h4>65% to 100% </h4>
+								<p>Placement program wise</p>
+								<!--<h4>Upto 100%</h4>
+								<p>Placement Assistance</p>-->
+							</div>
+						</div>
+						<div class="round round2">
+							<span class="sm-round"></span>
+							<div class="content">
+								<figure>
+									<img class="lazy" data-src="https://www.sharda.ac.in/assets/imgs/icon3.png" alt="icon">
+								</figure>
+								<h4>34000+</h4>
+
+								<p>Successful Alumni worldwide</p>
+							</div>
+						</div>
+						<div class="round round3">
+							<span class="sm-round"></span>
+							<div class="content">
+								<figure>
+									<img class="lazy" data-src="https://www.sharda.ac.in/assets/imgs/icon1.png" alt="icon">
+								</figure>
+								<h4>600+</h4>
+
+								<p>companies hiring world wide</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- /Company Hiring -->
+			<!-- Read Faq -->
+			<section id="read-faq">
+				<div class="container">
+					<h4>Have some questions? Read our FAQ's <a href="https://www.sharda.ac.in/admissions/faq" class="button2 btn btn-lg">View FAQs</a></h4>
+				</div>
+			</section>
+			<!--
+			<div id="home-video" class="modal fade" tabindex="-1" role="dialog">
+			  <div class="modal-dialog" role="document">
+				<div class="modal-content">
+				<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeVideo"><i class="icon-close icons"></i></button>
+			  </div>
+				  <div class="modal-body" id="playerID">
+					<iframe width="970" height="450" src="https://www.youtube.com/embed/bA4-FRJ5afc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+				  </div>
+				</div>
+			  </div>
+			</div>
+
+				$("#home-video").on('hidden.bs.modal', function (e) {
+						$("#home-video iframe").attr("src", $("#home-video iframe").attr("src"));
+				});
+
+		-->
+
+
+		
+			<script>
+				document.addEventListener("DOMContentLoaded",function(){var a;if("IntersectionObserver"in window){a=document.querySelectorAll(".lazy");var b=new IntersectionObserver(function(a){a.forEach(function(a){if(a.isIntersecting){var c=a.target;c.src=c.dataset.src,c.classList.remove("lazy"),b.unobserve(c)}})});a.forEach(function(a){b.observe(a)})}else{function b(){c&&clearTimeout(c),c=setTimeout(function(){var c=window.pageYOffset;a.forEach(function(a){a.offsetTop<window.innerHeight+c&&(a.src=a.dataset.src,a.classList.remove("lazy"))}),0==a.length&&(document.removeEventListener("scroll",b),window.removeEventListener("resize",b),window.removeEventListener("orientationChange",b))},20)}var c;a=document.querySelectorAll(".lazy"),document.addEventListener("scroll",b),window.addEventListener("resize",b),window.addEventListener("orientationChange",b)}}),$(document).ready(function(){$("#sharda-featured").slick({autoplay:!0,autoplaySpeed:1e4,speed:600,slidesToShow:1,slidesToScroll:1,pauseOnHover:!1,dots:!0,pauseOnDotsHover:!0,cssEase:"linear",draggable:!1}),
+                    
+                $("#campus-gallery").slick({dots:!0,autoplay: true,infinite:!0,speed:500,slidesToShow:1,slidesToScroll:1,cssEase:"linear"})
+                
+                $("#img-gallery").slick({dots: true,arrows : false,autoplay: true,infinite:!0,speed:500,slidesToShow:1,slidesToScroll:1,cssEase:"linear"})
+                $("#img-gallery-home").slick({dots: true,arrows : false,autoplay: true,infinite:!0,speed:500,slidesToShow:1,slidesToScroll:1,cssEase:"linear"})
+                });
+                
+                let redirectUrl=a=>{window.open(a,"_blank")};$(document).ready(function(){function a(){992>$(window).width()&&767<$(window).width()&&(setSlider("top-faculties",100,2,1,500,!1),setSlider("research-spotlights",100,1,1,500,!1),setSlider("success-stories",100,2,1,500,!1),setSlider("announcements",100,2,1,500,!1),setSlider("testimonials2",100,2,1,500,!1),setSlider("sharda-live",100,2,1,500,!1),Sharda_CommonFunction.round_slider()),767>$(window).width()&&(setSlider("top-faculties",100,1,1,500,!1),setSlider("research-spotlights",100,1,1,500,!1),setSlider("success-stories",100,1,1,500,!1),setSlider("announcements",100,1,1,500,!1),setSlider("testimonials2",100,1,1,500,!1),setSlider("sharda-live",100,1,1,500,!1)),992<$(window).width()&&(setSlider("top-faculties",100,4,1,500,!1),setSlider("research-spotlights",100,4,1,500,!1),setSlider("success-stories",100,4,1,500,!1),setSlider("announcements",100,3,1,500,!1),setSlider("testimonials2",100,3,1,500,!1),setSlider("sharda-live",100,5,1,500,!1),Sharda_CommonFunction.round_slider())}a(),$(window).resize(function(){a()})});
+			</script>
+<script>
+document.addEventListener("contextmenu", function(e) {
+    e.preventDefault();
+});
+
+document.onkeydown = function(e) {
+
+    if (e.keyCode == 123) { // F12
+        return false;
+    }
+
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 73) { // Ctrl+Shift+I
+        return false;
+    }
+
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 74) { // Ctrl+Shift+J
+        return false;
+    }
+
+    if (e.ctrlKey && e.keyCode == 85) { // Ctrl+U
+        return false;
+    }
+
+};
+</script>
+<!-- Footer -->
+<footer id="footer">
+	<div class="container">
+		<!-- Top -->
+		<div class="top">
+			<div class="row">
+				<div class="col-sm-6 col-md-3 col-xs-6">
+					<h4>Admissions</h4>
+					<ul class="margin">
+						<li>
+							<a href="https://www.sharda.ac.in/admissions"><i class="fa fa-angle-right" aria-hidden="true"></i>Admission</a>
+						</li>
+						<!--<li>
+										<a href="https://www.sharda.ac.in/apply/international"><i class="fa fa-angle-right" aria-hidden="true"></i>Admission International</a>
+									</li>-->
+						<li>
+							<a href="https://www.sharda.ac.in/admissions/how-to-apply"><i class="fa fa-angle-right" aria-hidden="true"></i>How To Apply</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/course-fee"><i class="fa fa-angle-right" aria-hidden="true"></i>Course Fee</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/scholarship"><i class="fa fa-angle-right" aria-hidden="true"></i>Scholarship</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/admissions/refund-policy"><i class="fa fa-angle-right" aria-hidden="true"></i>Refund Policy</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/admissions/lateral-entry"><i class="fa fa-angle-right" aria-hidden="true"></i>Lateral Entry</a>
+						</li>
+					</ul>
+					<h5>Connect</h5>
+					<ul>
+						<li>
+							<a href="https://www.sharda.ac.in/campuslife/gallery"><i class="fa fa-angle-right" aria-hidden="true"></i>Image Gallery</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/campuslife/video-gallery"><i class="fa fa-angle-right" aria-hidden="true"></i>Video Gallery</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/connect/news"><i class="fa fa-angle-right" aria-hidden="true"></i>News</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/connect/media-coverage"><i class="fa fa-angle-right" aria-hidden="true"></i>Media Coverage</a>
+						</li>
+
+					</ul>
+
+				</div>
+				<div class="col-sm-6 col-md-3 col-xs-6">
+					<h4>Other Links:</h4>
+					<ul class="hidden-margin-xs">
+						<!--<li class="hidden-xs">
+							<a href="https://www.sharda.ac.in/search"><i class="fa fa-angle-right" aria-hidden="true"></i>Find Courses</a>
+						</li>-->
+
+						<li>
+							<a href="https://www.sharda.ac.in/iqac/nirf"><i class="fa fa-angle-right" aria-hidden="true"></i>NIRF</a>
+						</li>
+						<li> 
+							<a href="https://www.sharda.ac.in/contact"><i class="fa fa-angle-right" aria-hidden="true"></i>Counseling Centres</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/international/admission-offices"><i class="fa fa-angle-right" aria-hidden="true"></i>Admission Offices International</a>
+						</li>
+						<li>
+							<a href="https://suat.sharda.ac.in/"><i class="fa fa-angle-right" aria-hidden="true"></i>SUAT</a>
+						</li>
+						<li class="hidden-xs">
+							<a href="https://www.sharda.ac.in/campuslife/transportation"><i class="fa fa-angle-right" aria-hidden="true"></i>Transportation</a>
+						</li>
+						<li class="hidden-xs">
+							<a href="https://www.sharda.ac.in/account-helpdesk"><i class="fa fa-angle-right" aria-hidden="true"></i>Account Help desk</a>
+						</li>
+						<li class="hidden-xs">
+							<a href="https://www.sharda.ac.in/campuslife/infrastructure"><i class="fa fa-angle-right" aria-hidden="true"></i>Infrastructure</a>
+						</li>
+						<li class="hidden-xs">
+							<a href="https://www.sharda.ac.in/campuslife/academic-facilities"><i class="fa fa-angle-right" aria-hidden="true"></i>Academic Facilities</a>
+						</li>
+						<li class="hidden-xs">
+							<a href="https://www.sharda.ac.in/campuslife/campus-facilities"><i class="fa fa-angle-right" aria-hidden="true"></i>Campus Facilities</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/placements"><i class="fa fa-angle-right" aria-hidden="true"></i>Placements</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/placements#our-recruiters"><i class="fa fa-angle-right" aria-hidden="true"></i>Recruiters</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/about/success-stories"><i class="fa fa-angle-right" aria-hidden="true"></i>Success Stories</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/about-us"><i class="fa fa-angle-right" aria-hidden="true"></i>About Sharda</a>
+						</li>
+						<li>
+						<a href="https://www.sharda.ac.in/about/covid-19" target="_blank"><i class="fa fa-angle-right" aria-hidden="true"></i>Covid 19 Updates</a>
+						</li>
+						
+						<li>
+							<a href="https://www.sws.ac.in" target="_blank"><i class="fa fa-angle-right" aria-hidden="true"></i>Sharda World School</a>
+						</li>
+						
+						<li>
+							<a href="https://www.shardauniversity.uz" target="_blank"><i class="fa fa-angle-right" aria-hidden="true"></i>Sharda University Uzbekistan</a>
+						</li>
+						
+						
+						<li>
+							<a href="https://www.agra.sharda.ac.in/" target="_blank"><i class="fa fa-angle-right" aria-hidden="true"></i>Sharda University Agra</a>
+						</li>
+						
+						
+					</ul>
+
+				</div>
+				<div class="col-sm-6 col-xs-6 visible-xs">
+				</div>
+				<div class="col-sm-6 col-md-3 col-xs-6">
+					<h4 class="hidden-xs">&nbsp;  </h4>
+					<ul class="margin">
+
+						<li>
+							<a href="https://www.sharda.ac.in/about/leadership/chancellor"><i class="fa fa-angle-right" aria-hidden="true"></i>Leadership</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/faculty"><i class="fa fa-angle-right" aria-hidden="true"></i>Faculties</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/about/career"><i class="fa fa-angle-right" aria-hidden="true"></i>Work At Sharda</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/research"><i class="fa fa-angle-right" aria-hidden="true"></i>Research</a>
+						</li>
+						<li>
+							<a href="https://alumni.sharda.ac.in/"><i class="fa fa-angle-right" aria-hidden="true"></i>Alumni</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/international/why-choose-sharda"><i class="fa fa-angle-right" aria-hidden="true"></i>International</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/blog/"><i class="fa fa-angle-right" aria-hidden="true"></i>Blog</a>
+						</li>
+						<li>
+							<a href="https://samadhaan.ugc.ac.in/" target="_blank"><i class="fa fa-angle-right" aria-hidden="true"></i>UGC e-Samadhaan</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/attachments/human-values-and-professional-ethics.xlsx" target="_blank"><i class="fa fa-angle-right" aria-hidden="true"></i>Courses on Human Values and Professional ethics</a> 
+						</li>
+						<li>
+							<a href="https://cybercrime.gov.in/" target="_blank"><i class="fa fa-angle-right" aria-hidden="true"></i>National Cyber Crime Reporting Portal</a>
+						</li>
+						<li><a href="https://www.sharda.ac.in/about/ariia"><i class="fa fa-angle-right" aria-hidden="true"></i>ARIIA</a></li>
+						<li><a href="https://www.sharda.ac.in/social-media-policy"><i class="fa fa-angle-right" aria-hidden="true"></i>Social Media Policy</a></li>
+						<li><a href="https://www.sharda.ac.in/admissions/credittransfer" title="International Credit Transfer Programme"><i class="fa fa-angle-right" aria-hidden="true"></i>International Credit Transfer Programme</a></li>
+					</ul>
+					<h5>Downloads</h5>
+					<ul>
+						<li>
+							<a href="https://www.sharda.ac.in/connect/brochure"><i class="fa fa-angle-right" aria-hidden="true"></i>Brochure</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/connect/newsletter"><i class="fa fa-angle-right" aria-hidden="true"></i>Newsletter</a>
+						</li>
+						<li>
+							<a href="https://www.sharda.ac.in/connect/the-shardans"><i class="fa fa-angle-right" aria-hidden="true"></i>The Shardans</a>
+						</li>
+					</ul>
+				</div>
+				<div class="col-sm-12 col-md-3 col-xs-12">
+					<h4 class="hidden-xs">&nbsp;  </h4>
+					<!-- Section -->
+					<div class="section">
+						<h6>Follow Sharda University</h6>
+						<!-- Sociable -->
+						<div class="sociable">
+							<a href="https://www.facebook.com/ShardaUniversity/" target="_blank" rel="nofollow"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+							<a href="https://twitter.com/sharda_uni" target="_blank" rel="nofollow"><svg style="font-size:17px;" viewBox="0 0 512 512" fill="#fff" height="1em" width="1em">
+  <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 274.2 26 48h145.5l98.1 116.3L389.2 48zm-24.8 373.8h39.1L151.1 88h-42.3l271 333.8z"></path>
+</svg></a>
+							<a href="https://in.linkedin.com/school/sharda-university/" target="_blank" rel="nofollow"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+							<a href="https://www.youtube.com/channel/UC8yE0HOsSQZwOJTgQQUn3DQ" target="_blank" rel="nofollow"><i class="fa fa-youtube-play" aria-hidden="true"></i></a>
+							<a href="https://www.instagram.com/sharda_university/" target="_blank" rel="nofollow"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+						</div>
+						<!-- /Sociable -->
+					</div>
+					<!-- /Section -->
+					<!-- Section -->
+					<div class="section">
+						<h6>No. of Visitors</h6>
+						<div class="inner">
+							<p><a href="javascript:void(0)" class="web-counter">107138136</a></p>
+						</div>
+					</div>
+					<!--<div class="section">
+						<h6>Download Our App</h6>
+						<a href="https://play.google.com/store/apps/details?id=com.shardatech.shardauniversity&hl=en_IN"><img class="app-download" src="https://www.sharda.ac.in/assets/imgs/google-play2.png" alt="app"></img></a>
+						<a href="https://itunes.apple.com/in/app/sharda-university/id1441100996?mt=8"><img class="app-download" src="https://www.sharda.ac.in/assets/imgs/ios2.png" alt="app"></img></a>
+					</div>-->
+					<!-- /Section -->
+					<!-- Section -->
+					<div class="section">
+						<h6>Subscribe Newsletter</h6>
+						<!-- Newsletter Form -->
+						<div class="newsletter-form">
+							<form method="post" class="clearfix" id="subscribe_div">
+								<input type="text" placeholder="Enter your email" name="subscribeEmail" id="subscribeEmail">
+								<button type="submit" value="Submit" onclick="return checkEmailField()"><i class="fa fa-angle-right" aria-hidden="true"></i></button>
+							</form>
+						</div>
+						<!-- /Newsletter Form -->
+					</div>
+					<!-- /Section -->
+				</div>
+			</div>
+		</div>
+		<!-- /Top -->
+		<!-- Contact -->
+		<div class="contact">
+			<div class="row">
+				<div class="col-sm-5">
+					<span class="icon">
+						<i class="fa fa-map-pin" aria-hidden="true"></i>
+					</span>
+					<div class="inner">
+						<p><a target="_blank" href="https://www.google.com/maps/dir/28.4708925,77.4863856/Plot+No.+32-34,+Knowledge+Park+III,Greater+Noida,+Uttar+Pradesh+201310/@28.4712506,77.4805553,16z/data=!3m1!4b1!4m9!4m8!1m1!4e1!1m5!1m1!1s0x390cea0f7b91511b:0x486f13bd49e5e7ae!2m2!1d77.4820016!2d28.47272">Plot No. 32-34, Knowledge Park III,Greater Noida, Uttar Pradesh 201310</a></p>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<span class="icon">
+						<i class="fa fa-phone" aria-hidden="true"></i>
+					</span>
+					<div class="inner">
+						<p><a href="tel:+91-120-4570000" class="National_Enquiry_Number">+91-120-4570000</a></p>
+					</div>
+				</div>
+				<div class="col-sm-3">
+					<span class="icon">
+						<a href="https://www.sharda.ac.in/admissions/vtour" target="_blank"><i class="fa fa-binoculars" aria-hidden="true"></i></a>
+					</span>
+					<div class="inner">
+						<p><a href="https://www.sharda.ac.in/admissions/vtour" target="_blank">Virtual Tour</a></p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Contact -->
+		<!-- Bottom -->
+		<div class="bottom">
+			<div class="row">
+				<div class="col-sm-4">
+					<a href="http://www.shardatech.org/" target="_blank">
+						<span class="powered-by">Powered By</span>
+						<span class="logo-wrapper">
+							<img src="https://www.sharda.ac.in/assets/imgs/sharda-tech-logo.png" alt="Sharda Tech Logo"></img>
+						</span>
+					</a>
+				</div>
+				<div class="col-sm-8">
+					<p>
+						<a>© 2026 Sharda University</a>
+						<a href="https://www.sharda.ac.in/disclaimer">Disclaimer</a>
+						<a href="https://www.sharda.ac.in/privacy-policy">Privacy Policy</a>
+						<a href="https://www.sharda.ac.in/terms-of-use">Terms of Use</a>
+					</p>
+				</div>
+			</div>
+
+		</div>
+		<!-- /Bottom -->
+
+	</div>
+	<!-- Scroll Top Icon -->
+	<a href="javascript:void(0);" id="scroll-top-icon" class="smooth-scroll" style="display:none;">
+		<i class="fa fa-arrow-up" aria-hidden="true"></i>
+	</a>
+	<!-- /Scroll Top Icon -->
+	<!-- Side quick Links -->
+	<div id="side-quick-links">
+		<ul>
+			<li class="call">
+				<div class="content">
+					<a href="#"><i class="fa fa-phone" aria-hidden="true"></i></a>
+					<p><a href="tel:+91-120-4570000" rel="nofollow" class="National_Enquiry_Number">+91-120-4570000</a></p>
+				</div>
+			</li>
+
+						<li class="marker">
+				<div class="content">
+					<a href="javascript:void(0)" rel="nofollow"><i class="fa fa-globe" aria-hidden="true"></i></a>
+						<p><a class="sociable" href="https://www.facebook.com/ShardaUniversity/" rel="nofollow" target="_blank"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+						<a class="sociable" href="https://twitter.com/sharda_uni" target="_blank" rel="nofollow"><i class="fa fa-brands fa-x-twitter"></i></a>
+						<a class="sociable" href="https://in.linkedin.com/school/sharda-university/" target="_blank" rel="nofollow"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+						<a class="sociable" href="https://www.youtube.com/channel/UC8yE0HOsSQZwOJTgQQUn3DQ" target="_blank" rel="nofollow"><i class="fa fa-youtube-play" aria-hidden="true"></i></a>
+						<a class="sociable" href="https://www.instagram.com/sharda_university/" target="_blank" rel="nofollow"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+						</p>
+				</div>
+			</li>
+			<li class="vertualtour">
+				<div class="content">
+				<a href="https://www.sharda.ac.in/admissions/vtour" target="_blank"><i class="fa fa fa-binoculars" aria-hidden="true"></i></a>
+				<p> <a href="https://www.sharda.ac.in/admissions/vtour" target="_blank">Virtual Tour</a></p>
+
+				</div>
+			</li>
+			<li class="watsapp">
+				<div class="content">
+					<a href="javascript:void(0)" rel="nofollow"><i class="fa fa-whatsapp" aria-hidden="true"></i></a>
+					<h6>National</h6>
+					<p><a href="https://wa.me/919205586066" rel="nofollow" target="_blank" class="National_Enquiry_Whatsapp">+91-9205586066</a></p>
+					<h6>International</h6>
+					<p><a href="https://wa.me/918800998881" rel="nofollow" target="_blank" class="International_Enquiry_Mail">+91-8800998881</a></p>
+					
+					
+				</div>
+			</li>
+			
+			<li class='chat'><!-- Load Facebook SDK for JavaScript -->
+			
+						
+				<!--Start of SuperBot Chat Script-->
+<script type="text/javascript" async>
+window.$superbot||(function(d,s){var _sb=$superbot=function(c){_sb._.push(c)},$=_sb.s=d.createElement(s),e=d.getElementsByTagName(s)[0];_sb.set=function(o){_sb.set._.push(o)};_sb._=[];_sb.set._=[];$.async=!0;$.setAttribute("charset","utf-8");$.src="https://app.superbot.works/agent.js?a=qA51JKQgOm&l=en";_sb.t=+new Date;$.type="text/javascript";e.parentNode.insertBefore($,e)})(document,"script");
+var _sb_visitor="";
+</script>
+
+
+<!--End of SuperBot Chat Script-->
+	
+				<!--<script language="javascript" type="text/javascript">
+				var q = document.createElement('script');
+				q.type = 'text/javascript';
+				q.async = true;
+				var proto = ('https:' == document.location.protocol?'https://':'http://');
+				q.src = proto + "czchat.trixchat.com/chatadmin/js_chat/check_for_valid_license.php?lk=e6dc99be05c9101c9af06e76cc2558de&is_agent=no";
+				document.getElementsByTagName('head')[0].appendChild(q);
+				</script>-->
+				
+				<!--Start of SuperBot Chat Script-->
+				<!--<script type="text/javascript" async>
+				window.$superbot||(function(d,s){var _sb=$superbot=function(c){_sb._.push(c)},$=_sb.s=d.createElement(s),e=d.getElementsByTagName(s)[0];_sb.set=function(o){_sb.set._.push(o)};_sb._=[];_sb.set._=[];$.async=!0;$.setAttribute("charset","utf-8");$.src="https://app.superbot.works/agent.js?a=qA51JKQgOm&l=en";_sb.t=+new Date;$.type="text/javascript";e.parentNode.insertBefore($,e)})(document,"script");
+				var _sb_visitor="";
+				</script>-->
+				<!--End of SuperBot Chat Script-->
+				
+						
+			</li>
+		</ul>
+
+	</div>
+	<!-- /Side quick Links -->
+	<style>
+		.sidebaropenleft {}
+
+		.sidebaropenleft img {
+			width: 100%;
+			border-radius: 10px 0 0 10px;
+		}
+
+		.sidebaropenleft span {
+			cursor: pointer;
+			background: linear-gradient(to left, #ed8449, #e3346f);
+			width: 44px;
+			height: 130px;
+			text-align: center;
+			line-height: 50px;
+			padding: 0px;
+			display: block;
+			position: absolute;
+			bottom: 33px;
+			margin: 0 0 -25px 0;
+			color: #fff;
+			left: -44px;
+			border-radius: 5px 0px 0px 5px;
+		}
+
+		.sidebaropenleft strong {
+			opacity: 1;
+			bottom: -73px;
+			font-weight: 400;
+			line-height: 41px;
+			transform: rotate(180deg);
+			white-space: nowrap;
+			writing-mode: vertical-rl;
+			transform-origin: -6px 0px;
+			left: 55px;
+			position: absolute;
+			font-size: 15px;
+		}
+
+		.sidebaropenleft span i {
+			font-size: 24px;
+		}
+
+		.sidebaropenleft span small {
+			width: 5px;
+			height: 5px;
+			float: left;
+			display: block;
+			margin: 2px;
+			border-radius: 4px;
+			background: #fff;
+		}
+
+		/* #live-events .live-events-content {
+			
+		} */
+
+		#live-events {
+			width: 275px;
+			border-radius: 10px 0px 0px 10px;
+			background: #fafafa;
+			right: -275px;
+			padding: 0px;
+			position: fixed;
+			display: block;
+			bottom: 150px;
+			z-index: 9999;
+			transition: ease all 0.4s;
+		}
+
+		.sidebaropenleft {
+			width: 200px;
+			border-radius: 10px 0px 0px 10px;
+			background: #fafafa;
+			right: -200px;
+			padding: 0px;
+			position: fixed;
+			display: block;
+			bottom: 290px;
+			z-index: 9999;
+			transition: ease all 0.4s;
+		}
+
+		.sidebaropenleft.open {
+			right: 0;
+		}
+
+		.whatsnew .slick-arrow {
+			display: none !important;
+		}
+
+		.whatsnew .slick-dots {
+			bottom: 5px !important;
+		}
+
+		.whatsnew .slick-dots li button {
+			background: #dadada !important;
+		}
+
+		.whatsnew .slick-dots li.slick-active button {
+			background: #31A649 !important;
+		}
+	</style>
+	<div class="sidebaropenleft" style="display:none;">
+		<span id="sidebaropenleft" class="color">
+			<strong>Sharda Care</strong>
+		</span>
+		<div class="sidebarformleft">
+			<div class="sidebarform-inleft">
+				<div class="whatsnew">
+					<div class="contantde">
+						<a href="https://www.shardacare.com/?utm_source=website&utm_medium=su&utm_campaign=sch-cta&utm_term=homepage" target="_blank" tabindex="0"><img src="https://www.sharda.ac.in/assets/imgs/WebsitePoster.png"></a>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+			</div>
+		</div>
+	</div>
+
+
+
+	<script>
+		$(document).ready(function() {
+
+
+			$("#sidebaropenleft").click(function() {
+				$(".sidebaropenleft").toggleClass("open");
+				/*$(".blackdiv").toggleClass("open");*/
+				$(".color").toggleClass("change");
+
+			});
+			$(".whatnewsclose").click(function() {
+				$(".sidebaropenleft").toggleClass("open");
+			});
+
+			$(window).scroll(function() {
+				var windowScroll = $(window).scrollTop();
+				var topScroll = 0;
+
+
+				var href = document.location.href;
+				var lastPathSegment = href.substr(href.lastIndexOf('/') + 1);
+				if (lastPathSegment == '') {
+
+					if (windowScroll > 200) {
+						$(".sidebaropenleft").removeClass('open');
+					} else {
+						$(".sidebaropenleft").addClass('open');
+					}
+
+				} else {
+					$(".sidebaropenleft").removeClass('open');
+				}
+			});
+
+		});
+	</script>
+
+				<!-- Live Events -->
+		<div id="live-events" class="active" >
+			<div class="live-events-placeholder">
+				<a href="javascript:void(0);" rel="nofollow" onclick="close_pop()">What’s New</a>
+									<span class="count">2</span>
+							</div>
+			<div class="live-events-content">
+				<div id="whats-new" class="slick-dotted2">
+					 <div>
+							<a href="https://www.sharda.ac.in/apply/?utm_source=SU_Website&utm_medium=Whats_New&utm_campaign=SU_Admissions_2026" target="_blank">
+								<img src="https://www.sharda.ac.in/attachments/promotional_banner/admissons_open20261.jpg" alt="image">
+							</a>
+						</div>
+					 <div>
+							<a href="https://www.sharda.ac.in/international/apply/?utm_source=SU_Website&utm_medium=Apply_Button&utm_campaign=SU_Admissions_2026" target="_blank">
+								<img src="https://www.sharda.ac.in/attachments/promotional_banner/international-whats-new.jpg" alt="image">
+							</a>
+						</div>
+									</div>
+
+			</div>
+		</div>
+		<!-- /Live Events -->
+		<!-- Notification -->
+	<div id="notification">
+		
+		<a href="javascript:void(0);" class="bell-icon">
+			<i class="fa fa-bell" aria-hidden="true"></i>
+			<span class="badge">4</span> 
+		</a>
+		<!-- Content -->
+		<div class="content">
+			<!-- Header -->
+			
+			<header>
+				<h6 class="clearfix">Notifications <a class="view-all" href="https://www.sharda.ac.in/happenings"><small>(View All)</small> </a><a class="close" href="javascript:void(0);"><i class="fa fa-times" aria-hidden="true"></i></a></h6>
+			</header>
+			<!-- /Header -->
+			<!-- Scroll -->
+			<div class="scroll">
+				<ul>
+									<li> 						<a href="https://www.sharda.ac.in/happenings/#heading1" class="clearfix">
+											<div class="banner">
+							<img src="https://www.sharda.ac.in/assets/imgs/announcement-default.jpg" alt="banner"/>
+						</div>
+						<div class="detail">
+							<h6>OFFICE ORDER No. 29 Appointment of Head of Department of Biotechnology, SSBT&ndash; Dr. Monika Jain, Assoc. Professor, SSBT</h6>
+							<p>04 May 2026</p>
+						</div>
+						</a>
+					</li>
+									<li> 						<a href="https://www.sharda.ac.in/happenings/#heading2" class="clearfix">
+											<div class="banner">
+							<img src="https://www.sharda.ac.in/assets/imgs/announcement-default.jpg" alt="banner"/>
+						</div>
+						<div class="detail">
+							<h6>Notification no. 24  Regulations for the Award of the Chancellors Gold Medal (Best Student Innovator and Best Student Entrepreneur) - revised</h6>
+							<p>04 May 2026</p>
+						</div>
+						</a>
+					</li>
+									<li> 						<a href="https://www.sharda.ac.in/happenings/#heading3" class="clearfix">
+											<div class="banner">
+							<img src="https://www.sharda.ac.in/assets/imgs/announcement-default.jpg" alt="banner"/>
+						</div>
+						<div class="detail">
+							<h6>Appointment of Advisor, Learning Resource Centre (LRC) - Prof. (Dr.) Anil Sagar, SSCSE</h6>
+							<p>02 May 2026</p>
+						</div>
+						</a>
+					</li>
+									<li> 						<a href="https://www.sharda.ac.in/happenings/#heading4" class="clearfix">
+											<div class="banner">
+							<img src="https://www.sharda.ac.in/assets/imgs/announcement-default.jpg" alt="banner"/>
+						</div>
+						<div class="detail">
+							<h6>Appointment of Chief Vigilance Officer (CVO) - Prof. (Dr.) Shajee Mohan, SSCSE</h6>
+							<p>02 May 2026</p>
+						</div>
+						</a>
+					</li>
+								</ul>
+		</div>
+		<!-- /Scroll -->
+	</div>
+	<!-- /Content -->
+	</div>
+	<!-- /Notification -->
+<script src="https://media.sharda.ac.in/sharda.ac.in/sharda-assets/js/easySlider1.7.js"></script>
+
+
+</footer>
+ 
+<!-- /Footer -->
+<!-- Javascript -->
+<script src="https://media.sharda.ac.in/sharda.ac.in/sharda-assets/js/jquery.group.js"></script>
+<script src="https://media.sharda.ac.in/sharda.ac.in/sharda-assets/js/bootstrap-3.3.7.min.js"></script>
+<script src="https://media.sharda.ac.in/sharda.ac.in/sharda-assets/js/jquery.carouFredSel-6.0.5-packed.js"></script>
+<script src="https://www.sharda.ac.in/assets/js/sharda_common_revamp_min.js?v3.0.8"></script>
+<script src="https://kit.fontawesome.com/39fb6a5c92.js" crossorigin="anonymous"></script>
+<script>
+	if (screen && screen.width > 767) {
+		document.write('<script type="text/javascript" src="https://media.sharda.ac.in/sharda.ac.in/sharda-assets/js/morpheus-svg.js"><\/script>')	}
+</script>
+
+<script type="text/javascript">
+	$(window).on("load", function() {
+		"global" != localStorage.getItem("popState") && ($("#student-category").addClass("sticky"), $("#student-category").delay(2e3).fadeIn(), localStorage.setItem("popState", "global"))
+	}), $("#student-category").click(function() {
+		$("#popup").fadeOut(), $("#student-category").fadeOut(), $("#student-category").addClass("sticky")
+	}), $(document).ready(function() {
+		Sharda_CommonFunction.init(), $("#whats-new").slick({
+			dots: !0,
+			infinite: !0,
+			autoplay: !0,
+			speed: 800,
+			autoplaySpeed: 5000,
+			slidesToShow: 1,
+			slidesToScroll: 1,
+			cssEase: "linear"
+		}), $(".strip-slider").slick({
+			dots: !1,
+			infinite: !0,
+			speed: 800,
+			arrows: !1,
+			slidesToShow: 1,
+			autoplay: !0
+		})
+	});
+	
+/*window.onload=function () {
+    if (!getCookie('hide')) {
+        $("#live-events").toggleClass("active");
+    } else { 
+	 $('#live-events').removeClass("active");
+	}
+}*/
+</script>
+<script>
+$(window).load(function() {
+   $("#sharda-featured").removeClass("home-sharda-featured");
+});
+</script>
+</div>
+<!-- Start of global snippet: Please do not remove -->
+
+<!-- Google tag (gtag.js) -->
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=DC-16419713"></script>
+
+<script>
+
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag(){dataLayer.push(arguments);}
+
+  gtag('js', new Date());
+
+
+
+  gtag('config', 'DC-16419713');
+
+</script>
+
+<!-- End of global snippet: Please do not remove -->
+
+<!--
+
+Event snippet for Sharda University Floodlight on : Please do not remove.
+
+Creation date: 02/11/2026-->
+
+<script>
+
+  gtag('event', 'conversion', {
+
+    'allow_custom_scripts': true,
+
+    'send_to': 'DC-16419713/invmedia/shard0+standard'
+
+  });
+
+</script>
+
+<noscript>
+
+<img src="https://ad.doubleclick.net/ddm/activity/src=16419713;type=invmedia;cat=shard0;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;npa=;gdpr=${GDPR};gdpr_consent=${GDPR_CONSENT_755};ord=1?" width="1" height="1" alt=""/>
+
+</noscript>
+
+<!-- End of event snippet -->
+
+
+
+</body>  
+
+<!-- Body -->
+</html>

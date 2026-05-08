@@ -1,0 +1,751 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<base href="https://smsvaranasi.com/">
+	
+<title>SMS-VARANASI | SCHOOL OF MANAGEMENT SCIENCES</title>
+<meta http-equiv="X-XSS-Protection" content="0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<meta name="description" content="School of Management Sciences, Varanasi is a NAAC ‘A’ accredited Autonomous College in Varanasi Affiliated to AKTU and MGKVP ranked among top 50 B-schools offering professional courses like MBA, MCA, M.Com, BBA, B.Com(Hons), BCA and BA(Hons) Mass Comm. with a robust placement record, in renowned companies across India.">
+<meta name="keywords" content="Management college in Varanasi, MBA college in Varanasi, BBA college in Varanasi, NAAC accredited college in Varanasi, A grade college in Varanasi, Top B-school in Varanasi, MBA course in Varanasi, MCA course in Varanasi, M.Com course in Varanasi, BBA course in Varanasi, B.Com(Hons) course in Varanasi, B.Com course in Varanasi, BA Mass Comm course in Varanasi, BCA course in Varanasi, AKTU affiliated college in Varanasi, MGKVP affiliated college in Varanasi, Best college in Varanasi for management studies, Management college  in Varanasi, Top management college in Uttar Pradesh, Best MBA college in Uttar Pradesh, Best B-school in Uttar Pradesh, MBA course in Uttar Pradesh, MCA course in Uttar Pradesh, BBA course in Uttar Pradesh, B.Com(Hons) course in Uttar Pradesh, B.Com course in Uttar Pradesh, BCA course in Uttar Pradesh, Business school in Varanasi, Best college for B.Com in India, Best college for BA Mass Comm in India, Top B-school, MBA college with good placement, Best MBA placement, MBA Fees">
+<meta name="robots" content="follow, index">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SCHOOL OF MANAGEMENT SCIENCES">
+<meta property="og:description" content="School of Management Sciences, Varanasi is a NAAC ‘A’ accredited Autonomous College in Varanasi Affiliated to AKTU and MGKVP ranked among top 50 B-schools offering professional courses like MBA, MCA, M.Com, BBA, B.Com(Hons), BCA and BA(Hons) Mass Comm. with a robust placement record, in renowned companies across India.">
+<meta property="og:url" content="https://smsvaranasi.com/apple-touch-icon.html">
+<meta property="og:site_name" content="SMS VARANASI">
+<meta property="og:image" content="https://smsvaranasi.com/img/logo.png">
+<meta property="og:image:width" content="1323">
+<meta property="og:image:height" content="578">
+<meta property="og:image:type" content="image/jpeg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SCHOOL OF MANAGEMENT SCIENCES">
+<meta name="twitter:description" content="School of Management Sciences, Varanasi is a NAAC ‘A’ accredited Autonomous College in Varanasi Affiliated to AKTU and MGKVP ranked among top 50 B-schools offering professional courses like MBA, MCA, M.Com, BBA, B.Com(Hons), BCA and BA(Hons) Mass Comm. with a robust placement record, in renowned companies across India.">
+<meta name="twitter:image" content="https://smsvaranasi.com/img/logo.png">
+<link rel="shortcut icon" href="https://smsvaranasi.com/img/favicon.png">
+<link rel="preconnect" href="https://smsvaranasi.com/css/main_min.css">
+<link rel="preconnect" href="https://smsvaranasi.com/css/swiper-bundle.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;800;900&family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://smsvaranasi.com/css/main_min.css" rel="stylesheet" >
+<link href="https://smsvaranasi.com/css/swiper-bundle.min.css" rel="stylesheet" >
+<link href="https://smsvaranasi.com/css/font-awesome.min.css" rel="stylesheet">
+<link rel="preload" href="https://smsvaranasi.com/css/popup.css" as="style" onload="this.rel='stylesheet'">
+<link rel="preload" href="https://smsvaranasi.com/css/prettyPhoto.css" as="style" onload="this.rel='stylesheet'">
+<link rel="preload" href="https://smsvaranasi.com/css/owl.carousel.css" as="style" onload="this.rel='stylesheet'">
+<link rel="preload" href="https://smsvaranasi.com/css/jquery.fancybox.css" as="style" onload="this.rel='stylesheet'">
+<link rel="canonical" href="https://smsvaranasi.com/apple-touch-icon.html" />
+<style type="text/css">
+.mySwiper {
+	width: 100%;
+	height: 700px;
+	position: relative;
+}
+/* Image full cover */
+.mySwiper img, .swiper-slide img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+/* Caption overlay center */
+.slide-caption {
+	position: absolute;
+	inset: 0; /* top:0 left:0 right:0 bottom:0 */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	padding: 0 15px;
+	color: #fff;
+
+	z-index: 10;
+}
+
+/* Optional overlay dark layer for readability */
+.swiper-slide::before {
+ content: "";
+ position: absolute;
+ inset: 0;
+ background: rgba(0, 0, 0, 0.35);
+ z-index: 1;
+}
+.swiper-slide img {
+	position: relative;
+	z-index: 0;
+}
+/* Caption above overlay */
+.slide-caption {
+	z-index: 2;
+}
+.slide-caption h2 {
+	color: #fff;
+	font-size: 2.5em;
+	font-weight: 700;
+	text-transform: uppercase;
+	margin-bottom: 10px;
+}
+.slide-caption p {
+	font-size: 18px;
+	max-width: 650px;
+	margin-bottom: 20px;
+	line-height: 1.4;
+}
+.slide-caption .btn, .slide-caption .blg-btn {
+	display: inline-block;
+	padding: 12px 30px;
+	border-radius: 5px;
+	font-weight: 500;
+	text-decoration: none;
+	transition: all 0.3s ease;
+}
+/* Buttons */
+.slide-caption .btn {
+	background: linear-gradient(90deg, #ffd94c, #ffcd02);
+	color: #000;
+}
+.slide-caption .blg-btn {
+	background: linear-gradient(90deg, #ff654c, #ff2602);
+	color: #fff;
+}
+/* Hover */
+.slide-caption .btn:hover, .slide-caption .blg-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+/* Blog button = Admission Open button size + 15px niche */
+.slide-caption .blg-btn {
+	padding: 12px 30px;     /* same as Admission Open */
+	font-size: 16px;        /* same feel */
+	margin-top: 15px;       /* 15px niche shift */
+}
+
+/* =========================
+   esponsive Height Fix
+========================= */
+@media (max-width: 1024px) {
+ .mySwiper {
+height: 520px;
+}
+ .slide-caption h2 {
+font-size: 28px;
+}
+ .slide-caption p {
+font-size: 16px;
+max-width: 100%;
+}
+ .slide-caption .btn,  .slide-caption .blg-btn {
+padding: 10px 25px;
+font-size: 14px;
+}
+}
+ @media (max-width: 768px) {
+ .mySwiper {
+height: 420px;
+}  /* fixed slider height for mobile */
+ .slide-caption h2 {
+font-size: 12px;
+line-height: 1.2;
+}
+ .slide-caption p {
+font-size: 7px;
+margin-bottom: 12px;
+}
+ .slide-caption .btn,  .slide-caption .blg-btn {
+padding: 10px 18px;
+font-size: 13px;
+}
+}
+ @media (max-width: 480px) {
+ .mySwiper {
+height: 360px;
+}
+ .slide-caption h2 {
+font-size: 11px;
+}
+ .slide-caption p {
+font-size: 6px;
+}
+}
+/*obile slider height small */
+@media (max-width: 768px) {
+ .mySwiper {
+ height: 280px;   /* yaha 280px / 320px try kar sakte ho */
+}
+ .swiper-slide img {
+ height: 100%;
+ object-fit: cover;  /* Revolution jaisa look */
+}
+}
+@media (max-width: 480px) {
+ .mySwiper {
+ height: 260px;
+}
+}
+/*obile par arrows + dots hide */
+@media (max-width: 768px) {
+ .swiper-button-next,  .swiper-button-prev,  .swiper-pagination {
+ display: none !important;
+}
+}
+.item-instructor {
+	display: flex;
+	align-items: center;
+	padding: 15px;
+	min-height: 120px; /* desktop ke liye */
+}
+.instructor-avatar img {
+	max-width: 120px;
+	height: auto;
+}
+.info-box {
+	flex: 1;
+	padding-left: 15px;
+}
+.info-box h3 {
+	font-size: 15px;
+	line-height: 1.4;
+	margin: 0;
+}
+@media (max-width: 768px) {
+ .item-instructor {
+ flex-direction: column;
+ text-align: center;
+ min-height: auto;
+}
+ .info-box {
+ padding-left: 0;
+}
+ .info-box h3 {
+ font-size: 14px;
+}
+}
+.news-img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+}
+.course-img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+</style>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "SMS VARANASI",
+    "logo": "( https://smsvaranasi.com/img/logo.png )",
+    "sameAs": [
+    "https:\/\/twitter.com\/smsvaranasi",
+    "https:\/\/www.facebook.com\/smsvns",
+     "http:\/\/instagram\/sms_varanasi",
+    "https://in.linkedin.com/school/school-of-management-sciences-varanasi/",
+    "",
+    "https:\/\/www.youtube.com\/channel\/UCRaZkDJoPUPVfFpwtI6RgEg",
+    ""
+  ],
+  "url": "https:\/\/www.smsvaranasi.com"
+}
+</script>
+<script type="application/ld+json">
+  {
+	"@context": "http://schema.org",
+	"@type": "WebSite",
+	"name": "SMS VARANASI",
+	"potentialAction": {
+	  "@type": "SearchAction",
+	  "target": "https:\/\/www.smsvaranasi.com\/search?q={search_term_string}",
+	  "query-input": "required name=search_term_string"
+	},
+	"url": "https:\/\/www.smsvaranasi.com"
+  }
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FW72MJ5PGH"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-FW72MJ5PGH');
+  gtag('config', 'G-X8BL3TF767');
+</script></head>
+<body>
+<!-- ==============================================
+    ** Header **
+    =================================================== -->
+<!-- page header -->
+	<header>
+		
+		<!-- sticky menu -->
+		<div class="sticky-wrapper">
+			<div class="sticky-menu">
+            <!-- header top panel -->
+		<div class="page-header-top" style="background-color:#000;">
+			<div class="grid-row clear-fix">
+            	
+                <style>
+            .blink {
+                animation: blinker 1.5s linear infinite;
+                color: white;
+                font-family: sans-serif;
+            }
+            @keyframes blinker {
+                50% {
+                    opacity: 0;
+                }
+            }
+        </style>
+
+            
+				<p style="text-align:center;">
+				<a href="https://smsvaranasi.com/" style="font-size:12px; font-weight:bold; color:#FFF; text-decoration:none;">HOME</a>
+                &nbsp;&nbsp;<span style="color:#f27c66">|</span>&nbsp;
+				<a href="/contact-us.html" target="_blank" style="font-size:12px; font-weight:bold; color:#FFF; text-decoration:none;">CONTACT US</a>
+                &nbsp;&nbsp;<span style="color:#f27c66">|</span>&nbsp;
+                <a href="http://online.smsvaranasi.com/" target="_blank" style="font-size:12px; font-weight:bold; color:#FFF; text-decoration:none;">APPLY ONLINE</a>
+                &nbsp;&nbsp;<span style="color:#f27c66">|</span>&nbsp;
+                <a href="http://epay.smsvaranasi.com/" target="_blank" style="font-size:12px; font-weight:bold; color:#FFF; text-decoration:none;">ONLINE FEE DEPOSIT</a>
+                &nbsp;&nbsp;<span style="color:#f27c66">|</span>&nbsp;
+				<a href="http://jobs.smsvaranasi.com/" target="_blank" style="font-size:12px; font-weight:bold; color:#FFF; text-decoration:none;">JOBS@SMS</a>
+                &nbsp;&nbsp;<span style="color:#f27c66">|</span>&nbsp;
+                <a href="http://blog.smsvaranasi.com/" target="_blank" style="font-size:12px; font-weight:bold; color:#FFF; text-decoration:none;">BLOG</a>
+                &nbsp;&nbsp;<span style="color:#f27c66">|</span>&nbsp;	
+                <a href="http://iqac.smsvaranasi.com/" target="_blank" style="font-size:12px; font-weight:bold; color:#FFF; text-decoration:none;">IQAC</a>
+                &nbsp;&nbsp;<span style="color:#f27c66">|</span>&nbsp;	
+                <a href="/nirf.html" target="_blank" style="font-size:12px; font-weight:bold; color:#FFF; text-decoration:none;">NIRF</a>
+                &nbsp;&nbsp;<span style="color:#f27c66">|</span>&nbsp;
+                <a href="http://sifdt.com/" target="_blank" style="font-size:12px; font-weight:bold; color:#FFF; text-decoration:none;">SIFDT</a>
+                &nbsp;&nbsp;<span style="color:#f27c66">|</span>&nbsp;
+                <a href="http://etender.smsvaranasi.com/" target="_blank" style="font-size:12px; font-weight:bold; color:#FFF; text-decoration:none;">E-TENDER</a>
+                &nbsp;&nbsp;<span style="color:#f27c66">|</span>&nbsp;
+                <a href="https://www.smsvaranasi.com/cuetug-2026.html" style="font-size:12px; font-weight:bold; color:#FFF; text-decoration:none;">CUET(UG)-2026</a>
+                &nbsp;&nbsp;<span style="color:#f27c66">|</span>&nbsp;
+                <a href="https://www.smsvaranasi.com/cuetpg-2026.html" style="font-size:12px; font-weight:bold; color:#FFF; text-decoration:none;">CUET(PG)-2026</a>
+                &nbsp;&nbsp;<span style="color:#f27c66">|</span>&nbsp;<br>
+                <a href="https://alumni.smsvaranasi.com/" target="_blank" style="font-size:12px; font-weight:bold; color:#FFF; text-decoration:none;" class="blink">ALUMNI REGISTRATION</a>
+                &nbsp;&nbsp;<span style="color:#f27c66">|</span>&nbsp;
+                <a href="http://smslawcollege.com/" target="_blank" style="font-size:13px; font-weight:bold; text-decoration:none;" >SMSLAW COLLEGE</a>&nbsp;
+				</p>
+			</div>
+		</div>
+		<!-- / header top panel -->
+		<h3 style="font-size:18px; font-weight:bold;color:#000080; text-align:center;">Admission Helpline: +91-8953761555, 7518501100, 7052055555 </h3>
+				<div class="grid-row clear-fix">
+                
+					<!-- logo -->
+                    <a title="SMS-VARANASI" href="https://smsvaranasi.com/" class="logo">
+                      
+						<img src="https://smsvaranasi.com/img/logo.png" alt="logo" style="width:180px;">
+					</a>
+					<!-- / logo --><nav class="main-nav">
+						<ul class="clear-fix">	<li><a href="/#"    class="" >ABOUT US</a><ul class="clear-fix">	<li><a href="/vision-and-mission.html">Vision & Mission</a></li>	<li><a href="/director-speaks.html">Director Speaks</a></li>	<li><a href="/the-journey.html">The Journey</a></li>	<li><a href="/#">Councils</a><ul><li ><a href="/governing-council.html">Governing Council</a></li><li ><a href="/academic-council.html">Academic Council</a></li><li ><a href="/corporate-advisory.html">Corporate Advisory</a></li></ul></li>	<li><a href="/#">Board of Studies</a><ul><li ><a href="/management-and-mass-comm-department.html">Management & Mass Comm Department</a></li><li ><a href="/computer-science-department.html">Computer Science Department</a></li><li ><a href="/commerce-department.html">Commerce Department</a></li></ul></li>	<li><a href="/#">Staff</a><ul><li ><a href="/administrative-staff.html">Administrative</a></li><li ><a href="/accounts-staff.html">Accounts</a></li><li ><a href="/computer-centre-staff.html">Computer Centre</a></li><li ><a href="/library-staff.html">Library</a></li></ul></li>	<li><a href="/#">Infrastructure</a><ul><li ><a href="/architectural-philosophy.html">Architectural Philosophy</a></li><li ><a href="/campus-facilities.html">Campus facilities</a></li><li ><a href="/computer-centre-infrastructure.html">Computer Centre</a></li><li ><a href="/media-lab.html">Media Lab</a></li><li ><a href="/library-infrastructure.html">Library</a></li></ul></li>	<li><a href="/green-initiative.html">Green Initiative</a></li>	<li><a href="/outreach-activity.html">Outreach Activity</a></li>	<li><a href="/professional-membership.html">Professional Membership</a></li>	<li><a href="/sms-commendations.html">SMS Commendations</a></li>	<li><a href="/contact-us.html">Contact US</a></li>	<li><a href="/about-varanasi.html">About Varanasi</a></li></ul></li>	<li><a href="/#"    class="" >PROGRAMS</a><ul class="clear-fix">	<li><a href="/mba.html">MBA</a></li>	<li><a href="/mca.html">MCA</a></li>	<li><a href="/mcom.html">MCOM</a></li>	<li><a href="/bba.html">BBA</a></li>	<li><a href="/bca.html">BCA</a></li>	<li><a href="/bcomhons.html">B.COM(HONS)</a></li>	<li><a href="/bahonsmasscomm.html">B.A.HONS(MASS COMMUNICATION)</a></li></ul></li>	<li><a href="/#"    class="" >PLACEMENT</a><ul class="clear-fix">	<li><a href="/director-message.html">Director's Message</a></li>	<li><a href="/training-placement-cell.html">Training & Placement Cell</a></li>	<li><a href="/placement-process.html">Placement Process</a></li>	<li><a href="/placement-track-record.html">Placement Track Record</a></li>	<li><a href="/list-of-recruiters.html">List of Recruiters</a></li>	<li><a href="/current-year-placement.html">Current Year Placement</a></li>	<li><a href="/#">E-Brochure</a><ul><li ><a href="https://smsvaranasi.com/uploads/page_file/12048PLACEMENT-BROCHURE-2026.pdf">Placement Brochure-PG</a></li><li ><a href="https://smsvaranasi.com/uploads/page_file/13990Placement-Brochure_UG.pdf">Placement Brochure-UG</a></li><li ><a href="https://smsvaranasi.com/uploads/page_file/76985Summer-Training-Brochure-2025.pdf">Summer Training Brochure</a></li></ul></li></ul></li>	<li><a href="/#"    class="" >FACULTY</a><ul class="clear-fix">	<li><a href="/faculty-management.html">Management and Commerce</a></li>	<li><a href="/faculty-computer.html">Computer Science</a></li>	<li><a href="/visiting-faculty-international.html">Visiting Faculty International</a></li>	<li><a href="/visiting-faculty-academic.html">Visiting Faculty Academic</a></li>	<li><a href="/visiting-faculty-industrial.html">Visiting Faculty Industrial</a></li></ul></li>	<li><a href="/#"    class="" >RESEARCH  JOURNALS</a><ul class="clear-fix">	<li><a href="https://journals.smsvaranasi.com/index.php/managementinsight">Management Insight Journal</a></li>	<li><a href="https://journals.smsvaranasi.com/index.php/purushartha">Purushartha Journal</a></li>	<li><a href="https://journals.smsvaranasi.com/index.php/smsjei">SMS Journal of Enterpreneurship & Innovation</a></li>	<li><a href="https://journals.smsvaranasi.com/index.php/crr">Commerce Research Review</a></li>	<li><a href="https://journals.smsvaranasi.com/index.php/computingtrendz">Computing Trendz</a></li></ul></li>	<li><a href="/#"    class="" >PUBLICATION</a><ul class="clear-fix">	<li><a href="/books-souvenirs.html">Books & Souvenirs</a></li></ul></li>	<li><a href="/#"    class="" >ALUMNI</a><ul class="clear-fix">	<li><a href="/alumni-association.html">Alumni Association SMS</a></li>	<li><a href="/alumni-meet.html">Chapter Wise Alumni Meet</a></li>	<li><a href="/#">Alumni Database</a><ul><li ><a href="/alumni-pgdbm-pgdm.html">PGDBM/PGDM</a></li><li ><a href="/alumni-pgdm-ib.html">PGDM-IB</a></li><li ><a href="/alumni-pgdm-rm.html">PGDM-RM</a></li><li ><a href="/alumni-pgdm-irm.html">PGDM-IRM</a></li><li ><a href="/alumni-mba.html">MBA</a></li><li ><a href="/alumni-mca.html">MCA</a></li><li ><a href="/alumni-mcom.html">M.COM</a></li><li ><a href="/alumni-bba.html">BBA</a></li><li ><a href="/alumni-bca.html">BCA</a></li><li ><a href="/alumni-bcom.html">B.COM</a></li><li ><a href="/alumni-bcomh.html">B.COM(H)</a></li><li ><a href="/alumni-bah-mass-comm.html">BA(H) MASS COMM</a></li></ul></li>	<li><a href="https://alumni.smsvaranasi.com/">Alumni Registration Form</a></li>	<li><a href="/alumni-engagement.html">Alumni Engagement</a></li></ul></li>	<li><a href="/#"    class="" >EVENTS</a><ul class="clear-fix">	<li><a href="/seminar-conferences.html">Seminar/Conferences</a></li>	<li><a href="/workshops.html">Workshops</a></li>	<li><a href="/industrial-visits.html">Industrial Visits</a></li>	<li><a href="/guest-lectures.html">Guest Lectures</a></li>	<li><a href="/adharshila.html">Adharshila</a></li>	<li><a href="/fresher-farewell.html">Fresher/ Farewell</a></li>	<li><a href="/orientation-programme.html">Orientation Programme</a></li>	<li><a href="/tech-marathon.html">Tech Marathon</a></li>	<li><a href="/fdp.html">FDP</a></li></ul></li>	<li><a href="/#"    class="" >DOWNLOADS</a><ul class="clear-fix">	<li><a href="/autonomous-status-approval-letter.html">Autonomous Status Approval Letter</a></li>	<li><a href="/naac-accrediation-certificate.html">NAAC Accrediation Certificate</a></li>	<li><a href="/aishe-certificate.html">AISHE Certificate</a></li>	<li><a href="/sms-scholarship-form.html">SMS Scholarship Form</a></li>	<li><a href="/hostel-requistion-form.html">Hostel Requisition Form</a></li>	<li><a href="/video-clips.html">Video Clips</a></li>	<li><a href="/newsletter.html">Newsletter</a></li>	<li><a href="/coffee-table-book.html">Coffee Table Book</a></li>	<li><a href="/aicte-approval.html">AICTE Approval</a></li>	<li><a href="/affiliation-letter.html">Affiliation Letter</a></li>	<li><a href="/ugc-12b-2f-letter.html">UGC 12(B) & 2(f) Letter</a></li>	<li><a href="https://smsvaranasi.com/nirf.html">NIRF</a></li></ul></li></ul>
+</nav></div>
+			</div>
+		</div>
+		<!-- sticky menu --> <!-- page title --><!-- page title -->
+        <hr class="divider-color"/></header>
+	<!-- / page header -->
+	<div class="page-content container clear-fix">
+		<div class="container-404">
+			<div class="number">4<span>0</span>4</div>
+			<p><span>Sorry:(</span><br/>This page doesn't exist.</p>
+			<a href="index.html" class="cws-button border-radius alt">Please, continue to our Home page</a>
+		</div>
+		
+	</div><!-- footer -->
+<footer>
+  <div class="grid-row">
+    <div class="grid-col-row clear-fix">
+      <section class="grid-col grid-col-3 footer-about">
+        <h2 class="corner-radius">Admission</h2>
+        <address>
+        <p><a href="/scholarship.html" style="text-decoration:none;">Scholarships</a></p>
+        <p><a href="http://epay.smsvaranasi.com/" style="text-decoration:none;" target="_blank">Online Fee Deposit</a></p>
+        <p><a href="/list-of-recruiters.html" style="text-decoration:none;">Our Recruiters</a></p>
+        <p><a href="/hostel-transport.html" style="text-decoration:none;">Hostel & Transport</a></p>
+        <p><a href="https://smsvaranasi.com/FAQ.html" style="text-decoration:none;" target="_blank">FAQ</a></p>
+        </address>
+      </section>
+      <section class="grid-col grid-col-2 footer-latest">
+        <h2 class="corner-radius">Media</h2>
+        <article>
+          <h3><a href="/news-room.html" style="text-decoration:none;">News Room</a></h3>
+          <h3><a href="/video-clips.html" style="text-decoration:none;">Video Gallery</a></h3>
+        </article>
+      </section>
+      <section class="grid-col grid-col-2 footer-contact-form">
+        <h2 class="corner-radius">Events</h2>
+        <article>
+          <h3><a href="https://smsvaranasi.com/fdp.html" style="text-decoration:none;" target="_blank">FDP</a></h3>
+          <h3><a href="http://icon.smsvaranasi.com/" style="text-decoration:none;" target="_blank">ICON</a></h3>
+        </article>
+      </section>
+      <section class="grid-col grid-col-3 footer-about">
+        <h2 class="corner-radius">Student's Club</h2>
+        <article>
+          <h3><a href="/rainbow-social-welfare-club.html" style="text-decoration:none;">Rainbow (Social Welfare Club)</a></h3>
+          <h3><a href="/contrast-creative-club.html" style="text-decoration:none;">Contrast (Creative Club)</a></h3>
+          <h3><a href="/synergy-the-literary-club.html" style="text-decoration:none;">Synergy (The Literary Club)</a></h3>
+          <h3><a href="/spark-performing-arts-cultural-club.html" style="text-decoration:none;">Spark (Performing Arts Cultural Club)</a></h3>
+          <h3><a href="/panorama-photography-club.html" style="text-decoration:none;">Panorama (Photography Club)</a></h3>
+          <h3><a href="/crest-sports-club.html" style="text-decoration:none;">Crest (Sports Club)</a></h3>
+          <h3><a href="/technical-club.html" style="text-decoration:none;">Livewire (Technical Club)</a></h3>
+        </article>
+      </section>
+      <section class="grid-col grid-col-3 footer-contact-form">
+        <h2 class="corner-radius">Other Useful Links</h2>
+        <article>
+          <h3><a href="https://pmvidyalaxmi.co.in" style="text-decoration:none;" target="_blank">PM-Vidya lakshmi</a></h3>
+          <h3><a href="https://www.vidyalakshmi.co.in/Students/" style="text-decoration:none;" target="_blank">Vidya lakshmi</a></h3>
+          <h3><a href="/spoken-tutorials.html" style="text-decoration:none;">Spoken Tutorials</a></h3>
+          <h3><a href="/awards-and-accolades.html" style="text-decoration:none;">Awards and Accolades</a></h3>
+          <h3><a href="/centre-of-excellence.html" style="text-decoration:none;">Centre of Excellence</a></h3>
+          <h3><a href="/nptel.html" style="text-decoration:none;">NPTEL</a></h3>
+          <h3><a href="/international-linkage.html" style="text-decoration:none;">International Linkage</a></h3>
+          <h3><a href="http://iqac.smsvaranasi.com/" style="text-decoration:none;" target="_blank">IQAC</a></h3>
+          <h3><a href="http://grievance.smsvaranasi.com/" style="text-decoration:none;" target="_blank">GRIEVANCE PORTAL</a></h3>
+          <h3><a href="https://www.aicte-india.org/" style="text-decoration:none;" target="_blank">AICTE</a></h3>
+          <h3><a href="http://naac.gov.in/index.php/en/" style="text-decoration:none;" target="_blank">NAAC</a></h3>
+          <h3><a href="https://www.ugc.ac.in/" style="text-decoration:none;" target="_blank">UGC</a></h3>
+        </article>
+      </section>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="grid-row clear-fix">
+      <div class="copyright" style="width:100%; padding:5px auto;">
+        <div class="footer-social"> <a href="https://twitter.com/smsvaranasi" aria-label="Visit SMS Varanasi on Twitter" class="fa fa-twitter" target="_blank"></a> <a href="https://in.linkedin.com/school/school-of-management-sciences-varanasi/" aria-label="Visit SMS Varanasi on LinkedIn" class="fa fa-linkedin" target="_blank"></a> <a href="https://www.facebook.com/smsvns" aria-label="Visit SMS Varanasi on Facebook" class="fa fa-facebook" target="_blank"></a> <a href="https://www.youtube.com/channel/UCRaZkDJoPUPVfFpwtI6RgEg" aria-label="Visit SMS Varanasi on YouTube" class="fa fa-youtube-play" target="_blank"></a> <a href="https://www.instagram.com/sms_varanasi/" aria-label="Visit SMS Varanasi on Instagram" class="fa fa-instagram" target="_blank"></a> <a href="https://smsvaranasi.wordpress.com/" aria-label="Visit SMS Varanasi on WordPress Blog" class="fa fa-wordpress" target="_blank"></a> </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-col-row clear-fix">
+      <div class="grid-col grid-col-8 footer-contact-form">
+        <p style="font-size:12px;margin:10px auto;">&copy; School of Management Sciences, Varanasi</p>
+      </div>
+      <div class="grid-col grid-col-4 footer-contact-form">
+        <p style="float:right; text-align:right; margin:10px auto; font-size:12px;"> <a href="https://www.smsvaranasi.com/" style="text-decoration:none;" target="_blank">Mandatory Disclosure</a> | <a href="https://smsvaranasi.com/sitemap.xml" style="text-decoration:none;" target="_blank">SITEMAP</a></a></p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- / footer -->
+
+
+<div id="id01" class="w3-modal">
+  <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width:600px">
+    <div class="w3-center">
+      <h3 class="w3-brown">Admission Enquiry Form</h3>
+    </div>
+    <div class="w3-center">
+     <span onclick="cookieCloseModal();" class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close Modal" style="color:#FFF;">X</span> </div>
+    <div id="popupmessage">
+      <form class="w3-container" action="" method="post">
+        <div class="w3-section">
+          <p class="form-row form-row-first">
+           <label class="control-label" for="firstname"><strong>Full Name</strong> <span style="color:#F00;">*</span></label>
+           <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter Full Name" name="firstname" id="firstname" required>
+          </p>
+          <p class="form-row form-row-last">
+           <label class="control-label" for="email"><strong>Email Address</strong> <span style="color:#F00;">*</span></label>
+           <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter Email" name="email" id="email" required>
+          </p>
+          <div class="clear"></div>
+          <p class="form-row form-row-first">
+           <label class="control-label" for="mobilenumber"><strong>Mobile No</strong> <span style="color:#F00;">*</span></label>
+           <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter Mobile Number" name="mobilenumber" id="mobilenumber" required>
+          </p>
+          <p class="form-row form-row-last">
+          <label class="control-label" for="state"><strong>State Name</strong> <span style="color:#F00;">*</span></label>
+          <select id="state" name="state" class="w3-select w3-border w3-margin-bottom" onchange="findDistrict(this.value)">
+            <option value="">--Select State--</option>
+            <option value="Andaman and Nicobar Island">Andaman and Nicobar</option>
+            <option value="Andhra Pradesh">Andhra Pradesh</option>
+            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+            <option value="Assam">Assam</option>
+            <option value="Bihar">Bihar</option>
+            <option value="Chandigarh">Chandigarh</option>
+            <option value="Chhattisgarh">Chhattisgarh</option>
+            <option value="Dadra and Nagar Haveli">Dadra and Nagar Haveli</option>
+            <option value="Daman and Diu">Daman and Diu</option>
+            <option value="Delhi">Delhi</option>
+            <option value="Goa">Goa</option>
+            <option value="Gujarat">Gujarat</option>
+            <option value="Haryana">Haryana</option>
+            <option value="Himachal Pradesh">Himachal Pradesh</option>
+            <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+            <option value="Jharkhand">Jharkhand</option>
+            <option value="Karnataka">Karnataka</option>
+            <option value="Kerala">Kerala</option>
+            <option value="Lakshadweep">Lakshadweep</option>
+            <option value="Madhya Pradesh">Madhya Pradesh</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Manipur">Manipur</option>
+            <option value="Meghalaya">Meghalaya</option>
+            <option value="Mizoram">Mizoram</option>
+            <option value="Nagaland">Nagaland</option>
+            <option value="Orissa">Orissa</option>
+            <option value="Puducherry">Puducherry</option>
+            <option value="Punjab">Punjab</option>
+            <option value="Rajasthan">Rajasthan</option>
+            <option value="Sikkim">Sikkim</option>
+            <option value="Tamil Nadu">Tamil Nadu</option>
+            <option value="Tripura">Tripura</option>
+            <option value="Uttar Pradesh">Uttar Pradesh</option>
+            <option value="Uttarakhand">Uttarakhand</option>
+            <option value="West Bengal">West Bengal</option>
+          </select>
+          </p>
+          <div class="clear"></div>
+          <p class="form-row form-row-first">
+            <label class="control-label" for="city"><strong>City Name</strong> <span style="color:#F00;">*</span></label>
+            <span id="txtHint">
+            <select name="city" id="city" class="w3-select w3-border w3-margin-bottom">
+              <option value="" selected="selected">--Select City--</option>
+            </select>
+            </span>
+          </p> 
+          
+          <p class="form-row form-row-last"> 
+          <label class="control-label" for="center"><strong>Course Name</strong> <span style="color:#F00;">*</span></label>
+          <select name="center" id="center" class="w3-select w3-border">
+            <option value="">--Select a Course--</option>
+            <option value="BA (Mass Comm.)">BA (Mass Comm.)</option>
+            <option value="BBA">BBA</option>
+            <option value="BCA">BCA</option>
+            <option value="BCOM(H)">BCOM(H)</option>
+            <option value="MBA">MBA</option>
+            <option value="MCA">MCA</option>
+            <option value="MCOM">MCOM</option>
+          </select>
+          </p>
+          <p class="form-row">
+           <img src='https://smsvaranasi.com/includes/captchademo.php' class="imgcaptcha" alt="captcha" draggable="false" oncontextmenu="return false;" />&nbsp;&nbsp;<span class="refresh" style="cursor:pointer"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+            <label class="control-label" for="captcha"><strong>Enter the code above here</strong></label>
+            <input type="text" class="form-control" name="captcha" id="captcha"  maxlength="6" pattern="[a-zA-Z0-9]+$" title="Valid Characters : Alphanumeric only!" autocomplete="off" required>
+          </p>
+          <input id="popupsubmit" type="button" class="w3-button w3-block w3-green w3-section w3-padding" value="Submit" />
+        </div>
+      </form>
+    </div>
+    <div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
+      <button onclick="cookieCloseModal();" type="button" class="w3-button w3-red">Close</button>
+    </div>
+  </div>
+</div>
+<script src="https://smsvaranasi.com/js/jquery.min.js"></script>
+<script src="https://smsvaranasi.com/js/swiper-bundle.min.js" defer></script>
+<script src="https://smsvaranasi.com/js/jquery.isotope.min.js" defer></script>
+<script src="https://smsvaranasi.com/js/owl.carousel.min.js" defer></script>
+<script src="https://smsvaranasi.com/js/jquery.fancybox.pack.js" defer></script>
+<script src="https://smsvaranasi.com/js/jquery.fancybox-media.js" defer></script>
+<script src="https://smsvaranasi.com/js/jquery.bpopup.min.js" defer></script>
+<script src="https://smsvaranasi.com/js/jquery.prettyPhoto.js" defer></script>
+<script src="https://smsvaranasi.com/js/main.js" defer></script>
+<script src="https://smsvaranasi.com//js/jquery.cookie.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if(typeof Swiper !== "undefined"){
+    const swiper = new Swiper(".mySwiper", {
+      loop: true,
+      speed: 800,
+      autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+      },
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+      pagination: {
+        el: ".swiper-pagination",
+        clickable: true,
+      },
+    });
+  }
+});
+</script>  
+
+<script type="text/javascript" charset="utf-8">
+ $(document).ready(function(){
+	$("area[rel^='prettyPhoto']").prettyPhoto();
+	$(".gallery:first a[rel^='prettyPhoto']").prettyPhoto({animation_speed:'normal',theme:'light_square',slideshow:3000, autoplay_slideshow: true});
+	$(".gallery:gt(0) a[rel^='prettyPhoto']").prettyPhoto({animation_speed:'fast',slideshow:10000, hideflash: true});
+
+	$("#custom_content a[rel^='prettyPhoto']:first").prettyPhoto({
+		custom_markup: '<div id="map_canvas" style="width:260px; height:265px"></div>',
+		changepicturecallback: function(){ initialize(); }
+	});
+
+	$("#custom_content a[rel^='prettyPhoto']:last").prettyPhoto({
+		custom_markup: '<div id="bsap_1259344" class="bsarocks bsap_d49a0984d0f377271ccbf01a33f2b6d6"></div><div id="bsap_1237859" class="bsarocks bsap_d49a0984d0f377271ccbf01a33f2b6d6" style="height:260px"></div><div id="bsap_1251710" class="bsarocks bsap_d49a0984d0f377271ccbf01a33f2b6d6"></div>',
+		changepicturecallback: function(){ _bsap.exec(); }
+	});
+});
+		
+
+$(document ).ready(function() {
+$('#popup_this').bPopup();
+$("#popupsubmit").on('click',function() {
+			var firstname = $("#firstname").val();
+			var email = $("#email").val();
+			var mobilenumber = $("#mobilenumber").val();
+			var state = $("#state").val();
+			var city = $("#city").val();
+			var center = $("#center").val();
+			var captcha_code = $("#captcha").val();
+
+			if(firstname==''||email==''||mobilenumber==''||state==''||city==''||center==''||captcha_code=='') {
+				alert("Please fill all fields.");
+				//return false;
+			}
+
+			$.ajax({
+				type: "POST",
+				url: "includes/save_enquiry.php",
+				data: {
+					firstname: firstname,
+					email: email,
+					mobilenumber: mobilenumber,
+					state: state,
+					city: city,
+					center: center,
+					captcha_code: captcha_code
+				},
+				cache: false,
+				success: function(data) {
+					if(data=='Success'){
+						document.getElementById('popupmessage').innerHTML='<div class="info-boxes confirmation-message"> <strong>Success!</strong>Your message was successfully delivered.</div>';
+					}else{
+						if(data==''){
+					alert('Error in API, Try after some time.');
+						}else{
+							alert(data);
+						}
+					}
+				},
+				error: function(xhr, status, error) {
+					console.error(xhr);
+					alert('error');
+				}
+			});
+			 
+		});	
+
+
+});
+
+
+
+function cookieOpenModal(){
+document.getElementById('id01').style.display='block';
+setTimeout(function() {document.getElementById('id01').style.display='block';
+}, 0);
+}
+
+
+
+if(localStorage.getItem('IsModalShown')!='true') 
+{
+cookieOpenModal();
+localStorage.setItem('IsModalShown',true);
+}
+
+var url= window.location.href;
+if(url=='https://smsvaranasi.com/mba.html' || url=='https://smsvaranasi.com/mca.html' || url=='https://smsvaranasi.com/mcom.html' || url=='https://smsvaranasi.com/bba.html' || url=='https://smsvaranasi.com/bca.html' || url=='https://smsvaranasi.com/bcom.html' || url=='https://smsvaranasi.com/bcomhons.html' || url=='https://smsvaranasi.com/bahonsmasscomm.html')
+{
+if($.cookie('modal_shown') === 'yes'){
+	cookieOpenModal();
+}	
+}
+const download_urls = ["https://smsvaranasi.com/autonomous-status-approval-letter.html", "https://smsvaranasi.com/naac-accrediation-certificate.html", "https://smsvaranasi.com/aishe-certificate.html", 
+"https://smsvaranasi.com/sms-scholarship-form.html", "https://smsvaranasi.com/hostel-requistion-form.html", "https://smsvaranasi.com/informa.html",
+"https://smsvaranasi.com/video-clips.html", "https://smsvaranasi.com/newsletter.html", "https://smsvaranasi.com/coffee-table-book.html", "https://smsvaranasi.com/aicte-approval.html",
+"https://smsvaranasi.com/affiliation-letter.html", "https://smsvaranasi.com/ugc-12b-2f-letter.html"];
+if(download_urls.indexOf(url) == -1)
+{
+cookieOpenModal();	
+}
+
+
+if(typeof $.cookie('modal_shown') === 'undefined'){ // no cookie
+cookieOpenModal(); 
+var date = new Date();
+var minutes =0 ;
+date.setTime(date.getTime() + (minutes * 60 * 1000));
+$.cookie('modal_shown', 'yes', { expires: date }); // set cookie expiry to 1 day
+} else { // have cookie
+// do something
+}
+
+
+cookieOpenModal();
+function cookieCloseModal(){
+document.cookie = "modelclose=Yes; max-age=1;";
+document.getElementById('id01').style.display='none';
+}
+
+</script>
+<script type="text/javascript">
+function findDistrict(str)
+{
+  if (str == " ")
+  {
+	  document.getElementById("txtHint").innerHTML = " ";
+	  return;
+  }
+  if (window.XMLHttpRequest)
+  {// code for IE7+, Firefox, Chrome, Opera, Safari
+	  xmlhttp = new XMLHttpRequest();
+  }
+  else
+  {// code for IE6, IE5
+	  xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  xmlhttp.onreadystatechange = function() {
+	  if ((xmlhttp.readyState==4) && (xmlhttp.status==200))
+	  {
+		  //alert("ok");
+		  document.getElementById("txtHint").innerHTML = this.responseText;
+	  }
+  }
+  xmlhttp.open("GET","includes/district.php?q="+str,true);
+  xmlhttp.send();
+}
+</script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(".refresh").click(function () {
+    const d = new Date().getTime();
+    $(".imgcaptcha").attr("src", "https://smsvaranasi.com/includes/captchademo.php?t=" + d);
+  });
+});
+</script>
+<script>
+let interval;
+// Page restore detect karega
+window.addEventListener("pageshow", function (event) {
+    if (event.persisted) {
+        console.log("Page restored from BFCache");
+        // Yaha aap data refresh ya UI update kar sakte ho
+    }
+    // Example timer
+    interval = setInterval(() => {
+        console.log("Running...");
+    }, 2000);
+});
+
+// Page cache hone se pehle cleanup
+window.addEventListener("pagehide", function () {
+    clearInterval(interval);
+});
+</script><script src="https://extraaedgeresources.blob.core.windows.net/documents/smsvaranasi/Chatbot/js/chat.vidyaai.js"></script>
+</body>
+</html>

@@ -1,0 +1,1101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0; maximum-scale=1">
+<meta name="description" content="RKGITM engineering college is one of the best engineering and MBA colleges in Ghaziabad UP and has excellent rank among top engineering colleges in Delhi Ncr. Highest CTC offered 25 LPA. 160 + companies visited in the campus. Best Engineering college in Delhi/NCR">
+<meta name="keywords" content="Admission Open 2021-22, engineering colleges in ghaziabad, engineering colleges in delhi ncr,  b.tech colleges in ghaziabad, engineering college in uttar pradesh, Best Engineering College in UP, top engineering college in UP, Top B Tech College in UP, Best Placement Record, Best AKTU Institute in UP, B Tech Admission 2019, Top B Tech College in Delhi NCR, Top Engineering College in Delhi NCR, Best Engineering College in Ghaziabad, Top Engineering College in North India, Top Ranked engineering in India, Highest CTC offered 25 LPA, 160 + companies visited in the campus, Best Engineering college in Delhi/NCR, Admission Open 2021-22, Best Engineering College" />
+<meta name="author" content="RKGITM">
+<link rel="shortcut icon" type="image/x-icon" href="images/favicon.png">
+<title>RKGITM | Top Engineering Colleges in UP, Admission Open 2021-22</title>
+<!-- Reset CSS -->
+<link href="css/reset.css" rel="stylesheet" type="text/css">
+<!-- Custom Fonts -->
+<link href="css/fonts.css" rel="stylesheet" type="text/css">
+<!-- Bootstrap -->
+<link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<!-- Select2 -->
+<link href="assets/select2/css/select2.min.css" rel="stylesheet" type="text/css">
+<!-- Font Awesome -->
+<link href="assets/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<!-- Magnific Popup -->
+<link href="assets/magnific-popup/css/magnific-popup.css" rel="stylesheet" type="text/css">
+<!-- Iconmoon -->
+<link href="assets/iconmoon/css/iconmoon.css" rel="stylesheet" type="text/css">
+<!-- Owl Carousel -->
+<link href="assets/owl-carousel/css/owl.carousel.min.css" rel="stylesheet" type="text/css">
+<!-- Animate -->
+<link href="css/animate.css" rel="stylesheet" type="text/css">
+<!-- Custom Style -->
+<link href="css/custom.css" rel="stylesheet" type="text/css">
+
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+
+<link href="css/site.css" rel="stylesheet" type="text/css" />
+<link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+
+<link rel="stylesheet" href="css/feedback.css" />
+
+<style type="text/css">
+	html, body {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	}
+	body{
+		background-color: #f2f2f2;
+		font-family: helvetica,arial,tahoma,verdana,sans-serif;
+	}
+	h1{
+		text-align: center;
+		margin-top: 40px;
+		color: #333;
+	}
+	</style>
+
+<div class="sticky-container">
+    <ul class="sticky">
+        <li>
+            <img src="images/Facebook-icon.png" width="32" height="32">
+            <p><a href="https://www.facebook.com/rkgitmgzb" target="_blank">Like Us on<br>Facebook</a></p>
+        </li>
+        <li>
+            <img src="images/twitter-icon.png" width="32" height="32">
+            <p><a href="https://twitter.com/rkgitm" target="_blank">Follow Us on<br>Twitter</a></p>
+        </li>
+        
+        
+        <li>
+            <img src="images/youtube-icon.png" width="32" height="32">
+            <p><a href="https://www.youtube.com/channel/UCEe6yazN8ReWMv38qZAdd0g" target="_blank">Subscribe on<br>YouYube</a></p>
+        </li>
+ <li>
+            <img src="images/apply-now.jpg" width="32" height="32">
+            <p><a href="http://rkgitm.ac.in/apply-online.php" target="_blank">Apply for<br>Admission</a></p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+
+
+
+
+
+
+<!-- Start Preloader -->
+<!--<div id="loading">
+  <div class="element">
+    <div class="sk-folding-cube">
+      <div class="sk-cube1 sk-cube"></div>
+      <div class="sk-cube2 sk-cube"></div>
+      <div class="sk-cube4 sk-cube"></div>
+      <div class="sk-cube3 sk-cube"></div>
+    </div>
+  </div>
+</div>-->
+<!-- End Preloader -->
+<!-- Start Header -->
+<header> 
+  <!-- Start Header top Bar -->
+  <div class="header-top">
+    <div class="container clearfix">
+      <ul class="follow-us hidden-xs">
+       
+        <li><a href="https://www.facebook.com/Rkgitm/"><i class="fa fa-facebook-official" aria-hidden="true"></i></a></li>
+		
+        
+        <li><a href="https://www.youtube.com/channel/UCEe6yazN8ReWMv38qZAdd0g"><i class="fa fa-youtube-play" aria-hidden="true"></i></a></li>
+        
+		 <li><a href="https://twitter.com/rkgitm?lang=en"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+      </ul>
+      <div class="right-block clearfix">
+        <ul class="top-nav">
+<li><a href="/alumni">RKGITM Alumni</a></li>
+<li><a href="Grievance- redressal.php">Grievance Online Form</a></li>
+		<li><a href="wgcell.php">Grievance Cell</a></li>
+		  <li><a href ="images/aicte/mandatory-disclosure-rkgitm-ak-19.pdf" target="blank">Mandatory Disclosure</a></li>
+          <li><a href="faculty.php">Faculty</a></li>
+		  <li><a href="staff.php">Staff</a></li>
+          <li><a href="event.php">News & Event</a></li>
+		 <!--  <li><a href="sessional-exam.php">Sessional Exam 2017</a></li>
+          <!--<li><a href="images/pdf/CocubesPracticeTest.pdf" target="blank">Cocubes Practice & Pre Assessment Test Schedule</a></li>-->
+          <li><a href="anti-ragging.php">Anti ragging </a></li>
+		   <li><a href="images/NIRF-2022.pdf" target="blank">NIRF</a></li>
+
+        </ul>
+        
+      </div>
+    </div>
+  </div>
+  <!-- End Header top Bar --> 
+  <!-- Start Header Middle -->
+  <div class="container header-middle">
+    <div class="row"> <span class="col-xs-6 col-sm-3"><a href="index-2.php"><img src="images/logo.png" class="img-responsive" alt=""></a></span>
+      <div class="col-xs-6 col-sm-3"></div>
+      <div class="col-xs-6 col-sm-9">
+        <div class="contact clearfix">
+          <ul class="hidden-xs">
+<li> <span>"AKTU Library"</span> <a href="aktu-library.php">Nalanda E-Consortium </a> </li>            
+<li> <span>Email</span> <a href="mailto:director@rkgitm.ac.in">info@rkgitw.edu.in </a> </li>
+            <li> <span>Mobile</span> +91-9310089953 </li>
+          </ul>
+         <a href="http://rkgitm.ac.in/apply-online.php" target="blank" class="login">Apply Online <span class="icon-more-icon"></span></a> </div>
+      </div>
+    </div>
+  </div>
+<!--<marquee behavior="scroll" direction="left">“Placement Data Form for 2021 Batch" <a href="https://docs.google.com/forms/d/1dIxj8wsqbDqsxRzEyuiMe995yLPKxkwW8DKudGGasd4/viewform?ts=5f02ee77&edit_requested=true">Click Here...</a>    </marquee> -->
+
+
+  <!-- End Header Middle --> 
+  <!-- Start Navigation -->
+  <nav class="navbar navbar-inverse">
+    <div class="container">
+      <div class="navbar-header">
+        <button aria-controls="navbar" aria-expanded="false" data-target="#navbar" data-toggle="collapse" class="navbar-toggle collapsed" type="button"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+      </div>
+      <div class="navbar-collapse collapse" id="navbar">
+        
+        <ul class="nav navbar-nav">
+          <li> <a href="index.php">Home</a></li>
+          <li class="dropdown"> <a data-toggle="dropdown" href="#">About Us <i class="fa fa-angle-down" aria-hidden="true"></i></a>
+            <ul class="dropdown-menu">
+			  <li><a href="vision.php">Vision & Mission</a></li>
+			  <li><a href="aboutus1.php">About RKGITM</a></li>
+			  <li><a href="https://aktu.ac.in/chancellor.html">Chancellor Message</a></li>
+              <li><a href="https://aktu.ac.in/vice-chancellor-profile.html">Vice Chancellor Message</a></li>
+              <li><a href="Chairman.php">Chairman Message</a></li>
+              
+              <li><a href="director_rd.php">Director, R&D Message</a></li>
+
+			  <li><a href="director1.php">Director Message</a></li>
+			  <li><a href="gallery.php">Life at RKGITM</a></li>
+            </ul>
+          </li>
+
+		 <li class="dropdown"> <a data-toggle="dropdown" href="#">Courses <i class="fa fa-angle-down" aria-hidden="true"></i></a>
+            <ul class="dropdown-menu">
+              <li><a href="btech.php">B.Tech</a></li>
+              
+              
+            </ul>
+          </li>
+
+          <li class="dropdown"> <a data-toggle="dropdown" href="#">Department <i class="fa fa-angle-down" aria-hidden="true"></i></a>
+            <ul class="dropdown-menu">
+              <li><a href="cse.php">Computer Science Engineering</a></li>
+              <li><a href="appliedscience.php">Applied Science</a></li>
+              <li><a href="electronics.php">Electronics & Communication</a></li>
+              <li><a href="information.php">Information Technology</a></li>
+			  <li><a href="electrical.php">Electrical and Electronics</a></li>
+            </ul>
+          </li>
+		  
+		  <li class="dropdown"> <a data-toggle="dropdown" href="#">Training & Placement <i class="fa fa-angle-down" aria-hidden="true"></i></a>
+            <ul class="dropdown-menu">
+              <li><a href="crc.php">Corporate Resource Center</a></li>
+              <li><a href="placement.php">Placements</a></li>
+              <li><a href="recruiters.php">Our Recruiters</a></li>
+             
+			  <li><a href="training.php">Training</a></li>
+			
+            </ul>
+          </li>
+		  <li class="dropdown"> <a data-toggle="dropdown" href="#">Infrastructure <i class="fa fa-angle-down" aria-hidden="true"></i></a>
+            <ul class="dropdown-menu">
+              <li><a href="campus.php">Campus  </a></li>
+              <li><a href="lecture.php">Lecture Theaters </a></li>
+              <li><a href="seminar.php">Seminar hall </a></li>
+			  <li><a href="library.php">Library </a></li>
+			  <li><a href="iedc.php">IEDC DST Lab   </a></li>
+              <li><a href="hostal.php">Hostel  </a></li>
+              <li><a href="food.php">Food court </a></li>
+              <li><a href="healthcentre.php">Health Center </a></li>
+			  
+			  <li><a href="other-facility.php">Internet &amp; Other Facilities </a></li>
+              <li><a href="other-facility.php">ATM </a></li>
+			  
+            </ul>
+          </li>
+		  
+          <li class="dropdown"> <a data-toggle="dropdown" href="#">Admissions<i class="fa fa-angle-down" aria-hidden="true"></i></a>
+            <ul class="dropdown-menu">
+              <li><a href="eligibility.php">Eligibility Criteria</a></li>
+              <li><a href="eligibility.php">Fee Structure</a></li>
+              <li><a href ="images/pdf/Registration form.jpg" target="blank">Registration Form</a></li>
+              <li><a href="RKGITM-brochure-2021.pdf">Download E-brochure</a></li>
+
+			  <li><a href="contact.php">Send Query/Feedback</a></li>
+            </ul>
+          </li>
+		  <li class="dropdown"> <a data-toggle="dropdown" href="#">AICTE Approval<i class="fa fa-angle-down" aria-hidden="true"></i></a>
+            <ul class="dropdown-menu">
+				<li><a href ="images/aicte/mandatory-disclosure-rkgitm-ak-19.pdf" target="blank">Mandatory Disclosure</a></li>
+              			<li><a href ="images/aicte/EOA Report 2020-21.pdf" target="blank">Letter Of Approval 2020-21</a></li>
+			 	<li><a href ="images/aicte/EOA Report 2019-20 revised.pdf" target="blank">Letter Of Approval 2019-20</a></li>
+			   	<li><a href ="images/aicte/Letter Of Approval 2018-19.pdf" target="blank">Letter Of Approval 2018-19</a></li>
+				<li><a href ="images/aicte/Letter Of Approval 2017-18.pdf" target="blank">Letter Of Approval 2017-18</a></li>
+			  <li><a href ="images/aicte/Letter Of Approval 2016-17.pdf" target="blank">Letter Of Approval 2016-17</a></li>
+			  <li><a href ="images/aicte/Letter Of Approval 2015-16.PDF" target="blank">Letter Of Approval 2015-16</a></li>
+			  <li><a href ="images/aicte/Letter Of Approval 2014-15.PDF" target="blank">Letter Of Approval 2014-15</a></li>
+			  <li><a href ="images/aicte/Letter Of Approval 2013-14.PDF" target="blank">Letter Of Approval 2013-14</a></li>
+			  <li><a href ="images/aicte/Letter Of Approval 2012-13.PDF" target="blank">Letter Of Approval 2012-13</a></li>
+			  <li><a href ="images/aicte/Letter Of Approval 2011-12.PDF" target="blank">Letter Of Approval 2011-12</a></li>
+			  <li><a href ="images/aicte/Letter Of Approval 2010-11.pdf" target="blank">Letter Of Approval 2010-11</a></li>
+			  <li><a href ="images/aicte/Letter Of Approval 2009-10.pdf" target="blank">Letter Of Approval 2009-10</a></li>
+			  <li><a href ="images/aicte/Letter Of Approval 2008-09.pdf" target="blank">Letter Of Approval 2008-09</a></li>
+            </ul>
+          </li>
+          <li> <a href="contact.php">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- End Navigation --> 
+</header>
+
+<!--<div id="feedback">
+		<div id="feedback-form" style='display:none;' class="col-xs-4 col-md-4 panel panel-default">
+			<form method="POST" action="/feedback" class="form panel-body" role="form">
+				<div class="form-group">
+					<input class="form-control" name="name" autofocus placeholder="Your Name" type="name" />
+				</div>
+				<div class="form-group">
+					<input class="form-control" name="mobile" autofocus placeholder="Your Mobile" type="mobile" />
+				</div>
+				<div class="form-group">
+					<input class="form-control" name="email" autofocus placeholder="Your e-mail" type="email" />
+				</div>
+				<div class="form-group">
+					<textarea class="form-control" name="body" required placeholder="Please write your Query here..." rows="5"></textarea>
+				</div>
+				<button class="btn btn-primary pull-right" type="submit">Send</button>
+			</form>
+		</div>
+		<div id="feedback-tab">Quick Query</div>-->
+	</div>
+
+<!-- End Header -->
+<style type="text/css">
+<!--
+.style1 {color: #FF0000}
+.style4 {font-size: x-large}
+.style5 {font-size: xx-large}
+-->
+</style>
+ 
+
+ <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+		           
+          <h4 align="center" class="modal-title style1">Welcome to RKGITM</h4>
+        </div>
+        <div class="modal-body">
+         <img src="images/RKGITM.jpeg" alt="Ad-RKGITM" width="703" height="742" class="img-responsive">        </div>
+		
+        <div class="modal-footer">
+<button onclick="location.href='apply-online.php'" type="button" class="btn btn-info btn-lg" data-toggle="modal">
+         Apply Online</button>
+		       
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="banner-outer">
+  <div class="banner-slider">
+    <div class="slide1">
+      <div class="container">
+        <div class="content animated fadeInRight">
+          <div class="fl-right">
+            <h1 class="animated fadeInRight"> <span class="animated fadeInRight">1st Position</span> </h1>
+            <p class="animated fadeInRight">RKGITM secured 1st Position among all the Institutes - Dr APJ AKTU </p>
+            <a href="aboutus1.php" class="btn animated fadeInRight">Know More <span class="icon-more-icon"></span></a> </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide3">
+      <div class="container">
+        <div class="content">
+          <h1 class="animated fadeInUp"></h1>
+          <p class="animated fadeInUp"></p>
+   </div>
+      </div>
+    </div>
+ <div class="slide4">
+      <div class="container">
+        <div class="content">
+          <h1 class="animated fadeInUp"></h1>
+          <p class="animated fadeInUp"></p>
+   </div>
+      </div>
+    </div>
+ <div class="slide5">
+      <div class="container">
+        <div class="content">
+          <h1 class="animated fadeInUp"></h1>
+          <p class="animated fadeInUp"></p>
+   </div>
+      </div>
+    </div>
+ <div class="slide6">
+      <div class="container">
+        <div class="content">
+          <h1 class="animated fadeInUp"></h1>
+          <p class="animated fadeInUp"></p>
+   </div>
+      </div>
+    </div>
+     <div class="slide7">
+      <div class="container">
+        <div class="content">
+          <h1 class="animated fadeInUp"></h1>
+          <p class="animated fadeInUp"></p>
+   </div>
+   </div>
+</div>
+  </div>
+</div>
+<!-- End Banner Carousel --> 
+
+<!-- Start About Section -->
+<section class="about">
+  <div class="container">
+    <ul class="row our-links">
+      <li class="col-sm-4 apply-online clearfix equal-hight">
+        <div class="icon"><img src="images/apply-online-ico.png" class="img-responsive" alt=""></div>
+        <div class="detail">
+          <h2><font color="#FFFFFF">Apply Online</font></h2>
+          <!--<p>Lorem Ipsum is simply dummy text of the printing...</p>-->
+          <a href="apply-online.php" class="more"><i class="fa fa-angle-right" aria-hidden="true"></i></a> </div>
+      </li>
+      <li class="col-sm-4 prospects clearfix equal-hight">
+        <div class="icon"><img src="images/prospects-ico.png" class="img-responsive" alt=""></div>
+        <div class="detail">
+          <h2><font color="#FFFFFF">Admission 2022</font></h2>
+          <!--<p>Lorem Ipsum is simply dummy text of the printing...</p>-->
+          <a href="eligibility.php" class="more"><i class="fa fa-angle-right" aria-hidden="true"></i></a> </div>
+      </li>
+      <li class="col-sm-4 certification clearfix equal-hight">
+        <div class="icon"><img src="images/certification-ico.png" class="img-responsive" alt=""></div>
+        <div class="detail">
+          <h2><font color="#FFFFFF">RKGITM Brochure</font></h2>
+          <!--<p>Lorem Ipsum is simply dummy text of the printing...</p>-->
+          <a href="images/Institute Brochure 2020-21.pdf" class="more"><i class="fa fa-angle-right" aria-hidden="true"></i></a> </div>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-7 col-sm-push-5 left-block"> <span class="sm-head">No.1 College in AKTU</span>
+        <h2>RKGITM - THE GREAT FOUNDATION</h2>
+        <p>We RKGITM, were earlier RKGITW (established in 2008) where we imparted technical education based on the philosophy of Teach a girl Teach a family. RKGITW received several merit awards for its performance.
+		Now we have been converted from Only Women Education to Co-ed Institute namely RKGITM (from the session 2016-17) in view of globalization and gender equality. We are shaping our ideas from only women education to co-education and are committing towards serving best education tools by engineering good human beings with cementing industrial and academica relations.</p>
+        <div class="know-more-wrapper"> <a href="#" class="know-more">Know More <span class="icon-more-icon"></span></a> </div>
+      </div>
+      <div class="col-sm-5 col-sm-pull-7">
+        <div class="video-block">
+          <div id="thumbnail_container"> <img src="images/about-video.jpg" id="thumbnail" class="img-responsive" alt=""> </div>
+          <!--<a href="#" data-toggle="modal" data-target="#myModal" class="start-video"><img src="images/play-btn.png" alt=""></a> 
+          <!-- Modal -->
+          <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <div class="modal-body">
+                  <div class="video-block">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/dGjnElOLWzk" allowfullscreen></iframe>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End About Section --> 
+
+<!-- Start Cources Section -->
+<section class="how-apply padding-lg1">
+  <div class="container">
+    <h2><span>There are many ways to learn</span>OUR B.Tech PROGRAMS</h2>
+    <ul class="row">
+      <li class="col-sm-4">
+        <div class="icon-block"> <font color="#FFFFFF" size="+6" face="Arial Black, Gadget, sans-serif">CSE</font></div>
+        <h3>COMPUTER SCIENCE ENGINEERING</h3>
+        
+      </li>
+      <li class="col-sm-4">
+       <div class="icon-block"> <font color="#FFFFFF" size="+6" face="Arial Black, Gadget, sans-serif">EC</font></div>
+        <h3>ELECTRONICS AND COMMUNICATION</h3>
+        
+      </li>
+       <li class="col-sm-4">
+       <div class="icon-block"> <font color="#FFFFFF" size="+6" face="Arial Black, Gadget, sans-serif">IT</font></div>
+        <h3>INFORMATION <br>TECHNOLOGY</h3>
+        
+      </li>
+	 
+    </ul>
+    <div class="button-wrapper"> <a href="btech.php" class="btn">Know More <span class="icon-more-icon"></span></a> </div>
+  </div>
+</section>
+<!-- End Cources Section --> 
+
+<!-- Start Our Importance Section -->
+
+<section class="our-impotance padding-lg">
+  <div class="container">
+  
+    <ul class="row">
+      <li class="col-sm-4 equal-hight">
+        <div class="inner"> <img src="images/study-time-ico.jpg" alt="Malleable Study Time">
+          <h3>Placement</h3>
+          <p>Highest CTC offered 25 LPA</p>
+        </div>
+      </li>
+      <li class="col-sm-4 equal-hight">
+        <div class="inner"> <img src="images/placement-ico.jpg" alt="Placement Assistance">
+          <h3>Training Assistance</h3>
+          <p>RKGITM The Institute Helps Each Student In Exploring Placement Opportunities.</p>
+        </div>
+      </li>
+      <li class="col-sm-4 equal-hight">
+        <div class="inner"> <img src="images/easy-access-ico.jpg" alt="Easy To Access">
+          <h3>E-Learning Center</h3>
+          <p>E-Learning Center under the aegis of IIT Bombay & IIT KGP Research Center</p>
+        </div>
+      </li>
+      <li class="col-sm-4 equal-hight">
+        <div class="inner"> <img src="images/study-go-ico.jpg" alt="Study on the Go">
+          <h3>Best College in NCR</h3>
+          <p>RKGITM secured 1st Position among all the Institutes of Dr APJ AKTU in V Semester result of 2016-17 sessions.</p>
+        </div>
+      </li>
+      <li class="col-sm-4 equal-hight">
+        <div class="inner"> <img src="images/get-innovative-ico.jpg" alt="Get an Innovative, In-depth Transition">
+          <h3>Get an Innovative, <span>In-depth Transition</span></h3>
+          <p>The transition to an environment of learning becomes easy with the availability of multiple sources of learning such as text books, power-point presentations, and story boards on various subjects.</p>
+        </div>
+      </li>
+      <li class="col-sm-4 equal-hight">
+        <div class="inner"> <img src="images/practical-ico.jpg" alt="Development">
+          <h3>Personalized Leadership  <span>Development</span></h3>
+          <p>Assessments and interactivities are given at the end of every session such that the practical application of theory learnt can be gauged.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- End Our Importance Section --> 
+
+<!-- Start How Study Section 
+
+<section class="how-study padding-lg">
+  <div class="container">
+    <h2>  MBA COURSES</h2>
+    <ul class="row">
+      <li class="col-sm-4">
+        <div class="overly">
+          <div class="cnt-block">
+            <h3>MBA -Sales &amp; Marketing</h3>
+            <p>Lorem Ipsum is simply dummy text of the printing...</p>
+          </div>
+          <a href="#" class="more"><i class="fa fa-caret-right" aria-hidden="true"></i></a> </div>
+        <figure><img src="images/how-study-img1.jpg" class="img-responsive" alt=""></figure>
+      </li>
+      <li class="col-sm-4">
+        <div class="overly">
+          <div class="cnt-block">
+            <h3>MBA -Finance</h3>
+            <p>Lorem Ipsum is simply dummy text of the printing...</p>
+          </div>
+          <a href="#" class="more"><i class="fa fa-caret-right" aria-hidden="true"></i></a> </div>
+        <figure><img src="images/how-study-img2.jpg" class="img-responsive" alt=""></figure>
+      </li>
+      <li class="col-sm-4">
+        <div class="overly">
+          <div class="cnt-block">
+            <h3> MBA -Human Resourse </h3>
+            <p>Lorem Ipsum is simply dummy text of the printing...</p>
+          </div>
+          <a href="#" class="more"><i class="fa fa-caret-right" aria-hidden="true"></i></a> </div>
+        <figure><img src="images/how-study-img3.jpg" class="img-responsive" alt=""></figure>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- End How Study Section --> 
+
+<!-- Start Why Choose Section -->
+
+<section class="why-choose padding-lg">
+  <div class="container">
+    <h2><span>The Numbers Say it All</span>Why Choose Us</h2>
+    <ul class="our-strength">
+      <li>
+        <div class="icon"><span class="icon-certification-icon"> </span></div>
+        <span class="counter">1</span>
+        <div class="title">Certified Courses</div>
+      </li>
+      <li>
+        <div class="icon"><span class="icon-student-icon"></span></div>
+       <div class="couter-outer"><span class="counter">600</span><span>+</span></div>
+        <div class="title">Students Enrolled </div>
+      </li>
+     
+      <li>
+        <div class="icon"><span class="icon-parents-icon"></span></div>
+        <div class="couter-outer"><span class="counter">93.14</span><span>%</span></div>
+        <div class="title">Placement </div>
+      </li>
+	  <li>
+        <div class="icon"><span class="icon-parents-icon"></span></div>
+        <div class="couter-outer"><span class="counter">100</span><span>%</span></div>
+        <div class="title">Satisfied Parents</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- End Why Choose Section --> 
+
+<!-- Start New & Events Section -->
+
+<section class="news-events padding-lg">
+  <div class="container">
+   
+   
+<div class="row">
+<div class="col-md-4">
+<div class="panel panel-default">
+<div class="panel-heading"> <span class="glyphicon glyphicon-list-alt"></span><b>Latest News</b></div>
+<div class="panel-body">
+<div class="row">
+<div class="col-xs-12">
+<ul class="demo1">
+<li class="news-item">
+<table cellpadding="4">
+
+
+<li class="news-item">
+<table cellpadding="4">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>Organizing a ONE DAY WORKSHOP ON C and C++ FOR TEACHERS on Saturday, 29 February 2020<a href="#"></a></td>
+</tr>
+</table>
+</li>
+
+<li class="news-item">
+<table cellpadding="4">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>List of Holidays for Odd Sem 2020-21<a href="images/List of Holidays for Odd Sem 2020-21.jpg">--Click here</a></td>
+</tr>
+</table>
+</li>
+<li class="news-item">
+<table cellpadding="4">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>Anti-ragging Committee for session 2019-20... </td>
+</tr>
+</table>
+</li>
+<li class="news-item">
+<table cellpadding="4">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>Authorized Research Center for Akash Tablets. </td>
+</tr>
+</table>
+</li>
+<li class="news-item">
+<table cellpadding="1">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>E-Learning Center under the aegis of IIT Bombay & IIT KGP. </td>
+</tr>
+</table>
+</li>
+
+
+</div>
+</div>
+</div>
+<div class="panel-footer"> </div>
+</div>
+</div>
+<div class="col-md-4">
+<div class="panel panel-default">
+<div class="panel-heading"> <span class="glyphicon glyphicon-list-alt"></span><b>Placement News</b></div>
+<div class="panel-body">
+<div class="row">
+<div class="col-xs-12">
+
+<ul class="demo1">
+<li class="news-item">
+<table cellpadding="4">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>Link for registration is uploaded on the College website (2024 passout batch) "<a href="https://forms.gle/gxMb6kkTufrxuJwv6" class="know-more">Know More <span class="icon-more-icon"></span></a> </td>
+</tr>
+</table>
+</li>
+
+<li class="news-item">
+<table cellpadding="4">
+
+
+
+
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>Congratulations!! to Mr. Nishant Pawar for selection  in Ameyo" </td>
+</tr>
+</table>
+</li>
+<li class="news-item">
+<table cellpadding="4">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>Congratulations!! to Ms. Yashi Goel for selection  in TCS" </td>
+</tr>
+</table>
+</li>
+<li class="news-item">
+<table cellpadding="4">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>Congratulations!! to Mr. Hritik Bhardwaj for selection  in BirlaSoft" </td>
+</tr>
+</table>
+</li>
+<li class="news-item">
+<table cellpadding="4">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>Congratulations!! to Mr. Bhanu Pratap for selection  in BYJUS" </a></td>
+</tr>
+</table>
+</li>
+
+
+
+
+</ul>
+
+
+
+<!--<ul class="demo2">
+<li class="news-item">GreyOrange Recruitment Drive on 19th July 2017... <a href="images/pdf/GreyOrange Recruitment Drive on 19th July 2017.pdf" target="blank">Read more...</a></li>
+<li class="news-item">Fiserv Off Campus Drive on 19th July 2017... <a href="images/pdf/FiservOffCampusDriveon19thJuly2017.pdf" target="blank">Read more...</a></li>
+<li class="news-item">CoCubes Recruitment Drive on 20th July 2017... <a href="images/pdf/CoCubes Recruitment Drive on 20th July 2017.pdf" target="blank">Read more...</a></li>The best placement records with 93.14%... <a href="#">Read more...</a>
+<li class="news-item">Cocubes Practice & Pre Assessment Test Schedule <a href="images/pdf/CocubesPracticeTest.pdf" target="blank">Read more...</a></li>
+<li class="news-item">Placement Highest Package 6.0 Lacs... <a href="track-record.php">Read more...</a></li>
+<li class="news-item"></li>
+<li class="news-item">118+ students placed in session 2016-17... <a href="#">Read more...</a></li>
+</ul>-->
+
+
+</div>
+</div>
+</div>
+<div class="panel-footer"> </div>
+</div>
+</div>
+<div class="col-md-4">
+<div class="panel panel-default">
+<div class="panel-heading"> <span class="glyphicon glyphicon-list-alt"></span><b>Why RKGITM</b></div>
+<div class="panel-body">
+<div class="row">
+<div class="col-xs-12">
+
+<ul class="demo1">
+<li class="news-item">
+<table cellpadding="4">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>Ist rank in all UP * - AKTU </td>
+</tr>
+</table>
+</li>
+
+<li class="news-item">
+<table cellpadding="4">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>CMAI National UP Education Award 2013. </td></tr>
+</table>
+</li>
+<li class="news-item">
+<table cellpadding="1">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>Education Excellence Award 2012. </td>
+</tr>
+</table>
+</li>
+
+<li class="news-item">
+<table cellpadding="1">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>RKGITM secured 1st Position among all the Institutes of Dr APJ AKTU in V Semester result  </td>
+</tr>
+</table>
+</li>
+
+<li class="news-item">
+
+<table cellpadding="1">
+<tr>
+<td><img src="images/1.png" width="60" class="img-circle" /></td>
+<td>160 + companies visited in the campus. </td>
+</tr>
+</table>
+</li>
+
+</ul>
+
+
+<!--<ul id="demo3">
+<li class="news-item">Ist rank in all UP * - AKTU <a href="#">Read more...</a></li>
+<li class="news-item">Authorized Research Center for Akash Tablets. <a href="#">Read more...</a></li>
+<li class="news-item">CMAI National UP Education Award 2013. <a href="#">Read more...</a></li>
+<li class="news-item">Education Excellence Award 2012. <a href="#">Read more...</a></li>
+<li class="news-item">E-Learning Center under the aegis of IIT Bombay & IIT KGP. <a href="#">Read more...</a></li>
+<li class="news-item">RKGITM secured 1st Position among all the Institutes of Dr APJ AKTU in V Semester result of 2016-17 sessions. <a href="#">Read more...</a> </li>
+
+</ul>-->
+
+
+
+</div>
+</div>
+</div>
+<div class="panel-footer"> </div>
+</div>
+</div>
+</div>
+
+   
+   
+    
+  </div>
+</section>
+
+
+
+<!-- End New & Events Section --> 
+
+<!-- Start Campus Tour Section -->
+
+<section class="campus-tour padding-lg">
+  <h2><span>Our campus have a lot to offer for our students</span>TAKE A CAMPUS TOUR</h2>
+  <ul class="gallery clearfix">
+    <li>
+      <div class="overlay">
+       
+        <a class="galleryItem" href="images/gallery/b1.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/1.jpg" class="img-responsive" alt=""></figure>
+    </li>
+    <li>
+      <div class="overlay">
+          <a class="galleryItem" href="images/gallery/b2.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/2.jpg" class="img-responsive" alt=""></figure>
+    </li>
+    <li>
+      <div class="overlay">
+         <a class="galleryItem" href="images/gallery/b3.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/3.jpg" class="img-responsive" alt=""></figure>
+    </li>
+    <li>
+      <div class="overlay">
+         <a class="galleryItem" href="images/gallery/b4.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/4.jpg" class="img-responsive" alt=""></figure>
+    </li>
+    <li>
+      <div class="overlay">
+         <a class="galleryItem" href="images/gallery/b5.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/5.jpg" class="img-responsive" alt=""></figure>
+    </li>
+    <li>
+      <div class="overlay">
+          <a class="galleryItem" href="images/gallery/b6.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/6.jpg" class="img-responsive" alt=""></figure>
+    </li>
+    <li>
+      <div class="overlay">
+          <a class="galleryItem" href="images/gallery/b7.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/7.jpg" class="img-responsive" alt=""></figure>
+    </li>
+    <li>
+      <div class="overlay">
+          <a class="galleryItem" href="images/gallery/b8.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/8.jpg" class="img-responsive" alt=""></figure>
+    </li>
+    <li>
+      <div class="overlay">
+         <a class="galleryItem" href="images/gallery/b9.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/9.jpg" class="img-responsive" alt=""></figure>
+    </li>
+    <li>
+      <div class="overlay">
+         <a class="galleryItem" href="images/gallery/b10.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/10.jpg" class="img-responsive" alt=""></figure>
+    </li>
+<li>
+      <div class="overlay">
+         <a class="galleryItem" href="images/gallery/IMG-20180727-WA0003.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/IMG-20180727-WA0003.jpg" alt="" width="409" height="314" class="img-responsive"></figure>
+    </li>
+    <li>
+      <div class="overlay">
+         <a class="galleryItem" href="images/gallery/IMG-20180727-WA0018.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/IMG-20180727-WA0018.jpg" class="img-responsive" alt=""></figure>
+    </li>
+<li>
+      <div class="overlay">
+         <a class="galleryItem" href="images/gallery/IMG-20180727-WA0024.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/IMG-20180727-WA0024.jpg" class="img-responsive" alt=""></figure>
+    </li>
+<li>
+      <div class="overlay">
+         <a class="galleryItem" href="images/gallery/IMG-20180727-WA0026.jpg"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/gallery/IMG-20180727-WA0026.jpg" class="img-responsive" alt=""></figure>
+    </li>
+<li>
+      <div class="overlay">
+         <a class="galleryItem" href="images/ip/ca2.JPG"><span class="icon-enlarge-icon"></span></a> <a href="#" class="more"><span class="icon-gallery-more-arrow"></span></a> </div>
+      <figure><img src="images/ip/ca2.JPG" class="img-responsive" alt=""></figure>
+    </li>
+  </ul>
+</section>
+
+<!-- End Campus Tour Section --> 
+
+<!-- Start logos Section -->
+
+<section class="logos">
+  <div class="container">
+    <ul class="owl-carousel clearfix">
+      <li><a href="#"><img src="images/recruiters/logo1.jpg" class="img-responsive" alt=""></a></li>
+      <li><a href="#"><img src="images/recruiters/logo2.jpg" class="img-responsive" alt=""></a></li>
+	  <li><a href="#"><img src="images/recruiters/logo3.jpg" class="img-responsive" alt=""></a></li>
+      <li><a href="#"><img src="images/recruiters/logo4.jpg" class="img-responsive" alt=""></a></li>
+	  <li><a href="#"><img src="images/recruiters/logo5.jpg" class="img-responsive" alt=""></a></li>
+      <li><a href="#"><img src="images/recruiters/logo6.jpg" class="img-responsive" alt=""></a></li>
+	  <li><a href="#"><img src="images/recruiters/logo7.jpg" class="img-responsive" alt=""></a></li>
+      <li><a href="#"><img src="images/recruiters/logo8.jpg" class="img-responsive" alt=""></a></li>
+	  <li><a href="#"><img src="images/recruiters/logo9.jpg" class="img-responsive" alt=""></a></li>
+      <li><a href="#"><img src="images/recruiters/logo10.jpg" class="img-responsive" alt=""></a></li>
+	  <li><a href="#"><img src="images/recruiters/logo11.jpg" class="img-responsive" alt=""></a></li>
+      <li><a href="#"><img src="images/recruiters/logo12.jpg" class="img-responsive" alt=""></a></li>
+	  <li><a href="#"><img src="images/recruiters/logo13.jpg" class="img-responsive" alt=""></a></li>
+      <li><a href="#"><img src="images/recruiters/logo14.jpg" class="img-responsive" alt=""></a></li>
+	  <li><a href="#"><img src="images/recruiters/logo15.jpg" class="img-responsive" alt=""></a></li>
+      <li><a href="#"><img src="images/recruiters/logo16.jpg" class="img-responsive" alt=""></a></li>
+	  <li><a href="#"><img src="images/recruiters/logo17.jpg" class="img-responsive" alt=""></a></li>
+      <li><a href="#"><img src="images/recruiters/logo18.jpg" class="img-responsive" alt=""></a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- End logos Section --> 
+
+<!-- Start Testimonial -->
+
+<section class="testimonial padding-lg">
+  <div class="container">
+    <div class="wrapper">
+      <h2>Alumini Testimonials</h2>
+      <ul class="testimonial-slide">
+        
+<li>
+<p> I would like to  heartedly announce that RKGITM has provided me wonderful environment and opportunity to learn and grow  myself academically as well as to secure a place the corporate with its best placement services. The faculties always motivated me to empower myself and were friendly, enthusiastic ready to  help encouraging and supportive. I got place in Microsoft, which is one of the fastest growing companies in a roll, which suit my skill set with the package of 25 Lakh. Looking forward to joining Microsoft and take RKGITM legacy ahead. </p> 
+          <span>Name - Apoorva Mall <span>Batch - B. Tech,CSE 2015-2019 batch  Company Name - Microsoft</span></span> </li>  
+<li>
+<p> CSE department was well equipped with laboratories and had great faculties. I can still recall the core concepts of subjects such as DAA, Database Management, Graph theory, Computer Network that are widely used in industry.  Overall, the college experience was good in terms of placement. Many personality-building sessions were arranged along with mock interview, which acted as a gateway and opened many doors in IT industry. I got my first offer from Aon through campus placement in 2013.Her package is of 12 Lakh. </p> 
+          <span>Name :Sapna Rai <span>Batch - B. Tech CSE, 2009-2013 batch  Company Name - Current Organization: Accenturet</span></span> </li>
+
+<li>
+<p> I had wonderful experience in RKGITM. The faculty is extremely supportive and has always encouraged innovative ideas and learning new things. The workshops and seminars were frequently organized which gave me an insight to the new technologies. I also got an opportunity to work in a project for IEDC. These four years taught me a lot and as I walked out of the campus, I had three offer letters. Now, I am a Systems Engineer at Infosys Ltd and a proud alumnus of RKGITM.  I want to thank all the teachers and faculty members especially the ECE department for making this happens." </p> 
+          <span>Name : Shivangi Verma <span>Batch - B. Tech, 2012-2016 batch  Company Name - Infosys Ltd</span></span> </li>
+
+<li>
+<p>It’s been fortunate to be a part of RKGITM where so many doors were opened for my personal and academic development that I became confident. This institute aims at enhancing our knowledge, skills and abilities. It, in fact, didn’t leave the attitude part behind as well. These years at RKGITM are the best years concerning learning, experience and gaining exposure to fields relevant to my discipline, all due to my faculty member.  I will always thank to the college and Training & Placement Department for their continuous efforts in getting me placed in top IT Company . I got placed in Wipro HR Services (Aka Aon Hewitt) in 2016 through college in campus placement. Currently working as Assistant Manager in EXL services with a package of 13 LPA.  </p> 
+          <span>Name: Anjali Bhargava <span>Batch - B. Tech, ECE 2012-2016 batch  Company Name -  EXL services</span></span> </li>
+
+
+        
+
+      </ul>
+     <div id="bx-pager"> <a data-slide-index="0" href="#"><img src="images/alumni/Apoorva Mall.jpg" class="img-circle" alt=""/></a> <a data-slide-index="1" href="#"><img src="images/alumni/Sapna-rai.jpeg" class="img-circle" alt="" /></a> <a data-slide-index="2" href="#"><img src="images/alumni/Shivangi Verma.jpg" class="img-circle" alt="" /></a><a data-slide-index="3" href="#"><img src="images/alumni/Anjali Bhargava.jpeg" class="img-circle" alt="" /></a> </div>
+    </div>
+  </div>
+</section>
+
+<!-- End Testimonial --> 
+
+<!-- Start Footer -->
+<footer class="footer"> 
+  <!-- Start Footer Top -->
+  <div class="container">
+    <div class="row row1">
+      <div class="col-sm-9 clearfix">
+        <div class="foot-nav">
+         
+        </div>
+        <div class="foot-nav">
+          <h3>B. Tech Courses</h3>
+          <ul>
+             <li><a href="cse.php">Computer Science Engineering</a></li>
+              <li><a href="appliedscience.php">Applied Science</a></li>
+              <li><a href="electronics.php">Electronics & Communication</a></li>
+              <li><a href="information.php">Information Technology</a></li>
+			  <li><a href="electrical.php">Electrical and Electronics</a></li>
+          </ul>
+        </div>
+        <div class="foot-nav">
+          <h3>Why RKEGITM</h3>
+          <ul>
+            <li><a href="aboutus.php">About RKGITM</a></li>
+              <li><a href="whyus.php">Why RKGITM</a></li>
+              <li><a href="director.php">Director Message</a></li>
+              <li><a href="faculty.php">Faculty</a></li>
+			  <li><a href="gallery.php">Life at RKGITM</a></li>
+          </ul>
+        </div>
+        <div class="foot-nav">
+          <h3>Learning Experience</h3>
+          <ul>
+          <li><a href="btech.php">B.Tech</a></li>
+          
+          <li> <a href="placement.php">Training and Placements</a></li>
+		
+          <li> <a href="pmkvy.php">PMKVY</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <div class="footer-logo hidden-xs"><a href="index-2.php"><img src="images/footer-logo.png" class="img-responsive" alt=""></a></div>
+        <p>© 2021 <span>RKGITM</span>. All rights reserved</p>
+        
+      </div>
+    </div>
+  </div>
+  <!-- End Footer Top --> 
+  <!-- Start Footer Bottom -->
+  
+       
+  <!-- End Footer Bottom --> 
+</footer>
+<!-- End Footer --> 
+
+<!-- Scroll to top --> 
+<a href="#" class="scroll-top"><i class="fa fa-chevron-up" aria-hidden="true"></i></a> 
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+<script type="text/javascript" src="js/jquery.min.js"></script> 
+<!-- Bootsrap JS --> 
+<script type="text/javascript" src="assets/bootstrap/js/bootstrap.min.js"></script> 
+<!-- Select2 JS --> 
+<script type="text/javascript" src="assets/select2/js/select2.min.js"></script> 
+<!-- Match Height JS --> 
+<script type="text/javascript" src="assets/matchHeight/js/matchHeight-min.js"></script> 
+<!-- Bxslider JS --> 
+<script type="text/javascript" src="assets/bxslider/js/bxslider.min.js"></script> 
+<!-- Waypoints JS --> 
+<script type="text/javascript" src="assets/waypoints/js/waypoints.min.js"></script> 
+<!-- Counter Up JS --> 
+<script type="text/javascript" src="assets/counterup/js/counterup.min.js"></script> 
+<!-- Magnific Popup JS --> 
+<script type="text/javascript" src="assets/magnific-popup/js/magnific-popup.min.js"></script> 
+<!-- Owl Carousal JS --> 
+<script type="text/javascript" src="assets/owl-carousel/js/owl.carousel.min.js"></script> 
+<!-- Modernizr JS --> 
+<script type="text/javascript" src="js/modernizr.custom.js"></script> 
+<!-- Custom JS --> 
+<script type="text/javascript" src="js/custom.js"></script>
+<script src="mrova-feedback-form.js" type="text/javascript"></script>
+
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="scripts/jquery.bootstrap.newsbox.min.js" type="text/javascript"></script>
+<script src="scripts/jquery.bootstrap.newsbox.js" type="text/javascript"></script>
+
+<!--Start of onloadpopup Script
+<script>
+ $(window).load(function(){        
+   $('#myModal').modal('show');
+    }); 
+</script>
+<!--end of onloadpopup Script-->
+
+<!--Start of Tawk.to Script-->
+<!--<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/59a5ff547ab2de3aea9d737e/default';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>-->
+<!--End of Tawk.to Script-->
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#myModal").modal('show');
+	});
+</script>
+
+	<script src="js/feedback.js"></script>
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36251023-1']);
+  _gaq.push(['_setDomainName', 'jqueryscript.net']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+
+</body>
+<script>'undefined'=== typeof _trfq || (window._trfq = []);'undefined'=== typeof _trfd && (window._trfd=[]),_trfd.push({'tccl.baseHost':'secureserver.net'},{'ap':'cpsh-oh'},{'server':'p3plzcpnl505340'},{'dcenter':'p3'},{'cp_id':'9856133'},{'cp_cache':''},{'cp_cl':'8'}) // Monitoring performance to make your website faster. If you want to opt-out, please contact web hosting support.</script><script src='https://img1.wsimg.com/traffic-assets/js/tccl.min.js'></script></html>

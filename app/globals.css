@@ -74,7 +74,7 @@ html {
 }
 
 body {
-    font-family: "Outfit", "Inter", "Lexend", sans-serif;
+    font-family: "Lexend", sans-serif;
     background-color: var(--color-bg-white);
     color: #0f172a;
     -webkit-font-smoothing: antialiased;

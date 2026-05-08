@@ -21,7 +21,23 @@ export async function POST(req: NextRequest) {
     }
 
     const emailLower = email.trim().toLowerCase();
-    const phoneTrimmed = phone.trim();
+    const phoneTrimmed = phone.trim().replace(/[\s\-+]/g, "");
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLower)) {
+      return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
+    }
+    if (!/^[6-9]\d{9}$/.test(phoneTrimmed)) {
+      return NextResponse.json({ error: "Please enter a valid 10-digit mobile number starting with 6-9." }, { status: 400 });
+    }
+
+    // Validate email format
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLower)) {
+      return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
+    }
+    // Validate phone — must be 10 digits (Indian mobile)
+    if (!/^[6-9]\d{9}$/.test(phoneTrimmed.replace(/[\s\-+]/g, ""))) {
+      return NextResponse.json({ error: "Please enter a valid 10-digit mobile number." }, { status: 400 });
+    }
     const db = await getDb();
 
     // Check email uniqueness across ALL collections

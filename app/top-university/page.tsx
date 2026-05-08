@@ -141,9 +141,75 @@ async function fetchTopUniversities(opts: {
     match.id = { $in: existing ? existing.filter((id) => feeIds.includes(id)) : feeIds };
   }
 
-  const sortStage: Record<string, 1 | -1> =
-    sort === "rating" ? { rating: -1, totalRatingUser: -1 }
-      : { topUniversityRank: 1, ranking: 1, rating: -1 };
+  // For fees sorting, aggregate with computed min/max fees first, then sort+paginate
+  if (sort === "fees" || sort === "fees_high") {
+    const feesPipeline = [
+      { $match: match },
+      { $lookup: { from: "collegemaster", localField: "id", foreignField: "collegeprofile_id", as: "cm" } },
+      {
+        $addFields: {
+          min_fees: { $min: { $filter: { input: "$cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
+          max_fees: { $max: { $filter: { input: "$cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
+        },
+      },
+      { $match: sort === "fees" ? { min_fees: { $ne: null, $gte: 1000 } } : { max_fees: { $ne: null, $gte: 1000 } } },
+      { $sort: sort === "fees" ? { min_fees: 1 as const } : { max_fees: -1 as const } },
+    ];
+
+    const [countResult, feesAgg] = await Promise.all([
+      db.collection("collegeprofile").aggregate([...feesPipeline, { $count: "total" }]).toArray(),
+      db.collection("collegeprofile").aggregate([
+        ...feesPipeline,
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "city" } },
+        { $unwind: { path: "$city", preserveNullAndEmptyArrays: true } },
+        { $lookup: { from: "functionalarea", localField: "cm.functionalarea_id", foreignField: "id", as: "fa" } },
+        {
+          $project: {
+            slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, ranking: 1,
+            isTopUniversity: 1, topUniversityRank: 1, universityType: 1, collegetype_id: 1, estyear: 1,
+            verified: 1, totalStudent: 1, registeredSortAddress: 1, min_fees: 1, max_fees: 1,
+            name: {
+              $cond: [
+                { $and: [{ $ne: ["$user.firstname", null] }, { $ne: [{ $trim: { input: "$user.firstname" } }, ""] }] },
+                { $trim: { input: "$user.firstname" } },
+                "$slug",
+              ],
+            },
+            city_name: "$city.name",
+            state_id: "$city.state_id",
+            streams: { $setUnion: ["$fa.name", []] },
+          },
+        },
+      ]).toArray(),
+    ]);
+
+    const total = countResult[0]?.total ?? 0;
+    const universities: CollegeResult[] = feesAgg.map((row) => ({
+      id: String(row._id), slug: row.slug,
+      name: row.name && row.name !== row.slug ? row.name : slugToName(row.slug || "university"),
+      location: row.registeredSortAddress || row.city_name || "India",
+      city_name: row.city_name ?? null, state_id: row.state_id ?? null,
+      image: buildImageUrl(row.bannerimage),
+      rating: parseFloat(String(row.rating)) || 0,
+      totalRatingUser: parseInt(String(row.totalRatingUser)) || 0,
+      ranking: row.ranking ? parseInt(String(row.ranking)) : null,
+      isTopUniversity: row.isTopUniversity ?? 0,
+      topUniversityRank: row.topUniversityRank ? parseInt(String(row.topUniversityRank)) : null,
+      universityType: row.universityType ?? null,
+      collegetype_id: row.collegetype_id ? parseInt(String(row.collegetype_id)) : null,
+      estyear: row.estyear ?? null, verified: row.verified ?? 0,
+      totalStudent: row.totalStudent ? parseInt(String(row.totalStudent)) : null,
+      streams: Array.isArray(row.streams) ? row.streams.filter(Boolean) : [],
+      min_fees: row.min_fees ?? null, max_fees: row.max_fees ?? null, avg_package: null,
+    }));
+    return { universities, total, totalPages: Math.ceil(total / limit) };
+  }
+
+  const sortStage: Record<string, 1 | -1> = { rating: -1, totalRatingUser: -1 };
 
   const [total, idRows] = await Promise.all([
     db.collection("collegeprofile").countDocuments(match),
@@ -190,13 +256,12 @@ async function fetchTopUniversities(opts: {
         city_name: "$city.name",
         state_id: "$city.state_id",
         streams: { $setUnion: ["$fa.name", []] },
-        min_fees: { $min: { $filter: { input: "$cm.fees", as: "f", cond: { $gt: ["$$f", 0] } } } },
-        max_fees: { $max: { $filter: { input: "$cm.fees", as: "f", cond: { $gt: ["$$f", 0] } } } },
+        min_fees: { $min: { $filter: { input: "$cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
+        max_fees: { $max: { $filter: { input: "$cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
       },
     },
   ]).toArray();
 
-  // Re-sort to match original order
   const orderMap = new Map(topIds.map((id, i) => [String(id), i]));
   dataRows.sort((a, b) => (orderMap.get(String(a._id)) ?? 0) - (orderMap.get(String(b._id)) ?? 0));
 
@@ -255,7 +320,7 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
   const cityId = getString("city_id");
   const stateId = getString("state_id");
   const feesMax = getString("fees_max");
-  const sort = getString("sort", "ranking");
+  const sort = getString("sort", "rating");
   const page = Math.max(1, parseInt(getString("page", "1")));
   const limit = 12;
 

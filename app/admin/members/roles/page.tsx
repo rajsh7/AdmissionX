@@ -207,9 +207,6 @@ export default async function MembersRolesPage({
         createAdminUser={createAdminUser}
         updateAdminUser={updateAdminUser}
         deleteAdminUser={deleteAdminUser}
-        createRole={createRole}
-        updateRole={updateRole}
-        deleteRole={deleteRole}
       />
     </div>
   );

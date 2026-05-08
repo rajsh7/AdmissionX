@@ -99,7 +99,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
     <main className="min-h-screen bg-[#F8F9FB]">
       <Header />
       {/* --- Hero Section -------------------------------------------------------- */}
-      <section className="pt-24 pb-12 px-4 sm:px-8 lg:px-12">
+      <section className="pt-[100px] lg:pt-[104px] pb-12 px-4 sm:px-8 lg:px-12">
         <div className="max-w-[1920px] mx-auto">
           <div
             style={{

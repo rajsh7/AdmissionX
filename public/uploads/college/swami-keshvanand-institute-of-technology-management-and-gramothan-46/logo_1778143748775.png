@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb" >
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width">
+<link rel="shortcut icon" href="/templates/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/templates/favicon.ico" type="image/x-icon">
+<base href="https://www.skit.ac.in/error.html" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="keywords" content="Best engineering colleges in jaipur, IT engineering in jaipur, computer science engineering in jaipur, mechanical, engineering in jaipur." />
+	<meta name="description" content="Welcome to Swami Keshvanand Institute of Technology Management &amp; Gramothan jaipur The best engineering college in Jaipur with the combination of education, discipline and placement." />
+	<title>Error 404 - SKIT Jaipur - NAAC A++ Grade Accredited, Best Engineering College, Best Faculty, Best Placements</title>
+	<link href="/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
+	<link href="/media/system/css/modal.css?f81eae7b21d83bae9e19dbf9df988d72" rel="stylesheet" type="text/css" />
+	<link href="https://www.skit.ac.in/libraries/cegcore/assets/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css" />
+	<link href="https://www.skit.ac.in/libraries/cegcore/assets/bootstrap/css/bootstrap-theme.css" rel="stylesheet" type="text/css" />
+	<link href="https://www.skit.ac.in/libraries/cegcore/assets/bootstrap/css/bootstrap-gcore.css" rel="stylesheet" type="text/css" />
+	<link href="https://www.skit.ac.in/libraries/cegcore/assets/font_awesome/css/font-awesome.css" rel="stylesheet" type="text/css" />
+	<link href="https://www.skit.ac.in/libraries/cegcore/assets/gplugins/gtooltip/gtooltip.css" rel="stylesheet" type="text/css" />
+	<link href="https://www.skit.ac.in/libraries/cegcore/assets/gplugins/gvalidation/gvalidation.css" rel="stylesheet" type="text/css" />
+	<link href="https://www.skit.ac.in/libraries/cegcore/assets/css/system_messages.css" rel="stylesheet" type="text/css" />
+	<link href="/media/djmegamenu/themes/custom155.css?v=3.7.0.pro" rel="stylesheet" type="text/css" />
+	<link href="/media/djmegamenu/mobilethemes/custom155.css?v=3.7.0.pro" rel="stylesheet" type="text/css" />
+	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+	<link href="/media/djmegamenu/themes/custom154.css?v=3.7.0.pro" rel="stylesheet" type="text/css" />
+	<link href="/media/djmegamenu/mobilethemes/custom154.css?v=3.7.0.pro" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+.scrollToTop {
+			padding: 10px;
+			margin: 20px;
+			text-align: center; 
+			font-weight: bold;
+			text-decoration: none;
+			position:fixed;
+			bottom: 0;
+			right: 0;
+			opacity: 0;
+			transition: opacity 0.2s ease;
+			z-index: 100;
+			width: 100px;
+			height: 100px;
+			color: inherit;
+			font-size: inheritpx;
+			font-family: inherit;
+			background-color: none;
+			background-image: url(/plugins/system/scrolltock/images/arrow_up.png);
+			background-position: center center ;
+			background-repeat: no-repeat;
+			border: 0px transparent solid;
+			border-radius: 0px;
+			box-shadow: transparent 0 0 0px;
+		}
+		.scrollToTop:hover {
+			text-decoration:none;
+			color: ;
+		}.scrolltotop-show { opacity: 1; }		.dj-hideitem { display: none !important; }
+
+			#dj-megamenu155mobile { display: none; }
+		@media (max-width: 979px) {
+			#dj-megamenu155, #dj-megamenu155sticky, #dj-megamenu155placeholder { display: none !important; }
+			#dj-megamenu155mobile { display: block; }
+		}
+	
+			#dj-megamenu154mobile { display: none; }
+		@media (max-width: 979px) {
+			#dj-megamenu154, #dj-megamenu154sticky, #dj-megamenu154placeholder { display: none !important; }
+			#dj-megamenu154mobile { display: block; }
+		}
+	
+	</style>
+	<script type="application/json" class="joomla-script-options new">{"csrf.token":"1885b272ea1245d30194e4782c64ffa9","system.paths":{"root":"","base":""}}</script>
+	<script src="/media/jui/js/jquery.min.js?f81eae7b21d83bae9e19dbf9df988d72" type="text/javascript"></script>
+	<script src="/media/jui/js/jquery-noconflict.js?f81eae7b21d83bae9e19dbf9df988d72" type="text/javascript"></script>
+	<script src="/media/jui/js/jquery-migrate.min.js?f81eae7b21d83bae9e19dbf9df988d72" type="text/javascript"></script>
+	<script src="/media/system/js/caption.js?f81eae7b21d83bae9e19dbf9df988d72" type="text/javascript"></script>
+	<script src="/media/system/js/mootools-core.js?f81eae7b21d83bae9e19dbf9df988d72" type="text/javascript"></script>
+	<script src="/media/system/js/core.js?f81eae7b21d83bae9e19dbf9df988d72" type="text/javascript"></script>
+	<script src="/media/system/js/mootools-more.js?f81eae7b21d83bae9e19dbf9df988d72" type="text/javascript"></script>
+	<script src="/media/system/js/modal.js?f81eae7b21d83bae9e19dbf9df988d72" type="text/javascript"></script>
+	<script src="/modules/mod_djmegamenu/assets/js/jquery.djmobilemenu.js?v=3.7.0.pro" type="text/javascript" defer="defer"></script>
+	<script type="text/javascript">
+jQuery(window).on('load',  function() {
+				new JCaption('img.caption');
+			});
+	var Scrolltock = function(container) {
+				if (! container) container = jQuery(document);
+				jQuery('a.scrollTo', container).click( function(event) {
+					var pageurl = window.location.href.split('#');
+					var linkurl = jQuery(this).attr('href').split('#');
+
+					if ( jQuery(this).attr('href').indexOf('#') != 0
+						&& ( ( jQuery(this).attr('href').indexOf('http') == 0 && pageurl[0] != linkurl[0] )
+						|| jQuery(this).attr('href').indexOf('http') != 0 && pageurl[0] != 'https://www.skit.ac.in/' + linkurl[0].replace('/', '') )
+						) {
+						// here action is the natural redirection of the link to the page
+					} else {
+						event.preventDefault();
+						jQuery(this).scrolltock();
+						setTimeout(function(){ jQuery(this).scrolltock(); }, 1000); // add timer to fix issue with page load
+					}
+				});
+			}
+			jQuery(document).ready(function($){$(document.body).append('<a href="#" class="scrollToTop">Go To Top</a>');
+					//Check to see if the window is top if not then display button
+					$(window).scroll(function(){
+						if ($(this).scrollTop() > 100) {
+							$('.scrollToTop').addClass('scrolltotop-show');
+						} else {
+							$('.scrollToTop').removeClass('scrolltotop-show');
+						}
+					});
+
+					//Click event to scroll to top
+					$('.scrollToTop').click(function(){
+						$('html, body').animate({scrollTop : 0},1000);
+						return false;
+					});
+				Scrolltock();
+
+				$.fn.scrolltock = function() {
+					var link = $(this);
+					var page = jQuery(this).attr('href');
+					if (page === undefined) return;
+					var pattern = /#(.*)/;
+					var targetEl = page.match(pattern);
+					if (! targetEl.length) return;
+					if (! jQuery(targetEl[0]).length) return;
+
+					// close the menu hamburger
+					if (link.parents('ul.nav,ul.menu,ul.maximenuck').length) {
+						var menu = $(link.parents('ul.nav,ul.menu,ul.maximenuck')[0]);
+						if (menu.parent().find('> .mobileckhambuger_toggler').length && menu.parent().find('> .mobileckhambuger_toggler').attr('checked') == 'checked') {
+							menu.animate({'opacity' : '0'}, function() { menu.parent().find('> .mobileckhambuger_toggler').attr('checked', false); menu.css('opacity', '1'); });
+						}
+					}
+
+					var speed = link.attr('data-speed') ? link.attr('data-speed') : 1000;
+					var isMobile = ($(window).width() <= 0);
+					if (isMobile) {
+						var offsety = link.attr('data-mobile-offset') ? parseInt(link.attr('data-mobile-offset')) : 0;
+					} else {
+						var offsety = link.attr('data-offset') ? parseInt(link.attr('data-offset')) : 0;
+					}
+					jQuery('html, body').animate( { scrollTop: jQuery(targetEl[0]).offset().top + offsety }, speed, scrolltock_setActiveItem() );
+					return false;
+				}
+				// Cache selectors
+				var lastId,
+				baseItems = jQuery('a.scrollTo');
+				// Anchors corresponding to menu items
+				scrollItems = baseItems.map(function(){
+					// if (! jQuery(jQuery(this).attr('href')).length) return;
+					var pattern = /#(.*)/;
+					var targetEl = jQuery(this).attr('href').match(pattern);
+
+						if (targetEl == null ) return;
+						if (! targetEl[0]) return;
+						if (! jQuery(targetEl[0]).length) return;
+						var item = jQuery(targetEl[0]);
+					if (item.length) { return item; }
+				});
+				// Bind to scroll
+				jQuery(window).scroll(function(){
+					scrolltock_setActiveItem();
+				});
+				
+				function scrolltock_setActiveItem() {
+					var isMobile = ($(window).width() <= 0);
+					if (isMobile) {
+						var offsety = 0;
+					} else {
+						var offsety = 0;
+					}
+					// Get container scroll position
+					var fromTop = jQuery(this).scrollTop()- (offsety) + 2;
+
+					// Get id of current scroll item
+					var cur = scrollItems.map(function(){
+						if (jQuery(this).offset().top < fromTop)
+							return this;
+					});
+					if (cur.length) {
+						// Get the id of the current element
+						cur = cur[cur.length-1];
+						var id = cur && cur.length ? cur[0].id : '';
+						var targetParent = baseItems.end().filter('[href$="#'+id+'"]').parent();
+
+						if (lastId !== id || !targetParent.hasClass('active')) {
+						   lastId = id;
+						   // Set/remove active class
+							baseItems.parent().parent().find('.active').removeClass('active');
+							baseItems
+							 .parent().removeClass('active')
+							 .end().filter('[href$="#'+id+'"]').parent().addClass('active');
+						}
+					} else {
+						baseItems.parent().parent().find('.active').removeClass('active');
+						baseItems.parent().removeClass('active');
+					}                  
+				}
+			}); // end of dom ready
+
+			window.addEventListener("load", function(event) {
+
+				var pageurl, pattern, targetPage;
+				pageurl = window.location.href;
+				pattern = /#(.*)/;
+				targetPage = pageurl.match(pattern);
+
+				var scrolltock_animate = function() {
+					jQuery('html, body').animate( { scrollTop: jQuery(targetPage[0]).offset().top + 0 }, 1000 );
+				}
+				if (targetPage && jQuery(targetPage[0]).length) {
+					
+					scrolltock_animate();
+					setTimeout(function(){ scrolltock_animate(); }, 1000);
+				}
+			});
+
+			function scrolltock_removeHashFromUrl() {
+				var uri = window.location.toString();
+	  
+				if (uri.indexOf("#") > 0) {
+					var clean_uri = uri.substring(0,
+									uri.indexOf("#"));
+	  
+					window.history.replaceState({},
+							document.title, clean_uri);
+				}
+			}
+			
+		jQuery(function($) {
+			SqueezeBox.initialize({});
+			initSqueezeBox();
+			$(document).on('subform-row-add', initSqueezeBox);
+
+			function initSqueezeBox(event, container)
+			{
+				SqueezeBox.assign($(container || document).find('a.modal').get(), {
+					parse: 'rel'
+				});
+			}
+		});
+
+		window.jModalClose = function () {
+			SqueezeBox.close();
+		};
+
+		// Add extra modal close functionality for tinyMCE-based editors
+		document.onreadystatechange = function () {
+			if (document.readyState == 'interactive' && typeof tinyMCE != 'undefined' && tinyMCE)
+			{
+				if (typeof window.jModalClose_no_tinyMCE === 'undefined')
+				{
+					window.jModalClose_no_tinyMCE = typeof(jModalClose) == 'function'  ?  jModalClose  :  false;
+
+					jModalClose = function () {
+						if (window.jModalClose_no_tinyMCE) window.jModalClose_no_tinyMCE.apply(this, arguments);
+						tinyMCE.activeEditor.windowManager.close();
+					};
+				}
+
+				if (typeof window.SqueezeBoxClose_no_tinyMCE === 'undefined')
+				{
+					if (typeof(SqueezeBox) == 'undefined')  SqueezeBox = {};
+					window.SqueezeBoxClose_no_tinyMCE = typeof(SqueezeBox.close) == 'function'  ?  SqueezeBox.close  :  false;
+
+					SqueezeBox.close = function () {
+						if (window.SqueezeBoxClose_no_tinyMCE)  window.SqueezeBoxClose_no_tinyMCE.apply(this, arguments);
+						tinyMCE.activeEditor.windowManager.close();
+					};
+				}
+			}
+		};
+		
+	</script>
+
+<!-- Global site tag (gtag.js) - Google Analytics Milind -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QSLT84VG0Z"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-QSLT84VG0Z');
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-119552632-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-119552632-1');
+  gtag('config', 'AW-807172441');
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollegeOrUniversity",
+  "name": "Swami Keshvanand Institute of Technology Management & Gramothan, Jaipur",
+  "alternateName": [
+      "SKIT Jaipur",
+      "SKIT College",
+      "SKIT",
+      "SKIT M&G",
+      "Swami Keshvanand Institute of Technology",
+      "SKIT Engineering College"
+      ],
+  "url": "https://www.skit.ac.in",
+  "logo": "https://www.skit.ac.in/images/headers/skit_logo.png",
+  "telephone": "+911413500300",
+  "email": "info@skit.ac.in",
+  "sameAs": [
+      "https://www.facebook.com/SKITJAIP",
+      "https://www.instagram.com/skitjaipurofficial/",
+      "https://www.youtube.com/channel/UCkMtvOxbKCT6WelA6e4-W2A",
+      "https://twitter.com/skit_jaipur",
+      "https://www.linkedin.com/school/skit-jaipur"
+    ],
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Ram Nagariya",
+    "addressLocality": "Jagatpura",
+    "addressRegion": "Jaipur, Rajasthan",
+    "postalCode": "302017",
+    "addressCountry": "India"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "26.8230807",
+    "longitude": "75.8651279"
+  },
+  "hasMap": "https://www.google.com/maps/place/SKIT+college/@26.8230807,75.8651279,17z/data=!4m8!1m2!2m1!1sswami+keshvanand+institute+of+technology+jaipur+rajasthan!3m4!1s0x396db770070b115f:0x6f306afd08a3e737!8m2!3d26.8230887!4d75.8673405",
+  "award": "NAAC A++, Ranked No. 1 Engineering College in Rajasthan by RTU Kota",
+  "affiliation": "Rajasthan Technical University, Kota",
+  "description": "NAAC A++ Accreditated, Ranked No. 1 Engineering Program in Rajasthan by RTU Kota. Approved by AICTE. Branches accredited by NBA. Affiliated to Rajasthan Technical University, Kota. Established in 2000. Awarded for Excellence in Placements.",
+  "hasCredential": {
+    "@type": "EducationalOccupationalCredential",
+    "credentialCategory": "Accreditation",
+    "recognizedBy": {
+      "@type": "Organization",
+      "name": "National Board of Accreditation"
+    }
+  }
+}
+</script>
+<link rel="stylesheet" href="/templates/system/css/system.css" type="text/css" />
+<link rel="stylesheet" href="/templates/system/css/general.css" type="text/css" />
+<link rel="stylesheet" href="/templates/skittemplate/css/template.css" type="text/css" />
+<link rel="stylesheet" href="/templates/skittemplate/bootstrap-css/bootstrap.css" type="text/css" />
+  
+<!--<style type="text/css">
+.drawer {
+  min-height: 405px;
+}
+</style>-->
+<!--<script type="text/javascript" src="//code.jquery.com/ui/1.11.1/jquery-ui.js" defer></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js" integrity="sha512-PYku51kWkxxuh0OiQHi8INwfDEVcEe9JYBiZCA21G0ITGdEUU7scEhTyutt69jK591vKJmBhPMP+yYMd6J88nQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript" src="/templates/skittemplate/bootstrap-js/bootstrap.min.js" defer></script>
+<script type="text/javascript" src="/templates/skittemplate/bootstrap-js/flowtype.js" defer></script>
+<script type="text/javascript" src="/templates/skittemplate/js/custom.js" defer></script>
+<!--bootstrap css and js start-->
+<!--<script type="text/javascript">
+jQuery(document).ready(function() {
+		var s = jQuery(".main-menu");
+		var pos = s.position();
+		jQuery(window).scroll(function() {
+		var windowpos = jQuery(window).scrollTop();
+		if (windowpos >= pos.top) {
+		s.addClass("dt-fixed");
+		} else {
+		s.removeClass("dt-fixed");
+		}
+		});
+	jQuery('body').flowtype({
+   minimum   : 100,
+   maximum   : 1600,
+   minFont   : 12,
+   maxFont   : 14,
+   fontRatio : 50
+	});	
+}); 
+</script>-->
+<!--
+hidden after update to joomla 3.9.15 by Milind
+jdoc:include type="footer" -->
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "dam3pmzwwj");
+</script>
+</head>
+<body class="site  view- no-layout no-task itemid-408"><div class="dj-offcanvas-wrapper"><div class="dj-offcanvas-pusher"><div class="dj-offcanvas-pusher-in">
+<div class="skit-top">
+    <div class="custom-1200">
+	    		<div class="moduletable">
+						
+<ul id="dj-megamenu154" class="dj-megamenu dj-megamenu-custom154 horizontalMenu "
+	 data-trigger="979">
+<li class="dj-up itemid101 first parent"><a class="dj-up_a  " href="/" ><span class="dj-drop" >Home<em class="arrow" aria-hidden="true"></em></span></a><div class="dj-subwrap  single_column subcols1" style=""><div class="dj-subwrap-in" style="width:200px;"><div class="dj-subcol" style="width:200px"><ul class="dj-submenu"><li class="itemid402 first"><a href="/" >About SKIT</a></li><li class="itemid129"><a href="/home/our-inspiration.html" >Our Inspiration</a></li><li class="itemid694"><a href="/home/board-of-governance.html" >Board of Governance</a></li><li class="itemid716"><a href="/home/message.html" >Message</a></li><li class="itemid130"><a href="/home/vision-mission.html" >Vision, Mission &amp; Quality Policy</a></li><li class="itemid696"><a href="/home/institute-s-organogram.html" >Institute Organogram</a></li><li class="itemid921"><a href="/home/academic-council-autonomous.html" >Academic Council (Autonomous)</a></li><li class="itemid695"><a href="/home/academic-management-council.html" >Academic &amp; Management Council</a></li><li class="itemid836"><a href="/home/iqac.html" >IQAC</a></li><li class="itemid698"><a href="/images/policy.pdf" >Policy of the Institute</a></li><li class="itemid857"><a href="/home/perspective-plan.html" >Perspective Plan</a></li><li class="itemid697"><a href="/images/Value-Ethics-Code_of_conduct.pdf" target="_blank" >Values, Ethics &amp; Code of Conduct</a></li><li class="itemid700"><a href="/home/social-responsibility-gramothan.html" >Social Responsibility &amp; Gramothan</a></li><li class="itemid699"><a href="/home/award-recognition.html" >Awards &amp; Recognitions</a></li><li class="itemid693"><a href="/images/Best-Practices.pdf" >Best Practices</a></li></ul></div><div style="clear:both;height:0"></div></div></div></li><li class="dj-up itemid104 parent"><a class="dj-up_a  " href="/academics.html" ><span class="dj-drop" >Academics <em class="arrow" aria-hidden="true"></em></span></a><div class="dj-subwrap  single_column subcols1" style=""><div class="dj-subwrap-in" style="width:200px;"><div class="dj-subcol" style="width:200px"><ul class="dj-submenu"><li class="itemid920 first"><a href="/academics/autonomous.html" >Autonomous</a></li><li class="itemid134"><a href="/academics/programmes-offered.html" >Programmes</a></li><li class="itemid701"><a href="/academics/academic-calander.html" >Academic Calendar</a></li><li class="itemid702"><a href="/academics/syllabus.html" >Syllabus</a></li><li class="itemid703"><a href="/academics/academic-tie-ups.html" >MOUs &amp; Collaborations</a></li><li class="itemid738"><a href="/academics/e-slate.html" >e-SLATE</a></li></ul></div><div style="clear:both;height:0"></div></div></div></li><li class="dj-up itemid460 parent"><a class="dj-up_a  " href="/research.html" ><span class="dj-drop" >Research<em class="arrow" aria-hidden="true"></em></span></a><div class="dj-subwrap  single_column subcols1" style=""><div class="dj-subwrap-in" style="width:200px;"><div class="dj-subcol" style="width:200px"><ul class="dj-submenu"><li class="itemid487 first"><a href="/research/research-project.html" >Research Projects</a></li><li class="itemid855"><a href="/research/phd-supervisors.html" >PhD Supervisors</a></li><li class="itemid839 parent separator subtree"><a class="dj-more "   tabindex="0">Centers of Excellence<em class="arrow" aria-hidden="true"></em></a><ul class="dj-subtree"><li class="itemid837 first"><a href="/research/centers-of-excellence/coe-in-transportation-engineering.html" >Transportation Engineering</a></li><li class="itemid838"><a href="/research/centers-of-excellence/coe-in-iot.html" >Internet of Things (IoT)</a></li><li class="itemid895"><a href="/research/centers-of-excellence/antena-microwave-and-rf-engineering.html" >Antenna, Microwave and RF Engineering</a></li><li class="itemid939"><a href="/research/centers-of-excellence/artificial-intelligence.html" >Artificial Intelligence &amp; Machine Learning</a></li></ul></li><li class="itemid704"><a href="/research/patents.html" >Patents</a></li><li class="itemid705"><a href="/research/publications.html" >Publications</a></li><li class="itemid489"><a href="http://ijskit.org/" target="_blank" >SKIT Research Journal</a></li><li class="itemid706"><a href="/research/research-events.html" >Research Events</a></li></ul></div><div style="clear:both;height:0"></div></div></div></li><li class="dj-up itemid103 parent separator"><a class="dj-up_a  "   tabindex="0"><span class="dj-drop" >Admissions<em class="arrow" aria-hidden="true"></em></span></a><div class="dj-subwrap  single_column subcols1" style=""><div class="dj-subwrap-in" style="width:200px;"><div class="dj-subcol" style="width:200px"><ul class="dj-submenu"><li class="itemid131 first"><a href="/admissions/b-tech-i-year.html" >B.Tech I Year</a></li><li class="itemid132"><a href="/admissions/b-tech-ii-year.html" >B.Tech II Year (Lateral Entry)</a></li><li class="itemid133"><a href="/admissions/m-tech.html" >M.Tech</a></li><li class="itemid391"><a href="/admissions/m-b-a.html" >M.B.A.</a></li><li class="itemid736"><a href="/admissions/ph-d.html" >Ph.D</a></li><li class="itemid414"><a href="/admissions/hostel-facility.html" >Hostel Facility</a></li><li class="itemid416"><a href="/admissions/education-loan.html" >Education Loan</a></li><li class="itemid491"><a href="/admissions/frequently-asked-queries.html" >FAQs - Admission</a></li><li class="itemid497"><a href="/admissions/faqs-hostel.html" >FAQs - Hostel</a></li><li class="itemid116"><a href="/admissions/infrastructure.html" >Infrastructure</a></li><li class="itemid559"><a href="/admissions/branch-change-process.html" >Branch Change (2nd Year)</a></li><li class="itemid907"><a href="/admissions/internal-sliding-first-year.html" >Internal Sliding (First Year)</a></li></ul></div><div style="clear:both;height:0"></div></div></div></li><li class="dj-up itemid709 parent separator"><a class="dj-up_a  "   tabindex="0"><span class="dj-drop" >NAAC<em class="arrow" aria-hidden="true"></em></span></a><div class="dj-subwrap  single_column subcols1" style=""><div class="dj-subwrap-in" style="width:200px;"><div class="dj-subcol" style="width:200px"><ul class="dj-submenu"><li class="itemid881 first"><a href="/naac/naac-certificate.html" >NAAC Certificate</a></li><li class="itemid885"><a href="/naac/aqar.html" >AQAR</a></li><li class="itemid859"><a href="/images/Undertaking.pdf" >Undertaking</a></li><li class="itemid880"><a href="/images/IIQA.pdf" >IIQA</a></li><li class="itemid870"><a href="/images/SSR_after_DVV.pdf" >SSR </a></li><li class="itemid882"><a href="/naac/dvv.html" >DVV</a></li><li class="itemid886"><a href="https://www.skit.ac.in/home/iqac.html" >IQAC</a></li></ul></div><div style="clear:both;height:0"></div></div></div></li><li class="dj-up itemid464 parent separator"><a class="dj-up_a  "   tabindex="0"><span class="dj-drop" >Accreditation &amp; Approval<em class="arrow" aria-hidden="true"></em></span></a><div class="dj-subwrap  single_column subcols1" style=""><div class="dj-subwrap-in" style="width:200px;"><div class="dj-subcol" style="width:200px"><ul class="dj-submenu"><li class="itemid453 first"><a href="/important-links/aicte-approval.html" >AICTE Approval</a></li><li class="itemid761"><a href="/important-links/rtu-affiliation-letter.html" >RTU Affiliation Letter</a></li><li class="itemid898 parent separator subtree"><a class="dj-more "   tabindex="0">Accreditation<em class="arrow" aria-hidden="true"></em></a><ul class="dj-subtree"><li class="itemid449 first"><a href="/important-links/accreditation/nba-accreditation-details.html" >NBA Accreditation</a></li><li class="itemid899"><a href="/important-links/accreditation/naac-certificate.html" >NAAC Certificate</a></li></ul></li><li class="itemid900 parent separator subtree"><a class="dj-more "   tabindex="0">Ranking<em class="arrow" aria-hidden="true"></em></a><ul class="dj-subtree"><li class="itemid719 first"><a href="/important-links/ranking/nirf.html" >NIRF</a></li><li class="itemid524"><a href="https://www.skit.ac.in/ARI-C-25123.pdf" target="_blank">ARIIA 2020 Report</a></li></ul></li><li class="itemid902 parent separator subtree"><a class="dj-more "   tabindex="0">Minute of Meetings<em class="arrow" aria-hidden="true"></em></a><ul class="dj-subtree"><li class="itemid903 first"><a href="/important-links/minute-of-meetings/board-of-governors.html" >Board of Governors</a></li><li class="itemid904"><a href="/important-links/minute-of-meetings/academic-management-council.html" >Academic &amp; Management Council</a></li></ul></li><li class="itemid521 parent separator subtree"><a class="dj-more "   tabindex="0">Mandatory Disclosure<em class="arrow" aria-hidden="true"></em></a><ul class="dj-subtree"><li class="itemid732 first"><a href="/important-links/mandatory-disclosure/aishe.html" >AISHE</a></li><li class="itemid723"><a href="/important-links/mandatory-disclosure/accounts.html" >Audit Statement</a></li><li class="itemid905"><a href="/important-links/mandatory-disclosure/aicte.html" >AICTE</a></li></ul></li><li class="itemid908"><a href="/important-links/aicte-reports.html" >AICTE Reports</a></li><li class="itemid424"><a href="https://erp.skit.ac.in" target="_blank" >ERP</a></li><li class="itemid520"><a href="/important-links/student-faculty-feedback.html" target="_blank" >Student Faculty Feedback</a></li></ul></div><div style="clear:both;height:0"></div></div></div></li><li class="dj-up itemid106 parent"><a class="dj-up_a  " href="/contact-us.html" ><span class="dj-drop" >Contact Us<em class="arrow" aria-hidden="true"></em></span></a><div class="dj-subwrap  single_column subcols1" style=""><div class="dj-subwrap-in" style="width:200px;"><div class="dj-subcol" style="width:200px"><ul class="dj-submenu"><li class="itemid536 first"><a href="/contact-us.html" >Write to Us</a></li><li class="itemid480"><a href="/contact-us/how-to-reach.html" >How to Reach</a></li><li class="itemid537"><a href="https://www.google.com/maps/dir//Swami+Keshvanand+Institute+of+Technology,+Management+and+Gramothan+(SKIT+Jaipur),+Ram+Nagariya+Rd,+Shivam+Nagar,+Jagatpura,+Jaipur,+Rajasthan+302017/@26.8195003,75.8619861,16z/data=!4m9!4m8!1m0!1m5!1m1!1s0x396db770070b115f:0x6f306afd08a3e737!2m2!1d75.866787!2d26.8230484!3e0" target="_blank" >Google Maps - Directions</a></li><li class="itemid534"><a href="/contact-us/careers.html" >Careers</a></li><li class="itemid292"><a href="/contact-us/login.html" >Login</a></li></ul></div><div style="clear:both;height:0"></div></div></div></li><li class="dj-up itemid733 parent"><a class="dj-up_a  " href="/feedback.html" ><span class="dj-drop" >Feedback<em class="arrow" aria-hidden="true"></em></span></a><div class="dj-subwrap  single_column subcols1" style=""><div class="dj-subwrap-in" style="width:200px;"><div class="dj-subcol" style="width:200px"><ul class="dj-submenu"><li class="itemid739 first parent separator subtree"><a class="dj-more "   tabindex="0">Submission<em class="arrow" aria-hidden="true"></em></a><ul class="dj-subtree"><li class="itemid742 first"><a href="https://erp.skit.ac.in" target="_blank" >Student</a></li><li class="itemid743"><a href="https://erp.skit.ac.in" target="_blank" >Faculty</a></li><li class="itemid823"><a href="https://forms.gle/CXp7voJkCtgAaXhz8" target="_blank" >Parents</a></li><li class="itemid744"><a href="https://alumni.skit.ac.in/" target="_blank" >Alumni</a></li><li class="itemid745"><a href="https://forms.gle/Hs7RWqggxkHrJwMZ7" target="_blank" >Employer</a></li></ul></li><li class="itemid740 parent separator subtree"><a class="dj-more "   tabindex="0">Analysis<em class="arrow" aria-hidden="true"></em></a><ul class="dj-subtree"><li class="itemid746 first"><a href="/images/Student_Feedback_analysis_2022-23.pdf" target="_blank" >Student</a></li><li class="itemid747"><a href="/images/Faculty_Feedback_Analysis.pdf" target="_blank" >Faculty</a></li><li class="itemid848"><a href="/images/Parents_Feedback_Analysis.pdf" target="_blank" >Parents</a></li><li class="itemid748"><a href="/images/Alumni_Feedback_Analysis.pdf" target="_blank" >Alumni</a></li><li class="itemid749"><a href="/images/Employer_Feedback_Analysis.pdf" target="_blank" >Employer</a></li></ul></li><li class="itemid741 parent separator subtree"><a class="dj-more "   tabindex="0">Action taken<em class="arrow" aria-hidden="true"></em></a><ul class="dj-subtree"><li class="itemid873 first"><a href="/images/Action_Taken_Report.pdf" >Action taken 2022-23</a></li></ul></li></ul></div><div style="clear:both;height:0"></div></div></div></li></ul>
+
+
+	<div id="dj-megamenu154mobile" class="dj-megamenu-accordion dj-megamenu-accordion-custom154 dj-pos-static  dj-align-right ">
+		<a href="#" class="dj-mobile-open-btn" aria-label="Open mobile menu"><span class="fa fa-bars" aria-hidden="true"></span></a>		
+		<div class="dj-accordion dj-accordion-custom154 ">
+			<div class="dj-accordion-in">
+				<ul class="dj-mobile-nav dj-mobile-custom154 ">
+<li class="dj-mobileitem itemid-101 deeper parent"><a href="/" >Home</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-402"><a href="/" >About SKIT</a></li><li class="dj-mobileitem itemid-129"><a href="/home/our-inspiration.html" >Our Inspiration</a></li><li class="dj-mobileitem itemid-694"><a href="/home/board-of-governance.html" >Board of Governance</a></li><li class="dj-mobileitem itemid-716"><a href="/home/message.html" >Message</a></li><li class="dj-mobileitem itemid-130"><a href="/home/vision-mission.html" >Vision, Mission &amp; Quality Policy</a></li><li class="dj-mobileitem itemid-696"><a href="/home/institute-s-organogram.html" >Institute Organogram</a></li><li class="dj-mobileitem itemid-921"><a href="/home/academic-council-autonomous.html" >Academic Council (Autonomous)</a></li><li class="dj-mobileitem itemid-695"><a href="/home/academic-management-council.html" >Academic &amp; Management Council</a></li><li class="dj-mobileitem itemid-836"><a href="/home/iqac.html" >IQAC</a></li><li class="dj-mobileitem itemid-698"><a href="/images/policy.pdf" >Policy of the Institute</a></li><li class="dj-mobileitem itemid-857"><a href="/home/perspective-plan.html" >Perspective Plan</a></li><li class="dj-mobileitem itemid-697"><a href="/images/Value-Ethics-Code_of_conduct.pdf" target="_blank" >Values, Ethics &amp; Code of Conduct</a></li><li class="dj-mobileitem itemid-700"><a href="/home/social-responsibility-gramothan.html" >Social Responsibility &amp; Gramothan</a></li><li class="dj-mobileitem itemid-699"><a href="/home/award-recognition.html" >Awards &amp; Recognitions</a></li><li class="dj-mobileitem itemid-693"><a href="/images/Best-Practices.pdf" >Best Practices</a></li></ul></li><li class="dj-mobileitem itemid-104 deeper parent"><a href="/academics.html" >Academics </a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-920"><a href="/academics/autonomous.html" >Autonomous</a></li><li class="dj-mobileitem itemid-134"><a href="/academics/programmes-offered.html" >Programmes</a></li><li class="dj-mobileitem itemid-701"><a href="/academics/academic-calander.html" >Academic Calendar</a></li><li class="dj-mobileitem itemid-702"><a href="/academics/syllabus.html" >Syllabus</a></li><li class="dj-mobileitem itemid-703"><a href="/academics/academic-tie-ups.html" >MOUs &amp; Collaborations</a></li><li class="dj-mobileitem itemid-738"><a href="/academics/e-slate.html" >e-SLATE</a></li></ul></li><li class="dj-mobileitem itemid-460 deeper parent"><a href="/research.html" >Research</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-487"><a href="/research/research-project.html" >Research Projects</a></li><li class="dj-mobileitem itemid-855"><a href="/research/phd-supervisors.html" >PhD Supervisors</a></li><li class="dj-mobileitem itemid-839 divider deeper parent"><a   tabindex="0">Centers of Excellence</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-837"><a href="/research/centers-of-excellence/coe-in-transportation-engineering.html" >Transportation Engineering</a></li><li class="dj-mobileitem itemid-838"><a href="/research/centers-of-excellence/coe-in-iot.html" >Internet of Things (IoT)</a></li><li class="dj-mobileitem itemid-895"><a href="/research/centers-of-excellence/antena-microwave-and-rf-engineering.html" >Antenna, Microwave and RF Engineering</a></li><li class="dj-mobileitem itemid-939"><a href="/research/centers-of-excellence/artificial-intelligence.html" >Artificial Intelligence &amp; Machine Learning</a></li></ul></li><li class="dj-mobileitem itemid-704"><a href="/research/patents.html" >Patents</a></li><li class="dj-mobileitem itemid-705"><a href="/research/publications.html" >Publications</a></li><li class="dj-mobileitem itemid-489"><a href="http://ijskit.org/" target="_blank" >SKIT Research Journal</a></li><li class="dj-mobileitem itemid-706"><a href="/research/research-events.html" >Research Events</a></li></ul></li><li class="dj-mobileitem itemid-103 divider deeper parent"><a   tabindex="0">Admissions</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-131"><a href="/admissions/b-tech-i-year.html" >B.Tech I Year</a></li><li class="dj-mobileitem itemid-132"><a href="/admissions/b-tech-ii-year.html" >B.Tech II Year (Lateral Entry)</a></li><li class="dj-mobileitem itemid-133"><a href="/admissions/m-tech.html" >M.Tech</a></li><li class="dj-mobileitem itemid-391"><a href="/admissions/m-b-a.html" >M.B.A.</a></li><li class="dj-mobileitem itemid-736"><a href="/admissions/ph-d.html" >Ph.D</a></li><li class="dj-mobileitem itemid-414"><a href="/admissions/hostel-facility.html" >Hostel Facility</a></li><li class="dj-mobileitem itemid-416"><a href="/admissions/education-loan.html" >Education Loan</a></li><li class="dj-mobileitem itemid-491"><a href="/admissions/frequently-asked-queries.html" >FAQs - Admission</a></li><li class="dj-mobileitem itemid-497"><a href="/admissions/faqs-hostel.html" >FAQs - Hostel</a></li><li class="dj-mobileitem itemid-116"><a href="/admissions/infrastructure.html" >Infrastructure</a></li><li class="dj-mobileitem itemid-559"><a href="/admissions/branch-change-process.html" >Branch Change (2nd Year)</a></li><li class="dj-mobileitem itemid-907"><a href="/admissions/internal-sliding-first-year.html" >Internal Sliding (First Year)</a></li></ul></li><li class="dj-mobileitem itemid-709 divider deeper parent"><a   tabindex="0">NAAC</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-881"><a href="/naac/naac-certificate.html" >NAAC Certificate</a></li><li class="dj-mobileitem itemid-885"><a href="/naac/aqar.html" >AQAR</a></li><li class="dj-mobileitem itemid-859"><a href="/images/Undertaking.pdf" >Undertaking</a></li><li class="dj-mobileitem itemid-880"><a href="/images/IIQA.pdf" >IIQA</a></li><li class="dj-mobileitem itemid-870"><a href="/images/SSR_after_DVV.pdf" >SSR </a></li><li class="dj-mobileitem itemid-882"><a href="/naac/dvv.html" >DVV</a></li><li class="dj-mobileitem itemid-886"><a href="https://www.skit.ac.in/home/iqac.html" >IQAC</a></li></ul></li><li class="dj-mobileitem itemid-464 divider deeper parent"><a   tabindex="0">Accreditation &amp; Approval</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-453"><a href="/important-links/aicte-approval.html" >AICTE Approval</a></li><li class="dj-mobileitem itemid-761"><a href="/important-links/rtu-affiliation-letter.html" >RTU Affiliation Letter</a></li><li class="dj-mobileitem itemid-898 divider deeper parent"><a   tabindex="0">Accreditation</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-449"><a href="/important-links/accreditation/nba-accreditation-details.html" >NBA Accreditation</a></li><li class="dj-mobileitem itemid-899"><a href="/important-links/accreditation/naac-certificate.html" >NAAC Certificate</a></li></ul></li><li class="dj-mobileitem itemid-900 divider deeper parent"><a   tabindex="0">Ranking</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-719"><a href="/important-links/ranking/nirf.html" >NIRF</a></li><li class="dj-mobileitem itemid-524"><a href="https://www.skit.ac.in/ARI-C-25123.pdf" target="_blank">ARIIA 2020 Report</a></li></ul></li><li class="dj-mobileitem itemid-902 divider deeper parent"><a   tabindex="0">Minute of Meetings</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-903"><a href="/important-links/minute-of-meetings/board-of-governors.html" >Board of Governors</a></li><li class="dj-mobileitem itemid-904"><a href="/important-links/minute-of-meetings/academic-management-council.html" >Academic &amp; Management Council</a></li></ul></li><li class="dj-mobileitem itemid-521 divider deeper parent"><a   tabindex="0">Mandatory Disclosure</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-732"><a href="/important-links/mandatory-disclosure/aishe.html" >AISHE</a></li><li class="dj-mobileitem itemid-723"><a href="/important-links/mandatory-disclosure/accounts.html" >Audit Statement</a></li><li class="dj-mobileitem itemid-905"><a href="/important-links/mandatory-disclosure/aicte.html" >AICTE</a></li></ul></li><li class="dj-mobileitem itemid-908"><a href="/important-links/aicte-reports.html" >AICTE Reports</a></li><li class="dj-mobileitem itemid-424"><a href="https://erp.skit.ac.in" target="_blank" >ERP</a></li><li class="dj-mobileitem itemid-520"><a href="/important-links/student-faculty-feedback.html" target="_blank" >Student Faculty Feedback</a></li></ul></li><li class="dj-mobileitem itemid-106 deeper parent"><a href="/contact-us.html" >Contact Us</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-536"><a href="/contact-us.html" >Write to Us</a></li><li class="dj-mobileitem itemid-480"><a href="/contact-us/how-to-reach.html" >How to Reach</a></li><li class="dj-mobileitem itemid-537"><a href="https://www.google.com/maps/dir//Swami+Keshvanand+Institute+of+Technology,+Management+and+Gramothan+(SKIT+Jaipur),+Ram+Nagariya+Rd,+Shivam+Nagar,+Jagatpura,+Jaipur,+Rajasthan+302017/@26.8195003,75.8619861,16z/data=!4m9!4m8!1m0!1m5!1m1!1s0x396db770070b115f:0x6f306afd08a3e737!2m2!1d75.866787!2d26.8230484!3e0" target="_blank" >Google Maps - Directions</a></li><li class="dj-mobileitem itemid-534"><a href="/contact-us/careers.html" >Careers</a></li><li class="dj-mobileitem itemid-292"><a href="/contact-us/login.html" >Login</a></li></ul></li><li class="dj-mobileitem itemid-733 deeper parent"><a href="/feedback.html" >Feedback</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-739 divider deeper parent"><a   tabindex="0">Submission</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-742"><a href="https://erp.skit.ac.in" target="_blank" >Student</a></li><li class="dj-mobileitem itemid-743"><a href="https://erp.skit.ac.in" target="_blank" >Faculty</a></li><li class="dj-mobileitem itemid-823"><a href="https://forms.gle/CXp7voJkCtgAaXhz8" target="_blank" >Parents</a></li><li class="dj-mobileitem itemid-744"><a href="https://alumni.skit.ac.in/" target="_blank" >Alumni</a></li><li class="dj-mobileitem itemid-745"><a href="https://forms.gle/Hs7RWqggxkHrJwMZ7" target="_blank" >Employer</a></li></ul></li><li class="dj-mobileitem itemid-740 divider deeper parent"><a   tabindex="0">Analysis</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-746"><a href="/images/Student_Feedback_analysis_2022-23.pdf" target="_blank" >Student</a></li><li class="dj-mobileitem itemid-747"><a href="/images/Faculty_Feedback_Analysis.pdf" target="_blank" >Faculty</a></li><li class="dj-mobileitem itemid-848"><a href="/images/Parents_Feedback_Analysis.pdf" target="_blank" >Parents</a></li><li class="dj-mobileitem itemid-748"><a href="/images/Alumni_Feedback_Analysis.pdf" target="_blank" >Alumni</a></li><li class="dj-mobileitem itemid-749"><a href="/images/Employer_Feedback_Analysis.pdf" target="_blank" >Employer</a></li></ul></li><li class="dj-mobileitem itemid-741 divider deeper parent"><a   tabindex="0">Action taken</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-873"><a href="/images/Action_Taken_Report.pdf" >Action taken 2022-23</a></li></ul></li></ul></li></ul>
+			</div>
+		</div>
+	</div>
+
+		</div>
+	 
+    </div>
+</div>
+<div style="clear:both;"></div>
+<!--Top End-->
+<!--Header Start-->
+<div class="skit-header">
+    <div class="custom-1200">
+                <div class="col-sm-5 col-md-6">
+                     
+                </div>
+                <div class="col-sm-5 col-sm-offset-2 col-md-6 col-md-offset-0">        
+                    
+                </div>
+    </div>
+</div>
+<div style="clear:both;"></div>
+<div class="col-md-12 nopadding header_area">
+ <div class="container nopadding">
+                		<div class="moduletable">
+						
+
+<div class="custom"  >
+	<div class="col-md-2 nopadding logo_sec"><a href="https://www.skit.ac.in/"><img class="img-responsive" src="/images/headers/skit_logo.png" alt="" /></a></div>
+<div class="col-md-8 mid_sec">
+<h2><strong>Swami Keshvanand Institute of Technology,</strong></h2>
+<h3>Management &amp; Gramothan, Jaipur</h3>
+<h5>(An Autonomous Institute Affiliated to Rajasthan Technical University, Kota)</h5>
+<a href="https://www.skit.ac.in/images/pdf/RTU_QIV_Rankings_awarded_for_AY_2023-24.pdf" target="_blank"><h5 style="color: #4a906d;">SKIT has been ranked no. 1 in Engineering Program in Rajasthan consecutively for the 7th year (2017-18 to 2023-24) by RTU, Kota</h5></a>
+</div>
+<div class="col-md-2 nopadding photo_sec"><img class="img-responsive" src="/images/headers/swamiji_photo.png" alt="" /></div>
+<div style="clear: both;"></div>
+<div class="col-md-12 nopadding header_contact head_top">
+<div class="col-md-3 nopadding colg_code"><strong>College Code REAP: 1031, RMAP: 302</strong></div>
+<div class="col-md-3 rect_desk"><strong style="color: #4a906d;">Creating Winners for Life....</strong></div>
+<div class="col-md-3 rect_desk"><strong>&#9742;:Admission Helpline: <a href="tel:+91-8505003008">8505003008</a></strong></div>
+<div class="col-md-3 nopadding toll_free"><a href="https://erp.skit.ac.in/admission_enquiry"><img src="/images/enquiry.png" width="150px" /></a></div>
+<!--<div class="col-md-3 nopadding toll_free"><a href="https://www.skit.ac.in/images/Document_Verification_Checklis_REAP2025.pdf"><img src="/images/document_checklist.png" width="150px" /></a></div>-->
+</div>
+<div style="clear: both;"></div>
+<hr style="margin-bottom:0px;margin-top:0px">
+<div style="text-align: center; "><span id="blink" style="text-align: center; line-height: 24px;"><strong style="color: #942a25;">Admission Cell Timings:  8am-4pm (all working days) | 9am-4pm (Sunday)  |  <a href="https://www.skit.ac.in/admissions/b-tech-i-year.html">B.Tech Admission Open, click here</a>
+</strong><span style="display:none"><br />
+<a href="https://www.skit.ac.in/reap-reporting-instructions.html"><strong style="color: #324a8a;">REAP-2022 Reporting Instructions
+</strong></a></span>
+</span>
+</div>
+
+<script type="text/javascript">
+        var blink = document.getElementById('blink');
+        setInterval(function() {
+            blink.style.opacity = (blink.style.opacity == 0.3 ? 1 : 0.3);
+        }, 1000);
+    </script></div>
+		</div>
+	
+            </div> 
+</div>            
+<div style="clear:both;"></div>
+<!--Header End-->
+<!--Main Menu Start-->
+    <div class="main-menu">
+        <div class="custom-1200">            
+          		<div class="moduletable">
+						
+<ul id="dj-megamenu155" class="dj-megamenu dj-megamenu-custom155 horizontalMenu "
+	 data-trigger="979">
+<li class="dj-up itemid117 first parent separator"><a class="dj-up_a  "   tabindex="0"><span class="dj-drop" >Departments<em class="arrow" aria-hidden="true"></em></span></a><div class="dj-subwrap  single_column subcols1" style=""><div class="dj-subwrap-in" style="width:200px;"><div class="dj-subcol" style="width:200px"><ul class="dj-submenu"><li class="itemid263 first"><a href="/departments/basic-sciences-and-humanities.html" >Basic Sciences and Humanities</a></li><li class="itemid245"><a href="/departments/ce-menu.html" >Civil Engineering </a></li><li class="itemid171"><a href="/departments/computer-science-engineering.html" >Computer Science &amp; Engineering</a></li><li class="itemid227"><a href="/departments/electronics-and-communication-engineering.html" >Electronics and Communication Engineering  </a></li><li class="itemid228"><a href="/departments/electrical-engineering.html" >Electrical Engineering  </a></li><li class="itemid209"><a href="/departments/information-technology.html" >Information Technology</a></li><li class="itemid154"><a href="/departments/mechanical-engineering.html" >Mechanical Engineering</a></li><li class="itemid278"><a href="/departments/management-studies.html" >Management Studies</a></li></ul></div><div style="clear:both;height:0"></div></div></div></li><li class="dj-up itemid352"><a class="dj-up_a  " href="/examination-cell.html" ><span >Examination Cell</span></a></li><li class="dj-up itemid714 parent separator"><a class="dj-up_a  "   tabindex="0"><span class="dj-drop" >Institute Initiatives<em class="arrow" aria-hidden="true"></em></span></a><div class="dj-subwrap  single_column subcols1" style=""><div class="dj-subwrap-in" style="width:200px;"><div class="dj-subcol" style="width:200px"><ul class="dj-submenu"><li class="itemid724 first"><a href="/techno-incubation-centre/srijan.html" >Incubation Centre</a></li><li class="itemid854"><a href="/techno-incubation-centre/e-cell.html" >E-Cell</a></li><li class="itemid852"><a href="/techno-incubation-centre/universal-human-values-uhv.html" >Universal Human Values</a></li><li class="itemid708"><a href="/techno-incubation-centre/e-yantra.html" >e-Yantra</a></li><li class="itemid856"><a href="/techno-incubation-centre/ipr-cell.html" >IPR Cell</a></li><li class="itemid932"><a href="/techno-incubation-centre/idea-lab.html" >Idea Lab</a></li></ul></div><div style="clear:both;height:0"></div></div></div></li><li class="dj-up itemid118"><a class="dj-up_a  " href="/training-placement.html" ><span >T&amp;P Cell</span></a></li><li class="dj-up itemid122"><a class="dj-up_a  " href="/library.html" ><span >Library</span></a></li><li class="dj-up itemid715 parent separator"><a class="dj-up_a  "   tabindex="0"><span class="dj-drop" >Student Corner<em class="arrow" aria-hidden="true"></em></span></a><div class="dj-subwrap  single_column subcols1" style=""><div class="dj-subwrap-in" style="width:200px;"><div class="dj-subcol" style="width:200px"><ul class="dj-submenu"><li class="itemid731 first"><a href="https://www.skit.ac.in/noticess.html" >Notices</a></li><li class="itemid729"><a href="/student-corner/student-chapters.html" >Student Chapters</a></li><li class="itemid105"><a href="/student-corner/students-s-life.html" >Student Clubs</a></li><li class="itemid140"><a href="/student-corner/skit-times.html" >SKIT Times</a></li><li class="itemid730"><a href="/student-corner/scholarships.html" >Scholarships</a></li><li class="itemid413"><a href="/student-corner/conveyance-facility.html" >Conveyance Facility</a></li><li class="itemid760"><a href="/student-corner/grievance-student.html" >Grievance Redressal</a></li><li class="itemid906"><a href="/student-corner/anti-ragging.html" >Anti-Ragging</a></li></ul></div><div style="clear:both;height:0"></div></div></div></li><li class="dj-up itemid120"><a class="dj-up_a  " href="https://alumni.skit.ac.in/" target="_blank" ><span >Alumni Corner</span></a></li><li class="dj-up itemid417"><a class="dj-up_a  " href="https://erp.skit.ac.in/payments" target="_blank" ><span >Online Payment</span></a></li></ul>
+
+
+	<div id="dj-megamenu155mobile" class="dj-megamenu-accordion dj-megamenu-accordion-custom155 dj-pos-static  dj-align-right ">
+		<a href="#" class="dj-mobile-open-btn" aria-label="Open mobile menu"><span class="fa fa-bars" aria-hidden="true"></span></a>		
+		<div class="dj-accordion dj-accordion-custom155 ">
+			<div class="dj-accordion-in">
+				<ul class="dj-mobile-nav dj-mobile-custom155 ">
+<li class="dj-mobileitem itemid-117 divider deeper parent"><a   tabindex="0">Departments</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-263"><a href="/departments/basic-sciences-and-humanities.html" >Basic Sciences and Humanities</a></li><li class="dj-mobileitem itemid-245"><a href="/departments/ce-menu.html" >Civil Engineering </a></li><li class="dj-mobileitem itemid-171"><a href="/departments/computer-science-engineering.html" >Computer Science &amp; Engineering</a></li><li class="dj-mobileitem itemid-227"><a href="/departments/electronics-and-communication-engineering.html" >Electronics and Communication Engineering  </a></li><li class="dj-mobileitem itemid-228"><a href="/departments/electrical-engineering.html" >Electrical Engineering  </a></li><li class="dj-mobileitem itemid-209"><a href="/departments/information-technology.html" >Information Technology</a></li><li class="dj-mobileitem itemid-154"><a href="/departments/mechanical-engineering.html" >Mechanical Engineering</a></li><li class="dj-mobileitem itemid-278"><a href="/departments/management-studies.html" >Management Studies</a></li></ul></li><li class="dj-mobileitem itemid-352"><a href="/examination-cell.html" >Examination Cell</a></li><li class="dj-mobileitem itemid-714 divider deeper parent"><a   tabindex="0">Institute Initiatives</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-724"><a href="/techno-incubation-centre/srijan.html" >Incubation Centre</a></li><li class="dj-mobileitem itemid-854"><a href="/techno-incubation-centre/e-cell.html" >E-Cell</a></li><li class="dj-mobileitem itemid-852"><a href="/techno-incubation-centre/universal-human-values-uhv.html" >Universal Human Values</a></li><li class="dj-mobileitem itemid-708"><a href="/techno-incubation-centre/e-yantra.html" >e-Yantra</a></li><li class="dj-mobileitem itemid-856"><a href="/techno-incubation-centre/ipr-cell.html" >IPR Cell</a></li><li class="dj-mobileitem itemid-932"><a href="/techno-incubation-centre/idea-lab.html" >Idea Lab</a></li></ul></li><li class="dj-mobileitem itemid-118"><a href="/training-placement.html" >T&amp;P Cell</a></li><li class="dj-mobileitem itemid-122"><a href="/library.html" >Library</a></li><li class="dj-mobileitem itemid-715 divider deeper parent"><a   tabindex="0">Student Corner</a><ul class="dj-mobile-nav-child"><li class="dj-mobileitem itemid-731"><a href="https://www.skit.ac.in/noticess.html" >Notices</a></li><li class="dj-mobileitem itemid-729"><a href="/student-corner/student-chapters.html" >Student Chapters</a></li><li class="dj-mobileitem itemid-105"><a href="/student-corner/students-s-life.html" >Student Clubs</a></li><li class="dj-mobileitem itemid-140"><a href="/student-corner/skit-times.html" >SKIT Times</a></li><li class="dj-mobileitem itemid-730"><a href="/student-corner/scholarships.html" >Scholarships</a></li><li class="dj-mobileitem itemid-413"><a href="/student-corner/conveyance-facility.html" >Conveyance Facility</a></li><li class="dj-mobileitem itemid-760"><a href="/student-corner/grievance-student.html" >Grievance Redressal</a></li><li class="dj-mobileitem itemid-906"><a href="/student-corner/anti-ragging.html" >Anti-Ragging</a></li></ul></li><li class="dj-mobileitem itemid-120"><a href="https://alumni.skit.ac.in/" target="_blank" >Alumni Corner</a></li><li class="dj-mobileitem itemid-417"><a href="https://erp.skit.ac.in/payments" target="_blank" >Online Payment</a></li></ul>
+			</div>
+		</div>
+	</div>
+
+		</div>
+	
+        </div>
+    </div>       
+<div style="clear:both;"></div>
+<!--Main Menu End-->
+<!--Drawer Start-->
+            <div class="drawer">
+                		<div class="moduletable">
+						<img src='https://www.skit.ac.in/images/innerf.jpg' alt='SKIT COLLEGE' class='img-responsive custom-intro-img'><style>
+.custom-intro-img
+{
+	margin:auto;
+}
+</style>		</div>
+	
+            </div>          
+<div style="clear:both;"></div>            
+<!--Drawer end-->
+<!--Content or sidebar start-->
+<div class="custom-fixed-content">
+<div class="custom-main-content">
+                <div class="custom-1200">  
+                        <div class="col-md-8">
+                            <div class="content-area">
+                                <div class="item-page" itemscope itemtype="http://schema.org/Article">
+	<meta itemprop="inLanguage" content="en-GB" />
+				<div class="page-header">
+    
+    
+		<h2 itemprop="name" class="custom-title-page">
+												<span>Brochure</span>									</h2>
+        
+							</div>
+					
+	
+	
+		
+								<div itemprop="articleBody">
+		 	</div>
+
+	
+						 </div>
+                            </div>
+                        </div>
+						                        <div class="col-md-4">
+                        <div class="side-bar">                        
+                            		<div class="moduletable custom-enquire">
+						
+
+<div class="custom custom-enquire"  >
+	<!--<div class="col-md-12">
+	<p style="padding-top: 0;">EDUCATION is not preparation for life; education is life itself.</p>
+</div>-->
+<div class="modal fade bs-example-modal-lg">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Enquire NOW</h4><button class="close" type="button" data-dismiss="modal">&times;<span class="sr-only">Close</span> </button>
+			</div>
+			<div class="col-md-4">
+				<p class="modal-code">REAP code : 1031</p>
+				<p><img src="/images/skit-logo.png" alt="" />
+				</p>
+			</div>
+			<div class="col-md-8">
+		<script type="text/javascript">
+		if("undefined"==typeof window.jQuery){}else{
+			var gcore_jQuery_bak = window.jQuery;
+			var gcore_$_bak = window.$;
+		}
+		if("undefined"==typeof gcore_jQuery){}else{
+			window.jQuery = gcore_jQuery;
+			window.$ = gcore_$;
+		}
+		</script>
+		
+<script src="https://www.skit.ac.in/libraries/cegcore/assets/jquery/jquery.js" type="text/javascript"></script>
+<script src="https://www.skit.ac.in/libraries/cegcore/assets/bootstrap/js/bootstrap.js" type="text/javascript"></script>
+<script src="https://www.skit.ac.in/libraries/cegcore/assets/gplugins/gtooltip/gtooltip.js" type="text/javascript"></script>
+<script src="https://www.skit.ac.in/libraries/cegcore/assets/gplugins/gvalidation/gvalidation.js" type="text/javascript"></script>
+<script src="https://www.skit.ac.in/libraries/cegcore/assets/jquery/jquery.inputmask.js" type="text/javascript"></script>
+<script type="text/javascript">jQuery(document).ready(function() {
+jQuery('#button6').live("click",function(e){
+if(jQuery("#name").val()!=""  && jQuery("#domicile_state").val()!="" && jQuery("#b_tech").val()!="" && jQuery("#course").val()!="" && jQuery("#qualification").val()!="" && jQuery("#contactno").val()=="" && jQuery("#email").val()=="")
+{
+e.preventDefault();	
+alert("Please Fill Contact No. Or Email ID");
+}
+});
+
+jQuery("#other_know").hide(); 
+jQuery('#how_to_know').live("change",function(){
+       if(this.value=="Other -")
+	   {
+		 jQuery("#other_know").show(); 
+	   }
+	   else
+	   {
+		 jQuery("#other_know").hide();
+	   }
+});
+});
+jQuery(document).ready(function($){
+				function chronoforms_fields_events(){
+}
+chronoforms_fields_events();
+$("#chronoform-enquirenow").gvalidate();
+
+					function chronoforms_validation_signs(formObj){
+						formObj.find(":input[class*=validate]").each(function(){
+							if($(this).attr("class").indexOf("required") >= 0 || $(this).attr("class").indexOf("group") >= 0){
+								if($(this).closest(".gcore-subinput-container").length > 0){
+									var required_parent = $(this).closest(".gcore-subinput-container");
+								}else if($(this).closest(".gcore-form-row").length > 0){
+									var required_parent = $(this).closest(".gcore-form-row");
+								}
+								if(required_parent.length > 0){
+									var required_label = required_parent.find("label");
+									if(required_label.length > 0 && !required_label.first().hasClass("required_label")){
+										required_label.first().addClass("required_label");
+										required_label.first().html(required_label.first().html() + " <i class='fa fa-asterisk' style='color:#ff0000; font-size:9px; vertical-align:top;'></i>");
+									}
+								}
+							}
+						});
+					}
+					chronoforms_validation_signs($("#chronoform-enquirenow"));
+				
+
+				function chronoforms_data_tooltip(formObj){
+					formObj.find(":input").each(function(){
+						if($(this).data("tooltip") && $(this).closest(".gcore-input, .gcore-input-wide").length > 0 && $(this).closest(".gcore-input, .gcore-input-wide").next(".input-tooltip").length < 1){
+							var $tip = $('<i class="fa fa-exclamation-circle input-tooltip" style="float:left; padding:7px 0px 0px 7px;"></i>').attr("title", $(this).data("tooltip"));
+							$(this).closest(".gcore-input, .gcore-input-wide").after($tip);
+							$(this).closest(".gcore-input, .gcore-input-wide").css("float", "left");
+						}
+					});
+					formObj.find(".input-tooltip").gtooltip("hover");
+				}
+				chronoforms_data_tooltip($("#chronoform-enquirenow"));
+			
+
+				function chronoforms_data_loadstate(formObj){
+					formObj.find(':input[data-load-state="disabled"]').prop("disabled", true);
+					formObj.find(':input[data-load-state="hidden"]').css("display", "none");
+					formObj.find(':input[data-load-state="hidden_parent"]').each(function(){
+						if($(this).closest(".gcore-subinput-container").length > 0){
+							$(this).closest(".gcore-subinput-container").css("display", "none");
+						}else if($(this).closest(".gcore-form-row").length > 0){
+							$(this).closest(".gcore-form-row").css("display", "none");
+						}
+					});
+				}
+				chronoforms_data_loadstate($("#chronoform-enquirenow"));
+			
+$(":input").inputmask();
+
+					function chrono_ajax_submit(){
+						$(document).on("click", "#chronoform-enquirenow :input[type=submit]", function(event){
+							$("#chronoform-enquirenow").append("<input type='hidden' name='"+$(this).attr("name")+"' value='"+$(this).val()+"' />");
+						});
+						
+						var files;
+						$("input[type=file]").on("change", function(event){
+							files = event.target.files;
+						});
+						
+						$(document).on("submit", "#chronoform-enquirenow", function(event){
+							var overlay = $("<div/>").css({
+								"position": "fixed",
+								"top": "0",
+								"left": "0",
+								"width": "100%",
+								"height": "100%",
+								"background-color": "#000",
+								"filter": "alpha(opacity=50)",
+								"-moz-opacity": "0.5",
+								"-khtml-opacity": "0.5",
+								"opacity": "0.5",
+								"z-index": "10000",
+								"background-image":"url(\"https://www.skit.ac.in/libraries/cegcore/assets/images/loading-small.gif\")",
+								"background-position":"center center",
+								"background-repeat":"no-repeat",
+							});
+							if(!$("#chronoform-enquirenow").hasClass("form-overlayed")){
+								$("#chronoform-enquirenow").append(overlay);
+								$("#chronoform-enquirenow").addClass("form-overlayed");
+							}
+							var form_action = $("#chronoform-enquirenow").prop("action");
+							var sep = (form_action.indexOf("?") > -1) ? "&" : "?";
+							var ajax_url = form_action + sep + "tvout=ajax";
+							/*
+							//files processing
+							event.stopPropagation();
+							event.preventDefault();
+							var data = new FormData();
+							$.each(files, function(key, value){
+								data.append(key, value);
+							});
+							$.ajax({
+								url: ajax_url,
+								type: "POST",
+								data: data,
+								cache: false,
+								dataType: "json",
+								async: false,
+								processData: false, // Do not process the files
+								contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+								success: function(data, textStatus, jqXHR){
+									if(typeof data.error === "undefined"){
+										console.log("Success " + data.error);
+									}else{
+										console.log("ERRORS: " + data.error);
+									}
+								},
+								error: function(jqXHR, textStatus, errorThrown){
+									console.log("ERRORS: " + textStatus);
+								}
+							});
+							*/
+							//data processing
+							$.ajax({
+								"type" : "POST",
+								"url" : ajax_url,
+								"data" : $("#chronoform-enquirenow").serialize(),
+								"success" : function(res){
+									//alert(ajax_url);
+									$("#chronoform-enquirenow").replaceWith(res);
+									$("#chronoform-enquirenow").gvalidate();
+									chronoforms_fields_events();
+									chronoforms_validation_signs($("#chronoform-enquirenow"));
+									chronoforms_data_tooltip($("#chronoform-enquirenow"));
+									chronoforms_data_loadstate($("#chronoform-enquirenow"));
+									//chrono_ajax_submit();//this line duplicates submissions, should be removed
+								},
+							});
+							return false;
+						});
+					}
+					chrono_ajax_submit();
+				
+			});</script>
+
+		<script type="text/javascript">
+		if("undefined"==typeof gcore_jQuery){
+			var gcore_jQuery = window.jQuery;
+			var gcore_$ = window.$;
+		}
+		if("undefined"==typeof gcore_jQuery_bak){}else{
+			window.jQuery = gcore_jQuery_bak;
+			window.$ = gcore_$_bak;
+		}
+		</script>
+		<div class="gbs3">        <script>
+	jQuery(document).ready(function() {
+				  jQuery("#course option").removeAttr("selected");
+				  jQuery("#b_tech").empty();
+                  jQuery("#b_tech").append(jQuery("<option>Select Branch</option>").val(" "));
+   
+   jQuery("#other_know").hide(); 
+jQuery('#how_to_know').live("change",function(){
+       if(this.value=="Other")
+	   {
+		 jQuery("#other_know").show(); 
+		 jQuery("#other_know").addClass("validate['required']");
+	   }
+	   else
+	   {
+		 jQuery("#other_know").hide();
+		 jQuery("#other_know").removeClass("validate['required']");   
+	   }
+});				  
+
+	});
+	</script>
+    
+        <form action="https://www.skit.ac.in:443/error.html?chronoform=enquirenow&event=submit" enctype="multipart/form-data" method="post" name="enquirenow" id="chronoform-enquirenow" class="chronoform form-horizontal"><div class="form-group gcore-form-row" id="form-row-name"><label for="name" class="control-label gcore-label-left">Name of Candidate</label>
+<div class="gcore-input gcore-display-table" id="fin-name"><input name="name" id="name" value="" placeholder="" maxlength="" size="" class="form-control A" title="" style="" data-inputmask="" data-load-state="" data-tooltip="" type="text" /></div></div><div class="form-group gcore-form-row" id="form-row-qualification"><label for="qualification" class="control-label gcore-label-left">Academic Qualification</label>
+<div class="gcore-input gcore-display-table" id="fin-qualification"><input name="qualification" id="qualification" value="" placeholder="" maxlength="" size="" class="validate[&#039;alphanum&#039;] form-control A" title="" style="" data-inputmask="" data-load-state="" data-tooltip="" type="text" /></div></div><div class="form-group gcore-form-row" id="form-row-course"><label for="course" class="control-label gcore-label-left">Course</label>
+<div class="gcore-input gcore-display-table" id="fin-course"><select name="course" id="course" size="" class="form-control A" title="" style="" data-load-state="" data-tooltip="">
+<option value="">Select Course</option>
+<option value="B.Tech">B.Tech</option>
+<option value="M.Tech">M.Tech</option>
+<option value="M.B.A">M.B.A</option>
+<option value="B.Pharma">B.Pharma</option>
+<option value="Ph.D">Ph.D</option>
+</select></div></div><div class="form-group gcore-form-row" id="form-row-b_tech"><label for="b_tech" class="control-label gcore-label-left">Branch/Specializaton</label>
+<div class="gcore-input gcore-display-table" id="fin-b_tech"><select name="branch" id="b_tech" size="" class="form-control A" title="" style="" data-load-state="" data-tooltip="">
+<option value="">Select Branch</option>
+<option value="Civil Engineering">Civil Engineering</option>
+<option value="Information Technology">Information Technology</option>
+<option value="Computer Science Engineering">Computer Science Engineering</option>
+<option value="Electronics and Communication Engineering">Electronics and Communication Engineering</option>
+<option value="Electrical Engineering">Electrical Engineering</option>
+<option value="Mechanical Engineering">Mechanical Engineering</option>
+</select></div></div><div class="form-group gcore-form-row" id="form-row-domicile_state"><label for="domicile_state" class="control-label gcore-label-left">Domicile State</label>
+<div class="gcore-input gcore-display-table" id="fin-domicile_state"><select name="domicile_state" id="domicile_state" size="" class="form-control A" title="" style="" data-load-state="" data-tooltip="">
+<option value="">Select State</option>
+<option value="Andra Pradesh">Andra Pradesh</option>
+<option value="Arunachal Pradesh">Arunachal Pradesh</option>
+<option value="Assam">Assam</option>
+<option value="Bihar">Bihar</option>
+<option value="Chhattisgarh">Chhattisgarh</option>
+<option value="Goa">Goa</option>
+<option value="Gujarat">Gujarat</option>
+<option value="Haryana">Haryana</option>
+<option value="Himachal Pradesh">Himachal Pradesh</option>
+<option value="Jammu and Kashmir">Jammu and Kashmir</option>
+<option value="Jharkhand">Jharkhand</option>
+<option value="Karnataka">Karnataka</option>
+<option value="Kerala">Kerala</option>
+<option value="Madhya Pradesh">Madhya Pradesh</option>
+<option value="Maharashtra">Maharashtra</option>
+<option value="Manipur">Manipur</option>
+<option value="Meghalaya">Meghalaya</option>
+<option value="Mizoram">Mizoram</option>
+<option value="Nagaland">Nagaland</option>
+<option value="Orissa">Orissa</option>
+<option value="Punjab">Punjab</option>
+<option value="Rajasthan">Rajasthan</option>
+<option value="Sikkim">Sikkim</option>
+<option value="Tamil Nadu">Tamil Nadu</option>
+<option value="Tripura">Tripura</option>
+<option value="Telangana">Telangana</option>
+<option value="Uttaranchal">Uttaranchal</option>
+<option value="Uttar Pradesh">Uttar Pradesh</option>
+<option value="West Bangal">West Bangal</option>
+<option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+<option value="Chandigarh">Chandigarh</option>
+<option value="Dadar and Nagar Haveli">Dadar and Nagar Haveli</option>
+<option value="Daman and Diu">Daman and Diu</option>
+<option value="Lakshadweep">Lakshadweep</option>
+<option value="Delhi">Delhi</option>
+<option value="Puducherry">Puducherry</option>
+</select></div></div><div class="form-group gcore-form-row" id="form-row-contactno"><label for="contactno" class="control-label gcore-label-left">Contact No</label>
+<div class="gcore-input gcore-display-table" id="fin-contactno"><input name="contactno" id="contactno" value="" placeholder="" maxlength="" size="" class="validate[&#039;required&#039;,&#039;number&#039;,&#039;phone&#039;,&#039;phone_inter&#039;] form-control A" title="" style="" data-inputmask="" data-load-state="" data-tooltip="" type="text" /></div></div><div class="form-group gcore-form-row" id="form-row-email"><label for="email" class="control-label gcore-label-left">Email</label>
+<div class="gcore-input gcore-display-table" id="fin-email"><input name="email" id="email" value="" placeholder="" maxlength="" size="" class="validate[&#039;required&#039;,&#039;email&#039;] form-control A" title="" style="" data-inputmask="" data-load-state="" data-tooltip="" type="text" /></div></div><div class="form-group gcore-form-row" id="form-row-how_to_know"><label for="how_to_know" class="control-label gcore-label-left">You heard from?</label>
+<div class="gcore-input gcore-display-table" id="fin-how_to_know"><select name="how_to_know" id="how_to_know" size="" class="form-control A" title="" style="" data-load-state="" data-tooltip="">
+<option value="">Select From</option>
+<option value="Education Fair">Education Fair</option>
+<option value="Newspaper">Newspaper</option>
+<option value="Friend">Friend</option>
+<option value="Relative">Relative</option>
+<option value="Internet">Internet</option>
+<option value="SKITian">SKITian</option>
+<option value="SKIT Employee">SKIT Employee</option>
+<option value="Alumnus/ Alumna">Alumnus/ Alumna</option>
+<option value="Other -">Other</option>
+</select></div></div><div class="form-group gcore-form-row" id="form-row-other_know"><label for="other_know" class="control-label gcore-label-left"> </label>
+<div class="gcore-input gcore-display-table" id="fin-other_know"><input name="other_know" id="other_know" value="" placeholder="Other" maxlength="" size="" class="form-control A" title="" style="" data-inputmask="" data-load-state="" data-tooltip="" type="text" /></div></div><div class="form-group gcore-form-row" id="form-row-textarea5"><label for="textarea5" class="control-label gcore-label-left">Message</label>
+<div class="gcore-input gcore-display-table" id="fin-textarea5"><textarea name="message" id="textarea5" placeholder="" rows="3" cols="40" class="form-control A" title="" style="" data-wysiwyg="0" data-load-state="" data-tooltip=""></textarea></div></div><input name="hid_subject" id="hid_subject" value="Enquiry Form" type="hidden" class="form-control A" /><div class="form-group gcore-form-row" id="form-row-button6"><div class="gcore-input gcore-display-table" id="fin-button6"><input name="button6" id="button6" type="submit" value="Send" class="form-control A" style="" data-load-state="" /></div></div></form><p class="chrono_credits"><a href="http://www.chronoengine.com" target="_blank">Powered by ChronoForms - ChronoEngine.com</a></p></div> &nbsp;</div>
+		</div>
+	</div>
+</div></div>
+		</div>
+	
+                        </div>
+                        </div>
+                                               </div>
+                </div>
+<div style="clear:both"></div> 
+<!--Content or sidebar end-->  
+</div>
+<!--extension start-->  
+	<div style="clear:both"></div> 
+<!--extension end-->  
+<!--main-bottom start-->
+		<div style="clear:both"></div>         
+<!--main-bottom start-->
+<!--bottom start-->
+		<div style="clear:both"></div>         
+<!--bottom end-->
+<!--social start-->
+		<!--social end-->
+<!--footer start-->
+		<!--footer end-->
+<!--only for mobile start-->
+<!--only for mobile end-->
+<!--copyrights start-->
+					<div class="copyrights">
+                <div class="custom-1200">  
+					
+
+<div class="custom"  >
+	<p><span class="copy_l">All Rights Reserved | Copyright © 2025 - Swami Keshvanand Institute of Technology, Management &amp; Gramothon</span><span class="copy_r">Managed by : <a href="https://www.skit.ac.in/">SKIT</a></span></p></div>
+
+				</div>
+            </div>
+        <!--copyrights end-->
+
+
+
+<!-- Modal -->
+
+                                                                                                                                      
+<script type="text/javascript">
+			function setCookie(name, value, days){
+				var date = new Date();
+				date.setTime(date.getTime() + (days*24*60*60*1000));
+				var expires = "; expires=" + date.toGMTString();
+				document.cookie = name + "=" + value + expires + ";path=/;domain=skit.ac.in;SameSite=none;Secure";
+			}
+			function readCookie(name) {
+				var n = name + "=";
+				var cookie = document.cookie.split(';');
+				for(var i=0;i < cookie.length;i++) {      
+					var c = cookie[i];      
+					while (c.charAt(0)==' '){c = c.substring(1,c.length);}      
+					if (c.indexOf(n) == 0){return c.substring(n.length,c.length);}
+				}
+				return null;
+			}
+			function getParam(p){
+				var match = RegExp('[?&]' + p + '=([^&]*)').exec(window.location.search);
+				return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+			}
+			var utm_source=getParam('utm_source');
+			var utm_medium=getParam('utm_medium');
+			var utm_campaign=getParam('utm_campaign');
+			if(utm_source){
+				setCookie('utm_source', utm_source, 90);
+			}
+			if(utm_medium) {
+				setCookie('utm_medium', utm_medium, 90);
+			} 
+			if(utm_campaign) {
+				setCookie('utm_campaign', utm_campaign, 90);
+			}
+		</script>
+                                                                                                                                                  
+
+</div></div></div></body>
+</html>   

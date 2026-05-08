@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminUserList from "./AdminUserList";
-import RoleDefinitionList from "./RoleDefinitionList";
 import type { AdminUserRow, RoleDefinition } from "./page";
 
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -19,17 +18,13 @@ interface Props {
   createAdminUser: (f: FormData) => Promise<void>;
   updateAdminUser: (f: FormData) => Promise<void>;
   deleteAdminUser: (id: string) => Promise<void>;
-  createRole:      (f: FormData) => Promise<void>;
-  updateRole:      (f: FormData) => Promise<void>;
-  deleteRole:      (id: string) => Promise<void>;
 }
 
 export default function RolesPageClient({
   users, roles, offset, page, totalPages, searchQuery,
   createAdminUser, updateAdminUser, deleteAdminUser,
-  createRole, updateRole, deleteRole,
 }: Props) {
-  const [tab, setTab] = useState<"users" | "roles">("users");
+  const [tab, setTab] = useState<"users">("users");
   const router = useRouter();
 
   return (
@@ -47,32 +42,15 @@ export default function RolesPageClient({
 
       {/* Tabs */}
       <div className="flex gap-1 bg-slate-100 p-1 rounded-xl w-fit">
-        {([
-          { key: "users", icon: "group",            label: "Admin Users" },
-          { key: "roles", icon: "shield_with_heart", label: "Role Definitions" },
-        ] as const).map(t => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              tab === t.key ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"
-            }`}
-          >
-            <span className="material-symbols-rounded text-[18px]" style={tab === t.key ? ICO_FILL : ICO}>{t.icon}</span>
-            {t.label}
-            {t.key === "users" && (
-              <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600">{users.length}</span>
-            )}
-            {t.key === "roles" && (
-              <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600">{roles.length}</span>
-            )}
-          </button>
-        ))}
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-white text-slate-800 shadow-sm">
+          <span className="material-symbols-rounded text-[18px]" style={ICO_FILL}>group</span>
+          Admin Users
+          <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600">{users.length}</span>
+        </div>
       </div>
 
-      {/* Tab: Admin Users */}
-      {tab === "users" && (
-        <>
+      {/* Admin Users — always shown */}
+      <>
           {/* Search */}
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex gap-3">
             <form method="GET" className="flex-1 flex gap-2">
@@ -124,17 +102,8 @@ export default function RolesPageClient({
             </div>
           )}
         </>
-      )}
 
-      {/* Tab: Role Definitions */}
-      {tab === "roles" && (
-        <RoleDefinitionList
-          roles={roles}
-          createRole={createRole}
-          updateRole={updateRole}
-          deleteRole={deleteRole}
-        />
-      )}
+
     </>
   );
 }

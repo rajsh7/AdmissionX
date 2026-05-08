@@ -67,7 +67,7 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
   };
 
   return (
-    <section className="relative bg-white h-[565px] flex items-center overflow-visible border-b border-slate-50 shadow-md">
+    <section className="relative bg-white h-[565px] flex items-center overflow-visible border-b border-slate-50 shadow-md pt-[104px]">
       {/* Background Image - User provided abstract pattern */}
       <div className="absolute inset-x-0 bottom-0 top-[90px] z-0 opacity-40 pointer-events-none">
         <Image

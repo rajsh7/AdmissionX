@@ -185,38 +185,8 @@ export async function GET(req: NextRequest) {
 
     // When searching a course with no explicit sort, default to fees
     const effectiveSort = (q.length >= 2 && (queryDegreeIds.length > 0 || queryStreamIds.length > 0) && sort === "rating") ? "fees" : sort;
-    const isFeeSort = effectiveSort === "fees";
-
-    const basePipeline: object[] = [
-      { $match: match },
-      { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
-      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-    ];
-
-    // Note: course-based q (e.g. "Btech") is already resolved to filteredIds above.
-    // Only apply text match for non-course queries (no degree/stream match found).
-    if (q.length >= 2 && queryDegreeIds.length === 0 && queryStreamIds.length === 0) {
-      basePipeline.push({
-        $match: {
-          $or: [
-            { "user.firstname": { $regex: q, $options: "i" } },
-            { registeredSortAddress: { $regex: q, $options: "i" } },
-            { slug: { $regex: q, $options: "i" } },
-          ],
-        },
-      });
-    }
-
-    const preSortStage: Record<string, 1 | -1> =
-      effectiveSort === "ranking" ? { ranking: 1 } :
-      effectiveSort === "newest" ? { created_at: -1 } :
-      { rating: -1, totalRatingUser: -1 };
-
-    basePipeline.push({ $sort: preSortStage });
-
-    // For fees sort: fetch large pool so aggregation can sort by computed min_fees
-    const fetchLimit = isFeeSort ? Math.max(limit * 20, 240) : limit;
-    const fetchOffset = isFeeSort ? 0 : offset;
+    const isFeeSort = effectiveSort === "fees" || effectiveSort === "fees_high";
+    const feesAscending = effectiveSort === "fees";
 
     const filteredCmExpr = (queryDegreeIds.length > 0 || queryStreamIds.length > 0)
       ? {
@@ -235,43 +205,113 @@ export async function GET(req: NextRequest) {
         }
       : { $filter: { input: "$cm", as: "c", cond: { $gte: ["$$c.fees", 500] } } };
 
-    const [countResult, dataRows] = await Promise.all([
-      db.collection("collegeprofile").aggregate([...basePipeline, { $count: "total" }]).toArray(),
-      db.collection("collegeprofile").aggregate([
-        ...basePipeline,
-        { $skip: fetchOffset },
-        { $limit: fetchLimit },
-        { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "city" } },
-        { $unwind: { path: "$city", preserveNullAndEmptyArrays: true } },
-        { $lookup: { from: "placement", localField: "id", foreignField: "collegeprofile_id", as: "placement" } },
-        { $unwind: { path: "$placement", preserveNullAndEmptyArrays: true } },
+    const baseProjectStage = {
+      $project: {
+        slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, ranking: 1,
+        isTopUniversity: 1, topUniversityRank: 1, universityType: 1, collegetype_id: 1, estyear: 1,
+        verified: 1, totalStudent: 1, registeredSortAddress: 1, id: 1,
+        name: { $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"] },
+        city_name: "$city.name",
+        streams: { $setUnion: ["$fa.name", []] },
+        min_fees: { $min: { $filter: { input: "$filtered_cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
+        max_fees: { $max: { $filter: { input: "$filtered_cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
+        avg_package: "$placement.ctcaverage",
+      },
+    };
+
+    let total: number;
+    let dataRows: any[];
+
+    if (isFeeSort) {
+      const feesPipeline: object[] = [
+        { $match: match },
         { $lookup: { from: "collegemaster", localField: "id", foreignField: "collegeprofile_id", as: "cm" } },
-        { $lookup: { from: "functionalarea", localField: "cm.functionalarea_id", foreignField: "id", as: "fa" } },
         { $addFields: { filtered_cm: filteredCmExpr } },
-        {
-          $project: {
-            slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, ranking: 1,
-            isTopUniversity: 1, topUniversityRank: 1, universityType: 1, collegetype_id: 1, estyear: 1,
-            verified: 1, totalStudent: 1, registeredSortAddress: 1, id: 1,
-            name: { $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"] },
-            city_name: "$city.name",
-            streams: { $setUnion: ["$fa.name", []] },
-            min_fees: { $min: "$filtered_cm.fees" },
-            max_fees: { $max: "$filtered_cm.fees" },
-            avg_package: "$placement.ctcaverage",
-          },
+        { $addFields: {
+            min_fees: { $min: { $filter: { input: "$filtered_cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
+            max_fees: { $max: { $filter: { input: "$filtered_cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
+        }},
+        { $match: feesAscending ? { min_fees: { $ne: null, $gte: 1000 } } : { max_fees: { $ne: null, $gte: 1000 } } },
+        { $sort: feesAscending ? { min_fees: 1 as const } : { max_fees: -1 as const } },
+      ];
+
+      const feesSortProjectStage = {
+        $project: {
+          slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, ranking: 1,
+          isTopUniversity: 1, topUniversityRank: 1, universityType: 1, collegetype_id: 1, estyear: 1,
+          verified: 1, totalStudent: 1, registeredSortAddress: 1, id: 1,
+          min_fees: 1, max_fees: 1,
+          name: { $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"] },
+          city_name: "$city.name",
+          streams: { $setUnion: ["$fa.name", []] },
+          avg_package: "$placement.ctcaverage",
         },
-        // Only filter to colleges with fees when sorting by fees
-        ...(isFeeSort ? [{ $match: { min_fees: { $gte: 500 } } }] : []),
-        ...(isFeeSort ? [
-          { $sort: { min_fees: 1 as const } },
+      };
+
+      const [countResult, pageRows] = await Promise.all([
+        db.collection("collegeprofile").aggregate([...feesPipeline, { $count: "total" }]).toArray(),
+        db.collection("collegeprofile").aggregate([
+          ...feesPipeline,
           { $skip: offset },
           { $limit: limit },
-        ] : []),
-      ]).toArray(),
-    ]);
+          { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+          { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+          { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "city" } },
+          { $unwind: { path: "$city", preserveNullAndEmptyArrays: true } },
+          { $lookup: { from: "placement", localField: "id", foreignField: "collegeprofile_id", as: "placement" } },
+          { $unwind: { path: "$placement", preserveNullAndEmptyArrays: true } },
+          { $lookup: { from: "functionalarea", localField: "cm.functionalarea_id", foreignField: "id", as: "fa" } },
+          feesSortProjectStage,
+        ]).toArray(),
+      ]);
+      total = countResult[0]?.total ?? 0;
+      dataRows = pageRows;
+    } else {
+      const basePipeline: object[] = [
+        { $match: match },
+        { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+      ];
 
-    const total = countResult[0]?.total ?? 0;
+      if (q.length >= 2 && queryDegreeIds.length === 0 && queryStreamIds.length === 0) {
+        basePipeline.push({
+          $match: {
+            $or: [
+              { "user.firstname": { $regex: q, $options: "i" } },
+              { registeredSortAddress: { $regex: q, $options: "i" } },
+              { slug: { $regex: q, $options: "i" } },
+            ],
+          },
+        });
+      }
+
+      const preSortStage: Record<string, 1 | -1> =
+        effectiveSort === "ranking" ? { ranking: 1 } :
+        effectiveSort === "newest" ? { created_at: -1 } :
+        { rating: -1, totalRatingUser: -1 };
+
+      basePipeline.push({ $sort: preSortStage });
+
+      const [countResult, pageRows] = await Promise.all([
+        db.collection("collegeprofile").aggregate([...basePipeline, { $count: "total" }]).toArray(),
+        db.collection("collegeprofile").aggregate([
+          ...basePipeline,
+          { $skip: offset },
+          { $limit: limit },
+          { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "city" } },
+          { $unwind: { path: "$city", preserveNullAndEmptyArrays: true } },
+          { $lookup: { from: "placement", localField: "id", foreignField: "collegeprofile_id", as: "placement" } },
+          { $unwind: { path: "$placement", preserveNullAndEmptyArrays: true } },
+          { $lookup: { from: "collegemaster", localField: "id", foreignField: "collegeprofile_id", as: "cm" } },
+          { $lookup: { from: "functionalarea", localField: "cm.functionalarea_id", foreignField: "id", as: "fa" } },
+          { $addFields: { filtered_cm: filteredCmExpr } },
+          baseProjectStage,
+        ]).toArray(),
+      ]);
+      total = countResult[0]?.total ?? 0;
+      dataRows = pageRows;
+    }
+
 
     const colleges = dataRows.map((row) => {
       const name = row.name && row.name !== row.slug ? row.name : slugToName(row.slug || "college");

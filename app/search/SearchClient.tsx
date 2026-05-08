@@ -66,10 +66,9 @@ interface SearchClientProps {
 type ViewMode = "grid" | "list";
 
 const SORT_OPTIONS = [
-  { value: "rating", label: "Top Rated" },
-  { value: "ranking", label: "Best Ranked" },
+  { value: "fees_high", label: "Highest Fees" },
   { value: "fees", label: "Lowest Fees" },
-  { value: "newest", label: "Newest" },
+  { value: "rating", label: "Top Rated" },
 ];
 
 function getCollegeRenderKey(college: CollegeResult, index: number): string {
@@ -193,25 +192,22 @@ export default function SearchClient({
 
   const handleLoadMore = useCallback(async () => {
     const nextCount = visibleCount + 12;
-    // Already have enough fetched, just show more
     if (nextCount <= colleges.length) {
       setVisibleCount(nextCount);
       return;
     }
-    // Need to fetch more from API
     setLoadingMore(true);
     try {
       const params = new URLSearchParams(searchParams.toString());
-      params.set("limit", "48");
-      params.delete("page");
-      // Ensure city_id is always sent (URL may only have ?city=text resolved server-side)
+      const nextPage = Math.floor(visibleCount / 12) + 1;
+      params.set("page", String(nextPage));
+      params.set("limit", "12");
       if (cityId && !params.get("city_id")) params.set("city_id", cityId);
-      // Remove the text-based city param so API doesn't get confused
       params.delete("city");
       const res = await fetch(`/api/search/colleges?${params.toString()}`);
       const data = await res.json();
       if (data.success && data.colleges.length > 0) {
-        setColleges(data.colleges);
+        setColleges(prev => [...prev, ...data.colleges]);
         setVisibleCount(nextCount);
       } else {
         setVisibleCount(nextCount);
@@ -451,7 +447,10 @@ export default function SearchClient({
                             if (val === "rating") p.delete("sort");
                             else p.set("sort", val);
                             p.delete("page");
-                            router.push(`${pathname}?${p.toString()}`);
+                            setLoading(true);
+                            startTransition(() => {
+                              router.push(`${pathname}?${p.toString()}`);
+                            });
                           }}
                           className="appearance-none bg-white border border-neutral-200 rounded-[5px] px-4 pr-10 text-[13px] font-medium text-[#6C6C6C] shadow-sm focus:outline-none focus:border-[#008080] transition-all cursor-pointer min-w-[180px]"
                           style={{ height: "45px" }}
@@ -555,6 +554,7 @@ export default function SearchClient({
                       college={college}
                       index={i}
                       entityName={entityName}
+                      sortMode={sort}
                     />
                   ))}
                 </div>
@@ -566,6 +566,7 @@ export default function SearchClient({
                       college={college}
                       index={i}
                       entityName={entityName}
+                      sortMode={sort}
                     />
                   ))}
                 </div>

@@ -79,7 +79,9 @@ export default async function CareerCoursesPage({ searchParams }: PageProps) {
   if (q.length >= 2) {
     filter.$or = [
       { name: { $regex: q, $options: "i" } },
+      { pagetitle: { $regex: q, $options: "i" } },
       { pagedescription: { $regex: q, $options: "i" } },
+      { pageslug: { $regex: q, $options: "i" } },
     ];
   }
   if (degreeId !== null) filter.degree_id = degreeId;

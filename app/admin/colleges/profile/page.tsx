@@ -9,7 +9,18 @@ async function deleteProfileRow(id: string) {
   "use server";
   try {
     const db = await getDb();
+    // Find the college first to get users_id
+    const college = await db.collection("collegeprofile").findOne({ slug: id }, { projection: { users_id: 1, email: 1 } });
+    // Delete from collegeprofile
     await db.collection("collegeprofile").deleteOne({ slug: id });
+    // Also delete from next_college_signups by email
+    if (college?.email) {
+      await db.collection("next_college_signups").deleteOne({ email: college.email });
+    }
+    // Also delete from users by users_id
+    if (college?.users_id) {
+      await db.collection("users").deleteOne({ $or: [{ id: college.users_id }, { _id: college.users_id }] });
+    }
   } catch (e) {
     console.error("[admin/colleges/profile deleteAction]", e);
   }

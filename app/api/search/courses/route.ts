@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
 
     const filter: Record<string, unknown> = { pageslug: { $exists: true, $ne: "" } };
     if (q.length >= 2) {
-      filter.$or = [{ name: { $regex: q, $options: "i" } }, { pagedescription: { $regex: q, $options: "i" } }];
+      filter.$or = [{ name: { $regex: q, $options: "i" } }, { pagetitle: { $regex: q, $options: "i" } }, { pagedescription: { $regex: q, $options: "i" } }, { pageslug: { $regex: q, $options: "i" } }];
     }
     if (degreeId) filter.degree_id = degreeId;
     if (faId) filter.functionalarea_id = faId;

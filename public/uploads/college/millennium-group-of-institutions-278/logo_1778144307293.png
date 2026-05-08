@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Millennium Group of Institutions | Best College in Bhopal, MP</title>
+<meta charset="utf-8">
+<base href="/">
+<meta name="viewport" content="width=device-width, initial-scale=1"> 
+<meta name="description" content="Visit Millennium Group of Institutions, the best college in Bhopal, MP, providing state-of-the-art facilities, a vibrant learning atmosphere, and exceptional instruction to help you define your future.">
+<meta property="og:title" content="Millennium Group of Institutions | Best College in Bhopal, MP">
+<meta property="og:site_name" content="Millennium Group of Institutions">
+<meta property="og:description" content="Visit Millennium Group of Institutions, the best college in Bhopal, MP, providing state-of-the-art facilities, a vibrant learning atmosphere, and exceptional instruction to help you define your future.">
+<meta property="og:url" content="/apple-touch-icon.png">
+<meta property="og:image" content="/uploads/logo.png">
+<meta property="og:type" content="website" > 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto&family=Roboto+Condensed&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="weaver.css">
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/owl.carousel.min.js"></script>
+<link rel="icon" type="image/png"   href="uploads/favicon.png">
+<style>
+</style>
+</head>
+<body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-dark d-sm-block d-md-none fixed-top">
+<div class="container-fluid">
+    <a class="navbar-brand" href="index.php"><!--<img src="uploads/footer.png" class="img-fluid">--><img src="uploads/header.png" class="img-fluid"></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarScroll">
+      <ul class="navbar-nav mx-auto">
+				<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+			 About Us			</a>
+			<div class="dropdown-menu rounded" aria-labelledby="navbarDropdownMenuLink">	
+											<a class="dropdown-item" href="millennium-group">Millennium Group</a>
+											<a class="dropdown-item" href="https://millenniumbhopal.com/Our-vision">Vision and Mission</a>
+											<a class="dropdown-item" href="chairmans-message">Chairman's Message</a>
+											<a class="dropdown-item" href="managing-directors-message">MD's Message</a>
+											<a class="dropdown-item" href="executive-directors-message">ED's Message</a>
+								</div>	
+					<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+			 Courses			</a>
+			<div class="dropdown-menu rounded" aria-labelledby="navbarDropdownMenuLink">	
+											<a class="dropdown-item" href="engineering">Engineering</a>
+											<a class="dropdown-item" href="pharmacy">Pharmacy</a>
+											<a class="dropdown-item" href="management">Management</a>
+											<a class="dropdown-item" href="education">Education</a>
+											<a class="dropdown-item" href="nursing">Nursing</a>
+											<a class="dropdown-item" href="paramedical-science">Paramedical Sciences</a>
+											<a class="dropdown-item" href="law">Law</a>
+											<a class="dropdown-item" href="graduation">Graduation</a>
+											<a class="dropdown-item" href="ame">AME</a>
+											<a class="dropdown-item" href="iti">ITI</a>
+								</div>	
+					<li class="nav-item">
+			<a class="nav-link" href="admissions">Admissions</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="placement">Placement</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="Important-Links">Important Links</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="https://www.millenniumbhopal.com/virtual-tour">Virtual Tour</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="Tarkash_SAC">Tarkash SAC</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="millenniumalumnirelationcell">MARC</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="maitrim-2026">MAITRIM 2026</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="news">News and Events</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="contact-us">Contact us</a>
+			</li>		
+			
+	</ul>
+      <span class="navbar-text">
+        <a href="https://mgigrouperp.in/smis/" class="mt-2 btn btn-warning btn-sm btn-rounded text-dark">Student Login</a>
+      </span>	
+  </div>
+</div>
+</nav>
+
+
+
+
+<div class="sidebar d-none d-md-block">
+  <div class="text-center">
+    <a class="sidebar-brand" href="index.php"><img src="uploads/logo.png" class="img-fluid" style="max-width:125px"><img src="uploads/header.png" class="img-fluid"></a>
+  </div>
+	<ul class="sidebar-links">
+	<li><a data-bs-toggle='collapse' href='#menu124'><i class='bi bi-caret-down-fill float-end'></i>About Us</a><ul class='sidebar-links collapse' id='menu124'><li><a href='millennium-group'>Millennium Group</a></li><li><a href='https://millenniumbhopal.com/Our-vision'>Vision and Mission</a></li><li><a href='chairmans-message'>Chairman's Message</a></li><li><a href='managing-directors-message'>MD's Message</a></li><li><a href='executive-directors-message'>ED's Message</a></li></ul></li>
+<li><a data-bs-toggle='collapse' href='#menu73'><i class='bi bi-caret-down-fill float-end'></i>Courses</a><ul class='sidebar-links collapse' id='menu73'><li><a href='engineering'>Engineering</a></li><li><a href='pharmacy'>Pharmacy</a></li><li><a href='management'>Management</a></li><li><a href='education'>Education</a></li><li><a href='nursing'>Nursing</a></li><li><a href='paramedical-science'>Paramedical Sciences</a></li><li><a href='law'>Law</a></li><li><a href='graduation'>Graduation</a></li><li><a href='ame'>AME</a></li><li><a href='iti'>ITI</a></li></ul></li>
+<li><a href='admissions'>Admissions</a></li><li><a href='placement'>Placement</a></li><li><a href='Important-Links'>Important Links</a></li><li><a href='https://www.millenniumbhopal.com/virtual-tour'>Virtual Tour</a></li><li><a href='Tarkash_SAC'>Tarkash SAC</a></li><li><a href='millenniumalumnirelationcell'>MARC</a></li><li><a href='maitrim-2026'>MAITRIM 2026</a></li><li><a href='news'>News and Events</a></li><li><a href='contact-us'>Contact us</a></li>	</ul>
+	
+	<p class="text-center"><a href="https://mgigrouperp.in/smis/" class="btn btn-sm btn-warning"><i class="bi bi-person-lock"></i> Student Login</a>
+</div>
+
+</header>
+<div style="min-height:80vh">
+<nav class="navbar navbar-expand-lg navbar-dark d-sm-block d-md-none fixed-top">
+<div class="container-fluid">
+    <a class="navbar-brand" href="index.php"><!--<img src="uploads/footer.png" class="img-fluid">--><img src="uploads/header.png" class="img-fluid"></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarScroll">
+      <ul class="navbar-nav mx-auto">
+				<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+			 About Us			</a>
+			<div class="dropdown-menu rounded" aria-labelledby="navbarDropdownMenuLink">	
+											<a class="dropdown-item" href="millennium-group">Millennium Group</a>
+											<a class="dropdown-item" href="https://millenniumbhopal.com/Our-vision">Vision and Mission</a>
+											<a class="dropdown-item" href="chairmans-message">Chairman's Message</a>
+											<a class="dropdown-item" href="managing-directors-message">MD's Message</a>
+											<a class="dropdown-item" href="executive-directors-message">ED's Message</a>
+								</div>	
+					<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+			 Courses			</a>
+			<div class="dropdown-menu rounded" aria-labelledby="navbarDropdownMenuLink">	
+											<a class="dropdown-item" href="engineering">Engineering</a>
+											<a class="dropdown-item" href="pharmacy">Pharmacy</a>
+											<a class="dropdown-item" href="management">Management</a>
+											<a class="dropdown-item" href="education">Education</a>
+											<a class="dropdown-item" href="nursing">Nursing</a>
+											<a class="dropdown-item" href="paramedical-science">Paramedical Sciences</a>
+											<a class="dropdown-item" href="law">Law</a>
+											<a class="dropdown-item" href="graduation">Graduation</a>
+											<a class="dropdown-item" href="ame">AME</a>
+											<a class="dropdown-item" href="iti">ITI</a>
+								</div>	
+					<li class="nav-item">
+			<a class="nav-link" href="admissions">Admissions</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="placement">Placement</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="Important-Links">Important Links</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="https://www.millenniumbhopal.com/virtual-tour">Virtual Tour</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="Tarkash_SAC">Tarkash SAC</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="millenniumalumnirelationcell">MARC</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="maitrim-2026">MAITRIM 2026</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="news">News and Events</a>
+			</li>		
+					<li class="nav-item">
+			<a class="nav-link" href="contact-us">Contact us</a>
+			</li>		
+			
+	</ul>
+      <span class="navbar-text">
+        <a href="https://mgigrouperp.in/smis/" class="mt-2 btn btn-warning btn-sm btn-rounded text-dark">Student Login</a>
+      </span>	
+  </div>
+</div>
+</nav>
+
+
+<div class="page-header shadow text-center" style="background-image:url('images/404header.jpg')"><p class="page-title">Page Not Found</p></div>
+
+
+<div class="container-fluid">
+  <div class="page-wrapper">
+    <div class="row align-items-center">
+      <div class="col-4 text-center"><img src="images/img404.jpg" class="img-fluid"></div>
+      <div class="col-8"><h1>This Page Is Under Construction</h1>
+Please bear with us as we migrate to our new website. We are working on this page and hope to have it up for you shortly.</p><p><a href="index.php" class="btn btn-warning">Home Page</a></p></div>
+    </div>
+  </div>
+</div></div>
+<footer>
+<div class="container-fluid mt-3">
+
+	<div class="row align-items-center">
+		<div class="col-md-4">
+			<p class="social-icons text-center">
+			<a href="mailto:tpo.mgi@gmail.com"><i class="bi bi-envelope text-light"></i></a> &nbsp;
+			<a href="tel:+91 9200300600"><i class="bi bi-telephone text-light"></i></a> &nbsp;
+			<a href='https://www.facebook.com/millenniumgroup.bpl' target='_blank'><i class='bi bi-facebook text-light'></i></a> &nbsp;&nbsp;<a href='https://www.linkedin.com/company/millennium-group-of-institution/mycompany' target='_blank'><i class='bi bi-linkedin text-light'></i></a> &nbsp;<a href='https://www.instagram.com/millennium_group_bhopal' target='_blank'><i class='bi bi-instagram text-light'></i></a> &nbsp;<a href='https://www.youtube.com/@MGIBhopal'  target='_blank'><i class='bi bi-youtube text-light'></i></a> &nbsp;<a href='whatsapp://send?abid=+91 9200300600&text=Hi There!' target='_blank'><i class='bi bi-whatsapp text-light'></i></a>				
+			</p>		
+		</div>
+		<div class="col-md-4 text-center">
+			<img src="uploads/footer.png" style="max-width:300px">
+			<address>
+			Millennium Campus,  Nathu Barkheda Road Near<br />
+Neelbad Square, Bhopal, M.P. - Pin Code: 462044			</address>		
+		
+			<p class="footer-text">
+							</p>	
+		</div>
+		<div class="col-md-4">
+			<p class="text-center text-light">
+			Copyright &copy 2026, Millennium Group of Institutions.<br> All rights reserved.
+			</p>			
+		
+		</div>
+	</div>
+
+</div>
+
+<div style="position:relative">
+<a href="tel:+91 9200300600"><img src="images/phone.png" style="width:40px;height:40px;position:fixed;bottom:15px;right:15px;border-radius:50%;z-index:999;background:#FFFFFF"></a>
+</div>
+</footer>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J6QG3CG2CJ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-J6QG3CG2CJ');
+</script></body>
+</html>

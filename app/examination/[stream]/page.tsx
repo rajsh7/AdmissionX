@@ -108,7 +108,7 @@ export default async function ExaminationStreamPage({ params }: { params: Promis
         </div>
 
         <div className="relative z-10">
-          <section className="relative h-[460px] md:h-[540px] flex flex-col items-center justify-center text-center">
+          <section className="relative h-[460px] md:h-[540px] flex flex-col items-center justify-center text-center pt-[104px]">
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 pointer-events-none" />
             <div className="relative z-20 w-full px-4 lg:px-8 xl:px-12 flex flex-col items-center">
               <nav className="flex items-center justify-center flex-wrap gap-1 text-white/70 text-sm mb-6">

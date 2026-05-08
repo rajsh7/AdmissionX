@@ -120,11 +120,10 @@ export default async function ExaminationHubPage({
 
   return (
     <div className="min-h-screen bg-neutral-50 relative">
-      <div className="relative z-10">
-        <Header />
+      <Header />\r\n      <div className="relative z-10">
 
         {/* Hero section */}
-        <div className="pt-20 sm:pt-24 pb-8 w-full px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10">
+        <div className="pt-[100px] lg:pt-[104px] pb-8 w-full px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10">
           <div
             className="relative bg-white rounded-[5px] shadow-lg border border-neutral-200 overflow-hidden flex flex-col md:flex-row bg-cover bg-right bg-no-repeat"
             style={{ minHeight: "360px", backgroundImage: `url("${HERO_BG}")` }}

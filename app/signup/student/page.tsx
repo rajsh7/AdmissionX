@@ -43,6 +43,12 @@ export default function StudentSignupPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMsg("");
+
+    if (!formData.name.trim()) { setErrorMsg("Please enter your name."); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) { setErrorMsg("Please enter a valid email address."); return; }
+    if (!/^[6-9]\d{9}$/.test(formData.phone.trim().replace(/[\s\-+]/g, ""))) { setErrorMsg("Please enter a valid 10-digit mobile number."); return; }
+    if (formData.password.length < 8) { setErrorMsg("Password must be at least 8 characters."); return; }
+
     setLoading(true);
     const res = await fetch("/api/signup/student", {
       method: "POST",

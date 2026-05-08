@@ -138,7 +138,7 @@ export default function TopUniversities({
     <section className="w-full bg-[#f8fafc]/30 py-24 lg:py-32">
       <div className="home-page-shell">
         <FadeIn>
-          <div className="mb-16 grid grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-12">
+          <div className="mb-8 grid grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-12">
             <div className="lg:col-span-8">
               <h2 className="text-[28px] sm:text-[40px] lg:text-[56px] xl:text-[68px] font-semibold leading-[1.1] tracking-tight text-slate-900">
                 Discover the Top <span className="text-primary">Universities</span>
@@ -176,7 +176,7 @@ export default function TopUniversities({
           <button
             suppressHydrationWarning
             onClick={() => setSortBy(sortBy === "rank" ? null : "rank")}
-            className={`h-[48px] w-full sm:w-auto rounded-[5px] border px-4 sm:px-6 text-sm font-medium shadow-sm transition-all ${
+            className={`h-[48px] w-full sm:w-auto sm:ml-auto rounded-[5px] border px-4 sm:px-6 text-sm font-medium shadow-sm transition-all ${
               sortBy === "rank" ? "border-[#FF3C3C] bg-[#FF3C3C] text-white" : "border-slate-200 bg-white text-slate-600"
             } flex items-center justify-center gap-2`}
           >

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import PaginationFixed from "@/app/components/PaginationFixed";
+import DeleteButton from "@/app/admin/_components/DeleteButton";
 
 interface StudentRow {
   id: number;
@@ -19,6 +20,7 @@ interface Props {
   totalPages: number;
   offset: number;
   PAGE_SIZE: number;
+  onDelete: (id: number) => Promise<void>;
 }
 
 const AVATAR_COLORS = [
@@ -61,7 +63,7 @@ function obfuscatePhone(phone: string | null | undefined) {
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
 
 export default function StudentsTableClient({
-  students, total, page, totalPages, offset, PAGE_SIZE,
+  students, total, page, totalPages, offset, PAGE_SIZE, onDelete,
 }: Props) {
   const [visibleCount, setVisibleCount] = useState(25);
 
@@ -88,6 +90,7 @@ export default function StudentsTableClient({
               <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider hidden lg:table-cell">Phone</th>
               <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider hidden sm:table-cell">Joined</th>
               <th className="text-right px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-20">ID</th>
+              <th className="text-right px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-16">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
@@ -121,6 +124,14 @@ export default function StudentsTableClient({
                   <span className="text-[10px] font-mono font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-lg">
                     #{student.id}
                   </span>
+                </td>
+                <td className="px-4 py-3.5 text-right">
+                  <DeleteButton
+                    action={async () => { await onDelete(student.id); }}
+                    label="Delete"
+                    size="xs"
+                    icon={<span className="material-symbols-outlined text-[13px]">delete</span>}
+                  />
                 </td>
               </tr>
             ))}

@@ -12,6 +12,7 @@ interface CollegeListItemProps {
   college: CollegeResult;
   index?: number;
   entityName?: string;
+  sortMode?: string;
 }
 
 function formatFees(fees: number | null): string {
@@ -33,12 +34,15 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
   );
 }
 
-export default function CollegeListItem({ college, index = 0, entityName = "College" }: CollegeListItemProps) {
+export default function CollegeListItem({ college, index = 0, entityName = "College", sortMode }: CollegeListItemProps) {
   const { handleApply, modalSlug, closeModal } = useApplyGuard();
   const { slug, name, location, image, rating, totalRatingUser, ranking, isTopUniversity, topUniversityRank, universityType, collegetype_id, estyear, verified, streams, min_fees, max_fees } = college;
 
   const displayRank = topUniversityRank ?? ranking;
-  const feesLabel = formatFees(max_fees) || null;
+  const feesValue = sortMode === "fees_high"
+    ? ((max_fees && max_fees >= 1000) ? max_fees : null)
+    : ((min_fees && min_fees >= 1000) ? min_fees : (max_fees && max_fees >= 1000) ? max_fees : null);
+  const feesLabel = formatFees(feesValue) || null;
 
   // collegetype_id: 2=Government College, 3=Government University
   const isGovt = collegetype_id === 2 || collegetype_id === 3;

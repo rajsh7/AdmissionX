@@ -209,10 +209,10 @@ export default async function NewsPage({
   }
 
   return (
-    <div className="min-h-screen bg-white font-poppins">
+    <div className="min-h-screen bg-white">
       <Header />
 
-      <main className="pt-[42px] sm:pt-20 pb-16 w-full">
+      <main className="pt-[100px] lg:pt-[104px] pb-16 w-full">
         <div className="w-full max-w-none mx-auto px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10">
           <div className="pt-2" />
           {/* Featured */}

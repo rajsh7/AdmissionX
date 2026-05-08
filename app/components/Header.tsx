@@ -703,7 +703,7 @@ export default function Header({ theme }: HeaderProps) {
       )}
 
       <motion.header
-        className="site-header fixed top-0 left-0 right-0 z-[100] w-full flex items-center h-[58px] bg-white border-b border-neutral-100"
+        className="site-header fixed top-0 left-0 right-0 z-[100] w-full flex items-center h-[58px] bg-white"
       >
         <div className="home-page-shell flex w-full items-center justify-between">
           {/* Logo Area */}
@@ -860,7 +860,7 @@ export default function Header({ theme }: HeaderProps) {
       </motion.header>
 
       {/* ── Second Navigation Bar ── */}
-      <div className="fixed left-0 right-0 z-[99] bg-white border-b border-slate-200 shadow-sm hidden lg:block" style={{ top: '58px' }}>
+      <div className="fixed left-0 right-0 z-[99] bg-white shadow-sm hidden lg:block" style={{ top: '58px' }}>
         <SecondNav />
       </div>
 
