@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { CollegeUser } from "../CollegeDashboardClient";
 
 interface Props { college: CollegeUser; }
@@ -23,7 +23,7 @@ interface Course {
   last_date: string | null;
 }
 
-interface Option { id: number; name: string; }
+interface Option { id: number | string; name: string; }
 
 const EMPTY_FORM = {
   course_id: "", degree_id: "", functionalarea_id: "",
@@ -39,6 +39,63 @@ function LegendInput({ label, children }: { label: string; children: React.React
       <label className="absolute -top-[11px] left-3 bg-white px-2 text-[13px] font-semibold text-slate-500 z-10">{label}</label>
       <div className="border border-slate-200 rounded-[5px] px-4 pt-4 pb-2 focus-within:border-red-300 transition-colors relative">
         {children}
+      </div>
+    </div>
+  );
+}
+
+function CustomSelect({ label, options, value, onChange, placeholder }: {
+  label: string;
+  options: Option[];
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = options.find(o => String(o.id) === value);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <div className="relative mt-4 mb-6" ref={ref}>
+      <label className="absolute -top-[11px] left-3 bg-white px-2 text-[13px] font-semibold text-slate-500 z-10">{label}</label>
+      <div className="border border-slate-200 rounded-[5px] px-4 pt-3 pb-2 focus-within:border-red-300 transition-colors relative">
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          className="w-full bg-transparent outline-none text-[14px] cursor-pointer py-1 text-left flex items-center justify-between"
+        >
+          <span className={selected ? "text-slate-600" : "text-slate-400"}>{selected?.name || placeholder}</span>
+          <span className="material-symbols-outlined text-slate-400 text-[18px]">expand_more</span>
+        </button>
+        {open && (
+          <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-[5px] shadow-lg max-h-60 overflow-y-auto">
+            <div
+              className="px-4 py-2.5 text-[13px] text-slate-400 cursor-pointer hover:bg-slate-50"
+              onClick={() => { onChange(""); setOpen(false); }}
+            >
+              {placeholder}
+            </div>
+            {options.map(o => (
+              <div
+                key={o.id}
+                className={`px-4 py-2.5 text-[13px] cursor-pointer hover:bg-red-50 hover:text-[#FF3C3C] ${
+                  String(o.id) === value ? "bg-red-50 text-[#FF3C3C] font-semibold" : "text-slate-600"
+                }`}
+                onClick={() => { onChange(String(o.id)); setOpen(false); }}
+              >
+                {o.name}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -158,41 +215,37 @@ export default function CoursesTab({ college }: Props) {
           <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-xl p-6 mb-8 shadow-sm max-w-3xl">
             <h3 className="text-[15px] font-bold text-slate-700 mb-4">Add New Course</h3>
 
-            <LegendInput label="Stream *">
-              <select value={form.functionalarea_id} onChange={e => upd("functionalarea_id", e.target.value)}
-                className="w-full bg-transparent outline-none text-[14px] text-slate-600 appearance-none cursor-pointer py-1">
-                <option value="">Select Stream</option>
-                {options.streams.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
-              </select>
-              <span className="material-symbols-outlined absolute right-3 top-4 text-slate-400 pointer-events-none text-[18px]">expand_more</span>
-            </LegendInput>
+            <CustomSelect
+              label="Stream *"
+              options={options.streams}
+              value={form.functionalarea_id}
+              onChange={v => upd("functionalarea_id", v)}
+              placeholder="Select Stream"
+            />
 
-            <LegendInput label="Degree Level *">
-              <select value={form.degree_id} onChange={e => upd("degree_id", e.target.value)}
-                className="w-full bg-transparent outline-none text-[14px] text-slate-600 appearance-none cursor-pointer py-1">
-                <option value="">Select Degree Level</option>
-                {options.degrees.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
-              </select>
-              <span className="material-symbols-outlined absolute right-3 top-4 text-slate-400 pointer-events-none text-[18px]">expand_more</span>
-            </LegendInput>
+            <CustomSelect
+              label="Degree Level *"
+              options={options.degrees}
+              value={form.degree_id}
+              onChange={v => upd("degree_id", v)}
+              placeholder="Select Degree Level"
+            />
 
-            <LegendInput label="Course *">
-              <select value={form.course_id} onChange={e => upd("course_id", e.target.value)}
-                className="w-full bg-transparent outline-none text-[14px] text-slate-600 appearance-none cursor-pointer py-1">
-                <option value="">Select Course</option>
-                {options.courses.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
-              </select>
-              <span className="material-symbols-outlined absolute right-3 top-4 text-slate-400 pointer-events-none text-[18px]">expand_more</span>
-            </LegendInput>
+            <CustomSelect
+              label="Course *"
+              options={options.courses}
+              value={form.course_id}
+              onChange={v => upd("course_id", v)}
+              placeholder="Select Course"
+            />
 
-            <LegendInput label="Course Duration">
-              <select value={form.courseduration} onChange={e => upd("courseduration", e.target.value)}
-                className="w-full bg-transparent outline-none text-[14px] text-slate-600 appearance-none cursor-pointer py-1">
-                <option value="">Select Duration</option>
-                {DURATION_OPTIONS.map(d => <option key={d} value={d}>{d}</option>)}
-              </select>
-              <span className="material-symbols-outlined absolute right-3 top-4 text-slate-400 pointer-events-none text-[18px]">expand_more</span>
-            </LegendInput>
+            <CustomSelect
+              label="Course Duration"
+              options={DURATION_OPTIONS.map(d => ({ id: d, name: d }))}
+              value={form.courseduration}
+              onChange={v => upd("courseduration", v)}
+              placeholder="Select Duration"
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
               <LegendInput label="Total Fees (per year)">

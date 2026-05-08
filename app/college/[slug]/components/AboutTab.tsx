@@ -24,6 +24,8 @@ interface AboutTabProps {
   aboutPara2: string;
   missionText: string;
   visionText: string;
+  aboutHeading?: string;
+  statsBannerTagline?: string;
   descriptionText: string;
   paragraphs: string[];
 }
@@ -38,7 +40,8 @@ function buildImageUrl(raw: string | null | undefined): string {
 export default function AboutTab({
   collegeName, slug, location, stats, mosaicImages,
   mosaic1, mosaic2, mosaic3, mosaic4, bannerimage,
-  aboutPara1, aboutPara2, missionText, visionText, descriptionText, paragraphs,
+  aboutPara1, aboutPara2, missionText, visionText, aboutHeading,
+  statsBannerTagline, descriptionText, paragraphs,
 }: AboutTabProps) {
   const { handleApply, modalSlug, closeModal } = useApplyGuard();
   return (
@@ -66,7 +69,7 @@ export default function AboutTab({
               {/* Title */}
               <div>
                 <h2 className="text-[22px] sm:text-[32px] lg:text-[42px] font-bold text-white leading-tight mb-2">
-                  India&apos;s biggest university,<br />
+                  {statsBannerTagline || "India's biggest university,"}<br />
                   <span className="text-white">{collegeName}</span>
                 </h2>
                 <div className="flex items-center gap-1.5 text-white mt-2">
@@ -145,9 +148,7 @@ export default function AboutTab({
             <div>
               <span className="text-[#FF3C3C] text-[16px] sm:text-[20px] lg:text-[24px] font-bold tracking-[0.2em] uppercase block mb-3">ABOUT US</span>
               <h3 className="text-[24px] sm:text-[32px] lg:text-[45px] font-bold leading-tight mb-4" style={{ color: "#0E2A46" }}>
-                Benefit From Our Online<br className="hidden sm:block" />
-                Learning Expertise Earn{" "}
-                <span className="text-[#FF3C3C]">Professional</span>
+                {aboutHeading || (<>Benefit From Our Online<br className="hidden sm:block" /> Learning Expertise Earn{" "}<span className="text-[#FF3C3C]">Professional</span></>)}
               </h3>
               <p className="text-[14px] sm:text-[16px] lg:text-[17px] font-normal leading-relaxed mb-6" style={{ color: "#333931" }}>{aboutPara1}</p>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Header from "../../../components/Header";
 import OverviewTab from "./tabs/OverviewTab";
@@ -19,6 +19,19 @@ import LettersTab from "./tabs/LettersTab";
 import EventsTab from "./tabs/EventsTab";
 import PlacementTab from "./tabs/PlacementTab";
 import SettingsTab from "./tabs/SettingsTab";
+import QueriesTab from "./tabs/QueriesTab";
+import ReviewsTab from "./tabs/ReviewsTab";
+import TransactionsTab from "./tabs/TransactionsTab";
+import FAQsTab from "./tabs/FAQsTab";
+import QATab from "./tabs/QATab";
+import HelpdeskTab from "./tabs/HelpdeskTab";
+import AgreementTab from "./tabs/AgreementTab";
+import TermsTab from "./tabs/TermsTab";
+import FacultyTab from "./tabs/FacultyTab";
+import SocialLinksTab from "./tabs/SocialLinksTab";
+import ApplicationsTab from "./tabs/ApplicationsTab";
+import DescriptionTab from "./tabs/DescriptionTab";
+import RecruitersTab from "./tabs/RecruitersTab";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface CollegeUser {
@@ -34,6 +47,7 @@ export type TabId =
   | "overview"
   | "banner"
   | "about_images"
+  | "description"
   | "address"
   | "gallery"
   | "achievements"
@@ -45,6 +59,9 @@ export type TabId =
   | "letters"
   | "sports"
   | "cutoffs"
+  | "faqs"
+  | "faculty"
+  | "recruiters"
   | "public_view"
   | "logout"
   | "settings";
@@ -64,6 +81,7 @@ const TABS: Tab[] = [
   // College Information Group
   { id: "banner", label: "Upload College Banner", icon: "image", mobileLabel: "Banner", group: "info" },
   { id: "about_images", label: "About Images", icon: "collections", mobileLabel: "About", group: "info" },
+  { id: "description", label: "About / Description", icon: "article", mobileLabel: "Desc", group: "info" },
   { id: "address", label: "Address", icon: "location_on", mobileLabel: "Addr", group: "info" },
   { id: "gallery", label: "Gallery", icon: "photo_library", mobileLabel: "Gal", group: "info" },
   { id: "achievements", label: "Achievements", icon: "emoji_events", mobileLabel: "Ach", group: "info" },
@@ -75,6 +93,9 @@ const TABS: Tab[] = [
   { id: "letters", label: "Affiliation / Accreditation Letters", icon: "description", mobileLabel: "Let", group: "info" },
   { id: "sports", label: "Sports & Activity", icon: "sports_soccer", mobileLabel: "Spo", group: "info" },
   { id: "cutoffs", label: "Cut Offs", icon: "trending_down", mobileLabel: "Cut", group: "info" },
+  { id: "faqs", label: "FAQs", icon: "quiz", mobileLabel: "FAQ", group: "info" },
+  { id: "faculty", label: "Faculty", icon: "person", mobileLabel: "Fac", group: "info" },
+  { id: "recruiters", label: "Top Recruiters", icon: "business", mobileLabel: "Rec", group: "info" },
 
   { id: "public_view", label: "Public View", icon: "visibility", mobileLabel: "Public" },
   { id: "settings", label: "Account Settings", icon: "settings", mobileLabel: "Settings" },
@@ -98,10 +119,19 @@ export default function CollegeDashboardClient({
   const logoRef = useRef<HTMLInputElement>(null);
   const slug = college.slug;
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab") as TabId | null;
+    if (tab && TABS.some(t => t.id === tab)) {
+      setActiveTab(tab);
+      if (TABS.find(t => t.id === tab)?.group === "info") setInfoExpanded(true);
+    }
+  }, [searchParams]);
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -194,6 +224,10 @@ export default function CollegeDashboardClient({
         return <CutoffsTab college={college} />;
       case "sports":
         return <SportsTab college={college} />;
+      case "description":
+        return <DescriptionTab college={college} />;
+      case "recruiters":
+        return <RecruitersTab college={college} />;
       case "settings":
         return <SettingsTab college={college} />;
       default:
@@ -202,7 +236,7 @@ export default function CollegeDashboardClient({
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f6f6] dark:bg-[#0f1623] font-poppins">
+    <div className="min-h-screen bg-[#f8f6f6] dark:bg-[#0f1623]">
       <Header theme="light" />
 
       <div className="flex pt-[96px]">
@@ -284,18 +318,18 @@ export default function CollegeDashboardClient({
                         ? { backgroundColor: '#963737', borderLeft: '4px solid #6e2222', color: 'white' }
                         : { borderLeft: '4px solid transparent', color: 'rgba(255,255,255,0.7)' }
                       }
-                      className="w-full flex items-center justify-between gap-3 px-5 py-2.5 text-[13px] font-bold transition-all"
+                      className="w-full flex items-center justify-between gap-3 px-5 py-2.5 text-[12px] font-bold transition-all"
                     >
                       <div className="flex items-center gap-3">
                         <span
-                          className="material-symbols-outlined text-[20px] flex-shrink-0"
+                          className="material-symbols-outlined text-[18px] flex-shrink-0"
                           style={{ fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20" }}
                         >
                           list_alt
                         </span>
                         <span className="truncate">College Information</span>
                       </div>
-                      <span className={`material-symbols-outlined text-[18px] transition-transform duration-300 ${infoExpanded ? 'rotate-180' : ''}`}>
+                      <span className={`material-symbols-outlined text-[16px] transition-transform duration-300 ${infoExpanded ? 'rotate-180' : ''}`}>
                         expand_more
                       </span>
                     </button>

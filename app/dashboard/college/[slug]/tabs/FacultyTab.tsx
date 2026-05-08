@@ -1013,42 +1013,9 @@ export default function FacultyTab({ college }: Props) {
       (f.stream_name ?? "").toLowerCase().includes(search.toLowerCase()),
   );
 
-  const tabs = [
-    { id: "address", label: "Address" },
-    { id: "gallery", label: "Gallery" },
-    { id: "achievements", label: "Achievements" },
-    { id: "courses", label: "Course" },
-    { id: "faculty", label: "Our Faculty" },
-    { id: "facilities", label: "Facilities" },
-    { id: "events", label: "Events" },
-    { id: "scholarships", label: "Scholarship" },
-    { id: "placement", label: "Placement" },
-    { id: "sports", label: "Sports" },
-    { id: "cutoffs", label: "Cutoffs" },
-  ];
-
   return (
     <div className="space-y-6 pb-20 w-full overflow-x-hidden">
       <div className="bg-[#fcfcfc] dark:bg-[#0f1623] min-h-[600px] border border-slate-200 dark:border-slate-800 rounded-[10px] overflow-hidden shadow-sm font-poppins">
-        {/* ── Sub-navigation ────────────────────────────────────────────────── */}
-        <div className="flex bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
-          {tabs.map((tab) => {
-            const isActive = tab.id === "faculty"; // We are in Faculty Tab
-            return (
-              <div
-                key={tab.id}
-                className={`flex items-center gap-2 py-3 px-5 text-[13px] font-bold transition-all cursor-pointer border-r border-slate-100 dark:border-slate-800 shrink-0 ${isActive ? "bg-[#8B3D3D] text-white" : "text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
-                  }`}
-              >
-                <span className="whitespace-nowrap">{tab.label}</span>
-                <span className={`material-symbols-outlined text-[17px] ${isActive ? "text-white" : "text-slate-400"}`}>
-                  edit_square
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
         <div className="p-8 md:p-12">
           {view === "list" ? (
             <>

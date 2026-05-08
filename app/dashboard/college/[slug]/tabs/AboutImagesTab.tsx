@@ -9,7 +9,8 @@ const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 
 function buildUrl(raw: string | null) {
   if (!raw) return null;
-  return raw.startsWith("http") || raw.startsWith("/") ? raw : `${IMAGE_BASE}${raw}`;
+  if (raw.startsWith("http") || raw.startsWith("/")) return raw;
+  return `${IMAGE_BASE}${raw}`;
 }
 
 interface ImageSlot {
@@ -20,9 +21,9 @@ interface ImageSlot {
 }
 
 const ABOUT_SLOTS: ImageSlot[] = [
-  { field: "mosaic2", label: "About Image 1 (Large Vertical)", hint: "600×800px recommended", aspect: "aspect-[3/4]" },
-  { field: "mosaic3", label: "About Image 2 (Square)",         hint: "600×600px recommended", aspect: "aspect-square" },
-  { field: "mosaic4", label: "About Image 3 (Square)",         hint: "600×600px recommended", aspect: "aspect-square" },
+  { field: "mosaic2", label: "About Image 1 (Large Vertical)", hint: "600×800px recommended", aspect: "h-48" },
+  { field: "mosaic3", label: "About Image 2 (Square)",         hint: "600×600px recommended", aspect: "h-40" },
+  { field: "mosaic4", label: "About Image 3 (Square)",         hint: "600×600px recommended", aspect: "h-40" },
 ];
 
 function ImageUploadCard({

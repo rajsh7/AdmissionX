@@ -9,10 +9,19 @@ interface Tab {
 }
 
 const TABS: Tab[] = [
-  { label: "About University", href: "" },
+  { label: "About", href: "" },
   { label: "Courses", href: "/courses" },
   { label: "Placements", href: "/placements" },
+  { label: "Faculty", href: "/faculty" },
+  { label: "Gallery", href: "/gallery" },
   { label: "Reviews", href: "/reviews" },
+  { label: "Facilities", href: "/facilities" },
+  { label: "Achievements", href: "/achievements" },
+  { label: "Scholarships", href: "/scholarships" },
+  { label: "Cut Offs", href: "/cutoffs" },
+  { label: "Events", href: "/events" },
+  { label: "Sports", href: "/sports" },
+  { label: "FAQs", href: "/faqs" },
 ];
 
 interface CollegeTabsProps {

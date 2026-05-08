@@ -263,112 +263,114 @@ export default function FAQsTab({ college }: Props) {
   }
 
   return (
-    <div className="pb-24 font-poppins space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <span className="w-1.5 h-6 bg-[#FF3D3D] rounded-full" />
-            <h2 className="text-[24px] font-black text-slate-800 uppercase tracking-tight">College FAQs</h2>
+    <div className="pb-24 font-poppins bg-[#fcfcfc] min-h-[600px] border border-slate-200 rounded-[10px] overflow-hidden shadow-sm">
+      <div className="p-6 md:p-8 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="w-1.5 h-6 bg-[#FF3D3D] rounded-full" />
+              <h2 className="text-[24px] font-black text-slate-800 uppercase tracking-tight">College FAQs</h2>
+            </div>
+            <p className="text-slate-500 text-sm font-medium">
+              Manage frequently asked questions for your institution.
+            </p>
           </div>
-          <p className="text-slate-500 text-sm font-medium">
-            Manage frequently asked questions for your institution.
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="bg-white border border-slate-200 rounded-2xl px-5 py-3 flex items-center gap-3 shadow-sm">
+              <span
+                className="material-symbols-outlined text-[22px] text-[#FF3D3D]"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                quiz
+              </span>
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Total FAQs</p>
+                <p className="text-[18px] font-black text-slate-800 leading-none">{faqs.length}</p>
+              </div>
+            </div>
+            {!showForm && !editingFaq && (
+              <button
+                onClick={() => setShowForm(true)}
+                className="flex items-center gap-2 px-5 py-3 bg-[#FF3D3D] hover:bg-[#e63535] text-white font-bold rounded-2xl shadow-sm transition-colors text-sm"
+              >
+                <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  add_circle
+                </span>
+                Add FAQ
+              </button>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="bg-white border border-slate-200 rounded-2xl px-5 py-3 flex items-center gap-3 shadow-sm">
+
+        {/* Add Form */}
+        {showForm && (
+          <FAQForm onSave={handleAdd} onCancel={() => setShowForm(false)} />
+        )}
+
+        {/* Edit Form */}
+        {editingFaq && (
+          <FAQForm
+            initial={editingFaq}
+            onSave={handleEdit}
+            onCancel={() => setEditingFaq(null)}
+          />
+        )}
+
+        {/* Error */}
+        {error && (
+          <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-2xl px-5 py-4 text-red-700">
+            <span className="material-symbols-outlined text-xl">error</span>
+            <span className="text-sm font-medium">{error}</span>
+            <button onClick={load} className="ml-auto text-xs font-bold underline">
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Loading */}
+        {loading ? (
+          <div className="space-y-3 animate-pulse">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-16 bg-slate-100 rounded-2xl" />
+            ))}
+          </div>
+        ) : faqs.length === 0 && !showForm ? (
+          <div className="p-20 text-center bg-white rounded-3xl border border-dashed border-slate-300">
             <span
-              className="material-symbols-outlined text-[22px] text-[#FF3D3D]"
+              className="material-symbols-outlined text-slate-300 text-6xl mb-4 block"
               style={{ fontVariationSettings: "'FILL' 1" }}
             >
               quiz
             </span>
-            <div>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Total FAQs</p>
-              <p className="text-[18px] font-black text-slate-800 leading-none">{faqs.length}</p>
-            </div>
-          </div>
-          {!showForm && !editingFaq && (
+            <p className="text-slate-400 font-bold text-lg">No FAQs added yet.</p>
+            <p className="text-slate-400 text-sm mt-1 max-w-sm mx-auto">
+              Add frequently asked questions to help prospective students.
+            </p>
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-2 px-5 py-3 bg-[#FF3D3D] hover:bg-[#e63535] text-white font-bold rounded-2xl shadow-sm transition-colors text-sm"
+              className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF3D3D] text-white font-bold rounded-xl text-sm hover:bg-[#e63535] transition-colors"
             >
-              <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                add_circle
-              </span>
-              Add FAQ
+              <span className="material-symbols-outlined text-[18px]">add</span>
+              Add First FAQ
             </button>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {faqs.map((faq) => (
+              <FAQCard
+                key={faq._id}
+                faq={faq}
+                onEdit={(f) => {
+                  setEditingFaq(f);
+                  setShowForm(false);
+                }}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        )}
       </div>
-
-      {/* Add Form */}
-      {showForm && (
-        <FAQForm onSave={handleAdd} onCancel={() => setShowForm(false)} />
-      )}
-
-      {/* Edit Form */}
-      {editingFaq && (
-        <FAQForm
-          initial={editingFaq}
-          onSave={handleEdit}
-          onCancel={() => setEditingFaq(null)}
-        />
-      )}
-
-      {/* Error */}
-      {error && (
-        <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-2xl px-5 py-4 text-red-700">
-          <span className="material-symbols-outlined text-xl">error</span>
-          <span className="text-sm font-medium">{error}</span>
-          <button onClick={load} className="ml-auto text-xs font-bold underline">
-            Retry
-          </button>
-        </div>
-      )}
-
-      {/* Loading */}
-      {loading ? (
-        <div className="space-y-3 animate-pulse">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-16 bg-slate-100 rounded-2xl" />
-          ))}
-        </div>
-      ) : faqs.length === 0 && !showForm ? (
-        <div className="p-20 text-center bg-white rounded-3xl border border-dashed border-slate-300">
-          <span
-            className="material-symbols-outlined text-slate-300 text-6xl mb-4 block"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            quiz
-          </span>
-          <p className="text-slate-400 font-bold text-lg">No FAQs added yet.</p>
-          <p className="text-slate-400 text-sm mt-1 max-w-sm mx-auto">
-            Add frequently asked questions to help prospective students.
-          </p>
-          <button
-            onClick={() => setShowForm(true)}
-            className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF3D3D] text-white font-bold rounded-xl text-sm hover:bg-[#e63535] transition-colors"
-          >
-            <span className="material-symbols-outlined text-[18px]">add</span>
-            Add First FAQ
-          </button>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {faqs.map((faq) => (
-            <FAQCard
-              key={faq._id}
-              faq={faq}
-              onEdit={(f) => {
-                setEditingFaq(f);
-                setShowForm(false);
-              }}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

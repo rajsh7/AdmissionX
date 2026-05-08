@@ -41,9 +41,8 @@ export default async function ReviewsPage({ params }: { params: Promise<{ slug: 
         .reduce((a, b) => a + b, 0) /
       Math.max(1, [r.academic, r.accommodation, r.faculty, r.infrastructure, r.placement, r.social]
         .filter((v): v is number => typeof v === "number" && v > 0).length)
-      ) / 2  // scores are 0-10, convert to 0-5
+      ) / 2
     ))),
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=60&w=150&h=150",
     role: "Student",
   }));
 

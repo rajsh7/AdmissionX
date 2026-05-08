@@ -62,7 +62,7 @@ function buildImageUrl(raw: string | null | undefined): string {
   if (!raw || String(raw).trim().toLowerCase() === "null") return DEFAULT_BANNER;
   const s = String(raw).trim();
   if (s.startsWith("http")) return s;
-  if (s.startsWith("/uploads/")) return `https://admin.admissionx.in${s}`;
+  if (s.startsWith("/uploads/")) return s; // local upload — serve directly
   if (s.startsWith("/")) return s;
   return `https://admin.admissionx.in/uploads/${s}`;
 }
@@ -118,9 +118,9 @@ async function fetchCollegeBase(slug: string) {
 async function fetchTabCounts(slug: string) {
   try {
     const db = await getDb();
-    const cp = await db.collection("collegeprofile").findOne({ slug }, { projection: { _id: 1 } });
+    const cp = await db.collection("collegeprofile").findOne({ slug }, { projection: { _id: 1, id: 1 } });
     if (!cp) return null;
-    const cpId = cp._id;
+    const cpId = cp.id ? Number(cp.id) : cp._id.toString();
 
     const [courses, faculty, reviews, admissionProcedures, faqs] = await Promise.all([
       db.collection("collegemaster").countDocuments({ collegeprofile_id: cpId }),
@@ -140,13 +140,13 @@ async function fetchTabCounts(slug: string) {
 const getCachedCollegeBase = unstable_cache(
   (slug: string) => fetchCollegeBase(slug),
   ["college-base-mongo"],
-  { revalidate: 60 }
+  { revalidate: 30, tags: ["college-base"] }
 );
 
 const getCachedTabCounts = unstable_cache(
   (slug: string) => fetchTabCounts(slug),
   ["college-tab-counts-mongo"],
-  { revalidate: 300 }
+  { revalidate: 30, tags: ["college-tab-counts"] }
 );
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {

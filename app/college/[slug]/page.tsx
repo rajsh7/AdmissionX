@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 
 import AboutTab from "./components/AboutTab";
 import TrackCollegeView from "@/app/components/TrackCollegeView";
-import CollegeGallery from "@/app/components/college/CollegeGallery";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +18,7 @@ const MOSAIC_FALLBACKS = [
 
 function buildImageUrl(raw: string | null): string {
   if (!raw) return DEFAULT_BANNER;
-  if (raw.startsWith("http")) return raw;
+  if (raw.startsWith("http") || raw.startsWith("/")) return raw;
   return `${IMAGE_BASE}${raw}`;
 }
 
@@ -56,38 +55,34 @@ export default async function CollegeOverviewPage({
 
   const db = await getDb();
 
-  // Step 1: Get college profile (fast — indexed slug)
   const cp = await db.collection("collegeprofile").findOne(
     { slug },
-    { projection: { _id: 1, users_id: 1, description: 1, totalStudent: 1, registeredSortAddress: 1, registeredAddressCityId: 1, bannerimage: 1, city_name: 1, mosaic1: 1, mosaic2: 1, mosaic3: 1, mosaic4: 1 } }
+    { projection: { _id: 1, id: 1, users_id: 1, description: 1, mission: 1, vision: 1, aboutHeading: 1, statsBannerTagline: 1, totalStudent: 1, registeredSortAddress: 1, registeredAddressCityId: 1, bannerimage: 1, city_name: 1, mosaic1: 1, mosaic2: 1, mosaic3: 1, mosaic4: 1 } }
   );
 
   if (!cp) notFound();
 
-  const cpId = cp._id;
+  const cpId = cp.id ? Number(cp.id) : cp._id.toString();
   const usersId = cp.users_id;
 
-  // Step 2: Get user name (fast — indexed _id)
   const user = usersId
     ? await db.collection("users").findOne({ _id: usersId }, { projection: { firstname: 1, profileimage: 1 } })
     : null;
 
-  // Step 3: Get city name
   const cityDoc = cp.city_name
     ? null
     : await db.collection("city").findOne({ _id: cp.registeredAddressCityId }, { projection: { name: 1 } });
 
-  // Step 4: Parallel fetch of courses, placement, gallery (all fast — indexed collegeprofile_id)
   const [courseRows, placementRow, galleryRows] = await Promise.all([
     db.collection("collegemaster")
       .find({ collegeprofile_id: cpId })
       .limit(100)
-      .project({ _id: 1, course_id: 1, degree_id: 1, functionalarea_id: 1, fees: 1, seats: 1, courseduration: 1, twelvemarks: 1, description: 1 })
+      .project({ _id: 1 })
       .toArray(),
 
     db.collection("placement").findOne(
       { collegeprofile_id: cpId },
-      { projection: { ctcaverage: 1, ctchighest: 1, ctclowest: 1, numberofrecruitingcompany: 1, numberofplacementlastyear: 1 } }
+      { projection: { ctcaverage: 1 } }
     ),
 
     db.collection("gallery")
@@ -98,28 +93,35 @@ export default async function CollegeOverviewPage({
       .toArray(),
   ]);
 
-  // Build derived values
   const collegeName = user?.firstname?.trim() || slugToName(slug);
   const location = cp.city_name || cityDoc?.name || cp.registeredSortAddress || "India";
 
-  const totalStudentDisplay = (() => {
-    const n = parseInt(cp.totalStudent);
-    return isNaN(n) || n === 0 ? "4,450+" : `${n.toLocaleString()}+`;
-  })();
+  // Only show stats that have real data — no fake fallbacks
+  const stats: { value: string; label: string }[] = [];
 
-  const courseDisplay = courseRows.length > 0 ? `${courseRows.length}+` : "25+";
+  const totalStudentN = parseInt(cp.totalStudent);
+  if (!isNaN(totalStudentN) && totalStudentN > 0) {
+    stats.push({ value: `${totalStudentN.toLocaleString()}+`, label: "Total Students" });
+  }
 
-  const avgCTCDisplay = (() => {
-    if (!placementRow?.ctcaverage) return "8 LPA avg";
+  if (courseRows.length > 0) {
+    stats.push({ value: `${courseRows.length}+`, label: "Courses Offered" });
+  }
+
+  if (placementRow?.ctcaverage) {
     const n = parseFloat(String(placementRow.ctcaverage));
-    return isNaN(n) || n === 0 ? "8 LPA avg" : `${n} LPA avg`;
-  })();
+    if (!isNaN(n) && n > 0) {
+      stats.push({ value: `${n} LPA`, label: "Avg. Placement" });
+    }
+  }
 
   const descriptionText = stripHtml(cp.description);
   const paragraphs = toParagraphs(descriptionText);
   const aboutPara1 = paragraphs[0] || `${collegeName} is a premier educational institution dedicated to academic excellence, research, and holistic development of students.`;
-  const missionText = paragraphs[2] || "To provide quality education that empowers students with knowledge, skills, and values to excel in their professional and personal lives.";
-  const visionText = "To become a world-class institution recognized for academic excellence, innovation, and meaningful contribution to society.";
+  const missionText = cp.mission ? stripHtml(cp.mission) : (paragraphs[2] || "To provide quality education that empowers students with knowledge, skills, and values to excel in their professional and personal lives.");
+  const visionText = cp.vision ? stripHtml(cp.vision) : "To become a world-class institution recognized for academic excellence, innovation, and meaningful contribution to society.";
+  const aboutHeading = cp.aboutHeading ? stripHtml(cp.aboutHeading) : "";
+  const statsBannerTagline = cp.statsBannerTagline ? stripHtml(cp.statsBannerTagline) : "";
 
   const mosaicImages = [
     galleryRows[0]?.fullimage ? buildImageUrl(galleryRows[0].fullimage as string) : MOSAIC_FALLBACKS[0],
@@ -127,36 +129,29 @@ export default async function CollegeOverviewPage({
     galleryRows[2]?.fullimage ? buildImageUrl(galleryRows[2].fullimage as string) : MOSAIC_FALLBACKS[2],
   ];
 
-  const stats = [
-    { value: totalStudentDisplay, label: "Total student" },
-    { value: courseDisplay, label: "Courses offered" },
-    { value: avgCTCDisplay, label: "2025 Placement" },
-  ];
-
   return (
     <>
       <TrackCollegeView slug={slug} name={collegeName} />
       <AboutTab
-      collegeName={collegeName}
-      slug={slug}
-      location={location}
-      stats={stats}
-      mosaicImages={mosaicImages}
-      mosaic1={cp.mosaic1}
-      mosaic2={cp.mosaic2}
-      mosaic3={cp.mosaic3}
-      mosaic4={cp.mosaic4}
-      bannerimage={cp.bannerimage}
-      aboutPara1={aboutPara1}
-      aboutPara2={paragraphs[1] || "The institution provides a vibrant campus environment with state-of-the-art facilities, experienced faculty, and strong industry connections."}
-      missionText={missionText}
-      visionText={visionText}
-      descriptionText={descriptionText}
-      paragraphs={paragraphs}
-    />
-      <div className="max-w-[1920px] mx-auto px-6 lg:px-12 pb-12">
-        <CollegeGallery slug={slug} />
-      </div>
+        collegeName={collegeName}
+        slug={slug}
+        location={location}
+        stats={stats}
+        mosaicImages={mosaicImages}
+        mosaic1={cp.mosaic1}
+        mosaic2={cp.mosaic2}
+        mosaic3={cp.mosaic3}
+        mosaic4={cp.mosaic4}
+        bannerimage={cp.bannerimage}
+        aboutPara1={aboutPara1}
+        aboutPara2={paragraphs[1] || "The institution provides a vibrant campus environment with state-of-the-art facilities, experienced faculty, and strong industry connections."}
+        missionText={missionText}
+        visionText={visionText}
+        aboutHeading={aboutHeading}
+        statsBannerTagline={statsBannerTagline}
+        descriptionText={descriptionText}
+        paragraphs={paragraphs}
+      />
     </>
   );
 }

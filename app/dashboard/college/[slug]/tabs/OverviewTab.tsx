@@ -171,6 +171,7 @@ export default function OverviewTab({ college, onNavigate }: Props) {
       setContactPhone(p.contactpersonnumber || "");
       setMediumOfInstruction(p.mediumOfInstruction || "");
       setStudyFrom(p.studyForm || "");
+      setStudyTo(p.studyTo || "");
       setAdmissionStart(p.admissionStart || "");
       setAdmissionEnd(p.admissionEnd || "");
       setCctv(p.CCTVSurveillance || "No");
@@ -414,49 +415,74 @@ export default function OverviewTab({ college, onNavigate }: Props) {
         ) : (
           <div className="space-y-6">
             {saveSuccess && (
-              <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-[5px] text-emerald-600 text-sm font-bold flex items-center gap-2">
+              <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-600 text-sm font-bold flex items-center gap-2">
                 <span className="material-symbols-outlined text-[18px]">check_circle</span>
                 {saveSuccess}
               </div>
             )}
-            <div className="bg-white rounded-[10px] border border-slate-100 shadow-sm p-8 md:p-12">
-               <div className="grid grid-cols-1 gap-y-10">
-                  <LegendInput label="Select University" value={universityType} onChange={setUniversityType} placeholder="Select University" isSelect options={["Amity", "Delhi", "IP", "Other"]} />
-                  <LegendInput label="Select College Type" value={collegeType} onChange={setCollegeType} placeholder="Select College Type" isSelect options={["Private", "Government"]} />
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-bold flex items-center gap-2">
+                <span className="material-symbols-outlined text-[18px]">error</span>
+                {error}
+              </div>
+            )}
+            <div className="space-y-6">
+
+              {/* Card 1 — Basic Info */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
+                <h3 className="text-[13px] font-black text-slate-400 uppercase tracking-widest mb-6">Basic Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
+                  <LegendInput label="University Type" value={universityType} onChange={setUniversityType} placeholder="Select University Type" isSelect options={["Central University", "State University", "Deemed University", "Private University", "Autonomous College", "Affiliated College", "Other"]} />
+                  <LegendInput label="College Type" value={collegeType} onChange={setCollegeType} placeholder="Select College Type" isSelect options={["Private", "Government", "Government Aided", "Autonomous"]} />
                   <LegendInput label="Website" value={website} onChange={setWebsite} placeholder="Enter your url here" />
-                  <LegendInput label="Approved By" value="AICTE, UGC, NAAC" placeholder="Select approved type" disabled />
                   <LegendInput label="Established Year" value={estyear} onChange={setEstyear} placeholder="e.g. 1995" type="number" />
-                  <LegendInput label="College code" value={collegeCode} onChange={setCollegeCode} placeholder="College code" />
-                  <LegendInput label="Contact Person / Administrator office Name" value={contactName} onChange={setContactName} placeholder="Name" />
-                  <LegendInput label="Contact Person / Administrator office Email" value={contactEmail} onChange={setContactEmail} placeholder="Email" type="email" />
-                  <LegendInput label="Contact Person / Administrator office Phone" value={contactPhone} onChange={setContactPhone} placeholder="Phone" type="tel" />
-                  <LegendInput label="Medium instruction" value={mediumOfInstruction} onChange={setMediumOfInstruction} placeholder="e.g. English" />
+                  <LegendInput label="College Code" value={collegeCode} onChange={setCollegeCode} placeholder="College code" />
+                  <LegendInput label="Medium of Instruction" value={mediumOfInstruction} onChange={setMediumOfInstruction} placeholder="e.g. English" />
+                </div>
+              </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-10">
-                    <LegendInput label="Study Form" value={studyFrom} onChange={setStudyFrom} placeholder="Class start" />
-                    <LegendInput label="Study To" value={studyTo} onChange={setStudyTo} placeholder="Class end" />
-                  </div>
+              {/* Card 2 — Contact Person */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
+                <h3 className="text-[13px] font-black text-slate-400 uppercase tracking-widest mb-6">Contact Person</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8">
+                  <LegendInput label="Contact Person / Administrator Name" value={contactName} onChange={setContactName} placeholder="Name" />
+                  <LegendInput label="Contact Person Email" value={contactEmail} onChange={setContactEmail} placeholder="Email" type="email" />
+                  <LegendInput label="Contact Person Phone" value={contactPhone} onChange={setContactPhone} placeholder="Phone" type="tel" />
+                </div>
+              </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-10">
-                    <LegendInput label="Admission Start Date" value={admissionStart} onChange={setAdmissionStart} type="date" />
-                    <LegendInput label="Admission End Date" value={admissionEnd} onChange={setAdmissionEnd} type="date" />
-                  </div>
+              {/* Card 3 — Schedule & Admission */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
+                <h3 className="text-[13px] font-black text-slate-400 uppercase tracking-widest mb-6">Schedule & Admission</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
+                  <LegendInput label="Study Form (Class Start Time)" value={studyFrom} onChange={setStudyFrom} placeholder="e.g. 9:00 AM" />
+                  <LegendInput label="Study To (Class End Time)" value={studyTo} onChange={setStudyTo} placeholder="e.g. 5:00 PM" />
+                  <LegendInput label="Admission Start Date" value={admissionStart} onChange={setAdmissionStart} type="date" />
+                  <LegendInput label="Admission End Date" value={admissionEnd} onChange={setAdmissionEnd} type="date" />
+                </div>
+              </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-10">
-                    <LegendInput label="CCTV Surveillance" value={cctv} onChange={setCctv} isSelect options={["Yes", "No"]} />
-                    <LegendInput label="AC Campus" value={acCampus} onChange={setAcCampus} isSelect options={["Yes", "No"]} />
-                    <LegendInput label="Total No Of Students" value={totalStudents} onChange={setTotalStudents} placeholder="e.g. 5000" type="number" />
-                  </div>
-               </div>
-               <div className="mt-16 flex justify-start">
-                  <button 
-                    onClick={handleSaveProfile}
-                    disabled={saving}
-                    className="bg-[#FF3B3B] text-white px-10 py-3 rounded-[8px] font-black text-[16px] hover:bg-[#ff2525] transition-all flex items-center justify-center min-w-[160px] shadow-sm active:scale-[0.98]"
-                  >
-                    {saving ? "..." : "Submit"}
-                  </button>
-               </div>
+              {/* Card 4 — Campus & Facilities */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
+                <h3 className="text-[13px] font-black text-slate-400 uppercase tracking-widest mb-6">Campus & Facilities</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8">
+                  <LegendInput label="CCTV Surveillance" value={cctv} onChange={setCctv} isSelect options={["Yes", "No"]} />
+                  <LegendInput label="AC Campus" value={acCampus} onChange={setAcCampus} isSelect options={["Yes", "No"]} />
+                  <LegendInput label="Total No Of Students" value={totalStudents} onChange={setTotalStudents} placeholder="e.g. 5000" type="number" />
+                </div>
+              </div>
+
+              {/* Submit */}
+              <div className="flex justify-start pb-4">
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={saving}
+                  className="bg-[#FF3B3B] text-white px-12 py-3 rounded-[8px] font-black text-[16px] hover:bg-[#ff2525] transition-all min-w-[160px] shadow-sm active:scale-[0.98] disabled:opacity-50"
+                >
+                  {saving ? "Saving..." : "Submit"}
+                </button>
+              </div>
+
             </div>
           </div>
         )}

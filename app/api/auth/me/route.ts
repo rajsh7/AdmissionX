@@ -29,12 +29,24 @@ export async function GET(req: NextRequest) {
   if (collegeToken) {
     const payload = await verifyCollegeToken(collegeToken);
     if (payload) {
+      // Look up the college slug from the profile
+      let collegeSlug: string | null = null;
+      try {
+        const { getDb } = await import("@/lib/db");
+        const db = await getDb();
+        const profile = await db.collection("collegeprofile").findOne(
+          { email: payload.email.toLowerCase() },
+          { projection: { slug: 1 } }
+        );
+        collegeSlug = profile?.slug ?? null;
+      } catch { /* ignore */ }
       return NextResponse.json({
         user: {
           id: payload.id,
           name: payload.name,
           email: payload.email,
           role: payload.role,
+          slug: collegeSlug,
         },
       });
     }

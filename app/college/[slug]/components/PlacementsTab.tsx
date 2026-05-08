@@ -13,20 +13,8 @@ interface PlacementsTabProps {
   placementInfo?: string | null;
   hasData?: boolean;
   mosaicImage?: string;
+  recruiters?: { name: string; logo: string; website?: string }[];
 }
-
-const TOP_RECRUITERS = [
-  { name: "Google",    logo: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" },
-  { name: "Microsoft", logo: "https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg" },
-  { name: "Amazon",    logo: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" },
-  { name: "IBM",       logo: "https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" },
-  { name: "Adobe",     logo: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Adobe_Corporate_logo.svg" },
-  { name: "Deloitte",  logo: "https://upload.wikimedia.org/wikipedia/commons/2/2b/Deloitte.svg" },
-  { name: "Accenture", logo: "https://upload.wikimedia.org/wikipedia/commons/c/cd/Accenture.svg" },
-  { name: "Infosys",   logo: "https://upload.wikimedia.org/wikipedia/commons/9/95/Infosys_logo.svg" },
-  { name: "TCS",       logo: "https://upload.wikimedia.org/wikipedia/commons/b/b1/Tata_Consultancy_Services_Logo.svg" },
-  { name: "Cognizant", logo: "https://upload.wikimedia.org/wikipedia/commons/4/43/Cognizant_logo_2022.svg" },
-];
 
 export default function PlacementsTab({
   slug,
@@ -40,7 +28,10 @@ export default function PlacementsTab({
   placementInfo,
   hasData = false,
   mosaicImage,
+  recruiters: customRecruiters,
 }: PlacementsTabProps) {
+
+  const hasRecruiters = customRecruiters && customRecruiters.length > 0;
 
   const stats = [
     { label: "Placement Ratio",  value: placementRatio, icon: "verified",        color: "text-emerald-600" },
@@ -105,7 +96,8 @@ export default function PlacementsTab({
           </div>
         </div>
 
-        {/* Top Recruiters */}
+        {/* Top Recruiters — only shown when college has uploaded their own */}
+        {hasRecruiters && (
         <div className="mt-6 sm:mt-10 bg-white rounded-[5px] shadow-sm border border-neutral-100 p-5 sm:p-8 lg:p-12">
           <div className="flex items-center justify-between mb-6 sm:mb-8 pb-4 sm:pb-6 border-b border-neutral-100">
             <div>
@@ -116,7 +108,7 @@ export default function PlacementsTab({
           </div>
 
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 sm:gap-6">
-            {TOP_RECRUITERS.map((r, idx) => (
+            {customRecruiters!.map((r, idx) => (
               <div
                 key={idx}
                 className="group bg-white rounded-[5px] flex flex-col items-center justify-center p-3 sm:p-6 border border-neutral-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all h-20 sm:h-28 relative"
@@ -143,6 +135,7 @@ export default function PlacementsTab({
             </a>
           </div>
         </div>
+        )}
       </div>
 
       {/* Explore Cards */}

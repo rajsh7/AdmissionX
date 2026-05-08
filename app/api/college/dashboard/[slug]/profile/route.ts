@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { saveUpload } from "@/lib/upload-utils";
+import { revalidateTag } from "next/cache";
 
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
@@ -65,6 +66,7 @@ export async function GET(
     contactpersonnumber:   s(cp.contactpersonnumber),
     mediumOfInstruction:   s(cp.mediumOfInstruction),
     studyForm:             s(cp.studyForm),
+    studyTo:               s(cp.studyTo),
     admissionStart:        s(cp.admissionStart),
     admissionEnd:          s(cp.admissionEnd),
     totalStudent:          s(cp.totalStudent),
@@ -82,6 +84,10 @@ export async function GET(
     mosaic3:               s(cp.mosaic3),
     mosaic4:               s(cp.mosaic4),
     ranking:               cp.ranking ?? null,
+    mission:               s(cp.mission),
+    vision:                s(cp.vision),
+    aboutHeading:          s(cp.aboutHeading),
+    statsBannerTagline:    s(cp.statsBannerTagline),
   };
 
   return NextResponse.json({ profile });
@@ -123,6 +129,10 @@ export async function PUT(
     admissionEnd:         "admissionEnd",
     totalStudent:         "totalStudent",
     description:          "description",
+    mission:              "mission",
+    vision:               "vision",
+    aboutHeading:         "aboutHeading",
+    statsBannerTagline:   "statsBannerTagline",
     facebookurl:          "facebookurl",
     twitterurl:           "twitterurl",
     registeredSortAddress: "registeredSortAddress",
@@ -146,6 +156,7 @@ export async function PUT(
     { $set }
   );
 
+  revalidateTag("college-base");
   return NextResponse.json({ success: true, message: "Profile updated successfully." });
 }
 
@@ -196,6 +207,7 @@ export async function PATCH(
       { $set: { [fieldName]: publicUrl, updated_at: new Date() } }
     );
 
+    revalidateTag("college-base");
     return NextResponse.json({ success: true, url: publicUrl, field: fieldName });
   } catch (e) {
     console.error("[profile PATCH] upload error:", e);

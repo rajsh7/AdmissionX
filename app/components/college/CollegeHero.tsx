@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 export interface CollegeHeroData {
   id: unknown;
@@ -45,26 +44,25 @@ export default function CollegeHero({ college }: { college: CollegeHeroData }) {
   return (
     <div className="relative w-full overflow-hidden bg-[#1e293b] flex items-center justify-center" style={{ height: 'clamp(320px, 50vw, 700px)' }}>
       {/* Background Image Layer */}
-      {image && (
-        <div className="absolute inset-0 z-0 h-full w-full">
-          <Image
+      <div className="absolute inset-0 z-0 h-full w-full">
+        {image ? (
+          <img
             src={image}
             alt={college_name}
-            fill
-            priority
-            className="object-cover transition-opacity duration-500 w-full"
-            unoptimized
+            className="w-full h-full object-cover"
           />
-          <div className="absolute inset-x-0 bottom-0 h-1/2 z-10 bg-gradient-to-t from-black/80 to-transparent" />
-        </div>
-      )}
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-900" />
+        )}
+        <div className="absolute inset-x-0 bottom-0 h-1/2 z-10 bg-gradient-to-t from-black/80 to-transparent" />
+      </div>
 
       <div className="absolute bottom-16 sm:bottom-24 md:bottom-32 left-0 w-full z-20">
         <div className="mx-auto max-w-[1920px] px-4 md:px-10 lg:px-12 flex flex-col items-start gap-3">
           <div className="flex items-center gap-3 md:gap-5 backdrop-blur-md px-4 py-2 md:px-7 md:py-2.5 rounded-[5px] shadow-2xl w-fit max-w-[calc(100vw-2rem)]" style={{ backgroundColor: "rgba(212, 12, 17, 0.35)" }}>
             <div className="flex-shrink-0 w-9 h-9 md:w-14 md:h-14 rounded-[5px] bg-white flex items-center justify-center shadow-lg overflow-hidden">
               {logo && logo !== "" && !logo.includes("unsplash.com") ? (
-                <Image src={logo} alt={college_name} width={56} height={56} className="w-full h-full object-cover" unoptimized />
+                <img src={logo} alt={college_name} className="w-full h-full object-cover" />
               ) : (
                 <span className="text-lg md:text-[32px] font-bold" style={{ color: "#FF3C3C" }}>{initial}</span>
               )}

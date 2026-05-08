@@ -36,7 +36,7 @@ export default async function PlacementsPage({ params }: { params: Promise<{ slu
   // Same id resolution as dashboard API
   const collegeprofile_id = cp.id ? Number(cp.id) : cp._id.toString();
 
-  const [user, placement, cityDoc] = await Promise.all([
+  const [user, placement, cityDoc, recruiterRows] = await Promise.all([
     cp.users_id
       ? db.collection("users").findOne(
           { $or: [{ _id: cp.users_id }, { id: cp.users_id }] },
@@ -56,11 +56,24 @@ export default async function PlacementsPage({ params }: { params: Promise<{ slu
           { projection: { name: 1 } }
         )
       : null,
+
+    db.collection("college_recruiters")
+      .find({ college_slug: slug })
+      .sort({ created_at: -1 })
+      .toArray(),
   ]);
 
   const collegeName = user?.firstname?.trim() || slugToName(slug);
   const location = cp.city_name || cityDoc?.name || cp.registeredSortAddress || "India";
   const bannerUrl = buildImageUrl(cp.bannerimage as string | null);
+
+  const recruiters = recruiterRows.map((r: any) => ({
+    name: String(r.name ?? ""),
+    logo: String(r.logo ?? "").startsWith("http") || String(r.logo ?? "").startsWith("/")
+      ? String(r.logo)
+      : `${IMAGE_BASE}${r.logo}`,
+    website: r.website ? String(r.website) : undefined,
+  }));
 
   return (
     <PlacementsTab
@@ -75,6 +88,7 @@ export default async function PlacementsPage({ params }: { params: Promise<{ slu
       placementInfo={placement?.placementinfo ? String(placement.placementinfo) : null}
       hasData={!!placement}
       mosaicImage={bannerUrl}
+      recruiters={recruiters.length > 0 ? recruiters : undefined}
     />
   );
 }

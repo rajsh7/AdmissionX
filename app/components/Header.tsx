@@ -16,6 +16,7 @@ interface AuthUser {
   name: string;
   email: string;
   role: string;
+  slug?: string | null;
 }
 
 interface MegaCategory {
@@ -110,10 +111,10 @@ function UserMenuDropdown({
       { label: "Admin Dashboard", href: dashboardBase, icon: "admin_panel_settings" },
     ];
   } else if (role === "college") {
-    dashboardBase = `/dashboard/college/${user.id}`;
+    dashboardBase = `/dashboard/college/${user.slug || user.id}`;
     userMenuItems = [
-      { label: "College Dashboard", href: dashboardBase, icon: "dashboard" },
-      { label: "College Profile", href: `${dashboardBase}?tab=profile`, icon: "domain" },
+      { label: "Dashboard", href: dashboardBase, icon: "dashboard" },
+      { label: "Account Settings", href: `${dashboardBase}?tab=settings`, icon: "settings" },
     ];
   } else {
     userMenuItems = [
@@ -977,7 +978,7 @@ export default function Header({ theme }: HeaderProps) {
                       authUser.role?.toLowerCase() === "admin"
                         ? "/admin"
                         : authUser.role?.toLowerCase() === "college"
-                          ? `/dashboard/college/${authUser.id}`
+                          ? `/dashboard/college/${authUser.slug || authUser.id}`
                           : `/dashboard/student/${authUser.id}`
                     }
                     className="flex items-center gap-3 px-3 py-4 text-sm font-normal text-slate-800"

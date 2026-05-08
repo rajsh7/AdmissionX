@@ -226,11 +226,11 @@ interface FAQAccordionProps {
 }
 
 export default function FAQAccordion({ faqs, collegeName }: FAQAccordionProps) {
-  const [openId, setOpenId] = useState<string | number | null>(faqs[0]?.id ?? null);
+  const [openId, setOpenId] = useState<number | null>(faqs.length > 0 ? 0 : null);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandAll, setExpandAll] = useState(false);
-  const [openIds, setOpenIds] = useState<Set<string | number>>(
-    new Set(faqs[0] ? [faqs[0].id] : [])
+  const [openIds, setOpenIds] = useState<Set<number>>(
+    new Set(faqs.length > 0 ? [0] : [])
   );
 
   // Filter FAQs by search query
@@ -244,16 +244,11 @@ export default function FAQAccordion({ faqs, collegeName }: FAQAccordionProps) {
     });
   }, [faqs, searchQuery]);
 
-  const handleToggle = (id: string | number) => {
+  const handleToggle = (id: number) => {
     if (expandAll) {
-      // In expand-all mode, toggle individual items in openIds set
       setOpenIds((prev) => {
         const next = new Set(prev);
-        if (next.has(id)) {
-          next.delete(id);
-        } else {
-          next.add(id);
-        }
+        if (next.has(id)) { next.delete(id); } else { next.add(id); }
         return next;
       });
     } else {
@@ -261,14 +256,14 @@ export default function FAQAccordion({ faqs, collegeName }: FAQAccordionProps) {
     }
   };
 
-  const isOpen = (id: string | number) => {
+  const isOpen = (id: number) => {
     if (expandAll) return openIds.has(id);
     return openId === id;
   };
 
   const handleExpandAll = () => {
     setExpandAll(true);
-    setOpenIds(new Set<string | number>(filteredFaqs.map((f) => f.id)));
+    setOpenIds(new Set<number>(filteredFaqs.map((_, i) => i)));
   };
 
   const handleCollapseAll = () => {
@@ -373,11 +368,11 @@ export default function FAQAccordion({ faqs, collegeName }: FAQAccordionProps) {
         <div className="space-y-3">
           {filteredFaqs.map((faq, i) => (
             <FAQItem
-              key={faq.id}
+              key={i}
               faq={faq}
               index={i}
-              isOpen={isOpen(faq.id)}
-              onToggle={() => handleToggle(faq.id)}
+              isOpen={isOpen(i)}
+              onToggle={() => handleToggle(i)}
               searchQuery={searchQuery}
             />
           ))}

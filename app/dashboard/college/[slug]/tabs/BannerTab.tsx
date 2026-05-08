@@ -9,7 +9,8 @@ const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
 
 function buildUrl(raw: string | null) {
   if (!raw) return null;
-  return raw.startsWith("http") || raw.startsWith("/") ? raw : `${IMAGE_BASE}${raw}`;
+  if (raw.startsWith("http") || raw.startsWith("/")) return raw;
+  return `${IMAGE_BASE}${raw}`;
 }
 
 interface ImageSlot {
@@ -20,11 +21,11 @@ interface ImageSlot {
 }
 
 const SLOTS: ImageSlot[] = [
-  { field: "bannerimage", label: "Hero Banner",            hint: "1200×400px recommended",  aspect: "aspect-[3/1]" },
-  { field: "mosaic1",     label: "Stats Section BG",       hint: "Full-width background",    aspect: "aspect-[3/1]" },
-  { field: "mosaic2",     label: "About Image 1 (Large)",  hint: "Vertical — 600×800px",     aspect: "aspect-[3/4]" },
-  { field: "mosaic3",     label: "About Image 2",          hint: "Square — 600×600px",       aspect: "aspect-square" },
-  { field: "mosaic4",     label: "About Image 3",          hint: "Square — 600×600px",       aspect: "aspect-square" },
+  { field: "bannerimage", label: "Hero Banner",            hint: "1200×400px recommended",  aspect: "h-36" },
+  { field: "mosaic1",     label: "Stats Section BG",       hint: "Full-width background",    aspect: "h-36" },
+  { field: "mosaic2",     label: "About Image 1 (Large)",  hint: "Vertical — 600×800px",     aspect: "h-48" },
+  { field: "mosaic3",     label: "About Image 2",          hint: "Square — 600×600px",       aspect: "h-40" },
+  { field: "mosaic4",     label: "About Image 3",          hint: "Square — 600×600px",       aspect: "h-40" },
 ];
 
 function ImageUploadCard({

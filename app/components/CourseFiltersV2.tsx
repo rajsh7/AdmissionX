@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 interface FilterOption {
@@ -142,23 +142,11 @@ export default function CourseFiltersV2({
           </div>
 
           {/* Stream */}
-          <div>
-            <label className="text-[16px] font-semibold text-[#6C6C6C] mb-1.5 block">Stream</label>
-            <div className="relative">
-              <select
-                value={stream}
-                onChange={(e) => { const val = e.target.value; setStream(val); applyFilters({ stream: val }); }}
-                className="w-full px-3 pr-8 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer transition-all"
-                style={{ height: "45px" }}
-              >
-                <option value="">Select Stream...</option>
-                {streams.map((s) => (
-                  <option key={s.id} value={s.slug || String(s.id)}>{s.name}</option>
-                ))}
-              </select>
-              <span className="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] text-neutral-400 pointer-events-none">expand_more</span>
-            </div>
-          </div>
+          <StreamDropdown
+            streams={streams}
+            value={stream}
+            onChange={(val) => { setStream(val); applyFilters({ stream: val }); }}
+          />
 
           {/* Buttons */}
           <div className="grid grid-cols-2 gap-3 pt-1 items-stretch">
@@ -182,5 +170,60 @@ export default function CourseFiltersV2({
         </div>
       </div>
     </aside>
+  );
+}
+
+function StreamDropdown({ streams, value, onChange }: { streams: FilterOption[]; value: string; onChange: (val: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = streams.find((s) => (s.slug || String(s.id)) === value);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <div>
+      <label className="text-[16px] font-semibold text-[#6C6C6C] mb-1.5 block">Stream</label>
+      <div ref={ref} className="relative">
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="w-full px-3 pr-8 text-[15px] font-medium text-[#9AA0B4] border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white cursor-pointer transition-all text-left"
+          style={{ height: "45px" }}
+        >
+          {selected?.name || "Select Stream..."}
+        </button>
+        <span className="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] text-neutral-400 pointer-events-none">expand_more</span>
+        {open && (
+          <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-neutral-200 rounded-[5px] shadow-lg max-h-60 overflow-y-auto">
+            <div
+              className="px-4 py-2.5 text-[14px] text-[#9AA0B4] cursor-pointer hover:bg-neutral-50"
+              onClick={() => { onChange(""); setOpen(false); }}
+            >
+              Select Stream...
+            </div>
+            {streams.map((s) => {
+              const val = s.slug || String(s.id);
+              return (
+                <div
+                  key={s.id}
+                  className={`px-4 py-2.5 text-[14px] cursor-pointer hover:bg-red-50 hover:text-[#FF3C3C] ${
+                    value === val ? "bg-red-50 text-[#FF3C3C] font-semibold" : "text-[#6C6C6C]"
+                  }`}
+                  onClick={() => { onChange(val); setOpen(false); }}
+                >
+                  {s.name}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

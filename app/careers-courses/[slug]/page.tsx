@@ -124,9 +124,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     {[degreeLevel, duration, streamName].filter(Boolean).map((tag, i, arr) => (
                       <span key={tag} className="flex items-center gap-5 text-[16px] font-semibold" style={{ color: "rgba(0, 81, 68, 0.75)" }}>
                         {tag}
-                        <span className="w-px h-5 bg-slate-300" />
+                        {i < arr.length - 1 && <span className="w-px h-5 bg-slate-300" />}
                       </span>
                     ))}
+                    <span className="w-px h-5 bg-slate-300" />
                     <div className="flex items-center gap-1.5">
                       {[1, 2, 3, 4, 5].map((s) => (
                         <Star key={s} className="w-5 h-5 fill-yellow-400 text-yellow-400" />

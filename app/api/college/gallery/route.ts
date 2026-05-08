@@ -1,37 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-
-const GALLERY_BASE = path.join(process.cwd(), "public", "gallery");
+import { getDb } from "@/lib/db";
 
 export async function GET(req: NextRequest) {
   const slug = new URL(req.url).searchParams.get("slug") ?? "";
   if (!slug) return NextResponse.json({ images: [] });
 
   try {
-    if (!fs.existsSync(GALLERY_BASE)) return NextResponse.json({ images: [] });
+    const db = await getDb();
 
-    const allFolders = fs.readdirSync(GALLERY_BASE);
+    const cp = await db.collection("collegeprofile").findOne(
+      { slug },
+      { projection: { _id: 1, users_id: 1 } }
+    );
+    if (!cp) return NextResponse.json({ images: [] });
 
-    // Folder pattern: [-]{slug}-{numericId}
-    const matchedFolder =
-      allFolders.find((f) => {
-        const clean = f.startsWith("-") ? f.slice(1) : f;
-        return clean === slug || clean.startsWith(slug + "-");
-      }) ??
-      allFolders.find((f) => {
-        const clean = f.startsWith("-") ? f.slice(1) : f;
-        return clean.includes(slug);
-      });
+    const usersId = cp.users_id;
 
-    if (!matchedFolder) return NextResponse.json({ images: [] });
+    const rows = await db.collection("gallery")
+      .find({
+        $or: [
+          { college_slug: slug },
+          { users_id: usersId, fullimage: { $exists: true, $ne: "" } },
+        ],
+        fullimage: { $exists: true, $ne: "" },
+      })
+      .sort({ _id: -1 })
+      .limit(50)
+      .project({ fullimage: 1 })
+      .toArray();
 
-    const folderPath = path.join(GALLERY_BASE, matchedFolder);
-    const files = fs.readdirSync(folderPath);
-
-    const images = files
-      .filter((f) => !f.includes("_original") && /\.(jpg|jpeg|png|webp|gif)$/i.test(f))
-      .map((f) => `/api/college/gallery-image?folder=${encodeURIComponent(matchedFolder)}&file=${encodeURIComponent(f)}`);
+    const images = rows.map((row: any) => {
+      const raw = String(row.fullimage ?? "");
+      if (raw.startsWith("http") || raw.startsWith("/")) return raw;
+      return `https://admin.admissionx.in/uploads/${raw}`;
+    });
 
     return NextResponse.json({ images });
   } catch (err) {
