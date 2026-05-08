@@ -71,11 +71,26 @@ async function updateUser(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-async function deleteUser(id: number) {
+async function deleteUser(id: number | string) {
   "use server";
-  if (isNaN(id)) return;
+  if (!id) return;
   try {
-    await pool.query("DELETE FROM users WHERE id = ?", [id]);
+    // Check if it's a MongoDB ObjectId (24 char hex string)
+    if (typeof id === "string" && id.length === 24) {
+      const db = await getDb();
+      const { ObjectId } = await import("mongodb");
+      // Try student first, then college
+      const studentResult = await db.collection("next_student_signups").deleteOne({ _id: new ObjectId(id) });
+      if (studentResult.deletedCount === 0) {
+        await db.collection("next_college_signups").deleteOne({ _id: new ObjectId(id) });
+      }
+    } else {
+      // MySQL numeric ID
+      const numId = typeof id === "string" ? parseInt(id, 10) : id;
+      if (!isNaN(numId)) {
+        await pool.query("DELETE FROM users WHERE id = ?", [numId]);
+      }
+    }
   } catch (e) {
     console.error("[admin/members/users deleteUser]", e);
   }
@@ -288,7 +303,7 @@ export default async function MembersUsersPage({
       </div>
 
       <UserListClient 
-        users={users} 
+        users={users as any} 
         roles={roles as { id: number; name: string }[]} 
         statuses={statuses as { id: number; name: string }[]} 
         offset={offset}

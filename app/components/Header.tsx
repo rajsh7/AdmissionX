@@ -740,7 +740,7 @@ export default function Header({ theme }: HeaderProps) {
 
                     {link.mega && (
                       <div
-                        className="fixed left-0  right-0 pt-1 opacity-0 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:pointer-events-auto transition-all duration-200 z-50"
+                        className="fixed  left-0  right-0 pt-1 opacity-0 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:pointer-events-auto transition-all duration-200 z-50"
                         style={{ top: isScrolled ? '54px' : '100px' }}
                       >
                         <div className="max-w-[1200px] mx-auto px-4">
