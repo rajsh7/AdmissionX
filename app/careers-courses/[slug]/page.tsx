@@ -113,14 +113,14 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
             {/* Left Side Content */}
             <div className="flex-1 p-8 lg:p-12 xl:p-16 flex flex-col justify-center relative z-10">
               <div className="flex flex-col gap-6">
-                <h1 className="text-[45px] font-bold text-slate-900 leading-[1.1] tracking-tight">
+                <h1 className="text-[32px] sm:text-[45px] font-bold text-slate-900 leading-[1.1] tracking-tight">
                   {title}
                 </h1>
 
                 {/* Metadata Badges + CTA — same width column */}
-                <div className="flex flex-col gap-4 w-fit">
+                <div className="flex flex-col gap-4 w-full sm:w-fit">
                   {/* Metadata Badges */}
-                  <div className="flex items-center gap-5 px-6 py-3.5 rounded-[5px] bg-white/80 border border-slate-100 shadow-sm">
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-3 px-4 sm:px-6 py-3.5 rounded-[5px] bg-white/80 border border-slate-100 shadow-sm">
                     {[degreeLevel, duration, streamName].filter(Boolean).map((tag, i, arr) => (
                       <span key={tag} className="flex items-center gap-5 text-[16px] font-semibold" style={{ color: "rgba(0, 81, 68, 0.75)" }}>
                         {tag}
@@ -136,11 +136,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   </div>
 
                   {/* CTA Buttons */}
-                  <div className="flex gap-4">
-                    <button className="flex-1 py-3 px-8 bg-[#FF3C3C] text-white rounded-[5px] font-bold text-base hover:bg-red-600 transition-all active:scale-95 shadow-lg shadow-red-500/20">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button className="w-full sm:flex-1 py-3 px-8 bg-[#FF3C3C] text-white rounded-[5px] font-bold text-base hover:bg-red-600 transition-all active:scale-95 shadow-lg shadow-red-500/20">
                       Apply Now
                     </button>
-                    <button className="flex-1 py-3 px-8 bg-white border-2 border-[#FF3C3C] text-[#FF3C3C] rounded-[5px] font-bold text-base hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
+                    <button className="w-full sm:flex-1 py-3 px-8 bg-white border-2 border-[#FF3C3C] text-[#FF3C3C] rounded-[5px] font-bold text-base hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
                       <Download className="w-4 h-4" />
                       Download Brochure
                     </button>
@@ -167,7 +167,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
       {/* ─── Stats Bar ────────────────────────────────────────────────────────── */}
       <section className="pb-16 px-4 sm:px-8 lg:px-12">
         <div className="max-w-[1920px] mx-auto">
-          <div className="bg-white rounded-[5px] border border-neutral-200 p-8 grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 divide-x lg:divide-y-0 divide-y divide-neutral-400 shadow-xl shadow-slate-200/60">
+          <div className="bg-white rounded-[5px] border border-neutral-200 p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-x-8 sm:gap-y-12 divide-y sm:divide-y-0 sm:divide-x divide-neutral-200 shadow-xl shadow-slate-200/60">
             <StatItem label="Duration" value={duration} />
             <StatItem label="Fees" value={avgFees ? formatFees(avgFees) : "—"} suffix={avgFees ? "/year" : undefined} />
             <StatItem label="Placement Rate" value="94%" />
@@ -197,7 +197,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
                 {/* Text Content */}
                 <div className="lg:col-span-8 flex flex-col gap-4">
-                  <h2 className="text-[45px] font-bold text-slate-900 leading-tight">
+                  <h2 className="text-[32px] sm:text-[45px] font-bold text-slate-900 leading-tight">
                     Course Overview
                   </h2>
                   <div className="space-y-4">
@@ -258,14 +258,14 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
 function StatItem({ label, value, suffix }: { label: string; value: string; suffix?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center text-center p-4">
+    <div className="flex flex-col items-center justify-center text-center p-2 sm:p-4 first:pt-0 sm:first:pt-4">
       <div className="flex items-baseline gap-1">
-        <span className="text-[28px] font-bold text-[#3e3e3e] leading-tight">
+        <span className="text-[24px] sm:text-[28px] font-bold text-[#3e3e3e] leading-tight">
           {value}
         </span>
-        {suffix && <span className="text-slate-400 font-semibold">{suffix}</span>}
+        {suffix && <span className="text-xs sm:text-sm text-slate-400 font-semibold">{suffix}</span>}
       </div>
-      <span className="text-[20px] font-semibold uppercase tracking-wide" style={{ color: "rgba(62, 62, 62, 0.71)" }}>
+      <span className="text-sm sm:text-[20px] font-semibold uppercase tracking-wide" style={{ color: "rgba(62, 62, 62, 0.71)" }}>
         {label}
       </span>
     </div>

@@ -65,11 +65,11 @@ export default function CollegeSignupPage() {
     <div className="min-h-screen flex flex-col font-display relative">
       <AuthBackgroundSlider />
       <Header />
-      <main className="relative flex-1 flex items-center justify-center px-6 py-36 z-10">
-        <div className="flex w-full max-w-[920px] rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.12)] overflow-hidden" style={{ minHeight: "600px" }}>
+      <main className="relative flex-1 flex items-center justify-center px-4 sm:px-6 py-24 sm:py-36 z-10">
+        <div className="flex flex-col lg:flex-row w-full max-w-[920px] rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.12)] overflow-hidden bg-white" style={{ minHeight: "600px" }}>
 
-          {/* LEFT: Slider */}
-          <div className="w-[38%] relative flex-shrink-0" style={{ minHeight: "600px" }}>
+          {/* LEFT: Slider (Desktop only) */}
+          <div className="hidden lg:block w-[38%] relative flex-shrink-0" style={{ minHeight: "600px" }}>
             {SLIDES.map((src, i) => (
               <div key={src} className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: i === slideIndex ? 1 : 0 }}>
                 <img src={src} alt="" className="w-full h-full object-cover" />
@@ -100,8 +100,8 @@ export default function CollegeSignupPage() {
           </div>
 
           {/* RIGHT: Form */}
-          <div className="flex-1 bg-[#f3f4f6] flex items-center justify-center px-8 py-10">
-            <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-8 py-8">
+          <div className="flex-1 bg-[#f3f4f6] flex items-center justify-center px-4 sm:px-8 py-10">
+            <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-6 sm:px-8 py-8 my-4">
               <h1 className="text-[24px] font-bold text-[#111] mb-1">Register Your College</h1>
               <p className="text-[13px] text-gray-500 mb-5">Submit details. Login credentials sent within 1–2 business days.</p>
 

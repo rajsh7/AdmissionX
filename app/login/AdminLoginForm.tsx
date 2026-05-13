@@ -47,8 +47,8 @@ export default function AdminLoginForm() {
     <div className="min-h-screen flex flex-col font-display relative">
       <AuthBackgroundSlider />
       <Header />
-      <main className="relative flex-1 flex items-center justify-center px-6 py-72 z-10">
-        <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-8 py-8">
+      <main className="relative flex-1 flex items-center justify-center px-4 sm:px-6 py-24 sm:py-36 z-10">
+        <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-6 sm:px-8 py-8 my-4">
 
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">

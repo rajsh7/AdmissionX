@@ -195,7 +195,7 @@ export default async function ContactUsPage({
                   <p className="text-[10px] font-black uppercase tracking-[0.22em] text-rose-500">
                     Contact Us
                   </p>
-                  <h1 className="mt-4 mx-auto max-w-md text-[34px] font-black leading-[1.05] text-slate-900 sm:text-[42px] lg:mx-0">
+                  <h1 className="mt-4 mx-auto max-w-md text-[28px] font-black leading-[1.05] text-slate-900 sm:text-[42px] lg:mx-0">
                     We&apos;re here to help you
                   </h1>
                   <p className="mt-4 mx-auto max-w-lg text-[14px] leading-7 text-slate-500 lg:mx-0">
@@ -226,8 +226,8 @@ export default async function ContactUsPage({
                   </div>
                 </div>
 
-                <div className="relative rounded-[26px] border border-[#efe7e0] bg-white p-5 shadow-[0_22px_60px_-36px_rgba(15,23,42,0.24)] sm:p-6">
-                  <h2 className="text-[18px] font-black text-slate-900">Send us a Message</h2>
+                <div className="relative rounded-[26px] border border-[#efe7e0] bg-white p-5 shadow-[0_22px_60px_-36px_rgba(15,23,42,0.24)] sm:p-8">
+                  <h2 className="text-[20px] font-black text-slate-900">Send us a Message</h2>
 
                   {sent && (
                     <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
@@ -339,7 +339,7 @@ export default async function ContactUsPage({
             <section className="border-t border-[#f2ebe5] px-5 py-7 sm:px-8 lg:px-10">
               <div className="grid gap-6 lg:grid-cols-[1fr_1.05fr]">
                 <div>
-                  <h2 className="text-[18px] font-black text-slate-900">
+                  <h2 className="text-[20px] font-black text-slate-900">
                     Frequently Asked Questions
                   </h2>
 
@@ -368,7 +368,7 @@ export default async function ContactUsPage({
                 </div>
 
                 <div>
-                  <h2 className="text-[18px] font-black text-slate-900">Our Office</h2>
+                  <h2 className="text-[20px] font-black text-slate-900">Our Office</h2>
 
                   <div className="mt-4 overflow-hidden rounded-[20px] border border-[#eee7e1] bg-white shadow-[0_18px_40px_-34px_rgba(15,23,42,0.22)]">
                     <div className="relative h-[210px] overflow-hidden bg-[linear-gradient(0deg,rgba(245,241,235,0.95),rgba(245,241,235,0.95)),linear-gradient(90deg,rgba(148,163,184,0.16)_1px,transparent_1px),linear-gradient(rgba(148,163,184,0.16)_1px,transparent_1px)] bg-[size:100%_100%,36px_36px,36px_36px] bg-center">

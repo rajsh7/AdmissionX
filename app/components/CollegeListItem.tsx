@@ -53,7 +53,7 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: Math.min(index * 0.05, 0.3) }}
     >
-      <div className="group relative flex  flex-col sm:flex-row items-start justify-between gap-4 bg-white rounded-[5px] border border-neutral-100 hover:border-[#FF3C3C]/20 hover:shadow-xl hover:shadow-[#FF3C3C]/5 transition-all duration-300 p-4 sm:p-5 pr-6 sm:pr-8 pb-16">
+      <div className="group relative flex flex-col sm:flex-row items-start justify-between gap-4 bg-white rounded-[5px] border border-neutral-100 hover:border-[#FF3C3C]/20 hover:shadow-xl hover:shadow-[#FF3C3C]/5 transition-all duration-300 p-4 sm:p-5 pr-4 sm:pr-8">
         <Link href={`/college/${slug}`} className="absolute inset-0 z-0" aria-label={`View ${name}`} />
 
         <div className="flex items-start  gap-4 flex-1  min-w-0">
@@ -148,14 +148,14 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
           </div>
         </div>
 
-        {/* Action Buttons - bottom right */}
-        <div className="absolute bottom-4  h-full right-4 flex flex-col items-start justify-evenly  gap-2 z-20">
-          <div className="flex items-center mt-5 mb-4 pt-3 gap-1.5">
+        {/* Action Buttons & Fees */}
+        <div className="relative sm:absolute sm:bottom-4 sm:right-4 w-full sm:w-auto flex flex-col items-start sm:items-end justify-end gap-3 z-20 mt-4 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-0 border-neutral-100">
+          <div className="flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-[13px] text-neutral-400">currency_rupee</span>
-                <span className="text-xl text-neutral-500 font-medium"> Fees:</span>
+                <span className="text-sm sm:text-xl text-neutral-500 font-medium"> Fees:</span>
                 {feesLabel ? (
                   <>
-                    <span className="text-xl font-black  text-[#FF3C3C]">{feesLabel}</span>
+                    <span className="text-lg sm:text-xl font-black text-[#FF3C3C]">{feesLabel}</span>
                     <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tight">/ year</span>
                   </>
                 ) : (
@@ -163,11 +163,11 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
                 )}
           </div>
          
-         <div className="flex gap-3 mt-10">
+          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
            {!isGovt && (
             <button
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleApply(slug); }}
-              className="flex items-center justify-center gap-1.5 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-sl font-bold px-3 py-2 rounded-[8px] transition-all duration-300 cursor-pointer whitespace-nowrap shadow-sm"
+              className="flex-1 flex items-center justify-center gap-1.5 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-[11px] sm:text-sm font-bold px-3 py-2.5 rounded-[5px] transition-all duration-300 cursor-pointer whitespace-nowrap shadow-sm"
             >
               <span className="material-symbols-outlined text-[15px]">edit_document</span>
               Apply Now
@@ -176,7 +176,7 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
           <AskQueryModal slug={slug} collegeName={name}   
             renderTrigger={(onClick) => (
               <button onClick={onClick}
-                className="flex items-center justify-center gap-1.5 bg-white border border-[#FF3C3C] hover:bg-red-50 text-[#FF3C3C] text-xs font-bold px-3 py-2 rounded-[8px] transition-all duration-300 cursor-pointer whitespace-nowrap shadow-sm">
+                className="flex-1 flex items-center justify-center gap-1.5 bg-white border border-[#FF3C3C] hover:bg-red-50 text-[#FF3C3C] text-[11px] sm:text-xs font-bold px-3 py-2.5 rounded-[5px] transition-all duration-300 cursor-pointer whitespace-nowrap shadow-sm">
                 <span className="material-symbols-outlined text-[15px]">help</span>
                 Ask Query
               </button>

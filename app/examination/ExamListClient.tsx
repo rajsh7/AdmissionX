@@ -98,7 +98,7 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
           <button
             key={cat}
             onClick={() => handleFilter(cat)}
-            className={`px-6 sm:px-8 h-[50px] flex items-center justify-center text-[20px] font-semibold rounded-[5px] transition-all duration-200 border shadow-sm ${activeFilter === cat
+            className={`px-4 sm:px-8 h-[40px] sm:h-[50px] flex items-center justify-center text-sm sm:text-[20px] font-semibold rounded-[5px] transition-all duration-200 border shadow-sm ${activeFilter === cat
               ? "bg-[#D40C11] text-white border-[#FF3C3C]"
               : "bg-[#E2E3E9] text-[#000000] border-transparent hover:bg-[#D4D5DB]"
               }`}
@@ -121,7 +121,7 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
                   Closing in 2 Days
                 </div>
                 <div className="flex justify-between items-start mb-6">
-                  <div className="pr-16 sm:pr-24">
+                  <div className="pr-1 sm:pr-24">
                     <h3 className="text-[16px] sm:text-[18px] font-bold text-[#444] mb-1 leading-snug">{exam.title}</h3>
                     <p className="text-[12px] sm:text-[13px] text-neutral-500 font-medium leading-relaxed">
                       {exam.description ? (exam.description.length > 80 ? exam.description.substring(0, 80) + "..." : exam.description) : "Joint Entrance Examination for admission to NITs, IITs."}
@@ -137,7 +137,7 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-row items-start gap-6 mb-6 pr-0 sm:pr-8">
+                <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6 pr-0 sm:pr-8">
                   <div className="flex items-start gap-1.5">
                     <span className="material-symbols-outlined text-[18px] text-neutral-500 mt-0.5">calendar_month</span>
                     <div>
@@ -157,25 +157,25 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
                 </div>
                 <div className="flex items-center gap-3 sm:gap-4">
                   {exam.getMoreInfoLink ? (
-                    <a href={exam.getMoreInfoLink} target="_blank" rel="noopener noreferrer" className="bg-[#D40C11] hover:bg-[#E23434] text-white text-[20px] font-semibold px-8 h-[50px] min-w-[110px] justify-center rounded-[5px] transition-colors inline-flex items-center gap-2">
-                      Apply Now <span className="material-symbols-outlined text-[20px] font-bold">open_in_new</span>
+                    <a href={exam.getMoreInfoLink} target="_blank" rel="noopener noreferrer" className="flex-1 sm:flex-none bg-[#D40C11] hover:bg-[#E23434] text-white text-sm sm:text-[20px] font-semibold px-4 sm:px-8 h-[45px] sm:h-[50px] min-w-[110px] justify-center rounded-[5px] transition-colors inline-flex items-center gap-2">
+                      Apply Now <span className="material-symbols-outlined text-[18px] sm:text-[20px] font-bold">open_in_new</span>
                     </a>
                   ) : (
-                    <Link href={`/examination/${exam.streamSlug}/${exam.slug}`} className="bg-[#D40C11] hover:bg-[#E23434] text-white text-[20px] font-semibold px-8 h-[51.8px] min-w-[110px] justify-center rounded-[5px] transition-colors inline-flex items-center gap-2">
-                      Apply Now <span className="material-symbols-outlined text-[20px] font-bold">arrow_forward</span>
+                    <Link href={`/examination/${exam.streamSlug}/${exam.slug}`} className="flex-1 sm:flex-none bg-[#D40C11] hover:bg-[#E23434] text-white text-sm sm:text-[20px] font-semibold px-4 sm:px-8 h-[45px] sm:h-[51.8px] min-w-[110px] justify-center rounded-[5px] transition-colors inline-flex items-center gap-2">
+                      Apply Now <span className="material-symbols-outlined text-[18px] sm:text-[20px] font-bold">arrow_forward</span>
                     </Link>
                   )}
                   {exam.syllabus ? (
                     <button
                       onClick={() => setSelectedSyllabus(exam)}
-                      className="border border-[#6C6C6C] text-[#6C6C6C] hover:bg-neutral-50 text-[20px] font-semibold px-8 h-[50px] min-w-[120px] justify-center rounded-[5px] transition-colors inline-flex items-center"
+                      className="flex-1 sm:flex-none border border-[#6C6C6C] text-[#6C6C6C] hover:bg-neutral-50 text-sm sm:text-[20px] font-semibold px-4 sm:px-8 h-[45px] sm:h-[50px] min-w-[120px] justify-center rounded-[5px] transition-colors inline-flex items-center"
                     >
                       View Syllabus
                     </button>
                   ) : (
                     <button
                       onClick={() => fetchAndShowSyllabus(exam)}
-                      className="border border-neutral-300 text-[#6C6C6C] hover:bg-neutral-100 text-[20px] font-semibold px-8 h-[50px] min-w-[120px] justify-center rounded-[5px] transition-colors inline-flex items-center"
+                      className="flex-1 sm:flex-none border border-neutral-300 text-[#6C6C6C] hover:bg-neutral-100 text-sm sm:text-[20px] font-semibold px-4 sm:px-8 h-[45px] sm:h-[50px] min-w-[120px] justify-center rounded-[5px] transition-colors inline-flex items-center"
                     >
                       View Syllabus
                     </button>

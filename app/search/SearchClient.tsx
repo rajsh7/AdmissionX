@@ -255,7 +255,8 @@ export default function SearchClient({
   return (
     <div suppressHydrationWarning className="min-h-screen bg-neutral-50 flex flex-col relative">
       <Header />
-      <div className="relative w-full z-20" style={{ height: heroHeight }}>
+      <style>{`@media (max-width: 640px) { [data-mobile-hero] { height: 350px !important; } }`}</style>
+      <div className="relative w-full z-20" style={{ height: heroHeight }} data-mobile-hero>
         <div className="absolute top-0 left-0 w-full h-full z-0">
           <Image
             src={heroImage}
@@ -275,10 +276,10 @@ export default function SearchClient({
               <div className="flex flex-col justify-center h-full relative z-20">
                 <div className={`transition-opacity duration-300 mt-6 flex flex-col justify-center ${heroRightImage ? "lg:max-w-[55%] text-left" : "max-w-4xl text-left"} ${hasMounted ? "opacity-100" : "opacity-0"}`}>
                   <h1 className="font-poppins text-white leading-[1.05] tracking-[0.02em] mb-4 drop-shadow-2xl">
-                    <span className="text-[36px] sm:text-[48px] lg:text-[64px] font-extrabold block mb-0">Finds your</span>
-                    <span className="text-[40px] sm:text-[54px] lg:text-[72px] font-black text-[#FF3C3C]">Dream college</span>
+                    <span className="text-[28px] sm:text-[48px] lg:text-[64px] font-extrabold block mb-0">Finds your</span>
+                    <span className="text-[32px] sm:text-[54px] lg:text-[72px] font-black text-[#FF3C3C]">Dream college</span>
                   </h1>
-                  <p className="text-white text-lg sm:text-2xl font-bold mb-8 max-w-2xl leading-relaxed opacity-90">
+                  <p className="text-white text-base sm:text-2xl font-bold mb-6 sm:mb-8 max-w-2xl leading-relaxed opacity-90">
                     Search thousands of courses and universities worldwide
                   </p>
                   <div className="max-w-2xl">
@@ -307,10 +308,10 @@ export default function SearchClient({
 
       <div className="relative z-10 flex-1 flex flex-col min-h-screen">
         {/* -- Main content -- */}
-        <div className="mx-auto max-w-[1920px] w-full px-0 pt-8 pb-8">
-          <div className="flex gap-5 items-start">
+        <div className="mx-auto max-w-[1920px] w-full px-0 pt-4 sm:pt-8 pb-8">
+          <div className="flex flex-col lg:flex-row gap-5 items-start">
             {/* ── Filters sidebar ── */}
-            <div className="hidden lg:block flex-shrink-0 sticky top-[72px] self-start" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
+            <div className="hidden lg:block flex-shrink-0 sticky top-[72px] self-start w-full lg:w-auto" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
               <SearchFilters
                 key={`${stream}|${degree}|${cityId}|${stateId}|${countryId}|${feesMax}|${sort}|${searchParams.get("fees_ranges")}|${searchParams.get("rating_ranges")}|${searchParams.get("ownerships")}`}
                 streams={streams}
@@ -335,13 +336,13 @@ export default function SearchClient({
             </div>
 
             {/* ── Results column ── */}
-            <div className="flex-1 min-w-0 pl-10 pr-6">
+            <div className="flex-1 min-w-0 px-4 sm:px-6 lg:pl-10 lg:pr-6">
               {/* ── Results Toolbar (Figma Redesign) ── */}
-              <div className="flex flex-col gap-5 mb-8">
+              <div className="flex flex-col gap-4 mb-6 sm:mb-8">
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-1 pb-4 border-b border-neutral-100">
                   {/* Active Filters Row */}
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap">
+                    <span className="text-sm sm:text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap">
                       Active Filters:
                     </span>
                     <div className="flex flex-wrap gap-2">
@@ -433,9 +434,9 @@ export default function SearchClient({
                   </div>
 
                   {/* Sort Row */}
-                  <div className="flex items-center gap-4 ml-auto">
+                  <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                     <div className="flex items-center gap-2">
-                      <span className="text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap">
+                      <span className="text-sm sm:text-[20px] font-medium text-[#6C6C6C] whitespace-nowrap">
                         Short by:
                       </span>
                       <div className="relative">

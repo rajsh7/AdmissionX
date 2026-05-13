@@ -131,41 +131,41 @@ export default async function ExaminationHubPage({
 
             <div className="relative z-10 pt-10 pb-16 px-8 md:px-12 lg:px-16 flex-1 flex flex-col justify-start">
               <h1
-                className="leading-[1.15] mb-4"
-                style={{ fontWeight: 600, fontSize: "48px", color: "rgba(62, 62, 62, 1)" }}
+                className="leading-[1.15] mb-4 text-[32px] sm:text-[48px]"
+                style={{ fontWeight: 600, color: "rgba(62, 62, 62, 1)" }}
               >
                 Finds Your Next Competitive exam
               </h1>
               <p
-                className="max-w-[520px] mb-8 leading-relaxed"
-                style={{ fontWeight: 500, fontSize: "20px", color: "rgba(62, 62, 62, 0.71)" }}
+                className="max-w-[520px] mb-8 leading-relaxed text-base sm:text-[20px]"
+                style={{ fontWeight: 500, color: "rgba(62, 62, 62, 0.71)" }}
               >
                 Discover all exams which can refine your future,
                 <br />
                 unlock gate for dream University.
               </p>
 
-              <form method="GET" action="/examination" className="flex w-full max-w-[560px] h-[51.8px] rounded-[5px] shadow-md transition-all">
-                <div className="flex flex-1 items-center bg-white border border-neutral-200 border-r-0 rounded-l-[5px]">
-                  <div className="flex items-center pl-4 pr-2 text-neutral-400">
-                    <span className="material-symbols-outlined text-[20px]">search</span>
+              <form method="GET" action="/examination" className="flex flex-col sm:flex-row w-full max-w-[800px] sm:h-[60px] gap-2 sm:gap-0 rounded-[5px] sm:shadow-md transition-all">
+                <div className="flex flex-1 items-center bg-white border border-neutral-200 sm:border-r-0 rounded-[5px] sm:rounded-r-none h-[60px] sm:h-auto shadow-md sm:shadow-none">
+                  <div className="flex items-center pl-5 pr-2 text-neutral-400">
+                    <span className="material-symbols-outlined text-[24px]">search</span>
                   </div>
                   <input
                     type="text"
                     name="q"
                     defaultValue={q}
                     suppressHydrationWarning
-                    placeholder="Location, universities, courses..."
-                    className="flex-1 px-2 text-sm text-neutral-800 placeholder-neutral-400 focus:outline-none bg-transparent font-medium min-w-0"
+                    placeholder="Search exams, dates, syllabus..."
+                    className="flex-1 px-2 text-base text-neutral-800 placeholder-neutral-400 focus:outline-none bg-transparent font-medium min-w-0"
                   />
                 </div>
-                <button type="submit" suppressHydrationWarning className="flex-shrink-0 bg-[#FF3C3C] hover:bg-[#E23434] text-white font-bold px-10 transition-colors text-sm tracking-wide rounded-r-[5px]">
+                <button type="submit" suppressHydrationWarning className="flex-shrink-0 bg-[#FF3C3C] hover:bg-[#E23434] text-white font-bold px-12 h-[60px] sm:h-auto transition-colors text-base tracking-wide rounded-[5px] sm:rounded-l-none shadow-md sm:shadow-none">
                   Search
                 </button>
               </form>
             </div>
 
-            <div className="relative w-[40%] min-h-[250px] md:min-h-full flex-shrink-0">
+            <div className="relative w-full md:w-[40%] min-h-[250px] md:min-h-full flex-shrink-0">
               <div className="relative w-full h-full min-h-[220px] rounded-none overflow-hidden">
                 <Image
                   src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&q=80&w=1200"
@@ -211,7 +211,7 @@ export default async function ExaminationHubPage({
             </div>
 
             {/* Right Sidebar */}
-            <div className="w-full max-w-[280px] flex-shrink-0 space-y-6 pt-10">
+            <div className="w-full lg:max-w-[280px] flex-shrink-0 space-y-6 pt-0 lg:pt-10">
 
               <ExamCalendarCard />
 

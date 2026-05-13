@@ -25,18 +25,18 @@ export default function CareerGuidance() {
 
           {/* ── Left Content (60% width) ─────────────────────────────────── */}
           <div className="flex-[1.2] text-center lg:text-left z-10 pb-8 lg:pb-16 flex flex-col justify-center">
-            <h2 className="text-[#1F2937] leading-[1.2] mb-4 sm:mb-6 tracking-tight text-[26px] sm:text-[36px] lg:text-[45px]" style={{ fontWeight: 600 }}>
+            <h2 className="text-[#1F2937] leading-[1.2] mb-4 sm:mb-6 tracking-tight text-[28px] sm:text-[36px] lg:text-[45px]" style={{ fontWeight: 600 }}>
               Confused about your <span className="text-[#FF3C3C]">career path?</span>
             </h2>
             <p
-              className="leading-relaxed mb-6 sm:mb-8 mx-auto lg:mx-0 w-full text-[15px] sm:text-[18px] lg:text-[22px]"
+              className="leading-relaxed mb-6 sm:mb-8 mx-auto lg:mx-0 w-full text-base sm:text-[18px] lg:text-[22px]"
               style={{ maxWidth: '773px', fontWeight: 500, color: '#222222' }}
             >
               Filter through thousands of institutions worldwide based on your specific academic preferences and career goals.
             </p>
 
             <ul
-              className="mb-8 sm:mb-10 flex flex-col gap-3 text-[14px] sm:text-[18px] lg:text-[22px]"
+              className="mb-8 sm:mb-10 flex flex-col gap-3 text-sm sm:text-[18px] lg:text-[22px]"
               style={{ fontWeight: 500, color: '#222222' }}
             >
               <li className="flex items-center gap-3 justify-center lg:justify-start">

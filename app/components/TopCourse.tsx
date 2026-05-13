@@ -242,7 +242,7 @@ export default function TopCourse() {
         <FadeIn>
           <div className="mb-16">
             <div className="mb-6 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center md:gap-12">
-              <h2 className="text-[40px] font-semibold leading-[1.1] tracking-tight text-slate-900 lg:text-[68px]">
+              <h2 className="text-[32px] sm:text-[40px] lg:text-[68px] font-semibold leading-[1.1] tracking-tight text-slate-900">
                 Discover the Top <span style={{ color: "#FF3C3C" }}>Course</span>
               </h2>
               <Link
@@ -255,10 +255,9 @@ export default function TopCourse() {
                 </span>
               </Link>
             </div>
-            <p className="max-w-4xl text-xl font-medium leading-relaxed text-slate-500">
+            <p className="max-w-4xl text-base sm:text-lg lg:text-xl font-medium leading-relaxed text-slate-500">
               Filter through thousands of institutions worldwide based on your
-              specific academic preferences and{" "}
-              career goals.
+              specific academic preferences and career goals.
             </p>
           </div>
         </FadeIn>
@@ -302,50 +301,50 @@ export default function TopCourse() {
             </div>
 
             <div className="flex flex-col gap-6">
-              <h3 className="text-[35px] font-semibold leading-none tracking-tight text-[#222222] lg:text-[40px]">
+              <h3 className="text-[28px] sm:text-[35px] lg:text-[40px] font-semibold leading-none tracking-tight text-[#222222]">
                 {current.name}
               </h3>
-              <p className="max-w-2xl text-xl font-normal leading-relaxed text-slate-500">
+              <p className="max-w-2xl text-base sm:text-lg lg:text-xl font-normal leading-relaxed text-slate-500">
                 {current.description}
               </p>
-              <div className="mt-4 flex flex-wrap items-center gap-12">
+              <div className="mt-4 grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-6 sm:gap-12">
                 <div className="flex flex-col">
-                  <span className="text-[28px] font-bold text-slate-900">
+                  <span className="text-[20px] sm:text-[28px] font-bold text-slate-900">
                     {current.stats.colleges}
                   </span>
-                  <span className="text-sm font-medium text-slate-400">
+                  <span className="text-xs sm:text-sm font-medium text-slate-400">
                     Colleges
                   </span>
                 </div>
-                <span className="h-12 w-px bg-slate-300" />
+                <span className="hidden sm:block h-12 w-px bg-slate-300" />
                 <div className="flex flex-col">
-                  <span className="text-[28px] font-bold text-slate-900">
+                  <span className="text-[20px] sm:text-[28px] font-bold text-slate-900">
                     {current.stats.salary}
                   </span>
-                  <span className="text-sm font-medium text-slate-400">
+                  <span className="text-xs sm:text-sm font-medium text-slate-400">
                     Avg. Salary
                   </span>
                 </div>
-                <span className="h-12 w-px bg-slate-300" />
+                <span className="hidden sm:block h-12 w-px bg-slate-300" />
                 <div className="flex flex-col">
                   <span
-                    className="text-[28px] font-bold"
+                    className="text-[20px] sm:text-[28px] font-bold"
                     style={{ color: "rgba(0, 177, 33, 1)" }}
                   >
                     {current.stats.growth}
                   </span>
-                  <span className="text-sm font-medium text-slate-400">
+                  <span className="text-xs sm:text-sm font-medium text-slate-400">
                     Job Growth
                   </span>
                 </div>
                 <Link
                   href={`/careers-courses?stream=${current.slug}`}
-                  className="ml-4 flex items-center gap-2 text-[25px] font-bold text-[#FF3C3C] transition-transform hover:translate-x-1"
+                  className="col-span-2 sm:col-span-1 sm:ml-4 flex items-center gap-2 text-[18px] sm:text-[25px] font-bold text-[#FF3C3C] transition-transform hover:translate-x-1"
                 >
                   View more{" "}
                   <span
                     className="material-symbols-outlined"
-                    style={{ fontSize: "25px", fontWeight: 700 }}
+                    style={{ fontSize: "20px", fontWeight: 700 }}
                   >
                     arrow_forward
                   </span>
@@ -373,7 +372,7 @@ export default function TopCourse() {
                   className="h-16 w-full rounded-[5px] pl-10 pr-4 outline-none transition-all"
                   style={{
                     backgroundColor: "rgba(244, 244, 244, 1)",
-                    fontSize: "20px",
+                    fontSize: "16px",
                     fontWeight: 400,
                     color: "rgba(108, 108, 108, 1)",
                   }}
@@ -431,13 +430,13 @@ export default function TopCourse() {
                         className="leading-none"
                         style={{
                           fontWeight: 500,
-                          fontSize: "20px",
+                          fontSize: "16px",
                           color: "rgba(108, 108, 108, 1)",
                         }}
                       >
                         {course.name}
                       </div>
-                      <div className="mt-1 text-[11px] font-medium uppercase tracking-[0.1em] text-[#6C6C6C]">
+                      <div className="mt-1 text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.1em] text-[#6C6C6C]">
                         {course.count}
                       </div>
                     </div>

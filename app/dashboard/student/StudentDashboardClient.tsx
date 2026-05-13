@@ -200,7 +200,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
   return (
     <div className="flex flex-col h-screen bg-[#f1f2f6] overflow-hidden font-sans">
       {/* HEADER */}
-      <header className="h-[80px] bg-white border-b border-gray-200 px-8 flex items-center justify-between shrink-0 shadow-sm z-50">
+      <header className="h-[70px] sm:h-[80px] bg-white border-b border-gray-200 px-4 sm:px-8 flex items-center justify-between shrink-0 shadow-sm z-50">
         <div className="flex items-center gap-6">
           <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-[#333] hover:bg-slate-100 p-1.5 rounded-lg transition-colors">
             <span className="material-symbols-outlined text-[28px]">menu</span>
@@ -230,9 +230,9 @@ export default function StudentDashboardClient({ user, activated }: Props) {
 
           <div className="flex items-center relative">
             <button onClick={() => setShowAccountMenu(p => !p)}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-[10px] bg-primary text-white hover:bg-primary-dark transition-all shadow-lg shadow-primary/10 active:scale-95">
+              className="flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-2.5 rounded-[10px] bg-primary text-white hover:bg-primary-dark transition-all shadow-lg shadow-primary/10 active:scale-95">
               <span className="material-symbols-outlined text-[18px]">account_circle</span>
-              <span className="text-[14px] font-normal">{user?.name?.split(" ")[0] ?? "Account"}</span>
+              <span className="hidden sm:inline text-[14px] font-normal">{user?.name?.split(" ")[0] ?? "Account"}</span>
               <span className="material-symbols-outlined text-[16px] text-white/70">expand_more</span>
             </button>
             {showAccountMenu && (
@@ -282,9 +282,9 @@ export default function StudentDashboardClient({ user, activated }: Props) {
           <SidebarContent />
         </aside>
 
-        <div className="flex-1 min-w-0 student-dashboard-scroll bg-[#f8f9fa] relative">
+        <div className="flex-1 min-w-0 student-dashboard-scroll bg-[#f8f9fa] relative pb-[80px] lg:pb-0">
           <main>
-            <div className={`p-10 max-w-[1600px] mx-auto ${showActivatedBanner ? "pt-16" : ""}`}>
+            <div className={`p-4 sm:p-10 max-w-[1600px] mx-auto ${showActivatedBanner ? "pt-16" : ""}`}>
               {renderTab()}
             </div>
           </main>

@@ -51,7 +51,9 @@ export default function NewsSection({ dbBlogs }: NewsSectionProps) {
       <div className="home-page-shell">
         <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-start">
            <div className="flex-1">
-               <h2 className="text-3xl lg:text-4xl font-black tracking-tight">Student <span style={{ color: '#FF3C3C' }}>Life & Beyond</span></h2>
+                <h2 className="text-[32px] sm:text-[40px] lg:text-[68px] font-semibold tracking-tight leading-[1.1] mb-3 sm:mb-4">
+                  Student <span style={{ color: '#FF3C3C' }}>Life & Beyond</span>
+                </h2>
               <p className="mt-3 text-slate-500 font-medium max-w-lg">
                 Explore our latest articles, guides, and student stories to stay ahead in your academic journey.
               </p>
