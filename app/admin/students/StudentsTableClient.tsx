@@ -81,7 +81,7 @@ export default function StudentsTableClient({
   return (
     <>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm min-w-[800px]">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-100">
               <th className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>

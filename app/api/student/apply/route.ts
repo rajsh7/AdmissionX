@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyStudentToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { sendApplicationSubmittedEmail, sendNewApplicationNotificationToCollege, sendApplicationStartedEmail } from "@/lib/email";
 
 async function checkAuth(req: NextRequest) {
   const cookieStore = await cookies();
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest) {
     stream_name?: string;
     fees?: number;
     notes?: string;
+    status?: string;
     documents?: { type: string; url: string }[];
     personal_info?: {
       name?: string;
@@ -71,15 +73,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { collegeprofile_id, collegemaster_id, college_name, course_name, degree_name, stream_name, fees, notes, documents, personal_info, academic_info, payment_info } = body;
+  const { collegeprofile_id, collegemaster_id, college_name, course_name, degree_name, stream_name, fees, notes, status, documents, personal_info, academic_info, payment_info } = body;
 
-  const REQUIRED_DOC_TYPES = ["10th Marksheet", "12th Marksheet", "ID Proof"];
-  if (!documents || !Array.isArray(documents)) {
-    return NextResponse.json({ error: "documents field is required and must be an array." }, { status: 400 });
-  }
-  const missingDocs = REQUIRED_DOC_TYPES.filter((t) => !documents.map((d) => d.type).includes(t));
-  if (missingDocs.length > 0) {
-    return NextResponse.json({ error: `Missing required documents: ${missingDocs.join(", ")}` }, { status: 400 });
+  const isDraft = status === "draft";
+  
+  if (!isDraft) {
+    const REQUIRED_DOC_TYPES = ["10th Marksheet", "12th Marksheet", "ID Proof"];
+    if (!documents || !Array.isArray(documents)) {
+      return NextResponse.json({ error: "documents field is required and must be an array." }, { status: 400 });
+    }
+    const missingDocs = REQUIRED_DOC_TYPES.filter((t) => !documents.map((d) => d.type).includes(t));
+    if (missingDocs.length > 0) {
+      return NextResponse.json({ error: `Missing required documents: ${missingDocs.join(", ")}` }, { status: 400 });
+    }
   }
   if (!collegeprofile_id) {
     return NextResponse.json({ error: "collegeprofile_id is required." }, { status: 400 });
@@ -95,11 +101,11 @@ export async function POST(req: NextRequest) {
   );
   if (collegeDoc) resolvedCollegeId = collegeDoc._id;
 
-  // Guard: one active application per college per student
+  // Guard: one active application per college per student (except drafts)
   const existing = await db.collection("applications").findOne({
     studentId,
     collegeId: resolvedCollegeId,
-    status: { $ne: "rejected" },
+    status: { $nin: ["rejected", "draft"] },
   });
   if (existing) {
     return NextResponse.json(
@@ -168,11 +174,11 @@ export async function POST(req: NextRequest) {
     personal_info: personal_info ?? null,
     academic_info: academic_info ?? null,
     payment_info: payment_info ?? null,
-    status: "submitted",
+    status: isDraft ? "draft" : "submitted",
     createdAt: new Date(),
   });
 
-  if (documents.length > 0) {
+  if (documents && documents.length > 0) {
     await db.collection("documents").insertMany(
       documents.map((d) => ({ applicationId: result.insertedId, type: d.type, fileUrl: d.url }))
     );
@@ -200,9 +206,57 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Send emails based on status
+  setImmediate(async () => {
+  try {
+    const studentDoc = await db.collection("next_student_signups").findOne(
+      { email: payload.email },
+      { projection: { name: 1, email: 1 } }
+    );
+    
+    if (studentDoc) {
+      if (isDraft) {
+        await sendApplicationStartedEmail(
+          studentDoc.email,
+          studentDoc.name || "Student",
+          applicationRef
+        );
+      } else {
+        await sendApplicationSubmittedEmail(
+          studentDoc.email,
+          studentDoc.name || "Student",
+          applicationRef,
+          resolvedCourseName || "General Admission",
+          resolvedCollegeName || "College"
+        );
+
+        const collegeDoc = await db.collection("collegeprofile").aggregate([
+          { $match: { _id: resolvedCollegeId } },
+          { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
+          { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
+          { $project: { email: "$u.email", name: "$u.firstname" } },
+          { $limit: 1 },
+        ]).toArray();
+
+        if (collegeDoc.length && collegeDoc[0].email) {
+          await sendNewApplicationNotificationToCollege(
+            collegeDoc[0].email,
+            resolvedCollegeName || "Your Institution",
+            studentDoc.name || "Student",
+            applicationRef,
+            resolvedCourseName || "General Admission"
+          );
+        }
+      }
+    }
+  } catch (emailErr) {
+    console.error("[Apply] Email notification failed:", emailErr);
+  }
+});
+
   return NextResponse.json({
     success: true,
-    message: "Application submitted successfully.",
+    message: isDraft ? "Application saved as draft." : "Application submitted successfully.",
     application: {
       id: result.insertedId,
       application_ref: applicationRef,
@@ -212,7 +266,7 @@ export async function POST(req: NextRequest) {
       degree_name: resolvedDegreeName,
       stream_name: resolvedStreamName,
       fees: resolvedFees,
-      status: "submitted",
+      status: isDraft ? "draft" : "submitted",
       payment_status: "pending",
     },
   }, { status: 201 });

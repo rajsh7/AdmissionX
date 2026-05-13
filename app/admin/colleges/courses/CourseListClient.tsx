@@ -147,12 +147,12 @@ export default function CourseListClient({
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
           <h1 className="text-lg font-black text-slate-800">College Courses</h1>
           <p className="text-xs text-slate-400 font-medium mt-0.5">Manage and monitor all college course listings</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setShowFilters((value) => !value)}
@@ -293,8 +293,8 @@ export default function CourseListClient({
         </form>
       )}
 
-      <div className="bg-white">
-        <div className="px-2  py-3 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-white w-full">
+        <div className="px-2 py-3 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between">
           <p className="text-sm text-slate-500 font-medium">
             {total > 0 ? (
               <>
@@ -318,129 +318,131 @@ export default function CourseListClient({
             <p className="text-sm text-slate-400 mt-1">Try adjusting your search or filters</p>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse table-fixed">
-            <colgroup>
-              <col style={{ width: "4%" }} />
-              <col style={{ width: "26%" }} />
-              <col style={{ width: "20%" }} />
-              <col style={{ width: "16%" }} />
-              <col style={{ width: "14%" }} />
-              <col style={{ width: "10%" }} />
-              <col style={{ width: "10%" }} />
-            </colgroup>
-            <thead >
-              <tr className="bg-slate-50 border-b bg-black  border-slate-100">
-                <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider text-center">
-                  S.No
-                </th>
-                <th className="px-4 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
-                  Course
-                </th>
-                <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
-                  College
-                </th>
-                <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
-                  Degree & Stream
-                </th>
-                <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
-                  Fees & Seats
-                </th>
-                <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
-                  Duration
-                </th>
-                <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider text-right">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 ">
-              {courses.slice(0, visibleCount).map((course, idx) => (
-                <tr key={course.id} className="hover:bg-slate-50/60 transition-colors  group">
-                  <td className="px-3 py-2.5 text-center ">
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
-                      {offset + idx + 1}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2.5">
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold text-slate-800 truncate leading-tight">
-                        {course.course_name || "General Program"}
-                      </p>
-                      <p className="text-[11px] text-slate-400 font-mono truncate mt-0.5">
-                        Course ID: {course.course_id ?? "-"}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-700 truncate">
-                        {course.college_name || "Unnamed College"}
-                      </p>
-                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                        Profile #{course.collegeprofile_id || "-"}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <div className="flex flex-wrap gap-1.5">
-                      {course.degree_name && (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold truncate max-w-full">
-                          {course.degree_name}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse table-fixed min-w-[800px]">
+              <colgroup>
+                <col style={{ width: "6%" }} />
+                <col style={{ width: "24%" }} />
+                <col style={{ width: "20%" }} />
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "14%" }} />
+                <col style={{ width: "10%" }} />
+                <col style={{ width: "10%" }} />
+              </colgroup>
+              <thead >
+                <tr className="bg-black border-b border-slate-800">
+                  <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider text-center">
+                    S.No
+                  </th>
+                  <th className="px-4 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
+                    Course
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
+                    College
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
+                    Degree & Stream
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
+                    Fees & Seats
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider">
+                    Duration
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-black text-white uppercase tracking-wider text-right">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 ">
+                {courses.slice(0, visibleCount).map((course, idx) => (
+                  <tr key={course.id} className="hover:bg-slate-50/60 transition-colors  group">
+                    <td className="px-3 py-2.5 text-center ">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[11px] font-black text-slate-500">
+                        {offset + idx + 1}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-slate-800 truncate leading-tight">
+                          {course.course_name || "General Program"}
+                        </p>
+                        <p className="text-[11px] text-slate-400 font-mono truncate mt-0.5">
+                          Course ID: {course.course_id ?? "-"}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-slate-700 truncate">
+                          {course.college_name || "Unnamed College"}
+                        </p>
+                        <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                          Profile #{course.collegeprofile_id || "-"}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <div className="flex flex-wrap gap-1.5">
+                        {course.degree_name && (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold truncate max-w-full">
+                            {course.degree_name}
+                          </span>
+                        )}
+                        {course.stream_name && (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 text-[11px] font-bold truncate max-w-full">
+                            {course.stream_name}
+                          </span>
+                        )}
+                        {!course.degree_name && !course.stream_name && (
+                          <span className="text-slate-300 text-sm">-</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <div className="flex flex-col gap-1">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-[11px] font-bold">
+                          {formatFee(course.fees)}
                         </span>
-                      )}
-                      {course.stream_name && (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 text-[11px] font-bold truncate max-w-full">
-                          {course.stream_name}
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold">
+                          Seats: {course.seats || "-"}
                         </span>
-                      )}
-                      {!course.degree_name && !course.stream_name && (
+                      </div>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      {course.courseduration ? (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-[11px] font-bold">
+                          {course.courseduration}
+                        </span>
+                      ) : (
                         <span className="text-slate-300 text-sm">-</span>
                       )}
-                    </div>
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <div className="flex flex-col gap-1">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-[11px] font-bold">
-                        {formatFee(course.fees)}
-                      </span>
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold">
-                        Seats: {course.seats || "-"}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-3 py-2.5">
-                    {course.courseduration ? (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-[11px] font-bold">
-                        {course.courseduration}
-                      </span>
-                    ) : (
-                      <span className="text-slate-300 text-sm">-</span>
-                    )}
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <div className="flex flex-row items-center justify-end gap-1.5">
-                      <Link
-                        href={`/admin/colleges/courses/${course.id}`}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition-colors shadow-sm"
-                        title="Edit course"
-                      >
-                        <span className="material-symbols-outlined text-[13px]">edit</span>
-                        Edit
-                      </Link>
-                      <DeleteButton
-                        action={async () => {
-                          await onDelete(course.id);
-                        }}
-                        label="Delete"
-                        size="xs"
-                        icon={<span className="material-symbols-outlined text-[13px]">delete</span>}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <div className="flex flex-row items-center justify-end gap-1.5">
+                        <Link
+                          href={`/admin/colleges/courses/${course.id}`}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition-colors shadow-sm"
+                          title="Edit course"
+                        >
+                          <span className="material-symbols-outlined text-[13px]">edit</span>
+                          Edit
+                        </Link>
+                        <DeleteButton
+                          action={async () => {
+                            await onDelete(course.id);
+                          }}
+                          label="Delete"
+                          size="xs"
+                          icon={<span className="material-symbols-outlined text-[13px]">delete</span>}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 

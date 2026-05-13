@@ -86,7 +86,7 @@ export default function PaginationFixed({
   return (
     <nav
       aria-label="Pagination"
-      className={`flex items-center justify-center gap-1.5 ${className}`}
+      className={`flex flex-wrap items-center justify-center gap-1.5 ${className}`}
     >
       {/* ← Prev */}
       <button
@@ -103,7 +103,7 @@ export default function PaginationFixed({
       </button>
 
       {/* Page numbers */}
-      <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center justify-center gap-1">
         {pages.map((p, idx) =>
           p === "…" ? (
             <span

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { verifyStudentToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import crypto from "crypto";
+import { sendPaymentSuccessEmail, sendPaymentFailedEmail } from "@/lib/email";
 
 async function checkAuth(studentId: string) {
   const cookieStore = await cookies();
@@ -54,25 +55,75 @@ export async function POST(req: NextRequest) {
 
   const transactionId = `ADX-TXN-${Date.now()}-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
 
+  // Simulate payment processing (replace with actual payment gateway)
+  const paymentSuccess = Math.random() > 0.1; // 90% success rate for demo
+
+  if (!paymentSuccess) {
+    // Payment failed
+    setImmediate(async () => {
+      try {
+        const studentDoc = await db.collection("next_student_signups").findOne(
+          { id: String(student_id) },
+          { projection: { name: 1, email: 1 } }
+        );
+        
+        if (studentDoc) {
+          await sendPaymentFailedEmail(studentDoc.email, studentDoc.name || "Student");
+        }
+      } catch (emailErr) {
+        console.error("[Payment Failed] Email notification failed:", emailErr);
+      }
+    });
+
+    return NextResponse.json(
+      { error: "Payment processing failed. Please try again.", transaction_id: null },
+      { status: 402 }
+    );
+  }
+
   await db.collection("applications").updateOne(
     { _id: application_id },
     { $set: { payment_status: "paid", transaction_id: transactionId, amount_paid: amountNum, updated_at: new Date() } }
   );
 
+  const receipt = {
+    transaction_id: transactionId,
+    application_ref: app.applicationRef || app.application_ref,
+    college_name: app.collegeName || app.college_name || "N/A",
+    course_name: app.courseName || app.course_name || "N/A",
+    degree_name: app.degreeName || app.degree_name || "",
+    amount_paid: amountNum,
+    card_last4,
+    card_name: String(card_name).trim(),
+    paid_at: new Date().toISOString(),
+    status: "paid",
+  };
+
+  // Send payment success email
+  setImmediate(async () => {
+    try {
+      const studentDoc = await db.collection("next_student_signups").findOne(
+        { id: String(student_id) },
+        { projection: { name: 1, email: 1 } }
+      );
+      
+      if (studentDoc) {
+        await sendPaymentSuccessEmail(
+          studentDoc.email,
+          studentDoc.name || "Student",
+          String(amountNum),
+          transactionId,
+          new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
+        );
+      }
+    } catch (emailErr) {
+      console.error("[Payment] Email notification failed:", emailErr);
+    }
+  });
+
   return NextResponse.json({
     success: true,
     message: "Payment processed successfully. Your application has been confirmed.",
-    receipt: {
-      transaction_id: transactionId,
-      application_ref: app.application_ref,
-      college_name: app.college_name ?? "N/A",
-      course_name: app.course_name ?? "N/A",
-      degree_name: app.degree_name ?? "",
-      amount_paid: amountNum,
-      card_last4,
-      card_name: String(card_name).trim(),
-      paid_at: new Date().toISOString(),
-      status: "paid",
-    },
+    receipt,
   });
 }

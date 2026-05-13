@@ -40,6 +40,13 @@ export default function StudentDashboardClient({ user, activated }: Props) {
   const [activeTab, setActiveTab]         = useState<TabId>("overview");
   const [sidebarOpen, setSidebarOpen]     = useState(false);
   const [showActivatedBanner, setShowActivatedBanner] = useState(!!activated);
+
+  useEffect(() => {
+    if (activated) {
+      const t = setTimeout(() => setShowActivatedBanner(false), 6000);
+      return () => clearTimeout(t);
+    }
+  }, [activated]);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -258,12 +265,10 @@ export default function StudentDashboardClient({ user, activated }: Props) {
 
       <div className="flex flex-1 min-h-0 overflow-hidden relative">
         {showActivatedBanner && (
-          <div className="fixed top-[80px] left-0 right-0 z-50 flex items-center justify-between gap-3 px-6 py-3 bg-emerald-500 text-white text-sm font-semibold shadow-lg">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-              Your email has been verified! Welcome to AdmissionX, {user?.name?.split(" ")[0] ?? "Student"}.
-            </div>
-            <button onClick={() => setShowActivatedBanner(false)} className="shrink-0 hover:opacity-70 transition-opacity">
+          <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-center gap-3 px-6 py-3.5 bg-emerald-500 text-white text-sm font-semibold shadow-md">
+            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+            <span>Your email has been verified! Welcome to AdmissionX, <strong>{user?.name?.split(" ")[0] ?? "Student"}</strong>.</span>
+            <button onClick={() => setShowActivatedBanner(false)} className="ml-4 shrink-0 hover:opacity-70 transition-opacity">
               <span className="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
@@ -279,7 +284,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
 
         <div className="flex-1 min-w-0 student-dashboard-scroll bg-[#f8f9fa] relative">
           <main>
-            <div className="p-10 max-w-[1600px] mx-auto">
+            <div className={`p-10 max-w-[1600px] mx-auto ${showActivatedBanner ? "pt-16" : ""}`}>
               {renderTab()}
             </div>
           </main>

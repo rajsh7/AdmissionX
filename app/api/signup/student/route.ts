@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { getDb } from "@/lib/db";
-import { sendStudentActivationEmail } from "@/lib/email";
-import { signStudentToken, STUDENT_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
+import { sendStudentActivationEmail, sendOTPEmail } from "@/lib/email";
 import { enforceRateLimit, rejectUntrustedOrigin } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
@@ -37,14 +36,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Please enter a valid 10-digit mobile number starting with 6-9." }, { status: 400 });
     }
 
-    // Validate email format
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLower)) {
-      return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
-    }
-    // Validate phone — must be 10 digits (Indian mobile)
-    if (!/^[6-9]\d{9}$/.test(phoneTrimmed.replace(/[\s\-+]/g, ""))) {
-      return NextResponse.json({ error: "Please enter a valid 10-digit mobile number." }, { status: 400 });
-    }
     const db = await getDb();
 
     // Check email uniqueness across ALL collections
@@ -76,8 +67,8 @@ export async function POST(req: NextRequest) {
     }
 
     const hashed = await bcrypt.hash(password, 12);
-    const activationToken = crypto.randomBytes(32).toString("hex");
-    const tokenExp = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     const result = await db.collection("next_student_signups").insertOne({
       name: name.trim(),
@@ -85,34 +76,29 @@ export async function POST(req: NextRequest) {
       phone: phoneTrimmed,
       password_hash: hashed,
       is_active: 0,
-      activation_token: activationToken,
-      activation_token_exp: tokenExp,
+      otp_code: otp,
+      otp_expiry: otpExpiry,
+      otp_verified: false,
+      otp_purpose: "signup",
       created_at: new Date(),
       updated_at: new Date(),
     });
 
     if (!result || !result.insertedId) {
-      throw new Error("Failed to insert student record into database. The database may be in mock mode or connection failed.");
+      throw new Error("Failed to insert student record into database.");
     }
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://admissionx.com";
-      const activationLink = `${baseUrl}/api/auth/activate?token=${activationToken}`;
-      await sendStudentActivationEmail(emailLower, name.trim(), activationLink);
-    } catch (emailErr) { 
-      console.error("[Signup] Email sending failed:", emailErr);
+      await sendOTPEmail(emailLower, name.trim(), otp, 10);
+    } catch (emailErr) {
+      console.error("[Signup] OTP email sending failed:", emailErr);
     }
 
-    const token = await signStudentToken({
-      id: result.insertedId.toString(),
-      name: name.trim(),
-      email: emailLower,
-      role: "student",
+    return NextResponse.json({ 
+      success: true,
+      message: "OTP sent to your email. Please verify to activate your account."
     });
 
-    const response = NextResponse.json({ success: true });
-    response.cookies.set(STUDENT_COOKIE, token, COOKIE_OPTIONS);
-    return response;
   } catch (err: unknown) {
     const error = err instanceof Error ? err : new Error("Unknown signup error");
     const errorCode = typeof err === "object" && err !== null && "code" in err ? (err as { code?: number }).code : undefined;
@@ -120,33 +106,24 @@ export async function POST(req: NextRequest) {
       ? (err as { keyPattern?: { email?: unknown } }).keyPattern
       : undefined;
 
-    // SELF-HEALING: If "not primary" error, force reconnect and retry once
     if (errorCode === 10107 || error.message?.includes("not primary")) {
       console.warn("♻️ [Signup] Detected 'not primary' error. Attempting self-healing reconnection...");
       const { forceReconnect } = await import("@/lib/db");
       await forceReconnect();
-      
-      // Optional: Small delay to allow replica set to settle
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Recursively call for one retry attempt (using a flag or just one-off)
-      // For safety, we just throw a custom message asking to try once more 
-      // OR we can actually re-run the logic. Let's do a clean error for now
-      // that explains the reconnection happened.
       return NextResponse.json(
-        { error: "Database was out of sync. Connection has been refreshed. Please click 'Create Account' again." }, 
+        { error: "Database was out of sync. Connection has been refreshed. Please click 'Create Account' again." },
         { status: 503 }
       );
     }
 
     console.error("[Signup Internal Error]:", error);
-    // MongoDB duplicate key error
     if (errorCode === 11000) {
       const field = keyPattern?.email ? "email" : "mobile number";
       return NextResponse.json({ error: `An account with this ${field} already exists.` }, { status: 409 });
     }
     return NextResponse.json(
-      { error: error.message || "Internal server error. Please try again." }, 
+      { error: error.message || "Internal server error. Please try again." },
       { status: 500 }
     );
   }

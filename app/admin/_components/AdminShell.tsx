@@ -192,7 +192,7 @@ export default function AdminShell({
           </button>
 
           {/* Right side actions */}
-          <div className="flex items-center gap-5 flex-shrink-0 pr-2 ml-auto">
+          <div className="flex items-center gap-2 sm:gap-5 flex-shrink-0 pr-1 sm:pr-2 ml-auto">
             
             {/* Action Icons */}
             <AdminNotifications />

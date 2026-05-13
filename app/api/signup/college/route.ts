@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { getDb } from "@/lib/db";
+import { getCollegeDb } from "@/lib/db";
 import { sendCollegeSignupConfirmationEmail } from "@/lib/email";
 import { enforceRateLimit, rejectUntrustedOrigin } from "@/lib/security";
 
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     if (!/^[6-9]\d{9}$/.test(phoneTrimmed)) {
       return NextResponse.json({ error: "Please enter a valid 10-digit mobile number starting with 6-9." }, { status: 400 });
     }
-    const db = await getDb();
+    const db = await getCollegeDb();
 
     // Check email uniqueness across ALL collections
     const [existingCollege, existingStudent, existingLegacy, existingAdmin] = await Promise.all([
@@ -94,8 +94,8 @@ export async function POST(req: NextRequest) {
     // SELF-HEALING: If "not primary" error, force reconnect
     if (errorCode === 10107 || error.message?.includes("not primary")) {
       console.warn("♻️ [College Signup] Detected 'not primary' error. Attempting self-healing reconnection...");
-      const { forceReconnect } = await import("@/lib/db");
-      await forceReconnect();
+      const { forceReconnectCollege } = await import("@/lib/db");
+      await forceReconnectCollege();
       
       return NextResponse.json(
         { error: "Database was out of sync. Connection has been refreshed. Please try again." }, 

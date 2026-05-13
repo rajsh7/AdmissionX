@@ -37,6 +37,9 @@ export default function StudentLoginForm() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendSent, setResendSent] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
+  const [showOTP, setShowOTP] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
     const t = setInterval(() => setSlideIndex(i => (i + 1) % SLIDES.length), 4000);
@@ -54,8 +57,10 @@ export default function StudentLoginForm() {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      if (res.ok) {
-        // Full page reload so cookie is read fresh by SSR
+      if (res.ok && data.pending_otp) {
+        setUserEmail(email);
+        setShowOTP(true);
+      } else if (res.ok) {
         window.location.href = data.user?.id ? `/dashboard/student/${data.user.id}` : redirectTo;
       } else if (res.status === 403) {
         setError(data.error || "Please verify your email before logging in.");
@@ -65,6 +70,51 @@ export default function StudentLoginForm() {
       }
     } catch { setError("Network error. Please try again."); }
     finally { setLoading(false); }
+  };
+
+  const handleVerifyOTP = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+
+    if (otp.length !== 6) {
+      setError("Please enter a valid 6-digit OTP.");
+      return;
+    }
+
+    setLoading(true);
+    const res = await fetch("/api/auth/verify-login-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: userEmail, otp }),
+    });
+    setLoading(false);
+
+    if (res.ok) {
+      const data = await res.json();
+      window.location.href = data.user?.id ? `/dashboard/student/${data.user.id}` : redirectTo;
+    } else {
+      const data = await res.json();
+      setError(data.error || "OTP verification failed");
+    }
+  };
+
+  const handleResendOTP = async () => {
+    setError("");
+    setResendLoading(true);
+    const res = await fetch("/api/auth/resend-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: userEmail }),
+    });
+    setResendLoading(false);
+
+    if (res.ok) {
+      setResendSent(true);
+      setTimeout(() => setResendSent(false), 3000);
+    } else {
+      const data = await res.json();
+      setError(data.error || "Failed to resend OTP");
+    }
   };
 
   return (
@@ -108,78 +158,139 @@ export default function StudentLoginForm() {
           {/* RIGHT: Form */}
           <div className="flex-1 bg-[#f3f4f6] flex items-center justify-center px-4 sm:px-8 py-10">
             <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-6 sm:px-8 py-8">
-              <h1 className="text-[20px] md:text-[24px] font-bold text-[#111] mb-1">Student Login</h1>
-              <p className="text-[12px] md:text-[13px] text-gray-500 mb-6">Sign in to your AdmissionX account.</p>
+              {!showOTP ? (
+                <>
+                  <h1 className="text-[20px] md:text-[24px] font-bold text-[#111] mb-1">Student Login</h1>
+                  <p className="text-[12px] md:text-[13px] text-gray-500 mb-6">Sign in to your AdmissionX account.</p>
 
-              <a href="/api/auth/google"
-                className="flex items-center justify-center gap-2.5 w-full py-2 md:py-2.5 border border-gray-300 rounded-lg text-[12px] md:text-[13px] font-medium text-[#111] bg-white hover:border-gray-400 transition-colors mb-4">
-                <GoogleIcon />Sign in with Google
-              </a>
+                  <a href="/api/auth/google"
+                    className="flex items-center justify-center gap-2.5 w-full py-2 md:py-2.5 border border-gray-300 rounded-lg text-[12px] md:text-[13px] font-medium text-[#111] bg-white hover:border-gray-400 transition-colors mb-4">
+                    <GoogleIcon />Sign in with Google
+                  </a>
 
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-[11px] text-gray-400 font-semibold tracking-wider">OR</span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
+                  <div className="flex items-center gap-2.5 mb-4">
+                    <div className="flex-1 h-px bg-gray-200" />
+                    <span className="text-[11px] text-gray-400 font-semibold tracking-wider">OR</span>
+                    <div className="flex-1 h-px bg-gray-200" />
+                  </div>
 
-              {error && (
-                <div className="mb-4 px-3 py-2.5 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">
-                  <p>{error}</p>
-                  {unverifiedEmail && (
-                    <div className="mt-2 pt-2 border-t border-red-200">
-                      <p className="text-red-500 mb-1">Didn&apos;t receive the email?</p>
-                      <button type="button" disabled={resendLoading || resendSent}
-                        onClick={async () => {
-                          setResendLoading(true);
-                          try {
-                            await fetch("/api/auth/resend-activation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: unverifiedEmail }) });
-                            setResendSent(true);
-                          } finally { setResendLoading(false); }
-                        }}
-                        className="font-semibold text-red-600 hover:underline disabled:opacity-60">
-                        {resendSent ? "Activation email sent!" : resendLoading ? "Sending…" : "Resend activation email"}
-                      </button>
+                  {error && (
+                    <div className="mb-4 px-3 py-2.5 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">
+                      <p>{error}</p>
+                      {unverifiedEmail && (
+                        <div className="mt-2 pt-2 border-t border-red-200">
+                          <p className="text-red-500 mb-1">Didn&apos;t receive the email?</p>
+                          <button type="button" disabled={resendLoading || resendSent}
+                            onClick={async () => {
+                              setResendLoading(true);
+                              try {
+                                await fetch("/api/auth/resend-activation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: unverifiedEmail }) });
+                                setResendSent(true);
+                              } finally { setResendLoading(false); }
+                            }}
+                            className="font-semibold text-red-600 hover:underline disabled:opacity-60">
+                            {resendSent ? "Activation email sent!" : resendLoading ? "Sending…" : "Resend activation email"}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
-                </div>
-              )}
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                <div className="flex flex-col gap-1">
-                  <label className="text-[11px] md:text-[12px] font-semibold text-gray-700">Email<span className="text-red-500 ml-0.5">*</span></label>
-                  <input type="email" placeholder="Enter your email" required
-                    value={email} onChange={e => setEmail(e.target.value)} suppressHydrationWarning
-                    className="px-3 py-2 border border-gray-300 rounded-[7px] text-[12px] md:text-[13px] placeholder:text-[11px] md:placeholder:text-[12px] text-[#111] outline-none focus:border-black transition-colors" />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[11px] md:text-[12px] font-semibold text-gray-700">Password<span className="text-red-500 ml-0.5">*</span></label>
-                    <Link href="/forgot-password" className="text-[10px] md:text-[11px] text-gray-500 hover:text-black hover:underline">Forgot password?</Link>
-                  </div>
-                  <div className="relative">
-                    <input type={showPassword ? "text" : "password"} placeholder="Enter your password" required
-                      value={password} onChange={e => setPassword(e.target.value)} suppressHydrationWarning
-                      className="w-full px-3 py-2 border border-gray-300 rounded-[7px] text-[12px] md:text-[13px] placeholder:text-[11px] md:placeholder:text-[12px] text-[#111] outline-none focus:border-black transition-colors pr-9" />
-                    <button type="button" tabIndex={-1} onClick={() => setShowPassword(p => !p)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                      <span className="material-symbols-outlined text-[17px]">{showPassword ? "visibility_off" : "visibility"}</span>
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] md:text-[12px] font-semibold text-gray-700">Email<span className="text-red-500 ml-0.5">*</span></label>
+                      <input type="email" placeholder="Enter your email" required
+                        value={email} onChange={e => setEmail(e.target.value)} suppressHydrationWarning
+                        className="px-3 py-2 border border-gray-300 rounded-[7px] text-[12px] md:text-[13px] placeholder:text-[11px] md:placeholder:text-[12px] text-[#111] outline-none focus:border-black transition-colors" />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between items-center">
+                        <label className="text-[11px] md:text-[12px] font-semibold text-gray-700">Password<span className="text-red-500 ml-0.5">*</span></label>
+                        <Link href="/forgot-password" className="text-[10px] md:text-[11px] text-gray-500 hover:text-black hover:underline">Forgot password?</Link>
+                      </div>
+                      <div className="relative">
+                        <input type={showPassword ? "text" : "password"} placeholder="Enter your password" required
+                          value={password} onChange={e => setPassword(e.target.value)} suppressHydrationWarning
+                          className="w-full px-3 py-2 border border-gray-300 rounded-[7px] text-[12px] md:text-[13px] placeholder:text-[11px] md:placeholder:text-[12px] text-[#111] outline-none focus:border-black transition-colors pr-9" />
+                        <button type="button" tabIndex={-1} onClick={() => setShowPassword(p => !p)}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                          <span className="material-symbols-outlined text-[17px]">{showPassword ? "visibility_off" : "visibility"}</span>
+                        </button>
+                      </div>
+                    </div>
+                    <button type="submit" disabled={loading}
+                      className="mt-2 py-2 md:py-2.5 bg-[#111] hover:bg-[#333] disabled:opacity-60 text-white rounded-lg text-[13px] md:text-[13.5px] font-semibold transition-colors w-full">
+                      {loading ? "Signing in…" : "Log in"}
                     </button>
-                  </div>
-                </div>
-                <button type="submit" disabled={loading}
-                  className="mt-2 py-2 md:py-2.5 bg-[#111] hover:bg-[#333] disabled:opacity-60 text-white rounded-lg text-[13px] md:text-[13.5px] font-semibold transition-colors w-full">
-                  {loading ? "Signing in…" : "Log in"}
-                </button>
-              </form>
+                  </form>
 
-              <p className="mt-4 text-[11px] md:text-[12px] text-gray-500 text-center">
-                Don&apos;t have an account?{" "}
-                <Link href="/signup/student" className="text-[#111] font-semibold hover:underline">Sign up</Link>
-              </p>
-              <p className="mt-2.5 text-[10px] md:text-[11px] text-gray-400 text-center">
-                By logging in, you agree to our{" "}
-                <Link href="/terms-and-conditions" className="text-gray-500 underline">terms of use</Link>.
-              </p>
+                  <p className="mt-4 text-[11px] md:text-[12px] text-gray-500 text-center">
+                    Don&apos;t have an account?{" "}
+                    <Link href="/signup/student" className="text-[#111] font-semibold hover:underline">Sign up</Link>
+                  </p>
+                  <p className="mt-2.5 text-[10px] md:text-[11px] text-gray-400 text-center">
+                    By logging in, you agree to our{" "}
+                    <Link href="/terms-and-conditions" className="text-gray-500 underline">terms of use</Link>.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-[20px] md:text-[24px] font-bold text-[#111] mb-1">Verify OTP</h1>
+                  <p className="text-[12px] md:text-[13px] text-gray-500 mb-5">
+                    We've sent a 6-digit OTP to <strong>{userEmail}</strong>
+                  </p>
+
+                  {error && (
+                    <div className="mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">{error}</div>
+                  )}
+
+                  {resendSent && (
+                    <div className="mb-3 px-3 py-2 bg-green-50 border border-green-200 rounded-lg text-green-600 text-xs">
+                      New OTP sent successfully!
+                    </div>
+                  )}
+
+                  <form onSubmit={handleVerifyOTP} className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] md:text-[12px] font-semibold text-gray-700">Enter OTP<span className="text-red-500 ml-0.5">*</span></label>
+                      <input
+                        type="text"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                        placeholder="Enter 6-digit OTP"
+                        maxLength={6}
+                        required
+                        className="px-3 py-2 border border-gray-300 rounded-[7px] text-[13px] text-[#111] outline-none focus:border-black transition-colors text-center text-2xl tracking-widest font-mono"
+                      />
+                    </div>
+
+                    <button type="submit" disabled={loading}
+                      className="py-2 md:py-2.5 bg-[#111] hover:bg-[#333] disabled:opacity-60 text-white rounded-lg text-[13px] md:text-[13.5px] font-semibold transition-colors w-full">
+                      {loading ? "Verifying…" : "Verify & Login"}
+                    </button>
+                  </form>
+
+                  <div className="mt-4 text-center">
+                    <p className="text-[11px] md:text-[12px] text-gray-500">
+                      Didn't receive the OTP?{" "}
+                      <button
+                        onClick={handleResendOTP}
+                        disabled={resendLoading || resendSent}
+                        className="text-[#111] font-semibold hover:underline disabled:opacity-60"
+                      >
+                        {resendLoading ? "Sending..." : "Resend"}
+                      </button>
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => { setShowOTP(false); setOtp(""); setError(""); }}
+                    className="mt-3 text-[11px] md:text-[12px] text-gray-500 hover:text-gray-700 w-full text-center"
+                  >
+                    ← Back to login
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

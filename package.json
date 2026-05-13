@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "migrate:otp": "node --env-file=.env --import tsx migrate-otp-fields.ts",
+    "verify:student": "node --env-file=.env --import tsx verify-student.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -37,6 +39,7 @@
     "eslint-config-next": "^16.2.2",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

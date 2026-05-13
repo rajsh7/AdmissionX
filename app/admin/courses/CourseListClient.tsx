@@ -65,7 +65,7 @@ export default function CourseListClient({
   return (
     <>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm min-w-[800px]">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-100">
               <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3 w-10">#</th>
@@ -178,7 +178,7 @@ export default function CourseListClient({
 
       {/* Pagination after all shown */}
       {showPagination && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/30 rounded-b-2xl">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/30 rounded-b-2xl">
           <p className="text-xs text-slate-500 font-medium tracking-tight">
             Showing <span className="text-slate-800 font-bold">{(page-1)*pageSize + 1}–{Math.min((page-1)*pageSize + pageSize, total)}</span> of <span className="text-slate-800 font-bold">{total.toLocaleString()}</span> courses
           </p>

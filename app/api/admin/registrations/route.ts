@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { ObjectId } from "mongodb";
 import bcrypt from "bcryptjs";
-import { sendCollegeApprovalEmail } from "@/lib/email";
+import { sendCollegeApprovalEmail, sendCollegeWelcomePartnerEmail } from "@/lib/email";
 
 export async function GET(req: NextRequest) {
   try {
@@ -42,16 +42,26 @@ export async function GET(req: NextRequest) {
       ]);
     }
 
-    const studentRows = (students as any[]).map((s) => ({
-      _id: s._id.toString(),
-      type: "student",
-      name: s.name,
-      email: s.email,
-      phone: s.phone,
-      role: "Student",
-      status: s.status || (s.is_active ? "approved" : "pending"),
-      created_at: s.created_at,
-    }));
+    const studentRows = (students as any[]).map((s) => {
+      let displayStatus = "pending";
+      if (s.is_active === 1 || s.is_active === true) {
+        displayStatus = "approved";
+      } else if (s.otp_code && s.otp_expiry) {
+        displayStatus = "pending_verification";
+      }
+      
+      return {
+        _id: s._id.toString(),
+        type: "student",
+        name: s.name,
+        email: s.email,
+        phone: s.phone,
+        role: "Student",
+        status: s.status || displayStatus,
+        created_at: s.created_at,
+        otp_pending: !!(s.otp_code && s.otp_expiry),
+      };
+    });
 
     const collegeRows = (colleges as any[]).map((c) => ({
       _id: c._id.toString(),
@@ -184,6 +194,7 @@ export async function PATCH(req: NextRequest) {
       // Send approval email with login credentials
       try {
         await sendCollegeApprovalEmail(collegeEmail, collegeName, contactName, tempPassword);
+        await sendCollegeWelcomePartnerEmail(collegeEmail, collegeName);
       } catch (emailErr) {
         console.error("[registrations] Approval email failed:", emailErr);
       }

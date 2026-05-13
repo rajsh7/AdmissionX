@@ -234,7 +234,8 @@ export default function WebsiteMetricsPage() {
         <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50">
           <h2 className="text-sm font-bold text-slate-700">Registration Summary</h2>
         </div>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[800px]">
           <thead>
             <tr className="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               <th className="px-5 py-3 text-left">Metric</th>
@@ -266,6 +267,7 @@ export default function WebsiteMetricsPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

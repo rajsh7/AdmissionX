@@ -99,7 +99,7 @@ export default function StudentProfileClient({
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
           <h1 className="text-lg font-black text-slate-800">Profile Information</h1>
           <p className="text-xs text-slate-400 font-medium mt-0.5">Manage and monitor all student profiles</p>
@@ -227,8 +227,9 @@ export default function StudentProfileClient({
             </p>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse table-fixed">
-            <colgroup>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse table-fixed min-w-[900px]">
+              <colgroup>
               <col style={{ width: "4%" }} />
               <col style={{ width: "28%" }} />
               <col style={{ width: "14%" }} />
@@ -338,6 +339,7 @@ export default function StudentProfileClient({
               ))}
             </tbody>
           </table>
+        </div>
         )}
       </div>
 

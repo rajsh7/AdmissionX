@@ -99,7 +99,7 @@ export default function BlogClient({
 
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden text-left">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[800px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
                 <th className="text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider px-5 py-3 w-8">#</th>

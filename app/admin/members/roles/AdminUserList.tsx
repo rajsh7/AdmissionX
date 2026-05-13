@@ -53,7 +53,7 @@ export default function AdminUserList({ users, roles, offset, createAdminUser, u
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <p className="text-sm text-slate-500">{users.length} admin account{users.length !== 1 ? "s" : ""}</p>
         <Link href="/admin/members/roles/create" className="bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-colors flex items-center gap-2 shadow-sm">
           <span className="material-symbols-rounded text-[20px]">add</span>
@@ -69,7 +69,7 @@ export default function AdminUserList({ users, roles, offset, createAdminUser, u
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[800px]">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
                   <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10 text-center">#</th>

@@ -68,7 +68,7 @@ function Dropdown({
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden">
+        <div className="absolute right-[-3rem] sm:right-0 top-full mt-2 w-[280px] sm:w-80 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
             <p className="text-sm font-bold text-slate-700">{viewAllLabel}</p>
             {items.length > 0 && (
@@ -147,7 +147,7 @@ export default function AdminNotifications() {
   }, [fetchNotifs]);
 
   return (
-    <div className="flex items-center gap-3 text-slate-600">
+    <div className="flex items-center gap-1 sm:gap-3 text-slate-600">
       <Dropdown
         icon="chat_bubble_outline"
         items={messages}

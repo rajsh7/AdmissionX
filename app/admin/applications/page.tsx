@@ -1,21 +1,84 @@
 import { getDb } from "@/lib/db";
+import { ObjectId } from "mongodb";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import ApplicationsListClient from "./ApplicationsListClient";
+import {
+  sendCollegeApplicationStatusEmail,
+  sendStudentApplicationStatusEmail,
+} from "@/lib/application-email";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function updateApplicationStatus(formData: FormData): Promise<void> {
   "use server";
-  const id       = formData.get("id")     as string;
-  const statusId = parseInt(formData.get("status") as string, 10);
-  if (!id || !statusId) return;
+  const appId = formData.get("appId") as string;
+  const status = formData.get("status") as string;
+  if (!appId || !status || !ObjectId.isValid(appId)) return;
   try {
     const db = await getDb();
-    await db.collection("application").updateOne(
-      { id: parseInt(id, 10) },
-      { $set: { applicationstatus_id: statusId, updated_at: new Date() } },
+    const application = await db.collection("applications").findOne({ _id: new ObjectId(appId) });
+    if (!application) return;
+
+    await db.collection("applications").updateOne(
+      { _id: new ObjectId(appId) },
+      { $set: { status, updated_at: new Date() } }
     );
+
+    const collegeSlug = String(application.college_slug ?? "").trim();
+    const collegeProfile = collegeSlug
+      ? await db.collection("collegeprofile").findOne(
+          { slug: collegeSlug },
+          { projection: { email: 1, contactpersonemail: 1, college_name: 1, contactpersonname: 1, slug: 1 } },
+        )
+      : null;
+
+    const appRef = String(application.application_ref ?? application._id.toString());
+    const studentName = String(application.student_name ?? "Student");
+    const collegeName = String(
+      application.college_name ??
+      collegeProfile?.college_name ??
+      collegeProfile?.contactpersonname ??
+      "Institution",
+    );
+    const courseName = application.course_name ? String(application.course_name) : null;
+    const reason = status === "rejected" ? "The institution has not approved this application at this stage." : null;
+
+    const studentEmail = String(application.student_email ?? "").trim();
+    if (studentEmail) {
+      try {
+        await sendStudentApplicationStatusEmail({
+          to: studentEmail,
+          studentName,
+          collegeName,
+          appId: appRef,
+          courseName,
+          status,
+          reason,
+        });
+      } catch (emailErr) {
+        console.error("[admin/applications studentEmail]", emailErr);
+      }
+    }
+
+    const collegeEmail = String(collegeProfile?.contactpersonemail ?? collegeProfile?.email ?? "").trim();
+    if (collegeEmail) {
+      try {
+        await sendCollegeApplicationStatusEmail({
+          to: collegeEmail,
+          collegeEmail,
+          studentName,
+          collegeName,
+          collegeSlug,
+          appId: appRef,
+          courseName,
+          status,
+          reason,
+        });
+      } catch (emailErr) {
+        console.error("[admin/applications collegeEmail]", emailErr);
+      }
+    }
   } catch (e) {
     console.error("[admin/applications updateStatus]", e);
   }
@@ -78,41 +141,14 @@ export default async function AdminApplicationsPage({
   const db = await getDb();
 
   // ── Load lookup maps ───────────────────────────────────────────────────────
-  const [appStatuses, collegeMasters, collegeProfiles, courses, degrees] = await Promise.all([
-    db.collection("applicationstatus").find({}).toArray(),
-    db.collection("collegemaster").find({}, { projection: { id: 1, course_id: 1, degree_id: 1, collegeprofile_id: 1 } }).toArray(),
-    db.collection("collegeprofile").find({}, { projection: { id: 1, slug: 1, contactpersonname: 1 } }).toArray(),
-    db.collection("course").find({}, { projection: { id: 1, name: 1 } }).toArray(),
-    db.collection("degree").find({}, { projection: { id: 1, name: 1 } }).toArray(),
-  ]);
+  const collegeProfiles = await db.collection("collegeprofile").find({}, { projection: { id: 1, slug: 1, contactpersonname: 1 } }).toArray();
 
-  // Build lookup maps
-  const statusMap  = Object.fromEntries(appStatuses.map(s => [s.id, String(s.name ?? "").trim()]));
-  const courseMap  = Object.fromEntries(courses.map(c => [c.id, String(c.name ?? "").trim()]));
-  const degreeMap  = Object.fromEntries(degrees.map(d => [d.id, String(d.name ?? "").trim()]));
-  const cpMap      = Object.fromEntries(collegeProfiles.map(cp => [cp.id, { slug: String(cp.slug ?? "").trim(), name: String(cp.contactpersonname ?? cp.slug ?? "").trim() }]));
-  const cmMap      = Object.fromEntries(collegeMasters.map(cm => [cm.id, { course_id: cm.course_id, degree_id: cm.degree_id, collegeprofile_id: cm.collegeprofile_id }]));
+  // Fetch all applications from new collection
+  const allApps = await db.collection("applications").find({}).sort({ created_at: -1 }).toArray();
 
-  // ── Build filter ───────────────────────────────────────────────────────────
-  // Resolve status id filter
-  let statusIdFilter: number | null = null;
-  if (statusFilter !== "all") {
-    const found = appStatuses.find(s => String(s.name ?? "").trim().toLowerCase() === statusFilter.toLowerCase());
-    if (found) statusIdFilter = found.id;
-  }
-
-  // Resolve college profile_id filter
-  let cpIdFilter: number | null = null;
-  if (collegeFilter) {
-    const found = collegeProfiles.find(cp => String(cp.slug ?? "").trim() === collegeFilter);
-    if (found) cpIdFilter = found.id;
-  }
-
-  // Fetch all applications (198 total — small enough to filter in memory)
-  const allApps = await db.collection("application").find({}).sort({ created_at: -1 }).toArray();
-
-  // Normalize + join in memory
+  // Normalize
   interface AppRow {
+    _id: string;
     id: number;
     applicationRef: string | null;
     student_name: string | null;
@@ -126,39 +162,28 @@ export default async function AdminApplicationsPage({
     createdAt: string;
   }
 
-  const normalized: AppRow[] = allApps.map(a => {
-    const statusId  = a.applicationstatus_id;
-    const statusName = statusMap[statusId] ?? "Submitted";
-    const cm        = cmMap[a.collegemaster_id];
-    const cp        = cm ? cpMap[cm.collegeprofile_id] : (cpMap[a.collegeprofile_id] ?? null);
-    const courseName = cm ? courseMap[cm.course_id] : null;
-    const degreeName = cm ? degreeMap[cm.degree_id] : null;
-    const firstName  = String(a.firstname ?? "").trim();
-    const lastName   = String(a.lastname  ?? "").trim();
-    return {
-      id:            a.id as number,
-      applicationRef: a.applicationID ? String(a.applicationID).trim() : null,
-      student_name:  [firstName, lastName].filter(Boolean).join(" ") || null,
-      student_email: a.email ? String(a.email).trim() : null,
-      student_phone: a.phone ? String(a.phone).trim() : null,
-      college_name:  cp?.name || null,
-      college_slug:  cp?.slug || null,
-      course_name:   courseName || null,
-      degree_name:   degreeName || null,
-      status:        statusName,
-      createdAt:     a.created_at ? String(a.created_at).trim() : "",
-    };
-  });
+  const normalized: AppRow[] = allApps.map((a, idx) => ({
+    _id: a._id.toString(),
+    id: idx + 1,
+    applicationRef: a.application_ref || null,
+    student_name: a.student_name || null,
+    student_email: a.student_email || null,
+    student_phone: a.student_phone || null,
+    college_name: a.college_name || null,
+    college_slug: a.college_slug || null,
+    course_name: a.course_name || null,
+    degree_name: a.degree_name || null,
+    status: a.status || "pending",
+    createdAt: a.created_at ? new Date(a.created_at).toISOString() : "",
+  }));
 
   // Apply filters
   let filtered = normalized;
-  if (statusIdFilter !== null) {
-    const targetStatus = statusMap[statusIdFilter]?.toLowerCase();
-    filtered = filtered.filter(a => a.status.toLowerCase() === targetStatus);
+  if (statusFilter !== "all") {
+    filtered = filtered.filter(a => a.status.toLowerCase() === statusFilter.toLowerCase());
   }
-  if (cpIdFilter !== null) {
-    const targetSlug = cpMap[cpIdFilter]?.slug;
-    filtered = filtered.filter(a => a.college_slug === targetSlug);
+  if (collegeFilter) {
+    filtered = filtered.filter(a => a.college_slug === collegeFilter);
   }
   if (q) {
     const lq = q.toLowerCase();
@@ -218,7 +243,7 @@ export default async function AdminApplicationsPage({
       </div>
 
       {/* ── Stat cards ─────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {STATUS_TABS.map((tab) => {
           const val      = tab.value === "all" ? grandTotal : (statusCountMap[tab.value] ?? 0);
           const isActive = statusFilter === tab.value;
@@ -248,7 +273,7 @@ export default async function AdminApplicationsPage({
       <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center">
 
         {/* Status tabs */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl flex-shrink-0 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl w-full sm:w-auto overflow-x-auto no-scrollbar">
           {STATUS_TABS.map((tab) => (
             <Link
               key={tab.value}
@@ -337,6 +362,7 @@ export default async function AdminApplicationsPage({
               totalPages={totalPages}
               total={total}
               pageSize={PAGE_SIZE}
+              updateAction={updateApplicationStatus}
             />
           </>
         )}
@@ -346,7 +372,4 @@ export default async function AdminApplicationsPage({
     </div>
   );
 }
-
-
-
 

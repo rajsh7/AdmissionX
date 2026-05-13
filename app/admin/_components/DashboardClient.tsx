@@ -139,11 +139,11 @@ export default function DashboardClient({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Student Registration Chart */}
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6 relative min-h-[520px]">
-          <div className="flex justify-between items-center mb-10 overflow-visible">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 overflow-visible">
             <h2 className="text-[22px] font-semibold text-slate-800">Student Registration</h2>
-            <div className="relative" ref={studentMonthRef}>
+            <div className="relative w-full sm:w-auto" ref={studentMonthRef}>
               <button type="button" onClick={() => setOpenMenu(v => v === "student" ? null : "student")}
-                className="text-[13px] font-semibold text-slate-500 flex items-center gap-2 border border-slate-100 px-4 py-1.5 rounded-[5px] hover:bg-slate-50 transition-all">
+                className="w-full sm:w-auto text-[13px] font-semibold text-slate-500 flex items-center justify-between sm:justify-start gap-2 border border-slate-100 px-4 py-1.5 rounded-[5px] hover:bg-slate-50 transition-all">
                 {monthFilter}
                 <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${openMenu === "student" ? "rotate-180" : ""}`} />
               </button>
@@ -170,11 +170,11 @@ export default function DashboardClient({
 
         {/* College Registration Chart */}
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6 relative min-h-[520px]">
-          <div className="flex justify-between items-center mb-10 overflow-visible">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 overflow-visible">
             <h2 className="text-[22px] font-semibold text-slate-800">College Registration</h2>
-            <div className="relative" ref={collegeMonthRef}>
+            <div className="relative w-full sm:w-auto" ref={collegeMonthRef}>
               <button type="button" onClick={() => setOpenMenu(v => v === "college" ? null : "college")}
-                className="text-[13px] font-semibold text-slate-500 flex items-center gap-2 border border-slate-100 px-4 py-1.5 rounded-[5px] hover:bg-slate-50 transition-all">
+                className="w-full sm:w-auto text-[13px] font-semibold text-slate-500 flex items-center justify-between sm:justify-start gap-2 border border-slate-100 px-4 py-1.5 rounded-[5px] hover:bg-slate-50 transition-all">
                 {monthFilter}
                 <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${openMenu === "college" ? "rotate-180" : ""}`} />
               </button>
@@ -233,12 +233,12 @@ export default function DashboardClient({
         </div>
 
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md overflow-hidden flex flex-col p-6 xl:col-span-2">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <h2 className="text-[22px] font-semibold text-slate-800">Recent Student Registrations</h2>
             <Link href="/admin/members/registrations" className="text-[13px] font-bold text-blue-600 hover:text-blue-700 underline">View All</Link>
           </div>
           <div className="overflow-x-auto rounded-[5px] border border-slate-100">
-            <table className="w-full text-center border-collapse">
+            <table className="w-full text-center border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-slate-50 text-slate-600">
                   <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider border-r border-slate-100">Name</th>

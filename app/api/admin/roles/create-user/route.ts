@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Send login credentials email
-    const loginUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://admissionx.in"}/login/admin`;
+    const loginUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://admissionx.com"}/login/admin`;
     const html = `
 <!DOCTYPE html>
 <html>

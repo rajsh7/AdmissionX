@@ -16,6 +16,10 @@ declare global {
   var _mongoUri: string | undefined;
   var _mongoDb: Db | null;
   var _connectionFailedAt: number | null;
+  var _mongoCollegeClient: MongoClient | undefined;
+  var _mongoCollegeUri: string | undefined;
+  var _mongoCollegeDb: Db | null;
+  var _collegeConnectionFailedAt: number | null;
 }
 
 function createMockDb(): Db {
@@ -65,6 +69,17 @@ export async function forceReconnect() {
   globalThis._connectionFailedAt = null;
 }
 
+export async function forceReconnectCollege() {
+  console.log("♻️ [db-college] Forcing college database reconnection...");
+  if (globalThis._mongoCollegeClient) {
+    try { await globalThis._mongoCollegeClient.close(); } catch {}
+  }
+  globalThis._mongoCollegeClient = undefined;
+  globalThis._mongoCollegeUri = undefined;
+  globalThis._mongoCollegeDb = null;
+  globalThis._collegeConnectionFailedAt = null;
+}
+
 export async function getDb(): Promise<Db> {
   const currentUri = process.env.MONGODB_URI!;
   
@@ -111,6 +126,57 @@ export async function getDb(): Promise<Db> {
     }
   }
   return globalThis._mongoDb;
+}
+
+export async function getCollegeDb(): Promise<Db> {
+  const currentUri = process.env.MONGODB_COLLEGE_URI!;
+  
+  if (!currentUri) {
+    console.warn("⚠️ [db-college] MONGODB_COLLEGE_URI not set, falling back to main DB");
+    return getDb();
+  }
+  
+  // If URI changed or client missing, re-initialize
+  if (!globalThis._mongoCollegeClient || globalThis._mongoCollegeUri !== currentUri) {
+    const hostInfo = currentUri.split('@')[1]?.split('/')[0] || "unknown-host";
+    console.log(`🔌 [db-college] Initializing new connection to: ${hostInfo}`);
+    
+    globalThis._mongoCollegeClient = new MongoClient(currentUri, {
+      serverSelectionTimeoutMS: 15000,
+      connectTimeoutMS: 15000,
+      retryWrites: true,
+    });
+    globalThis._mongoCollegeUri = currentUri;
+    globalThis._mongoCollegeDb = null;
+    globalThis._collegeConnectionFailedAt = null;
+  }
+
+  if (!globalThis._mongoCollegeDb) {
+    const failedAt = globalThis._collegeConnectionFailedAt;
+    if (failedAt && Date.now() - failedAt < 60_000) {
+      console.warn("⚠️ [db-college] Previous connection attempt failed recently. Using mock DB.");
+      return createMockDb();
+    }
+
+    try {
+      console.log("⏳ [db-college] Connecting to MongoDB...");
+      await globalThis._mongoCollegeClient.connect();
+      
+      const db = globalThis._mongoCollegeClient.db(process.env.MONGODB_COLLEGE_DB ?? "admissionx");
+      
+      console.log("🔍 [db-college] Verifying connection with ping...");
+      await db.command({ ping: 1 });
+      
+      globalThis._mongoCollegeDb = db;
+      globalThis._collegeConnectionFailedAt = null;
+      console.log("✅ [db-college] Connected successfully.");
+    } catch (error) {
+      console.error("❌ [db-college] Connection failed or timed out:", error);
+      globalThis._collegeConnectionFailedAt = Date.now();
+      return createMockDb();
+    }
+  }
+  return globalThis._mongoCollegeDb;
 }
 
 // ── SQL → MongoDB translator ──────────────────────────────────────────────────

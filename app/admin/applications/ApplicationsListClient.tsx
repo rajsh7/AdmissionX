@@ -10,6 +10,7 @@ const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz
 const STEP = 25;
 
 interface AppRow {
+  _id: string;
   id: number;
   applicationRef: string | null;
   student_name: string | null;
@@ -30,6 +31,7 @@ interface ApplicationsListClientProps {
   totalPages: number;
   total: number;
   pageSize: number;
+  updateAction: (formData: FormData) => void | Promise<void>;
 }
 
 const STATUS_STYLE: Record<string, { cls: string; dot: string }> = {
@@ -55,7 +57,7 @@ function formatDate(d: string | null | undefined): string {
   } catch { return "—"; }
 }
 
-export default function ApplicationsListClient({ initialRows, offset, page, totalPages, total, pageSize }: ApplicationsListClientProps) {
+export default function ApplicationsListClient({ initialRows, offset, page, totalPages, total, pageSize, updateAction }: ApplicationsListClientProps) {
   const [visibleCount, setVisibleCount] = useState(STEP);
 
   // Reset visibleCount when applications change
@@ -70,7 +72,7 @@ export default function ApplicationsListClient({ initialRows, offset, page, tota
   return (
     <>
       <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="w-full text-sm min-w-[800px]">
         <thead>
           <tr className="bg-slate-50 border-b border-slate-100">
             <th className="px-4 py-3 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
@@ -147,12 +149,23 @@ export default function ApplicationsListClient({ initialRows, offset, page, tota
                   </div>
                 </td>
 
-                {/* Status */}
+                {/* Status with dropdown */}
                 <td className="px-4 py-4 text-center">
-                  <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full ${style.cls.split(" border")[0]}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
-                    {app.status}
-                  </span>
+                  <form action={updateAction} className="inline-block">
+                    <input type="hidden" name="appId" value={app._id} />
+                    <select
+                      name="status"
+                      defaultValue={app.status}
+                      onChange={(e) => e.currentTarget.form?.requestSubmit()}
+                      className={`text-[10px] font-bold px-2.5 py-1 rounded-full border-0 cursor-pointer ${style.cls.split(" border")[0]}`}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                      <option value="submitted">Submitted</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </form>
                 </td>
 
                 {/* Date */}
@@ -192,7 +205,6 @@ export default function ApplicationsListClient({ initialRows, offset, page, tota
     </>
   );
 }
-
 
 
 

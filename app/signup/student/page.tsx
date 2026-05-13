@@ -30,6 +30,9 @@ export default function StudentSignupPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
+  const [showOTP, setShowOTP] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
     const t = setInterval(() => setSlideIndex(i => (i + 1) % SLIDES.length), 4000);
@@ -58,11 +61,55 @@ export default function StudentSignupPage() {
     setLoading(false);
     if (res.ok) {
       const data = await res.json();
-      // Full page reload so cookie is read fresh by SSR
-      window.location.href = "/signup/student/success";
+      setUserEmail(formData.email);
+      setShowOTP(true);
     } else {
       const data = await res.json();
       setErrorMsg(data.error || "Signup failed");
+    }
+  };
+
+  const handleVerifyOTP = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErrorMsg("");
+
+    if (otp.length !== 6) {
+      setErrorMsg("Please enter a valid 6-digit OTP.");
+      return;
+    }
+
+    setLoading(true);
+    const res = await fetch("/api/auth/verify-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: userEmail, otp }),
+    });
+    setLoading(false);
+
+    if (res.ok) {
+      window.location.href = "/signup/student/success";
+    } else {
+      const data = await res.json();
+      setErrorMsg(data.error || "OTP verification failed");
+    }
+  };
+
+  const handleResendOTP = async () => {
+    setErrorMsg("");
+    setLoading(true);
+    const res = await fetch("/api/auth/resend-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: userEmail }),
+    });
+    setLoading(false);
+
+    if (res.ok) {
+      setErrorMsg("");
+      alert("New OTP sent to your email!");
+    } else {
+      const data = await res.json();
+      setErrorMsg(data.error || "Failed to resend OTP");
     }
   };
 
@@ -107,53 +154,108 @@ export default function StudentSignupPage() {
           {/* RIGHT: Form */}
           <div className="flex-1 bg-[#f3f4f6] flex items-center justify-center px-8 py-10">
             <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-8 py-8">
-              <h1 className="text-[24px] font-bold text-[#111] mb-1">Student Signup</h1>
-              <p className="text-[13px] text-gray-500 mb-5">Create your free student account today.</p>
+              {!showOTP ? (
+                <>
+                  <h1 className="text-[24px] font-bold text-[#111] mb-1">Student Signup</h1>
+                  <p className="text-[13px] text-gray-500 mb-5">Create your free student account today.</p>
 
-              <a href="/api/auth/google"
-                className="flex items-center justify-center gap-2.5 w-full py-2.5 border border-gray-300 rounded-lg text-[13px] font-medium text-[#111] bg-white hover:border-gray-400 transition-colors mb-4">
-                <GoogleIcon />Sign up with Google
-              </a>
+                  <a href="/api/auth/google"
+                    className="flex items-center justify-center gap-2.5 w-full py-2.5 border border-gray-300 rounded-lg text-[13px] font-medium text-[#111] bg-white hover:border-gray-400 transition-colors mb-4">
+                    <GoogleIcon />Sign up with Google
+                  </a>
 
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-[11px] text-gray-400 font-semibold tracking-wider">OR</span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
-
-              {errorMsg && (
-                <div className="mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">{errorMsg}</div>
-              )}
-
-              <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                {[
-                  { label: "Name", name: "name", type: "text", placeholder: "Enter your name" },
-                  { label: "Email", name: "email", type: "email", placeholder: "Enter your email" },
-                  { label: "Phone Number", name: "phone", type: "tel", placeholder: "Enter your phone number" },
-                  { label: "Password", name: "password", type: "password", placeholder: "Create a password" },
-                ].map(f => (
-                  <div key={f.name} className="flex flex-col gap-1">
-                    <label className="text-[12px] font-semibold text-gray-700">{f.label}<span className="text-red-500 ml-0.5">*</span></label>
-                    <input type={f.type} name={f.name} placeholder={f.placeholder}
-                      value={formData[f.name as keyof typeof formData]} onChange={handleChange}
-                      required minLength={f.name === "password" ? 8 : undefined}
-                      className="px-3 py-2 border border-gray-300 rounded-[7px] text-[13px] text-[#111] outline-none focus:border-black transition-colors" />
+                  <div className="flex items-center gap-2.5 mb-4">
+                    <div className="flex-1 h-px bg-gray-200" />
+                    <span className="text-[11px] text-gray-400 font-semibold tracking-wider">OR</span>
+                    <div className="flex-1 h-px bg-gray-200" />
                   </div>
-                ))}
-                <button type="submit" disabled={loading}
-                  className="mt-2 py-2.5 bg-[#111] hover:bg-[#333] disabled:opacity-60 text-white rounded-lg text-[13.5px] font-semibold transition-colors w-full">
-                  {loading ? "Creating…" : "Sign up"}
-                </button>
-              </form>
 
-              <p className="mt-4 text-[12px] text-gray-500 text-center">
-                Already have an account?{" "}
-                <Link href="/login/student" className="text-[#111] font-semibold hover:underline">Log in</Link>
-              </p>
-              <p className="mt-2.5 text-[11px] text-gray-400 text-center">
-                By creating an account, you agree to our{" "}
-                <Link href="/terms-and-conditions" className="text-gray-500 underline">terms of use</Link>.
-              </p>
+                  {errorMsg && (
+                    <div className="mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">{errorMsg}</div>
+                  )}
+
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                    {[
+                      { label: "Name", name: "name", type: "text", placeholder: "Enter your name" },
+                      { label: "Email", name: "email", type: "email", placeholder: "Enter your email" },
+                      { label: "Phone Number", name: "phone", type: "tel", placeholder: "Enter your phone number" },
+                      { label: "Password", name: "password", type: "password", placeholder: "Create a password" },
+                    ].map(f => (
+                      <div key={f.name} className="flex flex-col gap-1">
+                        <label className="text-[12px] font-semibold text-gray-700">{f.label}<span className="text-red-500 ml-0.5">*</span></label>
+                        <input type={f.type} name={f.name} placeholder={f.placeholder}
+                          value={formData[f.name as keyof typeof formData]} onChange={handleChange}
+                          required minLength={f.name === "password" ? 8 : undefined}
+                          className="px-3 py-2 border border-gray-300 rounded-[7px] text-[13px] text-[#111] outline-none focus:border-black transition-colors" />
+                      </div>
+                    ))}
+                    <button type="submit" disabled={loading}
+                      className="mt-2 py-2.5 bg-[#111] hover:bg-[#333] disabled:opacity-60 text-white rounded-lg text-[13.5px] font-semibold transition-colors w-full">
+                      {loading ? "Creating…" : "Sign up"}
+                    </button>
+                  </form>
+
+                  <p className="mt-4 text-[12px] text-gray-500 text-center">
+                    Already have an account?{" "}
+                    <Link href="/login/student" className="text-[#111] font-semibold hover:underline">Log in</Link>
+                  </p>
+                  <p className="mt-2.5 text-[11px] text-gray-400 text-center">
+                    By creating an account, you agree to our{" "}
+                    <Link href="/terms-and-conditions" className="text-gray-500 underline">terms of use</Link>.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-[24px] font-bold text-[#111] mb-1">Verify Your Email</h1>
+                  <p className="text-[13px] text-gray-500 mb-5">
+                    We've sent a 6-digit OTP to <strong>{userEmail}</strong>
+                  </p>
+
+                  {errorMsg && (
+                    <div className="mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">{errorMsg}</div>
+                  )}
+
+                  <form onSubmit={handleVerifyOTP} className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[12px] font-semibold text-gray-700">Enter OTP<span className="text-red-500 ml-0.5">*</span></label>
+                      <input
+                        type="text"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                        placeholder="Enter 6-digit OTP"
+                        maxLength={6}
+                        required
+                        className="px-3 py-2 border border-gray-300 rounded-[7px] text-[13px] text-[#111] outline-none focus:border-black transition-colors text-center text-2xl tracking-widest font-mono"
+                      />
+                    </div>
+
+                    <button type="submit" disabled={loading}
+                      className="py-2.5 bg-[#111] hover:bg-[#333] disabled:opacity-60 text-white rounded-lg text-[13.5px] font-semibold transition-colors w-full">
+                      {loading ? "Verifying…" : "Verify OTP"}
+                    </button>
+                  </form>
+
+                  <div className="mt-4 text-center">
+                    <p className="text-[12px] text-gray-500">
+                      Didn't receive the OTP?{" "}
+                      <button
+                        onClick={handleResendOTP}
+                        disabled={loading}
+                        className="text-[#111] font-semibold hover:underline disabled:opacity-60"
+                      >
+                        Resend
+                      </button>
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => setShowOTP(false)}
+                    className="mt-3 text-[12px] text-gray-500 hover:text-gray-700 w-full text-center"
+                  >
+                    ← Back to signup
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

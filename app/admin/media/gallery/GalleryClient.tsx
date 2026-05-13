@@ -83,7 +83,7 @@ export default function GalleryClient({
 
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
+          <table className="w-full text-sm text-left min-w-[800px]">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100">
                 <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-24">Image</th>

@@ -73,7 +73,15 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "FINANCE",
     items: [
-      { href: "/admin/payment", icon: "payment", label: "Payment" },
+      {
+        href: "/admin/payment",
+        icon: "payment",
+        label: "Payment",
+        subItems: [
+          { href: "/admin/payment/student", label: "Student Payments", icon: "person" },
+          { href: "/admin/payment/college", label: "College Payments", icon: "account_balance" },
+        ]
+      },
       { href: "/admin/payment/transactions", icon: "receipt_long", label: "Transaction" },
     ],
   },

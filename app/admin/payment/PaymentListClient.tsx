@@ -50,7 +50,7 @@ export default function PaymentListClient({ payments, offset, total, page, total
             <p className="text-slate-500 font-semibold text-sm">No payment records found.</p>
           </div>
         ) : (
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[800px]">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100 text-left">
                 <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>

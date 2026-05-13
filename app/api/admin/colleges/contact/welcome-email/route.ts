@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       created_at: new Date(),
     });
 
-    const baseUrl     = (process.env.NEXT_PUBLIC_BASE_URL ?? "https://admissionx.info").replace(/\/+$/, "");
+    const baseUrl     = (process.env.NEXT_PUBLIC_BASE_URL ?? "https://admissionx.com").replace(/\/+$/, "");
     const resetLink   = `${baseUrl}/reset-password/${token}`;
 
     // Load the branded HTML template
