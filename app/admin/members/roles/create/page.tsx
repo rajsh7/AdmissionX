@@ -124,8 +124,8 @@ export default function CreateAdminUserPage() {
   return (
     <div className="p-6 max-w-[1200px] mx-auto w-full">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <Link href="/admin/members/roles" className="flex items-center gap-2 bg-white text-slate-700 border border-slate-200 px-4 py-2 rounded-2xl text-sm font-semibold hover:bg-slate-50 transition-colors">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
+        <Link href="/admin/members/roles" className="flex items-center justify-center w-fit h-fit gap-2 bg-white text-slate-700 border border-slate-200 px-4 py-2 rounded-2xl text-sm font-semibold hover:bg-slate-50 transition-colors">
           <span className="material-symbols-outlined text-[18px]">arrow_back</span>
         </Link>
         <div>
@@ -138,10 +138,10 @@ export default function CreateAdminUserPage() {
       {success && <div className="mb-5 px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold rounded-2xl">{success}</div>}
 
       <form onSubmit={handleSubmit}>
-        <div className="flex gap-6 items-start">
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
 
           {/* ── LEFT: User Details ── */}
-          <div className="w-[340px] flex-shrink-0 flex flex-col gap-4">
+          <div className="w-full lg:w-[340px] flex-shrink-0 flex flex-col gap-4">
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
               <h2 className="text-sm font-black text-slate-700 mb-5 flex items-center gap-2">
                 <span className="material-symbols-outlined text-[18px] text-[#FF3C3C]">person</span>
@@ -203,7 +203,7 @@ export default function CreateAdminUserPage() {
                 <span className="material-symbols-outlined text-[18px] text-[#FF3C3C]">manage_accounts</span>
                 Role Definition
               </h2>
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className={labelCls}>Role Name *</label>
                   <input value={roleLabel} onChange={e => setRoleLabel(e.target.value)} required placeholder="e.g. Content Manager" className={inputCls} />
@@ -224,7 +224,7 @@ export default function CreateAdminUserPage() {
                     ))}
                   </div>
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-1 sm:col-span-2">
                   <label className={labelCls}>Role Description</label>
                   <input value={roleDesc} onChange={e => setRoleDesc(e.target.value)} placeholder="e.g. Can manage blogs and news only" className={inputCls} />
                 </div>
@@ -233,7 +233,7 @@ export default function CreateAdminUserPage() {
               {/* Access Mode */}
               <div className="mb-5">
                 <label className={labelCls}>Access Mode</label>
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <label className={`flex-1 flex items-start gap-3 p-3 rounded-2xl border cursor-pointer transition-all ${accessMode === "whitelist" ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-slate-50 hover:border-slate-300"}`}>
                     <input type="radio" checked={accessMode === "whitelist"} onChange={() => setAccessMode("whitelist")} className="mt-0.5 accent-emerald-600" />
                     <div>
@@ -263,7 +263,7 @@ export default function CreateAdminUserPage() {
                     <button type="button" onClick={clearAll} className="text-[11px] font-bold text-red-500 hover:underline">Clear All</button>
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                   {ALL_PAGES.map(page => (
                     <label key={page.path} className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition-all ${selectedPages.includes(page.path) ? "border-emerald-400 bg-emerald-50 text-emerald-800 font-semibold" : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300"}`}>
                       <input

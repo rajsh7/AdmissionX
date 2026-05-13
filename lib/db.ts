@@ -315,8 +315,11 @@ async function mongoQuery(sql: string, params: unknown[] = []): Promise<QueryRes
 
       const rows = await collection.find(filter).sort(sort).skip(skip).limit(limit).toArray();
       // Ensure all rows are "plain objects" for Next.js by deeply serializing to JSON
-      // This strip away non-serializable things like Buffers (signup_id) and Dates
-      const cleanRows = JSON.parse(JSON.stringify(rows)).map(({ _id, ...rest }: any) => rest);
+      // We keep _id for keys in React components
+      const cleanRows = JSON.parse(JSON.stringify(rows)).map((row: any) => {
+        if (row._id && !row.id) row.id = row._id;
+        return row;
+      });
       return [cleanRows as Record<string, unknown>[], null];
     }
 

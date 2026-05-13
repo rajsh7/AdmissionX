@@ -30,7 +30,9 @@ interface DashboardClientProps {
     totalColleges: number;
     totalAdmins: number;
     activeQueries: number;
+    pendingStudents?: number;
     pendingColleges?: number;
+    successfulStudents?: number;
     activeBlogs?: number;
   };
   graphData: GraphPoint[];
@@ -103,10 +105,22 @@ export default function DashboardClient({
   const collegeYearTicks = useMemo(() => Array.from(collegeFirstKeyByYear.entries()).sort(([a],[b]) => a-b).map(([,k]) => k), [collegeFirstKeyByYear]);
 
   const statCards = [
-    { title: "Total Students", value: stats.totalStudents?.toLocaleString() || "0", subtext: `${stats.pendingColleges ?? 0} pending approval`, icon: <Users className="w-5 h-5" />,       href: "/admin/members/registrations" },
-    { title: "Total Colleges", value: stats.totalColleges?.toLocaleString() || "0", subtext: `${stats.pendingColleges ?? 0} pending approval`, icon: <Building2 className="w-5 h-5" />,   href: "/admin/colleges/profile" },
+    { 
+      title: "Total Students", 
+      value: stats.totalStudents?.toLocaleString() || "0", 
+      subtext: `${stats.successfulStudents ?? 0} successful signups`, 
+      icon: <Users className="w-5 h-5" />, 
+      href: "/admin/members/registrations" 
+    },
+    { 
+      title: "Total Colleges", 
+      value: stats.totalColleges?.toLocaleString() || "0", 
+      subtext: `${stats.pendingColleges ?? 0} pending approval`, 
+      icon: <Building2 className="w-5 h-5" />, 
+      href: "/admin/colleges/profile" 
+    },
     { title: "Admin Users",    value: stats.totalAdmins?.toLocaleString()   || "0", subtext: "active admins",                                  icon: <UserCog className="w-5 h-5" />,      href: "/admin/members/roles" },
-    { title: "Applications",   value: stats.activeQueries?.toLocaleString() || "0", subtext: `${stats.activeBlogs ?? 0} active blogs`,          icon: <MessageSquare className="w-5 h-5" />, href: "/admin/applications" },
+    { title: "Applications",   value: stats.activeQueries?.toLocaleString() || "0", subtext: `${stats.activeQueries ?? 0} open sessions`,          icon: <MessageSquare className="w-5 h-5" />, href: "/admin/applications" },
   ];
 
   return (
@@ -204,11 +218,11 @@ export default function DashboardClient({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6">
           <h2 className="text-[20px] font-bold text-slate-800 mb-6">Student Transactions</h2>
-          <div className="h-[300px] w-full"><TransactionsPieChart data={studentTransactionPie} /></div>
+          <div className="h-[450px] sm:h-[300px] w-full"><TransactionsPieChart data={studentTransactionPie} /></div>
         </div>
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6">
           <h2 className="text-[20px] font-bold text-slate-800 mb-6">College Transactions</h2>
-          <div className="h-[300px] w-full"><TransactionsPieChart data={collegeTransactionPie} /></div>
+          <div className="h-[450px] sm:h-[300px] w-full"><TransactionsPieChart data={collegeTransactionPie} /></div>
         </div>
       </div>
 

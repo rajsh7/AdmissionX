@@ -46,9 +46,11 @@ export default async function AdminDashboardPage() {
   const startMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (monthsBack - 1), 1));
 
   const [
-    [totalStudents, totalColleges, totalAdmins, activeQueries],
+    [totalStudents, totalColleges, totalAdmins, activeQueries, pendingStudents, pendingColleges, successfulStudents],
     recentStudentsRaw,
     recentColleges,
+    recentStudentSignups,
+    recentCollegeSignups,
     [paymentStatuses, studentTransactionAgg, collegeTransactionAgg],
     studentMonthlyAgg,
     collegeMonthlyAgg,
@@ -56,7 +58,6 @@ export default async function AdminDashboardPage() {
     Promise.all([
       (async () => {
         try {
-          const db = await getDb();
           const [mysqlRows] = await pool.query("SELECT COUNT(*) AS total FROM next_student_signups") as [CountRow[], null];
           const mysqlCount = Number(mysqlRows[0]?.total ?? 0);
           const mongoCount = await db.collection("studentprofile").estimatedDocumentCount();
@@ -66,6 +67,24 @@ export default async function AdminDashboardPage() {
       db.collection("collegeprofile").estimatedDocumentCount(),
       db.collection("next_admin_users").countDocuments({ is_hidden: { $ne: true } }),
       db.collection("chatbot_sessions").countDocuments({ status: "open" }),
+      (async () => {
+        try {
+          const [rows] = await pool.query("SELECT COUNT(*) AS total FROM next_student_signups WHERE status = 'pending'") as [CountRow[], null];
+          return Number(rows[0]?.total ?? 0);
+        } catch { return 0; }
+      })(),
+      (async () => {
+        try {
+          const [rows] = await pool.query("SELECT COUNT(*) AS total FROM next_college_signups WHERE status = 'pending'") as [CountRow[], null];
+          return Number(rows[0]?.total ?? 0);
+        } catch { return 0; }
+      })(),
+      (async () => {
+        try {
+          const [rows] = await pool.query("SELECT COUNT(*) AS total FROM next_student_signups WHERE status = 'approved'") as [CountRow[], null];
+          return Number(rows[0]?.total ?? 0);
+        } catch { return 0; }
+      })(),
     ]),
     db.collection("users")
       .find({}, {
@@ -88,6 +107,18 @@ export default async function AdminDashboardPage() {
       .sort({ created_at: -1 })
       .limit(3)
       .toArray(),
+    (async () => {
+      try {
+        const [rows] = await pool.query("SELECT id, name, status, created_at FROM next_student_signups ORDER BY created_at DESC LIMIT 5") as [any[], null];
+        return rows;
+      } catch { return []; }
+    })(),
+    (async () => {
+      try {
+        const [rows] = await pool.query("SELECT id, college_name, status, created_at FROM next_college_signups ORDER BY created_at DESC LIMIT 5") as [any[], null];
+        return rows;
+      } catch { return []; }
+    })(),
     Promise.all([
       db.collection<PaymentStatusRow>("paymentstatus").find({}, { projection: { id: 1, name: 1 } }).toArray(),
       // Student transactions — from transaction collection grouped by payment status
@@ -234,11 +265,11 @@ export default async function AdminDashboardPage() {
   const studentTransactionPie = processTransactionData(studentTransactionAgg);
   const collegeTransactionPie = processTransactionData(collegeTransactionAgg);
 
-  const recentActivity = [
+  const allActivity = [
     ...recentStudentsRaw.map((s) => ({
       id: s._id.toString(),
       type: "student",
-      message: `New student registered: ${s.firstname || "User"}`,
+      message: `User Login: ${s.firstname || "User"}`,
       time: s.created_at,
     })),
     ...recentColleges.map((c) => ({
@@ -247,8 +278,31 @@ export default async function AdminDashboardPage() {
       message: `New college profile created: ${c.slug}`,
       time: c.created_at,
     })),
-  ]
+    ...recentStudentSignups.map((s: any) => ({
+      id: `signup-s-${s.id}`,
+      type: "student",
+      message: `Student Signup: ${s.name} (${s.status || "pending"})`,
+      time: s.created_at,
+    })),
+    ...recentCollegeSignups.map((c: any) => ({
+      id: `signup-c-${c.id}`,
+      type: "college",
+      message: `College Signup: ${c.college_name} (${c.status || "pending"})`,
+      time: c.created_at,
+    })),
+  ];
+
+  // Deduplicate by message + simplified date string
+  const seen = new Set<string>();
+  const recentActivity = allActivity
     .sort((a, b) => new Date(b.time || 0).getTime() - new Date(a.time || 0).getTime())
+    .filter(item => {
+      const dateStr = item.time ? new Date(item.time).toLocaleDateString() : "no-date";
+      const key = `${item.message}-${dateStr}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
     .slice(0, 10);
 
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
@@ -289,7 +343,10 @@ export default async function AdminDashboardPage() {
           totalStudents,
           totalColleges,
           totalAdmins,
-          activeQueries
+          activeQueries,
+          pendingStudents,
+          pendingColleges,
+          successfulStudents
         }}
         graphData={studentGraphData}
         collegeGraphData={collegeGraphData}
