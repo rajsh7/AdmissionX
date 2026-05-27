@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useMemo, useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Users, Building2, UserCog, MessageSquare, ChevronDown } from "lucide-react";
@@ -44,23 +43,72 @@ interface DashboardClientProps {
 }
 
 export default function DashboardClient({
-  stats, graphData, collegeGraphData,
-  studentTransactionPie, collegeTransactionPie,
-  recentStudents, recentActivity,
+  stats: propStats, graphData: propGraphData, collegeGraphData: propCollegeGraphData,
+  studentTransactionPie: propStudentTransactionPie, collegeTransactionPie: propCollegeTransactionPie,
+  recentStudents: propRecentStudents, recentActivity: propRecentActivity,
 }: DashboardClientProps) {
-  const router = useRouter();
+  const [stats, setStats] = useState(propStats);
+  const [graphData, setGraphData] = useState(propGraphData);
+  const [collegeGraphData, setCollegeGraphData] = useState(propCollegeGraphData);
+  const [studentTransactionPie, setStudentTransactionPie] = useState(propStudentTransactionPie);
+  const [collegeTransactionPie, setCollegeTransactionPie] = useState(propCollegeTransactionPie);
+  const [recentStudents, setRecentStudents] = useState(propRecentStudents);
+  const [recentActivity, setRecentActivity] = useState(propRecentActivity);
   const [monthFilter, setMonthFilter] = useState("All");
   const [openMenu, setOpenMenu]     = useState<"student" | "college" | null>(null);
   const studentMonthRef = useRef<HTMLDivElement>(null);
   const collegeMonthRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      router.refresh();
-    }, 30000);
+  const [lastUpdated, setLastUpdated] = useState<string>("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
+  useEffect(() => {
+    setLastUpdated(new Date().toLocaleTimeString());
+  }, []);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const res = await fetch('/api/admin/dashboard-refresh', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        setStats(data.stats);
+        setGraphData(data.graphData);
+        setCollegeGraphData(data.collegeGraphData);
+        setStudentTransactionPie(data.studentTransactionPie);
+        setCollegeTransactionPie(data.collegeTransactionPie);
+        setRecentStudents(data.recentStudents);
+        setRecentActivity(data.recentActivity);
+        setLastUpdated(new Date().toLocaleTimeString());
+      } catch (e) {
+        console.error('[Dashboard] Auto-refresh failed:', e);
+      }
+    };
+
+    const intervalId = window.setInterval(fetchDashboardData, 30000);
     return () => window.clearInterval(intervalId);
-  }, [router]);
+  }, []);
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const res = await fetch('/api/admin/dashboard-refresh', { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data.stats);
+        setGraphData(data.graphData);
+        setCollegeGraphData(data.collegeGraphData);
+        setStudentTransactionPie(data.studentTransactionPie);
+        setCollegeTransactionPie(data.collegeTransactionPie);
+        setRecentStudents(data.recentStudents);
+        setRecentActivity(data.recentActivity);
+        setLastUpdated(new Date().toLocaleTimeString());
+      }
+    } catch (e) {
+      console.error('[Dashboard] Manual refresh failed:', e);
+    }
+    setTimeout(() => setIsRefreshing(false), 800);
+  };
 
   useEffect(() => {
     if (!openMenu) return;
@@ -125,10 +173,42 @@ export default function DashboardClient({
 
   return (
     <div className="space-y-8 pb-10">
-      {/* Title */}
-      <div>
-        <h1 className="text-[25px] font-semibold text-[#3E3E3E]">Dashboard</h1>
-        <p className="text-[18px] font-normal text-slate-500">Overview of platform growth and activity.</p>
+      {/* Title & Live Status */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-[25px] font-semibold text-[#3E3E3E]">Dashboard</h1>
+          <p className="text-[18px] font-normal text-slate-500">Overview of platform growth and activity.</p>
+        </div>
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full shadow-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="text-[11px] font-bold text-emerald-700 tracking-wide uppercase">
+              Live updates
+            </span>
+            <span className="text-[11px] text-emerald-600/80 font-semibold font-mono">
+              (Synced {lastUpdated})
+            </span>
+          </div>
+          <button 
+            onClick={handleManualRefresh}
+            disabled={isRefreshing}
+            className="p-2 text-slate-400 hover:text-slate-600 bg-white border border-slate-100 rounded-full shadow-sm hover:shadow transition-all disabled:opacity-50 flex items-center justify-center"
+            title="Sync now"
+          >
+            <svg 
+              className={`w-4 h-4 ${isRefreshing ? "animate-spin text-emerald-500" : ""}`} 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor" 
+              strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -178,7 +258,7 @@ export default function DashboardClient({
             </div>
           </div>
           <div className="h-[380px] w-full px-4 overflow-hidden">
-            <StudentRegistrationChart data={filteredGraphData} ticks={yearTicks} keyMap={keyMap} firstKeyByYear={firstKeyByYear} monthFilter={monthFilter} />
+            <StudentRegistrationChart key={JSON.stringify(filteredGraphData)} data={filteredGraphData} ticks={yearTicks} keyMap={keyMap} firstKeyByYear={firstKeyByYear} monthFilter={monthFilter} />
           </div>
         </div>
 
@@ -209,7 +289,7 @@ export default function DashboardClient({
             </div>
           </div>
           <div className="h-[380px] w-full px-4 overflow-hidden">
-            <CollegeRegistrationChart data={filteredCollegeGraphData} ticks={collegeYearTicks} keyMap={collegeKeyMap} firstKeyByYear={collegeFirstKeyByYear} monthFilter={monthFilter} />
+            <CollegeRegistrationChart key={JSON.stringify(filteredCollegeGraphData)} data={filteredCollegeGraphData} ticks={collegeYearTicks} keyMap={collegeKeyMap} firstKeyByYear={collegeFirstKeyByYear} monthFilter={monthFilter} />
           </div>
         </div>
       </div>
@@ -218,11 +298,11 @@ export default function DashboardClient({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6">
           <h2 className="text-[20px] font-bold text-slate-800 mb-6">Student Transactions</h2>
-          <div className="h-[450px] sm:h-[300px] w-full"><TransactionsPieChart data={studentTransactionPie} /></div>
+          <div className="h-[450px] sm:h-[300px] w-full"><TransactionsPieChart key={JSON.stringify(studentTransactionPie)} data={studentTransactionPie} /></div>
         </div>
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6">
           <h2 className="text-[20px] font-bold text-slate-800 mb-6">College Transactions</h2>
-          <div className="h-[450px] sm:h-[300px] w-full"><TransactionsPieChart data={collegeTransactionPie} /></div>
+          <div className="h-[450px] sm:h-[300px] w-full"><TransactionsPieChart key={JSON.stringify(collegeTransactionPie)} data={collegeTransactionPie} /></div>
         </div>
       </div>
 

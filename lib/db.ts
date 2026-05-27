@@ -173,7 +173,8 @@ export async function getCollegeDb(): Promise<Db> {
     } catch (error) {
       console.error("❌ [db-college] Connection failed or timed out:", error);
       globalThis._collegeConnectionFailedAt = Date.now();
-      return createMockDb();
+      console.warn("⚠️ [db-college] Falling back to main DB.");
+      return getDb();
     }
   }
   return globalThis._mongoCollegeDb;

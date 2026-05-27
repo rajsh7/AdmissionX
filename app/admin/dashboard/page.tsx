@@ -3,6 +3,7 @@ import pool from "@/lib/db";
 import DashboardClient from "../_components/DashboardClient";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface CountRow {
   total?: number | string;
@@ -52,8 +53,10 @@ export default async function AdminDashboardPage() {
     recentStudentSignups,
     recentCollegeSignups,
     [paymentStatuses, studentTransactionAgg, collegeTransactionAgg],
-    studentMonthlyAgg,
-    collegeMonthlyAgg,
+    usersMonthlyAgg,
+    collegeProfileMonthlyAgg,
+    studentSignupMonthlyAgg,
+    collegeSignupMonthlyAgg,
   ] = await Promise.all([
     Promise.all([
       (async () => {
@@ -211,6 +214,51 @@ export default async function AdminDashboardPage() {
       { $sort: { "_id.year": 1, "_id.month": 1 } },
     ]).toArray() as Promise<MonthlyAggRow[]>,
     db.collection("collegeprofile").aggregate([
+      { $match: { signup_id: { $exists: false } } },
+      {
+        $addFields: {
+          createdAt: {
+            $convert: {
+              input: "$created_at",
+              to: "date",
+              onError: null,
+              onNull: null,
+            },
+          },
+        },
+      },
+      { $match: { createdAt: { $ne: null, $gte: startMonth } } },
+      {
+        $group: {
+          _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
+    ]).toArray() as Promise<MonthlyAggRow[]>,
+    db.collection("next_student_signups").aggregate([
+      {
+        $addFields: {
+          createdAt: {
+            $convert: {
+              input: "$created_at",
+              to: "date",
+              onError: null,
+              onNull: null,
+            },
+          },
+        },
+      },
+      { $match: { createdAt: { $ne: null, $gte: startMonth } } },
+      {
+        $group: {
+          _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
+    ]).toArray() as Promise<MonthlyAggRow[]>,
+    db.collection("next_college_signups").aggregate([
       {
         $addFields: {
           createdAt: {
@@ -306,6 +354,32 @@ export default async function AdminDashboardPage() {
     .slice(0, 10);
 
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
+
+  function mergeAggregations(...sources: MonthlyAggRow[][]): MonthlyAggRow[] {
+    const map = new Map<string, { year: number; month: number; count: number }>();
+    for (const source of sources) {
+      if (!source) continue;
+      for (const agg of source) {
+        const year = agg._id?.year;
+        const month = agg._id?.month;
+        if (year === undefined || month === undefined) continue;
+        const key = `${year}-${month}`;
+        const existing = map.get(key);
+        if (existing) {
+          existing.count += agg.count ?? 0;
+        } else {
+          map.set(key, { year, month, count: agg.count ?? 0 });
+        }
+      }
+    }
+    return Array.from(map.values()).map(v => ({
+      _id: { year: v.year, month: v.month },
+      count: v.count
+    }));
+  }
+
+  const studentMonthlyAgg = mergeAggregations(usersMonthlyAgg, studentSignupMonthlyAgg);
+  const collegeMonthlyAgg = mergeAggregations(collegeProfileMonthlyAgg, collegeSignupMonthlyAgg);
 
   const studentGraphData = buildMonthlySeries(studentMonthlyAgg, startMonth, monthsBack);
   const collegeGraphData = buildMonthlySeries(collegeMonthlyAgg, startMonth, monthsBack);

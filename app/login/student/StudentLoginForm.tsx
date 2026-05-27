@@ -160,8 +160,10 @@ export default function StudentLoginForm() {
             <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-6 sm:px-8 py-8 my-4">
               {!showOTP ? (
                 <>
-                  <h1 className="text-[20px] md:text-[24px] font-bold text-[#111] mb-1">Student Login</h1>
-                  <p className="text-[12px] md:text-[13px] text-gray-500 mb-6">Sign in to your AdmissionX account.</p>
+                  <div className="text-center">
+                    <h1 className="text-[20px] md:text-[24px] font-bold text-[#111] mb-1">Student Login</h1>
+                    <p className="text-[12px] md:text-[13px] text-gray-500 mb-6">Sign in to your AdmissionX account.</p>
+                  </div>
 
                   <a href="/api/auth/google"
                     className="flex items-center justify-center gap-2.5 w-full py-2 md:py-2.5 border border-gray-300 rounded-lg text-[12px] md:text-[13px] font-medium text-[#111] bg-white hover:border-gray-400 transition-colors mb-4">
@@ -199,7 +201,7 @@ export default function StudentLoginForm() {
                   <form onSubmit={handleSubmit} className="flex flex-col gap-3">
                     <div className="flex flex-col gap-1">
                       <label className="text-[11px] md:text-[12px] font-semibold text-gray-700">Email<span className="text-red-500 ml-0.5">*</span></label>
-                      <input type="email" placeholder="Enter your email" required
+                      <input type="email" placeholder="Enter Your Student Email" required
                         value={email} onChange={e => setEmail(e.target.value)} suppressHydrationWarning
                         className="px-3 py-2 border border-gray-300 rounded-[7px] text-[12px] md:text-[13px] placeholder:text-[11px] md:placeholder:text-[12px] text-[#111] outline-none focus:border-black transition-colors" />
                     </div>
@@ -235,10 +237,12 @@ export default function StudentLoginForm() {
                 </>
               ) : (
                 <>
-                  <h1 className="text-[20px] md:text-[24px] font-bold text-[#111] mb-1">Verify OTP</h1>
-                  <p className="text-[12px] md:text-[13px] text-gray-500 mb-5">
-                    We've sent a 6-digit OTP to <strong>{userEmail}</strong>
-                  </p>
+                  <div className="text-center">
+                    <h1 className="text-[20px] md:text-[24px] font-bold text-[#111] mb-1">Verify OTP</h1>
+                    <p className="text-[12px] md:text-[13px] text-gray-500 mb-5">
+                      We've sent a 6-digit OTP to <strong>{userEmail}</strong>
+                    </p>
+                  </div>
 
                   {error && (
                     <div className="mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">{error}</div>

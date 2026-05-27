@@ -36,6 +36,7 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: "account_balance",
         label: "Colleges Profile",
         subItems: [
+          { href: "/admin/colleges", label: "Request New College", icon: "how_to_reg" },
           { href: "/admin/colleges/contact", label: "College Contact Card", icon: "contact_mail" },
           { href: "/admin/colleges/profile", label: "Profile Information", icon: "info" },
           { href: "/admin/colleges/courses", label: "Courses", icon: "book" },

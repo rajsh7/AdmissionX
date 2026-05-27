@@ -47,27 +47,26 @@ export default function AdminLoginForm() {
     <div className="min-h-screen flex flex-col font-display relative">
       <AuthBackgroundSlider />
       <Header />
-      <main className="relative flex-1 flex items-center justify-center px-4 sm:px-6 py-24 sm:py-36 z-10">
-        <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-6 sm:px-8 py-8 my-4">
-
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-primary text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>admin_panel_settings</span>
+      <main className="relative flex-1 flex items-center justify-center px-4 sm:px-6 py-24 md:py-32 lg:py-48 z-10">
+        <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-6 sm:px-8 py-10 my-4 flex flex-col justify-center gap-8" style={{ minHeight: "520px" }}>
+          <div className="flex flex-col items-center text-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-primary text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>admin_panel_settings</span>
             </div>
             <div>
               <h1 className="text-[22px] font-bold text-[#111] leading-tight">Admin Login</h1>
-              <p className="text-[12px] text-gray-500">Secure access for administrators only.</p>
+              <p className="text-[12px] text-gray-500 mt-1.5">Secure access for administrators only.</p>
             </div>
           </div>
 
           {error && (
-            <div className="mb-4 px-3 py-2.5 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">{error}</div>
+            <div className="px-3 py-2.5 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">{error}</div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <label className="text-[12px] font-semibold text-gray-700">Admin Email<span className="text-red-500 ml-0.5">*</span></label>
-              <input type="email" placeholder="admin@admissionx.com" required
+              <input type="email" placeholder="Enter Your Admin Email" required
                 value={email} onChange={e => setEmail(e.target.value)} suppressHydrationWarning
                 className="px-3 py-2 border border-gray-300 rounded-[7px] text-[13px] text-[#111] outline-none focus:border-black transition-colors" />
             </div>
@@ -92,7 +91,7 @@ export default function AdminLoginForm() {
             </button>
           </form>
 
-          <div className="mt-4 flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">
+          <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">
             <span className="material-symbols-outlined text-amber-500 text-[14px] shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
             <p className="text-[10px] text-amber-700 leading-relaxed">
               This is a restricted area. Unauthorized access attempts are logged and monitored.
