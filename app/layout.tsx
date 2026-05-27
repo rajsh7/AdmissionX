@@ -5,6 +5,9 @@ import ChatbotWrapper from "./components/ChatbotWrapper";
 import PublicProviders from "./components/PublicProviders";
 import TrackPageView from "./components/TrackPageView";
 import ClarityInit from "./components/ClarityInit";
+import dynamic from "next/dynamic";
+
+const CustomCursor = dynamic(() => import("./components/CustomCursor"), { ssr: false });
 
 export const metadata: Metadata = {
   title: "Admissionx - Find Your Dream College",
@@ -40,6 +43,7 @@ export default function RootLayout({
         <PublicProviders>
           <TrackPageView />
           <ClarityInit />
+          <CustomCursor />
           {children}
         </PublicProviders>
 
