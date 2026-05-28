@@ -26,9 +26,13 @@ export default async function StudentPaymentsPage({
 
   if (q) {
     filter.$or = [
+      { applicationRef: { $regex: q, $options: "i" } },
       { application_ref: { $regex: q, $options: "i" } },
+      { transactionId: { $regex: q, $options: "i" } },
       { transaction_id: { $regex: q, $options: "i" } },
+      { collegeName: { $regex: q, $options: "i" } },
       { college_name: { $regex: q, $options: "i" } },
+      { courseName: { $regex: q, $options: "i" } },
       { course_name: { $regex: q, $options: "i" } },
     ];
   }
@@ -36,7 +40,7 @@ export default async function StudentPaymentsPage({
   const [applications, total, stats] = await Promise.all([
     db.collection("applications")
       .find(filter)
-      .sort({ created_at: -1 })
+      .sort({ _id: -1 })
       .skip(offset)
       .limit(PAGE_SIZE)
       .toArray(),
@@ -56,15 +60,15 @@ export default async function StudentPaymentsPage({
 
   const payments = applications.map((app: any) => ({
     _id: app._id.toString(),
-    application_ref: app.application_ref || "—",
-    transaction_id: app.transaction_id || "—",
-    college_name: app.college_name || "—",
-    course_name: app.course_name || "—",
-    degree_name: app.degree_name || "",
+    application_ref: app.applicationRef || app.application_ref || "—",
+    transaction_id: app.transactionId || app.transaction_id || "—",
+    college_name: app.collegeName || app.college_name || "—",
+    course_name: app.courseName || app.course_name || "—",
+    degree_name: app.degreeName || app.degree_name || "",
     amount_paid: app.amount_paid || 0,
     payment_status: app.payment_status || "pending",
-    created_at: app.created_at,
-    updated_at: app.updated_at,
+    created_at: app.createdAt || app.created_at,
+    updated_at: app.updatedAt || app.updated_at,
   }));
 
   const statsData = stats[0] || { total_amount: 0, paid_count: 0, pending_count: 0 };

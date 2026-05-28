@@ -121,20 +121,42 @@ function Dropdown({
 export default function AdminNotifications() {
   const [bells,    setBells]    = useState<NotifItem[]>([]);
   const [messages, setMessages] = useState<NotifItem[]>([]);
-  const [bellSeen,    setBellSeen]    = useState(false);
-  const [messageSeen, setMessageSeen] = useState(false);
+  const [bellSeen,    setBellSeen]    = useState(true);
+  const [messageSeen, setMessageSeen] = useState(true);
 
   const fetchNotifs = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/notifications", { cache: "no-store" });
       if (!res.ok) return;
       const data = await res.json();
+      
       setBells(prev => {
-        if (JSON.stringify(prev) !== JSON.stringify(data.bells)) setBellSeen(false);
+        if (data.bells.length === 0) {
+          setBellSeen(true);
+        } else {
+          const latestId = data.bells[0]?.id;
+          const storedLastSeenId = localStorage.getItem("admin_bell_last_seen_id");
+          if (latestId && latestId === storedLastSeenId) {
+            setBellSeen(true);
+          } else if (JSON.stringify(prev) !== JSON.stringify(data.bells)) {
+            setBellSeen(false);
+          }
+        }
         return data.bells;
       });
+      
       setMessages(prev => {
-        if (JSON.stringify(prev) !== JSON.stringify(data.messages)) setMessageSeen(false);
+        if (data.messages.length === 0) {
+          setMessageSeen(true);
+        } else {
+          const latestId = data.messages[0]?.id;
+          const storedLastSeenId = localStorage.getItem("admin_message_last_seen_id");
+          if (latestId && latestId === storedLastSeenId) {
+            setMessageSeen(true);
+          } else if (JSON.stringify(prev) !== JSON.stringify(data.messages)) {
+            setMessageSeen(false);
+          }
+        }
         return data.messages;
       });
     } catch {}
@@ -142,7 +164,7 @@ export default function AdminNotifications() {
 
   useEffect(() => {
     fetchNotifs();
-    const interval = setInterval(fetchNotifs, 30_000);
+    const interval = setInterval(fetchNotifs, 10_000);
     return () => clearInterval(interval);
   }, [fetchNotifs]);
 
@@ -155,7 +177,13 @@ export default function AdminNotifications() {
         viewAllHref="/admin/queries"
         viewAllLabel="New Queries"
         seen={messageSeen}
-        onOpen={() => setMessageSeen(true)}
+        onOpen={() => {
+          setMessageSeen(true);
+          const latestId = messages[0]?.id;
+          if (latestId) {
+            localStorage.setItem("admin_message_last_seen_id", latestId);
+          }
+        }}
       />
       <Dropdown
         icon="notifications"
@@ -164,7 +192,13 @@ export default function AdminNotifications() {
         viewAllHref="/admin/members/registrations"
         viewAllLabel="New Registrations"
         seen={bellSeen}
-        onOpen={() => setBellSeen(true)}
+        onOpen={() => {
+          setBellSeen(true);
+          const latestId = bells[0]?.id;
+          if (latestId) {
+            localStorage.setItem("admin_bell_last_seen_id", latestId);
+          }
+        }}
       />
     </div>
   );
