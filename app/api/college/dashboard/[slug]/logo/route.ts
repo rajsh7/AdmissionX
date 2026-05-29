@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { saveUpload } from "@/lib/upload-utils";
+import { revalidateTag, revalidatePath } from "next/cache";
 
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
@@ -48,6 +49,10 @@ export async function POST(
     { slug },
     { $set: { logoimage: logoUrl, updated_at: new Date() } }
   );
+
+  revalidateTag("college-base", "max");
+  revalidatePath(`/college/${slug}`);
+  revalidatePath(`/dashboard/college/${slug}`);
 
   return NextResponse.json({ success: true, logo: logoUrl });
 }

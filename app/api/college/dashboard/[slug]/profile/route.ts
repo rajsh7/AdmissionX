@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { saveUpload } from "@/lib/upload-utils";
-import { revalidateTag } from "next/cache";
+import { revalidateTag, revalidatePath } from "next/cache";
 
 async function checkAuth(slug: string) {
   const cookieStore = await cookies();
@@ -157,6 +157,8 @@ export async function PUT(
   );
 
   revalidateTag("college-base", "max");
+  revalidatePath(`/college/${slug}`);
+  revalidatePath(`/dashboard/college/${slug}`);
   return NextResponse.json({ success: true, message: "Profile updated successfully." });
 }
 
@@ -208,6 +210,8 @@ export async function PATCH(
     );
 
     revalidateTag("college-base", "max");
+    revalidatePath(`/college/${slug}`);
+    revalidatePath(`/dashboard/college/${slug}`);
     return NextResponse.json({ success: true, url: publicUrl, field: fieldName });
   } catch (e) {
     console.error("[profile PATCH] upload error:", e);

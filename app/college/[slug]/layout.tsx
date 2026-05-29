@@ -89,7 +89,7 @@ async function fetchCollegeBase(slug: string) {
           totalStudent: 1, universityType: 1, ranking: 1, isTopUniversity: 1,
           topUniversityRank: 1, facebookurl: 1, twitterurl: 1,
           CCTVSurveillance: 1, ACCampus: 1, users_id: 1,
-          registeredAddressCityId: 1, collegetype_id: 1,
+          registeredAddressCityId: 1, collegetype_id: 1, logoimage: 1,
         },
       }
     );
@@ -105,7 +105,7 @@ async function fetchCollegeBase(slug: string) {
     return {
       ...cp,
       college_name: user?.firstname?.trim() || cp.slug,
-      logo: user?.profileimage || null,
+      logo: cp.logoimage || user?.profileimage || null,
       city_name: city?.name || null,
       college_type_name: ct?.name || null,
     } as CollegeBase;
