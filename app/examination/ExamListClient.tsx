@@ -38,7 +38,7 @@ function stripHtml(html: string | null | undefined): string {
   return html.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, " ").trim();
 }
 
-export default function ExamListClient({ exams, search = "" }: { exams: ExamItem[]; search?: string }) {
+export default function ExamListClient({ exams, search = "", hideFilters = false }: { exams: ExamItem[]; search?: string; hideFilters?: boolean }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [page, setPage] = useState(1);
   const [activeFilter, setActiveFilter] = useState("All Exams");
@@ -93,20 +93,22 @@ export default function ExamListClient({ exams, search = "" }: { exams: ExamItem
   return (
     <div>
       {/* Filter Buttons */}
-      <div className="mb-6 flex flex-wrap gap-3 sm:gap-4 items-center">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => handleFilter(cat)}
-            className={`px-4 sm:px-8 h-[40px] sm:h-[50px] flex items-center justify-center text-sm sm:text-[20px] font-semibold rounded-[5px] transition-all duration-200 border shadow-sm ${activeFilter === cat
-              ? "bg-[#D40C11] text-white border-[#FF3C3C]"
-              : "bg-[#E2E3E9] text-[#000000] border-transparent hover:bg-[#D4D5DB]"
-              }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
+      {!hideFilters && (
+        <div className="mb-6 flex flex-wrap gap-3 sm:gap-4 items-center">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => handleFilter(cat)}
+              className={`px-4 sm:px-8 h-[40px] sm:h-[50px] flex items-center justify-center text-sm sm:text-[20px] font-semibold rounded-[5px] transition-all duration-200 border shadow-sm ${activeFilter === cat
+                ? "bg-[#D40C11] text-white border-[#FF3C3C]"
+                : "bg-[#E2E3E9] text-[#000000] border-transparent hover:bg-[#D4D5DB]"
+                }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <div className="bg-white rounded-[5px] p-8 text-center text-neutral-500 border border-neutral-200 shadow-md">
