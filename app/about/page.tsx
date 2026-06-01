@@ -115,15 +115,10 @@ export default async function AboutPage() {
                   About AdmissionX
                 </h1>
                 <p className="mx-auto mt-4 max-w-xl text-[14px] leading-7 text-slate-500 lg:mx-0">
-                  AdmissionX is your trusted gateway to smarter college discovery,
+                  AdmissionX is developed, owned, and operated by <strong>Saroj Entertainment Pvt. Ltd.</strong>, an Indian company. It is your trusted gateway to smarter college discovery,
                   seamless admissions, and brighter academic futures. We help students
                   explore colleges, courses, exams, and career opportunities with greater
-                  clarity and confidence. Our platform brings together reliable
-                  information, practical guidance, and student-focused tools in one place.
-                  From discovering the right path to understanding eligibility, fees, and
-                  admission updates, we make every step easier to navigate. AdmissionX is
-                  built to simplify decisions, reduce confusion, and help every student
-                  move closer to the future they want to build.
+                  clarity and confidence.
                 </p>
               </div>
 
@@ -186,7 +181,7 @@ export default async function AboutPage() {
               <div>
                 <h2 className="text-[22px] font-black text-slate-900">About AdmissionX</h2>
                 <p className="mt-4 text-[13px] leading-7 text-slate-500">
-                  AdmissionX is a first of its kind platform that helps connect students
+                  AdmissionX is developed, owned, and operated by <strong>Saroj Entertainment Pvt. Ltd.</strong>, an Indian company registered under the Companies Act, 2013. AdmissionX is a first of its kind platform that helps connect students
                   and institutions for the purpose of admission in different courses. Our
                   portal is a repository of reliable data covering over 31100 colleges,
                   more than 50200 courses, and opportunities across 4000+ cities. We are

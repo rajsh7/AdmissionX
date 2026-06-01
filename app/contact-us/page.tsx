@@ -308,9 +308,8 @@ export default async function ContactUsPage({
                         <span className="material-symbols-outlined text-[16px]">send</span>
                       </button>
 
-                      <p className="flex items-center gap-2 text-[11px] text-slate-400">
-                        <span className="material-symbols-outlined text-[14px]">info</span>
-                        Your information is safe with us. We&apos;ll never share your data.
+                      <p className="text-[11px] text-slate-400 leading-relaxed">
+                        By submitting this form, you consent to receive communications from AdmissionX (a product of Saroj Entertainment Pvt. Ltd.) via SMS, email, WhatsApp, and phone calls regarding your enquiry and related educational services.
                       </p>
                     </form>
                   ) : (
@@ -386,19 +385,15 @@ export default async function ContactUsPage({
 
                     <div className="flex items-start gap-3 border-t border-[#f2ebe5] px-4 py-4">
                       <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-50">
-                        <span className="material-symbols-outlined text-[20px] text-rose-500">
-                          apartment
-                        </span>
+                        <span className="material-symbols-outlined text-[20px] text-rose-500">apartment</span>
                       </div>
                       <div>
-                        <h3 className="text-[13px] font-bold text-slate-900">
-                          AdmissionX Head Office
-                        </h3>
+                        <h3 className="text-[13px] font-bold text-slate-900">Saroj Entertainment Pvt. Ltd.</h3>
+                        <p className="mt-0.5 text-[11px] text-slate-400 font-medium">Parent Company of AdmissionX</p>
                         <p className="mt-1 text-[12px] leading-6 text-slate-500">
-                          123 Education Street, Mumbai,
-                          <br />
-                          Maharashtra 400001, India
+                          123 Education Street, Mumbai,<br />Maharashtra 400001, India
                         </p>
+                        <p className="mt-1 text-[11px] text-slate-400">CIN: U74999MH2020PTC000000</p>
                       </div>
                     </div>
                   </div>

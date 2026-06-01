@@ -182,7 +182,7 @@ export default function CancellationRefundsPage() {
 
             <div className="flex flex-col items-start justify-between gap-4 border-t border-neutral-100 pt-8 sm:flex-row sm:items-center">
               <p className="text-xs text-neutral-400">
-                © 2025 AdmissionX. All rights reserved.
+                © 2026 Saroj Entertainment Pvt. Ltd. All Rights Reserved.
               </p>
               <div className="flex items-center gap-4 text-xs">
                 <Link

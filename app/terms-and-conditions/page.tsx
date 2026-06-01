@@ -95,8 +95,8 @@ export default function TermsAndConditionsPage() {
             </span>
             <p className="text-sm text-blue-800">
               These Terms constitute a legally binding agreement between you and
-              AdmissionX. If you do not agree to these Terms, please do not use
-              our platform.
+              Saroj Entertainment Pvt. Ltd. (the developer, owner, and operator of AdmissionX). If you do not agree to these Terms, please do not use
+              our Platform.
             </p>
           </div>
 
@@ -114,6 +114,9 @@ export default function TermsAndConditionsPage() {
                 you are accessing the Platform on behalf of an institution, you
                 represent that you have the authority to bind that institution
                 to these Terms.
+              </Prose>
+              <Prose>
+                The Platform (<strong>admissionx.in</strong>) is owned, operated, and maintained by <strong>Saroj Entertainment Pvt. Ltd.</strong>, an Indian company registered under the Companies Act, 2013 having its registered office at 123 Education Street, Mumbai, Maharashtra 400001, India. All references to &ldquo;AdmissionX&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo; in these Terms refer to Saroj Entertainment Pvt. Ltd.
               </Prose>
               <Prose>
                 We reserve the right to modify these Terms at any time. Your
@@ -412,7 +415,7 @@ export default function TermsAndConditionsPage() {
               </Prose>
               <div className="mt-4 bg-neutral-50 rounded-2xl border border-neutral-100 p-6 space-y-3">
                 {[
-                  { icon: "business", label: "Company", value: "AdmissionX" },
+                  { icon: "business", label: "Company", value: "Saroj Entertainment Pvt. Ltd. (Parent Company of AdmissionX)" },
                   {
                     icon: "mail",
                     label: "Email",

@@ -103,10 +103,9 @@ export default function PrivacyPolicyPage() {
                 visitors to our website and to our online customers.
               </Prose>
               <Prose>
-                Admissionx.info is a property of Yuvi Aviation Pvt. Ltd., an
+                Admissionx.info is a property of <strong>Saroj Entertainment Pvt. Ltd.</strong>, an
                 Indian company registered under the Companies Act, 2013 having
-                its registered office at L-5, Lajpat Nagar 2, New Delhi -
-                110024.
+                its registered office at 123 Education Street, Mumbai, Maharashtra 400001.
               </Prose>
             </section>
 
@@ -288,13 +287,13 @@ export default function PrivacyPolicyPage() {
                   <span className="material-symbols-outlined text-[16px] text-neutral-400">
                     business
                   </span>
-                  <span>Yuvi Aviation Pvt. Ltd.</span>
+                  <span>Saroj Entertainment Pvt. Ltd.</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[16px] text-neutral-400">
                     location_on
                   </span>
-                  <span>L-5, Lajpat Nagar 2, New Delhi - 110024</span>
+                  <span>123 Education Street, Mumbai, Maharashtra 400001</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[16px] text-neutral-400">
@@ -312,7 +311,7 @@ export default function PrivacyPolicyPage() {
 
             <div className="flex flex-col items-start justify-between gap-4 border-t border-neutral-100 pt-8 sm:flex-row sm:items-center">
               <p className="text-xs text-neutral-400">
-                © 2025 AdmissionX. All rights reserved.
+                © 2026 Saroj Entertainment Pvt. Ltd. All Rights Reserved.
               </p>
               <div className="flex items-center gap-4 text-xs">
                 <Link

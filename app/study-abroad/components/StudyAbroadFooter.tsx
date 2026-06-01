@@ -80,8 +80,11 @@ export default function StudyAbroadFooter() {
             <Link href="/" className="inline-block mb-10">
               <img src="/admissionx-logo.png" alt="AdmissionX logo" className="h-9 w-auto object-contain" />
             </Link>
-            <p className="text-slate-500 font-medium leading-relaxed max-w-sm mb-12">
+            <p className="text-slate-500 font-medium leading-relaxed max-w-sm mb-4">
                Your one-stop platform for college admissions, entrance exams, scholarships, and study abroad guidance.
+            </p>
+            <p className="text-slate-400 text-xs font-semibold leading-relaxed max-w-sm mb-12">
+               AdmissionX is a product of Saroj Entertainment Pvt. Ltd.
             </p>
             <div className="flex items-center gap-4">
                {[GoogleIcon, XIcon, InstagramIcon, FacebookIcon].map((Icon, i) => (
@@ -110,7 +113,7 @@ export default function StudyAbroadFooter() {
         </div>
 
         <div className="pt-10 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6 text-slate-400 font-medium text-sm">
-           <p>© Copyright 2026 - All Rights Reserved AdmissionX</p>
+           <p>© 2026 Saroj Entertainment Pvt. Ltd. All Rights Reserved.</p>
            <div className="flex gap-8">
               <Link href="/privacy-policy" className="hover:text-primary">Privacy Policy</Link>
               <Link href="/terms-and-conditions" className="hover:text-primary">Terms of Use</Link>

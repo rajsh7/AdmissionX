@@ -980,8 +980,7 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
             className="mt-1 h-4 w-4 rounded border-[#d1d5db] text-[#ff5757] focus:ring-[#ff5757]"
           />
           <span>
-            I confirm that the information provided above is accurate and I agree to be
-            contacted by the admission team for this application.
+            I confirm that the information provided above is accurate and I consent to receive communications from AdmissionX (a product of Saroj Entertainment Pvt. Ltd.) and the educational institutions/admission team via SMS, email, WhatsApp, and phone calls regarding my application and related educational services.
           </span>
         </label>
       </div>

@@ -193,6 +193,9 @@ export default function StudentSignupPage() {
                       className="mt-2 py-2.5 bg-[#111] hover:bg-[#333] disabled:opacity-60 text-white rounded-lg text-[13.5px] font-semibold transition-colors w-full">
                       {loading ? "Creating…" : "Sign up"}
                     </button>
+                    <p className="text-[10px] text-gray-400 leading-normal mt-2">
+                      By signing up, you consent to receive communications from AdmissionX (a product of Saroj Entertainment Pvt. Ltd.) through SMS, email, WhatsApp, and phone calls regarding your account, college applications, and educational services.
+                    </p>
                   </form>
 
                   <p className="mt-4 text-[12px] text-gray-500 text-center">
