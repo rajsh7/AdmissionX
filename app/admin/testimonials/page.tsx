@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { saveUpload } from "@/lib/upload-utils";
 import TestimonialListClient from "./TestimonialListClient";
 
@@ -32,6 +32,8 @@ async function createTestimonial(formData: FormData) {
     console.error("[admin/testimonials createAction]", e);
   }
   revalidatePath("/admin/testimonials");
+  revalidateTag("homepage-data-v13", "max");
+  revalidatePath("/");
 }
 
 async function updateTestimonial(formData: FormData) {
@@ -62,6 +64,8 @@ async function updateTestimonial(formData: FormData) {
     console.error("[admin/testimonials updateAction]", e);
   }
   revalidatePath("/admin/testimonials");
+  revalidateTag("homepage-data-v13", "max");
+  revalidatePath("/");
 }
 
 async function deleteTestimonial(id: number) {
@@ -72,6 +76,8 @@ async function deleteTestimonial(id: number) {
     console.error("[admin/testimonials deleteAction]", e);
   }
   revalidatePath("/admin/testimonials");
+  revalidateTag("homepage-data-v13", "max");
+  revalidatePath("/");
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
