@@ -53,9 +53,22 @@ export default function StudentDashboardClient({ user, activated }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const [paymentStatus, setPaymentStatus] = useState<"success" | "failed" | null>(null);
+  const [paymentTxnId, setPaymentTxnId] = useState<string | null>(null);
+  const [paymentReason, setPaymentReason] = useState<string | null>(null);
+
   useEffect(() => {
     const tab = searchParams.get("tab") as TabId | null;
     if (tab) setActiveTab(tab);
+
+    const payment = searchParams.get("payment");
+    if (payment === "success") {
+      setPaymentStatus("success");
+      setPaymentTxnId(searchParams.get("txnid"));
+    } else if (payment === "failed") {
+      setPaymentStatus("failed");
+      setPaymentReason(searchParams.get("reason"));
+    }
   }, [searchParams]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -285,6 +298,60 @@ export default function StudentDashboardClient({ user, activated }: Props) {
         <div className="flex-1 min-w-0 student-dashboard-scroll bg-[#f8f9fa] relative pb-[80px] lg:pb-0">
           <main>
             <div className={`p-4 sm:p-10 max-w-[1600px] mx-auto ${showActivatedBanner ? "pt-16" : ""}`}>
+              {paymentStatus === "success" && (
+                <div className="mb-8 p-6 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl text-white shadow-xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        check_circle
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-base leading-tight text-white">Payment Completed Successfully!</h4>
+                      <p className="text-xs text-white/90 font-medium mt-1">
+                        Your college application fee has been securely processed. Transaction ID: <strong className="font-mono bg-black/25 px-1.5 py-0.5 rounded text-white">{paymentTxnId}</strong>
+                      </p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setPaymentStatus(null);
+                      router.replace(`/dashboard/student/${user?.id}?tab=app-all`);
+                    }}
+                    className="text-white/80 hover:text-white shrink-0"
+                  >
+                    <span className="material-symbols-outlined text-2xl">close</span>
+                  </button>
+                </div>
+              )}
+
+              {paymentStatus === "failed" && (
+                <div className="mb-8 p-6 bg-gradient-to-r from-red-500 to-rose-600 rounded-2xl text-white shadow-xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-white text-2xl">
+                        error
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-base leading-tight text-white">Payment Process Failed</h4>
+                      <p className="text-xs text-white/90 font-medium mt-1">
+                        {paymentReason || "Your transaction was cancelled or declined by the payment gateway."}
+                      </p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setPaymentStatus(null);
+                      router.replace(`/dashboard/student/${user?.id}?tab=app-all`);
+                    }}
+                    className="text-white/80 hover:text-white shrink-0"
+                  >
+                    <span className="material-symbols-outlined text-2xl">close</span>
+                  </button>
+                </div>
+              )}
+
               {renderTab()}
             </div>
           </main>

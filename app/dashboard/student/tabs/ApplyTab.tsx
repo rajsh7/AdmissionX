@@ -1046,36 +1046,12 @@ function PaymentStep({
   onBack: () => void;
   onPaid: (receipt: PaymentReceipt) => void;
 }) {
-  const [cardName, setCardName] = useState(user?.name ?? "");
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [saveCard, setSaveCard] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const formatCard = (v: string) =>
-    v
-      .replace(/\D/g, "")
-      .slice(0, 16)
-      .replace(/(.{4})/g, "$1 ")
-      .trim();
-  const formatExpiry = (v: string) => {
-    const d = v.replace(/\D/g, "").slice(0, 4);
-    return d.length >= 3 ? d.slice(0, 2) + "/" + d.slice(2) : d;
-  };
-  const maskedDisplay = cardNumber
-    ? "•••• •••• •••• " + cardNumber.replace(/\s/g, "").slice(-4)
-    : "•••• •••• •••• ••••";
 
   async function handlePay(e: React.FormEvent) {
     e.preventDefault();
     if (!user?.id) return;
-    const last4 = cardNumber.replace(/\s/g, "").slice(-4);
-    if (last4.length < 4) {
-      setError("Please enter a valid 16-digit card number.");
-      return;
-    }
     setProcessing(true);
     setError(null);
     try {
@@ -1085,20 +1061,22 @@ function PaymentStep({
         body: JSON.stringify({
           student_id: user.id,
           application_id: application.id,
-          card_name: cardName.trim(),
-          card_last4: last4,
           amount: application.fees,
-          save_card: saveCard,
         }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Payment failed. Please try again.");
+        setError(data.error ?? "Payment initiation failed. Please try again.");
         return;
       }
-      onPaid(data.receipt);
+      if (data.payment_url) {
+        // Redirect to Easebuzz checkout gateway
+        window.location.href = data.payment_url;
+      } else {
+        setError("Gateway failed to return secure checkout URL.");
+      }
     } catch {
-      setError("Network error. Please check your connection.");
+      setError("Network error. Please check your connection and try again.");
     } finally {
       setProcessing(false);
     }
@@ -1108,7 +1086,8 @@ function PaymentStep({
     <div className="max-w-4xl mx-auto">
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors mb-8 font-medium text-sm"
+        disabled={processing}
+        className="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors mb-8 font-medium text-sm disabled:opacity-40"
       >
         <span className="material-symbols-outlined text-[18px]">
           arrow_back
@@ -1124,7 +1103,7 @@ function PaymentStep({
               Checkout
             </h2>
             <p className="text-slate-500 text-sm mt-1">
-              Secure &amp; encrypted payment
+              Secure &amp; encrypted connection
             </p>
           </div>
 
@@ -1199,127 +1178,66 @@ function PaymentStep({
           </div>
         </div>
 
-        {/* Right: Card form */}
-        <div className="lg:col-span-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-lg p-8">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-            Payment Details
-          </h3>
-
-          {/* Card visualisation */}
-          <div className="relative w-full aspect-[1.7/1] rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-primary p-6 text-white shadow-2xl mb-8 overflow-hidden hover:scale-[1.01] transition-transform">
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <p className="text-[9px] uppercase tracking-widest opacity-60">
-                  AdmissionX
-                </p>
-                <div className="h-7 w-10 bg-yellow-400/20 rounded mt-1 border border-yellow-500/40" />
-              </div>
-              <span className="material-symbols-outlined text-3xl opacity-80">
-                contactless
-              </span>
-            </div>
-            <p className="text-lg tracking-[0.18em] font-medium mb-6">
-              {maskedDisplay}
+        {/* Right: Redirection flow details */}
+        <div className="lg:col-span-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-lg p-8 flex flex-col justify-between">
+          <div>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+              Secure Gateway Checkout
+            </h3>
+            <p className="text-slate-500 text-sm mb-6">
+              You are applying with production credentials. You will be redirected to the secure payment dashboard operated by our payment gateway, <strong>Easebuzz</strong>.
             </p>
-            <div className="flex justify-between items-end">
-              <div>
-                <p className="text-[8px] uppercase tracking-tighter opacity-60">
-                  Card Holder
-                </p>
-                <p className="text-sm font-semibold uppercase truncate max-w-[160px]">
-                  {cardName || user?.name || "YOUR NAME"}
-                </p>
+
+            {/* Visual Credit Card mockup explaining Easebuzz options */}
+            <div className="bg-gradient-to-br from-red-600 to-[#b8171b] rounded-2xl p-6 text-white shadow-xl mb-6 relative overflow-hidden">
+              <div className="absolute right-0 bottom-0 opacity-10 font-bold text-9xl pointer-events-none select-none select-all-none">
+                ₹
               </div>
-              <div className="text-right">
-                <p className="text-[8px] uppercase tracking-tighter opacity-60">
-                  Expires
-                </p>
-                <p className="text-sm font-semibold">{expiry || "MM/YY"}</p>
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <p className="text-[9px] uppercase tracking-widest opacity-80">
+                    Verified Merchant Partner
+                  </p>
+                  <p className="text-base font-bold tracking-wide mt-0.5">
+                    Saroj Entertainment Pvt. Ltd.
+                  </p>
+                </div>
+                <span className="material-symbols-outlined text-3xl opacity-80">
+                  shield
+                </span>
               </div>
+              <div className="space-y-2 mt-4">
+                <p className="text-xs text-white/80 font-medium">Supported Payment Methods on Easebuzz:</p>
+                <div className="flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-wider">
+                  <span className="px-2.5 py-1 bg-white/10 rounded-full">UPI / GPay / PhonePe</span>
+                  <span className="px-2.5 py-1 bg-white/10 rounded-full">Credit & Debit Cards</span>
+                  <span className="px-2.5 py-1 bg-white/10 rounded-full">Net Banking</span>
+                  <span className="px-2.5 py-1 bg-white/10 rounded-full">Wallets</span>
+                </div>
+              </div>
+              <div className="absolute -bottom-8 -right-8 w-36 h-36 bg-white/5 rounded-full blur-3xl" />
             </div>
-            <div className="absolute -bottom-8 -right-8 w-36 h-36 bg-white/5 rounded-full blur-3xl" />
+
+            {/* Instruction Bullet Points */}
+            <div className="space-y-4 mb-8">
+              {[
+                { icon: "schedule", text: "Do not close the page or click back once redirection begins." },
+                { icon: "verified", text: "Cryptographic hash verification ensures payment integrity." },
+                { icon: "mail", text: "A digital receipt and confirmation email are fired immediately upon success." },
+              ].map((item, i) => (
+                <div key={i} className="flex gap-3 text-slate-600 dark:text-slate-300">
+                  <span className="material-symbols-outlined text-emerald-500 shrink-0 text-[18px]">
+                    {item.icon}
+                  </span>
+                  <p className="text-xs font-semibold leading-relaxed">
+                    {item.text}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handlePay} className="space-y-5">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Name on Card
-              </label>
-              <input
-                type="text"
-                value={cardName}
-                onChange={(e) => setCardName(e.target.value)}
-                placeholder="Full name"
-                required
-                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Card Number
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                  credit_card
-                </span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={cardNumber}
-                  onChange={(e) => setCardNumber(formatCard(e.target.value))}
-                  placeholder="0000 0000 0000 0000"
-                  required
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-12 pr-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Expiry
-                </label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={expiry}
-                  onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                  placeholder="MM/YY"
-                  required
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  CVV
-                </label>
-                <input
-                  type="password"
-                  value={cvv}
-                  onChange={(e) =>
-                    setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))
-                  }
-                  placeholder="•••"
-                  required
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
-                />
-              </div>
-            </div>
-
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={saveCard}
-                onChange={(e) => setSaveCard(e.target.checked)}
-                className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
-              />
-              <span className="text-xs text-slate-500 font-medium">
-                Save card for future payments
-              </span>
-            </label>
-
+          <form onSubmit={handlePay} className="space-y-4">
             {error && (
               <div className="flex items-start gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
                 <span className="material-symbols-outlined text-red-500 shrink-0 mt-0.5">
@@ -1334,18 +1252,18 @@ function PaymentStep({
             <button
               type="submit"
               disabled={processing}
-              className="w-full py-4 bg-primary hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-2xl shadow-xl shadow-primary/25 transition-all flex items-center justify-center gap-2"
+              className="w-full py-4 bg-primary hover:bg-[#c0191e] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/45 transition-all flex items-center justify-center gap-2 text-base active:scale-[0.98]"
             >
               {processing ? (
                 <>
                   <span className="material-symbols-outlined animate-spin">
                     progress_activity
                   </span>
-                  Processing…
+                  Redirecting to Gateway…
                 </>
               ) : (
                 <>
-                  Pay {formatCurrency(application.fees)}
+                  Proceed to Easebuzz Secure Payment
                   <span className="material-symbols-outlined">
                     arrow_forward
                   </span>
@@ -1354,8 +1272,7 @@ function PaymentStep({
             </button>
 
             <p className="text-[10px] text-center text-slate-400">
-              By clicking &apos;Pay&apos; you agree to AdmissionX&apos;s Terms
-              of Service and Refund Policy.
+              By clicking &apos;Proceed&apos; you agree to the platform&apos;s Terms of Service and Refund Policy.
             </p>
           </form>
         </div>
