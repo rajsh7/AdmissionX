@@ -11,14 +11,25 @@ import path from "path";
  * @returns The public URL path of the saved file
  */
 export async function saveUpload(file: File, subDir: string, prefix: string = "img"): Promise<string> {
-  const rootUploadDir = path.join(process.cwd(), "public", "uploads", subDir);
-  const standaloneUploadDir = path.join(process.cwd(), ".next", "standalone", "public", "uploads", subDir);
+  let projectRoot = process.cwd();
+  
+  // Platform-safe check if we are running in Next.js standalone directory
+  const normalizedPath = projectRoot.replace(/\\/g, "/");
+  const idx = normalizedPath.indexOf(".next/standalone");
+  if (idx !== -1) {
+    projectRoot = projectRoot.substring(0, idx);
+  } else if (normalizedPath.endsWith("standalone")) {
+    projectRoot = path.resolve(projectRoot, "..", "..");
+  }
+
+  const rootUploadDir = path.join(projectRoot, "public", "uploads", subDir);
+  const standaloneUploadDir = path.join(projectRoot, ".next", "standalone", "public", "uploads", subDir);
   
   if (!existsSync(rootUploadDir)) {
     await mkdir(rootUploadDir, { recursive: true });
   }
 
-  const isStandaloneActive = existsSync(path.join(process.cwd(), ".next", "standalone"));
+  const isStandaloneActive = existsSync(path.join(projectRoot, ".next", "standalone"));
   if (isStandaloneActive && !existsSync(standaloneUploadDir)) {
     await mkdir(standaloneUploadDir, { recursive: true });
   }

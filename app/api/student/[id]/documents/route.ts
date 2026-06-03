@@ -6,6 +6,7 @@ import { writeFile, mkdir, unlink } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
 import { ObjectId } from "mongodb";
+import { saveUpload } from "@/lib/upload-utils";
 
 async function checkAuth(studentId: string) {
   const cookieStore = await cookies();
@@ -110,15 +111,8 @@ export async function POST(
 
   const docName = String(formData.get("name") ?? "").trim() || CATEGORY_LABELS[category] || file.name;
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "student", id);
-  if (!existsSync(uploadDir)) await mkdir(uploadDir, { recursive: true });
-
-  const ext       = path.extname(file.name).toLowerCase() || ".bin";
-  const safeName  = `${category}_${Date.now()}${ext}`;
-  const fullPath  = path.join(uploadDir, safeName);
-  const publicUrl = `/uploads/student/${id}/${safeName}`;
-
-  await writeFile(fullPath, Buffer.from(await file.arrayBuffer()));
+  // Save upload with mirroring and path resolution helper
+  const publicUrl = await saveUpload(file, `student/${id}`, category);
 
   const db = await getDb();
   const result = await db.collection("next_student_documents").insertOne({
