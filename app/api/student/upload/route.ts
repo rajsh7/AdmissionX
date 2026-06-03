@@ -45,8 +45,16 @@ export async function POST(req: NextRequest) {
     // Save file using standard helper which handles root/standalone mirroring and path resolution
     const url = await saveUpload(file, "documents", "doc");
     return NextResponse.json({ url });
-  } catch (err) {
+  } catch (err: any) {
     console.error("[upload] local save error:", err);
-    return NextResponse.json({ error: "Upload failed. Please try again." }, { status: 500 });
+    return NextResponse.json({ 
+      error: "Upload failed. Please try again.",
+      debug: {
+        message: err?.message,
+        code: err?.code,
+        stack: err?.stack,
+        cwd: process.cwd(),
+      }
+    }, { status: 500 });
   }
 }
