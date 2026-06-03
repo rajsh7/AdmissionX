@@ -76,7 +76,9 @@ export async function POST(req: NextRequest) {
       // 2. Fire transaction success email asynchronously
       setImmediate(async () => {
         try {
-          const studentDoc = await db.collection("next_student_signups").findOne({ id: studentId });
+          const studentDoc = await db.collection("next_student_signups").findOne({
+            _id: (ObjectId.isValid(studentId) ? new ObjectId(studentId) : studentId) as any
+          });
           if (studentDoc) {
             await sendPaymentSuccessEmail(
               studentDoc.email,
@@ -113,7 +115,9 @@ export async function POST(req: NextRequest) {
       // 2. Fire transaction failed email
       setImmediate(async () => {
         try {
-          const studentDoc = await db.collection("next_student_signups").findOne({ id: studentId });
+          const studentDoc = await db.collection("next_student_signups").findOne({
+            _id: (ObjectId.isValid(studentId) ? new ObjectId(studentId) : studentId) as any
+          });
           if (studentDoc) {
             await sendPaymentFailedEmail(studentDoc.email, studentDoc.name || "Student");
           }

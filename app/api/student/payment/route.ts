@@ -4,6 +4,7 @@ import { verifyStudentToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import crypto from "crypto";
 import { ObjectId } from "mongodb";
+import { sendPaymentSuccessEmail } from "@/lib/email";
 
 async function checkAuth(studentId: string) {
   const cookieStore = await cookies();
@@ -50,12 +51,54 @@ export async function POST(req: NextRequest) {
   if (app.status === "rejected") return NextResponse.json({ error: "Cannot process payment for a rejected application." }, { status: 409 });
 
   const amountNum = app.fees ? parseFloat(String(app.fees)) : parseFloat(String(amount ?? "0"));
-  if (isNaN(amountNum) || amountNum <= 0) {
-    return NextResponse.json({ error: "Application amount must be a positive number." }, { status: 400 });
+  if (isNaN(amountNum) || amountNum < 0) {
+    return NextResponse.json({ error: "Application amount must be a positive number or zero." }, { status: 400 });
   }
 
   // Retrieve student details to prefill payment form
-  const studentDoc = await db.collection("next_student_signups").findOne({ id: String(student_id) });
+  const studentIdStr = String(student_id);
+  const studentDoc = await db.collection("next_student_signups").findOne({
+    _id: (ObjectId.isValid(studentIdStr) ? new ObjectId(studentIdStr) : studentIdStr) as any
+  });
+
+  if (amountNum === 0) {
+    // 0-fee (free) application bypass
+    const freeTxnid = `ADX-FREE-${Date.now()}-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+    
+    // Update application to paid
+    await db.collection("applications").updateOne(appFilter, {
+      $set: {
+        payment_status: "paid",
+        transaction_id: freeTxnid,
+        amount_paid: 0,
+        updated_at: new Date(),
+      }
+    });
+
+    // Send payment success email (free application receipt)
+    const emailToUse = app.personal_info?.email || studentDoc?.email || "";
+    const nameToUse = app.personal_info?.name || studentDoc?.name || "Student";
+    
+    if (emailToUse) {
+      try {
+        await sendPaymentSuccessEmail(
+          emailToUse,
+          nameToUse,
+          "0.00",
+          freeTxnid,
+          new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
+        );
+      } catch (emailErr) {
+        console.error("[Free Payment Bypass] Email notification failed:", emailErr);
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      payment_url: `/dashboard/student/${student_id}?tab=app-all&payment=success&txnid=${freeTxnid}`,
+      txnid: freeTxnid,
+    });
+  }
 
   const firstname = (app.personal_info?.name || studentDoc?.name || "Student").trim();
   const email = (app.personal_info?.email || studentDoc?.email || "").trim();
