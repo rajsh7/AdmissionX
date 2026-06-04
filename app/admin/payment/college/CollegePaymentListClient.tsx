@@ -62,7 +62,7 @@ export default function CollegePaymentListClient({ payments, offset, total, page
                     <span className="font-bold text-slate-800 text-sm">{p.college_name}</span>
                   </td>
                   <td className="px-4 py-4">
-                    <span className="font-mono text-xs text-slate-600">{p.transaction_id}</span>
+                    <span className="font-mono text-xs text-slate-600 select-all break-all" title={p.transaction_id}>{p.transaction_id}</span>
                   </td>
                   <td className="px-4 py-4">
                     <span className="text-xs text-slate-600">{p.service_type}</span>

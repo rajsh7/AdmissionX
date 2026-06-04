@@ -84,8 +84,19 @@ export async function GET(
   const applications = rows.map((row) => {
     const status = String(row.status ?? "submitted");
     const payStatus = String(row.payment_status ?? "pending");
-    const sm = statusMeta[status] ?? statusMeta["submitted"];
+    let sm = statusMeta[status] ?? statusMeta["submitted"];
     const pm = payMeta[payStatus] ?? payMeta["pending"];
+
+    const fees = Number(row.fees ?? 0);
+    // Override overall status visuals if payment is not completed successfully
+    if (fees > 0 && payStatus !== "paid") {
+      if (payStatus === "failed") {
+        sm = { label: "Payment Failed", cls: "bg-red-100 text-red-700", icon: "money_off", progress: 40, progressColor: "red" };
+      } else if (payStatus === "pending") {
+        sm = { label: "Payment Pending", cls: "bg-amber-100 text-amber-700", icon: "pending", progress: 40, progressColor: "amber" };
+      }
+    }
+
     const actionLabel = status === "draft" ? "Complete Application" : payStatus === "pending" && status === "verified" ? "Pay Fees" : "View Details";
 
     return {
@@ -97,7 +108,7 @@ export async function GET(
       progress: sm.progress, progressColor: sm.progressColor,
       paymentLabel: pm.label, paymentClass: pm.cls, paymentIcon: pm.icon,
       actionLabel,
-      fees: Number(row.fees ?? 0),
+      fees,
       amount_paid: Number(row.amount_paid ?? 0),
       submittedOn: row.created_at ? new Date(row.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : null,
     };

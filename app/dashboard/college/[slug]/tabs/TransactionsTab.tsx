@@ -203,7 +203,7 @@ export default function TransactionsTab({ college }: Props) {
                         <span className="text-xs font-black text-primary bg-primary/5 px-2 py-0.5 rounded w-fit">
                           {txn.application_ref}
                         </span>
-                        <span className="text-sm font-bold text-slate-800 dark:text-white group-hover:text-primary transition-colors">
+                        <span className="text-sm font-bold text-slate-800 dark:text-white group-hover:text-primary transition-colors select-all break-all" title={txn.transaction_id}>
                           {txn.transaction_id}
                         </span>
                       </div>

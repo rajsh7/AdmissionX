@@ -65,7 +65,7 @@ export default function StudentPaymentListClient({ payments, offset, total, page
                     <span className="font-bold text-slate-800 text-xs">{p.application_ref}</span>
                   </td>
                   <td className="px-4 py-4">
-                    <span className="font-mono text-xs text-slate-600">{p.transaction_id}</span>
+                    <span className="font-mono text-xs text-slate-600 select-all break-all" title={p.transaction_id}>{p.transaction_id}</span>
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex flex-col gap-0.5">

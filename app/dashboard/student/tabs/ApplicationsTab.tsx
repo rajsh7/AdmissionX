@@ -152,7 +152,7 @@ function AppCard({ app, user }: { app: Application; user: Props["user"] }) {
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="space-y-1">
             <p className="text-[10px] font-semibold text-gray-300 uppercase tracking-widest">Status</p>
-            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold ${STATUS_COLORS[app.status] ?? "bg-gray-100 text-gray-600"}`}>
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold ${app.statusClass || "bg-gray-100 text-gray-600"}`}>
               <span className="material-symbols-outlined text-[14px]">{app.statusIcon}</span>
               {app.statusLabel}
             </span>
@@ -172,7 +172,7 @@ function AppCard({ app, user }: { app: Application; user: Props["user"] }) {
               </div>
               <div className="space-y-1">
                 <p className="text-[10px] font-semibold text-gray-300 uppercase tracking-widest">Transaction ID</p>
-                <p className="text-[12px] font-mono font-semibold text-[#555] truncate max-w-[130px]" title={app.transaction_id || "N/A"}>
+                <p className="text-[12px] font-mono font-semibold text-[#555] select-all break-all" title={app.transaction_id || "N/A"}>
                   {app.transaction_id || "—"}
                 </p>
               </div>
