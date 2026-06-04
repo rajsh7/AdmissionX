@@ -4,7 +4,7 @@ import AdminModal from "@/app/admin/_components/AdminModal";
 import { useState } from "react";
 
 interface UserOption {
-  id: number;
+  id: number | string;
   name: string;
   email: string;
 }
