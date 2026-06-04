@@ -4,8 +4,27 @@ import crypto from "crypto";
 import { ObjectId } from "mongodb";
 import { sendPaymentSuccessEmail, sendPaymentFailedEmail } from "@/lib/email";
 
+function getRequestOrigin(req: NextRequest): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes("0.0.0.0")) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+  const forwardedHost = req.headers.get("x-forwarded-host");
+  const forwardedProto = req.headers.get("x-forwarded-proto") || "https";
+  if (forwardedHost && !forwardedHost.includes("0.0.0.0")) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+  const host = req.headers.get("host");
+  if (host && !host.includes("0.0.0.0")) {
+    const isLocal = host.includes("localhost") || host.includes("127.0.0.1");
+    const defaultProto = isLocal ? "http" : "https";
+    const proto = req.headers.get("x-forwarded-proto") || defaultProto;
+    return `${proto}://${host}`;
+  }
+  return "https://admissionx.com";
+}
+
 export async function POST(req: NextRequest) {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || req.url;
+  const baseUrl = getRequestOrigin(req);
   try {
     const formData = await req.formData();
     const data = Object.fromEntries(formData.entries());

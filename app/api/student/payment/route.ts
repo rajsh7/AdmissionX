@@ -15,6 +15,25 @@ async function checkAuth(studentId: string) {
   return payload;
 }
 
+function getRequestOrigin(req: NextRequest): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes("0.0.0.0")) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+  const forwardedHost = req.headers.get("x-forwarded-host");
+  const forwardedProto = req.headers.get("x-forwarded-proto") || "https";
+  if (forwardedHost && !forwardedHost.includes("0.0.0.0")) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+  const host = req.headers.get("host");
+  if (host && !host.includes("0.0.0.0")) {
+    const isLocal = host.includes("localhost") || host.includes("127.0.0.1");
+    const defaultProto = isLocal ? "http" : "https";
+    const proto = req.headers.get("x-forwarded-proto") || defaultProto;
+    return `${proto}://${host}`;
+  }
+  return "https://admissionx.com";
+}
+
 export async function POST(req: NextRequest) {
   let body: {
     student_id?: number | string;
@@ -111,7 +130,7 @@ export async function POST(req: NextRequest) {
   const txnid = `ADX-TXN-${Date.now()}-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
 
   // Configure URLs
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || req.nextUrl.origin;
+  const origin = getRequestOrigin(req);
   const surl = `${origin}/api/student/payment/callback`;
   const furl = `${origin}/api/student/payment/callback`;
 
