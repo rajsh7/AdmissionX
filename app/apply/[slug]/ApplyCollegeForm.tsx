@@ -457,6 +457,7 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
             collegeprofile_id: college.slug,
             college_name: college.collegeName,
             documents: docs,
+            fees: 499, // Pass the standard application fee of 499
             personal_info: {
               name: form.personal.fullName,
               email: form.personal.email,
@@ -490,6 +491,35 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
         if (!res.ok) {
           setError(data.error || "Submission failed. Please try again.");
           return;
+        }
+
+        // If the application has a fee, initiate Easebuzz payment checkout link
+        if (data.application?.fees > 0) {
+          try {
+            const payRes = await fetch("/api/student/payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                student_id: data.application.student_id,
+                application_id: data.application.id,
+                amount: data.application.fees,
+              }),
+            });
+            const payData = await payRes.json();
+            if (payRes.ok && payData.payment_url) {
+              localStorage.removeItem(storageKey);
+              // Redirect directly to the Easebuzz hosted checkout portal
+              window.location.href = payData.payment_url;
+              return;
+            } else {
+              setError(payData.error || "Payment initiation failed. Please try again.");
+              return;
+            }
+          } catch (payErr) {
+            console.error("[Payment Initiate Error]:", payErr);
+            setError("Failed to redirect to payment gateway. Please check your network.");
+            return;
+          }
         }
 
         setCompleted(true);
