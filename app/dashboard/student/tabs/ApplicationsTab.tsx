@@ -107,7 +107,7 @@ function AppCard({ app, user }: { app: Application; user: Props["user"] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           student_id: user.id,
-          application_id: app.id,
+          application_id: app.id || (app as any)._id,
           amount: app.fees,
         }),
       });
