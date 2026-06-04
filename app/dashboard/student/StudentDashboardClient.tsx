@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Header from "../../components/Header";
 import OverviewTab from "./tabs/OverviewTab";
 import ProfileTab from "./tabs/ProfileTab";
 import AddressTab from "./tabs/AddressTab";
@@ -134,72 +135,18 @@ export default function StudentDashboardClient({ user, activated }: Props) {
 
 
   return (
-    <div className="flex flex-col h-screen bg-[#f1f2f6] overflow-hidden font-sans">
-      {/* HEADER */}
-      <header className="h-[70px] sm:h-[80px] bg-white border-b border-gray-200 px-4 sm:px-8 flex items-center justify-between shrink-0 shadow-sm z-50">
-        <div className="flex items-center gap-6">
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-[#333] hover:bg-slate-100 p-1.5 rounded-lg transition-colors">
-            <span className="material-symbols-outlined text-[28px]">menu</span>
-          </button>
-          <Link href="/" className="shrink-0">
-            <img src="/admissionx-logo.png" alt="AdmissionX logo" className="h-8 w-auto object-contain" />
-          </Link>
-        </div>
+    <div className="min-h-screen bg-[#f1f2f6] font-sans flex flex-col">
+      <Header theme="light" />
 
-        <div className="ml-auto flex items-center gap-10">
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
-            {[
-              { label: "Home", href: "/" },
-              { label: "Colleges", href: "/top-colleges" },
-              { label: "Top University", href: "/top-university" },
-              { label: "Top Courses", href: "/careers-courses" },
-              { label: "Study Abroad", href: "/study-abroad" },
-              { label: "More", href: "#", hasSub: true },
-            ].map((link) => (
-              <Link key={link.label} href={link.href}
-                className="flex items-center gap-1 px-4 py-2 text-[16px] font-normal text-slate-700 hover:text-primary transition-colors whitespace-nowrap">
-                {link.label}
-                {link.hasSub && <span className="material-symbols-outlined text-[18px] text-slate-300">expand_more</span>}
-              </Link>
-            ))}
-          </nav>
+      {/* Floating mobile sidebar drawer toggle button */}
+      <button
+        onClick={() => setSidebarOpen(true)}
+        className="lg:hidden fixed bottom-20 right-4 z-40 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-red-200 active:scale-95 transition-all"
+      >
+        <span className="material-symbols-outlined text-[24px]">menu</span>
+      </button>
 
-          <div className="flex items-center relative">
-            <button onClick={() => setShowAccountMenu(p => !p)}
-              className="flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-2.5 rounded-[10px] bg-primary text-white hover:bg-primary-dark transition-all shadow-lg shadow-primary/10 active:scale-95">
-              <span className="material-symbols-outlined text-[18px]">account_circle</span>
-              <span className="hidden sm:inline text-[14px] font-normal">{user?.name?.split(" ")[0] ?? "Account"}</span>
-              <span className="material-symbols-outlined text-[16px] text-white/70">expand_more</span>
-            </button>
-            {showAccountMenu && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowAccountMenu(false)} />
-                <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
-                  <div className="px-4 py-3 border-b border-gray-50">
-                    <p className="text-[13px] font-bold text-[#222] truncate">{user?.name}</p>
-                    <p className="text-[11px] text-gray-400 truncate">{user?.email}</p>
-                  </div>
-                  <button onClick={() => { navigate("account-details"); setShowAccountMenu(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-gray-600 hover:bg-gray-50 transition-colors">
-                    <span className="material-symbols-outlined text-[18px]">manage_accounts</span>My Profile
-                  </button>
-                  <button onClick={() => { navigate("account-settings"); setShowAccountMenu(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-gray-600 hover:bg-gray-50 transition-colors">
-                    <span className="material-symbols-outlined text-[18px]">settings</span>Settings
-                  </button>
-                  <div className="border-t border-gray-50" />
-                  <button onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 transition-colors">
-                    <span className="material-symbols-outlined text-[18px]">logout</span>Sign Out
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
-
-      <div className="flex flex-1 min-h-0 overflow-hidden relative">
+      <div className="flex flex-1 pt-[58px] lg:pt-[96px] h-[calc(100vh-58px)] lg:h-[calc(100vh-96px)] overflow-hidden relative">
         {showActivatedBanner && (
           <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-center gap-3 px-6 py-3.5 bg-emerald-500 text-white text-sm font-semibold shadow-md">
             <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
