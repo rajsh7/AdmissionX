@@ -131,84 +131,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
     }
   }
 
-  function SidebarContent() {
-    const MENU_ITEMS: NavItem[] = [
-      { id: "overview",          label: "Dashboard",                  icon: "bar_chart"    },
-      { id: "account-details",   label: "Student Details",            icon: "person"       },
-      { id: "ai-recommend",      label: "AI Recommendations",         icon: "auto_awesome" },
-      { id: "app-all",           label: "Application",                icon: "description"  },
-      { id: "queries-all",       label: "Queries",                    icon: "forum"        },
-      { id: "bookmark-colleges", label: "Bookmarks",                  icon: "bookmarks"    },
-      { id: "qa-questions",      label: "Question | Answer | Comment",icon: "rate_review"  },
-      { id: "counselling-forms", label: "Counseling Forms",           icon: "assignment"   },
-      { id: "help-desk",         label: "Help Desk",                  icon: "help_center"  },
-    ];
 
-    return (
-      <div className="flex flex-col h-full bg-[#333333] text-white font-sans">
-        {/* Profile Card */}
-        <div className="p-5 space-y-4">
-          <div className="bg-[#333333] rounded-xl overflow-hidden shadow-2xl p-4 flex flex-col items-center">
-            <div className={`w-28 h-28 rounded-full flex items-center justify-center mb-4 overflow-hidden ${user?.avatar ? "" : "border-[8px] border-[#f5f5f5] bg-white"}`}>
-              {user?.avatar ? (
-                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-              ) : (
-                <span className="material-symbols-outlined text-[54px] text-[#ddd]">photo_camera</span>
-              )}
-            </div>
-            <p className="text-[13px] font-semibold text-[#555] text-center leading-tight mb-1">
-              {user?.name ?? "Student"}
-            </p>
-            <p className="text-[11px] text-gray-400 text-center truncate max-w-full px-2">
-              {user?.email ?? ""}
-            </p>
-          </div>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploadingAvatar}
-            className="w-full py-2.5 bg-[#8b8b8b] text-white text-[12px] font-medium rounded-[6px] hover:bg-[#777] transition-colors uppercase tracking-wider shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {uploadingAvatar ? "Uploading..." : "Upload New Profile image"}
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleAvatarUpload}
-            className="hidden"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-          />
-        </div>
-
-        {/* Main Menu Label */}
-        <div className="px-6 py-4 mt-2">
-          <p className="text-[11px] font-medium text-white/40 uppercase tracking-[1.5px]">MAIN MENU</p>
-        </div>
-
-        {/* Nav List */}
-        <nav className="flex-1 px-0 space-y-0 overflow-y-auto no-scrollbar">
-          {MENU_ITEMS.map((item) => {
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => navigate(item.id)}
-                className={`w-full flex items-center gap-4 px-6 py-4 text-[14px] font-medium transition-all border-l-[4px] ${
-                  isActive
-                    ? "bg-[#e31e24] text-white border-white"
-                    : "text-white/70 hover:bg-white/5 hover:text-white border-transparent"
-                }`}
-              >
-                <span className={`material-symbols-outlined text-[20px] ${isActive ? "text-white" : "text-white/60"}`}>
-                  {item.icon}
-                </span>
-                <span className="truncate">{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col h-screen bg-[#f1f2f6] overflow-hidden font-sans">
@@ -292,7 +215,14 @@ export default function StudentDashboardClient({ user, activated }: Props) {
         )}
 
         <aside className={`fixed inset-y-0 left-0 z-[70] lg:static w-[280px] h-full shadow-2xl lg:shadow-none transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
-          <SidebarContent />
+          <SidebarContent
+            user={user}
+            activeTab={activeTab}
+            uploadingAvatar={uploadingAvatar}
+            fileInputRef={fileInputRef}
+            handleAvatarUpload={handleAvatarUpload}
+            navigate={navigate}
+          />
         </aside>
 
         <div className="flex-1 min-w-0 student-dashboard-scroll bg-[#f8f9fa] relative pb-[80px] lg:pb-0">
@@ -361,6 +291,101 @@ export default function StudentDashboardClient({ user, activated }: Props) {
       <div className="lg:hidden">
         <MobileBottomNav activeTab={activeTab} navigate={navigate} />
       </div>
+    </div>
+  );
+}
+
+interface SidebarContentProps {
+  user: Props["user"];
+  activeTab: TabId;
+  uploadingAvatar: boolean;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  handleAvatarUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
+  navigate: (id: TabId) => void;
+}
+
+function SidebarContent({
+  user,
+  activeTab,
+  uploadingAvatar,
+  fileInputRef,
+  handleAvatarUpload,
+  navigate,
+}: SidebarContentProps) {
+  const MENU_ITEMS: NavItem[] = [
+    { id: "overview",          label: "Dashboard",                  icon: "bar_chart"    },
+    { id: "account-details",   label: "Student Details",            icon: "person"       },
+    { id: "ai-recommend",      label: "AI Recommendations",         icon: "auto_awesome" },
+    { id: "app-all",           label: "Application",                icon: "description"  },
+    { id: "queries-all",       label: "Queries",                    icon: "forum"        },
+    { id: "bookmark-colleges", label: "Bookmarks",                  icon: "bookmarks"    },
+    { id: "qa-questions",      label: "Question | Answer | Comment",icon: "rate_review"  },
+    { id: "counselling-forms", label: "Counseling Forms",           icon: "assignment"   },
+    { id: "help-desk",         label: "Help Desk",                  icon: "help_center"  },
+  ];
+
+  return (
+    <div className="flex flex-col h-full bg-[#333333] text-white font-sans">
+      {/* Profile Card */}
+      <div className="p-5 space-y-4">
+        <div className="bg-[#333333] rounded-xl overflow-hidden shadow-2xl p-4 flex flex-col items-center">
+          <div className={`w-28 h-28 rounded-full flex items-center justify-center mb-4 overflow-hidden ${user?.avatar ? "" : "border-[8px] border-[#f5f5f5] bg-white"}`}>
+            {user?.avatar ? (
+              <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            ) : (
+              <span className="material-symbols-outlined text-[54px] text-[#ddd]">photo_camera</span>
+            )}
+          </div>
+          <p className="text-[13px] font-semibold text-white text-center leading-tight mb-1">
+            {user?.name ?? "Student"}
+          </p>
+          <p className="text-[11px] text-gray-400 text-center truncate max-w-full px-2">
+            {user?.email ?? ""}
+          </p>
+        </div>
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploadingAvatar}
+          className="w-full py-2.5 bg-[#8b8b8b] text-white text-[12px] font-medium rounded-[6px] hover:bg-[#777] transition-colors uppercase tracking-wider shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          {uploadingAvatar ? "Uploading..." : "Upload New Profile image"}
+        </button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleAvatarUpload}
+          className="hidden"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+        />
+      </div>
+
+      {/* Main Menu Label */}
+      <div className="px-6 py-4 mt-2">
+        <p className="text-[11px] font-medium text-white/40 uppercase tracking-[1.5px]">MAIN MENU</p>
+      </div>
+
+      {/* Nav List */}
+      <nav className="flex-1 px-0 space-y-0 overflow-y-auto no-scrollbar">
+        {MENU_ITEMS.map((item) => {
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => navigate(item.id)}
+              className={`w-full flex items-center gap-4 px-6 py-4 text-[14px] font-medium transition-all border-l-[4px] ${
+                isActive
+                  ? "bg-[#e31e24] text-white border-white"
+                  : "text-white/70 hover:bg-white/5 hover:text-white border-transparent"
+              }`}
+            >
+              <span className={`material-symbols-outlined text-[20px] ${isActive ? "text-white" : "text-white/60"}`}>
+                {item.icon}
+              </span>
+              <span className="truncate">{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
