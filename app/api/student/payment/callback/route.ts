@@ -5,6 +5,7 @@ import { ObjectId } from "mongodb";
 import { sendPaymentSuccessEmail, sendPaymentFailedEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || req.url;
   try {
     const formData = await req.formData();
     const data = Object.fromEntries(formData.entries());
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
         string: computedString,
       });
 
-      const redirectUrl = new URL(`/dashboard/student/${studentId || "unknown"}`, req.url);
+      const redirectUrl = new URL(`/dashboard/student/${studentId || "unknown"}`, baseUrl);
       redirectUrl.searchParams.set("tab", "app-all");
       redirectUrl.searchParams.set("payment", "failed");
       redirectUrl.searchParams.set("reason", "Cryptographic signature validation failed (Possible tampering).");
@@ -94,7 +95,7 @@ export async function POST(req: NextRequest) {
       });
 
       // 3. Redirect back to the student application tab with success parameter
-      const redirectUrl = new URL(`/dashboard/student/${studentId}`, req.url);
+      const redirectUrl = new URL(`/dashboard/student/${studentId}`, baseUrl);
       redirectUrl.searchParams.set("tab", "app-all");
       redirectUrl.searchParams.set("payment", "success");
       redirectUrl.searchParams.set("txnid", txnid);
@@ -127,7 +128,7 @@ export async function POST(req: NextRequest) {
       });
 
       // 3. Redirect back to student dashboard with error reason
-      const redirectUrl = new URL(`/dashboard/student/${studentId}`, req.url);
+      const redirectUrl = new URL(`/dashboard/student/${studentId}`, baseUrl);
       redirectUrl.searchParams.set("tab", "app-all");
       redirectUrl.searchParams.set("payment", "failed");
       redirectUrl.searchParams.set("reason", errorMessage);
