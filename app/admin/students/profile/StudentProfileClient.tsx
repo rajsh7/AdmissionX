@@ -43,6 +43,8 @@ interface StudentProfileClientProps {
   selectedParentsName?: string;
   createProfile: (data: FormData) => Promise<void>;
   deleteProfile: (id: number) => Promise<void>;
+  bookmarkedStudentIds?: string[];
+  toggleBookmark?: (studentId: string, studentName: string) => Promise<void>;
 }
 
 export default function StudentProfileClient({
@@ -58,6 +60,8 @@ export default function StudentProfileClient({
   selectedParentsName = "",
   createProfile,
   deleteProfile,
+  bookmarkedStudentIds = [],
+  toggleBookmark,
 }: StudentProfileClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(
@@ -231,12 +235,12 @@ export default function StudentProfileClient({
             <table className="w-full text-left border-collapse table-fixed min-w-[900px]">
               <colgroup>
               <col style={{ width: "4%" }} />
-              <col style={{ width: "28%" }} />
+              <col style={{ width: "26%" }} />
               <col style={{ width: "14%" }} />
               <col style={{ width: "10%" }} />
               <col style={{ width: "14%" }} />
               <col style={{ width: "18%" }} />
-              <col style={{ width: "12%" }} />
+              <col style={{ width: "14%" }} />
             </colgroup>
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
@@ -311,6 +315,28 @@ export default function StudentProfileClient({
                   </td>
                   <td className="px-3 py-2.5">
                     <div className="flex flex-row items-center justify-end gap-1.5">
+                      {toggleBookmark && (
+                        (() => {
+                          const isBookmarked = bookmarkedStudentIds.includes(String(profile.users_id));
+                          return (
+                            <button
+                              onClick={async () => {
+                                await toggleBookmark(String(profile.users_id), profile.student_name);
+                              }}
+                              className={`flex items-center justify-center p-1.5 rounded-lg border shadow-sm transition-all ${
+                                isBookmarked
+                                  ? "bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-100"
+                                  : "bg-white border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+                              }`}
+                              title={isBookmarked ? "Remove bookmark" : "Bookmark student"}
+                            >
+                              <span className="material-symbols-outlined text-[15px]" style={{ fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0" }}>
+                                bookmark
+                              </span>
+                            </button>
+                          );
+                        })()
+                      )}
                       <Link
                         href={`/admin/students/profile/${profile.id}`}
                         className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-[11px] font-bold hover:bg-slate-100 transition-colors shadow-sm"
