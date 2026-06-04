@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
   const txnid = `ADX-TXN-${Date.now()}-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
 
   // Configure URLs
-  const origin = req.nextUrl.origin;
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || req.nextUrl.origin;
   const surl = `${origin}/api/student/payment/callback`;
   const furl = `${origin}/api/student/payment/callback`;
 
