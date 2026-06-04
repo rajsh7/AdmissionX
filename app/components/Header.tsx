@@ -471,18 +471,22 @@ function SecondNav() {
   const barRef = useRef<HTMLDivElement>(null);
   const [barRect, setBarRect] = useState<{ left: number; right: number; bottom: number } | null>(null);
 
-  useEffect(() => {
-    const update = () => {
-      if (barRef.current) {
-        const r = barRef.current.getBoundingClientRect();
-        setBarRect({ left: r.left, right: r.right, bottom: r.bottom });
-      }
-    };
-    update();
-    window.addEventListener('resize', update);
-    window.addEventListener('scroll', update);
-    return () => { window.removeEventListener('resize', update); window.removeEventListener('scroll', update); };
+  const updateRect = useCallback(() => {
+    if (barRef.current) {
+      const r = barRef.current.getBoundingClientRect();
+      setBarRect({ left: r.left, right: r.right, bottom: r.bottom });
+    }
   }, []);
+
+  useEffect(() => {
+    updateRect();
+    window.addEventListener('resize', updateRect);
+    window.addEventListener('scroll', updateRect);
+    return () => {
+      window.removeEventListener('resize', updateRect);
+      window.removeEventListener('scroll', updateRect);
+    };
+  }, [updateRect]);
 
   return (
     <div className="home-page-shell flex bg-white justify-end ">
@@ -495,7 +499,10 @@ function SecondNav() {
             <div
               key={item.label}
               className="relative"
-              onMouseEnter={() => setHoveredItem(item.label)}
+              onMouseEnter={() => {
+                updateRect();
+                setHoveredItem(item.label);
+              }}
               onMouseLeave={() => { setHoveredItem(null); setHoveredCat(p => ({ ...p, [item.label]: item.mega?.[0]?.label ?? "" })); }}
             >
               <Link
@@ -512,7 +519,7 @@ function SecondNav() {
 
               {item.mega && isHov && barRect && (
                 <div
-                  className="fixed z-50"
+                  className="fixed z-[100]"
                   style={{ top: barRect.bottom, left: barRect.left, width: barRect.right - barRect.left }}
                 >
                   <div className="bg-white rounded-[12px] shadow-2xl shadow-black/10 border border-slate-100 overflow-hidden flex min-h-[200px]">

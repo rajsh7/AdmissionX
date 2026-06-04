@@ -47,6 +47,7 @@ interface ProfileSummary {
   stream: string;
   city: string | null;
   hasMarks: boolean;
+  hasMarksheet?: boolean;
 }
 
 const IMAGE_PROXY = (url: string) => `/api/image-proxy?url=${encodeURIComponent(url)}`;
@@ -207,7 +208,7 @@ export default function AIRecommendTab({ user, navigate }: Props) {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`/api/ai/recommend/${user.id}`);
+      const res = await fetch(`/api/ai/recommend/${user.id}`, { cache: "no-store" });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Failed to load recommendations"); return; }
       setRecommendations(data.recommendations ?? []);
@@ -253,12 +254,30 @@ export default function AIRecommendTab({ user, navigate }: Props) {
 
       {/* Profile summary banner */}
       {profileSummary && (
-        <div className={`rounded-2xl p-5 flex flex-wrap items-center gap-4 ${profileSummary.hasMarks ? "bg-gradient-to-r from-[#FF3C3C]/5 to-orange-50 border border-[#FF3C3C]/10" : "bg-amber-50 border border-amber-200"}`}>
+        <div className={`rounded-2xl p-5 flex flex-wrap items-center gap-4 ${
+          (profileSummary.hasMarks && profileSummary.hasMarksheet) 
+            ? "bg-gradient-to-r from-[#FF3C3C]/5 to-orange-50 border border-[#FF3C3C]/10" 
+            : "bg-amber-50 border border-amber-200"
+        }`}>
           <span className="material-symbols-outlined text-[28px] text-[#FF3C3C]" style={{ fontVariationSettings: "'FILL' 1" }}>
-            {profileSummary.hasMarks ? "school" : "warning"}
+            {(profileSummary.hasMarks && profileSummary.hasMarksheet) ? "school" : "warning"}
           </span>
           <div className="flex-1 min-w-0">
-            {profileSummary.hasMarks ? (
+            {(!profileSummary.hasMarks) ? (
+              <>
+                <p className="text-[14px] font-bold text-amber-800">Add your academic marks for better recommendations</p>
+                <p className="text-[12px] text-amber-600 mt-0.5">
+                  Go to Academic Records and fill in your 10th / 12th details
+                </p>
+              </>
+            ) : (!profileSummary.hasMarksheet) ? (
+              <>
+                <p className="text-[14px] font-bold text-amber-800">Upload your academic marksheets for recommendations</p>
+                <p className="text-[12px] text-amber-600 mt-0.5">
+                  Go to Documents & Certificates to upload your 10th & 12th marksheets
+                </p>
+              </>
+            ) : (
               <>
                 <p className="text-[14px] font-bold text-[#1a1a1a]">
                   Based on your {profileSummary.pct12}% in {profileSummary.stream}
@@ -268,19 +287,18 @@ export default function AIRecommendTab({ user, navigate }: Props) {
                   Our AI has analysed thousands of colleges to find your best matches
                 </p>
               </>
-            ) : (
-              <>
-                <p className="text-[14px] font-bold text-amber-800">Add your academic marks for better recommendations</p>
-                <p className="text-[12px] text-amber-600 mt-0.5">
-                  Go to Academic Records and fill in your 10th / 12th details
-                </p>
-              </>
             )}
           </div>
           {!profileSummary.hasMarks && navigate && (
             <button onClick={() => navigate("academic-details")}
               className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[12px] font-bold rounded-xl transition-colors whitespace-nowrap">
               Add Marks
+            </button>
+          )}
+          {profileSummary.hasMarks && !profileSummary.hasMarksheet && navigate && (
+            <button onClick={() => navigate("academic-certificates")}
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[12px] font-bold rounded-xl transition-colors whitespace-nowrap">
+              Upload Marksheets
             </button>
           )}
         </div>
@@ -315,16 +333,24 @@ export default function AIRecommendTab({ user, navigate }: Props) {
       ) : !loading && !error && (
         <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-2xl border border-gray-100">
           <div className="w-20 h-20 bg-[#FF3C3C]/5 rounded-full flex items-center justify-center mb-4">
-            <span className="material-symbols-outlined text-[40px] text-[#FF3C3C]/40">school</span>
+            <span className="material-symbols-outlined text-[40px] text-[#FF3C3C]/40">
+              {(!profileSummary || !profileSummary.hasMarks) ? "school" : "upload_file"}
+            </span>
           </div>
-          <h3 className="text-[18px] font-bold text-[#333] mb-2">No recommendations yet</h3>
+          <h3 className="text-[18px] font-bold text-[#333] mb-2">
+            {(!profileSummary || !profileSummary.hasMarks) ? "No recommendations yet" : "Upload Marksheets to View Matches"}
+          </h3>
           <p className="text-[13px] text-gray-400 max-w-xs mb-6">
-            Fill in your academic marks and stream to get personalised college recommendations.
+            {(!profileSummary || !profileSummary.hasMarks)
+              ? "Fill in your academic marks and stream to get personalised college recommendations."
+              : "Upload your 10th & 12th marksheets in documents to unlock recommendations."}
           </p>
           {navigate && (
-            <button onClick={() => navigate("academic-details")}
-              className="px-8 py-3 bg-[#FF3C3C] text-white text-[13px] font-bold rounded-xl hover:bg-[#e63636] transition-colors shadow-lg shadow-red-100">
-              Add Academic Details
+            <button
+              onClick={() => navigate((!profileSummary || !profileSummary.hasMarks) ? "academic-details" : "academic-certificates")}
+              className="px-8 py-3 bg-[#FF3C3C] text-white text-[13px] font-bold rounded-xl hover:bg-[#e63636] transition-colors shadow-lg shadow-red-100"
+            >
+              {(!profileSummary || !profileSummary.hasMarks) ? "Add Academic Details" : "Upload Academic Documents"}
             </button>
           )}
         </div>

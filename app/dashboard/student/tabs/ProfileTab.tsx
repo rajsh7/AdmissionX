@@ -257,16 +257,41 @@ const EMPTY_MARKS: Marks = {
   grad_university: "", grad_college: "", grad_program: "", grad_year: "", grad_percent: "", grad_cgpa: "",
 };
 
+interface DocType {
+  id: string;
+  name: string;
+  file_path: string;
+  category: string;
+}
+
 function AcademicInner({ user, showToast }: { user: Props["user"]; showToast: (m: string) => void }) {
   const [marks, setMarks] = useState<Marks>({ ...EMPTY_MARKS });
   const [saving, setSaving] = useState<"class10" | "class12" | "grad" | false>(false);
+  const [docs, setDocs] = useState<DocType[]>([]);
+  const [uploadingDoc, setUploadingDoc] = useState<string | false>(false);
+
+  const loadDocs = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      const res = await fetch(`/api/student/${user.id}/documents`);
+      const d = await res.json();
+      setDocs(d.documents ?? []);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [user?.id]);
 
   const load = useCallback(async () => {
     if (!user?.id) return;
-    const res = await fetch(`/api/student/${user.id}/marks`);
-    const d = await res.json();
-    setMarks({ ...EMPTY_MARKS, ...(d.marks ?? {}) });
-  }, [user?.id]);
+    try {
+      const res = await fetch(`/api/student/${user.id}/marks`);
+      const d = await res.json();
+      setMarks({ ...EMPTY_MARKS, ...(d.marks ?? {}) });
+      await loadDocs();
+    } catch (e) {
+      console.error(e);
+    }
+  }, [user?.id, loadDocs]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -294,6 +319,46 @@ function AcademicInner({ user, showToast }: { user: Props["user"]; showToast: (m
     }
   }
 
+  async function handleUploadDoc(file: File, category: string) {
+    if (!user?.id) return;
+    setUploadingDoc(category);
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("name", file.name);
+    fd.append("category", category);
+    try {
+      const res = await fetch(`/api/student/${user.id}/documents`, { method: "POST", body: fd });
+      if (res.ok) {
+        showToast("Marksheet uploaded successfully!");
+        await loadDocs();
+      } else {
+        const d = await res.json();
+        showToast(d.error || "Upload failed");
+      }
+    } catch {
+      showToast("Upload failed");
+    } finally {
+      setUploadingDoc(false);
+    }
+  }
+
+  async function handleDeleteDoc(docId: string) {
+    if (!user?.id) return;
+    if (!confirm("Delete this document?")) return;
+    try {
+      const res = await fetch(`/api/student/${user.id}/documents?docId=${docId}`, { method: "DELETE" });
+      if (res.ok) {
+        showToast("Document deleted successfully!");
+        await loadDocs();
+      }
+    } catch {
+      showToast("Failed to delete document");
+    }
+  }
+
+  const doc10 = docs.find(d => d.category === "marksheet_10");
+  const doc12 = docs.find(d => d.category === "marksheet_12");
+
   return (
     <form onSubmit={e => e.preventDefault()} className="space-y-6">
       {/* Class 10 */}
@@ -309,6 +374,46 @@ function AcademicInner({ user, showToast }: { user: Props["user"]; showToast: (m
           <AField  label="Total Marks" {...f("class10_total")} placeholder="e.g. 500" />
           <AField  label="Marks Obtained" {...f("class10_obtained")} placeholder="e.g. 425" />
         </div>
+
+        {/* Upload 10th Marksheet */}
+        <div className="border-t border-gray-100 pt-4 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-slate-400">upload_file</span>
+            <span className="text-[13px] font-semibold text-slate-700">Class 10th Marksheet:</span>
+            {doc10 ? (
+              <span className="text-emerald-600 text-[13px] font-semibold flex items-center gap-1">
+                <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                Uploaded ({doc10.name})
+              </span>
+            ) : (
+              <span className="text-amber-600 text-[13px] font-semibold flex items-center gap-1">
+                <span className="material-symbols-outlined text-[16px]">warning</span>
+                Not Uploaded
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            {doc10 ? (
+              <>
+                <a href={doc10.file_path} target="_blank" rel="noreferrer" className="text-blue-600 text-[12px] font-semibold hover:underline flex items-center gap-0.5">
+                  <span className="material-symbols-outlined text-[14px]">visibility</span> View
+                </a>
+                <button type="button" onClick={() => handleDeleteDoc(doc10.id)} className="text-rose-600 text-[12px] font-semibold hover:underline flex items-center gap-0.5">
+                  <span className="material-symbols-outlined text-[14px]">delete</span> Delete
+                </button>
+              </>
+            ) : (
+              <div className="flex items-center gap-2">
+                <input type="file" accept="image/*,.pdf" disabled={uploadingDoc === "marksheet_10"} onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleUploadDoc(file, "marksheet_10");
+                }} className="text-[12px] text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-[#e31e24]/5 file:text-[#e31e24] hover:file:bg-[#e31e24]/10" />
+                {uploadingDoc === "marksheet_10" && <span className="text-[11px] text-slate-400">Uploading...</span>}
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="flex justify-end pt-2">
           <button type="button" disabled={!!saving} onClick={() => handleSaveSection("class10")}
             className="px-6 py-2 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all disabled:opacity-50">
@@ -331,6 +436,46 @@ function AcademicInner({ user, showToast }: { user: Props["user"]; showToast: (m
           <AField  label="Total Marks" {...f("class12_total")} placeholder="e.g. 500" />
           <AField  label="Marks Obtained" {...f("class12_obtained")} placeholder="e.g. 450" />
         </div>
+
+        {/* Upload 12th Marksheet */}
+        <div className="border-t border-gray-100 pt-4 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-slate-400">upload_file</span>
+            <span className="text-[13px] font-semibold text-slate-700">Class 12th Marksheet:</span>
+            {doc12 ? (
+              <span className="text-emerald-600 text-[13px] font-semibold flex items-center gap-1">
+                <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                Uploaded ({doc12.name})
+              </span>
+            ) : (
+              <span className="text-amber-600 text-[13px] font-semibold flex items-center gap-1">
+                <span className="material-symbols-outlined text-[16px]">warning</span>
+                Not Uploaded
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            {doc12 ? (
+              <>
+                <a href={doc12.file_path} target="_blank" rel="noreferrer" className="text-blue-600 text-[12px] font-semibold hover:underline flex items-center gap-0.5">
+                  <span className="material-symbols-outlined text-[14px]">visibility</span> View
+                </a>
+                <button type="button" onClick={() => handleDeleteDoc(doc12.id)} className="text-rose-600 text-[12px] font-semibold hover:underline flex items-center gap-0.5">
+                  <span className="material-symbols-outlined text-[14px]">delete</span> Delete
+                </button>
+              </>
+            ) : (
+              <div className="flex items-center gap-2">
+                <input type="file" accept="image/*,.pdf" disabled={uploadingDoc === "marksheet_12"} onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleUploadDoc(file, "marksheet_12");
+                }} className="text-[12px] text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-[#e31e24]/5 file:text-[#e31e24] hover:file:bg-[#e31e24]/10" />
+                {uploadingDoc === "marksheet_12" && <span className="text-[11px] text-slate-400">Uploading...</span>}
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="flex justify-end pt-2">
           <button type="button" disabled={!!saving} onClick={() => handleSaveSection("class12")}
             className="px-6 py-2 bg-[#e31e24] text-white text-[13px] font-semibold rounded-lg hover:bg-[#c0191e] transition-all disabled:opacity-50">

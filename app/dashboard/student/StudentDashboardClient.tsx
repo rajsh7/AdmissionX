@@ -135,7 +135,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
 
 
   return (
-    <div className="min-h-screen bg-[#f1f2f6] font-sans flex flex-col">
+    <div className="flex flex-col h-screen bg-[#f1f2f6] overflow-hidden font-sans">
       <Header theme="light" />
 
       {/* Floating mobile sidebar drawer toggle button */}
@@ -146,7 +146,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
         <span className="material-symbols-outlined text-[24px]">menu</span>
       </button>
 
-      <div className="flex flex-1 pt-[58px] lg:pt-[96px] h-[calc(100vh-58px)] lg:h-[calc(100vh-96px)] overflow-hidden relative">
+      <div className="flex flex-1 mt-[58px] lg:mt-[96px] h-[calc(100vh-58px)] lg:h-[calc(100vh-96px)] overflow-hidden relative">
         {showActivatedBanner && (
           <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-center gap-3 px-6 py-3.5 bg-emerald-500 text-white text-sm font-semibold shadow-md">
             <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
@@ -161,7 +161,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
           <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm lg:hidden" onClick={() => setSidebarOpen(false)} />
         )}
 
-        <aside className={`fixed inset-y-0 left-0 z-[70] lg:static w-[280px] h-full shadow-2xl lg:shadow-none transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+        <aside className={`fixed inset-y-0 left-0 z-[70] lg:static w-[280px] h-full overflow-hidden shadow-2xl lg:shadow-none transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
           <SidebarContent
             user={user}
             activeTab={activeTab}
