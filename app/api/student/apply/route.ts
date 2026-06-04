@@ -101,19 +101,6 @@ export async function POST(req: NextRequest) {
   );
   if (collegeDoc) resolvedCollegeId = collegeDoc._id;
 
-  // Guard: one active application per college per student (except drafts)
-  const existing = await db.collection("applications").findOne({
-    studentId,
-    collegeId: resolvedCollegeId,
-    status: { $nin: ["rejected", "draft"] },
-  });
-  if (existing) {
-    return NextResponse.json(
-      { error: "You already have an active application for this college.", application_ref: existing.applicationRef },
-      { status: 409 }
-    );
-  }
-
   // Enrich college name
   let resolvedCollegeName = college_name?.trim() || null;
   if (!resolvedCollegeName) {
@@ -152,36 +139,90 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Generate unique ref
-  let applicationRef = generateRef();
-  for (let i = 0; i < 5; i++) {
-    const check = await db.collection("applications").findOne({ applicationRef });
-    if (!check) break;
-    applicationRef = generateRef();
-  }
-
-  const result = await db.collection("applications").insertOne({
-    applicationRef,
+  // Guard: one active application per college per student (except drafts)
+  const existing = await db.collection("applications").findOne({
     studentId,
     collegeId: resolvedCollegeId,
-    collegeName: resolvedCollegeName,
-    courseId: collegemaster_id ?? null,
-    courseName: resolvedCourseName,
-    degreeName: resolvedDegreeName,
-    streamName: resolvedStreamName,
-    fees: resolvedFees,
-    notes: notes ?? null,
-    personal_info: personal_info ?? null,
-    academic_info: academic_info ?? null,
-    payment_info: payment_info ?? null,
-    status: isDraft ? "draft" : "submitted",
-    createdAt: new Date(),
+    status: { $nin: ["rejected", "draft"] },
   });
 
-  if (documents && documents.length > 0) {
-    await db.collection("documents").insertMany(
-      documents.map((d) => ({ applicationId: result.insertedId, type: d.type, fileUrl: d.url }))
+  let targetId: any = null;
+  let finalRef = "";
+
+  if (existing) {
+    if (existing.payment_status === "paid") {
+      return NextResponse.json(
+        { error: "You already have an active application for this college.", application_ref: existing.applicationRef },
+        { status: 409 }
+      );
+    }
+    
+    // Unpaid application exists: update it instead of creating a new one
+    targetId = existing._id;
+    finalRef = existing.applicationRef;
+
+    await db.collection("applications").updateOne(
+      { _id: targetId },
+      {
+        $set: {
+          collegeId: resolvedCollegeId,
+          collegeName: resolvedCollegeName,
+          courseId: collegemaster_id ?? null,
+          courseName: resolvedCourseName,
+          degreeName: resolvedDegreeName,
+          streamName: resolvedStreamName,
+          fees: resolvedFees,
+          notes: notes ?? null,
+          personal_info: personal_info ?? null,
+          academic_info: academic_info ?? null,
+          payment_info: payment_info ?? null,
+          status: isDraft ? "draft" : "submitted",
+          updatedAt: new Date(),
+        }
+      }
     );
+
+    // Recreate documents reference
+    await db.collection("documents").deleteMany({ applicationId: targetId });
+    if (documents && documents.length > 0) {
+      await db.collection("documents").insertMany(
+        documents.map((d) => ({ applicationId: targetId, type: d.type, fileUrl: d.url }))
+      );
+    }
+  } else {
+    // Generate unique ref
+    let applicationRef = generateRef();
+    for (let i = 0; i < 5; i++) {
+      const check = await db.collection("applications").findOne({ applicationRef });
+      if (!check) break;
+      applicationRef = generateRef();
+    }
+    finalRef = applicationRef;
+
+    const result = await db.collection("applications").insertOne({
+      applicationRef: finalRef,
+      studentId,
+      collegeId: resolvedCollegeId,
+      collegeName: resolvedCollegeName,
+      courseId: collegemaster_id ?? null,
+      courseName: resolvedCourseName,
+      degreeName: resolvedDegreeName,
+      streamName: resolvedStreamName,
+      fees: resolvedFees,
+      notes: notes ?? null,
+      personal_info: personal_info ?? null,
+      academic_info: academic_info ?? null,
+      payment_info: payment_info ?? null,
+      status: isDraft ? "draft" : "submitted",
+      createdAt: new Date(),
+    });
+    targetId = result.insertedId;
+
+    if (documents && documents.length > 0) {
+      await db.collection("documents").insertMany(
+        documents.map((d) => ({ applicationId: targetId, type: d.type, fileUrl: d.url }))
+      );
+    }
   }
 
   // Save personal info back to profile so next application is pre-filled
@@ -219,13 +260,13 @@ export async function POST(req: NextRequest) {
         await sendApplicationStartedEmail(
           studentDoc.email,
           studentDoc.name || "Student",
-          applicationRef
+          finalRef
         );
       } else {
         await sendApplicationSubmittedEmail(
           studentDoc.email,
           studentDoc.name || "Student",
-          applicationRef,
+          finalRef,
           resolvedCourseName || "General Admission",
           resolvedCollegeName || "College"
         );
@@ -243,7 +284,7 @@ export async function POST(req: NextRequest) {
             collegeDoc[0].email,
             resolvedCollegeName || "Your Institution",
             studentDoc.name || "Student",
-            applicationRef,
+            finalRef,
             resolvedCourseName || "General Admission"
           );
         }
@@ -258,8 +299,8 @@ export async function POST(req: NextRequest) {
     success: true,
     message: isDraft ? "Application saved as draft." : "Application submitted successfully.",
     application: {
-      id: result.insertedId,
-      application_ref: applicationRef,
+      id: targetId,
+      application_ref: finalRef,
       student_id: studentId,
       college_name: resolvedCollegeName,
       course_name: resolvedCourseName,
