@@ -91,9 +91,42 @@ function DocBadge({ doc }: { doc: DocItem }) {
   );
 }
 
-function AppCard({ app }: { app: Application }) {
+function AppCard({ app, user }: { app: Application; user: Props["user"] }) {
   const [expanded, setExpanded] = useState(false);
+  const [payLoading, setPayLoading] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
   const hasDocs = app.documents && app.documents.length > 0;
+
+  async function handlePayNow() {
+    if (!user?.id) return;
+    setPayLoading(true);
+    setPayError(null);
+    try {
+      const res = await fetch("/api/student/payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          student_id: user.id,
+          application_id: app.id,
+          amount: app.fees,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPayError(data.error ?? "Payment initiation failed.");
+        return;
+      }
+      if (data.payment_url) {
+        window.location.href = data.payment_url;
+      } else {
+        setPayError("Failed to resolve checkout URL.");
+      }
+    } catch {
+      setPayError("Network error. Please try again.");
+    } finally {
+      setPayLoading(false);
+    }
+  }
 
   return (
     <div className="bg-white rounded-[12px] border-2 border-gray-100 hover:border-[#e31e24]/20 transition-all group overflow-hidden">
@@ -128,6 +161,23 @@ function AppCard({ app }: { app: Application }) {
             <p className="text-[10px] font-semibold text-gray-300 uppercase tracking-widest">Applied On</p>
             <p className="text-[13px] font-semibold text-[#333]">{app.submittedOn || "—"}</p>
           </div>
+          {app.fees > 0 && (
+            <>
+              <div className="space-y-1">
+                <p className="text-[10px] font-semibold text-gray-300 uppercase tracking-widest">Payment Status</p>
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold ${app.paymentClass}`}>
+                  <span className="material-symbols-outlined text-[14px]">{app.paymentIcon}</span>
+                  {app.paymentLabel}
+                </span>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-semibold text-gray-300 uppercase tracking-widest">Transaction ID</p>
+                <p className="text-[12px] font-mono font-semibold text-[#555] truncate max-w-[130px]" title={app.transaction_id || "N/A"}>
+                  {app.transaction_id || "—"}
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Doc count pill */}
@@ -143,14 +193,42 @@ function AppCard({ app }: { app: Application }) {
             <span className="text-[10px] font-semibold text-gray-300 uppercase tracking-widest">Application Fee</span>
             <span className="text-[16px] font-bold text-[#333]">₹{app.fees.toLocaleString("en-IN")}</span>
           </div>
-          <button
-            onClick={() => setExpanded(p => !p)}
-            className="px-5 py-2.5 bg-[#1a1a1a] text-white text-[12px] font-bold uppercase tracking-widest rounded-lg hover:bg-black transition-all flex items-center gap-1.5"
-          >
-            {expanded ? "Hide Details" : "View Details"}
-            <span className="material-symbols-outlined text-[16px]">{expanded ? "expand_less" : "expand_more"}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            {app.fees > 0 && (app.payment_status === "failed" || app.payment_status === "pending") && (
+              <button
+                onClick={handlePayNow}
+                disabled={payLoading}
+                className="px-4 py-2.5 bg-emerald-600 text-white text-[12px] font-bold uppercase tracking-widest rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-all flex items-center gap-1.5 shadow-sm"
+              >
+                {payLoading ? (
+                  <>
+                    <span className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent inline-block"></span>
+                    <span>Processing</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-[16px]">credit_card</span>
+                    <span>Pay Now</span>
+                  </>
+                )}
+              </button>
+            )}
+            <button
+              onClick={() => setExpanded(p => !p)}
+              className="px-4 py-2.5 bg-[#1a1a1a] text-white text-[12px] font-bold uppercase tracking-widest rounded-lg hover:bg-black transition-all flex items-center gap-1.5"
+            >
+              {expanded ? "Hide Details" : "View Details"}
+              <span className="material-symbols-outlined text-[16px]">{expanded ? "expand_less" : "expand_more"}</span>
+            </button>
+          </div>
         </div>
+
+        {payError && (
+          <div className="mt-3 text-[12px] font-semibold text-red-600 bg-red-50 px-3 py-2 rounded-lg flex items-center gap-1.5 animate-in fade-in duration-300">
+            <span className="material-symbols-outlined text-[16px]">error</span>
+            <span>{payError}</span>
+          </div>
+        )}
       </div>
 
       {/* Expanded Details */}
@@ -262,7 +340,7 @@ export default function ApplicationsTab({ user }: Props) {
 
       {applications.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-          {applications.map(app => <AppCard key={String(app.id)} app={app} />)}
+          {applications.map(app => <AppCard key={String(app.id)} app={app} user={user} />)}
         </div>
       ) : (
         <div className="bg-white rounded-[10px] border border-gray-100 flex flex-col items-center justify-center py-32 text-center">
