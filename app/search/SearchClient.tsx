@@ -137,6 +137,7 @@ export default function SearchClient({
   initFeesMax,
   initSort,
   initPage,
+  initType,
   entityName = "College",
   entityNamePlural = "Colleges",
   gridCols = 3,
@@ -203,6 +204,12 @@ export default function SearchClient({
       const nextPage = Math.floor(visibleCount / 12) + 1;
       params.set("page", String(nextPage));
       params.set("limit", "12");
+      if (!params.has("sort") && initSort) {
+        params.set("sort", initSort);
+      }
+      if (!params.has("type") && initType) {
+        params.set("type", initType);
+      }
       if (cityId && !params.get("city_id")) params.set("city_id", cityId);
       params.delete("city");
       const res = await fetch(`/api/search/colleges?${params.toString()}`);

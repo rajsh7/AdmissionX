@@ -148,22 +148,22 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
           </div>
         </div>
 
-        {/* Action Buttons & Fees */}
-        <div className="relative sm:absolute sm:bottom-4 sm:right-4 w-full sm:w-auto flex flex-col items-start sm:items-end justify-end gap-3 z-20 mt-4 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-0 border-neutral-100">
-          <div className="flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[13px] text-neutral-400">currency_rupee</span>
-                <span className="text-sm sm:text-xl text-neutral-500 font-medium"> Fees:</span>
-                {feesLabel ? (
-                  <>
-                    <span className="text-lg sm:text-xl font-black text-[#FF3C3C]">{feesLabel}</span>
-                    <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tight">/ year</span>
-                  </>
-                ) : (
-                  <span className="text-[12px] font-semibold text-slate-400 italic">Contact college</span>
-                )}
-          </div>
-         
-          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+        {/* Fees at right top side */}
+        <div className="relative sm:absolute sm:top-5 sm:right-8 z-20 flex items-center gap-1.5 mt-2 sm:mt-0">
+          <span className="material-symbols-outlined text-[13px] text-neutral-400">currency_rupee</span>
+          <span className="text-sm sm:text-xl text-neutral-500 font-medium"> Fees:</span>
+          {feesLabel ? (
+            <>
+              <span className="text-lg sm:text-xl font-black text-[#FF3C3C]">{feesLabel}</span>
+              <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tight">/ year</span>
+            </>
+          ) : (
+            <span className="text-[12px] font-semibold text-slate-400 italic">Contact college</span>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="relative sm:absolute sm:bottom-5 sm:right-8 w-full sm:w-auto flex gap-2 sm:gap-3 z-20 mt-4 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-0 border-neutral-100">
            {!isGovt && (
             <button
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleApply(slug); }}
@@ -182,8 +182,6 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
               </button>
             )}
           />
-         </div>
-          
         </div>
       </div>
 
