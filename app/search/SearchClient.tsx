@@ -69,6 +69,7 @@ const SORT_OPTIONS = [
   { value: "fees_high", label: "Highest Fees" },
   { value: "fees", label: "Lowest Fees" },
   { value: "rating", label: "Top Rated" },
+  { value: "name", label: "Alphabetical" },
 ];
 
 function getCollegeRenderKey(college: CollegeResult, index: number): string {
@@ -445,7 +446,7 @@ export default function SearchClient({
                           onChange={(e) => {
                             const val = e.target.value;
                             const p = new URLSearchParams(searchParams.toString());
-                            if (val === "rating") p.delete("sort");
+                            if (val === initSort) p.delete("sort");
                             else p.set("sort", val);
                             p.delete("page");
                             setLoading(true);

@@ -209,22 +209,48 @@ async function fetchTopUniversities(opts: {
     return { universities, total, totalPages: Math.ceil(total / limit) };
   }
 
-  const sortStage: Record<string, 1 | -1> = { rating: -1, totalRatingUser: -1 };
+  let total: number;
+  let topIds: any[];
 
-  const [total, idRows] = await Promise.all([
-    db.collection("collegeprofile").countDocuments(match),
-    db.collection("collegeprofile")
-      .find(match)
-      .sort(sortStage)
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .project({ _id: 1 })
-      .toArray(),
-  ]);
+  if (sort === "name") {
+    total = await db.collection("collegeprofile").countDocuments(match);
+    const namePipeline = [
+      { $match: match },
+      { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+      {
+        $addFields: {
+          sort_name: {
+            $toLower: {
+              $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"]
+            }
+          }
+        }
+      },
+      { $sort: { sort_name: 1 } },
+      { $skip: (page - 1) * limit },
+      { $limit: limit },
+      { $project: { _id: 1 } }
+    ];
+    const idRows = await db.collection("collegeprofile").aggregate(namePipeline).toArray();
+    topIds = idRows.map((r) => r._id);
+  } else {
+    const sortStage: Record<string, 1 | -1> = { rating: -1, totalRatingUser: -1 };
+    const [countResult, idRows] = await Promise.all([
+      db.collection("collegeprofile").countDocuments(match),
+      db.collection("collegeprofile")
+        .find(match)
+        .sort(sortStage)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .project({ _id: 1 })
+        .toArray(),
+    ]);
+    total = countResult;
+    topIds = idRows.map((r) => r._id);
+  }
 
-  if (!idRows.length) return { universities: [], total, totalPages: Math.ceil(total / limit) };
-
-  const topIds = idRows.map((r) => r._id);
+  if (!topIds.length) return { universities: [], total, totalPages: Math.ceil(total / limit) };
 
   const dataRows = await db.collection("collegeprofile").aggregate([
     { $match: { _id: { $in: topIds } } },
@@ -320,7 +346,7 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
   const cityId = getString("city_id");
   const stateId = getString("state_id");
   const feesMax = getString("fees_max");
-  const sort = getString("sort", "rating");
+  const sort = getString("sort", "name");
   const page = Math.max(1, parseInt(getString("page", "1")));
   const limit = 12;
 

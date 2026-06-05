@@ -118,11 +118,10 @@ const getHomePageData = unstable_cache(
           { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
           { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
           { $lookup: { from: "placement", localField: "id", foreignField: "collegeprofile_id", as: "placement", }, },
-          { $unwind: { path: "$placement", preserveNullAndEmptyArrays: true } },
           {
             $project: {
               _id: 0, slug: 1, name: { $cond: [ { $and: [{ $ne: ["$user.firstname", null] }, { $ne: [{ $trim: { input: "$user.firstname" } }, ""] }] }, { $trim: { input: "$user.firstname" } }, "$slug", ], },
-              location: "$registeredSortAddress", image: "$bannerimage", rating: 1, avgPackage: "$placement.ctcaverage",
+              location: "$registeredSortAddress", image: "$bannerimage", rating: 1, avgPackage: { $arrayElemAt: ["$placement.ctcaverage", 0] },
             },
           },
         ]).toArray() as Promise<(CollegeRow & { avgPackage?: string })[]>,

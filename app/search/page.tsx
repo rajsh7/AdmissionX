@@ -224,18 +224,44 @@ async function fetchColleges(opts: {
     total = countResult[0]?.total ?? 0;
     dataRows = pageRows;
   } else {
-    const preSortStage: Record<string, 1 | -1> =
-      effectiveSort === "ranking" ? { ranking: 1, rating: -1 }
-      : effectiveSort === "newest" ? { created_at: -1 }
-      : { rating: -1, totalRatingUser: -1 };
+    let topIds: any[];
 
-    const idRows = await db.collection("collegeprofile")
-      .find(match).sort(preSortStage).skip((page - 1) * limit).limit(limit).project({ _id: 1 }).toArray();
+    if (effectiveSort === "name") {
+      total = await db.collection("collegeprofile").countDocuments(match);
+      const namePipeline = [
+        { $match: match },
+        { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        {
+          $addFields: {
+            sort_name: {
+              $toLower: {
+                $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"]
+              }
+            }
+          }
+        },
+        { $sort: { sort_name: 1 } },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        { $project: { _id: 1 } }
+      ];
+      const idRows = await db.collection("collegeprofile").aggregate(namePipeline).toArray();
+      topIds = idRows.map((r: any) => r._id);
+    } else {
+      const preSortStage: Record<string, 1 | -1> =
+        effectiveSort === "ranking" ? { ranking: 1, rating: -1 }
+        : effectiveSort === "newest" ? { created_at: -1 }
+        : { rating: -1, totalRatingUser: -1 };
 
-    if (!idRows.length) return { colleges: [], total: await db.collection("collegeprofile").countDocuments(match), totalPages: 0 };
+      const idRows = await db.collection("collegeprofile")
+        .find(match).sort(preSortStage).skip((page - 1) * limit).limit(limit).project({ _id: 1 }).toArray();
 
-    const topIds = idRows.map((r: any) => r._id);
-    total = await db.collection("collegeprofile").countDocuments(match);
+      total = await db.collection("collegeprofile").countDocuments(match);
+      topIds = idRows.map((r: any) => r._id);
+    }
+
+    if (!topIds.length) return { colleges: [], total, totalPages: 0 };
 
     const pageRows = await db.collection("collegeprofile").aggregate([
       { $match: { _id: { $in: topIds } } },

@@ -215,7 +215,7 @@ export async function GET(req: NextRequest) {
         streams: { $setUnion: ["$fa.name", []] },
         min_fees: { $min: { $filter: { input: "$filtered_cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
         max_fees: { $max: { $filter: { input: "$filtered_cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
-        avg_package: "$placement.ctcaverage",
+        avg_package: { $arrayElemAt: ["$placement.ctcaverage", 0] },
       },
     };
 
@@ -244,7 +244,7 @@ export async function GET(req: NextRequest) {
           name: { $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"] },
           city_name: "$city.name",
           streams: { $setUnion: ["$fa.name", []] },
-          avg_package: "$placement.ctcaverage",
+          avg_package: { $arrayElemAt: ["$placement.ctcaverage", 0] },
         },
       };
 
@@ -259,7 +259,6 @@ export async function GET(req: NextRequest) {
           { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "city" } },
           { $unwind: { path: "$city", preserveNullAndEmptyArrays: true } },
           { $lookup: { from: "placement", localField: "id", foreignField: "collegeprofile_id", as: "placement" } },
-          { $unwind: { path: "$placement", preserveNullAndEmptyArrays: true } },
           { $lookup: { from: "functionalarea", localField: "cm.functionalarea_id", foreignField: "id", as: "fa" } },
           feesSortProjectStage,
         ]).toArray(),
@@ -285,7 +284,20 @@ export async function GET(req: NextRequest) {
         });
       }
 
+      if (effectiveSort === "name") {
+        basePipeline.push({
+          $addFields: {
+            sort_name: {
+              $toLower: {
+                $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"]
+              }
+            }
+          }
+        });
+      }
+
       const preSortStage: Record<string, 1 | -1> =
+        effectiveSort === "name" ? { sort_name: 1 } :
         effectiveSort === "ranking" ? { ranking: 1 } :
         effectiveSort === "newest" ? { created_at: -1 } :
         { rating: -1, totalRatingUser: -1 };
@@ -301,7 +313,6 @@ export async function GET(req: NextRequest) {
           { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "city" } },
           { $unwind: { path: "$city", preserveNullAndEmptyArrays: true } },
           { $lookup: { from: "placement", localField: "id", foreignField: "collegeprofile_id", as: "placement" } },
-          { $unwind: { path: "$placement", preserveNullAndEmptyArrays: true } },
           { $lookup: { from: "collegemaster", localField: "id", foreignField: "collegeprofile_id", as: "cm" } },
           { $lookup: { from: "functionalarea", localField: "cm.functionalarea_id", foreignField: "id", as: "fa" } },
           { $addFields: { filtered_cm: filteredCmExpr } },

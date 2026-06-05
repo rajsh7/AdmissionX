@@ -94,7 +94,6 @@ export async function fetchCollegesForSlug(
             as: "placement",
           },
         },
-        { $unwind: { path: "$placement", preserveNullAndEmptyArrays: true } },
         {
           $lookup: {
             from: "collegemaster",
@@ -125,7 +124,7 @@ export async function fetchCollegesForSlug(
             image: "$bannerimage",
             rating: 1,
             totalRatingUser: 1,
-            avgPackage: "$placement.ctcaverage",
+            avgPackage: { $arrayElemAt: ["$placement.ctcaverage", 0] },
             streams: { $setUnion: ["$fa.name", []] },
             min_fees: { $min: { $filter: { input: "$cm.fees", as: "f", cond: { $gt: ["$$f", 0] } } } },
           },

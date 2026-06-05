@@ -235,13 +235,18 @@ async function fetchAbroadCollegesBase(opts: {
 
   const whereClause = conditions.join(" AND ");
   let orderBy = "cp.rating DESC, cp.id DESC";
+  let joinClause = "";
   if (sort === "ranking") {
     orderBy = "(cp.ranking IS NULL OR cp.ranking = 0) ASC, cp.ranking ASC";
+  } else if (sort === "name") {
+    joinClause = "LEFT JOIN users u_sort ON u_sort.id = cp.users_id";
+    orderBy = "COALESCE(NULLIF(TRIM(u_sort.firstname), ''), NULLIF(TRIM(cp.slug), ''), 'College') ASC";
   }
 
   const idSql = `
     SELECT cp.id
     FROM collegeprofile cp
+    ${joinClause}
     WHERE ${whereClause}
     ORDER BY ${orderBy}
     LIMIT ${limit} OFFSET ${offset}
