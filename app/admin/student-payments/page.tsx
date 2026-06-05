@@ -69,6 +69,8 @@ export default async function StudentPaymentsPage({
     payment_status: app.payment_status || "pending",
     created_at: app.createdAt || app.created_at,
     updated_at: app.updatedAt || app.updated_at,
+    student_name: app.personal_info?.name || app.student_name || "—",
+    student_email: app.personal_info?.email || app.student_email || "",
   }));
 
   const statsData = stats[0] || { total_amount: 0, paid_count: 0, pending_count: 0 };

@@ -123,6 +123,8 @@ const STATUS_STYLE: Record<string, { cls: string; dot: string }> = {
   submitted: { cls: "bg-blue-50 text-blue-700 border-blue-100",          dot: "bg-blue-500"    },
   rejected:  { cls: "bg-red-50 text-red-700 border-red-100",             dot: "bg-red-500"     },
   cancelled: { cls: "bg-slate-50 text-slate-600 border-slate-100",       dot: "bg-slate-400"   },
+  "payment failed": { cls: "bg-red-50 text-red-700 border-red-100",      dot: "bg-red-500"     },
+  "payment pending": { cls: "bg-amber-50 text-amber-700 border-amber-100", dot: "bg-amber-500"   },
   default:   { cls: "bg-slate-50 text-slate-600 border-slate-100",       dot: "bg-slate-400"   },
 };
 
@@ -180,6 +182,17 @@ export default async function AdminApplicationsPage({
     const cId = a.collegeId ? a.collegeId.toString() : null;
     const cSlug = cId ? collegeSlugMap.get(cId) : null;
 
+    const fees = Number(a.fees ?? 0);
+    const payment_status = String(a.payment_status ?? "pending");
+    let status = a.status || "pending";
+    if (fees > 0 && payment_status !== "paid") {
+      if (payment_status === "failed") {
+        status = "payment failed";
+      } else {
+        status = "payment pending";
+      }
+    }
+
     return {
       _id: a._id.toString(),
       id: idx + 1,
@@ -191,7 +204,7 @@ export default async function AdminApplicationsPage({
       college_slug: cSlug || a.college_slug || null,
       course_name: a.courseName || a.course_name || null,
       degree_name: a.degreeName || a.degree_name || null,
-      status: a.status || "pending",
+      status,
       createdAt: (a.createdAt || a.created_at) ? new Date(a.createdAt || a.created_at).toISOString() : "",
     };
   });

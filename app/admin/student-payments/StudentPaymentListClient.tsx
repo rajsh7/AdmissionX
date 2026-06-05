@@ -13,6 +13,8 @@ interface Payment {
   payment_status: string;
   created_at: Date;
   updated_at: Date;
+  student_name?: string;
+  student_email?: string;
 }
 
 interface Props {
@@ -50,6 +52,7 @@ export default function StudentPaymentListClient({ payments, offset, total, page
               <tr className="bg-slate-50/50 border-b border-slate-100 text-left">
                 <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10">#</th>
                 <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Application Ref</th>
+                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Student</th>
                 <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Transaction ID</th>
                 <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">College / Course</th>
                 <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Amount</th>
@@ -63,6 +66,12 @@ export default function StudentPaymentListClient({ payments, offset, total, page
                   <td className="px-5 py-4 text-xs text-slate-400 font-mono">{offset + idx + 1}</td>
                   <td className="px-4 py-4">
                     <span className="font-bold text-slate-800 text-xs">{p.application_ref}</span>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-slate-800 text-xs leading-snug">{p.student_name || "—"}</span>
+                      {p.student_email && <span className="text-[10px] text-slate-400 truncate leading-snug">{p.student_email}</span>}
+                    </div>
                   </td>
                   <td className="px-4 py-4">
                     <span className="font-mono text-xs text-slate-600 select-all break-all" title={p.transaction_id}>{p.transaction_id}</span>

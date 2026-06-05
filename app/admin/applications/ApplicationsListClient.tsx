@@ -40,6 +40,8 @@ const STATUS_STYLE: Record<string, { cls: string; dot: string }> = {
   submitted:    { cls: "bg-blue-50 text-blue-700 border-blue-100",    dot: "bg-blue-500"    },
   rejected:     { cls: "bg-red-50 text-red-700 border-red-100",      dot: "bg-red-500"     },
   cancelled:    { cls: "bg-slate-50 text-slate-600 border-slate-100",  dot: "bg-slate-400"   },
+  "payment failed": { cls: "bg-red-50 text-red-700 border-red-100",  dot: "bg-red-500"     },
+  "payment pending": { cls: "bg-amber-50 text-amber-700 border-amber-100", dot: "bg-amber-500" },
   default:      { cls: "bg-slate-50 text-slate-600 border-slate-100",  dot: "bg-slate-400"   },
 };
 
@@ -151,21 +153,27 @@ export default function ApplicationsListClient({ initialRows, offset, page, tota
 
                 {/* Status with dropdown */}
                 <td className="px-4 py-4 text-center">
-                  <form action={updateAction} className="inline-block">
-                    <input type="hidden" name="appId" value={app._id} />
-                    <select
-                      name="status"
-                      defaultValue={app.status}
-                      onChange={(e) => e.currentTarget.form?.requestSubmit()}
-                      className={`text-[10px] font-bold px-2.5 py-1 rounded-full border-0 cursor-pointer ${style.cls.split(" border")[0]}`}
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="approved">Approved</option>
-                      <option value="rejected">Rejected</option>
-                      <option value="submitted">Submitted</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                  </form>
+                  {app.status === "payment failed" || app.status === "payment pending" ? (
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full capitalize ${style.cls.split(" border")[0]}`}>
+                      {app.status}
+                    </span>
+                  ) : (
+                    <form action={updateAction} className="inline-block">
+                      <input type="hidden" name="appId" value={app._id} />
+                      <select
+                        name="status"
+                        defaultValue={app.status}
+                        onChange={(e) => e.currentTarget.form?.requestSubmit()}
+                        className={`text-[10px] font-bold px-2.5 py-1 rounded-full border-0 cursor-pointer ${style.cls.split(" border")[0]}`}
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="submitted">Submitted</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </form>
+                  )}
                 </td>
 
                 {/* Date */}
