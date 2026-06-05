@@ -91,9 +91,9 @@ const getFilterData = unstable_cache(
 
 async function fetchTopUniversities(opts: {
   q: string; stream: string; degree: string; cityId: string; stateId: string;
-  feesMax: string; sort: string; page: number; limit: number;
+  feesMax: string; feesRanges: string[]; ratingRanges: string[]; ownerships: string[]; ranking: string; sort: string; page: number; limit: number;
 }) {
-  const { q, stream, degree, cityId, stateId, feesMax, sort, page, limit } = opts;
+  const { q, stream, degree, cityId, stateId, feesMax, feesRanges, ratingRanges, ownerships, ranking, sort, page, limit } = opts;
   const db = await getDb();
 
   const match: Record<string, unknown> = { isTopUniversity: 1 };
@@ -133,12 +133,57 @@ async function fetchTopUniversities(opts: {
     match.id = { $in: existing ? existing.filter((id) => degreeIds.includes(id)) : degreeIds };
   }
 
+  const feeConditions = [];
   if (feesMax && !isNaN(Number(feesMax))) {
+    feeConditions.push({ fees: { $gt: 0, $lte: Number(feesMax) } });
+  }
+  if (feesRanges && feesRanges.length > 0) {
+    for (const rangeStr of feesRanges) {
+      const [minStr, maxStr] = rangeStr.split("-");
+      const min = parseInt(minStr) || 0;
+      const max = parseInt(maxStr) || 999999999;
+      feeConditions.push({ fees: { $gt: min, $lte: max } });
+    }
+  }
+  if (feeConditions.length > 0) {
     const feeIds = await db.collection("collegemaster")
-      .find({ fees: { $gt: 0, $lte: Number(feesMax) } }, { projection: { collegeprofile_id: 1 } })
+      .find({ $or: feeConditions }, { projection: { collegeprofile_id: 1 } })
       .limit(5000).toArray().then((r) => [...new Set(r.map((x) => x.collegeprofile_id))]);
     const existing = (match.id as { $in: unknown[] } | undefined)?.$in;
     match.id = { $in: existing ? existing.filter((id) => feeIds.includes(id)) : feeIds };
+  }
+
+  const OWNERSHIP_MAP: Record<string, number[]> = {
+    "Private College":       [1],
+    "Government College":    [2],
+    "Government University": [3],
+    "Private University":    [4],
+  };
+
+  if (ownerships && ownerships.length > 0) {
+    const typeIds = ownerships.flatMap((o) => OWNERSHIP_MAP[o] ?? []);
+    if (typeIds.length > 0) match.collegetype_id = { $in: typeIds };
+  }
+
+  if (ratingRanges && ratingRanges.length > 0) {
+    const ratingOr = ratingRanges.map(r => {
+      const [min, max] = r.split("-");
+      return { rating: { $gt: parseFloat(min), $lte: parseFloat(max) } };
+    });
+    match.$or = ratingOr;
+  }
+
+  if (ranking) {
+    const [minStr, maxStr] = ranking.split("-");
+    const min = parseInt(minStr);
+    const max = parseInt(maxStr);
+    if (!isNaN(min)) {
+      if (!isNaN(max)) {
+        match.topUniversityRank = { $gte: min, $lte: max };
+      } else if (ranking.endsWith("+")) {
+        match.topUniversityRank = { $gt: min };
+      }
+    }
   }
 
   // For fees sorting, aggregate with computed min/max fees first, then sort+paginate
@@ -346,13 +391,17 @@ export default async function TopUniversityPage({ searchParams }: PageProps) {
   const cityId = getString("city_id");
   const stateId = getString("state_id");
   const feesMax = getString("fees_max");
+  const feesRanges = getString("fees_ranges") ? getString("fees_ranges").split(",") : [];
+  const ratingRanges = getString("rating_ranges") ? getString("rating_ranges").split(",") : [];
+  const ownerships = getString("ownerships") ? getString("ownerships").split(",") : [];
+  const ranking = getString("ranking");
   const sort = getString("sort", "name");
   const page = Math.max(1, parseInt(getString("page", "1")));
   const limit = 12;
 
   const [{ universities, total, totalPages }, { streamRows, degreeRows, cityRows, stateRows, countryRows }] =
     await Promise.all([
-      fetchTopUniversities({ q, stream, degree, cityId, stateId, feesMax, sort, page, limit }),
+      fetchTopUniversities({ q, stream, degree, cityId, stateId, feesMax, feesRanges, ratingRanges, ownerships, ranking, sort, page, limit }),
       getFilterData(),
     ]);
 

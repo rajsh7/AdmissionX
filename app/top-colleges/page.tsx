@@ -115,9 +115,9 @@ const OWNERSHIP_MAP: Record<string, number[]> = {
 
 async function fetchTopColleges(opts: {
   q: string; stream: string; degree: string; cityId: string; stateId: string; countryId: string;
-  feesMax: string; feesRanges: string[]; ratingRanges: string[]; ownerships: string[]; sort: string; page: number; limit: number;
+  feesMax: string; feesRanges: string[]; ratingRanges: string[]; ownerships: string[]; ranking: string; sort: string; page: number; limit: number;
 }): Promise<{ colleges: CollegeResult[]; total: number; totalPages: number }> {
-  const { q, stream, degree, cityId, stateId, countryId, feesMax, feesRanges, ratingRanges, ownerships, sort, page, limit } = opts;
+  const { q, stream, degree, cityId, stateId, countryId, feesMax, feesRanges, ratingRanges, ownerships, ranking, sort, page, limit } = opts;
   const db = await getDb();
 
   const match: Record<string, unknown> = { isShowOnTop: 1 };
@@ -282,6 +282,19 @@ async function fetchTopColleges(opts: {
       return { rating: { $gt: parseFloat(min), $lte: parseFloat(max) } };
     });
     match.$or = ratingOr;
+  }
+
+  if (ranking) {
+    const [minStr, maxStr] = ranking.split("-");
+    const min = parseInt(minStr);
+    const max = parseInt(maxStr);
+    if (!isNaN(min)) {
+      if (!isNaN(max)) {
+        match.ranking = { $gte: min, $lte: max };
+      } else if (ranking.endsWith("+")) {
+        match.ranking = { $gt: min };
+      }
+    }
   }
 
   // For fees sorting, aggregate with computed min/max fees first, then sort+paginate
@@ -493,13 +506,14 @@ export default async function TopCollegesPage({ searchParams }: PageProps) {
   const feesRanges = getString("fees_ranges") ? getString("fees_ranges").split(",") : [];
   const ratingRanges = getString("rating_ranges") ? getString("rating_ranges").split(",") : [];
   const ownerships = getString("ownerships") ? getString("ownerships").split(",") : [];
+  const ranking = getString("ranking");
   const sort = getString("sort", "name");
   const page = Math.max(1, parseInt(getString("page", "1")));
   const limit = 12;
 
   const [{ colleges, total, totalPages }, { streamRows, degreeRows, cityRows, stateRows, countryRows }] =
     await Promise.all([
-      fetchTopColleges({ q, stream, degree, cityId, stateId, countryId, feesMax, feesRanges, ratingRanges, ownerships, sort, page, limit }),
+      fetchTopColleges({ q, stream, degree, cityId, stateId, countryId, feesMax, feesRanges, ratingRanges, ownerships, ranking, sort, page, limit }),
       getFilterData(),
     ]);
 

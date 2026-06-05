@@ -56,9 +56,9 @@ function escapeRegex(s: string): string {
 
 async function fetchColleges(opts: {
   q: string; stream: string; degree: string; cityId: string; stateId: string;
-  countryId: string; feesMax: string; sort: string; type: string; page: number; limit: number;
+  countryId: string; feesMax: string; ranking: string; sort: string; type: string; page: number; limit: number;
 }): Promise<{ colleges: CollegeResult[]; total: number; totalPages: number }> {
-  const { q, stream, degree, cityId, stateId, countryId, feesMax, sort, type, page, limit } = opts;
+  const { q, stream, degree, cityId, stateId, countryId, feesMax, ranking, sort, type, page, limit } = opts;
   const db = await getDb();
 
   const match: Record<string, unknown> = {};
@@ -153,6 +153,20 @@ async function fetchColleges(opts: {
       .find({ fees: { $gte: 500, $lte: Number(feesMax) } }, { projection: { collegeprofile_id: 1 } })
       .limit(5000).toArray().then((r) => [...new Set(r.map((x: any) => Number(x.collegeprofile_id)))]);
     match.$and = [...((match.$and as any[]) ?? []), { id: { $in: feeIds } }];
+  }
+
+  if (ranking) {
+    const [minStr, maxStr] = ranking.split("-");
+    const min = parseInt(minStr);
+    const max = parseInt(maxStr);
+    const field = (type === "university") ? "topUniversityRank" : "ranking";
+    if (!isNaN(min)) {
+      if (!isNaN(max)) {
+        match.$and = [...((match.$and as any[]) ?? []), { [field]: { $gte: min, $lte: max } }];
+      } else if (ranking.endsWith("+")) {
+        match.$and = [...((match.$and as any[]) ?? []), { [field]: { $gt: min } }];
+      }
+    }
   }
 
   const effectiveSort = (q.length >= 2 && (queryDegreeIds.length > 0 || queryStreamIds.length > 0) && sort === "rating") ? "fees" : sort;
@@ -324,6 +338,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const stateId = getString("state_id");
   const countryId = getString("country_id");
   const feesMax = getString("fees_max");
+  const ranking = getString("ranking");
   const sort = getString("sort", "rating");
   const type = getString("type");
   const page = Math.max(1, parseInt(getString("page", "1")));
@@ -354,7 +369,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   const [{ colleges, total, totalPages }, streamRows, degreeRows, cityRows, stateRows, countryRows] =
     await Promise.all([
-      fetchColleges({ q, stream, degree, cityId: resolvedCityId, stateId, countryId, feesMax, sort, type, page, limit }),
+      fetchColleges({ q, stream, degree, cityId: resolvedCityId, stateId, countryId, feesMax, ranking, sort, type, page, limit }),
 
       (async (): Promise<StreamRow[]> => {
         try {

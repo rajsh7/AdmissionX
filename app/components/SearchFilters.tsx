@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 interface FilterOption {
@@ -26,6 +26,10 @@ interface SearchFiltersProps {
   totalResults?: number;
   onFilterChange?: (filters: ActiveFilters) => void;
   entityNamePlural?: string;
+  activeFeesRanges?: string;
+  activeRatingRanges?: string;
+  activeOwnerships?: string;
+  activeRanking?: string;
 }
 
 export interface ActiveFilters {
@@ -79,6 +83,58 @@ const OWNERSHIP_OPTIONS = [
   { label: "Private University", value: "Private University" },
 ];
 
+interface FilterDropdownProps {
+  label: string;
+  placeholder: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+  activeCount?: number;
+  children: React.ReactNode;
+}
+
+function FilterDropdown({ label, placeholder, isOpen, onToggle, onClose, activeCount = 0, children }: FilterDropdownProps) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [isOpen, onClose]);
+
+  return (
+    <div ref={ref} className="relative w-full">
+      <label className="text-[14px] font-bold text-[#6C6C6C] block mb-1.5 uppercase tracking-wider">{label}</label>
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`w-full flex items-center justify-between px-3 text-sm font-semibold border rounded-[5px] bg-white transition-all hover:border-neutral-400 ${
+          isOpen ? "border-[#FF3C3C] ring-1 ring-[#FF3C3C]/20" : "border-neutral-200"
+        }`}
+        style={{ height: "45px" }}
+      >
+        <span className={`truncate text-left ${activeCount > 0 ? "text-neutral-900 font-bold" : "text-[#6C6C6C]/70"}`}>
+          {activeCount > 0 ? `${placeholder} (${activeCount})` : placeholder}
+        </span>
+        <span className={`material-symbols-outlined text-[18px] text-neutral-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
+          expand_more
+        </span>
+      </button>
+
+      {isOpen && (
+        <div className="absolute left-0 right-0 mt-1.5 bg-white border border-neutral-200 rounded-[5px] shadow-xl z-50 p-3.5 max-h-60 overflow-y-auto space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-150">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function SearchFilters({
   streams = [],
   degrees = [],
@@ -98,7 +154,8 @@ export default function SearchFilters({
   activeFeesRanges = "",
   activeRatingRanges = "",
   activeOwnerships = "",
-}: SearchFiltersProps & { activeFeesRanges?: string; activeRatingRanges?: string; activeOwnerships?: string; }) {
+  activeRanking = "",
+}: SearchFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -110,15 +167,18 @@ export default function SearchFilters({
   const [countryId, setCountryId] = useState(activeCountryId);
   const [feesMax, setFeesMax] = useState(activeFeesMax);
   const [sort] = useState(activeSort || "rating");
-  const [ranking, setRanking] = useState("");
+  const [ranking, setRanking] = useState(activeRanking);
   const [feesRanges, setFeesRanges] = useState<string[]>(activeFeesRanges ? activeFeesRanges.split(',') : []);
   const [ratingRanges, setRatingRanges] = useState<string[]>(activeRatingRanges ? activeRatingRanges.split(',') : []);
   const [ownerships, setOwnerships] = useState<string[]>(activeOwnerships ? activeOwnerships.split(',') : []);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [citySearch, setCitySearch] = useState("");
   const [cityDropOpen, setCityDropOpen] = useState(false);
+  const [degreeSearch, setDegreeSearch] = useState("");
+  const [streamSearch, setStreamSearch] = useState("");
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  const activeCount = [stream, degree, cityId, stateId, countryId, feesMax].filter(Boolean).length + feesRanges.length + ratingRanges.length + ownerships.length;
+  const activeCount = [stream, degree, cityId, stateId, countryId, feesMax, ranking].filter(Boolean).length + feesRanges.length + ratingRanges.length + ownerships.length;
 
   const applyFilters = useCallback(
     (overrides: Partial<ActiveFilters> = {}) => {
@@ -388,138 +448,224 @@ export default function SearchFilters({
         </div>
 
         {/* Course Name */}
-        <div>
-          <label className="text-[16px] font-semibold text-[#6C6C6C] block">Course name</label>
-          <div className="relative">
-            <select value={degree} onChange={(e) => handleDegree(e.target.value)}
-              className="w-full pl-3 pr-8 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
-              style={{ height: "45px" }}>
-              <option value="">Search according to the course...</option>
-              {degrees.map((d) => <option key={d.id} value={d.slug || String(d.id)}>{d.name}</option>)}
-            </select>
-            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[20px] text-neutral-400 pointer-events-none">expand_more</span>
+        <FilterDropdown
+          label="Course name"
+          placeholder={degree ? (degrees.find(d => String(d.slug || d.id) === degree)?.name ?? degree) : "Search according to the course..."}
+          isOpen={openDropdown === "course"}
+          onToggle={() => setOpenDropdown(prev => prev === "course" ? null : "course")}
+          onClose={() => setOpenDropdown(null)}
+          activeCount={degree ? 1 : 0}
+        >
+          <input
+            type="text"
+            placeholder="Search course..."
+            value={degreeSearch}
+            onChange={(e) => setDegreeSearch(e.target.value)}
+            className="w-full px-2.5 py-1.5 text-xs border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] mb-2 font-semibold bg-white"
+          />
+          <div className="max-h-40 overflow-y-auto space-y-1">
+            <button
+              type="button"
+              onClick={() => { handleDegree(""); setDegreeSearch(""); setOpenDropdown(null); }}
+              className={`w-full text-left px-2 py-1.5 text-xs rounded-[5px] transition-colors font-semibold ${!degree ? "bg-[#FF3C3C]/5 text-[#FF3C3C] font-bold" : "hover:bg-neutral-50 text-neutral-600"}`}
+            >
+              All Courses
+            </button>
+            {degrees.filter(d => !degreeSearch || d.name.toLowerCase().includes(degreeSearch.toLowerCase())).map((d) => (
+              <button
+                key={d.id}
+                type="button"
+                onClick={() => { handleDegree(d.slug || String(d.id)); setDegreeSearch(""); setOpenDropdown(null); }}
+                className={`w-full text-left px-2 py-1.5 text-xs rounded-[5px] transition-colors font-semibold ${degree === (d.slug || String(d.id)) ? "bg-[#FF3C3C]/5 text-[#FF3C3C] font-bold" : "hover:bg-neutral-50 text-neutral-600"}`}
+              >
+                {d.name}
+              </button>
+            ))}
           </div>
-        </div>
+        </FilterDropdown>
 
         {/* Stream */}
-        <div>
-          <label className="text-[16px] font-semibold text-[#6C6C6C] block">Stream</label>
-          <div className="relative">
-            <select value={stream} onChange={(e) => handleStream(e.target.value)}
-              className="w-full pl-3 pr-8 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
-              style={{ height: "45px" }}>
-              <option value="">Select Stream...</option>
-              {streams.map((s) => <option key={s.id} value={s.slug || String(s.id)}>{s.name}</option>)}
-            </select>
-            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[20px] text-neutral-400 pointer-events-none">expand_more</span>
+        <FilterDropdown
+          label="Stream"
+          placeholder={stream ? (streams.find(s => String(s.slug || s.id) === stream)?.name ?? stream) : "Select Stream..."}
+          isOpen={openDropdown === "stream"}
+          onToggle={() => setOpenDropdown(prev => prev === "stream" ? null : "stream")}
+          onClose={() => setOpenDropdown(null)}
+          activeCount={stream ? 1 : 0}
+        >
+          <input
+            type="text"
+            placeholder="Search stream..."
+            value={streamSearch}
+            onChange={(e) => setStreamSearch(e.target.value)}
+            className="w-full px-2.5 py-1.5 text-xs border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] mb-2 font-semibold bg-white"
+          />
+          <div className="max-h-40 overflow-y-auto space-y-1">
+            <button
+              type="button"
+              onClick={() => { handleStream(""); setStreamSearch(""); setOpenDropdown(null); }}
+              className={`w-full text-left px-2 py-1.5 text-xs rounded-[5px] transition-colors font-semibold ${!stream ? "bg-[#FF3C3C]/5 text-[#FF3C3C] font-bold" : "hover:bg-neutral-50 text-neutral-600"}`}
+            >
+              All Streams
+            </button>
+            {streams.filter(s => !streamSearch || s.name.toLowerCase().includes(streamSearch.toLowerCase())).map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => { handleStream(s.slug || String(s.id)); setStreamSearch(""); setOpenDropdown(null); }}
+                className={`w-full text-left px-2 py-1.5 text-xs rounded-[5px] transition-colors font-semibold ${stream === (s.slug || String(s.id)) ? "bg-[#FF3C3C]/5 text-[#FF3C3C] font-bold" : "hover:bg-neutral-50 text-neutral-600"}`}
+              >
+                {s.name}
+              </button>
+            ))}
           </div>
-        </div>
+        </FilterDropdown>
 
         {/* Tuition Fee */}
-        <div>
-          <label className="text-[16px] font-semibold text-[#6C6C6C] block">Tuition fee</label>
-          <div className="relative">
-            <select value={feesMax} onChange={(e) => handleFees(e.target.value)}
-              className="w-full pl-3 pr-8 text-sm border border-neutral-200 rounded-[5px] focus:outline-none focus:border-[#FF3C3C] bg-white appearance-none cursor-pointer"
-              style={{ height: "45px" }}>
-              <option value="">Select Fees Range...</option>
-              {FEES_OPTIONS.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-            </select>
-            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[20px] text-neutral-400 pointer-events-none">expand_more</span>
+        <FilterDropdown
+          label="Tuition fee"
+          placeholder={feesMax ? (FEES_OPTIONS.find(o => o.value === feesMax)?.label ?? feesMax) : "Select Fees Range..."}
+          isOpen={openDropdown === "tuition"}
+          onToggle={() => setOpenDropdown(prev => prev === "tuition" ? null : "tuition")}
+          onClose={() => setOpenDropdown(null)}
+          activeCount={feesMax ? 1 : 0}
+        >
+          <div className="space-y-1">
+            <button
+              type="button"
+              onClick={() => { handleFees(""); setOpenDropdown(null); }}
+              className={`w-full text-left px-2 py-1.5 text-xs rounded-[5px] transition-colors font-semibold ${!feesMax ? "bg-[#FF3C3C]/5 text-[#FF3C3C] font-bold" : "hover:bg-neutral-50 text-neutral-600"}`}
+            >
+              Select Fees Range...
+            </button>
+            {FEES_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => { handleFees(opt.value); setOpenDropdown(null); }}
+                className={`w-full text-left px-2 py-1.5 text-xs rounded-[5px] transition-colors font-semibold ${feesMax === opt.value ? "bg-[#FF3C3C]/5 text-[#FF3C3C] font-bold" : "hover:bg-neutral-50 text-neutral-600"}`}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
-        </div>
+        </FilterDropdown>
 
         {/* Ranking */}
-        <div>
-          <label className="text-[16px] font-semibold text-[#6C6C6C] block">Ranking</label>
-          <div className="space-y-1 px-1">
+        <FilterDropdown
+          label="Ranking"
+          placeholder={ranking ? (RANKING_OPTIONS.find(o => o.id === ranking)?.name ?? ranking) : "Select Ranking..."}
+          isOpen={openDropdown === "ranking"}
+          onToggle={() => setOpenDropdown(prev => prev === "ranking" ? null : "ranking")}
+          onClose={() => setOpenDropdown(null)}
+          activeCount={ranking ? 1 : 0}
+        >
+          <div className="space-y-2">
             {RANKING_OPTIONS.map((opt) => (
-              <label key={opt.id} className="flex items-center gap-3 cursor-pointer group">
+              <label key={opt.id} className="flex items-center gap-3 cursor-pointer group py-0.5">
                 <div className="relative flex items-center">
                   <input type="checkbox" checked={ranking === opt.id}
                     onChange={() => { const v = ranking === opt.id ? "" : opt.id; setRanking(v); applyFilters({ ranking: v }); }}
-                    className="w-5 h-5 border-2 border-neutral-200 rounded bg-white checked:bg-[#FF3C3C] checked:border-[#FF3C3C] appearance-none transition-all cursor-pointer"
+                    className="w-4.5 h-4.5 border border-neutral-200 rounded bg-white checked:bg-[#FF3C3C] checked:border-[#FF3C3C] appearance-none transition-all cursor-pointer"
                   />
                   {ranking === opt.id && (
-                    <span className="material-symbols-outlined absolute inset-0 text-white text-[16px] flex items-center justify-center pointer-events-none">check</span>
+                    <span className="material-symbols-outlined absolute inset-0 text-white text-[14px] flex items-center justify-center pointer-events-none font-bold">check</span>
                   )}
                 </div>
-                <span className={`text-sm font-medium transition-colors ${ranking === opt.id ? "text-[#FF3C3C]" : "text-neutral-500 group-hover:text-neutral-800"}`}>
+                <span className={`text-xs font-semibold transition-colors ${ranking === opt.id ? "text-[#FF3C3C] font-bold" : "text-neutral-500 group-hover:text-neutral-800"}`}>
                   {opt.name}
                 </span>
               </label>
             ))}
           </div>
-        </div>
+        </FilterDropdown>
 
         {/* Total Fees */}
-        <div>
-          <label className="text-[16px] font-semibold text-[#6C6C6C] block mb-2">Total Fees</label>
-          <div className="space-y-1 px-1">
+        <FilterDropdown
+          label="Total Fees"
+          placeholder={feesRanges.length > 0 ? (feesRanges.length === 1 ? (TOTAL_FEES_OPTIONS.find(o => o.value === feesRanges[0])?.label ?? feesRanges[0]) : `${feesRanges.length} Selected`) : "Select Fees Range..."}
+          isOpen={openDropdown === "fees"}
+          onToggle={() => setOpenDropdown(prev => prev === "fees" ? null : "fees")}
+          onClose={() => setOpenDropdown(null)}
+          activeCount={feesRanges.length}
+        >
+          <div className="space-y-2">
             {TOTAL_FEES_OPTIONS.map((opt) => (
-              <label key={opt.value} className="flex items-center gap-3 cursor-pointer group">
+              <label key={opt.value} className="flex items-center gap-3 cursor-pointer group py-0.5">
                 <div className="relative flex items-center">
                   <input type="checkbox" checked={feesRanges.includes(opt.value)}
                     onChange={() => toggleArrayItem(setFeesRanges, opt.value, "fees_ranges")}
-                    className="w-5 h-5 border-2 border-neutral-200 rounded bg-white checked:bg-[#FF3C3C] checked:border-[#FF3C3C] appearance-none transition-all cursor-pointer"
+                    className="w-4.5 h-4.5 border border-neutral-200 rounded bg-white checked:bg-[#FF3C3C] checked:border-[#FF3C3C] appearance-none transition-all cursor-pointer"
                   />
                   {feesRanges.includes(opt.value) && (
-                    <span className="material-symbols-outlined absolute inset-0 text-white text-[16px] flex items-center justify-center pointer-events-none">check</span>
+                    <span className="material-symbols-outlined absolute inset-0 text-white text-[14px] flex items-center justify-center pointer-events-none font-bold">check</span>
                   )}
                 </div>
-                <span className={`text-sm font-medium transition-colors ${feesRanges.includes(opt.value) ? "text-[#FF3C3C]" : "text-neutral-500 group-hover:text-neutral-800"}`}>
+                <span className={`text-xs font-semibold transition-colors ${feesRanges.includes(opt.value) ? "text-[#FF3C3C] font-bold" : "text-neutral-500 group-hover:text-neutral-800"}`}>
                   {opt.label}
                 </span>
               </label>
             ))}
           </div>
-        </div>
+        </FilterDropdown>
 
         {/* Rating */}
-        <div>
-          <label className="text-[16px] font-semibold text-[#6C6C6C] block mb-2">Rating</label>
-          <div className="space-y-1 px-1">
+        <FilterDropdown
+          label="Rating"
+          placeholder={ratingRanges.length > 0 ? (ratingRanges.length === 1 ? (RATING_OPTIONS.find(o => o.value === ratingRanges[0])?.label ?? ratingRanges[0]) : `${ratingRanges.length} Selected`) : "Select Rating..."}
+          isOpen={openDropdown === "rating"}
+          onToggle={() => setOpenDropdown(prev => prev === "rating" ? null : "rating")}
+          onClose={() => setOpenDropdown(null)}
+          activeCount={ratingRanges.length}
+        >
+          <div className="space-y-2">
             {RATING_OPTIONS.map((opt) => (
-              <label key={opt.value} className="flex items-center gap-3 cursor-pointer group">
+              <label key={opt.value} className="flex items-center gap-3 cursor-pointer group py-0.5">
                 <div className="relative flex items-center">
                   <input type="checkbox" checked={ratingRanges.includes(opt.value)}
                     onChange={() => toggleArrayItem(setRatingRanges, opt.value, "rating_ranges")}
-                    className="w-5 h-5 border-2 border-neutral-200 rounded bg-white checked:bg-[#FF3C3C] checked:border-[#FF3C3C] appearance-none transition-all cursor-pointer"
+                    className="w-4.5 h-4.5 border border-neutral-200 rounded bg-white checked:bg-[#FF3C3C] checked:border-[#FF3C3C] appearance-none transition-all cursor-pointer"
                   />
                   {ratingRanges.includes(opt.value) && (
-                    <span className="material-symbols-outlined absolute inset-0 text-white text-[16px] flex items-center justify-center pointer-events-none">check</span>
+                    <span className="material-symbols-outlined absolute inset-0 text-white text-[14px] flex items-center justify-center pointer-events-none font-bold">check</span>
                   )}
                 </div>
-                <span className={`text-sm font-medium transition-colors ${ratingRanges.includes(opt.value) ? "text-[#FF3C3C]" : "text-neutral-500 group-hover:text-neutral-800"}`}>
+                <span className={`text-xs font-semibold transition-colors ${ratingRanges.includes(opt.value) ? "text-[#FF3C3C] font-bold" : "text-[#6C6C6C] group-hover:text-neutral-800"}`}>
                   {opt.label}
                 </span>
               </label>
             ))}
           </div>
-        </div>
+        </FilterDropdown>
 
         {/* Ownership */}
-        <div>
-          <label className="text-[16px] font-semibold text-[#6C6C6C] block mb-2">Ownership</label>
-          <div className="space-y-1 px-1">
+        <FilterDropdown
+          label="Ownership"
+          placeholder={ownerships.length > 0 ? (ownerships.length === 1 ? ownerships[0] : `${ownerships.length} Selected`) : "Select Ownership..."}
+          isOpen={openDropdown === "ownership"}
+          onToggle={() => setOpenDropdown(prev => prev === "ownership" ? null : "ownership")}
+          onClose={() => setOpenDropdown(null)}
+          activeCount={ownerships.length}
+        >
+          <div className="space-y-2">
             {OWNERSHIP_OPTIONS.map((opt) => (
-              <label key={opt.value} className="flex items-center gap-3 cursor-pointer group">
+              <label key={opt.value} className="flex items-center gap-3 cursor-pointer group py-0.5">
                 <div className="relative flex items-center">
                   <input type="checkbox" checked={ownerships.includes(opt.value)}
                     onChange={() => toggleArrayItem(setOwnerships, opt.value, "ownerships")}
-                    className="w-5 h-5 border-2 border-neutral-200 rounded bg-white checked:bg-[#FF3C3C] checked:border-[#FF3C3C] appearance-none transition-all cursor-pointer"
+                    className="w-4.5 h-4.5 border border-neutral-200 rounded bg-white checked:bg-[#FF3C3C] checked:border-[#FF3C3C] appearance-none transition-all cursor-pointer"
                   />
                   {ownerships.includes(opt.value) && (
-                    <span className="material-symbols-outlined absolute inset-0 text-white text-[16px] flex items-center justify-center pointer-events-none">check</span>
+                    <span className="material-symbols-outlined absolute inset-0 text-white text-[14px] flex items-center justify-center pointer-events-none font-bold">check</span>
                   )}
                 </div>
-                <span className={`text-sm font-medium transition-colors ${ownerships.includes(opt.value) ? "text-[#FF3C3C]" : "text-neutral-500 group-hover:text-neutral-800"}`}>
+                <span className={`text-xs font-semibold transition-colors ${ownerships.includes(opt.value) ? "text-[#FF3C3C] font-bold" : "text-[#6C6C6C] group-hover:text-neutral-800"}`}>
                   {opt.label}
                 </span>
               </label>
             ))}
           </div>
-        </div>
+        </FilterDropdown>
 
         {/* Actions */}
         <div className="pt-0 grid grid-cols-2 items-stretch gap-3">

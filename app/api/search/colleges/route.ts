@@ -65,6 +65,7 @@ export async function GET(req: NextRequest) {
   const feesRanges = sp.get("fees_ranges") ? sp.get("fees_ranges")!.split(",") : [];
   const ratingRanges = sp.get("rating_ranges") ? sp.get("rating_ranges")!.split(",") : [];
   const ownerships = sp.get("ownerships") ? sp.get("ownerships")!.split(",") : [];
+  const ranking = sp.get("ranking") || null;
   const sort = sp.get("sort") ?? "rating";
   const type = (sp.get("type") ?? "").trim();
   const page = Math.max(1, parseInt(sp.get("page") ?? "1"));
@@ -181,6 +182,19 @@ export async function GET(req: NextRequest) {
         const [min, max] = r.split("-");
         return { rating: { $gt: parseFloat(min), $lte: parseFloat(max) } };
       });
+    }
+    if (ranking) {
+      const [minStr, maxStr] = ranking.split("-");
+      const min = parseInt(minStr);
+      const max = parseInt(maxStr);
+      const field = (type === "university") ? "topUniversityRank" : "ranking";
+      if (!isNaN(min)) {
+        if (!isNaN(max)) {
+          match[field] = { $gte: min, $lte: max };
+        } else if (ranking.endsWith("+")) {
+          match[field] = { $gt: min };
+        }
+      }
     }
 
     // When searching a course with no explicit sort, default to fees

@@ -72,6 +72,13 @@ const SORT_OPTIONS = [
   { value: "name", label: "Alphabetical" },
 ];
 
+const RANKING_OPTIONS = [
+  { id: "1-50", name: "Top 50" },
+  { id: "51-100", name: "Top 100" },
+  { id: "101-200", name: "Top 200" },
+  { id: "201+", name: "Above 200" },
+];
+
 function getCollegeRenderKey(college: CollegeResult, index: number): string {
   return [
     college.id ?? "no-id",
@@ -175,6 +182,7 @@ export default function SearchClient({
   const stateId = searchParams.get("state_id") ?? initStateId;
   const countryId = searchParams.get("country_id") ?? initCountryId;
   const feesMax = searchParams.get("fees_max") ?? initFeesMax;
+  const ranking = searchParams.get("ranking") ?? "";
   const sort = searchParams.get("sort") ?? initSort;
   const page = parseInt(searchParams.get("page") ?? String(initPage));
   const feesRanges = searchParams.get("fees_ranges") ? searchParams.get("fees_ranges")!.split(",") : [];
@@ -252,7 +260,7 @@ export default function SearchClient({
     [searchParams, router, pathname],
   );
 
-  const isFiltered = !!(q || stream || degree || cityId || stateId || countryId || feesMax || feesRanges.length > 0 || ratingRanges.length > 0 || ownerships.length > 0);
+  const isFiltered = !!(q || stream || degree || cityId || stateId || countryId || feesMax || ranking || feesRanges.length > 0 || ratingRanges.length > 0 || ownerships.length > 0);
 
   const showingText = loading
     ? "Loading..."
@@ -321,7 +329,7 @@ export default function SearchClient({
             {/* ── Filters sidebar ── */}
             <div className="hidden lg:block flex-shrink-0 sticky top-[72px] self-start w-full lg:w-auto" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
               <SearchFilters
-                key={`${stream}|${degree}|${cityId}|${stateId}|${countryId}|${feesMax}|${sort}|${searchParams.get("fees_ranges")}|${searchParams.get("rating_ranges")}|${searchParams.get("ownerships")}`}
+                key={`${stream}|${degree}|${cityId}|${stateId}|${countryId}|${feesMax}|${sort}|${searchParams.get("fees_ranges")}|${searchParams.get("rating_ranges")}|${searchParams.get("ownerships")}|${ranking}`}
                 streams={streams}
                 degrees={degrees}
                 cities={cities}
@@ -336,6 +344,7 @@ export default function SearchClient({
                 activeFeesRanges={searchParams.get("fees_ranges") ?? ""}
                 activeRatingRanges={searchParams.get("rating_ranges") ?? ""}
                 activeOwnerships={searchParams.get("ownerships") ?? ""}
+                activeRanking={ranking}
                 activeSort={sort}
                 totalResults={total}
                 entityNamePlural={entityNamePlural}
@@ -400,6 +409,12 @@ export default function SearchClient({
                         <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
                           Up to ₹{(Number(feesMax) / 100000).toFixed(0)}L fees
                           <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("fees_max"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                        </div>
+                      )}
+                      {ranking && (
+                        <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
+                          Ranking: {RANKING_OPTIONS.find(o => o.id === ranking)?.name ?? ranking}
+                          <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("ranking"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
                         </div>
                       )}
                       {feesRanges.map(fr => (
