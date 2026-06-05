@@ -88,7 +88,7 @@ export async function GET() {
     const startMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (monthsBack - 1), 1));
 
     const [
-      [totalStudents, totalColleges, totalAdmins, activeQueries, pendingStudents, pendingColleges, successfulStudents],
+      [totalStudents, totalColleges, totalAdmins, activeQueries, pendingStudents, pendingColleges, successfulStudents, totalApplications, pendingApplications],
       recentStudentsRaw,
       recentColleges,
       recentStudentSignups,
@@ -129,6 +129,8 @@ export async function GET() {
             return Number(rows[0]?.total ?? 0);
           } catch { return 0; }
         })(),
+        db.collection("applications").countDocuments({}),
+        db.collection("applications").countDocuments({ status: { $in: ["submitted", "pending", "payment pending", "payment failed"] } }),
       ]),
       db.collection("users")
         .find({}, {
@@ -417,7 +419,9 @@ export async function GET() {
         activeQueries,
         pendingStudents,
         pendingColleges,
-        successfulStudents
+        successfulStudents,
+        totalApplications,
+        pendingApplications
       },
       graphData: studentGraphData,
       collegeGraphData,

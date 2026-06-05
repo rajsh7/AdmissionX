@@ -33,6 +33,8 @@ interface DashboardClientProps {
     pendingColleges?: number;
     successfulStudents?: number;
     activeBlogs?: number;
+    totalApplications?: number;
+    pendingApplications?: number;
   };
   graphData: GraphPoint[];
   collegeGraphData: GraphPoint[];
@@ -168,7 +170,7 @@ export default function DashboardClient({
       href: "/admin/colleges/profile" 
     },
     { title: "Admin Users",    value: stats.totalAdmins?.toLocaleString()   || "0", subtext: "active admins",                                  icon: <UserCog className="w-5 h-5" />,      href: "/admin/members/roles" },
-    { title: "Applications",   value: stats.activeQueries?.toLocaleString() || "0", subtext: `${stats.activeQueries ?? 0} open sessions`,          icon: <MessageSquare className="w-5 h-5" />, href: "/admin/applications" },
+    { title: "Applications",   value: stats.totalApplications?.toLocaleString() || "0", subtext: `${stats.pendingApplications ?? 0} pending review`,          icon: <MessageSquare className="w-5 h-5" />, href: "/admin/applications" },
   ];
 
   return (

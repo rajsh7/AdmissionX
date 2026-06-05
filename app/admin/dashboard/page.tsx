@@ -47,7 +47,7 @@ export default async function AdminDashboardPage() {
   const startMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (monthsBack - 1), 1));
 
   const [
-    [totalStudents, totalColleges, totalAdmins, activeQueries, pendingStudents, pendingColleges, successfulStudents],
+    [totalStudents, totalColleges, totalAdmins, activeQueries, pendingStudents, pendingColleges, successfulStudents, totalApplications, pendingApplications],
     recentStudentsRaw,
     recentColleges,
     recentStudentSignups,
@@ -88,6 +88,8 @@ export default async function AdminDashboardPage() {
           return Number(rows[0]?.total ?? 0);
         } catch { return 0; }
       })(),
+      db.collection("applications").countDocuments({}),
+      db.collection("applications").countDocuments({ status: { $in: ["submitted", "pending", "payment pending", "payment failed"] } }),
     ]),
     db.collection("users")
       .find({}, {
@@ -420,7 +422,9 @@ export default async function AdminDashboardPage() {
           activeQueries,
           pendingStudents,
           pendingColleges,
-          successfulStudents
+          successfulStudents,
+          totalApplications,
+          pendingApplications
         }}
         graphData={studentGraphData}
         collegeGraphData={collegeGraphData}

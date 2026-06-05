@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     const db = await getDb();
     const user = await db.collection("next_student_signups").findOne(
       { email: email.trim().toLowerCase() },
-      { projection: { _id: 1, name: 1, email: 1, password_hash: 1, is_active: 1 } }
+      { projection: { _id: 1, name: 1, email: 1, password_hash: 1, is_active: 1, status: 1 } }
     );
 
     if (!user) {
@@ -42,6 +42,27 @@ export async function POST(req: NextRequest) {
     const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    }
+
+    const isApproved = String(user.status ?? "").toLowerCase() === "approved";
+
+    if (isApproved) {
+      const token = await signStudentToken({
+        id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        role: "student",
+      });
+
+      const response = NextResponse.json({
+        success: true,
+        pending_otp: false,
+        message: "Login successful.",
+        user: { id: user._id.toString(), name: user.name, email: user.email },
+      });
+      
+      response.cookies.set(STUDENT_COOKIE, token, COOKIE_OPTIONS);
+      return response;
     }
 
     // Generate OTP for login
