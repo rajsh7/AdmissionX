@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     const isApproved = String(user.status ?? "").toLowerCase() === "approved";
 
-    if (isApproved) {
+    if (isActive || isApproved) {
       const token = await signStudentToken({
         id: user._id.toString(),
         name: user.name,
