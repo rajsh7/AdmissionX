@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
       state?: string;
       address?: string;
       preferredStartDate?: string;
+      pincode?: string;
       countryCode?: string;
     };
     academic_info?: {
@@ -240,6 +241,7 @@ export async function POST(req: NextRequest) {
     if (pi.gender) profUpdate.gender = pi.gender;
     if (pi.city)   profUpdate.city   = pi.city.trim();
     if (pi.state)  profUpdate.state  = pi.state;
+    if (pi.pincode) profUpdate.pincode = pi.pincode;
     await db.collection("next_student_profiles").updateOne(
       { student_id: String(studentId) },
       { $set: profUpdate, $setOnInsert: { created_at: new Date() } },

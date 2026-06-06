@@ -39,7 +39,7 @@ interface Application {
   documents?: DocItem[];
   personal_info?: {
     name?: string; email?: string; phone?: string; dob?: string;
-    city?: string; address?: string; preferredStartDate?: string; countryCode?: string;
+    city?: string; state?: string; pincode?: string; address?: string; countryCode?: string;
   } | null;
   academic_info?: {
     qualification?: string; board?: string; stream?: string; percentage?: string;
@@ -257,7 +257,8 @@ function AppCard({ app, user }: { app: Application; user: Props["user"] }) {
                 <InfoRow label="Phone" value={app.personal_info.countryCode && app.personal_info.phone ? `${app.personal_info.countryCode} ${app.personal_info.phone}` : app.personal_info.phone} />
                 <InfoRow label="Date of Birth" value={app.personal_info.dob} />
                 <InfoRow label="City" value={app.personal_info.city} />
-                <InfoRow label="Preferred Start" value={app.personal_info.preferredStartDate} />
+                <InfoRow label="State" value={app.personal_info.state} />
+                <InfoRow label="Pincode" value={app.personal_info.pincode} />
                 {app.personal_info.address && (
                   <div className="col-span-2 flex flex-col gap-0.5">
                     <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Address</span>
