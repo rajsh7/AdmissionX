@@ -44,7 +44,6 @@ const navLinks: NavLink[] = [
 const loginOptions = [
   { label: "Student Login", href: "/login/student", icon: "school" },
   { label: "College Login", href: "/login/college", icon: "apartment" },
-  { label: "Admin Login", href: "/login/admin", icon: "admin_panel_settings" },
 ];
 
 const signupOptions = [
