@@ -66,8 +66,8 @@ interface SearchClientProps {
 type ViewMode = "grid" | "list";
 
 const SORT_OPTIONS = [
-  { value: "fees_high", label: "Highest Fees" },
-  { value: "fees", label: "Lowest Fees" },
+  { value: "fees_high", label: "Highest to Lowest" },
+  { value: "fees", label: "Lowest to highest fees" },
   { value: "rating", label: "Top Rated" },
   { value: "name", label: "Alphabetical" },
 ];
