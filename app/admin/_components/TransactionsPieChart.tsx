@@ -14,11 +14,11 @@ export default function TransactionsPieChart({ data }: { data: any[] }) {
   }
 
   return (
-    <div className="flex items-center gap-6 h-full w-full">
-      {/* Left Legend */}
-      <div className="flex flex-col gap-3 flex-shrink-0 min-w-[140px]">
+    <div className="flex flex-col sm:flex-row items-center gap-6 h-full w-full">
+      {/* Legend */}
+      <div className="flex flex-row flex-wrap sm:flex-col gap-3 sm:gap-3 flex-shrink-0 min-w-[140px] justify-center sm:justify-start">
         {data.map((item, index) => (
-          <div key={index} className="flex items-start gap-2">
+          <div key={index} className="flex items-start gap-2 min-w-[120px] sm:min-w-0">
             <span
               className="w-3 h-3 rounded-full flex-shrink-0 mt-0.5"
               style={{ backgroundColor: COLORS[index % COLORS.length] }}
@@ -37,7 +37,7 @@ export default function TransactionsPieChart({ data }: { data: any[] }) {
       </div>
 
       {/* Pie Chart */}
-      <div className="flex-1 h-full">
+      <div className="flex-1 w-full h-[250px] sm:h-full min-h-[200px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie

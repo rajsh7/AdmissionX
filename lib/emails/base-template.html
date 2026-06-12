@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{TITLE}}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { margin: 0; padding: 0; background: #f4f7fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif; }
+    .email-wrapper { max-width: 600px; margin: 0 auto; background: #ffffff; }
+    .header { background: linear-gradient(135deg, #c0392b 0%, #8e2a1f 100%); padding: 40px 32px; text-align: center; }
+    .logo-container { margin-bottom: 16px; }
+    .logo { max-width: 180px; height: auto; }
+    .header-title { color: #ffffff; font-size: 26px; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.5px; }
+    .header-subtitle { color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 500; margin: 0; }
+    .content { padding: 40px 32px; }
+    .greeting { font-size: 18px; font-weight: 600; color: #1a1a1a; margin: 0 0 24px; }
+    .message { font-size: 15px; line-height: 1.7; color: #4a4a4a; margin: 0 0 20px; }
+    .message strong { color: #1a1a1a; font-weight: 600; }
+    .highlight-box { background: #f8f9fa; border-left: 4px solid #c0392b; padding: 20px; margin: 24px 0; border-radius: 4px; }
+    .highlight-box p { margin: 0 0 8px; font-size: 14px; color: #4a4a4a; }
+    .highlight-box p:last-child { margin: 0; }
+    .highlight-box strong { color: #1a1a1a; }
+    .btn-container { text-align: center; margin: 32px 0; }
+    .btn { display: inline-block; padding: 14px 36px; background: linear-gradient(135deg, #c0392b 0%, #8e2a1f 100%); color: #ffffff !important; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(192, 57, 43, 0.3); transition: all 0.3s ease; }
+    .btn:hover { box-shadow: 0 6px 16px rgba(192, 57, 43, 0.4); }
+    .info-list { list-style: none; padding: 0; margin: 20px 0; }
+    .info-list li { padding: 8px 0; font-size: 15px; color: #4a4a4a; display: flex; align-items: flex-start; }
+    .info-list li:before { content: "✓"; color: #c0392b; font-weight: bold; margin-right: 12px; font-size: 18px; }
+    .divider { border: none; border-top: 1px solid #e5e7eb; margin: 32px 0; }
+    .footer { background: #f8f9fa; padding: 32px; text-align: center; border-top: 1px solid #e5e7eb; }
+    .footer-text { font-size: 13px; color: #6b7280; margin: 0 0 16px; line-height: 1.6; }
+    .footer-links { margin: 16px 0; }
+    .footer-links a { color: #c0392b; text-decoration: none; font-size: 13px; margin: 0 12px; }
+    .footer-links a:hover { text-decoration: underline; }
+    .footer-copyright { font-size: 12px; color: #9ca3af; margin: 16px 0 0; }
+    .otp-box { background: #f8f9fa; border: 2px dashed #c0392b; padding: 24px; text-align: center; margin: 24px 0; border-radius: 8px; }
+    .otp-code { font-size: 32px; font-weight: 700; color: #c0392b; letter-spacing: 8px; margin: 8px 0; font-family: 'Courier New', monospace; }
+    .warning-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px; margin: 20px 0; border-radius: 4px; }
+    .warning-box p { margin: 0; font-size: 14px; color: #856404; }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo-container">
+        <img src="https://admissionx.com/admissionx-logo.png" alt="AdmissionX Logo" class="logo" />
+      </div>
+      <h1 class="header-title">AdmissionX</h1>
+      <p class="header-subtitle">World's First Online Admission Portal</p>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      {{CONTENT}}
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p class="footer-text">
+        <strong>Need Help?</strong><br />
+        Contact us at <a href="mailto:support@admissionx.com" style="color: #c0392b; text-decoration: none;">support@admissionx.com</a>
+      </p>
+      <div class="footer-links">
+        <a href="https://admissionx.com/help-center">Help Center</a>
+        <a href="https://admissionx.com/privacy-policy">Privacy Policy</a>
+        <a href="https://admissionx.com/terms-and-conditions">Terms</a>
+      </div>
+      <p class="footer-copyright">
+        © {{YEAR}} AdmissionX. All rights reserved.<br />
+        World's First Online Admission Portal
+      </p>
+    </div>
+  </div>
+</body>
+</html>

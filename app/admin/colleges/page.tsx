@@ -612,36 +612,36 @@ export default async function AdminCollegesPage({
                   </div>
 
                   {/* Approve/Reject/Reset + Delete */}
-                  <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
+                  <div className="grid grid-cols-3 gap-2 pt-2">
                     {college.status !== "approved" && (
-                      <form action={approveCollegeAction}>
+                      <form action={approveCollegeAction} className="w-full">
                         <input type="hidden" name="id"  value={String(college._id)} />
                         <input type="hidden" name="src" value={college._source ?? "new"} />
-                        <button type="submit" className="text-[10px] font-black px-3 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 hover:shadow-lg hover:shadow-green-500/30 transition-all uppercase tracking-tighter">
+                        <button type="submit" className="w-full text-xs font-bold py-2.5 px-2 rounded-xl bg-green-500 text-white hover:bg-green-600 hover:shadow-lg hover:shadow-green-500/20 transition-all uppercase tracking-wider text-center">
                           Approve
                         </button>
                       </form>
                     )}
                     {college.status !== "rejected" && (
-                      <form action={rejectCollegeAction}>
+                      <form action={rejectCollegeAction} className="w-full">
                         <input type="hidden" name="id"  value={String(college._id)} />
                         <input type="hidden" name="src" value={college._source ?? "new"} />
-                        <button type="submit" className="text-[10px] font-black px-3 py-2 rounded-xl bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all uppercase tracking-tighter">
+                        <button type="submit" className="w-full text-xs font-bold py-2.5 px-2 rounded-xl bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 hover:text-red-700 transition-all uppercase tracking-wider text-center">
                           Reject
                         </button>
                       </form>
                     )}
                     {college.status !== "pending" && (
-                      <form action={pendingCollegeAction}>
+                      <form action={pendingCollegeAction} className="w-full">
                         <input type="hidden" name="id"  value={String(college._id)} />
                         <input type="hidden" name="src" value={college._source ?? "new"} />
-                        <button type="submit" className="text-[10px] font-black px-3 py-2 rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 transition-all uppercase tracking-tighter">
+                        <button type="submit" className="w-full text-xs font-bold py-2.5 px-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all uppercase tracking-wider text-center">
                           Reset
                         </button>
                       </form>
                     )}
+                    <DeleteButton action={deleteCollegeById.bind(null, String(college._id), college._source ?? "new")} size="lg" variant="classic" />
                   </div>
-                  <DeleteButton action={deleteCollegeById.bind(null, String(college._id), college._source ?? "new")} size="sm" />
                 </div>
               </div>
             );

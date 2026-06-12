@@ -2,10 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { getDb } from "@/lib/db";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { enforceRateLimit, rejectUntrustedOrigin } from "@/lib/security";
 
 const EXPIRES_IN_MS = 15 * 60 * 1000; // 15 minutes
 
 export async function POST(req: NextRequest) {
+  const originError = rejectUntrustedOrigin(req);
+  if (originError) return originError;
+
+  const rateLimitError = enforceRateLimit(req, "forgot-password", 5, 15 * 60 * 1000);
+  if (rateLimitError) return rateLimitError;
+
   try {
     const body = await req.json();
     const email: string = (body.email ?? "").trim().toLowerCase();

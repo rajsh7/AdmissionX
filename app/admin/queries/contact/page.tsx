@@ -1,5 +1,6 @@
 import { getDb } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import DeleteButton from "@/app/admin/_components/DeleteButton";
 
 const PAGE_SIZE = 20;
 const ICO_FILL = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20" };
@@ -16,6 +17,14 @@ async function updateStatus(formData: FormData) {
     { _id: new ObjectId(id) },
     { $set: { status, updated_at: new Date() } }
   );
+  revalidatePath("/admin/queries/contact");
+}
+
+async function deleteQuery(id: string) {
+  "use server";
+  const db = await getDb();
+  const { ObjectId } = await import("mongodb");
+  await db.collection("contact_queries").deleteOne({ _id: new ObjectId(id) });
   revalidatePath("/admin/queries/contact");
 }
 
@@ -137,7 +146,7 @@ export default async function ContactQueriesPage({
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[800px]">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100 text-left">
                   <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Name & Email</th>
@@ -157,7 +166,7 @@ export default async function ContactQueriesPage({
                     </td>
                     <td className="px-4 py-4 text-slate-700 font-medium max-w-[160px] truncate">{r.subject || "—"}</td>
                     <td className="px-4 py-4 text-slate-500 text-xs max-w-[260px]">
-                      <p className="line-clamp-2">{r.message}</p>
+                      <p className="whitespace-pre-wrap break-words">{r.message}</p>
                     </td>
                     <td className="px-4 py-4 text-xs text-slate-400 whitespace-nowrap">{formatDate(r.created_at)}</td>
                     <td className="px-4 py-4">
@@ -166,21 +175,24 @@ export default async function ContactQueriesPage({
                       </span>
                     </td>
                     <td className="px-4 py-4">
-                      <form action={updateStatus} className="flex gap-1">
-                        <input type="hidden" name="id" value={String(r._id)} />
-                        {r.status !== "read" && (
-                          <button name="status" value="read" type="submit"
-                            className="text-[10px] font-bold px-2 py-1 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors">
-                            Mark Read
-                          </button>
-                        )}
-                        {r.status !== "resolved" && (
-                          <button name="status" value="resolved" type="submit"
-                            className="text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors">
-                            Resolve
-                          </button>
-                        )}
-                      </form>
+                      <div className="flex items-center gap-2">
+                        <form action={updateStatus} className="flex gap-1">
+                          <input type="hidden" name="id" value={String(r._id)} />
+                          {r.status !== "read" && (
+                            <button name="status" value="read" type="submit"
+                              className="text-[10px] font-bold px-2 py-1 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors">
+                              Mark Read
+                            </button>
+                          )}
+                          {r.status !== "resolved" && (
+                            <button name="status" value="resolved" type="submit"
+                              className="text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors">
+                              Resolve
+                            </button>
+                          )}
+                        </form>
+                        <DeleteButton action={deleteQuery.bind(null, String(r._id))} size="xs" variant="ghost" />
+                      </div>
                     </td>
                   </tr>
                 ))}

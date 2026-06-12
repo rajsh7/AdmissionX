@@ -124,7 +124,7 @@ export default function BookmarkClient({
               </select>
             </div>
           </div>
-          <div className="mt-4 flex gap-2 sm:justify-end">
+          <div className="mt-4 flex flex-wrap gap-2 sm:justify-end">
             <button
               type="submit"
               className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-all"
@@ -186,7 +186,8 @@ export default function BookmarkClient({
             </p>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse table-fixed">
+          <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse table-fixed min-w-[800px]">
             <colgroup>
               <col style={{ width: "4%" }} />
               <col style={{ width: "24%" }} />
@@ -304,6 +305,7 @@ export default function BookmarkClient({
               })}
             </tbody>
           </table>
+        </div>
         )}
       </div>
 

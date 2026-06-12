@@ -1,12 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
   STUDENT_COOKIE,
   COLLEGE_COOKIE,
   ADMIN_COOKIE,
   COOKIE_OPTIONS,
 } from "@/lib/auth";
+import { rejectUntrustedOrigin } from "@/lib/security";
 
-export async function POST() {
+export async function POST(req: NextRequest) {
+  const originError = rejectUntrustedOrigin(req);
+  if (originError) return originError;
+
   const response = NextResponse.json({ success: true });
 
   const clearOptions = {

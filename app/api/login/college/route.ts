@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { getDb } from "@/lib/db";
+import { getCollegeDb } from "@/lib/db";
 import { signCollegeToken, COLLEGE_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
+import { enforceRateLimit, rejectUntrustedOrigin } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
+  const originError = rejectUntrustedOrigin(req);
+  if (originError) return originError;
+
+  const rateLimitError = enforceRateLimit(req, "login-college", 8, 10 * 60 * 1000);
+  if (rateLimitError) return rateLimitError;
+
   try {
     const { email, password } = await req.json();
 
@@ -11,7 +18,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
     }
 
-    const db = await getDb();
+    const db = await getCollegeDb();
     const emailLower = email.trim().toLowerCase();
 
     const user = await db.collection("next_college_signups").findOne(

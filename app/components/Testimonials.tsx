@@ -47,8 +47,8 @@ export default function Testimonials({ testimonials: dynamicTestimonials }: Test
       <div className="home-page-shell">
         
         <div className="mb-10 sm:mb-16 flex flex-col justify-between gap-6 sm:gap-8 md:flex-row md:items-start">
-            <div className="max-w-2xl">
-                <h2 className="text-[26px] sm:text-[32px] lg:text-[40px] font-semibold tracking-tight leading-[1.1] mb-3 sm:mb-4">
+            <div className="w-full">
+                <h2 className="text-[32px] sm:text-[40px] lg:text-[68px] font-semibold tracking-tight leading-[1.1] mb-3 sm:mb-4">
                   <span className="text-[#0F182A]">Unfiltered</span> <span className="text-primary">Student Voices</span>
                 </h2>
                 <p className="text-slate-500 font-normal text-[14px] sm:text-[16px] lg:text-lg">

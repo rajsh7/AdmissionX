@@ -134,9 +134,9 @@ export default function CollegeLoginForm() {
         }} />
       )}
       <main className="relative flex-1 flex items-center justify-center px-4 sm:px-6 py-24 md:py-32 lg:py-48 z-10">
-        <div className="flex flex-col md:flex-row w-full max-w-[920px] rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.12)] overflow-hidden" style={{ minHeight: "520px" }}>
+        <div className="flex flex-col md:flex-row w-full max-w-[920px] rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.12)] overflow-hidden bg-white" style={{ minHeight: "520px" }}>
 
-          {/* LEFT: Slider */}
+          {/* LEFT: Slider (Desktop only) */}
           <div className="hidden md:block w-[38%] relative flex-shrink-0" style={{ minHeight: "520px" }}>
             {SLIDES.map((src, i) => (
               <div key={src} className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: i === slideIndex ? 1 : 0 }}>
@@ -169,9 +169,11 @@ export default function CollegeLoginForm() {
 
           {/* RIGHT: Form */}
           <div className="flex-1 bg-[#f3f4f6] flex items-center justify-center px-4 sm:px-8 py-10">
-            <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-6 sm:px-8 py-8">
-              <h1 className="text-[20px] md:text-[24px] font-bold text-[#111] mb-1">College Login</h1>
-              <p className="text-[12px] md:text-[13px] text-gray-500 mb-6">Sign in to manage your college dashboard.</p>
+            <div className="w-full max-w-sm bg-white rounded-2xl shadow-md px-6 sm:px-8 py-8 my-4">
+              <div className="text-center">
+                <h1 className="text-[20px] md:text-[24px] font-bold text-[#111] mb-1">College Login</h1>
+                <p className="text-[12px] md:text-[13px] text-gray-500 mb-6">Sign in to manage your college dashboard.</p>
+              </div>
 
               {error && (
                 <div className="mb-4 px-3 py-2.5 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">{error}</div>
@@ -180,7 +182,7 @@ export default function CollegeLoginForm() {
               <form onSubmit={handleSubmit} className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1">
                   <label className="text-[11px] md:text-[12px] font-semibold text-gray-700">Official Email<span className="text-red-500 ml-0.5">*</span></label>
-                  <input type="email" placeholder="admissions@yourcollege.com" required
+                  <input type="email" placeholder="Enter Your College Email Address" required
                     value={email} onChange={e => setEmail(e.target.value)} suppressHydrationWarning
                     className="px-3 py-2 border border-gray-300 rounded-[7px] text-[12px] md:text-[13px] placeholder:text-[11px] md:placeholder:text-[12px] text-[#111] outline-none focus:border-black transition-colors" />
                 </div>

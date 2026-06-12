@@ -3,7 +3,7 @@ import { getDb } from "@/lib/db";
 import { signStudentToken, STUDENT_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://admissionx.com";
   const code = req.nextUrl.searchParams.get("code");
 
   if (!code) {

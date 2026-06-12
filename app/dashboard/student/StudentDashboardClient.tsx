@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Header from "../../components/Header";
 import OverviewTab from "./tabs/OverviewTab";
 import ProfileTab from "./tabs/ProfileTab";
 import AddressTab from "./tabs/AddressTab";
@@ -40,15 +41,35 @@ export default function StudentDashboardClient({ user, activated }: Props) {
   const [activeTab, setActiveTab]         = useState<TabId>("overview");
   const [sidebarOpen, setSidebarOpen]     = useState(false);
   const [showActivatedBanner, setShowActivatedBanner] = useState(!!activated);
+
+  useEffect(() => {
+    if (activated) {
+      const t = setTimeout(() => setShowActivatedBanner(false), 6000);
+      return () => clearTimeout(t);
+    }
+  }, [activated]);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const [paymentStatus, setPaymentStatus] = useState<"success" | "failed" | null>(null);
+  const [paymentTxnId, setPaymentTxnId] = useState<string | null>(null);
+  const [paymentReason, setPaymentReason] = useState<string | null>(null);
+
   useEffect(() => {
     const tab = searchParams.get("tab") as TabId | null;
     if (tab) setActiveTab(tab);
+
+    const payment = searchParams.get("payment");
+    if (payment === "success") {
+      setPaymentStatus("success");
+      setPaymentTxnId(searchParams.get("txnid"));
+    } else if (payment === "failed") {
+      setPaymentStatus("failed");
+      setPaymentReason(searchParams.get("reason"));
+    }
   }, [searchParams]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,159 +132,26 @@ export default function StudentDashboardClient({ user, activated }: Props) {
     }
   }
 
-  function SidebarContent() {
-    const MENU_ITEMS: NavItem[] = [
-      { id: "overview",          label: "Dashboard",                  icon: "bar_chart"    },
-      { id: "account-details",   label: "Student Details",            icon: "person"       },
-      { id: "ai-recommend",      label: "AI Recommendations",         icon: "auto_awesome" },
-      { id: "app-all",           label: "Application",                icon: "description"  },
-      { id: "queries-all",       label: "Queries",                    icon: "forum"        },
-      { id: "bookmark-colleges", label: "Bookmarks",                  icon: "bookmarks"    },
-      { id: "qa-questions",      label: "Question | Answer | Comment",icon: "rate_review"  },
-      { id: "counselling-forms", label: "Counseling Forms",           icon: "assignment"   },
-      { id: "help-desk",         label: "Help Desk",                  icon: "help_center"  },
-    ];
 
-    return (
-      <div className="flex flex-col h-full bg-[#333333] text-white font-sans">
-        {/* Profile Card */}
-        <div className="p-5 space-y-4">
-          <div className="bg-[#333333] rounded-xl overflow-hidden shadow-2xl p-4 flex flex-col items-center">
-            <div className={`w-28 h-28 rounded-full flex items-center justify-center mb-4 overflow-hidden ${user?.avatar ? "" : "border-[8px] border-[#f5f5f5] bg-white"}`}>
-              {user?.avatar ? (
-                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-              ) : (
-                <span className="material-symbols-outlined text-[54px] text-[#ddd]">photo_camera</span>
-              )}
-            </div>
-            <p className="text-[13px] font-semibold text-[#555] text-center leading-tight mb-1">
-              {user?.name ?? "Student"}
-            </p>
-            <p className="text-[11px] text-gray-400 text-center truncate max-w-full px-2">
-              {user?.email ?? ""}
-            </p>
-          </div>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploadingAvatar}
-            className="w-full py-2.5 bg-[#8b8b8b] text-white text-[12px] font-medium rounded-[6px] hover:bg-[#777] transition-colors uppercase tracking-wider shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {uploadingAvatar ? "Uploading..." : "Upload New Profile image"}
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleAvatarUpload}
-            className="hidden"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-          />
-        </div>
-
-        {/* Main Menu Label */}
-        <div className="px-6 py-4 mt-2">
-          <p className="text-[11px] font-medium text-white/40 uppercase tracking-[1.5px]">MAIN MENU</p>
-        </div>
-
-        {/* Nav List */}
-        <nav className="flex-1 px-0 space-y-0 overflow-y-auto no-scrollbar">
-          {MENU_ITEMS.map((item) => {
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => navigate(item.id)}
-                className={`w-full flex items-center gap-4 px-6 py-4 text-[14px] font-medium transition-all border-l-[4px] ${
-                  isActive
-                    ? "bg-[#e31e24] text-white border-white"
-                    : "text-white/70 hover:bg-white/5 hover:text-white border-transparent"
-                }`}
-              >
-                <span className={`material-symbols-outlined text-[20px] ${isActive ? "text-white" : "text-white/60"}`}>
-                  {item.icon}
-                </span>
-                <span className="truncate">{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col h-screen bg-[#f1f2f6] overflow-hidden font-sans">
-      {/* HEADER */}
-      <header className="h-[80px] bg-white border-b border-gray-200 px-8 flex items-center justify-between shrink-0 shadow-sm z-50">
-        <div className="flex items-center gap-6">
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-[#333] hover:bg-slate-100 p-1.5 rounded-lg transition-colors">
-            <span className="material-symbols-outlined text-[28px]">menu</span>
-          </button>
-          <Link href="/" className="shrink-0">
-            <img src="/admissionx-logo.png" alt="AdmissionX logo" className="h-8 w-auto object-contain" />
-          </Link>
-        </div>
+      <Header theme="light" />
 
-        <div className="ml-auto flex items-center gap-10">
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
-            {[
-              { label: "Home", href: "/" },
-              { label: "Colleges", href: "/top-colleges" },
-              { label: "Top University", href: "/top-university" },
-              { label: "Top Courses", href: "/careers-courses" },
-              { label: "Study Abroad", href: "/study-abroad" },
-              { label: "More", href: "#", hasSub: true },
-            ].map((link) => (
-              <Link key={link.label} href={link.href}
-                className="flex items-center gap-1 px-4 py-2 text-[16px] font-normal text-slate-700 hover:text-primary transition-colors whitespace-nowrap">
-                {link.label}
-                {link.hasSub && <span className="material-symbols-outlined text-[18px] text-slate-300">expand_more</span>}
-              </Link>
-            ))}
-          </nav>
+      {/* Floating mobile sidebar drawer toggle button */}
+      <button
+        onClick={() => setSidebarOpen(true)}
+        className="lg:hidden fixed bottom-20 right-4 z-40 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-red-200 active:scale-95 transition-all"
+      >
+        <span className="material-symbols-outlined text-[24px]">menu</span>
+      </button>
 
-          <div className="flex items-center relative">
-            <button onClick={() => setShowAccountMenu(p => !p)}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-[10px] bg-primary text-white hover:bg-primary-dark transition-all shadow-lg shadow-primary/10 active:scale-95">
-              <span className="material-symbols-outlined text-[18px]">account_circle</span>
-              <span className="text-[14px] font-normal">{user?.name?.split(" ")[0] ?? "Account"}</span>
-              <span className="material-symbols-outlined text-[16px] text-white/70">expand_more</span>
-            </button>
-            {showAccountMenu && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowAccountMenu(false)} />
-                <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
-                  <div className="px-4 py-3 border-b border-gray-50">
-                    <p className="text-[13px] font-bold text-[#222] truncate">{user?.name}</p>
-                    <p className="text-[11px] text-gray-400 truncate">{user?.email}</p>
-                  </div>
-                  <button onClick={() => { navigate("account-details"); setShowAccountMenu(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-gray-600 hover:bg-gray-50 transition-colors">
-                    <span className="material-symbols-outlined text-[18px]">manage_accounts</span>My Profile
-                  </button>
-                  <button onClick={() => { navigate("account-settings"); setShowAccountMenu(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-gray-600 hover:bg-gray-50 transition-colors">
-                    <span className="material-symbols-outlined text-[18px]">settings</span>Settings
-                  </button>
-                  <div className="border-t border-gray-50" />
-                  <button onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 transition-colors">
-                    <span className="material-symbols-outlined text-[18px]">logout</span>Sign Out
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
-
-      <div className="flex flex-1 min-h-0 overflow-hidden relative">
+      <div className="flex flex-1 mt-[58px] lg:mt-[96px] h-[calc(100vh-58px)] lg:h-[calc(100vh-96px)] overflow-hidden relative">
         {showActivatedBanner && (
-          <div className="fixed top-[80px] left-0 right-0 z-50 flex items-center justify-between gap-3 px-6 py-3 bg-emerald-500 text-white text-sm font-semibold shadow-lg">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-              Your email has been verified! Welcome to AdmissionX, {user?.name?.split(" ")[0] ?? "Student"}.
-            </div>
-            <button onClick={() => setShowActivatedBanner(false)} className="shrink-0 hover:opacity-70 transition-opacity">
+          <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-center gap-3 px-6 py-3.5 bg-emerald-500 text-white text-sm font-semibold shadow-md">
+            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+            <span>Your email has been verified! Welcome to AdmissionX, <strong>{user?.name?.split(" ")[0] ?? "Student"}</strong>.</span>
+            <button onClick={() => setShowActivatedBanner(false)} className="ml-4 shrink-0 hover:opacity-70 transition-opacity">
               <span className="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
@@ -273,13 +161,74 @@ export default function StudentDashboardClient({ user, activated }: Props) {
           <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm lg:hidden" onClick={() => setSidebarOpen(false)} />
         )}
 
-        <aside className={`fixed inset-y-0 left-0 z-[70] lg:static w-[280px] h-full shadow-2xl lg:shadow-none transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
-          <SidebarContent />
+        <aside className={`fixed inset-y-0 left-0 z-[70] lg:static w-[280px] h-full overflow-hidden shadow-2xl lg:shadow-none transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+          <SidebarContent
+            user={user}
+            activeTab={activeTab}
+            uploadingAvatar={uploadingAvatar}
+            fileInputRef={fileInputRef}
+            handleAvatarUpload={handleAvatarUpload}
+            navigate={navigate}
+          />
         </aside>
 
-        <div className="flex-1 min-w-0 student-dashboard-scroll bg-[#f8f9fa] relative">
+        <div className="flex-1 min-w-0 student-dashboard-scroll bg-[#f8f9fa] relative pb-[80px] lg:pb-0">
           <main>
-            <div className="p-10 max-w-[1600px] mx-auto">
+            <div className={`p-4 sm:p-10 max-w-[1600px] mx-auto ${showActivatedBanner ? "pt-16" : ""}`}>
+              {paymentStatus === "success" && (
+                <div className="mb-8 p-6 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl text-white shadow-xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        check_circle
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-base leading-tight text-white">Payment Completed Successfully!</h4>
+                      <p className="text-xs text-white/90 font-medium mt-1">
+                        Your college application fee has been securely processed. Transaction ID: <strong className="font-mono bg-black/25 px-1.5 py-0.5 rounded text-white">{paymentTxnId}</strong>
+                      </p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setPaymentStatus(null);
+                      router.replace(`/dashboard/student/${user?.id}?tab=app-all`);
+                    }}
+                    className="text-white/80 hover:text-white shrink-0"
+                  >
+                    <span className="material-symbols-outlined text-2xl">close</span>
+                  </button>
+                </div>
+              )}
+
+              {paymentStatus === "failed" && (
+                <div className="mb-8 p-6 bg-gradient-to-r from-red-500 to-rose-600 rounded-2xl text-white shadow-xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-white text-2xl">
+                        error
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-base leading-tight text-white">Payment Process Failed</h4>
+                      <p className="text-xs text-white/90 font-medium mt-1">
+                        {paymentReason || "Your transaction was cancelled or declined by the payment gateway."}
+                      </p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setPaymentStatus(null);
+                      router.replace(`/dashboard/student/${user?.id}?tab=app-all`);
+                    }}
+                    className="text-white/80 hover:text-white shrink-0"
+                  >
+                    <span className="material-symbols-outlined text-2xl">close</span>
+                  </button>
+                </div>
+              )}
+
               {renderTab()}
             </div>
           </main>
@@ -289,6 +238,101 @@ export default function StudentDashboardClient({ user, activated }: Props) {
       <div className="lg:hidden">
         <MobileBottomNav activeTab={activeTab} navigate={navigate} />
       </div>
+    </div>
+  );
+}
+
+interface SidebarContentProps {
+  user: Props["user"];
+  activeTab: TabId;
+  uploadingAvatar: boolean;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  handleAvatarUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
+  navigate: (id: TabId) => void;
+}
+
+function SidebarContent({
+  user,
+  activeTab,
+  uploadingAvatar,
+  fileInputRef,
+  handleAvatarUpload,
+  navigate,
+}: SidebarContentProps) {
+  const MENU_ITEMS: NavItem[] = [
+    { id: "overview",          label: "Dashboard",                  icon: "bar_chart"    },
+    { id: "account-details",   label: "Student Details",            icon: "person"       },
+    { id: "ai-recommend",      label: "AI Recommendations",         icon: "auto_awesome" },
+    { id: "app-all",           label: "Application",                icon: "description"  },
+    { id: "queries-all",       label: "Queries",                    icon: "forum"        },
+    { id: "bookmark-colleges", label: "Bookmarks",                  icon: "bookmarks"    },
+    { id: "qa-questions",      label: "Question | Answer | Comment",icon: "rate_review"  },
+    { id: "counselling-forms", label: "Counseling Forms",           icon: "assignment"   },
+    { id: "help-desk",         label: "Help Desk",                  icon: "help_center"  },
+  ];
+
+  return (
+    <div className="flex flex-col h-full bg-[#333333] text-white font-sans">
+      {/* Profile Card */}
+      <div className="p-5 space-y-4">
+        <div className="bg-[#333333] rounded-xl overflow-hidden shadow-2xl p-4 flex flex-col items-center">
+          <div className={`w-28 h-28 rounded-full flex items-center justify-center mb-4 overflow-hidden ${user?.avatar ? "" : "border-[8px] border-[#f5f5f5] bg-white"}`}>
+            {user?.avatar ? (
+              <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            ) : (
+              <span className="material-symbols-outlined text-[54px] text-[#ddd]">photo_camera</span>
+            )}
+          </div>
+          <p className="text-[13px] font-semibold text-white text-center leading-tight mb-1">
+            {user?.name ?? "Student"}
+          </p>
+          <p className="text-[11px] text-gray-400 text-center truncate max-w-full px-2">
+            {user?.email ?? ""}
+          </p>
+        </div>
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploadingAvatar}
+          className="w-full py-2.5 bg-[#8b8b8b] text-white text-[12px] font-medium rounded-[6px] hover:bg-[#777] transition-colors uppercase tracking-wider shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          {uploadingAvatar ? "Uploading..." : "Upload New Profile image"}
+        </button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleAvatarUpload}
+          className="hidden"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+        />
+      </div>
+
+      {/* Main Menu Label */}
+      <div className="px-6 py-4 mt-2">
+        <p className="text-[11px] font-medium text-white/40 uppercase tracking-[1.5px]">MAIN MENU</p>
+      </div>
+
+      {/* Nav List */}
+      <nav className="flex-1 px-0 space-y-0 overflow-y-auto no-scrollbar">
+        {MENU_ITEMS.map((item) => {
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => navigate(item.id)}
+              className={`w-full flex items-center gap-4 px-6 py-4 text-[14px] font-medium transition-all border-l-[4px] ${
+                isActive
+                  ? "bg-[#e31e24] text-white border-white"
+                  : "text-white/70 hover:bg-white/5 hover:text-white border-transparent"
+              }`}
+            >
+              <span className={`material-symbols-outlined text-[20px] ${isActive ? "text-white" : "text-white/60"}`}>
+                {item.icon}
+              </span>
+              <span className="truncate">{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }

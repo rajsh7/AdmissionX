@@ -102,7 +102,7 @@ export default function RegistrationsClient() {
   return (
     <>
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {[
           { label: "Total Registrations", value: studentTotal + collegeTotal, icon: "how_to_reg", color: "text-emerald-600", bg: "bg-emerald-50" },
           { label: "Students", value: studentTotal, icon: "school", color: "text-blue-600", bg: "bg-blue-50" },
@@ -122,8 +122,8 @@ export default function RegistrationsClient() {
 
       {/* Filters */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center mb-6">
-        <form onSubmit={(e) => { e.preventDefault(); setQ(search); setPage(1); }} className="flex-1 flex gap-2">
-          <div className="relative flex-1">
+        <form onSubmit={(e) => { e.preventDefault(); setQ(search); setPage(1); }} className="w-full sm:flex-1 flex flex-col sm:flex-row gap-2">
+          <div className="relative w-full sm:flex-1">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-rounded text-slate-400 text-[18px]">search</span>
             <input
               value={search}
@@ -132,10 +132,12 @@ export default function RegistrationsClient() {
               className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-slate-50"
             />
           </div>
-          <button type="submit" className="px-4 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700">Search</button>
-          {q && <button type="button" onClick={() => { setQ(""); setSearch(""); setPage(1); }} className="px-4 py-2.5 bg-slate-100 text-slate-600 text-sm font-semibold rounded-xl hover:bg-slate-200">Clear</button>}
+          <div className="flex gap-2">
+            <button type="submit" className="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700">Search</button>
+            {q && <button type="button" onClick={() => { setQ(""); setSearch(""); setPage(1); }} className="flex-1 sm:flex-none px-4 py-2.5 bg-slate-100 text-slate-600 text-sm font-semibold rounded-xl hover:bg-slate-200">Clear</button>}
+          </div>
         </form>
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl overflow-x-auto whitespace-nowrap scrollbar-hide w-full sm:w-auto">
           {[{ v: "all", l: "All" }, { v: "student", l: "Students" }, { v: "college", l: "Colleges" }].map((opt) => (
             <button
               key={opt.v}
@@ -164,7 +166,7 @@ export default function RegistrationsClient() {
           <div className="py-20 text-center text-slate-400 text-sm">No registrations found.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[800px]">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
                   <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider w-10 text-center">#</th>

@@ -185,7 +185,8 @@ export default function ScholarshipListClient({
             </p>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse table-fixed">
+          <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse table-fixed min-w-[800px]">
             <colgroup>
               <col style={{ width: "4%" }} />
               <col style={{ width: "30%" }} />
@@ -270,6 +271,7 @@ export default function ScholarshipListClient({
               ))}
             </tbody>
           </table>
+        </div>
         )}
       </div>
 

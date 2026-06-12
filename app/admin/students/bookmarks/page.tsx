@@ -2,6 +2,7 @@ import { getDb } from "@/lib/db";
 import pool from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import BookmarkClient from "./BookmarkClient";
+import { ObjectId } from "mongodb";
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +26,8 @@ async function safeQuery<T >(
 
 async function createBookmark(formData: FormData) {
   "use server";
-  const student_id = parseInt(formData.get("student_id") as string, 10);
+  const rawId = formData.get("student_id") as string;
+  const student_id = isNaN(Number(rawId)) ? rawId : parseInt(rawId, 10);
   const bookmarktypeinfo_id = formData.get("bookmarktypeinfo_id") as string;
   const title = formData.get("title") as string;
   const url = formData.get("url") as string;
@@ -33,7 +35,7 @@ async function createBookmark(formData: FormData) {
   const course_id = parseInt(formData.get("course_id") as string, 10) || 0;
   const blog_id = parseInt(formData.get("blog_id") as string, 10) || 0;
 
-  if (isNaN(student_id) || !bookmarktypeinfo_id || !title || !url) return;
+  if (!student_id || !bookmarktypeinfo_id || !title || !url) return;
 
   try {
     await pool.query(
@@ -52,7 +54,8 @@ async function createBookmark(formData: FormData) {
 async function updateBookmark(formData: FormData) {
   "use server";
   const id = parseInt(formData.get("id") as string, 10);
-  const student_id = parseInt(formData.get("student_id") as string, 10);
+  const rawId = formData.get("student_id") as string;
+  const student_id = isNaN(Number(rawId)) ? rawId : parseInt(rawId, 10);
   const bookmarktypeinfo_id = formData.get("bookmarktypeinfo_id") as string;
   const title = formData.get("title") as string;
   const url = formData.get("url") as string;
@@ -60,7 +63,7 @@ async function updateBookmark(formData: FormData) {
   const course_id = parseInt(formData.get("course_id") as string, 10) || 0;
   const blog_id = parseInt(formData.get("blog_id") as string, 10) || 0;
 
-  if (isNaN(id) || isNaN(student_id) || !bookmarktypeinfo_id || !title || !url) return;
+  if (isNaN(id) || !student_id || !bookmarktypeinfo_id || !title || !url) return;
 
   try {
     await pool.query(
@@ -169,76 +172,110 @@ export default async function StudentBookmarksPage({
     safeQuery<TypeRow>(`SELECT id, name FROM bookmarktypeinfos ORDER BY name ASC`)
   ]);
 
-  // Fetch user names from MongoDB users collection
+  // Fetch user names from MongoDB users collection and next_student_signups
   const db = await getDb();
-  const bookmarkStudentIds = [...new Set(bookmarks.map((b: any) => Number(b.student_id)).filter(Boolean))];
+
+  // Extract student IDs of all types (numbers and string ObjectIds)
+  const rawStudentIds = bookmarks.map((b: any) => b.student_id).filter(Boolean);
+  const numericIds = rawStudentIds.map(id => Number(id)).filter(id => !isNaN(id) && id > 0);
+  const stringIds = rawStudentIds.map(id => String(id)).filter(id => isNaN(Number(id)));
 
   // If searching by name/email in q, also search MongoDB for matching users
   let mongoUserFilter: Record<string, unknown> = {};
+  let nextStudentFilter: Record<string, unknown> = {};
   if (q) {
     mongoUserFilter = { $or: [
       { firstname: { $regex: q, $options: "i" } },
       { email: { $regex: q, $options: "i" } },
     ]};
+    nextStudentFilter = { $or: [
+      { name: { $regex: q, $options: "i" } },
+      { email: { $regex: q, $options: "i" } },
+    ]};
   }
 
-  const [userRows, matchedUserRows] = await Promise.all([
-    bookmarkStudentIds.length > 0
-      ? db.collection("users").find({ id: { $in: bookmarkStudentIds } }, { projection: { id: 1, firstname: 1, email: 1 } }).toArray()
+  const objectIds = stringIds.map(id => ObjectId.isValid(id) ? new ObjectId(id) : id);
+
+  const [userRows, nextStudentRows, matchedUserRows, matchedNextStudentRows] = await Promise.all([
+    numericIds.length > 0
+      ? db.collection("users").find({ id: { $in: numericIds } }, { projection: { id: 1, firstname: 1, email: 1 } }).toArray()
+      : Promise.resolve([]),
+    stringIds.length > 0
+      ? db.collection("next_student_signups").find({ _id: { $in: objectIds as any } }, { projection: { _id: 1, name: 1, email: 1 } }).toArray()
       : Promise.resolve([]),
     q
       ? db.collection("users").find(mongoUserFilter, { projection: { id: 1, firstname: 1, email: 1 } }).limit(200).toArray()
       : Promise.resolve([]),
+    q
+      ? db.collection("next_student_signups").find(nextStudentFilter, { projection: { _id: 1, name: 1, email: 1 } }).limit(200).toArray()
+      : Promise.resolve([]),
   ]);
 
-  const userMap = new Map(userRows.map((u: any) => [Number(u.id), u]));
+  // Build a unified map of student info indexed by String representation of ID
+  const userMap = new Map<string, { name: string; email: string }>();
+  userRows.forEach((u: any) => userMap.set(String(u.id), { name: u.firstname || "Unknown", email: u.email || "-" }));
+  nextStudentRows.forEach((s: any) => userMap.set(String(s._id), { name: s.name || "Unknown", email: s.email || "-" }));
+  matchedUserRows.forEach((u: any) => userMap.set(String(u.id), { name: u.firstname || "Unknown", email: u.email || "-" }));
+  matchedNextStudentRows.forEach((s: any) => userMap.set(String(s._id), { name: s.name || "Unknown", email: s.email || "-" }));
 
   // If q matches student names/emails, fetch their bookmarks too and merge
   let extraBookmarks: any[] = [];
-  if (q && matchedUserRows.length > 0) {
-    const matchedIds = matchedUserRows.map((u: any) => Number(u.id)).filter((id: number) => !bookmarkStudentIds.includes(id));
+  if (q) {
+    const matchedIds = [
+      ...matchedUserRows.map((u: any) => String(u.id)),
+      ...matchedNextStudentRows.map((s: any) => String(s._id))
+    ].filter(id => !rawStudentIds.map(String).includes(id));
+
     if (matchedIds.length > 0) {
-      const extraConditions = ["b.student_id IN (" + matchedIds.map(() => "?").join(",") + ")"];
-      if (typeId) { extraConditions.push("b.bookmarktypeinfo_id = ?"); }
-      const extraWhere = `WHERE ${extraConditions.join(" AND ")}`;
-      const extraParams: (string | number)[] = [...matchedIds, ...(typeId ? [typeId] : [])];
-      extraBookmarks = await safeQuery<BookmarkRow>(
-        `SELECT b.*, bt.name as type_name
-         FROM bookmarks b
-         LEFT JOIN bookmarktypeinfos bt ON b.bookmarktypeinfo_id = bt.id
-         ${extraWhere}
-         ORDER BY b.created_at DESC
-         LIMIT ?`,
-        [...extraParams, FETCH_SIZE]
-      );
-      matchedUserRows.forEach((u: any) => userMap.set(Number(u.id), u));
+      const matchedIdFilters = matchedIds.map(id => isNaN(Number(id)) ? id : Number(id));
+      const queryFilter: any = { student_id: { $in: matchedIdFilters } };
+      if (typeId) {
+        queryFilter.bookmarktypeinfo_id = { $in: [Number(typeId), typeId] };
+      }
+      extraBookmarks = await db.collection("bookmarks").find(queryFilter).sort({ created_at: -1 }).limit(FETCH_SIZE).toArray();
     }
   }
 
   const allBookmarks = [...bookmarks, ...extraBookmarks];
 
   // Enrich bookmarks with student names
-  const enrichedBookmarks = allBookmarks.map((b: any) => ({
-    id:                  Number(b.id),
-    student_id:          Number(b.student_id),
-    college_id:          Number(b.college_id  ?? 0),
-    course_id:           Number(b.course_id   ?? 0),
-    blog_id:             Number(b.blog_id     ?? 0),
-    title:               String(b.title       ?? ""),
-    url:                 String(b.url         ?? ""),
-    bookmarktypeinfo_id: String(b.bookmarktypeinfo_id ?? ""),
-    type_name:           String(b.type_name   ?? ""),
-    created_at:          b.created_at instanceof Date ? b.created_at.toISOString() : String(b.created_at ?? ""),
-    student_name:        userMap.get(Number(b.student_id))?.firstname?.trim() || "Unknown",
-    student_email:       userMap.get(Number(b.student_id))?.email?.trim()     || "-",
-  }));
+  const enrichedBookmarks = allBookmarks.map((b: any) => {
+    const sId = String(b.student_id);
+    const userInfo = userMap.get(sId);
+    return {
+      id:                  Number(b.id),
+      student_id:          b.student_id,
+      college_id:          Number(b.college_id  ?? 0),
+      course_id:           Number(b.course_id   ?? 0),
+      blog_id:             Number(b.blog_id     ?? 0),
+      title:               String(b.title       ?? ""),
+      url:                 String(b.url         ?? ""),
+      bookmarktypeinfo_id: String(b.bookmarktypeinfo_id ?? ""),
+      type_name:           String(b.type_name   ?? ""),
+      created_at:          b.created_at instanceof Date ? b.created_at.toISOString() : String(b.created_at ?? ""),
+      student_name:        userInfo?.name || "Unknown",
+      student_email:       userInfo?.email || "-",
+    };
+  });
 
   // Users list for filter dropdown — fetch all users who have bookmarks
-  const allUserIds = [...new Set(allBookmarks.map((b: any) => Number(b.student_id)).filter(Boolean))];
-  const allUserRows = allUserIds.length > 0
-    ? await db.collection("users").find({ id: { $in: allUserIds } }, { projection: { id: 1, firstname: 1, email: 1 } }).toArray()
-    : [];
-  const users = allUserRows.map((u: any) => ({ id: Number(u.id), name: (u.firstname || "").trim(), email: (u.email || "").trim() }));
+  const allStudentIds = [...new Set(allBookmarks.map((b: any) => b.student_id).filter(Boolean))];
+  const dropdownNumericIds = allStudentIds.map(id => Number(id)).filter(id => !isNaN(id));
+  const dropdownStringIds = allStudentIds.map(id => String(id)).filter(id => isNaN(Number(id)));
+  
+  const [dropdownUserRows, dropdownNextStudentRows] = await Promise.all([
+    dropdownNumericIds.length > 0
+      ? db.collection("users").find({ id: { $in: dropdownNumericIds } }, { projection: { id: 1, firstname: 1, email: 1 } }).toArray()
+      : Promise.resolve([]),
+    dropdownStringIds.length > 0
+      ? db.collection("next_student_signups").find({ _id: { $in: dropdownStringIds.map(id => ObjectId.isValid(id) ? new ObjectId(id) : id) as any } }, { projection: { _id: 1, name: 1, email: 1 } }).toArray()
+      : Promise.resolve([]),
+  ]);
+
+  const dropdownUsers = [
+    ...dropdownUserRows.map((u: any) => ({ id: String(u.id), name: (u.firstname || "").trim(), email: (u.email || "").trim() })),
+    ...dropdownNextStudentRows.map((s: any) => ({ id: String(s._id), name: (s.name || "").trim(), email: (s.email || "").trim() }))
+  ];
 
   const total = Number(countRows[0]?.total ?? 0) + extraBookmarks.length;
   const totalPages = Math.ceil(total / FETCH_SIZE);
@@ -247,7 +284,7 @@ export default async function StudentBookmarksPage({
     <div className="p-6 space-y-6 w-full">
       <BookmarkClient 
         bookmarks={enrichedBookmarks}
-        users={users}
+        users={dropdownUsers}
         types={types.map((t: any) => ({ id: Number(t.id), name: String(t.name ?? "") }))}
         offset={offset}
         PAGE_SIZE={PAGE_SIZE}

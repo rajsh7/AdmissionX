@@ -140,10 +140,10 @@ export default function TopUniversities({
         <FadeIn>
           <div className="mb-8 grid grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-12">
             <div className="lg:col-span-8">
-              <h2 className="text-[28px] sm:text-[40px] lg:text-[56px] xl:text-[68px] font-semibold leading-[1.1] tracking-tight text-slate-900">
+              <h2 className="text-[32px] sm:text-[40px] lg:text-[56px] xl:text-[68px] font-semibold leading-[1.1] tracking-tight text-slate-900">
                 Discover the Top <span className="text-primary">Universities</span>
               </h2>
-              <p className="mt-4 max-w-3xl text-[15px] sm:text-[18px] lg:text-[22px] font-medium leading-relaxed text-slate-500">
+              <p className="mt-4 max-w-3xl text-base sm:text-[18px] lg:text-[22px] font-medium leading-relaxed text-slate-500">
                 Filter through thousands of institutions worldwide based on your
                 specific academic preferences and career goals.
               </p>
@@ -203,7 +203,7 @@ export default function TopUniversities({
         </div>
 
         <div className="mb-8 flex items-center gap-4">
-          <h3 className="whitespace-nowrap text-[20px] font-bold uppercase tracking-wider text-slate-900">
+          <h3 className="whitespace-nowrap text-base sm:text-[20px] font-bold uppercase tracking-wider text-slate-900">
             Top rank universities !
           </h3>
           <div className="h-px flex-1 bg-slate-100" />
@@ -215,7 +215,7 @@ export default function TopUniversities({
           {filteredUniversities.length > 0 ? (
             filteredUniversities.slice(0, 8).map((uni, i) => (
               <div key={`${uni.href}-${i}`}>
-                  <div className="group flex h-full flex-col overflow-hidden rounded-[5px] border border-slate-100 bg-white shadow-[0_15px_50px_-15px_rgba(0,0,0,0.05)] transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5">
+                  <div className="group flex h-full flex-col overflow-hidden rounded-[5px] border border-slate-200 bg-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_40px_80px_-15px_rgba(229,46,46,0.25)] hover:border-primary/30">
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <Image
                         src={uni.image}

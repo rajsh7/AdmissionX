@@ -175,7 +175,7 @@ export default async function AdminCoursesPage({
       </div>
 
       {/* ── Stats bar ─────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           {
             label: "Total Courses",
@@ -228,7 +228,7 @@ export default async function AdminCoursesPage({
 
       {/* ── Search + filter bar ───────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-        <form method="GET" action="/admin/courses" className="flex-1 flex gap-2">
+        <form method="GET" action="/admin/courses" className="flex-1 flex flex-wrap sm:flex-nowrap gap-2 w-full">
           {filter !== "all" && <input type="hidden" name="filter" value={filter} />}
           <div className="relative flex-1">
             <span

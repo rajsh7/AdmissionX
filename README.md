@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AdmissionX - World's First Online Admission Portal
 
-## Getting Started
+A comprehensive Next.js application for managing college admissions, student applications, and institutional partnerships.
 
-First, run the development server:
+## 🚀 Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔧 Environment Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create `.env.local` with:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+# Database
+MONGODB_URI=your_mongodb_connection_string
 
-## Learn More
+# Email (SMTP)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=welcome@admissionx.info
+SMTP_PASS=your_app_password
 
-To learn more about Next.js, take a look at the following resources:
+# Application
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+JWT_SECRET=your_jwt_secret
+CRON_SECRET=your_cron_secret
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Cloudinary (optional)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📁 Project Structure
 
-## Deploy on Vercel
+```
+app/
+├── api/              # API routes
+│   ├── auth/         # Authentication (login, signup, OTP)
+│   ├── student/      # Student operations
+│   ├── college/      # College operations
+│   ├── admin/        # Admin operations
+│   └── cron/         # Scheduled jobs
+├── dashboard/        # User dashboards
+├── colleges/         # College listings
+└── components/       # Shared components
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+lib/
+├── email.ts          # Email templates & sender
+├── db.ts             # Database connection
+├── auth.ts           # Authentication utilities
+└── security.ts       # Security middleware
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🎯 Key Features
+
+- **Student Portal**: Application management, document upload, payment processing
+- **College Portal**: Application review, admission management, student communication
+- **Admin Panel**: User management, college approvals, system monitoring
+- **Email Automation**: 20 automated email notifications
+- **Document Management**: Secure upload and verification
+- **Payment Integration**: Application fee processing
+- **Counselling System**: Session scheduling and management
+- **Seat Reservation**: Automated seat allocation
+
+## 📚 Documentation
+
+- [Email Integration Guide](./EMAIL_INTEGRATION_COMPLETE.md)
+- [Signup/Login Flow](./SIGNUP_LOGIN_FLOW.md)
+- [Database Setup](./DATABASE_SETUP.md)
+- [Production Checklist](./PRODUCTION_CHECKLIST.md)
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Database**: MongoDB
+- **Authentication**: JWT
+- **Email**: Nodemailer (SMTP)
+- **Styling**: Tailwind CSS
+- **Deployment**: Vercel
+
+## 🔐 Security
+
+- Rate limiting on authentication endpoints
+- CSRF protection
+- JWT-based authentication
+- Secure password hashing (bcrypt)
+- Input validation and sanitization
+- OTP verification (10 min expiry)
+- Activation link system (24 hour expiry)
+
+## 📞 Support
+
+For issues or questions, contact: welcome@admissionx.info

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const clientId = process.env.GOOGLE_CLIENT_ID!;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://admissionx.com";
   const redirectUri = `${baseUrl}/api/auth/google/callback`;
 
   // Pass apply_redirect as state so callback can redirect there after login

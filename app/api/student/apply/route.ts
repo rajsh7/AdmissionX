@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyStudentToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { sendApplicationSubmittedEmail, sendNewApplicationNotificationToCollege, sendApplicationStartedEmail } from "@/lib/email";
 
 async function checkAuth(req: NextRequest) {
   const cookieStore = await cookies();
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest) {
     stream_name?: string;
     fees?: number;
     notes?: string;
+    status?: string;
     documents?: { type: string; url: string }[];
     personal_info?: {
       name?: string;
@@ -46,6 +48,7 @@ export async function POST(req: NextRequest) {
       state?: string;
       address?: string;
       preferredStartDate?: string;
+      pincode?: string;
       countryCode?: string;
     };
     academic_info?: {
@@ -71,15 +74,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { collegeprofile_id, collegemaster_id, college_name, course_name, degree_name, stream_name, fees, notes, documents, personal_info, academic_info, payment_info } = body;
+  const { collegeprofile_id, collegemaster_id, college_name, course_name, degree_name, stream_name, fees, notes, status, documents, personal_info, academic_info, payment_info } = body;
 
-  const REQUIRED_DOC_TYPES = ["10th Marksheet", "12th Marksheet", "ID Proof"];
-  if (!documents || !Array.isArray(documents)) {
-    return NextResponse.json({ error: "documents field is required and must be an array." }, { status: 400 });
-  }
-  const missingDocs = REQUIRED_DOC_TYPES.filter((t) => !documents.map((d) => d.type).includes(t));
-  if (missingDocs.length > 0) {
-    return NextResponse.json({ error: `Missing required documents: ${missingDocs.join(", ")}` }, { status: 400 });
+  const isDraft = status === "draft";
+  
+  if (!isDraft) {
+    const REQUIRED_DOC_TYPES = ["10th Marksheet", "12th Marksheet", "ID Proof"];
+    if (!documents || !Array.isArray(documents)) {
+      return NextResponse.json({ error: "documents field is required and must be an array." }, { status: 400 });
+    }
+    const missingDocs = REQUIRED_DOC_TYPES.filter((t) => !documents.map((d) => d.type).includes(t));
+    if (missingDocs.length > 0) {
+      return NextResponse.json({ error: `Missing required documents: ${missingDocs.join(", ")}` }, { status: 400 });
+    }
   }
   if (!collegeprofile_id) {
     return NextResponse.json({ error: "collegeprofile_id is required." }, { status: 400 });
@@ -94,19 +101,6 @@ export async function POST(req: NextRequest) {
     { projection: { _id: 1 } }
   );
   if (collegeDoc) resolvedCollegeId = collegeDoc._id;
-
-  // Guard: one active application per college per student
-  const existing = await db.collection("applications").findOne({
-    studentId,
-    collegeId: resolvedCollegeId,
-    status: { $ne: "rejected" },
-  });
-  if (existing) {
-    return NextResponse.json(
-      { error: "You already have an active application for this college.", application_ref: existing.applicationRef },
-      { status: 409 }
-    );
-  }
 
   // Enrich college name
   let resolvedCollegeName = college_name?.trim() || null;
@@ -146,36 +140,90 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Generate unique ref
-  let applicationRef = generateRef();
-  for (let i = 0; i < 5; i++) {
-    const check = await db.collection("applications").findOne({ applicationRef });
-    if (!check) break;
-    applicationRef = generateRef();
-  }
-
-  const result = await db.collection("applications").insertOne({
-    applicationRef,
+  // Guard: one active application per college per student (except drafts)
+  const existing = await db.collection("applications").findOne({
     studentId,
     collegeId: resolvedCollegeId,
-    collegeName: resolvedCollegeName,
-    courseId: collegemaster_id ?? null,
-    courseName: resolvedCourseName,
-    degreeName: resolvedDegreeName,
-    streamName: resolvedStreamName,
-    fees: resolvedFees,
-    notes: notes ?? null,
-    personal_info: personal_info ?? null,
-    academic_info: academic_info ?? null,
-    payment_info: payment_info ?? null,
-    status: "submitted",
-    createdAt: new Date(),
+    status: { $nin: ["rejected", "draft"] },
   });
 
-  if (documents.length > 0) {
-    await db.collection("documents").insertMany(
-      documents.map((d) => ({ applicationId: result.insertedId, type: d.type, fileUrl: d.url }))
+  let targetId: any = null;
+  let finalRef = "";
+
+  if (existing) {
+    if (existing.payment_status === "paid") {
+      return NextResponse.json(
+        { error: "You already have an active application for this college.", application_ref: existing.applicationRef },
+        { status: 409 }
+      );
+    }
+    
+    // Unpaid application exists: update it instead of creating a new one
+    targetId = existing._id;
+    finalRef = existing.applicationRef;
+
+    await db.collection("applications").updateOne(
+      { _id: targetId },
+      {
+        $set: {
+          collegeId: resolvedCollegeId,
+          collegeName: resolvedCollegeName,
+          courseId: collegemaster_id ?? null,
+          courseName: resolvedCourseName,
+          degreeName: resolvedDegreeName,
+          streamName: resolvedStreamName,
+          fees: resolvedFees,
+          notes: notes ?? null,
+          personal_info: personal_info ?? null,
+          academic_info: academic_info ?? null,
+          payment_info: payment_info ?? null,
+          status: isDraft ? "draft" : "submitted",
+          updatedAt: new Date(),
+        }
+      }
     );
+
+    // Recreate documents reference
+    await db.collection("documents").deleteMany({ applicationId: targetId });
+    if (documents && documents.length > 0) {
+      await db.collection("documents").insertMany(
+        documents.map((d) => ({ applicationId: targetId, type: d.type, fileUrl: d.url }))
+      );
+    }
+  } else {
+    // Generate unique ref
+    let applicationRef = generateRef();
+    for (let i = 0; i < 5; i++) {
+      const check = await db.collection("applications").findOne({ applicationRef });
+      if (!check) break;
+      applicationRef = generateRef();
+    }
+    finalRef = applicationRef;
+
+    const result = await db.collection("applications").insertOne({
+      applicationRef: finalRef,
+      studentId,
+      collegeId: resolvedCollegeId,
+      collegeName: resolvedCollegeName,
+      courseId: collegemaster_id ?? null,
+      courseName: resolvedCourseName,
+      degreeName: resolvedDegreeName,
+      streamName: resolvedStreamName,
+      fees: resolvedFees,
+      notes: notes ?? null,
+      personal_info: personal_info ?? null,
+      academic_info: academic_info ?? null,
+      payment_info: payment_info ?? null,
+      status: isDraft ? "draft" : "submitted",
+      createdAt: new Date(),
+    });
+    targetId = result.insertedId;
+
+    if (documents && documents.length > 0) {
+      await db.collection("documents").insertMany(
+        documents.map((d) => ({ applicationId: targetId, type: d.type, fileUrl: d.url }))
+      );
+    }
   }
 
   // Save personal info back to profile so next application is pre-filled
@@ -193,6 +241,7 @@ export async function POST(req: NextRequest) {
     if (pi.gender) profUpdate.gender = pi.gender;
     if (pi.city)   profUpdate.city   = pi.city.trim();
     if (pi.state)  profUpdate.state  = pi.state;
+    if (pi.pincode) profUpdate.pincode = pi.pincode;
     await db.collection("next_student_profiles").updateOne(
       { student_id: String(studentId) },
       { $set: profUpdate, $setOnInsert: { created_at: new Date() } },
@@ -200,19 +249,67 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Send emails based on status
+  setImmediate(async () => {
+  try {
+    const studentDoc = await db.collection("next_student_signups").findOne(
+      { email: payload.email },
+      { projection: { name: 1, email: 1 } }
+    );
+    
+    if (studentDoc) {
+      if (isDraft) {
+        await sendApplicationStartedEmail(
+          studentDoc.email,
+          studentDoc.name || "Student",
+          finalRef
+        );
+      } else {
+        await sendApplicationSubmittedEmail(
+          studentDoc.email,
+          studentDoc.name || "Student",
+          finalRef,
+          resolvedCourseName || "General Admission",
+          resolvedCollegeName || "College"
+        );
+
+        const collegeDoc = await db.collection("collegeprofile").aggregate([
+          { $match: { _id: resolvedCollegeId } },
+          { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
+          { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
+          { $project: { email: "$u.email", name: "$u.firstname" } },
+          { $limit: 1 },
+        ]).toArray();
+
+        if (collegeDoc.length && collegeDoc[0].email) {
+          await sendNewApplicationNotificationToCollege(
+            collegeDoc[0].email,
+            resolvedCollegeName || "Your Institution",
+            studentDoc.name || "Student",
+            finalRef,
+            resolvedCourseName || "General Admission"
+          );
+        }
+      }
+    }
+  } catch (emailErr) {
+    console.error("[Apply] Email notification failed:", emailErr);
+  }
+});
+
   return NextResponse.json({
     success: true,
-    message: "Application submitted successfully.",
+    message: isDraft ? "Application saved as draft." : "Application submitted successfully.",
     application: {
-      id: result.insertedId,
-      application_ref: applicationRef,
+      id: targetId,
+      application_ref: finalRef,
       student_id: studentId,
       college_name: resolvedCollegeName,
       course_name: resolvedCourseName,
       degree_name: resolvedDegreeName,
       stream_name: resolvedStreamName,
       fees: resolvedFees,
-      status: "submitted",
+      status: isDraft ? "draft" : "submitted",
       payment_status: "pending",
     },
   }, { status: 201 });

@@ -56,9 +56,9 @@ function escapeRegex(s: string): string {
 
 async function fetchColleges(opts: {
   q: string; stream: string; degree: string; cityId: string; stateId: string;
-  countryId: string; feesMax: string; sort: string; type: string; page: number; limit: number;
+  countryId: string; feesMax: string; ranking: string; sort: string; type: string; page: number; limit: number;
 }): Promise<{ colleges: CollegeResult[]; total: number; totalPages: number }> {
-  const { q, stream, degree, cityId, stateId, countryId, feesMax, sort, type, page, limit } = opts;
+  const { q, stream, degree, cityId, stateId, countryId, feesMax, ranking, sort, type, page, limit } = opts;
   const db = await getDb();
 
   const match: Record<string, unknown> = {};
@@ -155,6 +155,20 @@ async function fetchColleges(opts: {
     match.$and = [...((match.$and as any[]) ?? []), { id: { $in: feeIds } }];
   }
 
+  if (ranking) {
+    const [minStr, maxStr] = ranking.split("-");
+    const min = parseInt(minStr);
+    const max = parseInt(maxStr);
+    const field = (type === "university") ? "topUniversityRank" : "ranking";
+    if (!isNaN(min)) {
+      if (!isNaN(max)) {
+        match.$and = [...((match.$and as any[]) ?? []), { [field]: { $gte: min, $lte: max } }];
+      } else if (ranking.endsWith("+")) {
+        match.$and = [...((match.$and as any[]) ?? []), { [field]: { $gt: min } }];
+      }
+    }
+  }
+
   const effectiveSort = (q.length >= 2 && (queryDegreeIds.length > 0 || queryStreamIds.length > 0) && sort === "rating") ? "fees" : sort;
   const isFeeSort = effectiveSort === "fees" || effectiveSort === "fees_high";
   const feesAscending = effectiveSort === "fees";
@@ -224,18 +238,44 @@ async function fetchColleges(opts: {
     total = countResult[0]?.total ?? 0;
     dataRows = pageRows;
   } else {
-    const preSortStage: Record<string, 1 | -1> =
-      effectiveSort === "ranking" ? { ranking: 1, rating: -1 }
-      : effectiveSort === "newest" ? { created_at: -1 }
-      : { rating: -1, totalRatingUser: -1 };
+    let topIds: any[];
 
-    const idRows = await db.collection("collegeprofile")
-      .find(match).sort(preSortStage).skip((page - 1) * limit).limit(limit).project({ _id: 1 }).toArray();
+    if (effectiveSort === "name") {
+      total = await db.collection("collegeprofile").countDocuments(match);
+      const namePipeline = [
+        { $match: match },
+        { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
+        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        {
+          $addFields: {
+            sort_name: {
+              $toLower: {
+                $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"]
+              }
+            }
+          }
+        },
+        { $sort: { sort_name: 1 } },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        { $project: { _id: 1 } }
+      ];
+      const idRows = await db.collection("collegeprofile").aggregate(namePipeline).toArray();
+      topIds = idRows.map((r: any) => r._id);
+    } else {
+      const preSortStage: Record<string, 1 | -1> =
+        effectiveSort === "ranking" ? { ranking: 1, rating: -1 }
+        : effectiveSort === "newest" ? { created_at: -1 }
+        : { rating: -1, totalRatingUser: -1 };
 
-    if (!idRows.length) return { colleges: [], total: await db.collection("collegeprofile").countDocuments(match), totalPages: 0 };
+      const idRows = await db.collection("collegeprofile")
+        .find(match).sort(preSortStage).skip((page - 1) * limit).limit(limit).project({ _id: 1 }).toArray();
 
-    const topIds = idRows.map((r: any) => r._id);
-    total = await db.collection("collegeprofile").countDocuments(match);
+      total = await db.collection("collegeprofile").countDocuments(match);
+      topIds = idRows.map((r: any) => r._id);
+    }
+
+    if (!topIds.length) return { colleges: [], total, totalPages: 0 };
 
     const pageRows = await db.collection("collegeprofile").aggregate([
       { $match: { _id: { $in: topIds } } },
@@ -279,6 +319,9 @@ async function fetchColleges(opts: {
   }));
 
   return { colleges, total, totalPages: Math.ceil(total / limit) };
+}
+
+interface SearchPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
@@ -295,6 +338,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const stateId = getString("state_id");
   const countryId = getString("country_id");
   const feesMax = getString("fees_max");
+  const ranking = getString("ranking");
   const sort = getString("sort", "rating");
   const type = getString("type");
   const page = Math.max(1, parseInt(getString("page", "1")));
@@ -325,7 +369,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   const [{ colleges, total, totalPages }, streamRows, degreeRows, cityRows, stateRows, countryRows] =
     await Promise.all([
-      fetchColleges({ q, stream, degree, cityId: resolvedCityId, stateId, countryId, feesMax, sort, type, page, limit }),
+      fetchColleges({ q, stream, degree, cityId: resolvedCityId, stateId, countryId, feesMax, ranking, sort, type, page, limit }),
 
       (async (): Promise<StreamRow[]> => {
         try {

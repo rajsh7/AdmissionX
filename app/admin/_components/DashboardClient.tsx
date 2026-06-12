@@ -29,8 +29,12 @@ interface DashboardClientProps {
     totalColleges: number;
     totalAdmins: number;
     activeQueries: number;
+    pendingStudents?: number;
     pendingColleges?: number;
+    successfulStudents?: number;
     activeBlogs?: number;
+    totalApplications?: number;
+    pendingApplications?: number;
   };
   graphData: GraphPoint[];
   collegeGraphData: GraphPoint[];
@@ -41,17 +45,72 @@ interface DashboardClientProps {
 }
 
 export default function DashboardClient({
-  stats, graphData, collegeGraphData,
-  studentTransactionPie, collegeTransactionPie,
-  recentStudents, recentActivity,
+  stats: propStats, graphData: propGraphData, collegeGraphData: propCollegeGraphData,
+  studentTransactionPie: propStudentTransactionPie, collegeTransactionPie: propCollegeTransactionPie,
+  recentStudents: propRecentStudents, recentActivity: propRecentActivity,
 }: DashboardClientProps) {
-  const [isMounted, setIsMounted]   = useState(false);
+  const [stats, setStats] = useState(propStats);
+  const [graphData, setGraphData] = useState(propGraphData);
+  const [collegeGraphData, setCollegeGraphData] = useState(propCollegeGraphData);
+  const [studentTransactionPie, setStudentTransactionPie] = useState(propStudentTransactionPie);
+  const [collegeTransactionPie, setCollegeTransactionPie] = useState(propCollegeTransactionPie);
+  const [recentStudents, setRecentStudents] = useState(propRecentStudents);
+  const [recentActivity, setRecentActivity] = useState(propRecentActivity);
   const [monthFilter, setMonthFilter] = useState("All");
   const [openMenu, setOpenMenu]     = useState<"student" | "college" | null>(null);
   const studentMonthRef = useRef<HTMLDivElement>(null);
   const collegeMonthRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setIsMounted(true); }, []);
+  const [lastUpdated, setLastUpdated] = useState<string>("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    setLastUpdated(new Date().toLocaleTimeString());
+  }, []);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const res = await fetch('/api/admin/dashboard-refresh', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        setStats(data.stats);
+        setGraphData(data.graphData);
+        setCollegeGraphData(data.collegeGraphData);
+        setStudentTransactionPie(data.studentTransactionPie);
+        setCollegeTransactionPie(data.collegeTransactionPie);
+        setRecentStudents(data.recentStudents);
+        setRecentActivity(data.recentActivity);
+        setLastUpdated(new Date().toLocaleTimeString());
+      } catch (e) {
+        console.error('[Dashboard] Auto-refresh failed:', e);
+      }
+    };
+
+    const intervalId = window.setInterval(fetchDashboardData, 30000);
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const res = await fetch('/api/admin/dashboard-refresh', { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data.stats);
+        setGraphData(data.graphData);
+        setCollegeGraphData(data.collegeGraphData);
+        setStudentTransactionPie(data.studentTransactionPie);
+        setCollegeTransactionPie(data.collegeTransactionPie);
+        setRecentStudents(data.recentStudents);
+        setRecentActivity(data.recentActivity);
+        setLastUpdated(new Date().toLocaleTimeString());
+      }
+    } catch (e) {
+      console.error('[Dashboard] Manual refresh failed:', e);
+    }
+    setTimeout(() => setIsRefreshing(false), 800);
+  };
 
   useEffect(() => {
     if (!openMenu) return;
@@ -96,20 +155,62 @@ export default function DashboardClient({
   const collegeYearTicks = useMemo(() => Array.from(collegeFirstKeyByYear.entries()).sort(([a],[b]) => a-b).map(([,k]) => k), [collegeFirstKeyByYear]);
 
   const statCards = [
-    { title: "Total Students", value: stats.totalStudents?.toLocaleString() || "0", subtext: `${stats.pendingColleges ?? 0} pending approval`, icon: <Users className="w-5 h-5" />,       href: "/admin/members/registrations" },
-    { title: "Total Colleges", value: stats.totalColleges?.toLocaleString() || "0", subtext: `${stats.pendingColleges ?? 0} pending approval`, icon: <Building2 className="w-5 h-5" />,   href: "/admin/colleges/profile" },
+    { 
+      title: "Total Students", 
+      value: stats.totalStudents?.toLocaleString() || "0", 
+      subtext: `${stats.successfulStudents ?? 0} successful signups`, 
+      icon: <Users className="w-5 h-5" />, 
+      href: "/admin/members/registrations" 
+    },
+    { 
+      title: "Total Colleges", 
+      value: stats.totalColleges?.toLocaleString() || "0", 
+      subtext: `${stats.pendingColleges ?? 0} pending approval`, 
+      icon: <Building2 className="w-5 h-5" />, 
+      href: "/admin/colleges/profile" 
+    },
     { title: "Admin Users",    value: stats.totalAdmins?.toLocaleString()   || "0", subtext: "active admins",                                  icon: <UserCog className="w-5 h-5" />,      href: "/admin/members/roles" },
-    { title: "Applications",   value: stats.activeQueries?.toLocaleString() || "0", subtext: `${stats.activeBlogs ?? 0} active blogs`,          icon: <MessageSquare className="w-5 h-5" />, href: "/admin/applications" },
+    { title: "Applications",   value: stats.totalApplications?.toLocaleString() || "0", subtext: `${stats.pendingApplications ?? 0} pending review`,          icon: <MessageSquare className="w-5 h-5" />, href: "/admin/applications" },
   ];
-
-  if (!isMounted) return <div className="min-h-screen bg-slate-50/50 animate-pulse" />;
 
   return (
     <div className="space-y-8 pb-10">
-      {/* Title */}
-      <div>
-        <h1 className="text-[25px] font-semibold text-[#3E3E3E]">Dashboard</h1>
-        <p className="text-[18px] font-normal text-slate-500">Overview of platform growth and activity.</p>
+      {/* Title & Live Status */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-[25px] font-semibold text-[#3E3E3E]">Dashboard</h1>
+          <p className="text-[18px] font-normal text-slate-500">Overview of platform growth and activity.</p>
+        </div>
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full shadow-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="text-[11px] font-bold text-emerald-700 tracking-wide uppercase">
+              Live updates
+            </span>
+            <span className="text-[11px] text-emerald-600/80 font-semibold font-mono">
+              (Synced {lastUpdated})
+            </span>
+          </div>
+          <button 
+            onClick={handleManualRefresh}
+            disabled={isRefreshing}
+            className="p-2 text-slate-400 hover:text-slate-600 bg-white border border-slate-100 rounded-full shadow-sm hover:shadow transition-all disabled:opacity-50 flex items-center justify-center"
+            title="Sync now"
+          >
+            <svg 
+              className={`w-4 h-4 ${isRefreshing ? "animate-spin text-emerald-500" : ""}`} 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor" 
+              strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -134,11 +235,11 @@ export default function DashboardClient({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Student Registration Chart */}
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6 relative min-h-[520px]">
-          <div className="flex justify-between items-center mb-10 overflow-visible">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 overflow-visible">
             <h2 className="text-[22px] font-semibold text-slate-800">Student Registration</h2>
-            <div className="relative" ref={studentMonthRef}>
+            <div className="relative w-full sm:w-auto" ref={studentMonthRef}>
               <button type="button" onClick={() => setOpenMenu(v => v === "student" ? null : "student")}
-                className="text-[13px] font-semibold text-slate-500 flex items-center gap-2 border border-slate-100 px-4 py-1.5 rounded-[5px] hover:bg-slate-50 transition-all">
+                className="w-full sm:w-auto text-[13px] font-semibold text-slate-500 flex items-center justify-between sm:justify-start gap-2 border border-slate-100 px-4 py-1.5 rounded-[5px] hover:bg-slate-50 transition-all">
                 {monthFilter}
                 <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${openMenu === "student" ? "rotate-180" : ""}`} />
               </button>
@@ -159,17 +260,17 @@ export default function DashboardClient({
             </div>
           </div>
           <div className="h-[380px] w-full px-4 overflow-hidden">
-            <StudentRegistrationChart data={filteredGraphData} ticks={yearTicks} keyMap={keyMap} firstKeyByYear={firstKeyByYear} monthFilter={monthFilter} />
+            <StudentRegistrationChart key={JSON.stringify(filteredGraphData)} data={filteredGraphData} ticks={yearTicks} keyMap={keyMap} firstKeyByYear={firstKeyByYear} monthFilter={monthFilter} />
           </div>
         </div>
 
         {/* College Registration Chart */}
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6 relative min-h-[520px]">
-          <div className="flex justify-between items-center mb-10 overflow-visible">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 overflow-visible">
             <h2 className="text-[22px] font-semibold text-slate-800">College Registration</h2>
-            <div className="relative" ref={collegeMonthRef}>
+            <div className="relative w-full sm:w-auto" ref={collegeMonthRef}>
               <button type="button" onClick={() => setOpenMenu(v => v === "college" ? null : "college")}
-                className="text-[13px] font-semibold text-slate-500 flex items-center gap-2 border border-slate-100 px-4 py-1.5 rounded-[5px] hover:bg-slate-50 transition-all">
+                className="w-full sm:w-auto text-[13px] font-semibold text-slate-500 flex items-center justify-between sm:justify-start gap-2 border border-slate-100 px-4 py-1.5 rounded-[5px] hover:bg-slate-50 transition-all">
                 {monthFilter}
                 <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${openMenu === "college" ? "rotate-180" : ""}`} />
               </button>
@@ -190,7 +291,7 @@ export default function DashboardClient({
             </div>
           </div>
           <div className="h-[380px] w-full px-4 overflow-hidden">
-            <CollegeRegistrationChart data={filteredCollegeGraphData} ticks={collegeYearTicks} keyMap={collegeKeyMap} firstKeyByYear={collegeFirstKeyByYear} monthFilter={monthFilter} />
+            <CollegeRegistrationChart key={JSON.stringify(filteredCollegeGraphData)} data={filteredCollegeGraphData} ticks={collegeYearTicks} keyMap={collegeKeyMap} firstKeyByYear={collegeFirstKeyByYear} monthFilter={monthFilter} />
           </div>
         </div>
       </div>
@@ -199,11 +300,11 @@ export default function DashboardClient({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6">
           <h2 className="text-[20px] font-bold text-slate-800 mb-6">Student Transactions</h2>
-          <div className="h-[300px] w-full"><TransactionsPieChart data={studentTransactionPie} /></div>
+          <div className="h-[450px] sm:h-[300px] w-full"><TransactionsPieChart key={JSON.stringify(studentTransactionPie)} data={studentTransactionPie} /></div>
         </div>
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md p-6">
           <h2 className="text-[20px] font-bold text-slate-800 mb-6">College Transactions</h2>
-          <div className="h-[300px] w-full"><TransactionsPieChart data={collegeTransactionPie} /></div>
+          <div className="h-[450px] sm:h-[300px] w-full"><TransactionsPieChart key={JSON.stringify(collegeTransactionPie)} data={collegeTransactionPie} /></div>
         </div>
       </div>
 
@@ -228,12 +329,12 @@ export default function DashboardClient({
         </div>
 
         <div className="bg-white rounded-[5px] border border-slate-100 shadow-md overflow-hidden flex flex-col p-6 xl:col-span-2">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <h2 className="text-[22px] font-semibold text-slate-800">Recent Student Registrations</h2>
             <Link href="/admin/members/registrations" className="text-[13px] font-bold text-blue-600 hover:text-blue-700 underline">View All</Link>
           </div>
           <div className="overflow-x-auto rounded-[5px] border border-slate-100">
-            <table className="w-full text-center border-collapse">
+            <table className="w-full text-center border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-slate-50 text-slate-600">
                   <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider border-r border-slate-100">Name</th>

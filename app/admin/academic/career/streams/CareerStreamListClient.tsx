@@ -76,7 +76,7 @@ export default function CareerStreamListClient({
 
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-6">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[800px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 <th className="px-5 py-3 text-left">Career Title</th>

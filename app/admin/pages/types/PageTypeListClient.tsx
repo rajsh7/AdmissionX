@@ -53,7 +53,7 @@ export default function PageTypeListClient({
       {/* Table */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto text-sm">
-          <table className="w-full">
+          <table className="w-full min-w-[800px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100 text-left">
                 <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Type Name / Category</th>

@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { getDb } from "@/lib/db";
+import { getCollegeDb } from "@/lib/db";
 import { sendCollegeSignupConfirmationEmail } from "@/lib/email";
+import { enforceRateLimit, rejectUntrustedOrigin } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
+  const originError = rejectUntrustedOrigin(req);
+  if (originError) return originError;
+
+  const rateLimitError = enforceRateLimit(req, "signup-college", 5, 15 * 60 * 1000);
+  if (rateLimitError) return rateLimitError;
+
   try {
     const body = await req.json();
     const { collegeName, email, contactName, phone, address, courses, password, captchaOk } = body;
@@ -27,7 +34,7 @@ export async function POST(req: NextRequest) {
     if (!/^[6-9]\d{9}$/.test(phoneTrimmed)) {
       return NextResponse.json({ error: "Please enter a valid 10-digit mobile number starting with 6-9." }, { status: 400 });
     }
-    const db = await getDb();
+    const db = await getCollegeDb();
 
     // Check email uniqueness across ALL collections
     const [existingCollege, existingStudent, existingLegacy, existingAdmin] = await Promise.all([
@@ -77,12 +84,18 @@ export async function POST(req: NextRequest) {
     } catch { /* ignore */ }
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error("Unknown college signup error");
+    const errorCode = typeof err === "object" && err !== null && "code" in err ? (err as { code?: number }).code : undefined;
+    const keyPattern = typeof err === "object" && err !== null && "keyPattern" in err
+      ? (err as { keyPattern?: { email?: unknown } }).keyPattern
+      : undefined;
+
     // SELF-HEALING: If "not primary" error, force reconnect
-    if (err.code === 10107 || err.message?.includes("not primary")) {
+    if (errorCode === 10107 || error.message?.includes("not primary")) {
       console.warn("♻️ [College Signup] Detected 'not primary' error. Attempting self-healing reconnection...");
-      const { forceReconnect } = await import("@/lib/db");
-      await forceReconnect();
+      const { forceReconnectCollege } = await import("@/lib/db");
+      await forceReconnectCollege();
       
       return NextResponse.json(
         { error: "Database was out of sync. Connection has been refreshed. Please try again." }, 
@@ -90,13 +103,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.error("[College Signup Internal Error]:", err);
-    if (err.code === 11000) {
-      const field = err.keyPattern?.email ? "email" : "mobile number";
+    console.error("[College Signup Internal Error]:", error);
+    if (errorCode === 11000) {
+      const field = keyPattern?.email ? "email" : "mobile number";
       return NextResponse.json({ error: `An account with this ${field} already exists.` }, { status: 409 });
     }
     return NextResponse.json(
-      { error: err.message || "Internal server error. Please try again." }, 
+      { error: error.message || "Internal server error. Please try again." }, 
       { status: 500 }
     );
   }

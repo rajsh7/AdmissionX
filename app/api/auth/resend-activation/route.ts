@@ -2,8 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { getDb } from "@/lib/db";
 import { sendStudentActivationEmail } from "@/lib/email";
+import { enforceRateLimit, rejectUntrustedOrigin } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
+  const originError = rejectUntrustedOrigin(req);
+  if (originError) return originError;
+
+  const rateLimitError = enforceRateLimit(req, "resend-activation", 5, 15 * 60 * 1000);
+  if (rateLimitError) return rateLimitError;
+
   try {
     const { email } = await req.json();
     if (!email) return NextResponse.json({ error: "Email is required." }, { status: 400 });

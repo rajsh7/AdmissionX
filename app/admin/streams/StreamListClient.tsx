@@ -128,7 +128,7 @@ export default function StreamListClient({
 
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-6">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[800px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 <th className="px-5 py-3 text-left w-10">#</th>
@@ -262,7 +262,7 @@ export default function StreamListClient({
 
       {/* Pagination after all shown */}
       {showPagination && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/30 rounded-b-2xl">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/30 rounded-b-2xl">
           <p className="text-xs text-slate-400 font-medium">
             Showing <span className="text-slate-700 font-bold">{offset + 1}–{Math.min(offset + pageSize, total)}</span> of <span className="text-slate-700 font-bold">{total}</span> streams
           </p>

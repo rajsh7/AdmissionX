@@ -190,7 +190,8 @@ export default function SportsListClient({
             </p>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse table-fixed">
+          <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse table-fixed min-w-[800px]">
             <colgroup>
               <col style={{ width: "4%" }} />
               <col style={{ width: "32%" }} />
@@ -284,6 +285,7 @@ export default function SportsListClient({
               );})}
             </tbody>
           </table>
+        </div>
         )}
       </div>
 

@@ -101,6 +101,7 @@ const footerLinks = {
     { label: "About Us", href: "/about" },
     { label: "Privacy Policy", href: "/privacy-policy" },
     { label: "Terms & Conditions", href: "/terms-and-conditions" },
+    { label: "Cancellation & Refunds", href: "/cancellation-refunds" },
     { label: "FAQ", href: "/faq" },
     { label: "Site Map", href: "/site-map" },
   ],
@@ -188,6 +189,9 @@ export default function Footer() {
               <p className="text-slate-400 text-[14px] leading-relaxed mb-4 max-w-md">
                 AdmissionX is India&apos;s most trusted college admissions platform. We connect students with 16,000+ institutions, entrance exams, scholarships, and career guidance — all in one place.
               </p>
+              <p className="text-slate-500 text-[13px] leading-relaxed mb-2 max-w-md">
+                AdmissionX is a product of <span className="text-white font-semibold">Saroj Entertainment Pvt. Ltd.</span>
+              </p>
               <p className="text-slate-500 text-[13px] leading-relaxed mb-6 max-w-md">
                 Founded with a mission to democratise access to quality education information, we help every student — regardless of background or location — make confident, well-informed decisions about their future.
               </p>
@@ -267,11 +271,12 @@ export default function Footer() {
           <FadeIn>
             <div className="mt-12 pt-6 border-t border-white/8 flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-[12px] text-slate-600 text-center sm:text-left">
-                © {new Date().getFullYear()} AdmissionX. All rights reserved.
+                © 2026 Saroj Entertainment Pvt. Ltd. All Rights Reserved.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
                 <Link href="/privacy-policy" className="text-[12px] text-slate-600 hover:text-white transition-colors">Privacy Policy</Link>
-                <Link href="/terms-and-conditions" className="text-[12px] text-slate-600 hover:text-white transition-colors">Terms of Service</Link>
+                <Link href="/terms-and-conditions" className="text-[12px] text-slate-600 hover:text-white transition-colors">Terms & Conditions</Link>
+                <Link href="/cancellation-refunds" className="text-[12px] text-slate-600 hover:text-white transition-colors">Cancellation & Refunds</Link>
                 <Link href="/contact-us" className="text-[12px] text-slate-600 hover:text-white transition-colors">Contact Us</Link>
               </div>
             </div>

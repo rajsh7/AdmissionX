@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { signStudentToken, STUDENT_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
+import { sendStudentRegistrationEmail } from "@/lib/email";
 
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
@@ -41,6 +42,26 @@ export async function GET(req: NextRequest) {
     { _id: student._id },
     { $set: { is_active: 1, activation_token: null, activation_token_exp: null } }
   );
+
+  // Send welcome registration email after activation
+  setImmediate(async () => {
+    try {
+      const studentDoc = await db.collection("next_student_signups").findOne(
+        { _id: student._id },
+        { projection: { name: 1, email: 1, phone: 1 } }
+      );
+      if (studentDoc) {
+        await sendStudentRegistrationEmail(
+          studentDoc.email,
+          studentDoc.name || "Student",
+          studentDoc.email,
+          studentDoc.phone || "Not provided"
+        );
+      }
+    } catch (emailErr) {
+      console.error("[Activate] Welcome email failed:", emailErr);
+    }
+  });
 
   const jwtToken = await signStudentToken({
     id: student._id.toString(),

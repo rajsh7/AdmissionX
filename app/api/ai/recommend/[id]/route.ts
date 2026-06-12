@@ -55,18 +55,38 @@ export async function GET(
 
   const db = await getDb();
 
-  const [marksDoc, profileDoc] = await Promise.all([
+  const [marksDoc, profileDoc, docsList] = await Promise.all([
     db.collection("next_student_marks").findOne({ $or: [{ student_id: id }, { student_id: payload.id }] }),
     db.collection("next_student_profiles").findOne({ student_id: id }),
+    db.collection("next_student_documents").find({ $or: [{ student_id: id }, { student_id: payload.id }] }).toArray(),
   ]);
 
   const marks = (marksDoc ?? {}) as Record<string, unknown>;
   const profile = (profileDoc ?? {}) as Record<string, unknown>;
+  const docs = docsList ?? [];
 
   const pct12 = parseFloat(String(marks.class12_percent || marks.class10_percent || "0")) || 0;
   const stream12 = String(marks.class12_stream || "").trim();
   const city = String(profile.city || "").trim();
   const state = String(profile.state || "").trim();
+
+  const hasMarks = pct12 > 0;
+  const has10thMarksheet = docs.some(d => d.category === "marksheet_10");
+  const has12thMarksheet = docs.some(d => d.category === "marksheet_12");
+  const hasMarksheet = has10thMarksheet && has12thMarksheet;
+
+  if (!hasMarks || !hasMarksheet) {
+    return NextResponse.json({
+      recommendations: [],
+      profileSummary: {
+        pct12,
+        stream: stream12 || "Not specified",
+        city: city || null,
+        hasMarks,
+        hasMarksheet,
+      },
+    });
+  }
 
   const relevantStreams = STREAM_MAP[stream12] ?? ["Engineering", "Management", "Medical", "Arts", "Commerce"];
 
@@ -77,7 +97,16 @@ export async function GET(
   const faIds = faRows.map((f: any) => f.id);
 
   if (!faIds.length) {
-    return NextResponse.json({ recommendations: [], profileSummary: { pct12, stream: stream12 || "Not specified", city: city || null, hasMarks: pct12 > 0 } });
+    return NextResponse.json({
+      recommendations: [],
+      profileSummary: {
+        pct12,
+        stream: stream12 || "Not specified",
+        city: city || null,
+        hasMarks,
+        hasMarksheet,
+      },
+    });
   }
 
   const cmRows = await db.collection("collegemaster")
@@ -218,6 +247,6 @@ export async function GET(
 
   return NextResponse.json({
     recommendations,
-    profileSummary: { pct12, stream: stream12 || "Not specified", city: city || null, hasMarks: pct12 > 0 },
+    profileSummary: { pct12, stream: stream12 || "Not specified", city: city || null, hasMarks: pct12 > 0, hasMarksheet: true },
   });
 }

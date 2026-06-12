@@ -180,7 +180,7 @@ export default async function AdminBlogsPage({
       </div>
 
       {/* ── Stats bar ────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           {
             label: "Total Blogs",
@@ -224,7 +224,7 @@ export default async function AdminBlogsPage({
       {/* ── Search + filter bar ───────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3">
         {/* Search */}
-        <form method="GET" action="/admin/blogs" className="flex-1 flex gap-2">
+        <form method="GET" action="/admin/blogs" className="flex-1 flex flex-wrap sm:flex-nowrap gap-2 w-full">
           {filter !== "all" && <input type="hidden" name="filter" value={filter} />}
           <div className="relative flex-1">
             <span

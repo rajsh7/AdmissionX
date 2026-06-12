@@ -21,7 +21,8 @@ interface FormState {
     countryCode: string;
     phone: string;
     dob: string;
-    preferredStartDate: string;
+    pincode: string;
+    state: string;
     address: string;
     city: string;
   };
@@ -107,7 +108,8 @@ const defaultFormState: FormState = {
     countryCode: "+91",
     phone: "",
     dob: "",
-    preferredStartDate: "",
+    pincode: "",
+    state: "",
     address: "",
     city: "",
   },
@@ -370,9 +372,25 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
 
   function validateStep(stepIndex: number) {
     if (stepIndex === 0) {
-      const { fullName, email, phone, dob, address, city } = form.personal;
-      if (!fullName || !email || !phone || !dob || !address || !city) {
+      const { fullName, email, phone, dob, pincode, state, address, city, countryCode } = form.personal;
+      if (!fullName || !email || !phone || !dob || !pincode || !state || !address || !city) {
         return "Please complete all personal details before continuing.";
+      }
+
+      const cleanPhone = phone.replace(/[-()\s]/g, "");
+      if (countryCode === "+91" && !/^[6-9]\d{9}$/.test(cleanPhone)) {
+        return "Please enter a valid 10-digit Indian mobile number.";
+      }
+      if (!/^\d{7,15}$/.test(cleanPhone)) {
+        return "Please enter a valid phone number (digits only).";
+      }
+
+      if (!/^\d{8}$/.test(dob)) {
+        return "Please enter a valid Date of Birth in DDMMYYYY format (exactly 8 digits, e.g. 12052002).";
+      }
+
+      if (!/^\d{6}$/.test(pincode)) {
+        return "Please enter a valid 6-digit Pincode.";
       }
     }
 
@@ -393,12 +411,36 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
         !board ||
         !stream ||
         !percentage ||
-        !yearOfPassing ||
-        !entranceExam ||
-        !entrancePercentage ||
-        !yearOfExam
+        !yearOfPassing
       ) {
         return "Please complete all academic details before continuing.";
+      }
+
+      if (!/^\d+(\.\d+)?$/.test(percentage)) {
+        return "Percentage must contain only numbers (e.g., 85.5).";
+      }
+      const pct = parseFloat(percentage);
+      if (pct < 0 || pct > 100) {
+        return "Percentage must be between 0 and 100.";
+      }
+
+      if (!/^\d{4}$/.test(yearOfPassing)) {
+        return "Year of passing must be a 4-digit number (e.g., 2024).";
+      }
+
+      if (entrancePercentage) {
+        if (!/^\d+(\.\d+)?$/.test(entrancePercentage)) {
+          return "Entrance exam percentage must contain only numbers (e.g., 90.2).";
+        }
+        const ePct = parseFloat(entrancePercentage);
+        if (ePct < 0 || ePct > 100) {
+          return "Entrance percentage must be between 0 and 100.";
+        }
+      }
+      if (yearOfExam) {
+        if (!/^\d{4}$/.test(yearOfExam)) {
+          return "Year of exam must be a 4-digit number (e.g., 2024).";
+        }
       }
     }
 
@@ -457,14 +499,16 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
             collegeprofile_id: college.slug,
             college_name: college.collegeName,
             documents: docs,
+            fees: 499, // Pass the standard application fee of 499
             personal_info: {
               name: form.personal.fullName,
               email: form.personal.email,
               phone: form.personal.phone,
               dob: form.personal.dob,
               city: form.personal.city,
+              state: form.personal.state,
+              pincode: form.personal.pincode,
               address: form.personal.address,
-              preferredStartDate: form.personal.preferredStartDate,
               countryCode: form.personal.countryCode,
             },
             academic_info: {
@@ -490,6 +534,35 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
         if (!res.ok) {
           setError(data.error || "Submission failed. Please try again.");
           return;
+        }
+
+        // If the application has a fee, initiate Easebuzz payment checkout link
+        if (data.application?.fees > 0) {
+          try {
+            const payRes = await fetch("/api/student/payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                student_id: data.application.student_id,
+                application_id: data.application.id,
+                amount: data.application.fees,
+              }),
+            });
+            const payData = await payRes.json();
+            if (payRes.ok && payData.payment_url) {
+              localStorage.removeItem(storageKey);
+              // Redirect directly to the Easebuzz hosted checkout portal
+              window.location.href = payData.payment_url;
+              return;
+            } else {
+              setError(payData.error || "Payment initiation failed. Please try again.");
+              return;
+            }
+          } catch (payErr) {
+            console.error("[Payment Initiate Error]:", payErr);
+            setError("Failed to redirect to payment gateway. Please check your network.");
+            return;
+          }
         }
 
         setCompleted(true);
@@ -535,7 +608,7 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
             <FieldInput
               value={form.personal.fullName}
               onChange={(value) => updatePersonal("fullName", value)}
-              placeholder="Full Name ( as per passport )"
+              placeholder="Full Name"
             />
           </div>
           <div className="space-y-2">
@@ -557,7 +630,13 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
                 <span className="text-base">🇮🇳</span>
                 <select
                   value={form.personal.countryCode}
-                  onChange={(event) => updatePersonal("countryCode", event.target.value)}
+                  onChange={(event) => {
+                    const nextCode = event.target.value;
+                    updatePersonal("countryCode", nextCode);
+                    if (nextCode === "+91") {
+                      updatePersonal("phone", form.personal.phone.replace(/\D/g, "").slice(0, 10));
+                    }
+                  }}
                   className="bg-transparent outline-none"
                 >
                   <option value="+91">+91</option>
@@ -567,7 +646,11 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
               </div>
               <input
                 value={form.personal.phone}
-                onChange={(event) => updatePersonal("phone", event.target.value)}
+                onChange={(event) => {
+                  const cleaned = event.target.value.replace(/\D/g, "");
+                  const maxLen = form.personal.countryCode === "+91" ? 10 : 15;
+                  updatePersonal("phone", cleaned.slice(0, maxLen));
+                }}
                 placeholder="XXX-XXX-XXXX"
                 className="min-w-0 flex-1 px-4 text-sm text-[#111827] outline-none"
               />
@@ -578,46 +661,48 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
             <FieldLabel>Date of Birth</FieldLabel>
             <FieldInput
               value={form.personal.dob}
-              onChange={(value) => updatePersonal("dob", value)}
-              placeholder="DD/MM/YYYY"
+              onChange={(value) => updatePersonal("dob", value.replace(/\D/g, "").slice(0, 8))}
+              placeholder="DDMMYYYY"
             />
           </div>
 
           <div className="space-y-2">
-            <FieldLabel>Preferred Start Date</FieldLabel>
+            <FieldLabel>Pincode</FieldLabel>
             <FieldInput
-              value={form.personal.preferredStartDate}
-              onChange={(value) => updatePersonal("preferredStartDate", value)}
-              placeholder="DD/MM/YYYY"
+              value={form.personal.pincode}
+              onChange={(value) => updatePersonal("pincode", value.replace(/\D/g, "").slice(0, 6))}
+              placeholder="Enter pincode"
             />
           </div>
         </div>
 
+        <div className="space-y-2">
+          <FieldLabel>Permanent Address</FieldLabel>
+          <textarea
+            value={form.personal.address}
+            onChange={(event) => updatePersonal("address", event.target.value)}
+            placeholder="Enter your permanent full address"
+            className="min-h-[92px] w-full rounded-[4px] border border-[#e5e7eb] px-4 py-3 text-sm text-[#111827] outline-none transition focus:border-[#d1d5db] focus:ring-2 focus:ring-[#ff5757]/15"
+          />
+        </div>
+
         <div className="grid gap-5 md:grid-cols-2">
           <div className="space-y-2">
-            <FieldLabel>Permanent Address</FieldLabel>
-            <textarea
-              value={form.personal.address}
-              onChange={(event) => updatePersonal("address", event.target.value)}
-              placeholder="Enter your permanent full address"
-              className="min-h-[92px] w-full rounded-[4px] border border-[#e5e7eb] px-4 py-3 text-sm text-[#111827] outline-none transition focus:border-[#d1d5db] focus:ring-2 focus:ring-[#ff5757]/15"
+            <FieldLabel>Current City</FieldLabel>
+            <FieldInput
+              value={form.personal.city}
+              onChange={(value) => updatePersonal("city", value)}
+              placeholder="Enter your city"
             />
           </div>
 
           <div className="space-y-2">
-            <FieldLabel>Current City</FieldLabel>
-            <select
-              value={form.personal.city}
-              onChange={(event) => updatePersonal("city", event.target.value)}
-              className="h-11 w-full rounded-[4px] border border-[#e5e7eb] px-4 text-sm text-[#111827] outline-none transition focus:border-[#d1d5db] focus:ring-2 focus:ring-[#ff5757]/15"
-            >
-              <option value="">Enter your city</option>
-              {cityOptions.map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
-              ))}
-            </select>
+            <FieldLabel>State</FieldLabel>
+            <FieldInput
+              value={form.personal.state}
+              onChange={(value) => updatePersonal("state", value)}
+              placeholder="Enter your state"
+            />
           </div>
         </div>
       </div>
@@ -674,7 +759,12 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
             <FieldLabel>Percentage</FieldLabel>
             <FieldInput
               value={form.academic.percentage}
-              onChange={(value) => updateAcademic("percentage", value)}
+              onChange={(value) => {
+                const cleaned = value.replace(/[^0-9.]/g, "");
+                const parts = cleaned.split(".");
+                const finalVal = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : cleaned;
+                updateAcademic("percentage", finalVal);
+              }}
               placeholder="Enter your percentage"
             />
           </div>
@@ -682,8 +772,8 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
             <FieldLabel>Year of passing</FieldLabel>
             <FieldInput
               value={form.academic.yearOfPassing}
-              onChange={(value) => updateAcademic("yearOfPassing", value)}
-              placeholder="DD/MM/YYYY"
+              onChange={(value) => updateAcademic("yearOfPassing", value.replace(/\D/g, "").slice(0, 4))}
+              placeholder="YYYY"
             />
           </div>
         </div>
@@ -708,7 +798,12 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
             <FieldLabel>Percentage</FieldLabel>
             <FieldInput
               value={form.academic.entrancePercentage}
-              onChange={(value) => updateAcademic("entrancePercentage", value)}
+              onChange={(value) => {
+                const cleaned = value.replace(/[^0-9.]/g, "");
+                const parts = cleaned.split(".");
+                const finalVal = parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : cleaned;
+                updateAcademic("entrancePercentage", finalVal);
+              }}
               placeholder="Enter your percentage"
             />
           </div>
@@ -716,8 +811,8 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
             <FieldLabel>Year of Exam</FieldLabel>
             <FieldInput
               value={form.academic.yearOfExam}
-              onChange={(value) => updateAcademic("yearOfExam", value)}
-              placeholder="DD/MM/YYYY"
+              onChange={(value) => updateAcademic("yearOfExam", value.replace(/\D/g, "").slice(0, 4))}
+              placeholder="YYYY"
             />
           </div>
         </div>
@@ -941,6 +1036,11 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
       { label: "Applicant Name", value: form.personal.fullName || "-" },
       { label: "Email", value: form.personal.email || "-" },
       { label: "Phone", value: form.personal.phone || "-" },
+      { label: "Date of Birth", value: form.personal.dob || "-" },
+      { label: "City", value: form.personal.city || "-" },
+      { label: "State", value: form.personal.state || "-" },
+      { label: "Pincode", value: form.personal.pincode || "-" },
+      { label: "Address", value: form.personal.address || "-" },
       { label: "Qualification", value: form.academic.qualification || "-" },
       { label: "Board", value: form.academic.board || "-" },
       { label: "Stream", value: form.academic.stream || "-" },
@@ -980,8 +1080,7 @@ export default function ApplyCollegeForm({ college }: { college: ApplyCollegeDat
             className="mt-1 h-4 w-4 rounded border-[#d1d5db] text-[#ff5757] focus:ring-[#ff5757]"
           />
           <span>
-            I confirm that the information provided above is accurate and I agree to be
-            contacted by the admission team for this application.
+            I confirm that the information provided above is accurate and I consent to receive communications from AdmissionX (a product of Saroj Entertainment Pvt. Ltd.) and the educational institutions/admission team via SMS, email, WhatsApp, and phone calls regarding my application and related educational services.
           </span>
         </label>
       </div>

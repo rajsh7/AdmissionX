@@ -281,14 +281,14 @@ export default function CounsellingPageClient() {
           {/* Text Content */}
           <div className="relative z-10 flex-1 w-full text-center lg:text-left py-10 lg:py-0">
             <h1
-              className="font-semibold leading-[1.1] tracking-tight [text-shadow:0_1px_2px_rgba(255,255,255,0.85)] mb-4 max-w-[850px]"
-              style={{ fontSize: "40px", color: "#3E3E3E" }}
+              className="font-semibold leading-[1.1] tracking-tight [text-shadow:0_1px_2px_rgba(255,255,255,0.85)] mb-4 max-w-[850px] text-[32px] sm:text-[40px]"
+              style={{ color: "#3E3E3E" }}
             >
               Find the Right Course &amp; college in 60 Seconds
             </h1>
             <p
-              className="font-medium leading-relaxed mx-auto lg:mx-0 mb-8 max-w-[850px]"
-              style={{ fontSize: "20px", color: "#3E3E3EB5" }}
+              className="font-medium leading-relaxed mx-auto lg:mx-0 mb-8 max-w-[850px] text-base sm:text-[20px]"
+              style={{ color: "#3E3E3EB5" }}
             >
               Our AI-powered matcher learns your interests and goals, then suggests courses <br className="hidden lg:block" /> and colleges that fit — so you spend less time searching and more <br className="hidden lg:block" /> time planning your future.
             </p>
@@ -308,7 +308,7 @@ export default function CounsellingPageClient() {
           </div>
 
           {/* Robot Mascot */}
-          <div className="absolute right-8 sm:right-16 lg:right-24 top-1/2 -translate-y-1/2 w-[300px] sm:w-[340px] lg:w-[380px] aspect-square pointer-events-none select-none">
+          <div className="relative lg:absolute lg:right-24 lg:top-1/2 lg:-translate-y-1/2 w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[380px] aspect-square pointer-events-none select-none mx-auto lg:mx-0 mt-6 lg:mt-0">
             <Image
               src={HERO_ROBOT_SRC}
               alt="Friendly AI counselling assistant"
@@ -323,7 +323,7 @@ export default function CounsellingPageClient() {
 
       {/* Wizard */}
       <section id="counselling-wizard" className="w-full max-w-none px-2 sm:px-4 lg:px-6 xl:px-8 2xl:px-10 pb-6 scroll-mt-24">
-        <div className="w-full max-w-none mx-auto bg-white rounded-[5px] border border-neutral-200/90 shadow-[0_8px_30px_rgb(0,0,0,0.06)] px-6 sm:px-8 lg:px-12 xl:px-14 py-6 sm:py-8 lg:py-10">
+        <div className="w-full max-w-none mx-auto bg-white rounded-[5px] border border-neutral-200/90 shadow-[0_8px_30px_rgb(0,0,0,0.06)] px-4 sm:px-8 lg:px-12 xl:px-14 py-6 sm:py-8 lg:py-10">
           <div className="flex flex-wrap items-start justify-between gap-2 text-xs sm:text-sm text-neutral-500 mb-3">
             <span>
               Step {step} of {STEPS.length}
@@ -343,14 +343,14 @@ export default function CounsellingPageClient() {
           {step === 1 && (
             <div className="space-y-4 max-w-4xl">
               <h2
-                className="font-medium mb-2"
-                style={{ fontSize: "32px", color: "#3E3E3E" }}
+                className="font-medium mb-2 text-[24px] sm:text-[32px]"
+                style={{ color: "#3E3E3E" }}
               >
                 Let&apos;s personalize your journey
               </h2>
               <p
-                className="font-medium leading-relaxed"
-                style={{ fontSize: "20px", color: "#3E3E3E80" }}
+                className="font-medium leading-relaxed text-base sm:text-[20px]"
+                style={{ color: "#3E3E3E80" }}
               >
                 Answer a few quick questions. It takes about a minute, and we&apos;ll use your answers to surface
                 colleges and courses that fit you.
@@ -362,14 +362,14 @@ export default function CounsellingPageClient() {
             <div className="space-y-6">
               <div>
                 <h2
-                  className="font-medium mb-1"
-                  style={{ fontSize: "32px", color: "#3E3E3E" }}
+                  className="font-medium mb-1 text-[24px] sm:text-[32px]"
+                  style={{ color: "#3E3E3E" }}
                 >
                   What fields are you most interested in?
                 </h2>
                 <p
-                  className="font-medium"
-                  style={{ fontSize: "20px", color: "#3E3E3E80" }}
+                  className="font-medium text-base sm:text-[20px]"
+                  style={{ color: "#3E3E3E80" }}
                 >
                   Select up to 3 options to help us narrow down your perfect fit.
                 </p>
@@ -419,14 +419,14 @@ export default function CounsellingPageClient() {
           {step === 3 && (
             <div className="space-y-4 max-w-4xl">
               <h2
-                className="font-medium"
-                style={{ fontSize: "32px", color: "#3E3E3E" }}
+                className="font-medium text-[24px] sm:text-[32px]"
+                style={{ color: "#3E3E3E" }}
               >
                 What&apos;s your current academic level?
               </h2>
               <p
-                className="font-medium"
-                style={{ fontSize: "20px", color: "#3E3E3E80" }}
+                className="font-medium text-base sm:text-[20px]"
+                style={{ color: "#3E3E3E80" }}
               >
                 This helps us recommend realistic entry paths.
               </p>
@@ -454,18 +454,18 @@ export default function CounsellingPageClient() {
 
           {step === 4 && (
             <div className="space-y-4 max-w-4xl">
-              <h2
-                className="font-medium"
-                style={{ fontSize: "32px", color: "#3E3E3E" }}
-              >
-                Preferred study locations
-              </h2>
-              <p
-                className="font-medium"
-                style={{ fontSize: "24px", color: "#3E3E3E80" }}
-              >
-                You can refine this later — pick what feels right today.
-              </p>
+                <h2
+                  className="font-medium text-[24px] sm:text-[32px]"
+                  style={{ color: "#3E3E3E" }}
+                >
+                  Preferred study locations
+                </h2>
+                <p
+                  className="font-medium text-base sm:text-[24px]"
+                  style={{ color: "#3E3E3E80" }}
+                >
+                  You can refine this later — pick what feels right today.
+                </p>
               <div className="flex flex-wrap gap-2">
                 {LOCATION_OPTIONS.map((x) => (
                   <button
@@ -487,14 +487,14 @@ export default function CounsellingPageClient() {
           {step === 5 && (
             <div className="space-y-4 max-w-4xl">
               <h2
-                className="font-medium"
-                style={{ fontSize: "36px", color: "#3E3E3E" }}
+                className="font-medium text-[24px] sm:text-[36px]"
+                style={{ color: "#3E3E3E" }}
               >
                 Annual fee comfort zone
               </h2>
               <p
-                className="font-medium"
-                style={{ fontSize: "24px", color: "#3E3E3E80" }}
+                className="font-medium text-base sm:text-[24px]"
+                style={{ color: "#3E3E3E80" }}
               >
                 Rough range is fine; we use it to filter suggestions.
               </p>
@@ -579,14 +579,14 @@ export default function CounsellingPageClient() {
         <div className="w-full max-w-none mx-auto px-6 sm:px-8 lg:px-12 xl:px-14">
           <div className="mb-6">
             <h2
-              className="font-semibold"
-              style={{ fontSize: "32px", color: "#3E3E3E" }}
+              className="font-semibold text-[24px] sm:text-[32px]"
+              style={{ color: "#3E3E3E" }}
             >
               Your Top Matches
             </h2>
             <p
-              className="font-normal mt-1"
-              style={{ fontSize: "20px", color: "#3E3E3E80" }}
+              className="font-normal mt-1 text-base sm:text-[20px]"
+              style={{ color: "#3E3E3E80" }}
             >
               {!hasPersonalizedAnswers
                 ? "Start selecting your preferences to see personalized matches."

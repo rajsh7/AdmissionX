@@ -31,7 +31,7 @@ export default function ContactSection() {
             {/* ── Left: Contact Info ────────────────────────────── */}
             <div className="flex flex-col justify-center">
               <h2 className="tracking-tight leading-[1.1] mb-3 sm:mb-4 text-[28px] sm:text-[38px] lg:text-[50px]" style={{ fontWeight: '700', color: '#3E3E3E' }}>
-                Get in Touch
+                Get in <span className="text-[#FF3C3C]">Touch</span>
               </h2>
               <p className="tracking-relaxed mb-8 sm:mb-12 max-w-xl text-[15px] sm:text-[18px] lg:text-[20px]" style={{ fontWeight: '500', color: '#3E3E3E' }}>
                 Get the real story about campus life, professors, and placements from people who've actually been there.

@@ -280,7 +280,7 @@ export default function BulkImagesClient({
       {/* Table */}
       <form id="bulk-form" ref={formRef} onSubmit={handleSubmit} className="bg-white mt-2">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
                 {/* Select all checkbox */}

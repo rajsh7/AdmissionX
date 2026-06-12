@@ -1,9 +1,19 @@
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 
 // ── Secret ────────────────────────────────────────────────────────────────────
-const SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET ?? "adx-dev-secret-change-me-in-production",
-);
+const FALLBACK_SECRET = "adx-dev-secret-change-me-in-production";
+const JWT_ISSUER = "admissionx";
+const JWT_AUDIENCE = "admissionx-web";
+
+function getSecret() {
+  const rawSecret = process.env.JWT_SECRET ?? FALLBACK_SECRET;
+  if (process.env.NODE_ENV === "production" && rawSecret === FALLBACK_SECRET) {
+    throw new Error("JWT_SECRET must be set in production.");
+  }
+  return new TextEncoder().encode(rawSecret);
+}
+
+const SECRET = getSecret();
 
 // ── Cookie Names ──────────────────────────────────────────────────────────────
 export const STUDENT_COOKIE = "adx_student";
@@ -25,6 +35,8 @@ export async function signStudentToken(
 ): Promise<string> {
   return new SignJWT({ ...data })
     .setProtectedHeader({ alg: "HS256" })
+    .setIssuer(JWT_ISSUER)
+    .setAudience(JWT_AUDIENCE)
     .setIssuedAt()
     .setExpirationTime("7d")
     .sign(SECRET);
@@ -34,7 +46,10 @@ export async function verifyStudentToken(
   token: string,
 ): Promise<StudentTokenPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, SECRET);
+    const { payload } = await jwtVerify(token, SECRET, {
+      issuer: JWT_ISSUER,
+      audience: JWT_AUDIENCE,
+    });
     return payload as StudentTokenPayload;
   } catch {
     return null;
@@ -56,6 +71,8 @@ export async function signCollegeToken(
 ): Promise<string> {
   return new SignJWT({ ...data })
     .setProtectedHeader({ alg: "HS256" })
+    .setIssuer(JWT_ISSUER)
+    .setAudience(JWT_AUDIENCE)
     .setIssuedAt()
     .setExpirationTime("7d")
     .sign(SECRET);
@@ -65,7 +82,10 @@ export async function verifyCollegeToken(
   token: string,
 ): Promise<CollegeTokenPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, SECRET);
+    const { payload } = await jwtVerify(token, SECRET, {
+      issuer: JWT_ISSUER,
+      audience: JWT_AUDIENCE,
+    });
     return payload as CollegeTokenPayload;
   } catch {
     return null;
@@ -88,6 +108,8 @@ export async function signAdminToken(
 ): Promise<string> {
   return new SignJWT({ ...data })
     .setProtectedHeader({ alg: "HS256" })
+    .setIssuer(JWT_ISSUER)
+    .setAudience(JWT_AUDIENCE)
     .setIssuedAt()
     .setExpirationTime("1d")
     .sign(SECRET);
@@ -97,7 +119,10 @@ export async function verifyAdminToken(
   token: string,
 ): Promise<AdminTokenPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, SECRET);
+    const { payload } = await jwtVerify(token, SECRET, {
+      issuer: JWT_ISSUER,
+      audience: JWT_AUDIENCE,
+    });
     return payload as AdminTokenPayload;
   } catch {
     return null;

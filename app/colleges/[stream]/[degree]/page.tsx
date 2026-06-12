@@ -96,21 +96,45 @@ export default async function CollegesByStreamDegreePage({ params, searchParams 
     total = cpIds.length;
     totalPages = Math.ceil(total / limit);
 
-    const mongoSort: Record<string, 1 | -1> =
-      sort === "ranking" ? { ranking: 1 } :
-      sort === "newest" ? { created_at: -1 } :
-      { rating: -1, totalRatingUser: -1 };
+    const pipeline: any[] = [
+      { $match: { id: { $in: cpIds } } }
+    ];
 
-    const cpDocs = await db.collection("collegeprofile").aggregate([
-      { $match: { id: { $in: cpIds } } },
-      { $sort: mongoSort },
+    if (sort === "name") {
+      pipeline.push(
+        { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
+        { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
+        {
+          $addFields: {
+            sort_name: {
+              $toLower: {
+                $ifNull: [{ $trim: { input: "$u.firstname" } }, "$slug"]
+              }
+            }
+          }
+        },
+        { $sort: { sort_name: 1 } }
+      );
+    } else {
+      const mongoSort: Record<string, 1 | -1> =
+        sort === "ranking" ? { ranking: 1 } :
+        sort === "newest" ? { created_at: -1 } :
+        { rating: -1, totalRatingUser: -1 };
+      pipeline.push(
+        { $sort: mongoSort },
+        { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
+        { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } }
+      );
+    }
+
+    pipeline.push(
       { $skip: offset },
       { $limit: limit },
-      { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
-      { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
       { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "c" } },
-      { $unwind: { path: "$c", preserveNullAndEmptyArrays: true } },
-    ]).toArray();
+      { $unwind: { path: "$c", preserveNullAndEmptyArrays: true } }
+    );
+
+    const cpDocs = await db.collection("collegeprofile").aggregate(pipeline).toArray();
 
     colleges = cpDocs.map((row) => ({
       id: row.id, slug: row.slug,

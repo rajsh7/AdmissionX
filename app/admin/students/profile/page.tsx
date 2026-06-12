@@ -141,6 +141,11 @@ export default async function StudentProfilePage({
     is_active: Number(p.is_active || 0),
     created_at: String(p.created_at || ""),
   }));
+  const statsBookmarked = await db.collection("bookmarks")
+    .find({ bookmarktypeinfo_id: { $in: [4, "4"] } }, { projection: { student_id: 1 } })
+    .toArray();
+  const bookmarkedStudentIds = statsBookmarked.map((b: any) => String(b.student_id));
+
   const total = newStudents.length + totalCount;
   const totalPages = Math.max(1, Math.ceil(total / FETCH_SIZE));
 
@@ -152,6 +157,37 @@ export default async function StudentProfilePage({
 
   async function createProfile(formData: FormData) { "use server"; }
   async function deleteProfile(id: number) { "use server"; }
+
+  async function toggleBookmark(studentIdStr: string, studentName: string) {
+    "use server";
+    const db = await getDb();
+    const existing = await db.collection("bookmarks").findOne({
+      student_id: { $in: [Number(studentIdStr), studentIdStr] },
+      bookmarktypeinfo_id: { $in: [4, "4"] }
+    });
+
+    if (existing) {
+      await db.collection("bookmarks").deleteOne({ _id: existing._id });
+    } else {
+      const last = await db.collection("bookmarks").find({}, { projection: { id: 1 } }).sort({ id: -1 }).limit(1).toArray();
+      const nextId = ((last[0]?.id as number) ?? 0) + 1;
+
+      await db.collection("bookmarks").insertOne({
+        id: nextId,
+        student_id: isNaN(Number(studentIdStr)) ? studentIdStr : Number(studentIdStr),
+        college_id: 0,
+        course_id: 0,
+        blog_id: 0,
+        url: `/admin/students/profile/${studentIdStr}`,
+        bookmarktypeinfo_id: 4,
+        title: studentName,
+        created_at: new Date(),
+        updated_at: new Date()
+      });
+    }
+    revalidatePath("/admin/students/profile");
+    revalidatePath("/admin/students/bookmarks");
+  }
 
   return (
     <div className="p-6 space-y-6 w-full">
@@ -168,6 +204,8 @@ export default async function StudentProfilePage({
         selectedParentsName={parentsName}
         createProfile={createProfile}
         deleteProfile={deleteProfile}
+        bookmarkedStudentIds={JSON.parse(JSON.stringify(bookmarkedStudentIds))}
+        toggleBookmark={toggleBookmark}
       />
     </div>
   );

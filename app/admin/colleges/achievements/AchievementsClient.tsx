@@ -188,7 +188,8 @@ export default function AchievementsClient({ slug, collegeName }: Props) {
             </button>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
                 <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-wider">Title</th>
@@ -229,6 +230,7 @@ export default function AchievementsClient({ slug, collegeName }: Props) {
               ))}
             </tbody>
           </table>
+        </div>
         )}
       </div>
     </div>

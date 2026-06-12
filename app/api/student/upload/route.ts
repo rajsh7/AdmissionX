@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyStudentToken, STUDENT_COOKIE } from "@/lib/auth";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { saveUpload } from "@/lib/upload-utils";
 
 export const runtime = "nodejs";
 
@@ -43,23 +42,19 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Build a unique filename
-    const ext = file.name.split(".").pop() || "bin";
-    const filename = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "documents");
-    await mkdir(uploadDir, { recursive: true });
-
-    const filePath = path.join(uploadDir, filename);
-    await writeFile(filePath, buffer);
-
-    const url = `/uploads/documents/${filename}`;
+    // Save file using standard helper which handles root/standalone mirroring and path resolution
+    const url = await saveUpload(file, "documents", "doc");
     return NextResponse.json({ url });
-  } catch (err) {
+  } catch (err: any) {
     console.error("[upload] local save error:", err);
-    return NextResponse.json({ error: "Upload failed. Please try again." }, { status: 500 });
+    return NextResponse.json({ 
+      error: "Upload failed. Please try again.",
+      debug: {
+        message: err?.message,
+        code: err?.code,
+        stack: err?.stack,
+        cwd: process.cwd(),
+      }
+    }, { status: 500 });
   }
 }

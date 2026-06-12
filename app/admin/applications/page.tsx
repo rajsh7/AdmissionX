@@ -1,21 +1,90 @@
 import { getDb } from "@/lib/db";
+import { ObjectId } from "mongodb";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import ApplicationsListClient from "./ApplicationsListClient";
+import {
+  sendCollegeApplicationStatusEmail,
+  sendStudentApplicationStatusEmail,
+} from "@/lib/application-email";
 
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
 async function updateApplicationStatus(formData: FormData): Promise<void> {
   "use server";
-  const id       = formData.get("id")     as string;
-  const statusId = parseInt(formData.get("status") as string, 10);
-  if (!id || !statusId) return;
+  const appId = formData.get("appId") as string;
+  const status = formData.get("status") as string;
+  if (!appId || !status || !ObjectId.isValid(appId)) return;
   try {
     const db = await getDb();
-    await db.collection("application").updateOne(
-      { id: parseInt(id, 10) },
-      { $set: { applicationstatus_id: statusId, updated_at: new Date() } },
+    const application = await db.collection("applications").findOne({ _id: new ObjectId(appId) });
+    if (!application) return;
+
+    await db.collection("applications").updateOne(
+      { _id: new ObjectId(appId) },
+      { $set: { status, updated_at: new Date(), updatedAt: new Date() } }
     );
+
+    const collegeProfile = application.collegeId
+      ? await db.collection("collegeprofile").findOne(
+          { _id: new ObjectId(application.collegeId) },
+          { projection: { email: 1, contactpersonemail: 1, college_name: 1, contactpersonname: 1, slug: 1 } }
+        )
+      : (application.college_slug
+        ? await db.collection("collegeprofile").findOne(
+            { slug: String(application.college_slug).trim() },
+            { projection: { email: 1, contactpersonemail: 1, college_name: 1, contactpersonname: 1, slug: 1 } }
+          )
+        : null);
+
+    const collegeSlug = collegeProfile?.slug ? String(collegeProfile.slug).trim() : "";
+    const appRef = String(application.applicationRef ?? application.application_ref ?? application._id.toString());
+    const studentName = String(application.personal_info?.name ?? application.student_name ?? "Student");
+    const collegeName = String(
+      application.collegeName ??
+      application.college_name ??
+      collegeProfile?.college_name ??
+      collegeProfile?.contactpersonname ??
+      "Institution",
+    );
+    const courseName = (application.courseName ?? application.course_name) ? String(application.courseName ?? application.course_name) : null;
+    const reason = status === "rejected" ? "The institution has not approved this application at this stage." : null;
+
+    const studentEmail = String(application.personal_info?.email ?? application.student_email ?? "").trim();
+    if (studentEmail) {
+      try {
+        await sendStudentApplicationStatusEmail({
+          to: studentEmail,
+          studentName,
+          collegeName,
+          appId: appRef,
+          courseName,
+          status,
+          reason,
+        });
+      } catch (emailErr) {
+        console.error("[admin/applications studentEmail]", emailErr);
+      }
+    }
+
+    const collegeEmail = String(collegeProfile?.contactpersonemail ?? collegeProfile?.email ?? "").trim();
+    if (collegeEmail) {
+      try {
+        await sendCollegeApplicationStatusEmail({
+          to: collegeEmail,
+          collegeEmail,
+          studentName,
+          collegeName,
+          collegeSlug,
+          appId: appRef,
+          courseName,
+          status,
+          reason,
+        });
+      } catch (emailErr) {
+        console.error("[admin/applications collegeEmail]", emailErr);
+      }
+    }
   } catch (e) {
     console.error("[admin/applications updateStatus]", e);
   }
@@ -41,6 +110,7 @@ function formatDate(d: string | Date | null | undefined): string {
 
 const STATUS_TABS = [
   { value: "all",       label: "All"          },
+  { value: "submitted", label: "Submitted"    },
   { value: "approved",  label: "Approved"     },
   { value: "pending",   label: "Pending"      },
   { value: "rejected",  label: "Rejected"     },
@@ -53,6 +123,8 @@ const STATUS_STYLE: Record<string, { cls: string; dot: string }> = {
   submitted: { cls: "bg-blue-50 text-blue-700 border-blue-100",          dot: "bg-blue-500"    },
   rejected:  { cls: "bg-red-50 text-red-700 border-red-100",             dot: "bg-red-500"     },
   cancelled: { cls: "bg-slate-50 text-slate-600 border-slate-100",       dot: "bg-slate-400"   },
+  "payment failed": { cls: "bg-red-50 text-red-700 border-red-100",      dot: "bg-red-500"     },
+  "payment pending": { cls: "bg-amber-50 text-amber-700 border-amber-100", dot: "bg-amber-500"   },
   default:   { cls: "bg-slate-50 text-slate-600 border-slate-100",       dot: "bg-slate-400"   },
 };
 
@@ -78,41 +150,21 @@ export default async function AdminApplicationsPage({
   const db = await getDb();
 
   // ── Load lookup maps ───────────────────────────────────────────────────────
-  const [appStatuses, collegeMasters, collegeProfiles, courses, degrees] = await Promise.all([
-    db.collection("applicationstatus").find({}).toArray(),
-    db.collection("collegemaster").find({}, { projection: { id: 1, course_id: 1, degree_id: 1, collegeprofile_id: 1 } }).toArray(),
-    db.collection("collegeprofile").find({}, { projection: { id: 1, slug: 1, contactpersonname: 1 } }).toArray(),
-    db.collection("course").find({}, { projection: { id: 1, name: 1 } }).toArray(),
-    db.collection("degree").find({}, { projection: { id: 1, name: 1 } }).toArray(),
-  ]);
+  const collegeProfiles = await db.collection("collegeprofile").find({}, { projection: { id: 1, slug: 1, contactpersonname: 1 } }).toArray();
 
-  // Build lookup maps
-  const statusMap  = Object.fromEntries(appStatuses.map(s => [s.id, String(s.name ?? "").trim()]));
-  const courseMap  = Object.fromEntries(courses.map(c => [c.id, String(c.name ?? "").trim()]));
-  const degreeMap  = Object.fromEntries(degrees.map(d => [d.id, String(d.name ?? "").trim()]));
-  const cpMap      = Object.fromEntries(collegeProfiles.map(cp => [cp.id, { slug: String(cp.slug ?? "").trim(), name: String(cp.contactpersonname ?? cp.slug ?? "").trim() }]));
-  const cmMap      = Object.fromEntries(collegeMasters.map(cm => [cm.id, { course_id: cm.course_id, degree_id: cm.degree_id, collegeprofile_id: cm.collegeprofile_id }]));
-
-  // ── Build filter ───────────────────────────────────────────────────────────
-  // Resolve status id filter
-  let statusIdFilter: number | null = null;
-  if (statusFilter !== "all") {
-    const found = appStatuses.find(s => String(s.name ?? "").trim().toLowerCase() === statusFilter.toLowerCase());
-    if (found) statusIdFilter = found.id;
+  const collegeSlugMap = new Map<string, string>();
+  for (const cp of collegeProfiles) {
+    if (cp._id && cp.slug) {
+      collegeSlugMap.set(cp._id.toString(), cp.slug);
+    }
   }
 
-  // Resolve college profile_id filter
-  let cpIdFilter: number | null = null;
-  if (collegeFilter) {
-    const found = collegeProfiles.find(cp => String(cp.slug ?? "").trim() === collegeFilter);
-    if (found) cpIdFilter = found.id;
-  }
+  // Fetch all applications from new collection
+  const allApps = await db.collection("applications").find({}).sort({ _id: -1 }).toArray();
 
-  // Fetch all applications (198 total — small enough to filter in memory)
-  const allApps = await db.collection("application").find({}).sort({ created_at: -1 }).toArray();
-
-  // Normalize + join in memory
+  // Normalize
   interface AppRow {
+    _id: string;
     id: number;
     applicationRef: string | null;
     student_name: string | null;
@@ -126,39 +178,44 @@ export default async function AdminApplicationsPage({
     createdAt: string;
   }
 
-  const normalized: AppRow[] = allApps.map(a => {
-    const statusId  = a.applicationstatus_id;
-    const statusName = statusMap[statusId] ?? "Submitted";
-    const cm        = cmMap[a.collegemaster_id];
-    const cp        = cm ? cpMap[cm.collegeprofile_id] : (cpMap[a.collegeprofile_id] ?? null);
-    const courseName = cm ? courseMap[cm.course_id] : null;
-    const degreeName = cm ? degreeMap[cm.degree_id] : null;
-    const firstName  = String(a.firstname ?? "").trim();
-    const lastName   = String(a.lastname  ?? "").trim();
+  const normalized: AppRow[] = allApps.map((a, idx) => {
+    const cId = a.collegeId ? a.collegeId.toString() : null;
+    const cSlug = cId ? collegeSlugMap.get(cId) : null;
+
+    const fees = Number(a.fees ?? 0);
+    const payment_status = String(a.payment_status ?? "pending");
+    let status = a.status || "pending";
+    if (fees > 0 && payment_status !== "paid") {
+      if (payment_status === "failed") {
+        status = "payment failed";
+      } else {
+        status = "payment pending";
+      }
+    }
+
     return {
-      id:            a.id as number,
-      applicationRef: a.applicationID ? String(a.applicationID).trim() : null,
-      student_name:  [firstName, lastName].filter(Boolean).join(" ") || null,
-      student_email: a.email ? String(a.email).trim() : null,
-      student_phone: a.phone ? String(a.phone).trim() : null,
-      college_name:  cp?.name || null,
-      college_slug:  cp?.slug || null,
-      course_name:   courseName || null,
-      degree_name:   degreeName || null,
-      status:        statusName,
-      createdAt:     a.created_at ? String(a.created_at).trim() : "",
+      _id: a._id.toString(),
+      id: idx + 1,
+      applicationRef: a.applicationRef || a.application_ref || null,
+      student_name: a.personal_info?.name || a.student_name || null,
+      student_email: a.personal_info?.email || a.student_email || null,
+      student_phone: a.personal_info?.phone || a.student_phone || null,
+      college_name: a.collegeName || a.college_name || null,
+      college_slug: cSlug || a.college_slug || null,
+      course_name: a.courseName || a.course_name || null,
+      degree_name: a.degreeName || a.degree_name || null,
+      status,
+      createdAt: (a.createdAt || a.created_at) ? new Date(a.createdAt || a.created_at).toISOString() : "",
     };
   });
 
   // Apply filters
   let filtered = normalized;
-  if (statusIdFilter !== null) {
-    const targetStatus = statusMap[statusIdFilter]?.toLowerCase();
-    filtered = filtered.filter(a => a.status.toLowerCase() === targetStatus);
+  if (statusFilter !== "all") {
+    filtered = filtered.filter(a => a.status.toLowerCase() === statusFilter.toLowerCase());
   }
-  if (cpIdFilter !== null) {
-    const targetSlug = cpMap[cpIdFilter]?.slug;
-    filtered = filtered.filter(a => a.college_slug === targetSlug);
+  if (collegeFilter) {
+    filtered = filtered.filter(a => a.college_slug === collegeFilter);
   }
   if (q) {
     const lq = q.toLowerCase();
@@ -218,7 +275,7 @@ export default async function AdminApplicationsPage({
       </div>
 
       {/* ── Stat cards ─────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         {STATUS_TABS.map((tab) => {
           const val      = tab.value === "all" ? grandTotal : (statusCountMap[tab.value] ?? 0);
           const isActive = statusFilter === tab.value;
@@ -248,7 +305,7 @@ export default async function AdminApplicationsPage({
       <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center">
 
         {/* Status tabs */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl flex-shrink-0 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl w-full sm:w-auto overflow-x-auto no-scrollbar">
           {STATUS_TABS.map((tab) => (
             <Link
               key={tab.value}
@@ -337,6 +394,7 @@ export default async function AdminApplicationsPage({
               totalPages={totalPages}
               total={total}
               pageSize={PAGE_SIZE}
+              updateAction={updateApplicationStatus}
             />
           </>
         )}
@@ -346,7 +404,4 @@ export default async function AdminApplicationsPage({
     </div>
   );
 }
-
-
-
 

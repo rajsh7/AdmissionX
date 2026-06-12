@@ -112,7 +112,7 @@ export default async function ApplyCollegePage({
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
       <Header />
-      <main className="mt-8 pb-10 pt-6 md:mt-10 md:pb-12 md:pt-8 lg:mt-12">
+      <main className="pt-[110px] md:pt-[130px] pb-10 md:pb-12">
         <div className="mx-auto w-full max-w-6xl px-4">
           <ApplyCollegeForm college={college} />
         </div>

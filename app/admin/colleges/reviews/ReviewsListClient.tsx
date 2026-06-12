@@ -156,7 +156,7 @@ export default function ReviewsListClient({
           <div className="py-20 text-center text-slate-500 text-sm font-semibold">No review records found.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[800px]">
               <thead>
                 <tr style={{ backgroundColor: "#3F434A" }}>
                   <th className="px-4 py-3 text-left text-white text-[13px] font-semibold tracking-wide">S.NO</th>

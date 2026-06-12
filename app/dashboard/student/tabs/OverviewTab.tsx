@@ -45,7 +45,7 @@ function StatCard({
   trendUp?: boolean;
 }) {
   return (
-    <div className="bg-white rounded-[10px] p-6 shadow-sm border border-gray-100 flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
+    <div className="bg-white rounded-[10px] p-4 sm:p-6 shadow-sm border border-gray-100 flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
       <div className="flex justify-between items-start mb-4">
         <div>
            <p className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider mb-1">{title}</p>
@@ -116,7 +116,7 @@ export default function OverviewTab({ user, navigate }: Props) {
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Page Header */}
       <div className="flex flex-col gap-1">
-        <h2 className="text-[26px] font-bold text-[#222] tracking-tight">Dashboard</h2>
+        <h2 className="text-[22px] sm:text-[26px] font-bold text-[#222] tracking-tight">Dashboard</h2>
         <p className="text-[14px] font-semibold text-gray-400 uppercase tracking-widest leading-none">Welcome back!</p>
       </div>
 
@@ -156,26 +156,26 @@ export default function OverviewTab({ user, navigate }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-8">
           {/* Greeting Card */}
-          <div className="bg-white rounded-[10px] p-8 shadow-sm border border-gray-100 flex items-center gap-8 relative overflow-hidden group">
+          <div className="bg-white rounded-[10px] p-6 sm:p-8 shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 relative overflow-hidden group">
             <div className="absolute right-0 top-0 w-32 h-32 bg-[#e31e24] opacity-[0.03] rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
             
-            <div className="w-24 h-24 bg-gray-100 rounded-full shrink-0 border-4 border-gray-50 flex items-center justify-center text-gray-300 overflow-hidden">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-full shrink-0 border-4 border-gray-50 flex items-center justify-center text-gray-300 overflow-hidden">
                {profile?.photo
                  ? <img src={profile.photo} alt={name} className="w-full h-full object-cover" />
-                 : <span className="material-symbols-outlined text-[48px]">person</span>
+                 : <span className="material-symbols-outlined text-[40px] sm:text-[48px]">person</span>
                }
             </div>
             
-            <div className="space-y-2">
-              <h3 className="text-[28px] font-bold text-[#222]">Hi! {name}</h3>
+            <div className="space-y-2 text-center sm:text-left">
+              <h3 className="text-[24px] sm:text-[28px] font-bold text-[#222]">Hi! {name}</h3>
               <p className="text-[14px] font-medium text-gray-500 leading-relaxed max-w-md">
                 Your admission journey is progressing well. You have {stats?.total ?? 0} active applications currently being processed.
               </p>
-              <div className="pt-2 flex gap-3">
-                <button onClick={() => navigate("account-details")} className="px-5 py-2 bg-[#e31e24] text-white text-[13px] font-medium rounded-lg hover:shadow-lg transition-all active:scale-95">
+              <div className="pt-2 flex flex-wrap justify-center sm:justify-start gap-3">
+                <button onClick={() => navigate("account-details")} className="flex-1 sm:flex-none px-5 py-2 bg-[#e31e24] text-white text-[13px] font-medium rounded-lg hover:shadow-lg transition-all active:scale-95">
                   Complete Profile
                 </button>
-                <button onClick={() => navigate("app-all")} className="px-5 py-2 bg-gray-100 text-gray-600 text-[13px] font-medium rounded-lg hover:bg-gray-200 transition-all">
+                <button onClick={() => navigate("app-all")} className="flex-1 sm:flex-none px-5 py-2 bg-gray-100 text-gray-600 text-[13px] font-medium rounded-lg hover:bg-gray-200 transition-all">
                   View Timeline
                 </button>
               </div>
@@ -183,7 +183,7 @@ export default function OverviewTab({ user, navigate }: Props) {
           </div>
 
           {/* Recent Activity - real applications */}
-          <div className="bg-white rounded-[10px] p-8 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-[10px] p-6 sm:p-8 shadow-sm border border-gray-100">
              <div className="flex items-center justify-between mb-8">
                 <h4 className="text-[18px] font-bold text-[#222]">Recent Applications</h4>
                 <button onClick={() => navigate("app-all")} className="text-[12px] font-semibold text-[#e31e24] uppercase tracking-wider">View All</button>
@@ -213,8 +213,8 @@ export default function OverviewTab({ user, navigate }: Props) {
         </div>
 
         {/* Right Sidebar Stats */}
-        <div className="lg:col-span-4 flex flex-col gap-8">
-           <div className="bg-[#333333] rounded-[10px] p-8 text-white relative overflow-hidden group">
+        <div className="lg:col-span-4 flex flex-col gap-6 sm:gap-8">
+           <div className="bg-[#333333] rounded-[10px] p-6 sm:p-8 text-white relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-6 opacity-20 transform translate-x-4 -translate-y-4">
                  <span className="material-symbols-outlined text-[100px]">equalizer</span>
               </div>
@@ -234,7 +234,7 @@ export default function OverviewTab({ user, navigate }: Props) {
               </div>
            </div>
 
-           <div className="bg-white rounded-[10px] p-8 shadow-sm border border-gray-100 text-center">
+           <div className="bg-white rounded-[10px] p-6 sm:p-8 shadow-sm border border-gray-100 text-center">
               <div className="w-16 h-16 bg-red-50 text-[#e31e24] rounded-full flex items-center justify-center mx-auto mb-4">
                  <span className="material-symbols-outlined text-[32px]">support_agent</span>
               </div>

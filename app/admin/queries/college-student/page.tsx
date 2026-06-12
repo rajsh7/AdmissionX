@@ -190,7 +190,7 @@ export default async function CollegeStudentQueryPage({
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[800px]">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100 text-left">
                   <th className="px-5 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Student</th>

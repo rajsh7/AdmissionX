@@ -174,12 +174,12 @@ export default function SignupPage() {
       {/* Footer */}
       <footer className="w-full py-8 px-6 text-center text-slate-400 text-xs max-w-7xl mx-auto">
         <p>
-          © 2026 AdmissionX Inc. All rights reserved.
-          <a href="#" className="hover:text-primary mx-2">
+          © 2026 Saroj Entertainment Pvt. Ltd. All Rights Reserved.
+          <a href="/privacy-policy" className="hover:text-primary mx-2">
             Privacy Policy
           </a>
           •
-          <a href="#" className="hover:text-primary mx-2">
+          <a href="/terms-and-conditions" className="hover:text-primary mx-2">
             Terms of Service
           </a>
         </p>

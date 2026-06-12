@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyCollegeToken } from "@/lib/auth";
 import pool from "@/lib/db";
-import { sendMail } from "@/lib/email";
+import { 
+  sendStudentApplicationStatusEmail,
+  sendAdmissionApprovedNotificationToCollege,
+  sendAdmissionRejectedNotificationToCollege 
+} from "@/lib/email";
 
 // ── Auth + ownership helper ───────────────────────────────────────────────────
 async function checkAuth(slug: string) {
@@ -270,54 +274,71 @@ export async function PUT(
       [status, application_id],
     );
 
-    // Send status change email to student
+    // Send status change email to student using new template
     if (appRecord.student_email && appRecord.student_name) {
-      const sm2 = STATUS_META[status] ?? STATUS_META["submitted"];
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://admissionx.com";
-      const statusMessages: Record<string, string> = {
-        under_review: "Your application is now under review. Our team will get back to you shortly.",
-        verified: "Congratulations! Your application has been verified. Please log in to complete the next steps.",
-        rejected: "We regret to inform you that your application has not been accepted at this time.",
-        enrolled: "Congratulations! You have been successfully enrolled. Welcome aboard!",
-        submitted: "Your application has been received and is being processed.",
-      };
-      const msg = statusMessages[status] ?? `Your application status has been updated to ${sm2.label}.`;
       const collegeName = appRecord.college_name ?? auth.payload.name ?? "The College";
-      try {
-        await sendMail({
-          to: appRecord.student_email,
-          subject: `Application Update — ${sm2.label} | AdmissionX`,
-          html: `
-<!DOCTYPE html><html><head><meta charset="UTF-8"/><style>
-body{margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
-.w{max-width:600px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);}
-.h{background:#c0392b;padding:32px 40px;text-align:center;}
-.h h1{margin:0;color:#fff;font-size:24px;font-weight:700;}
-.h p{margin:4px 0 0;color:rgba(255,255,255,.75);font-size:13px;}
-.b{padding:40px;color:#1e293b;line-height:1.6;}
-.badge{display:inline-block;padding:6px 16px;border-radius:999px;font-weight:700;font-size:14px;margin:12px 0;}
-.btn{display:inline-block;margin:16px 0;padding:14px 32px;background:#c0392b;color:#fff!important;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;}
-.f{padding:24px 40px;background:#f8fafc;text-align:center;font-size:12px;color:#94a3b8;}
-</style></head><body>
-<div class="w">
-  <div class="h"><h1>AdmissionX</h1><p>India's Trusted College Admissions Platform</p></div>
-  <div class="b">
-    <h2 style="margin:0 0 8px;font-size:20px;">Application Status Update</h2>
-    <p>Hi <strong>${appRecord.student_name}</strong>,</p>
-    <p>Your application to <strong>${collegeName}</strong> (Ref: <code>${appRecord.applicationRef}</code>) has been updated:</p>
-    <span class="badge" style="background:#f1f5f9;color:#334155;">${sm2.label}</span>
-    <p>${msg}</p>
-    <a href="${baseUrl}/dashboard/student" class="btn">View My Applications</a>
-    <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;"/>
-    <p style="font-size:13px;color:#94a3b8;">Questions? Contact us at <a href="mailto:support@admissionx.com" style="color:#c0392b;">support@admissionx.com</a></p>
-  </div>
-  <div class="f">&copy; ${new Date().getFullYear()} AdmissionX. All rights reserved.</div>
-</div>
-</body></html>`,
-        });
-      } catch (emailErr) {
-        console.error("[Applications] Status email failed:", emailErr);
-      }
+      
+      setImmediate(async () => {
+        try {
+          // Get course details
+          const [courseRows] = await conn.query(
+            `SELECT co.name AS course_name
+             FROM applications a
+             LEFT JOIN collegemaster cm ON cm.id = a.courseId
+             LEFT JOIN course co ON co.id = cm.course_id
+             WHERE a.id = ?
+             LIMIT 1`,
+            [application_id]
+          );
+          const courseList = courseRows as { course_name: string | null }[];
+          const courseName = courseList[0]?.course_name || "General Admission";
+
+          // Send student notification
+          if (appRecord.student_email && appRecord.student_name) {
+            await sendStudentApplicationStatusEmail({
+              to: appRecord.student_email,
+              studentName: appRecord.student_name,
+              collegeName: collegeName,
+              appId: appRecord.applicationRef,
+              courseName: courseName || "General Admission",
+              reason: notes || null,
+              status: status,
+            });
+          }
+
+          // Send college notification for approved/rejected
+          const collegeDoc = await conn.query(
+            `SELECT u.email FROM collegeprofile cp
+             JOIN users u ON u.id = cp.users_id
+             WHERE cp.id = ?
+             LIMIT 1`,
+            [auth.collegeprofile_id]
+          );
+          const collegeList = collegeDoc[0] as { email: string }[];
+          
+          if (collegeList.length && collegeList[0].email && appRecord.student_name) {
+            if (status === "verified" || status === "enrolled") {
+              await sendAdmissionApprovedNotificationToCollege(
+                collegeList[0].email,
+                collegeName,
+                appRecord.student_name,
+                courseName || "General Admission",
+                appRecord.applicationRef
+              );
+            } else if (status === "rejected") {
+              await sendAdmissionRejectedNotificationToCollege(
+                collegeList[0].email,
+                collegeName,
+                appRecord.student_name,
+                appRecord.applicationRef,
+                notes || "Application did not meet requirements"
+              );
+            }
+          }
+        } catch (emailErr) {
+          console.error("[Applications] Status email failed:", emailErr);
+        }
+      });
     }
 
     const sm = STATUS_META[status] ?? STATUS_META["submitted"];

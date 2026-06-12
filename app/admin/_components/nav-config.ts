@@ -36,6 +36,7 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: "account_balance",
         label: "Colleges Profile",
         subItems: [
+          { href: "/admin/colleges", label: "Request New College", icon: "how_to_reg" },
           { href: "/admin/colleges/contact", label: "College Contact Card", icon: "contact_mail" },
           { href: "/admin/colleges/profile", label: "Profile Information", icon: "info" },
           { href: "/admin/colleges/courses", label: "Courses", icon: "book" },
@@ -73,7 +74,15 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "FINANCE",
     items: [
-      { href: "/admin/payment", icon: "payment", label: "Payment" },
+      {
+        href: "/admin/payment",
+        icon: "payment",
+        label: "Payment",
+        subItems: [
+          { href: "/admin/payment/student", label: "Student Payments", icon: "person" },
+          { href: "/admin/payment/college", label: "College Payments", icon: "account_balance" },
+        ]
+      },
       { href: "/admin/payment/transactions", icon: "receipt_long", label: "Transaction" },
     ],
   },

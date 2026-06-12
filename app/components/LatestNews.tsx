@@ -105,9 +105,8 @@ export default function LatestNews() {
         {/* Header */}
         <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-start">
           <div>
-            <p className="text-primary text-[12px] font-bold uppercase tracking-[3px] mb-2">Latest Updates</p>
-            <h2 className="text-[36px] lg:text-[48px] font-bold text-slate-900 leading-tight tracking-tight">
-              Education News
+            <h2 className="text-[28px] sm:text-[36px] lg:text-[48px] font-black leading-tight tracking-tight text-slate-900">
+              Education <span className="text-[#FF3C3C]">News</span>
             </h2>
             <p className="mt-3 text-slate-500 font-medium max-w-lg">
               Stay updated with the latest news, announcements, and insights from the world of education.

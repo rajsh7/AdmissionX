@@ -1,14 +1,15 @@
-import pool from "@/lib/db";
+import pool, { getDb } from "@/lib/db";
 import { redirect, notFound } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ObjectId } from "mongodb";
 
 export const dynamic = "force-dynamic";
 
 interface BookmarkRow {
   id: number;
-  student_id: number;
+  student_id: number | string;
   college_id: number;
   course_id: number;
   blog_id: number;
@@ -22,7 +23,7 @@ interface BookmarkRow {
 }
 
 interface UserRow {
-  id: number;
+  id: number | string;
   name: string;
   email: string;
 }
@@ -46,7 +47,8 @@ async function updateBookmark(formData: FormData) {
   "use server";
 
   const id = parseInt(formData.get("id") as string, 10);
-  const student_id = parseInt(formData.get("student_id") as string, 10);
+  const rawId = formData.get("student_id") as string;
+  const student_id = isNaN(Number(rawId)) ? rawId : parseInt(rawId, 10);
   const bookmarktypeinfo_id = String(formData.get("bookmarktypeinfo_id") ?? "");
   const title = String(formData.get("title") ?? "");
   const url = String(formData.get("url") ?? "");
@@ -54,7 +56,7 @@ async function updateBookmark(formData: FormData) {
   const course_id = parseInt(formData.get("course_id") as string, 10) || 0;
   const blog_id = parseInt(formData.get("blog_id") as string, 10) || 0;
 
-  if (isNaN(id) || isNaN(student_id) || !bookmarktypeinfo_id || !title || !url) return;
+  if (isNaN(id) || !student_id || !bookmarktypeinfo_id || !title || !url) return;
 
   try {
     await pool.query(
@@ -115,29 +117,75 @@ export default async function EditBookmarkPage({
   const idNum = parseInt(id, 10);
   if (isNaN(idNum)) notFound();
 
-  const [bookmarks, users, types] = await Promise.all([
-    safeQuery<BookmarkRow>(
-      `SELECT b.*, s.name as student_name, s.email as student_email, bt.name as type_name
-       FROM bookmarks b
-       LEFT JOIN next_student_signups s ON b.student_id = s.id
-       LEFT JOIN bookmarktypeinfos bt ON b.bookmarktypeinfo_id = bt.id
-       WHERE b.id = ?
-       LIMIT 1`,
-      [idNum],
-    ),
-    safeQuery<UserRow>("SELECT id, name, email FROM next_student_signups ORDER BY name ASC LIMIT 1000"),
-    safeQuery<TypeRow>("SELECT id, name FROM bookmarktypeinfos ORDER BY name ASC"),
+  const db = await getDb();
+  // Fetch bookmark
+  const rawBookmarks = await db.collection("bookmarks").find({ id: idNum }).limit(1).toArray();
+  const rawBookmark = rawBookmarks[0];
+  if (!rawBookmark) notFound();
+
+  // Fetch student info for this bookmark
+  const studentIdVal = rawBookmark.student_id;
+  let studentName = "Unknown";
+  let studentEmail = "-";
+
+  if (studentIdVal) {
+    const isNumeric = !isNaN(Number(studentIdVal));
+    if (isNumeric) {
+      const u = await db.collection("users").findOne({ id: Number(studentIdVal) });
+      if (u) {
+        studentName = u.firstname || "Unknown";
+        studentEmail = u.email || "-";
+      }
+    } else {
+      const s = await db.collection("next_student_signups").findOne({ _id: ObjectId.isValid(String(studentIdVal)) ? new ObjectId(String(studentIdVal)) : String(studentIdVal) as any });
+      if (s) {
+        studentName = s.name || "Unknown";
+        studentEmail = s.email || "-";
+      }
+    }
+  }
+
+  const bookmark = {
+    id: Number(rawBookmark.id),
+    student_id: rawBookmark.student_id,
+    college_id: Number(rawBookmark.college_id ?? 0),
+    course_id: Number(rawBookmark.course_id ?? 0),
+    blog_id: Number(rawBookmark.blog_id ?? 0),
+    title: String(rawBookmark.title ?? ""),
+    url: String(rawBookmark.url ?? ""),
+    bookmarktypeinfo_id: String(rawBookmark.bookmarktypeinfo_id ?? ""),
+    created_at: rawBookmark.created_at instanceof Date ? rawBookmark.created_at.toISOString() : String(rawBookmark.created_at ?? ""),
+    student_name: studentName,
+    student_email: studentEmail,
+    type_name: "",
+  };
+
+  // Fetch dropdown lists: users and next_student_signups
+  const [oldUserRows, nextStudentRows, types] = await Promise.all([
+    db.collection("users").find({}, { projection: { id: 1, firstname: 1, email: 1 } }).sort({ firstname: 1 }).limit(1000).toArray(),
+    db.collection("next_student_signups").find({}, { projection: { _id: 1, name: 1, email: 1 } }).sort({ name: 1 }).limit(1000).toArray(),
+    db.collection("bookmarktypeinfos").find({}).sort({ name: 1 }).toArray(),
   ]);
 
-  const bookmark = bookmarks[0];
-  if (!bookmark) notFound();
+  const usersList = [
+    ...oldUserRows.map((u: any) => ({ id: String(u.id), name: (u.firstname || "").trim(), email: (u.email || "").trim() })),
+    ...nextStudentRows.map((s: any) => ({ id: String(s._id), name: (s.name || "").trim(), email: (s.email || "").trim() }))
+  ];
+
+  const typesList = types.map((t: any) => ({
+    id: Number(t.id),
+    name: String(t.name ?? "")
+  }));
+
+  const currentType = typesList.find((t) => String(t.id) === String(bookmark.bookmarktypeinfo_id));
+  bookmark.type_name = currentType?.name || "";
 
   const createdAt = bookmark.created_at
     ? new Date(bookmark.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
     : "-";
 
-  const currentUserMissing = users && !users.find((u) => u.id === bookmark.student_id);
-  const currentTypeMissing = types && !types.find((t) => String(t.id) === String(bookmark.bookmarktypeinfo_id));
+  const currentUserMissing = usersList && !usersList.find((u) => String(u.id) === String(bookmark.student_id));
+  const currentTypeMissing = typesList && !typesList.find((t) => String(t.id) === String(bookmark.bookmarktypeinfo_id));
 
   return (
     <div className="min-h-screen bg-slate-50/60 p-4 sm:p-6 lg:p-8">
@@ -199,7 +247,7 @@ export default async function EditBookmarkPage({
                         required
                       >
                         <option value="">Select a student</option>
-                        {users.map((u, idx) => (
+                        {usersList.map((u, idx) => (
                           <option key={`${u.id}-${u.email}-${idx}`} value={u.id}>
                             {u.name} ({u.email})
                           </option>
@@ -225,7 +273,7 @@ export default async function EditBookmarkPage({
                         required
                       >
                         <option value="">Select type</option>
-                        {types.map((t, idx) => (
+                        {typesList.map((t, idx) => (
                           <option key={`${t.id}-${t.name}-${idx}`} value={t.id}>
                             {t.name}
                           </option>
