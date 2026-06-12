@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import DeleteButton from "@/app/admin/_components/DeleteButton";
 import PaginationFixed from "@/app/components/PaginationFixed";
 
 interface CollegeRow {
@@ -10,16 +11,13 @@ interface CollegeRow {
   bannerimage: string | null;
   logoimage: string | null;
   hasMosaic: boolean;
+  suspicious: boolean;
 }
 
 const IMAGE_KEYS = ["banner"] as const;
 type ImageKey = (typeof IMAGE_KEYS)[number];
+const KEY_LABELS: Record<ImageKey, string> = { banner: "Banner" };
 
-const KEY_LABELS: Record<ImageKey, string> = {
-  banner: "Banner",
-};
-
-// How many rows visible per "Show More" step — matches other admin pages
 const STEP = 15;
 
 interface Props {
@@ -28,27 +26,79 @@ interface Props {
   page: number;
   totalPages: number;
   q: string;
+  showSuspicious: boolean;
+  suspiciousCount: number;
+  hasImage: string;
+  onDelete: (slug: string) => Promise<void>;
 }
 
-export default function BulkImagesClient({ colleges, total, page, totalPages, q }: Props) {
+export default function BulkImagesClient({
+  colleges, total, page, totalPages, q,
+  showSuspicious, suspiciousCount, hasImage, onDelete,
+}: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const formRef = useRef<HTMLFormElement>(null);
 
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const [dirtyRows, setDirtyRows] = useState<Set<string>>(new Set());
   const [visibleCount, setVisibleCount] = useState(STEP);
+  const [search, setSearch] = useState(q);
+  const [uploadedSlugs, setUploadedSlugs] = useState<Set<string>>(new Set());
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
+  const visible = colleges.slice(0, visibleCount);
   const showMore = visibleCount < colleges.length;
   const showPagination = !showMore && totalPages > 1;
-  const [search, setSearch] = useState(q);
-
-  // uploaded slugs — to show green tick after upload
-  const [uploadedSlugs, setUploadedSlugs] = useState<Set<string>>(new Set());
+  const start = (page - 1) * 50 + 1;
+  const end = (page - 1) * 50 + colleges.length;
 
   function markDirty(slug: string) {
     setDirtyRows((prev) => new Set(prev).add(slug));
+  }
+
+  function toggleSelect(slug: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(slug) ? next.delete(slug) : next.add(slug);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (selected.size === visible.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(visible.map((c) => c.slug)));
+    }
+  }
+
+  async function handleBulkDelete() {
+    if (!selected.size) return;
+    if (!confirm(`Delete ${selected.size} selected college(s)? This cannot be undone.`)) return;
+    setBulkDeleting(true);
+    setStatus(null);
+    try {
+      const res = await fetch("/api/admin/colleges/bulk-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slugs: [...selected] }),
+      });
+      const json = await res.json();
+      if (json.ok) {
+        setStatus(`✅ Deleted ${json.deleted} college(s) successfully.`);
+        setSelected(new Set());
+        router.refresh();
+      } else {
+        setStatus(`❌ Error: ${json.error}`);
+      }
+    } catch (err) {
+      setStatus(`❌ Network error: ${String(err)}`);
+    } finally {
+      setBulkDeleting(false);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -62,7 +112,6 @@ export default function BulkImagesClient({ colleges, total, page, totalPages, q 
       const json = await res.json();
       if (json.ok) {
         setStatus(`✅ Done — ${json.updated} college(s) updated out of ${json.total} selected.`);
-        // mark uploaded slugs
         setUploadedSlugs((prev) => {
           const next = new Set(prev);
           for (const slug of dirtyRows) next.add(slug);
@@ -83,10 +132,13 @@ export default function BulkImagesClient({ colleges, total, page, totalPages, q 
   function goPage(p: number) {
     const params = new URLSearchParams();
     if (search) params.set("q", search);
+    if (showSuspicious) params.set("suspicious", "1");
+    if (hasImage) params.set("hasImage", hasImage);
     params.set("page", String(p));
     router.push(`${pathname}?${params.toString()}`);
     setVisibleCount(STEP);
     setDirtyRows(new Set());
+    setSelected(new Set());
     setStatus(null);
   }
 
@@ -95,9 +147,23 @@ export default function BulkImagesClient({ colleges, total, page, totalPages, q 
     goPage(1);
   }
 
-  const visible = colleges.slice(0, visibleCount);
-  const start = (page - 1) * 50 + 1;
-  const end = (page - 1) * 50 + colleges.length;
+  function toggleSuspicious() {
+    const params = new URLSearchParams();
+    if (search) params.set("q", search);
+    if (!showSuspicious) params.set("suspicious", "1");
+    if (hasImage) params.set("hasImage", hasImage);
+    params.set("page", "1");
+    router.push(`${pathname}?${params.toString()}`);
+  }
+
+  function toggleHasImage(val: string) {
+    const params = new URLSearchParams();
+    if (search) params.set("q", search);
+    if (showSuspicious) params.set("suspicious", "1");
+    if (hasImage !== val) params.set("hasImage", val);
+    params.set("page", "1");
+    router.push(`${pathname}?${params.toString()}`);
+  }
 
   return (
     <div className="space-y-0 mx-[10px]">
@@ -106,20 +172,49 @@ export default function BulkImagesClient({ colleges, total, page, totalPages, q 
         <div>
           <h1 className="text-lg font-black text-slate-800">Bulk College Images</h1>
           <p className="text-xs text-slate-400 font-medium mt-0.5">
-            Upload banner images for multiple colleges at once
+            Upload banner images · detect & remove fake colleges
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
           <div className="flex items-center gap-2 bg-[#008080]/10 px-4 py-2 rounded-xl">
             <span className="material-symbols-outlined text-[18px] text-[#008080]">photo_library</span>
             <span className="text-sm font-black text-[#008080]">{total.toLocaleString()} Colleges</span>
           </div>
+
+          {/* Suspicious toggle */}
+          <button
+            type="button"
+            onClick={toggleSuspicious}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-bold transition-all ${
+              showSuspicious
+                ? "bg-orange-500 text-white border-orange-500"
+                : "bg-white text-orange-600 border-orange-300 hover:bg-orange-50"
+            }`}
+          >
+            <span className="material-symbols-outlined text-[18px]">warning</span>
+            Suspicious ({suspiciousCount})
+          </button>
+
+          {/* Bulk delete selected */}
+          {selected.size > 0 && (
+            <button
+              type="button"
+              onClick={handleBulkDelete}
+              disabled={bulkDeleting}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-black hover:bg-red-700 disabled:opacity-50 transition-colors"
+            >
+              <span className="material-symbols-outlined text-[18px]">delete_sweep</span>
+              {bulkDeleting ? "Deleting…" : `Delete ${selected.size} Selected`}
+            </button>
+          )}
+
           {dirtyRows.size > 0 && (
             <div className="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-xl border border-amber-200">
               <span className="material-symbols-outlined text-[18px] text-amber-600">pending</span>
               <span className="text-sm font-black text-amber-700">{dirtyRows.size} pending</span>
             </div>
           )}
+
           <button
             type="submit"
             form="bulk-form"
@@ -152,9 +247,17 @@ export default function BulkImagesClient({ colleges, total, page, totalPages, q 
           </button>
         )}
         <p className="text-xs text-slate-400 font-medium whitespace-nowrap">
-          Showing {start}–{end} of {total.toLocaleString()}
+          {showSuspicious ? `${colleges.length} suspicious` : `${start}–${end} of ${total.toLocaleString()}`}
         </p>
       </form>
+
+      {/* Suspicious banner */}
+      {showSuspicious && (
+        <div className="mx-6 mt-3 px-4 py-3 rounded-xl bg-orange-50 border border-orange-200 text-sm text-orange-800 font-semibold flex items-center gap-2">
+          <span className="material-symbols-outlined text-[18px]">warning</span>
+          Showing <strong>{colleges.length}</strong> suspicious entries — names with no education keywords, no website, no banner image. Review carefully before deleting.
+        </div>
+      )}
 
       {/* Status */}
       {status && (
@@ -166,11 +269,12 @@ export default function BulkImagesClient({ colleges, total, page, totalPages, q 
       )}
 
       {/* Legend */}
-      <div className="px-6 pt-3 pb-1 flex items-center gap-4 text-[11px] font-semibold text-slate-400">
-        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-green-400 inline-block" /> Image uploaded</span>
+      <div className="px-6 pt-3 pb-1 flex items-center gap-4 text-[11px] font-semibold text-slate-400 flex-wrap">
+        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-green-400 inline-block" /> Has image</span>
         <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-slate-200 inline-block" /> No image</span>
         <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-amber-400 inline-block" /> Pending upload</span>
         <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-blue-400 inline-block" /> Just uploaded ✓</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-orange-400 inline-block" /> Suspicious</span>
       </div>
 
       {/* Table */}
@@ -179,32 +283,56 @@ export default function BulkImagesClient({ colleges, total, page, totalPages, q 
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
+                {/* Select all checkbox */}
+                <th className="px-3 py-2.5 w-8 text-center">
+                  <input
+                    type="checkbox"
+                    checked={visible.length > 0 && selected.size === visible.length}
+                    onChange={toggleSelectAll}
+                    className="w-3.5 h-3.5 accent-[#FF3C3C] cursor-pointer"
+                  />
+                </th>
                 <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider w-8 text-center">#</th>
-                <th className="px-4 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider w-[320px]">College</th>
+                <th className="px-4 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">College</th>
                 <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider w-16 text-center">Status</th>
                 {IMAGE_KEYS.map((k) => (
                   <th key={k} className="px-2 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider text-center">
                     {KEY_LABELS[k]}
                   </th>
                 ))}
+                <th className="px-3 py-2.5 text-[11px] font-black text-slate-400 uppercase tracking-wider w-16 text-center">Delete</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {visible.map((c, idx) => {
                 const isDirty = dirtyRows.has(c.slug);
                 const isUploaded = uploadedSlugs.has(c.slug);
+                const isSelected = selected.has(c.slug);
                 const hasAnyImage = !!(c.bannerimage || c.logoimage);
                 return (
                   <tr
                     key={c.slug}
                     className={`transition-colors ${
-                      isUploaded ? "bg-blue-50/40" : isDirty ? "bg-amber-50/40" : "hover:bg-slate-50/60"
+                      isSelected ? "bg-red-50/60" :
+                      isUploaded ? "bg-blue-50/40" :
+                      isDirty ? "bg-amber-50/40" :
+                      c.suspicious ? "bg-orange-50/40" :
+                      "hover:bg-slate-50/60"
                     }`}
                   >
-                    <input type="hidden" name={`slug__${c.slug}`} value={c.slug} />
+                    {/* Checkbox */}
+                    <td className="px-3 py-2 text-center">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelect(c.slug)}
+                        className="w-3.5 h-3.5 accent-[#FF3C3C] cursor-pointer"
+                      />
+                    </td>
 
                     {/* S.No */}
                     <td className="px-3 py-2 text-center">
+                      <input type="hidden" name={`slug__${c.slug}`} value={c.slug} />
                       <span className="text-[11px] font-black text-slate-400">
                         {(page - 1) * 50 + idx + 1}
                       </span>
@@ -224,8 +352,16 @@ export default function BulkImagesClient({ colleges, total, page, totalPages, q 
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-bold text-slate-800 leading-snug">{c.name}</p>
-                          <p className="text-[10px] text-slate-400 font-mono break-all">{c.slug}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-xs font-bold text-slate-800 leading-snug truncate max-w-[260px]" title={c.name}>{c.name}</p>
+                            {c.suspicious && (
+                              <span className="flex-shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[9px] font-black">
+                                <span className="material-symbols-outlined text-[10px]">warning</span>
+                                Fake?
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-slate-400 font-mono truncate">{c.slug}</p>
                         </div>
                       </div>
                     </td>
@@ -250,15 +386,21 @@ export default function BulkImagesClient({ colleges, total, page, totalPages, q 
                       )}
                     </td>
 
-                    {/* File inputs */}
+                    {/* File input */}
                     {IMAGE_KEYS.map((k) => (
                       <td key={k} className="px-2 py-2 text-center">
-                        <FileCell
-                          name={`${k}__${c.slug}`}
-                          onPick={() => markDirty(c.slug)}
-                        />
+                        <FileCell name={`${k}__${c.slug}`} onPick={() => markDirty(c.slug)} />
                       </td>
                     ))}
+
+                    {/* Delete */}
+                    <td className="px-3 py-2 text-center">
+                      <DeleteButton
+                        action={async () => { await onDelete(c.slug); }}
+                        size="xs"
+                        icon={<span className="material-symbols-outlined text-[14px]">delete</span>}
+                      />
+                    </td>
                   </tr>
                 );
               })}
@@ -283,7 +425,7 @@ export default function BulkImagesClient({ colleges, total, page, totalPages, q 
         </div>
       )}
 
-      {/* Pagination — shown after show-more exhausted */}
+      {/* Pagination */}
       {showPagination && (
         <div className="px-6 py-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between bg-slate-50/50 mt-6 mb-6">
           <p className="text-sm text-slate-400 font-medium">

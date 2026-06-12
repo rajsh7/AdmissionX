@@ -746,7 +746,7 @@ export default function Header({ theme }: HeaderProps) {
                       >
                         <div className="max-w-[1200px] mx-auto px-4">
                           <div className="bg-white rounded-[12px]  shadow-2xl shadow-black/10 border border-slate-100 overflow-hidden flex min-h-[200px]">
-                            {/* Left: Categories */}
+                            {/* Left: Categories */} 
                             <div className="w-[200px] shrink-0  border-r border-slate-100 py-3">
                               {link.mega.map((cat) => {
                                 const isActive = activeCat === cat.label;

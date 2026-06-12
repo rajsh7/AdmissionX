@@ -1,30 +1,29 @@
-import { writeFile, mkdir } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 /**
- * Saves a File object to the specified directory within public/uploads.
- * @param file The File object from FormData
- * @param subDir The subdirectory, e.g., 'college/slug', 'sliders', 'gallery'
- * @param prefix An optional prefix for the filename
- * @returns The public URL path of the saved file
+ * Uploads a File object to Cloudinary.
+ * @param file    The File object from FormData
+ * @param subDir  Folder path in Cloudinary, e.g. 'college/slug'
+ * @param prefix  Public ID prefix, e.g. 'banner'
+ * @returns       The Cloudinary secure_url
  */
 export async function saveUpload(file: File, subDir: string, prefix: string = "img"): Promise<string> {
-  const uploadDir = path.join(process.cwd(), "public", "uploads", subDir);
-  
-  if (!existsSync(uploadDir)) {
-    await mkdir(uploadDir, { recursive: true });
-  }
-
-  const ext = path.extname(file.name).toLowerCase() || ".jpg";
-  const filename = `${prefix}_${Date.now()}${ext}`;
-  const fullPath = path.join(uploadDir, filename);
-  
-  // Public URL used in <img> tags and stored in DB
-  const publicUrl = `/uploads/${subDir}/${filename}`;
-
   const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(fullPath, buffer);
+  const base64 = buffer.toString("base64");
+  const dataUri = `data:${file.type || "image/jpeg"};base64,${base64}`;
 
-  return publicUrl;
+  const result = await cloudinary.uploader.upload(dataUri, {
+    folder: `admissionx/${subDir}`,
+    public_id: `${prefix}_${Date.now()}`,
+    overwrite: true,
+    resource_type: "image",
+  });
+
+  return result.secure_url;
 }
