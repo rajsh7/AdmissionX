@@ -32,7 +32,7 @@ export async function PUT(req: NextRequest) {
   const payload = await getAdmin();
   if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { name, email, currentPassword, newPassword } = await req.json();
+  const { name, email, phone, designation, avatar, currentPassword, newPassword } = await req.json();
 
   const db = await getDb();
   const admin = await db.collection("next_admin_users").findOne({ _id: new ObjectId(payload.id) });
@@ -42,6 +42,9 @@ export async function PUT(req: NextRequest) {
 
   if (name?.trim()) $set.name = name.trim();
   if (email?.trim()) $set.email = email.trim();
+  if (phone !== undefined) $set.phone = phone.trim();
+  if (designation !== undefined) $set.designation = designation.trim();
+  if (avatar !== undefined) $set.avatar = avatar;
 
   if (newPassword) {
     if (!currentPassword) return NextResponse.json({ error: "Current password required" }, { status: 400 });

@@ -74,7 +74,7 @@ html {
 }
 
 body {
-    font-family: "Lexend", sans-serif;
+    font-family: "Poppins", sans-serif;
     background-color: var(--color-bg-white);
     color: #0f172a;
     -webkit-font-smoothing: antialiased;
