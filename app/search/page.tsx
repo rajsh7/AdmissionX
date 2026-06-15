@@ -66,7 +66,10 @@ async function fetchColleges(opts: {
   let queryStreamIds: number[] = [];
 
   if (q.length >= 2) {
-    const qLower = q.toLowerCase().replace(/\s+/g, "");
+    let qLower = q.toLowerCase().replace(/\s+/g, "");
+    qLower = qLower.replace(/^(collegeof|collageof|universityof|instituteof|schoolof|facultyof|departmentof)/, "");
+    qLower = qLower.replace(/(college|collage|institute|school|academy|department)s?$/, "");
+    qLower = qLower.replace(/universit(y|ies)$/, "");
     const aliasPattern = ALIASES[qLower] ?? q;
     const courseRegex = { $regex: aliasPattern, $options: "i" };
 

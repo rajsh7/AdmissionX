@@ -38,7 +38,10 @@ export async function GET(request: NextRequest) {
       "medical": "mbbs|medical|bds|bams",
       "management": "mba|bba|management|pgdm",
     };
-    const subjectLower = subject.toLowerCase().replace(/\s+/g, "");
+    let subjectLower = subject.toLowerCase().replace(/\s+/g, "");
+    subjectLower = subjectLower.replace(/^(collegeof|collageof|universityof|instituteof|schoolof|facultyof|departmentof)/, "");
+    subjectLower = subjectLower.replace(/(college|collage|institute|school|academy|department)s?$/, "");
+    subjectLower = subjectLower.replace(/universit(y|ies)$/, "");
     const aliasPattern = ALIASES[subjectLower] ?? subject;
     const subjectRegex = { $regex: aliasPattern, $options: "i" };
     const locationRegex = location ? { $regex: location, $options: "i" } : null;
