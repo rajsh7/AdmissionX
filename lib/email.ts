@@ -1419,14 +1419,18 @@ export async function sendPaymentSuccessEmail(
   name: string,
   amount: string,
   transactionId: string,
-  date: string
+  date: string,
+  collegeName: string,
+  courseName: string
 ): Promise<void> {
   const dashboardUrl = `${getBaseUrl()}/dashboard/student`;
   const body = `
     <p>Dear <strong>${escapeHtml(name)}</strong>,</p>
-    <p>Your payment has been processed successfully.</p>
+    <p>Your payment has been processed successfully. You are now successfully enrolled.</p>
     <div class="panel">
-      <p class="row"><span class="label">Amount:</span> <span class="value">₹${escapeHtml(amount)}</span></p>
+      <p class="row"><span class="label">College:</span> <span class="value">${escapeHtml(collegeName)}</span></p>
+      <p class="row"><span class="label">Course:</span> <span class="value">${escapeHtml(courseName)}</span></p>
+      <p class="row"><span class="label">Amount Paid:</span> <span class="value">₹${escapeHtml(amount)}</span></p>
       <p class="row"><span class="label">Transaction ID:</span> <span class="value">${escapeHtml(transactionId)}</span></p>
       <p class="row"><span class="label">Date:</span> <span class="value">${escapeHtml(date)}</span></p>
     </div>
@@ -1440,6 +1444,39 @@ export async function sendPaymentSuccessEmail(
     to,
     subject: "Payment Successful - AdmissionX",
     html: renderTemplate("Payment Successful", "Your payment has been confirmed", body),
+  });
+}
+
+export async function sendCollegeStudentEnrolledEmail(
+  to: string,
+  collegeName: string,
+  studentName: string,
+  appId: string,
+  courseName: string,
+  amountPaid: string,
+  transactionId: string
+): Promise<void> {
+  const dashboardUrl = `${getBaseUrl()}/dashboard/college`;
+  const body = `
+    <p>Dear Team <strong>${escapeHtml(collegeName)}</strong>,</p>
+    <p>We are pleased to inform you that a student has successfully completed their payment and enrolled in your institution.</p>
+    <div class="panel">
+      <p class="row"><span class="label">Student Name:</span> <span class="value">${escapeHtml(studentName)}</span></p>
+      <p class="row"><span class="label">Course Enrolled:</span> <span class="value">${escapeHtml(courseName)}</span></p>
+      <p class="row"><span class="label">Application ID:</span> <span class="value">${escapeHtml(appId)}</span></p>
+      <p class="row"><span class="label">Amount Paid:</span> <span class="value">₹${escapeHtml(amountPaid)}</span></p>
+      <p class="row"><span class="label">Transaction ID:</span> <span class="value">${escapeHtml(transactionId)}</span></p>
+    </div>
+    <a href="${dashboardUrl}" class="btn">Go to Dashboard</a>
+    <p class="sign">
+      Best Regards,<br />
+      <strong>Team AdmissionX</strong>
+    </p>
+  `;
+  await sendMail({
+    to,
+    subject: `Student Enrolled Successfully: ${escapeHtml(studentName)} - AdmissionX`,
+    html: renderTemplate("Student Enrolled", "New student enrollment confirmed", body),
   });
 }
 

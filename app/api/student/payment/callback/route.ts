@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import crypto from "crypto";
 import { ObjectId } from "mongodb";
-import { sendPaymentSuccessEmail, sendPaymentFailedEmail } from "@/lib/email";
+import { sendPaymentSuccessEmail, sendPaymentFailedEmail, sendCollegeStudentEnrolledEmail } from "@/lib/email";
 
 function getRequestOrigin(req: NextRequest): string {
   if (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes("0.0.0.0")) {
@@ -93,23 +93,56 @@ export async function POST(req: NextRequest) {
 
       console.log("[Easebuzz Callback] Application update status:", updateResult.modifiedCount ? "Paid" : "Unchanged");
 
-      // 2. Fire transaction success email asynchronously
+      // 2. Fire transaction success and college notification emails asynchronously
       setImmediate(async () => {
         try {
-          const studentDoc = await db.collection("next_student_signups").findOne({
-            _id: (ObjectId.isValid(studentId) ? new ObjectId(studentId) : studentId) as any
-          });
-          if (studentDoc) {
-            await sendPaymentSuccessEmail(
-              studentDoc.email,
-              studentDoc.name || "Student",
-              amount,
-              txnid,
-              new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
-            );
+          const appDoc = await db.collection("applications").findOne(appFilter);
+          if (appDoc) {
+            const studentDoc = await db.collection("next_student_signups").findOne({
+              _id: (ObjectId.isValid(studentId) ? new ObjectId(studentId) : studentId) as any
+            });
+            if (studentDoc) {
+              const collegeName = appDoc.collegeName || appDoc.college_name || "the College";
+              const courseName = appDoc.courseName || appDoc.course_name || "General Admission";
+              const appRef = appDoc.applicationRef || appDoc.application_ref || "N/A";
+
+              // Notify Student with complete receipt details
+              await sendPaymentSuccessEmail(
+                studentDoc.email,
+                studentDoc.name || "Student",
+                amount,
+                txnid,
+                new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+                collegeName,
+                courseName
+              );
+
+              // Notify College
+              if (appDoc.collegeId) {
+                const collegeDoc = await db.collection("collegeprofile").aggregate([
+                  { $match: { _id: appDoc.collegeId } },
+                  { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
+                  { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
+                  { $project: { email: "$u.email", name: "$u.firstname" } },
+                  { $limit: 1 },
+                ]).toArray();
+
+                if (collegeDoc.length && collegeDoc[0].email) {
+                  await sendCollegeStudentEnrolledEmail(
+                    collegeDoc[0].email,
+                    collegeDoc[0].name || collegeName,
+                    studentDoc.name || "Student",
+                    appRef,
+                    courseName,
+                    amount,
+                    txnid
+                  );
+                }
+              }
+            }
           }
         } catch (emailErr) {
-          console.error("[Easebuzz Callback] Email notification failed:", emailErr);
+          console.error("[Easebuzz Callback] Email notifications failed:", emailErr);
         }
       });
 

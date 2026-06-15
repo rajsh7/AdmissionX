@@ -97,6 +97,8 @@ export async function POST(req: NextRequest) {
     // Send payment success email (free application receipt)
     const emailToUse = app.personal_info?.email || studentDoc?.email || "";
     const nameToUse = app.personal_info?.name || studentDoc?.name || "Student";
+    const collegeName = app.college_name || "AdmissionX College";
+    const courseName = [app.degree_name, app.course_name].filter(Boolean).join(" - ") || "Application Fee";
     
     if (emailToUse) {
       try {
@@ -105,7 +107,9 @@ export async function POST(req: NextRequest) {
           nameToUse,
           "0.00",
           freeTxnid,
-          new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
+          new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+          collegeName,
+          courseName
         );
       } catch (emailErr) {
         console.error("[Free Payment Bypass] Email notification failed:", emailErr);
