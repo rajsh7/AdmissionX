@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdmissionX – Student Registration Email</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #F2F2F0; font-family: 'DM Sans', sans-serif; padding: 40px 16px; min-height: 100vh; }
+  .email-outer { max-width: 620px; margin: 0 auto; }
+  .brand-strip { background: #111111; border-radius: 12px 12px 0 0; overflow: hidden; }
+  .brand-strip-red { height: 5px; background: #D91A1A; }
+  .brand-strip-inner { padding: 20px 32px 18px; display: flex; align-items: center; justify-content: space-between; }
+  .brand-strip-inner img { height: 26px; width: auto; filter: invert(1) brightness(10); display: block; }
+  .brand-tagline { font-size: 10px; color: rgba(255,255,255,0.38); letter-spacing: 0.1em; text-transform: uppercase; text-align: right; line-height: 1.5; }
+  .email-card { background: #FFFFFF; padding: 40px 40px 36px; border-left: 1px solid #E8E8E4; border-right: 1px solid #E8E8E4; }
+  .welcome-badge { display: inline-flex; align-items: center; gap: 7px; background: #FFF0F0; border: 1px solid #FFDADA; border-radius: 100px; padding: 5px 14px 5px 8px; margin-bottom: 24px; }
+  .welcome-dot { width: 8px; height: 8px; border-radius: 50%; background: #D91A1A; }
+  .welcome-badge span { font-size: 12px; color: #D91A1A; font-weight: 500; letter-spacing: 0.02em; }
+  .greeting { font-size: 22px; font-family: 'DM Serif Display', serif; color: #111111; margin-bottom: 10px; line-height: 1.3; }
+  .greeting strong { color: #D91A1A; }
+  .headline { font-size: 15px; color: #444; line-height: 1.7; margin-bottom: 6px; }
+  .subline { font-size: 14px; color: #666; line-height: 1.7; margin-bottom: 28px; }
+  .divider { height: 1px; background: #F0EFEB; margin: 24px 0; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #AAAAAA; margin-bottom: 14px; }
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 28px; }
+  .feature-item { display: flex; align-items: flex-start; gap: 10px; background: #FAFAF8; border: 1px solid #EEECEA; border-radius: 10px; padding: 12px 14px; }
+  .feature-icon { width: 28px; height: 28px; border-radius: 7px; background: #111111; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .feature-icon svg { width: 14px; height: 14px; fill: none; stroke: #D91A1A; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .feature-text { font-size: 12.5px; color: #444; line-height: 1.4; padding-top: 6px; }
+  .login-box { background: #111111; border-radius: 12px; padding: 20px 22px; margin-bottom: 28px; }
+  .login-box-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 14px; }
+  .login-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .login-row:last-child { border-bottom: none; }
+  .login-label { font-size: 12px; color: rgba(255,255,255,0.4); letter-spacing: 0.02em; }
+  .login-value { font-size: 12.5px; color: #D91A1A; font-family: 'DM Sans', monospace; font-weight: 500; background: rgba(217,26,26,0.1); padding: 3px 10px; border-radius: 5px; border: 1px solid rgba(217,26,26,0.2); }
+  .closing { font-size: 14px; color: #555; line-height: 1.7; margin-bottom: 24px; }
+  .signoff { font-size: 14px; color: #333; line-height: 1.8; }
+  .signoff strong { color: #111; font-size: 15px; display: block; margin-bottom: 2px; }
+  .signoff-sub { font-size: 11.5px; color: #AAAAAA; letter-spacing: 0.02em; margin-top: 2px; display: block; }
+  .benefits-section { background: #FAFAF8; border-left: 1px solid #E8E8E4; border-right: 1px solid #E8E8E4; padding: 32px 40px; }
+  .benefits-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #AAAAAA; margin-bottom: 20px; text-align: center; }
+  .benefits-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .benefits-col { background: #FFFFFF; border: 1px solid #EEECEA; border-radius: 12px; padding: 18px 16px; }
+  .benefits-col-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #F0EFEB; }
+  .benefits-col-icon { width: 30px; height: 30px; border-radius: 8px; background: #111111; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .benefits-col-icon svg { width: 15px; height: 15px; fill: none; stroke: #D91A1A; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .benefits-col-title { font-size: 13px; font-weight: 600; color: #111; }
+  .benefit-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+  .benefit-item:last-child { margin-bottom: 0; }
+  .benefit-dot { width: 5px; height: 5px; border-radius: 50%; background: #D91A1A; flex-shrink: 0; margin-top: 6px; }
+  .benefit-text { font-size: 12px; color: #555; line-height: 1.5; }
+  .social-section { background: #111111; border-left: 1px solid #222; border-right: 1px solid #222; padding: 24px 40px; text-align: center; }
+  .social-label { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; }
+  .social-links { display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .social-btn { display: flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-decoration: none; font-size: 12px; color: rgba(255,255,255,0.7); font-family: 'DM Sans', sans-serif; font-weight: 500; transition: all 0.2s; background: rgba(255,255,255,0.04); }
+  .social-btn:hover { border-color: #D91A1A; color: #fff; background: rgba(217,26,26,0.1); }
+  .social-btn svg { width: 15px; height: 15px; fill: currentColor; }
+  .footer-strip { background: #0D0D0D; border-radius: 0 0 12px 12px; overflow: hidden; }
+  .footer-strip-inner { padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .footer-auto { font-size: 11px; color: rgba(255,255,255,0.25); line-height: 1.5; }
+  .footer-copy { font-size: 11px; color: rgba(255,255,255,0.25); text-align: right; line-height: 1.5; }
+  .footer-copy span { color: #D91A1A; }
+  .footer-strip-red { height: 3px; background: #D91A1A; }
+</style>
+</head>
+<body>
+<div class="email-outer">
+  <div class="brand-strip">
+    <div class="brand-strip-red"></div>
+    <div class="brand-strip-inner">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAAaCAYAAADyrhO6AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QkMyMkY0RTU1RjdDMTFFQTk1QjJCMDEyM0IzRkE4NkMiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QkMyMkY0RTY1RjdDMTFFQTk1QjJCMDEyM0IzRkE4NkMiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpCQzIyRjRFMzVGN0MxMUVBOTVCMkIwMTIzQjNGQTg2QyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpCQzIyRjRFNDVGN0MxMUVBOTVCMkIwMTIzQjNGQTg2QyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PvmIsQoAACQtSURBVHja7Fx3fFTVtt7TUibJpIeEJBB6BEIHkV4UEAVBUIpcURHQhwreJ1XKBQQVsFxFpSrlggioFEVA4QKCQNBAQgIkQGghJCF9kkymnvd9J3NwjJkJ3ve83D/egfPLlH3OXnvVb629zqhKSkqEwWAQX375pais" alt="AdmissionX Logo">
+      <div class="brand-tagline">World's First Online<br>Admission Portal</div>
+    </div>
+  </div>
+  <div class="email-card">
+    <div class="welcome-badge">
+      <span class="welcome-dot"></span>
+      <span>Account Created Successfully</span>
+    </div>
+    <div class="greeting">Dear <strong>Raj Sharma</strong>,</div>
+    <p class="headline">Welcome on board <strong style="color:#111">AdmissionX</strong> — the world's first online admission portal.</p>
+    <p class="subline">Your account has been successfully created and your admission journey has officially begun.</p>
+    <div class="divider"></div>
+    <div class="section-label">You can now</div>
+    <div class="feature-grid">
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        </div>
+        <div class="feature-text">Explore courses &amp; universities</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="feature-text">Complete your profile</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="feature-text">Upload required documents</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        </div>
+        <div class="feature-text">Apply for admissions online</div>
+      </div>
+    </div>
+    
+      <div style="text-align: center; margin: 30px 0;">
+        <p style="font-size: 14px; color: #444; margin-bottom: 15px;">Please activate your account to get started:</p>
+        <a href="https://admissionx.com/activate?token=sample_token" style="display: inline-block; background: #D91A1A; color: #fff; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">Activate Your Account</a>
+        <p style="font-size: 12px; color: #888; margin-top: 10px;">This link will expire in 24 hours.</p>
+      </div>
+    
+    <div class="login-box">
+      <div class="login-box-title">Login Details</div>
+      <div class="login-row">
+        <span class="login-label">Email</span>
+        <span class="login-value">rajsharma74411@gmail.com</span>
+      </div>
+      <div class="login-row">
+        <span class="login-label">Mobile</span>
+        <span class="login-value">9999999999</span>
+      </div>
+    </div>
+    <p class="closing">We are excited to help you shape your future.</p>
+    <div class="divider"></div>
+    <div class="signoff">
+      <strong>Best Regards,</strong>
+      Team AdmissionX
+      <span class="signoff-sub">World's First Online Admission Portal</span>
+    </div>
+  </div>
+  <div class="benefits-section">
+    <div class="benefits-title">Why AdmissionX</div>
+    <div class="benefits-cols">
+      <div class="benefits-col">
+        <div class="benefits-col-header">
+          <div class="benefits-col-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+          <div class="benefits-col-title">For Students</div>
+        </div>
+        <div class="benefit-item"><span class="benefit-dot"></span><span class="benefit-text">Apply to multiple universities in one place</span></div>
+        <div class="benefit-item"><span class="benefit-dot"></span><span class="benefit-text">Real-time application status tracking</span></div>
+        <div class="benefit-item"><span class="benefit-dot"></span><span class="benefit-text">Secure digital document management</span></div>
+        <div class="benefit-item"><span class="benefit-dot"></span><span class="benefit-text">Expert counselling &amp; guidance support</span></div>
+        <div class="benefit-item"><span class="benefit-dot"></span><span class="benefit-text">100% paperless admission process</span></div>
+      </div>
+      <div class="benefits-col">
+        <div class="benefits-col-header">
+          <div class="benefits-col-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div class="benefits-col-title">For Colleges</div>
+        </div>
+        <div class="benefit-item"><span class="benefit-dot"></span><span class="benefit-text">Centralized student application dashboard</span></div>
+        <div class="benefit-item"><span class="benefit-dot"></span><span class="benefit-text">Automated document verification system</span></div>
+        <div class="benefit-item"><span class="benefit-dot"></span><span class="benefit-text">Instant communication with applicants</span></div>
+        <div class="benefit-item"><span class="benefit-dot"></span><span class="benefit-text">Real-time seat &amp; enrollment management</span></div>
+        <div class="benefit-item"><span class="benefit-dot"></span><span class="benefit-text">Data-driven admission analytics</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="social-section">
+    <div class="social-label">Connect with us</div>
+    <div class="social-links">
+      <a href="https://facebook.com/admissionx" class="social-btn">
+        <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        Facebook
+      </a>
+      <a href="https://instagram.com/admissionx" class="social-btn">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        Instagram
+      </a>
+      <a href="https://twitter.com/admissionx" class="social-btn">
+        <svg viewBox="0 0 24 24"><path d="M4 4l16 16M4 20L20 4"/></svg>
+        X (Twitter)
+      </a>
+    </div>
+  </div>
+  <div class="footer-strip">
+    <div class="footer-strip-inner">
+      <div class="footer-auto">This is an automated email. Please do not reply directly to this message.</div>
+      <div class="footer-copy">© 2026 <span>AdmissionX</span>. All rights reserved.</div>
+    </div>
+    <div class="footer-strip-red"></div>
+  </div>
+</div>
+</body>
+</html>

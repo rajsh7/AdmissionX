@@ -134,8 +134,7 @@ export async function sendStudentRegistrationEmail(
   phone: string,
   activationLink?: string
 ): Promise<void> {
-  const template = `
-<!DOCTYPE html>
+  const template = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -162,7 +161,6 @@ export async function sendStudentRegistrationEmail(
   .brand-strip {
     background: #111111;
     border-radius: 12px 12px 0 0;
-    padding: 0;
     overflow: hidden;
   }
   .brand-strip-red {
@@ -531,7 +529,7 @@ export async function sendStudentRegistrationEmail(
   <div class="brand-strip">
     <div class="brand-strip-red"></div>
     <div class="brand-strip-inner">
-      <img src="https://admissionx.com/logo-white.png" alt="AdmissionX Logo">
+      <img src="data:image/jpeg;base64,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" alt="AdmissionX Logo">
       <div class="brand-tagline">World's First Online<br>Admission Portal</div>
     </div>
   </div>
@@ -554,25 +552,25 @@ export async function sendStudentRegistrationEmail(
     <div class="feature-grid">
       <div class="feature-item">
         <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#D91A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
         </div>
         <div class="feature-text">Explore courses &amp; universities</div>
       </div>
       <div class="feature-item">
         <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#D91A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
         <div class="feature-text">Complete your profile</div>
       </div>
       <div class="feature-item">
         <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#D91A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         </div>
         <div class="feature-text">Upload required documents</div>
       </div>
       <div class="feature-item">
         <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#D91A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
         </div>
         <div class="feature-text">Apply for admissions online</div>
       </div>
@@ -619,7 +617,7 @@ export async function sendStudentRegistrationEmail(
       <div class="benefits-col">
         <div class="benefits-col-header">
           <div class="benefits-col-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#D91A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
           </div>
           <div class="benefits-col-title">For Students</div>
         </div>
@@ -634,7 +632,7 @@ export async function sendStudentRegistrationEmail(
       <div class="benefits-col">
         <div class="benefits-col-header">
           <div class="benefits-col-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#D91A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           </div>
           <div class="benefits-col-title">For Colleges</div>
         </div>
@@ -653,18 +651,21 @@ export async function sendStudentRegistrationEmail(
     <div class="social-label">Connect with us</div>
     <div class="social-links">
 
+      <!-- Facebook -->
       <a href="https://facebook.com/admissionx" class="social-btn">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
         Facebook
       </a>
 
+      <!-- Instagram -->
       <a href="https://instagram.com/admissionx" class="social-btn">
-        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
         Instagram
       </a>
 
+      <!-- X / Twitter -->
       <a href="https://twitter.com/admissionx" class="social-btn">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M4 4l16 16M4 20L20 4"/></svg>
         X (Twitter)
       </a>
 
