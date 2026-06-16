@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdmissionX – OTP Verification Email</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #F2F2F0; font-family: 'DM Sans', sans-serif; padding: 40px 16px; min-height: 100vh; }
+  .email-outer { max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 24px; box-shadow: 0 16px 40px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid #E6E6E2; }
+  .brand-strip { background: linear-gradient(135deg, #1A1A19 0%, #2D2D2A 100%); padding: 30px; text-align: center; color: #FFFFFF; }
+  .brand-name { font-family: 'DM Serif Display', serif; font-size: 28px; letter-spacing: -0.02em; }
+  .brand-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: #9A9A95; margin-top: 4px; font-weight: 500; }
+  .content-section { padding: 45px 40px; }
+  .salutation { font-size: 18px; font-weight: 500; color: #1C1C1A; margin-bottom: 16px; }
+  .message-text { font-size: 15px; line-height: 1.6; color: #555552; margin-bottom: 30px; }
+  .otp-container { background: #F8F8F6; border: 1px dashed #D2D2CD; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 30px; }
+  .otp-code { font-size: 38px; font-weight: 600; letter-spacing: 0.2em; color: #0f766e; font-family: monospace; }
+  .otp-expiry { font-size: 12px; color: #8C8C87; margin-top: 8px; }
+  .footer-section { background: #F8F8F6; padding: 24px 40px; text-align: center; border-top: 1px solid #E6E6E2; }
+  .footer-text { font-size: 12px; color: #8C8C87; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="email-outer">
+  <div class="brand-strip">
+    <div class="brand-name">AdmissionX</div>
+    <div class="brand-tag">Secure Verification</div>
+  </div>
+  <div class="content-section">
+    <div class="salutation">Hello Raj Sharma,</div>
+    <div class="message-text">Please use the following One-Time Password (OTP) to complete your login or registration verification. This code is confidential and should not be shared.</div>
+    <div class="otp-container">
+      <div class="otp-code">580924</div>
+      <div class="otp-expiry">Valid for next 10 minutes</div>
+    </div>
+  </div>
+  <div class="footer-section">
+    <div class="footer-text">© 2026 AdmissionX. All rights reserved.</div>
+  </div>
+</div>
+</body>
+</html>
