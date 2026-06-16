@@ -176,7 +176,6 @@ export async function sendStudentRegistrationEmail(
   .brand-strip-inner img {
     height: 26px;
     width: auto;
-    filter: invert(1) brightness(10);
     display: block;
   }
   .brand-tagline {
@@ -515,10 +514,6 @@ export async function sendStudentRegistrationEmail(
     height: 3px;
     background: #D91A1A;
   }
-  @media (max-width: 480px) {
-    .feature-grid, .benefits-cols { grid-template-columns: 1fr; }
-    .brand-strip-inner, .email-card, .benefits-section, .social-section, .footer-strip-inner { padding-left: 20px; padding-right: 20px; }
-  }
 </style>
 </head>
 <body>
@@ -529,7 +524,7 @@ export async function sendStudentRegistrationEmail(
   <div class="brand-strip">
     <div class="brand-strip-red"></div>
     <div class="brand-strip-inner">
-      <img src="data:image/jpeg;base64,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" alt="AdmissionX Logo">
+      <img src="https://admissionx.com/logo-white.png" alt="AdmissionX Logo">
       <div class="brand-tagline">World's First Online<br>Admission Portal</div>
     </div>
   </div>
@@ -683,8 +678,7 @@ export async function sendStudentRegistrationEmail(
 
 </div>
 </body>
-</html>
-  `;
+</html>`;
 
   await sendMail({
     to,
