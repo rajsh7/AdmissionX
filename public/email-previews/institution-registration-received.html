@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdmissionX – Institution Registration Received</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
+  @media only screen and (max-width: 600px) {
+    .email-outer { width: 100% !important; }
+    .brand-logo-cell { padding-left: 16px !important; padding-top: 16px !important; padding-bottom: 14px !important; }
+    .brand-tagline-cell { padding-right: 16px !important; padding-top: 16px !important; padding-bottom: 14px !important; }
+    .email-card-cell { padding-left: 16px !important; padding-right: 16px !important; padding-top: 28px !important; padding-bottom: 20px !important; }
+    .benefits-section-cell { padding-left: 16px !important; padding-right: 16px !important; padding-top: 24px !important; padding-bottom: 8px !important; }
+    .social-section-cell { padding-left: 16px !important; padding-right: 16px !important; }
+    .footer-section-cell { padding-left: 16px !important; padding-right: 16px !important; }
+    .footer-text-right { text-align: center !important; }
+    .col-stack { display: block !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; padding-left: 0 !important; padding-right: 0 !important; margin-bottom: 12px !important; }
+    .benefits-col-stack { display: block !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; padding-left: 0 !important; padding-right: 0 !important; }
+    .benefits-sep { display: none !important; }
+  }
+</style>
+</head>
+<body style="background-color: #F2F2F0; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 0; margin: 0;">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; background-color: #F2F2F0; border-collapse: collapse; table-layout: fixed;">
+  <tr>
+    <td align="center" style="padding: 40px 16px;">
+      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; max-width: 620px; margin: 0 auto; border-collapse: collapse; table-layout: fixed;" align="center" class="email-outer">
+
+        <!-- BRAND STRIP -->
+        <tr>
+          <td align="center" style="background-color: #FFFFFF; border-radius: 12px 12px 0 0; border-bottom: 1px solid #F0EFEB; overflow: hidden; padding: 0;">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td colspan="2" style="height: 5px; background-color: #D91A1A; line-height: 5px; font-size: 1px;">&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="left" valign="middle" class="brand-logo-cell" style="padding: 20px 0 18px 32px;">
+                  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAAaCAYAAADyrhO6AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QkMyMkY0RTU1RjdDMTFFQTk1QjJCMDEyM0IzRkE4NkMiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QkMyMkY0RTY1RjdDMTFFQTk1QjJCMDEyM0IzRkE4NkMiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpCQzIyRjRFMzVGN0MxMUVBOTVCMkIwMTIzQjNGQTg2QyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpCQzIyRjRFNDVGN0MxMUVBOTVCMkIwMTIzQjNGQTg2QyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PvmIsQoAACQtSURBVHja7Fx3fFTV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" alt="AdmissionX Logo" style="height: 26px; width: auto; display: block; border: 0;">
+                </td>
+                <td align="right" valign="middle" class="brand-tagline-cell" style="padding: 20px 32px 18px 0; font-size: 10px; color: #666666; letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.5; font-family: 'DM Sans', sans-serif; font-weight: 500;">
+                  World's First Online<br>Admission Portal
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- MAIN EMAIL CARD -->
+        <tr>
+          <td class="email-card-cell" style="background-color: #FFFFFF; border-left: 1px solid #E8E8E4; border-right: 1px solid #E8E8E4; padding: 40px 40px 36px;">
+
+              <!-- HERO -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse; text-align: center; margin-bottom: 24px;">
+                <tr>
+                  <td align="center">
+                    <div style="width: 68px; height: 68px; border-radius: 50%; border: 2px solid #FFDADA; background-color: transparent; text-align: center; line-height: 64px; display: inline-block;">
+                      <div style="width: 60px; height: 60px; border-radius: 50%; background-color: #111111; display: inline-block; vertical-align: middle; line-height: 60px; text-align: center;">
+                        <img src="https://img.icons8.com/material-outlined/28/D91A1A/building.png" alt="Institution" width="28" height="28" style="width: 28px; height: 28px; display: inline-block; vertical-align: middle; border: 0;">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding-top: 16px;">
+                    <table cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF0F0; border: 1px solid #FFDADA; border-radius: 100px; padding: 5px 14px 5px 8px; margin-bottom: 14px; display: inline-block;">
+                      <tr>
+                        <td valign="middle" style="line-height: 1;">
+                          <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #D91A1A; display: inline-block; vertical-align: middle;"></div>
+                        </td>
+                        <td valign="middle" style="font-size: 11px; color: #D91A1A; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; font-family: 'DM Sans', sans-serif; padding-left: 7px; line-height: 1;">
+                          Registration Received
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-size: 26px; font-family: 'DM Serif Display', Georgia, serif; color: #111111; line-height: 1.3;">
+                    Welcome to AdmissionX, <strong style="color: #D91A1A;">Amity University</strong>!
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-top: 8px; font-size: 15px; color: #666666; line-height: 1.7; font-family: 'DM Sans', sans-serif;">
+                    Your institution registration request has been received successfully.
+                  </td>
+                </tr>
+              </table>
+
+              <!-- DIVIDER -->
+              <hr style="height: 1px; background-color: #F0EFEB; margin: 32px 0; border: none;">
+
+              <!-- REGISTRATION ID HERO -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #111111; border-top: 3px solid #D91A1A; border-radius: 12px; border-collapse: separate; margin-bottom: 28px; width: 100%;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+                      <tr>
+                        <td align="left" valign="middle">
+                          <span style="font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 6px; font-family: 'DM Sans', sans-serif;">Registration ID</span>
+                          <span style="font-size: 22px; font-weight: 700; color: #D91A1A; font-family: 'DM Sans', Courier, monospace; letter-spacing: 0.04em;">REG-2026-77124</span>
+                        </td>
+                        <td align="right" valign="middle" width="40">
+                          <div style="width: 40px; height: 40px; border-radius: 10px; background-color: rgba(217,26,26,0.12); border: 1px solid rgba(217,26,26,0.25); text-align: center; line-height: 40px;">
+                            <img src="https://img.icons8.com/material-outlined/18/D91A1A/file.png" alt="ID" width="18" height="18" style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; border: 0;">
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- WHAT YOU CAN DO LABEL -->
+              <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #AAAAAA; margin-bottom: 14px; font-family: 'DM Sans', sans-serif;">What You Can Do After Approval</div>
+
+              <!-- CAPABILITIES BOX -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #111111; border-top: 3px solid #D91A1A; border-radius: 12px; border-collapse: separate; margin-bottom: 28px; width: 100%;">
+                <tr>
+                  <td style="padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+                      <tr>
+                        <td valign="middle" width="32" style="padding-right: 12px;">
+                          <div style="width: 32px; height: 32px; border-radius: 8px; background-color: rgba(217,26,26,0.12); border: 1px solid rgba(217,26,26,0.25); text-align: center; line-height: 30px;">
+                            <img src="https://img.icons8.com/material-outlined/15/D91A1A/user.png" alt="Applications" width="15" height="15" style="width: 15px; height: 15px; display: inline-block; vertical-align: middle; border: 0;">
+                          </div>
+                        </td>
+                        <td valign="middle" align="left">
+                          <div style="font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 3px; font-family: 'DM Sans', sans-serif;">Receive Applications</div>
+                          <div style="font-size: 14px; color: #FFFFFF; font-weight: 600; font-family: 'DM Sans', sans-serif; letter-spacing: 0.02em;">From qualified students</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+                      <tr>
+                        <td valign="middle" width="32" style="padding-right: 12px;">
+                          <div style="width: 32px; height: 32px; border-radius: 8px; background-color: rgba(217,26,26,0.12); border: 1px solid rgba(217,26,26,0.25); text-align: center; line-height: 30px;">
+                            <img src="https://img.icons8.com/material-outlined/15/D91A1A/building.png" alt="Admissions" width="15" height="15" style="width: 15px; height: 15px; display: inline-block; vertical-align: middle; border: 0;">
+                          </div>
+                        </td>
+                        <td valign="middle" align="left">
+                          <div style="font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 3px; font-family: 'DM Sans', sans-serif;">Manage Admissions</div>
+                          <div style="font-size: 14px; color: #FFFFFF; font-weight: 600; font-family: 'DM Sans', sans-serif; letter-spacing: 0.02em;">Completely online</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 14px 20px;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+                      <tr>
+                        <td valign="middle" width="32" style="padding-right: 12px;">
+                          <div style="width: 32px; height: 32px; border-radius: 8px; background-color: rgba(217,26,26,0.12); border: 1px solid rgba(217,26,26,0.25); text-align: center; line-height: 30px;">
+                            <img src="https://img.icons8.com/material-outlined/15/D91A1A/combo-chart.png" alt="Analytics" width="15" height="15" style="width: 15px; height: 15px; display: inline-block; vertical-align: middle; border: 0;">
+                          </div>
+                        </td>
+                        <td valign="middle" align="left">
+                          <div style="font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 3px; font-family: 'DM Sans', sans-serif;">Real-time Tracking</div>
+                          <div style="font-size: 14px; color: #FFFFFF; font-weight: 600; font-family: 'DM Sans', sans-serif; letter-spacing: 0.02em;">Application status &amp; analytics</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- INFO NOTE -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #FAFAF8; border-top: 1px solid #EEECEA; border-right: 1px solid #EEECEA; border-bottom: 1px solid #EEECEA; border-left: 3px solid #D91A1A; border-radius: 0 10px 10px 0; padding: 14px 16px; margin-bottom: 28px; border-collapse: collapse; box-sizing: border-box;">
+                <tr>
+                  <td valign="top" width="30" style="padding-right: 12px;">
+                    <div style="width: 30px; height: 30px; background-color: #FFF0F0; border-radius: 8px; text-align: center; line-height: 30px;">
+                      <img src="https://img.icons8.com/material-outlined/15/D91A1A/clock.png" alt="Next Steps" width="15" height="15" style="width: 15px; height: 15px; display: inline-block; vertical-align: middle; border: 0;">
+                    </div>
+                  </td>
+                  <td valign="middle" style="font-size: 13px; color: #555555; line-height: 1.6; font-family: 'DM Sans', sans-serif; text-align: left;">
+                    <strong style="color: #111111; display: block; margin-bottom: 2px; font-weight: bold;">Next Steps</strong>
+                    Our verification team will review your submitted details and documents shortly. You will receive another email once your institution is approved and activated.
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SIGNOFF -->
+              <div style="font-size: 14px; color: #333333; line-height: 1.8; font-family: 'DM Sans', sans-serif; text-align: left;">
+                <strong style="color: #111111; font-size: 15px; display: block; margin-bottom: 2px; font-weight: bold;">Best Regards,</strong>
+                Partnership Team<br>AdmissionX
+                <span style="font-size: 11.5px; color: #AAAAAA; letter-spacing: 0.02em; margin-top: 2px; display: block; font-family: 'DM Sans', sans-serif;">World's First Online Admission Portal</span>
+              </div>
+
+          </td>
+        </tr>
+
+        <!-- BENEFITS SECTION -->
+        <tr>
+          <td class="benefits-section-cell" style="background-color: #FAFAF8; border-left: 1px solid #E8E8E4; border-right: 1px solid #E8E8E4; padding: 32px 40px 16px 40px;">
+            <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #AAAAAA; margin-bottom: 20px; text-align: center; font-family: 'DM Sans', sans-serif;">Why AdmissionX</div>
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td align="center" style="font-size: 0; text-align: center; padding: 0;">
+                  <div class="benefits-col-stack" style="display: inline-block; width: 100%; max-width: 262px; vertical-align: top; text-align: left;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #FFFFFF; border: 1px solid #EEECEA; border-radius: 12px; width: 100%; margin-bottom: 16px; border-collapse: collapse;">
+                      <tr><td style="padding: 18px 16px 12px 16px; border-bottom: 1px solid #F0EFEB;">
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse: collapse;"><tr>
+                          <td valign="middle" width="30"><div style="width: 30px; height: 30px; border-radius: 8px; background-color: #111111; text-align: center; line-height: 30px;"><img src="https://img.icons8.com/material-outlined/15/D91A1A/graduation-cap.png" alt="students" width="15" height="15" style="width:15px;height:15px;display:inline-block;vertical-align:middle;border:0;"></div></td>
+                          <td valign="middle" style="font-size: 13px; font-weight: 600; color: #111111; padding-left: 8px; font-family: 'DM Sans', sans-serif;">For Students</td>
+                        </tr></table>
+                      </td></tr>
+                      <tr><td style="padding: 14px 16px 18px 16px;">
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Apply to multiple universities in one place</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Real-time application status tracking</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Secure digital document management</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Expert counselling &amp; guidance support</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">100% paperless admission process</td></tr></table>
+                      </td></tr>
+                    </table>
+                  </div>
+                  <span class="benefits-sep" style="display: inline-block; width: 8px; height: 1px;"></span>
+                  <div class="benefits-col-stack" style="display: inline-block; width: 100%; max-width: 262px; vertical-align: top; text-align: left;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #FFFFFF; border: 1px solid #EEECEA; border-radius: 12px; width: 100%; margin-bottom: 16px; border-collapse: collapse;">
+                      <tr><td style="padding: 18px 16px 12px 16px; border-bottom: 1px solid #F0EFEB;">
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse: collapse;"><tr>
+                          <td valign="middle" width="30"><div style="width: 30px; height: 30px; border-radius: 8px; background-color: #111111; text-align: center; line-height: 30px;"><img src="https://img.icons8.com/material-outlined/15/D91A1A/school.png" alt="colleges" width="15" height="15" style="width:15px;height:15px;display:inline-block;vertical-align:middle;border:0;"></div></td>
+                          <td valign="middle" style="font-size: 13px; font-weight: 600; color: #111111; padding-left: 8px; font-family: 'DM Sans', sans-serif;">For Colleges</td>
+                        </tr></table>
+                      </td></tr>
+                      <tr><td style="padding: 14px 16px 18px 16px;">
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Centralized student application dashboard</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Automated document verification system</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Instant communication with applicants</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Real-time seat &amp; enrollment management</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Data-driven admission analytics</td></tr></table>
+                      </td></tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- SOCIAL LINKS -->
+        <tr>
+          <td align="center" class="social-section-cell" style="background-color: #FFFFFF; border-left: 1px solid #E8E8E4; border-right: 1px solid #E8E8E4; border-top: 1px solid #F0EFEB; padding: 24px 16px;">
+            <div style="font-size: 11px; color: #AAAAAA; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; font-family: 'DM Sans', sans-serif; font-weight: 600;">Connect with us</div>
+            <div style="text-align: center; font-family: 'DM Sans', sans-serif;">
+              <a href="https://facebook.com/admissionx" style="display:inline-block;padding:8px 16px;margin:6px 8px;border-radius:8px;border:1px solid #EEECEA;text-decoration:none;font-size:12px;color:#444444;font-family:'DM Sans',sans-serif;font-weight:500;background-color:#FFFFFF;white-space:nowrap;vertical-align:middle;"><img src="https://img.icons8.com/ios-glyphs/14/111111/facebook.png" alt="fb" width="14" height="14" style="width:14px;height:14px;display:inline-block;vertical-align:middle;border:0;padding-right:6px;"><span style="vertical-align:middle;color:#444444;">Facebook</span></a>
+              <a href="https://instagram.com/admissionx" style="display:inline-block;padding:8px 16px;margin:6px 8px;border-radius:8px;border:1px solid #EEECEA;text-decoration:none;font-size:12px;color:#444444;font-family:'DM Sans',sans-serif;font-weight:500;background-color:#FFFFFF;white-space:nowrap;vertical-align:middle;"><img src="https://img.icons8.com/ios-glyphs/14/111111/instagram.png" alt="ig" width="14" height="14" style="width:14px;height:14px;display:inline-block;vertical-align:middle;border:0;padding-right:6px;"><span style="vertical-align:middle;color:#444444;">Instagram</span></a>
+              <a href="https://twitter.com/admissionx" style="display:inline-block;padding:8px 16px;margin:6px 8px;border-radius:8px;border:1px solid #EEECEA;text-decoration:none;font-size:12px;color:#444444;font-family:'DM Sans',sans-serif;font-weight:500;background-color:#FFFFFF;white-space:nowrap;vertical-align:middle;"><img src="https://img.icons8.com/ios-glyphs/14/111111/twitterx.png" alt="x" width="14" height="14" style="width:14px;height:14px;display:inline-block;vertical-align:middle;border:0;padding-right:6px;"><span style="vertical-align:middle;color:#444444;">X (Twitter)</span></a>
+              <a href="https://youtube.com/admissionx" style="display:inline-block;padding:8px 16px;margin:6px 8px;border-radius:8px;border:1px solid #EEECEA;text-decoration:none;font-size:12px;color:#444444;font-family:'DM Sans',sans-serif;font-weight:500;background-color:#FFFFFF;white-space:nowrap;vertical-align:middle;"><img src="https://img.icons8.com/ios-glyphs/14/111111/youtube.png" alt="yt" width="14" height="14" style="width:14px;height:14px;display:inline-block;vertical-align:middle;border:0;padding-right:6px;"><span style="vertical-align:middle;color:#444444;">YouTube</span></a>
+            </div>
+          </td>
+        </tr>
+
+        <!-- FOOTER -->
+        <tr>
+          <td bgcolor="#0D0D0D" class="footer-section-cell" style="background-color: #0D0D0D; border-radius: 0 0 12px 12px; border-left: 1px solid #222222; border-right: 1px solid #222222; border-bottom: 1px solid #222222; overflow: hidden; padding: 0;">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 24px 32px 20px 32px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td align="center" style="font-size: 0; text-align: center; padding: 0;">
+                        <div class="col-stack" style="display: inline-block; width: 100%; max-width: 260px; vertical-align: top; text-align: left;">
+                          <div style="font-family: 'DM Sans', sans-serif; font-size: 11px; color: #888888; line-height: 1.6;">This is an automated email. Please do not reply directly to this message.</div>
+                        </div>
+                        <span class="benefits-sep" style="display: inline-block; width: 12px; height: 1px;"></span>
+                        <div class="col-stack" style="display: inline-block; width: 100%; max-width: 260px; vertical-align: top; text-align: right;">
+                          <div class="footer-text-right" style="font-family: 'DM Sans', sans-serif; font-size: 11px; color: #888888; line-height: 1.6; text-align: right;">© 2026 <span style="color: #D91A1A; font-weight: 500;">AdmissionX</span>. All rights reserved.</div>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td style="height: 3px; background-color: #D91A1A; line-height: 3px; font-size: 1px;">&nbsp;</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

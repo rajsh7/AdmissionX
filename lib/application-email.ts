@@ -30,6 +30,18 @@ function getPublicBaseUrl(): string {
   return (process.env.NEXT_PUBLIC_BASE_URL ?? "https://admissionx.com").replace(/\/$/, "");
 }
 
+function getPublicLogoUrl(): string {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (siteUrl && !siteUrl.includes("localhost")) {
+    return `${siteUrl.replace(/\/$/, "")}/admissionx-logo.png`;
+  }
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  if (baseUrl && !baseUrl.includes("localhost")) {
+    return `${baseUrl.replace(/\/$/, "")}/admissionx-logo.png`;
+  }
+  return "https://admissionx.com/admissionx-logo.png";
+}
+
 function applicationStatusLabel(status: string): string {
   const key = status.toLowerCase().trim();
   const labels: Record<ApplicationEmailStatus, string> = {
@@ -44,7 +56,7 @@ function applicationStatusLabel(status: string): string {
 
 function renderAdmissionXTemplate(title: string, preheader: string, body: string): string {
   const baseUrl = getPublicBaseUrl();
-  const logoUrl = `${baseUrl}/admissionx-logo.png`;
+  const logoUrl = getPublicLogoUrl();
 
   return `
 <!DOCTYPE html>

@@ -5,8 +5,18 @@ import pool from "@/lib/db";
 import { 
   sendStudentApplicationStatusEmail,
   sendAdmissionApprovedNotificationToCollege,
-  sendAdmissionRejectedNotificationToCollege 
+  sendAdmissionRejectedNotificationToCollege,
+  sendAdmissionConfirmationEmail
 } from "@/lib/email";
+import {
+  sendSMSApplicationUnderReview,
+  sendSMSAppApprovedByCollege,
+  sendSMSAdmissionConfirmed,
+  sendSMSEnrollmentGenerated,
+  sendSMSCollegeAdmissionApproved,
+  sendSMSCollegeEnrollmentDone,
+  sendSMSCollegeStatusUpdated
+} from "@/lib/sms";
 
 // ── Auth + ownership helper ───────────────────────────────────────────────────
 async function checkAuth(slug: string) {
@@ -251,8 +261,8 @@ export async function PUT(
     // Verify the application belongs to this college
     const [checkRows] = await conn.query(
       `SELECT a.id, a.status, a.applicationRef,
-              s.name AS student_name, s.email AS student_email,
-              cp.college_name
+              s.name AS student_name, s.email AS student_email, s.phone AS student_phone,
+              cp.college_name, cp.phone AS college_phone
        FROM applications a
        LEFT JOIN next_student_signups s ON s.id = a.studentId
        LEFT JOIN collegeprofile cp ON cp.id = a.collegeId
@@ -260,7 +270,7 @@ export async function PUT(
        LIMIT 1`,
       [application_id, auth.collegeprofile_id],
     );
-    const checkList = checkRows as { id: number; status: string; applicationRef: string; student_name: string | null; student_email: string | null; college_name: string | null }[];
+    const checkList = checkRows as { id: number; status: string; applicationRef: string; student_name: string | null; student_email: string | null; student_phone: string | null; college_name: string | null; college_phone: string | null }[];
     if (!checkList.length) {
       return NextResponse.json(
         { error: "Application not found or does not belong to this college." },
@@ -269,10 +279,19 @@ export async function PUT(
     }
     const appRecord = checkList[0];
 
-    await conn.query(
-      `UPDATE applications SET status = ? WHERE id = ?`,
-      [status, application_id],
-    );
+    let enrollmentNo = "";
+    if (status === "enrolled") {
+      enrollmentNo = `ENR-${Date.now()}-${Math.floor(10000 + Math.random() * 90000)}`;
+      await conn.query(
+        `UPDATE applications SET status = ?, enrollment_no = ? WHERE id = ?`,
+        [status, enrollmentNo, application_id],
+      );
+    } else {
+      await conn.query(
+        `UPDATE applications SET status = ? WHERE id = ?`,
+        [status, application_id],
+      );
+    }
 
     // Send status change email to student using new template
     if (appRecord.student_email && appRecord.student_name) {
@@ -295,15 +314,26 @@ export async function PUT(
 
           // Send student notification
           if (appRecord.student_email && appRecord.student_name) {
-            await sendStudentApplicationStatusEmail({
-              to: appRecord.student_email,
-              studentName: appRecord.student_name,
-              collegeName: collegeName,
-              appId: appRecord.applicationRef,
-              courseName: courseName || "General Admission",
-              reason: notes || null,
-              status: status,
-            });
+            if (status === "enrolled") {
+              await sendAdmissionConfirmationEmail(
+                appRecord.student_email,
+                appRecord.student_name,
+                collegeName,
+                appRecord.applicationRef,
+                courseName || "General Admission",
+                enrollmentNo
+              );
+            } else {
+              await sendStudentApplicationStatusEmail({
+                to: appRecord.student_email,
+                studentName: appRecord.student_name,
+                collegeName: collegeName,
+                appId: appRecord.applicationRef,
+                courseName: courseName || "General Admission",
+                reason: notes || null,
+                status: status,
+              });
+            }
           }
 
           // Send college notification for approved/rejected
@@ -331,9 +361,41 @@ export async function PUT(
                 collegeName,
                 appRecord.student_name,
                 appRecord.applicationRef,
-                notes || "Application did not meet requirements"
+                notes || "Application did not meet requirements",
+                courseName || "General Admission"
               );
             }
+          }
+
+          // Send Student SMS based on status
+          try {
+            if (appRecord.student_phone) {
+              if (status === "under_review") {
+                await sendSMSApplicationUnderReview(appRecord.student_phone, appRecord.applicationRef);
+              } else if (status === "verified") {
+                await sendSMSAppApprovedByCollege(appRecord.student_phone, collegeName);
+              } else if (status === "enrolled") {
+                await sendSMSAdmissionConfirmed(appRecord.student_phone);
+                await sendSMSEnrollmentGenerated(appRecord.student_phone, enrollmentNo);
+              }
+            }
+          } catch (smsErr) {
+            console.error("[Applications] Student SMS failed:", smsErr);
+          }
+
+          // Send College SMS based on status
+          try {
+            if (appRecord.college_phone) {
+              if (status === "verified") {
+                await sendSMSCollegeAdmissionApproved(appRecord.college_phone, appRecord.applicationRef);
+              } else if (status === "enrolled") {
+                await sendSMSCollegeEnrollmentDone(appRecord.college_phone, enrollmentNo, appRecord.applicationRef);
+              }
+              // Send status updated message for any status update
+              await sendSMSCollegeStatusUpdated(appRecord.college_phone, appRecord.applicationRef);
+            }
+          } catch (smsErr) {
+            console.error("[Applications] College SMS failed:", smsErr);
           }
         } catch (emailErr) {
           console.error("[Applications] Status email failed:", emailErr);

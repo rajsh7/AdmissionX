@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { signStudentToken, STUDENT_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
 import { sendStudentRegistrationEmail } from "@/lib/email";
+import { sendSMSWelcome } from "@/lib/sms";
 
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
@@ -57,9 +58,17 @@ export async function GET(req: NextRequest) {
           studentDoc.email,
           studentDoc.phone || "Not provided"
         );
+
+        if (studentDoc.phone) {
+          try {
+            await sendSMSWelcome(studentDoc.phone);
+          } catch (smsErr) {
+            console.error("[Activate] Welcome SMS failed:", smsErr);
+          }
+        }
       }
-    } catch (emailErr) {
-      console.error("[Activate] Welcome email failed:", emailErr);
+    } catch (err) {
+      console.error("[Activate] Welcome notification failed:", err);
     }
   });
 

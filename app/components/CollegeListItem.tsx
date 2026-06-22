@@ -17,19 +17,35 @@ interface CollegeListItemProps {
 
 function formatFees(fees: number | null): string {
   if (!fees || fees < 500) return "";
-  return `₹${fees.toLocaleString("en-IN")}`;
+  return `₹ ${fees.toLocaleString("en-IN")}`;
 }
 
 function StarRating({ rating, count }: { rating: number; count: number }) {
-  if (rating === 0) return null;
-  const countStr = count >= 1000 ? `${(count / 1000).toFixed(1)}k` : count;
+  const stars = [];
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+
+  for (let i = 1; i <= 5; i++) {
+    if (i <= fullStars) {
+      stars.push(
+        <span key={i} className="text-[#FF8F00] text-lg">★</span>
+      );
+    } else if (i === fullStars + 1 && hasHalfStar) {
+      stars.push(
+        <span key={i} className="text-[#FF8F00] text-lg">★</span>
+      );
+    } else {
+      stars.push(
+        <span key={i} className="text-[#CCCCCC] text-lg">★</span>
+      );
+    }
+  }
+
   return (
-    <div className="flex items-center gap-1.5">
-      <span className="material-symbols-rounded text-[#FCD34D] text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-      <span className="font-semibold" style={{ fontSize: "13px", color: "#3E3E3E" }}>
-        {rating.toFixed(1)}
-        <span className="ml-1 font-medium">( {countStr} Reviews )</span>
-      </span>
+    <div className="flex items-center gap-1">
+      <span className="text-[13.5px] font-semibold text-[#3E3E3E] mr-1">{rating.toFixed(1)}</span>
+      <div className="flex items-center mr-1.5">{stars}</div>
+      <span className="text-[13.5px] font-medium text-[#3E3E3E]">( {count} )</span>
     </div>
   );
 }
@@ -47,142 +63,154 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
   // collegetype_id: 2=Government College, 3=Government University
   const isGovt = collegetype_id === 2 || collegetype_id === 3;
 
+  const formattedLocation = (location || "Indore , Madhya Pradesh , India")
+    .trim()
+    .replace(/^\s*,\s*/g, "")
+    .replace(/\s*,\s*/g, " , ");
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -16 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: Math.min(index * 0.05, 0.3) }}
     >
-      <div className="group relative flex flex-col sm:flex-row items-start justify-between gap-4 bg-white rounded-[5px] border border-neutral-100 hover:border-[#FF3C3C]/20 hover:shadow-xl hover:shadow-[#FF3C3C]/5 transition-all duration-300 p-4 sm:p-5 pr-4 sm:pr-8">
-        <Link href={`/college/${slug}`} className="absolute inset-0 z-0" aria-label={`View ${name}`} />
-
-        <div className="flex items-start  gap-4 flex-1  min-w-0">
-          {/* Thumbnail */}
-          <div className="relative z-10 w-24 h-20 sm:w-40 sm:h-40 flex-shrink-0 rounded-[5px]  overflow-hidden bg-neutral-100 flex items-center justify-center">
-            {image && image !== "" ? (
-              <Image src={image} alt={name} fill sizes="150px" className="object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none" />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-[#FF3C3C]/10 to-[#FF3C3C]/5 flex items-center justify-center p-2 text-center pointer-events-none">
-                <span className="material-symbols-outlined text-3xl text-[#FF3C3C]/30">account_balance</span>
-              </div>
-            )}
-            <div className="absolute top-1 right-0 bg-white px-1.5 py-0.5 flex items-center gap-1 shadow-md rounded-l-[5px] border border-r-0 border-neutral-100 z-10">
-              <span className="material-symbols-rounded text-[#FF3C3C] text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="font-semibold" style={{ fontSize: "11px", color: "#3E3E3E" }}>{rating.toFixed(1)}</span>
+      <div className="group relative flex flex-col md:flex-row gap-5 bg-white border border-[#e5e7eb] hover:shadow-lg transition-all duration-300 p-5 md:py-16 pl-5 pr-4 md:pr-5 mr-4 md:mr-80 rounded-[5px] min-h-[300px]">
+        {/* Left Side: Thumbnail / Logo */}
+        <div className="relative flex-shrink-0 w-full md:w-[180px] h-[130px] flex items-center justify-center bg-white border border-[#f3f4f6]">
+          {image && image !== "" && !image.includes("default") ? (
+            <div className="relative w-full h-full p-2">
+              <Image src={image} alt={name} fill sizes="180px" className="object-contain pointer-events-none" />
             </div>
-            {displayRank && (
-              <div className="absolute top-1.5 left-1.5 w-7 h-7 rounded-[5px] bg-[#FF3C3C] text-white flex items-center justify-center text-[10px] font-black shadow-md">
-                #{displayRank}
-              </div>
-            )}
-          </div>
-
-          {/* Main Info */}
-          <div className="flex-1 min-w-0 z-10 relative">
-            <div className="flex items-start justify-between gap-2 mb-1.5">
-              <Link href={`/college/${slug}`} className="text-xl sm:text-[20px] font-extrabold text-[#333333] group-hover:text-[#FF3C3C] transition-colors leading-snug line-clamp-2">
-                {name}
-              </Link>
-            </div>
-            <p className="flex items-center gap-1 text-xs text-neutral-400 mb-2">
-              <span className="material-symbols-outlined text-[13px]">location_on</span>
-              <span className="truncate">{location || "India"}</span>
-            </p>
-            <div className="flex flex-wrap items-center gap-2 mb-2.5">
-              <StarRating rating={rating} count={totalRatingUser} />
-              <div className="w-px h-3 bg-neutral-200" />
-              
-              {/* Money */}
-              
-             
-              
-            </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pointer-events-none">
-              {(universityType || isGovt !== undefined) && (
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${isGovt ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-blue-50 text-blue-700 border border-blue-200"}`}>
-                  {isGovt ? "Govt." : "Private"}
-                </span>
-              )}
-              
-              {verified ? (
-                <span className="inline-flex items-center gap-0.5 px-2 py-0.5 bg-slate-50 text-slate-600 border border-slate-200 rounded-full text-[10px] font-bold uppercase tracking-wide">
-                  <span className="material-symbols-outlined text-[11px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                  Verified
-                </span>
-              ) : null}
-              {isTopUniversity ? (
-                <span className="inline-flex items-center gap-0.5 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold uppercase tracking-wide">
-                  <span className="material-symbols-outlined text-[11px]" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
-                  Top University
-                </span>
-              ) : null}
-              {streams.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {streams.slice(0, 4).map((s) => (
-                    <span key={s} className="px-2 py-0.5 bg-neutral-50 text-neutral-600 text-[10px] font-bold rounded-full border border-neutral-100 group-hover:border-[#FF3C3C]/20 group-hover:text-[#FF3C3C] group-hover:bg-[#FF3C3C]/5 transition-all">{s}</span>
-                  ))}
-                  {streams.length > 4 && <span className="px-2 py-0.5 bg-neutral-50 text-neutral-400 text-[10px] font-bold rounded-full border border-neutral-50 italic">+{streams.length - 4}</span>}
-                </div>
-              )}
-              {estyear && (
-                <div className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[13px] text-neutral-400">calendar_month</span>
-                  <span className="text-[10px] text-neutral-400 font-bold">Est. {estyear}</span>
-                </div>
-              )}
-              
-            </div>
-            {/* money */}
-            {/* <div className="flex items-center mt-5 gap-1.5">
-              <span className="material-symbols-outlined text-[13px] text-neutral-400">currency_rupee</span>
-              <span className="text-sm text-neutral-500 font-medium">Starting Fees:</span>
-              {feesLabel ? (
-                <>
-                  <span className="text-md font-black text-[#FF3C3C]">{feesLabel}</span>
-                  <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tight">/ year</span>
-                </>
-              ) : (
-                <span className="text-[12px] font-semibold text-slate-400 italic">Contact college</span>
-              )}
-            </div> */}
-          </div>
-        </div>
-
-        {/* Fees at right top side */}
-        <div className="relative sm:absolute sm:top-5 sm:right-8 z-20 flex items-center gap-1.5 mt-2 sm:mt-0">
-          <span className="material-symbols-outlined text-[13px] text-neutral-400">currency_rupee</span>
-          <span className="text-sm sm:text-xl text-neutral-500 font-medium"> Fees:</span>
-          {feesLabel ? (
-            <>
-              <span className="text-lg sm:text-xl font-black text-[#FF3C3C]">{feesLabel}</span>
-              <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tight">/ year</span>
-            </>
           ) : (
-            <span className="text-[12px] font-semibold text-slate-400 italic">Contact college</span>
+            <div className="w-full h-full flex items-center justify-center">
+              <svg className="w-[100px] h-[75px] text-[#2f4f4f]" viewBox="0 0 160 120" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                {/* Left wing */}
+                <rect x="25" y="45" width="25" height="55" rx="2" />
+                {/* Right wing */}
+                <rect x="110" y="45" width="25" height="55" rx="2" />
+                {/* Central body */}
+                <rect x="50" y="32" width="60" height="68" rx="2" />
+                {/* Gable triangle roof */}
+                <polygon points="50,32 80,15 110,32" fill="white" />
+                {/* Central gable circle */}
+                <circle cx="80" cy="24" r="5" strokeWidth="3" />
+                {/* Central door */}
+                <rect x="71" y="68" width="18" height="32" rx="1" />
+                <line x1="80" y1="68" x2="80" y2="100" />
+                
+                {/* Flag pole */}
+                <line x1="80" y1="15" x2="80" y2="3" />
+                {/* Flag */}
+                <polygon points="80,3 95,8 80,13" fill="#2f4f4f" />
+
+                {/* Windows - Left Wing */}
+                <line x1="31" y1="53" x2="31" y2="60" />
+                <line x1="44" y1="53" x2="44" y2="60" />
+                <line x1="31" y1="68" x2="31" y2="75" />
+                <line x1="44" y1="68" x2="44" y2="75" />
+                <line x1="31" y1="83" x2="31" y2="90" />
+                <line x1="44" y1="83" x2="44" y2="90" />
+
+                {/* Windows - Right Wing */}
+                <line x1="116" y1="53" x2="116" y2="60" />
+                <line x1="129" y1="53" x2="129" y2="60" />
+                <line x1="116" y1="68" x2="116" y2="75" />
+                <line x1="129" y1="68" x2="129" y2="75" />
+                <line x1="116" y1="83" x2="116" y2="90" />
+                <line x1="129" y1="83" x2="129" y2="90" />
+
+                {/* Windows - Central Body */}
+                <line x1="60" y1="42" x2="65" y2="42" />
+                <line x1="70" y1="42" x2="75" y2="42" />
+                <line x1="85" y1="42" x2="90" y2="42" />
+                <line x1="95" y1="42" x2="100" y2="42" />
+
+                <line x1="60" y1="54" x2="65" y2="54" />
+                <line x1="70" y1="54" x2="75" y2="54" />
+                <line x1="85" y1="54" x2="90" y2="54" />
+                <line x1="95" y1="54" x2="100" y2="54" />
+
+                <line x1="60" y1="66" x2="65" y2="66" />
+                <line x1="95" y1="66" x2="100" y2="66" />
+              </svg>
+            </div>
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="relative sm:absolute sm:bottom-5 sm:right-8 w-full sm:w-auto flex gap-2 sm:gap-3 z-20 mt-4 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-0 border-neutral-100">
-           {!isGovt && (
+        {/* Middle: Details */}
+        <div className="flex-1 min-w-0 md:pr-[195px]">
+          {/* Title */}
+          <h2 className="text-[17px] font-bold text-[#1f2937] leading-snug mb-1">
+            <Link href={`/college/${slug}`} className="hover:underline">
+              {name}
+            </Link>
+          </h2>
+
+          {/* Rating */}
+          <div className="mb-2">
+            <StarRating rating={rating} count={totalRatingUser} />
+          </div>
+
+          {/* Location */}
+          <p className="text-[13px] text-[#374151] mb-2.5">
+            <span className="font-bold text-[#1f2937]">Location:</span> {formattedLocation}
+          </p>
+
+          {/* Bulleted Links */}
+          <div className="border-t border-neutral-100 pt-2 mb-1">
+            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] text-[#e2583e] font-semibold">
+              <span className="text-[#e2583e]">•</span>
+              <Link href={`/college/${slug}`} className="hover:underline">About</Link>
+              <span className="text-[#e2583e]">•</span>
+              <Link href={`/college/${slug}/courses`} className="hover:underline">Courses & Fees</Link>
+              <span className="text-[#e2583e]">•</span>
+              <Link href={`/college/${slug}/faculty`} className="hover:underline">Faculty</Link>
+              <span className="text-[#e2583e]">•</span>
+              <Link href={`/college/${slug}/admission-procedure`} className="hover:underline">Admission Procedure</Link>
+              <span className="text-[#e2583e]">•</span>
+              <Link href={`/college/${slug}/reviews`} className="hover:underline">Reviews</Link>
+              <span className="text-[#e2583e]">•</span>
+              <Link href={`/college/${slug}/faqs`} className="hover:underline">FAQs</Link>
+              <span className="text-[#e2583e]">•</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Top Side: Fee Info */}
+        <div className="md:absolute md:top-4 md:right-4 text-right flex-shrink-0">
+          {feesLabel ? (
+            <div className="flex flex-col items-end">
+              <span className="text-[17px] font-black text-[#bf360c]">{feesLabel}</span>
+              <span className="text-[10px] text-green-700 font-bold uppercase tracking-tight">Per year</span>
+            </div>
+          ) : (
+            <span className="text-[15px] font-bold text-[#bf360c]">Fee : N/A</span>
+          )}
+        </div>
+
+        {/* Right Bottom Side: Action Buttons */}
+        <div className="md:absolute md:bottom-4 md:right-4 flex flex-wrap items-center gap-2 mt-4 md:mt-0 pt-3 md:pt-0 border-t md:border-0 border-neutral-100 w-full md:w-auto">
+          {!isGovt && (
             <button
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleApply(slug); }}
-              className="flex-1 flex items-center justify-center gap-1.5 bg-[#FF3C3C] hover:bg-[#E63636] text-white text-[11px] sm:text-sm font-bold px-3 py-2.5 rounded-[5px] transition-all duration-300 cursor-pointer whitespace-nowrap shadow-sm"
+              className="flex-1 md:flex-initial border border-[#ff7a00] hover:bg-[#ff7a00]/5 text-[#ff7a00] text-[13px] font-semibold px-4 py-1.5 rounded-[3px] transition-all duration-200 whitespace-nowrap text-center cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[15px]">edit_document</span>
               Apply Now
             </button>
           )}
-          <AskQueryModal slug={slug} collegeName={name}   
+          <AskQueryModal slug={slug} collegeName={name}
             renderTrigger={(onClick) => (
               <button onClick={onClick}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-white border border-[#FF3C3C] hover:bg-red-50 text-[#FF3C3C] text-[11px] sm:text-xs font-bold px-3 py-2.5 rounded-[5px] transition-all duration-300 cursor-pointer whitespace-nowrap shadow-sm">
-                <span className="material-symbols-outlined text-[15px]">help</span>
-                Ask Query
+                className="flex-1 md:flex-initial border border-[#ff7a00] hover:bg-[#ff7a00]/5 text-[#ff7a00] text-[13px] font-semibold px-4 py-1.5 rounded-[3px] transition-all duration-200 whitespace-nowrap text-center cursor-pointer">
+                Query
               </button>
             )}
           />
+          <Link href={`/college/${slug}`} className="flex-1 md:flex-initial border border-[#ff7a00] hover:bg-[#ff7a00]/5 text-[#ff7a00] text-[13px] font-semibold px-4 py-1.5 rounded-[3px] transition-all duration-200 whitespace-nowrap text-center">
+            View Details
+          </Link>
         </div>
+
       </div>
 
       {modalSlug && <ApplyAuthModal redirectTo={`/apply/${modalSlug}`} onClose={closeModal} />}

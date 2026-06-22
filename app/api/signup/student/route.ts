@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { getDb } from "@/lib/db";
 import { sendStudentActivationEmail, sendOTPEmail } from "@/lib/email";
+import { sendSMSSignupOTP } from "@/lib/sms";
 import { enforceRateLimit, rejectUntrustedOrigin } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
@@ -94,9 +95,17 @@ export async function POST(req: NextRequest) {
       console.error("[Signup] OTP email sending failed:", emailErr);
     }
 
+    if (phoneTrimmed) {
+      try {
+        await sendSMSSignupOTP(phoneTrimmed, otp);
+      } catch (smsErr) {
+        console.error("[Signup] OTP SMS sending failed:", smsErr);
+      }
+    }
+
     return NextResponse.json({ 
       success: true,
-      message: "OTP sent to your email. Please verify to activate your account."
+      message: "OTP sent to your email and mobile. Please verify to activate your account."
     });
 
   } catch (err: unknown) {

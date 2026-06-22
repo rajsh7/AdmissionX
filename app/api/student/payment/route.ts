@@ -4,7 +4,8 @@ import { verifyStudentToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import crypto from "crypto";
 import { ObjectId } from "mongodb";
-import { sendPaymentSuccessEmail } from "@/lib/email";
+import { sendPaymentSuccessEmail, sendCollegeStudentEnrolledEmail } from "@/lib/email";
+import { sendSMSPaymentSuccess } from "@/lib/sms";
 
 async function checkAuth(studentId: string) {
   const cookieStore = await cookies();
@@ -99,6 +100,7 @@ export async function POST(req: NextRequest) {
     const nameToUse = app.personal_info?.name || studentDoc?.name || "Student";
     const collegeName = app.college_name || "AdmissionX College";
     const courseName = [app.degree_name, app.course_name].filter(Boolean).join(" - ") || "Application Fee";
+    const appRef = app.applicationRef || app.application_ref || "APP-2026-88094";
     
     if (emailToUse) {
       try {
@@ -109,10 +111,52 @@ export async function POST(req: NextRequest) {
           freeTxnid,
           new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
           collegeName,
-          courseName
+          courseName,
+          appRef
         );
       } catch (emailErr) {
         console.error("[Free Payment Bypass] Email notification failed:", emailErr);
+      }
+    }
+
+    // Send Free Bypass SMS to Student
+    try {
+      const studentPhone = app.personal_info?.phone || studentDoc?.phone;
+      if (studentPhone) {
+        await sendSMSPaymentSuccess(studentPhone, "0.00", freeTxnid);
+      }
+    } catch (smsErr) {
+      console.error("[Free Payment Bypass] SMS notification failed:", smsErr);
+    }
+
+    // Notify College
+    if (app.collegeId) {
+      try {
+        const colId = typeof app.collegeId === "string" && ObjectId.isValid(app.collegeId)
+          ? new ObjectId(app.collegeId)
+          : app.collegeId;
+
+        const collegeDoc = await db.collection("collegeprofile").aggregate([
+          { $match: { _id: colId } },
+          { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
+          { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
+          { $project: { email: "$u.email", name: "$u.firstname" } },
+          { $limit: 1 },
+        ]).toArray();
+
+        if (collegeDoc.length && collegeDoc[0].email) {
+          await sendCollegeStudentEnrolledEmail(
+            collegeDoc[0].email,
+            collegeDoc[0].name || collegeName,
+            nameToUse,
+            appRef,
+            courseName,
+            "0.00",
+            freeTxnid
+          );
+        }
+      } catch (collegeErr) {
+        console.error("[Free Payment Bypass] College enrollment email notification failed:", collegeErr);
       }
     }
 

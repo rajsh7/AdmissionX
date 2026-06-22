@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db";
 import { ObjectId } from "mongodb";
 import bcrypt from "bcryptjs";
 import { sendCollegeApprovalEmail, sendCollegeWelcomePartnerEmail } from "@/lib/email";
+import { sendSMSCollegeVerified, sendSMSCollegeProfileLive } from "@/lib/sms";
 
 export async function GET(req: NextRequest) {
   try {
@@ -197,6 +198,16 @@ export async function PATCH(req: NextRequest) {
         await sendCollegeWelcomePartnerEmail(collegeEmail, collegeName);
       } catch (emailErr) {
         console.error("[registrations] Approval email failed:", emailErr);
+      }
+
+      // Send approval SMS notifications
+      try {
+        if (collegePhone) {
+          await sendSMSCollegeVerified(collegePhone, collegeName);
+          await sendSMSCollegeProfileLive(collegePhone);
+        }
+      } catch (smsErr) {
+        console.error("[registrations] Approval SMS failed:", smsErr);
       }
 
       return NextResponse.json({

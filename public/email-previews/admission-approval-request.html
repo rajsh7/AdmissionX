@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdmissionX – Admission Approval Request</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
+  @media only screen and (max-width: 600px) {
+    .email-outer { width: 100% !important; }
+    .brand-logo-cell { padding-left: 16px !important; padding-top: 16px !important; padding-bottom: 14px !important; }
+    .brand-tagline-cell { padding-right: 16px !important; padding-top: 16px !important; padding-bottom: 14px !important; }
+    .email-card-cell { padding-left: 16px !important; padding-right: 16px !important; padding-top: 28px !important; padding-bottom: 20px !important; }
+    .benefits-section-cell { padding-left: 16px !important; padding-right: 16px !important; padding-top: 24px !important; padding-bottom: 8px !important; }
+    .social-section-cell { padding-left: 16px !important; padding-right: 16px !important; }
+    .footer-section-cell { padding-left: 16px !important; padding-right: 16px !important; }
+    .footer-text-right { text-align: center !important; }
+    .col-stack { display: block !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; padding-left: 0 !important; padding-right: 0 !important; margin-bottom: 12px !important; }
+    .benefits-col-stack { display: block !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; padding-left: 0 !important; padding-right: 0 !important; }
+    .benefits-sep { display: none !important; }
+  }
+</style>
+</head>
+<body style="background-color: #F2F2F0; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 0; margin: 0;">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; background-color: #F2F2F0; border-collapse: collapse; table-layout: fixed;">
+  <tr>
+    <td align="center" style="padding: 40px 16px;">
+      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; max-width: 620px; margin: 0 auto; border-collapse: collapse; table-layout: fixed;" align="center" class="email-outer">
+
+        <!-- BRAND STRIP -->
+        <tr>
+          <td align="center" style="background-color: #FFFFFF; border-radius: 12px 12px 0 0; border-bottom: 1px solid #F0EFEB; overflow: hidden; padding: 0;">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td colspan="2" style="height: 5px; background-color: #D91A1A; line-height: 5px; font-size: 1px;">&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="left" valign="middle" class="brand-logo-cell" style="padding: 20px 0 18px 32px;">
+                  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAAaCAYAAADyrhO6AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QkMyMkY0RTU1RjdDMTFFQTk1QjJCMDEyM0IzRkE4NkMiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QkMyMkY0RTY1RjdDMTFFQTk1QjJCMDEyM0IzFkE4NkMiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpCQzIyRjRFMzVGN0MxMUVBOTVCMkIwMTIzQjNGQTg2QyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpCQzIyRjRFNDVGN0MxMUVBOTVCMkIwMTIzQjNGQTg2QyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PvmIsQoAACQtSURBVHja7Fx3fFTVtt7TUibJpIeEJBB6BEIHkV4UEAVBUIpcURHQhwreJ1XKBQQVsFxFpSrlggioFEVA4QKCQNBAQgIkQGghJCF9kkymnvd9J3NwjJkJ3ve83D/egfPLlH3OXnvVb629zqhKSkqEwWAQX375paisrJTPRx55RGzfvl1cu3ZNGI1GoVKphMViERqNRgQHB4vY2FjRokUL0b59e5Gfny9u374trly5Itq1ayd/7+/vL9Rqtbh69argUVBQIPz8/ER5ebnYtWuXyMjIEM8884x48MEHRVFRkfDx8ZE/27Nnj/D19RVarVYoh9lslt8PHz5cNGjQQFRUVMj3OnHihEwf55IkSR5LGvV6vYiLixMhISHyGNKYlJQkfvrpJ1FcXCyPjYmJESNGjBC3bt0SnTp1kj/Py8sTubm5omHDhuLGjRvi4MGD8trsdrs8x5AhQ+R1BwQEyPQqc7oeOp1OnDt3Thw7dkzmRdOmTcWlS5fEzZs35fdRUVHyelwPLy8veT7yi3zev3+/OHPmjLwWzhMZGSnT6u3tLfOKNHCNlJtyFhYWisaNG4tNmzbJ9+I9SUtCQoLo3bu3fA9e73A4fkczZcdrOCYoKEikpoke/w/G+zB5D7yH2EP0D8D/f+D752G8D7jW35CflA8I6N//e+QhH5NfCPL3D8D//8D/D/j/gP/L7+B/kZf4u0f48zD6I3gfpkC/sRjeB97y/y5/oWff9Tf0QvkL+/chH5NfCPL3D8D//8D/D/j/gP/L7+B/kZf4u0f48zD6I3gfpkC/sRjeB97y/y5/oWff9Tf0QvkL+/chH5NfCIrz81p9Qc0DVLdC+Qh1D3iP/2K8T2Cv/f/z+B/P33wD/8D/+G/g3eX4C8/j/wD/GvG9N8afVAPQ+fB/wL/X4y+8t9/mHf0p/gP753H0NfwD/f/g32D+Df8J/rwe++F/gH+Nf+P/L+zldUD9P/g3mH8DqgYg/l7g//n+BfG2L/B9/f8G3mUP3t+APv+B/9v/A88RjY8541xMAAAABJRU5CYII=" alt="AdmissionX Logo" style="height: 26px; width: auto; display: block; border: 0;">
+                </td>
+                <td align="right" valign="middle" class="brand-tagline-cell" style="padding: 20px 32px 18px 0; font-size: 10px; color: #666666; letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.5; font-family: 'DM Sans', sans-serif; font-weight: 500;">
+                  World's First Online<br>Admission Portal
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- MAIN EMAIL CARD -->
+        <tr>
+          <td class="email-card-cell" style="background-color: #FFFFFF; border-left: 1px solid #E8E8E4; border-right: 1px solid #E8E8E4; padding: 40px 40px 36px;">
+
+              <!-- HERO -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse; text-align: center; margin-bottom: 24px;">
+                <tr>
+                  <td align="center">
+                    <div style="width: 68px; height: 68px; border-radius: 50%; border: 2px solid #FFDADA; background-color: transparent; text-align: center; line-height: 64px; display: inline-block;">
+                      <div style="width: 60px; height: 60px; border-radius: 50%; background-color: #111111; display: inline-block; vertical-align: middle; line-height: 60px; text-align: center;">
+                        <img src="https://img.icons8.com/material-outlined/28/D91A1A/checked-checkbox.png" alt="Approval Request" width="28" height="28" style="width: 28px; height: 28px; display: inline-block; vertical-align: middle; border: 0;">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding-top: 16px;">
+                    <table cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF0F0; border: 1px solid #FFDADA; border-radius: 100px; padding: 5px 14px 5px 8px; margin-bottom: 14px; display: inline-block;">
+                      <tr>
+                        <td valign="middle" style="line-height: 1;">
+                          <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #D91A1A; display: inline-block; vertical-align: middle;"></div>
+                        </td>
+                        <td valign="middle" style="font-size: 11px; color: #D91A1A; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; font-family: 'DM Sans', sans-serif; padding-left: 7px; line-height: 1;">
+                          Approval Pending
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-size: 26px; font-family: 'DM Serif Display', Georgia, serif; color: #111111; line-height: 1.3; text-align: center;">
+                    Admission Approval Request, <strong style="color: #D91A1A;">Amity University</strong>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-top: 8px; font-size: 15px; color: #666666; line-height: 1.7; font-family: 'DM Sans', sans-serif; text-align: center;">
+                    A student application is waiting for your approval.
+                  </td>
+                </tr>
+              </table>
+
+              <!-- DIVIDER -->
+              <hr style="height: 1px; background-color: #F0EFEB; margin: 32px 0; border: none;">
+
+              <!-- APPLICATION ID HERO -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #111111; border-top: 3px solid #D91A1A; border-radius: 12px; border-collapse: separate; margin-bottom: 28px; width: 100%;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+                      <tr>
+                        <td align="left" valign="middle">
+                          <span style="font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 6px; font-family: 'DM Sans', sans-serif;">Application ID</span>
+                          <span style="font-size: 22px; font-weight: 700; color: #D91A1A; font-family: 'DM Sans', Courier, monospace; letter-spacing: 0.04em;">APP-2026-88094</span>
+                        </td>
+                        <td align="right" valign="middle" width="40">
+                          <div style="width: 40px; height: 40px; border-radius: 10px; background-color: rgba(217,26,26,0.12); border: 1px solid rgba(217,26,26,0.25); text-align: center; line-height: 40px;">
+                            <img src="https://img.icons8.com/material-outlined/18/D91A1A/file.png" alt="ID" width="18" height="18" style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; border: 0;">
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- DETAILS LABEL -->
+              <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #AAAAAA; margin-bottom: 14px; font-family: 'DM Sans', sans-serif;">Student Application</div>
+
+              <!-- DETAILS BOX -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #111111; border-top: 3px solid #D91A1A; border-radius: 12px; border-collapse: separate; margin-bottom: 28px; width: 100%;">
+                <tr>
+                  <td style="padding: 4px;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+                      
+                      <!-- STUDENT NAME -->
+                      <tr>
+                        <td style="padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                              <td valign="middle" width="32">
+                                <div style="width: 32px; height: 32px; border-radius: 8px; background-color: rgba(217,26,26,0.12); border: 1px solid rgba(217,26,26,0.25); text-align: center; line-height: 32px;">
+                                  <img src="https://img.icons8.com/material-outlined/15/D91A1A/user.png" alt="Student" width="15" height="15" style="width: 15px; height: 15px; display: inline-block; vertical-align: middle; border: 0;">
+                                </div>
+                              </td>
+                              <td valign="middle" style="padding-left: 12px;">
+                                <span style="font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; text-transform: uppercase; display: block; margin-bottom: 3px; font-family: 'DM Sans', sans-serif;">Student Name</span>
+                                <span style="font-size: 14px; color: #FFFFFF; font-weight: 600; letter-spacing: 0.02em; font-family: 'DM Sans', sans-serif;">Raj Sharma</span>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- COURSE APPLIED -->
+                      <tr>
+                        <td style="padding: 14px 20px;">
+                          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                              <td valign="middle" width="32">
+                                <div style="width: 32px; height: 32px; border-radius: 8px; background-color: rgba(217,26,26,0.12); border: 1px solid rgba(217,26,26,0.25); text-align: center; line-height: 32px;">
+                                  <img src="https://img.icons8.com/material-outlined/15/D91A1A/graduation-cap.png" alt="Course" width="15" height="15" style="width: 15px; height: 15px; display: inline-block; vertical-align: middle; border: 0;">
+                                </div>
+                              </td>
+                              <td valign="middle" style="padding-left: 12px;">
+                                <span style="font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; text-transform: uppercase; display: block; margin-bottom: 3px; font-family: 'DM Sans', sans-serif;">Course</span>
+                                <span style="font-size: 14px; color: #FFFFFF; font-weight: 600; letter-spacing: 0.02em; font-family: 'DM Sans', sans-serif;">B.Tech - Computer Science</span>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- INFO NOTE -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #FAFAF8; border-top: 1px solid #EEECEA; border-right: 1px solid #EEECEA; border-bottom: 1px solid #EEECEA; border-left: 3px solid #D91A1A; border-radius: 0 10px 10px 0; padding: 14px 16px; margin-bottom: 28px; border-collapse: collapse; box-sizing: border-box;">
+                <tr>
+                  <td valign="top" width="30" style="padding-right: 12px;">
+                    <div style="width: 30px; height: 30px; background-color: #FFF0F0; border-radius: 8px; text-align: center; line-height: 30px;">
+                      <img src="https://img.icons8.com/material-outlined/15/D91A1A/info.png" alt="Action Required" width="15" height="15" style="width: 15px; height: 15px; display: inline-block; vertical-align: middle; border: 0;">
+                    </div>
+                  </td>
+                  <td valign="middle" style="font-size: 13px; color: #555555; line-height: 1.6; font-family: 'DM Sans', sans-serif; text-align: left;">
+                    <strong style="color: #111111; display: block; margin-bottom: 2px; font-weight: bold;">Action Required</strong>
+                    Please review the student's application, documents, and academic details in your AdmissionX dashboard and approve or reject the admission.
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SIGNOFF -->
+              <div style="font-size: 14px; color: #333333; line-height: 1.8; font-family: 'DM Sans', sans-serif; text-align: left;">
+                <strong style="color: #111111; font-size: 15px; display: block; margin-bottom: 2px; font-weight: bold;">Best Regards,</strong>
+                Team AdmissionX<br>
+                <span style="font-size: 11.5px; color: #AAAAAA; letter-spacing: 0.02em; margin-top: 2px; display: block; font-family: 'DM Sans', sans-serif;">World's First Online Admission Portal</span>
+              </div>
+
+          </td>
+        </tr>
+
+        <!-- BENEFITS SECTION -->
+        <tr>
+          <td class="benefits-section-cell" style="background-color: #FAFAF8; border-left: 1px solid #E8E8E4; border-right: 1px solid #E8E8E4; padding: 32px 40px 16px 40px;">
+            <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #AAAAAA; margin-bottom: 20px; text-align: center; font-family: 'DM Sans', sans-serif;">Why AdmissionX</div>
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td align="center" style="font-size: 0; text-align: center; padding: 0;">
+                  <div class="benefits-col-stack" style="display: inline-block; width: 100%; max-width: 262px; vertical-align: top; text-align: left;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #FFFFFF; border: 1px solid #EEECEA; border-radius: 12px; width: 100%; margin-bottom: 16px; border-collapse: collapse;">
+                      <tr><td style="padding: 18px 16px 12px 16px; border-bottom: 1px solid #F0EFEB;">
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse: collapse;"><tr>
+                          <td valign="middle" width="30"><div style="width: 30px; height: 30px; border-radius: 8px; background-color: #111111; text-align: center; line-height: 30px;"><img src="https://img.icons8.com/material-outlined/15/D91A1A/graduation-cap.png" alt="students" width="15" height="15" style="width:15px;height:15px;display:inline-block;vertical-align:middle;border:0;"></div></td>
+                          <td valign="middle" style="font-size: 13px; font-weight: 600; color: #111111; padding-left: 8px; font-family: 'DM Sans', sans-serif;">For Students</td>
+                        </tr></table>
+                      </td></tr>
+                      <tr><td style="padding: 14px 16px 18px 16px;">
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;font-family:'DM Sans',sans-serif;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Apply to multiple universities in one place</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;font-family:'DM Sans',sans-serif;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Real-time application status tracking</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;font-family:'DM Sans',sans-serif;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Secure digital document management</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;font-family:'DM Sans',sans-serif;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Expert counselling &amp; guidance support</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;font-family:'DM Sans',sans-serif;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">100% paperless admission process</td></tr></table>
+                      </td></tr>
+                    </table>
+                  </div>
+                  <span class="benefits-sep" style="display: inline-block; width: 8px; height: 1px;"></span>
+                  <div class="benefits-col-stack" style="display: inline-block; width: 100%; max-width: 262px; vertical-align: top; text-align: left;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #FFFFFF; border: 1px solid #EEECEA; border-radius: 12px; width: 100%; margin-bottom: 16px; border-collapse: collapse;">
+                      <tr><td style="padding: 18px 16px 12px 16px; border-bottom: 1px solid #F0EFEB;">
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse: collapse;"><tr>
+                          <td valign="middle" width="30"><div style="width: 30px; height: 30px; border-radius: 8px; background-color: #111111; text-align: center; line-height: 30px;"><img src="https://img.icons8.com/material-outlined/15/D91A1A/school.png" alt="colleges" width="15" height="15" style="width:15px;height:15px;display:inline-block;vertical-align:middle;border:0;"></div></td>
+                          <td valign="middle" style="font-size: 13px; font-weight: 600; color: #111111; padding-left: 8px; font-family: 'DM Sans', sans-serif;">For Colleges</td>
+                        </tr></table>
+                      </td></tr>
+                      <tr><td style="padding: 14px 16px 18px 16px;">
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;font-family:'DM Sans',sans-serif;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Centralized student application dashboard</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;font-family:'DM Sans',sans-serif;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Automated document verification system</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;font-family:'DM Sans',sans-serif;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Instant communication with applicants</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;font-family:'DM Sans',sans-serif;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Real-time seat &amp; enrollment management</td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr><td valign="top" width="10" style="font-size:14px;line-height:16px;color:#D91A1A;padding-right:8px;font-family:'DM Sans',sans-serif;">•</td><td valign="top" style="font-size:12px;color:#555555;line-height:1.5;font-family:'DM Sans',sans-serif;">Data-driven admission admission analytics</td></tr></table>
+                      </td></tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- SOCIAL LINKS -->
+        <tr>
+          <td align="center" class="social-section-cell" style="background-color: #FFFFFF; border-left: 1px solid #E8E8E4; border-right: 1px solid #E8E8E4; border-top: 1px solid #F0EFEB; padding: 24px 16px;">
+            <div style="font-size: 11px; color: #AAAAAA; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; font-family: 'DM Sans', sans-serif; font-weight: 600;">Connect with us</div>
+            <div style="text-align: center; font-family: 'DM Sans', sans-serif;">
+              <a href="https://facebook.com/admissionx" style="display:inline-block;padding:8px 16px;margin:6px 8px;border-radius:8px;border:1px solid #EEECEA;text-decoration:none;font-size:12px;color:#444444;font-family:'DM Sans',sans-serif;font-weight:500;background-color:#FFFFFF;white-space:nowrap;vertical-align:middle;"><img src="https://img.icons8.com/ios-glyphs/14/111111/facebook.png" alt="fb" width="14" height="14" style="width:14px;height:14px;display:inline-block;vertical-align:middle;border:0;padding-right:6px;"><span style="vertical-align:middle;color:#444444;">Facebook</span></a>
+              <a href="https://instagram.com/admissionx" style="display:inline-block;padding:8px 16px;margin:6px 8px;border-radius:8px;border:1px solid #EEECEA;text-decoration:none;font-size:12px;color:#444444;font-family:'DM Sans',sans-serif;font-weight:500;background-color:#FFFFFF;white-space:nowrap;vertical-align:middle;"><img src="https://img.icons8.com/ios-glyphs/14/111111/instagram.png" alt="ig" width="14" height="14" style="width:14px;height:14px;display:inline-block;vertical-align:middle;border:0;padding-right:6px;"><span style="vertical-align:middle;color:#444444;">Instagram</span></a>
+              <a href="https://twitter.com/admissionx" style="display:inline-block;padding:8px 16px;margin:6px 8px;border-radius:8px;border:1px solid #EEECEA;text-decoration:none;font-size:12px;color:#444444;font-family:'DM Sans',sans-serif;font-weight:500;background-color:#FFFFFF;white-space:nowrap;vertical-align:middle;"><img src="https://img.icons8.com/ios-glyphs/14/111111/twitterx.png" alt="x" width="14" height="14" style="width:14px;height:14px;display:inline-block;vertical-align:middle;border:0;padding-right:6px;"><span style="vertical-align:middle;color:#444444;">X (Twitter)</span></a>
+              <a href="https://youtube.com/admissionx" style="display:inline-block;padding:8px 16px;margin:6px 8px;border-radius:8px;border:1px solid #EEECEA;text-decoration:none;font-size:12px;color:#444444;font-family:'DM Sans',sans-serif;font-weight:500;background-color:#FFFFFF;white-space:nowrap;vertical-align:middle;"><img src="https://img.icons8.com/ios-glyphs/14/111111/youtube.png" alt="yt" width="14" height="14" style="width:14px;height:14px;display:inline-block;vertical-align:middle;border:0;padding-right:6px;"><span style="vertical-align:middle;color:#444444;">YouTube</span></a>
+            </div>
+          </td>
+        </tr>
+
+        <!-- FOOTER -->
+        <tr>
+          <td bgcolor="#0D0D0D" class="footer-section-cell" style="background-color: #0D0D0D; border-radius: 0 0 12px 12px; border-left: 1px solid #222222; border-right: 1px solid #222222; border-bottom: 1px solid #222222; overflow: hidden; padding: 0;">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 24px 32px 20px 32px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td align="center" style="font-size: 0; text-align: center; padding: 0;">
+                        <div class="col-stack" style="display: inline-block; width: 100%; max-width: 260px; vertical-align: top; text-align: left;">
+                          <div style="font-family: 'DM Sans', sans-serif; font-size: 11px; color: #888888; line-height: 1.6;">This is an automated email. Please do not reply directly to this message.</div>
+                        </div>
+                        <span class="benefits-sep" style="display: inline-block; width: 12px; height: 1px;"></span>
+                        <div class="col-stack" style="display: inline-block; width: 100%; max-width: 260px; vertical-align: top; text-align: right;">
+                          <div class="footer-text-right" style="font-family: 'DM Sans', sans-serif; font-size: 11px; color: #888888; line-height: 1.6; text-align: right;">© 2026 <span style="color: #D91A1A; font-weight: 500;">AdmissionX</span>. All rights reserved.</div>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td style="height: 3px; background-color: #D91A1A; line-height: 3px; font-size: 1px;">&nbsp;</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { sendOTPEmail } from "@/lib/email";
+import { sendSMSLoginOTP } from "@/lib/sms";
 import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
@@ -34,11 +35,23 @@ export async function POST(req: NextRequest) {
       }
     );
 
-    await sendOTPEmail(student.email, student.name || "Student", otp, expiryMinutes);
+    try {
+      await sendOTPEmail(student.email, student.name || "Student", otp, expiryMinutes);
+    } catch (emailErr) {
+      console.error("[Send OTP] Email sending failed:", emailErr);
+    }
+
+    if (student.phone) {
+      try {
+        await sendSMSLoginOTP(student.phone, otp);
+      } catch (smsErr) {
+        console.error("[Send OTP] SMS sending failed:", smsErr);
+      }
+    }
 
     return NextResponse.json({
       success: true,
-      message: "OTP sent successfully to your email.",
+      message: "OTP sent successfully to your email and mobile.",
     });
   } catch (err) {
     console.error("[Send OTP Error]:", err);

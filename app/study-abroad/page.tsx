@@ -179,7 +179,7 @@ async function fetchAbroadCollegesBase(opts: {
   const offset = (page - 1) * limit;
 
   const conditions: string[] = [
-    "(cp.registeredAddressCountryId != 1 OR cp.campusAddressCountryId != 1)",
+    "(cp.registeredAddressCountryId != 99 OR cp.campusAddressCountryId != 99)",
     "(cp.registeredAddressCountryId IS NOT NULL OR cp.campusAddressCountryId IS NOT NULL)",
   ];
   const params: (string | number)[] = [];
@@ -389,7 +389,7 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
           INNER JOIN collegeprofile cp
             ON cp.registeredAddressCountryId = c.id
             OR cp.campusAddressCountryId = c.id
-          WHERE c.id != 1
+          WHERE c.id != 99
           ORDER BY c.name
         `),
       ]);
@@ -408,7 +408,7 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
 
     const countryOptions: FilterOption[] = countryRows.map((r) => ({
       id: r.id,
-      name: r.name,
+      name: r.name.trim(),
     }));
 
     const selectedCountryName =
@@ -439,6 +439,7 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
         initType="abroad"
         pageTitle="Study Abroad Colleges"
         pageSubtitle={pageSubtitle}
+        heroImage="/images/study-abroad-hero.jpg"
       />
     );
   }
@@ -450,7 +451,7 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
       INNER JOIN collegeprofile cp
         ON cp.registeredAddressCountryId = c.id
         OR cp.campusAddressCountryId = c.id
-      WHERE c.id != 1
+      WHERE c.id != 99
       GROUP BY c.id, c.name
       ORDER BY college_count DESC, c.name ASC
     `),
@@ -460,20 +461,17 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
   const countries = countryRows
     .map((country) => ({
       id: country.id,
-      name: country.name,
+      name: country.name.trim(),
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  const quickFilters = [...countryRows]
-    .sort(
-      (a, b) =>
-        (b.college_count ?? 0) - (a.college_count ?? 0) ||
-        a.name.localeCompare(b.name),
-    )
-    .slice(0, 3)
+  const popularCountryIds = [230, 229, 38, 13];
+  const quickFilters = popularCountryIds
+    .map((id) => countries.find((c) => Number(c.id) === id))
+    .filter(Boolean)
     .map((country) => ({
-      id: country.id,
-      name: country.name,
+      id: country!.id,
+      name: country!.name,
     }));
 
   return (

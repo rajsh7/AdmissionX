@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { sendSeatReservationEmail } from "@/lib/email";
+import { sendSMSSeatReservedDetails } from "@/lib/sms";
 
 export async function POST(req: NextRequest) {
   try {
@@ -55,12 +56,26 @@ export async function POST(req: NextRequest) {
         });
 
         if (student) {
+          const appRef = app.applicationRef || app.application_ref || "APP-2026-88094";
           await sendSeatReservationEmail(
             student.email,
             student.name || "Student",
             app.courseName || "Course",
-            app.collegeName || "College"
+            app.collegeName || "College",
+            appRef
           );
+
+          try {
+            if (student.phone) {
+              await sendSMSSeatReservedDetails(
+                student.phone,
+                app.courseName || "Course",
+                app.collegeName || "College"
+              );
+            }
+          } catch (smsErr) {
+            console.error("[Seat Reservation] SMS failed:", smsErr);
+          }
         }
       } catch (emailErr) {
         console.error("[Seat Reservation] Email failed:", emailErr);

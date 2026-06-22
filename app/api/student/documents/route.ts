@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { sendDocumentsVerifiedEmail, sendDocumentsRejectedEmail } from "@/lib/email";
+import { sendSMSDocumentsVerified, sendSMSDocumentsRejected } from "@/lib/sms";
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,13 +42,36 @@ export async function POST(req: NextRequest) {
 
         if (student) {
           if (status === "verified") {
-            await sendDocumentsVerifiedEmail(student.email, student.name || "Student");
+            await sendDocumentsVerifiedEmail(
+              student.email,
+              student.name || "Student",
+              app.applicationRef || "APP-2026-88094",
+              app.courseName || "B.Tech - Computer Science",
+              app.collegeName || "Amity University"
+            );
+
+            try {
+              if (student.phone) {
+                await sendSMSDocumentsVerified(student.phone);
+              }
+            } catch (smsErr) {
+              console.error("[Documents] Verification success SMS failed:", smsErr);
+            }
           } else {
             await sendDocumentsRejectedEmail(
               student.email,
               student.name || "Student",
-              reason || "Documents do not meet requirements"
+              reason || "Documents do not meet requirements",
+              app.applicationRef || "APP-2026-88094"
             );
+
+            try {
+              if (student.phone) {
+                await sendSMSDocumentsRejected(student.phone);
+              }
+            } catch (smsErr) {
+              console.error("[Documents] Verification rejection SMS failed:", smsErr);
+            }
           }
         }
       } catch (emailErr) {

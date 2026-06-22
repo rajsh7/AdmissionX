@@ -3,6 +3,22 @@
     {
       "path": "/api/cron/profile-reminder",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/application-reminder",
+      "schedule": "0 10 */4 * *"
+    },
+    {
+      "path": "/api/cron/college-pending-reminder",
+      "schedule": "0 10 */5 * *"
+    },
+    {
+      "path": "/api/cron/student-notification",
+      "schedule": "0 8 */2 * *"
+    },
+    {
+      "path": "/api/cron/college-notification",
+      "schedule": "0 8 */2 * *"
     }
   ]
 }

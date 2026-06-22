@@ -95,6 +95,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
     .project({ name: 1, pageslug: 1, logoimage: 1, bannerimage: 1 })
     .toArray();
 
+  // Build colleges URL filtered by this degree
+  const degreeSlug = isDegreePage ? slug : (degreeDoc as any)?.pageslug ?? "";
+  const collegesUrl = degreeSlug
+    ? `/top-colleges?degree=${degreeSlug}`
+    : `/top-colleges`;
+
   return (
     <main className="min-h-screen bg-[#F8F9FB]">
       <Header />
@@ -137,9 +143,9 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
                   {/* CTA Buttons */}
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <button className="w-full sm:flex-1 py-3 px-8 bg-[#FF3C3C] text-white rounded-[5px] font-bold text-base hover:bg-red-600 transition-all active:scale-95 shadow-lg shadow-red-500/20">
+                    <Link href={collegesUrl} className="w-full sm:flex-1 py-3 px-8 bg-[#FF3C3C] text-white rounded-[5px] font-bold text-base hover:bg-red-600 transition-all active:scale-95 shadow-lg shadow-red-500/20 text-center">
                       Apply Now
-                    </button>
+                    </Link>
                     <button className="w-full sm:flex-1 py-3 px-8 bg-white border-2 border-[#FF3C3C] text-[#FF3C3C] rounded-[5px] font-bold text-base hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
                       <Download className="w-4 h-4" />
                       Download Brochure

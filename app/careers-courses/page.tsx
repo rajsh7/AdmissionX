@@ -151,7 +151,6 @@ export default async function CareerCoursesPage({ searchParams }: PageProps) {
       initSort={sort}
       initPage={page}
       heroImage="/Background-images/student-hero-bg.png"
-      heroRightImage="/images/2999ec4e5233aa8cb9dbf010e3c51149ae41f951.png"
       heroHeight="700px"
       heroObjectPosition="center"
       heroFit="cover"

@@ -185,6 +185,7 @@ export default function SearchClient({
   const ranking = searchParams.get("ranking") ?? "";
   const sort = searchParams.get("sort") ?? initSort;
   const page = parseInt(searchParams.get("page") ?? String(initPage));
+  const type = searchParams.get("type") ?? initType;
   const feesRanges = searchParams.get("fees_ranges") ? searchParams.get("fees_ranges")!.split(",") : [];
   const ratingRanges = searchParams.get("rating_ranges") ? searchParams.get("rating_ranges")!.split(",") : [];
   const ownerships = searchParams.get("ownerships") ? searchParams.get("ownerships")!.split(",") : [];
@@ -272,7 +273,7 @@ export default function SearchClient({
     <div suppressHydrationWarning className="min-h-screen bg-neutral-50 flex flex-col relative">
       <Header />
       <style>{`@media (max-width: 640px) { [data-mobile-hero] { height: 350px !important; } }`}</style>
-      <div className="relative w-full z-20" style={{ height: heroHeight }} data-mobile-hero>
+      <div className="relative w-full z-20 mt-[100px] lg:mt-[104px]" style={{ height: heroHeight }} data-mobile-hero>
         <div className="absolute top-0 left-0 w-full h-full z-0">
           <Image
             src={heroImage}
@@ -327,7 +328,7 @@ export default function SearchClient({
         <div className="mx-auto max-w-[1920px] w-full px-0 pt-4 sm:pt-8 pb-8">
           <div className="flex flex-col lg:flex-row gap-5 items-start">
             {/* ── Filters sidebar ── */}
-            <div className="hidden lg:block flex-shrink-0 sticky top-[72px] self-start w-full lg:w-auto" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
+            <div className="hidden lg:block flex-shrink-0 sticky top-[100px] self-start w-full lg:w-auto" style={{ flexBasis: filterWidth, minWidth: filterWidth, maxWidth: filterWidth }}>
               <SearchFilters
                 key={`${stream}|${degree}|${cityId}|${stateId}|${countryId}|${feesMax}|${sort}|${searchParams.get("fees_ranges")}|${searchParams.get("rating_ranges")}|${searchParams.get("ownerships")}|${ranking}`}
                 streams={streams}
@@ -390,7 +391,7 @@ export default function SearchClient({
                       {cityId && (
                         <div className="flex items-center gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-[10px] text-[13px] font-medium text-[#6C6C6C] shadow-sm hover:border-[#FF3C3C] transition-all">
                           {cities.find(c => String(c.id) === cityId)?.name || cityId}
-                          <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("city_id"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+                          <button onClick={() => { const p = new URLSearchParams(searchParams.toString()); p.delete("city_id"); p.delete("city"); p.delete("page"); router.push(`${pathname}?${p.toString()}`); }} className="hover:text-red-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
                         </div>
                       )}
                       {stateId && (

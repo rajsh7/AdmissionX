@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db";
 import { signStudentToken, STUDENT_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
 import { enforceRateLimit, rejectUntrustedOrigin } from "@/lib/security";
 import { sendOTPEmail } from "@/lib/email";
+import { sendSMSLoginOTP } from "@/lib/sms";
 
 export async function POST(req: NextRequest) {
   const originError = rejectUntrustedOrigin(req);
@@ -87,10 +88,18 @@ export async function POST(req: NextRequest) {
       console.error("[Login] OTP email sending failed:", emailErr);
     }
 
+    if (user.phone) {
+      try {
+        await sendSMSLoginOTP(user.phone, otp);
+      } catch (smsErr) {
+        console.error("[Login] OTP SMS sending failed:", smsErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       pending_otp: true,
-      message: "OTP sent to your email. Please verify to complete login.",
+      message: "OTP sent to your email and mobile. Please verify to complete login.",
       user: { id: user._id.toString(), email: user.email },
     });
   } catch {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { getCollegeDb } from "@/lib/db";
 import { sendCollegeSignupConfirmationEmail } from "@/lib/email";
+import { sendSMSCollegeRegReceived } from "@/lib/sms";
 import { enforceRateLimit, rejectUntrustedOrigin } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
@@ -82,6 +83,12 @@ export async function POST(req: NextRequest) {
     try {
       await sendCollegeSignupConfirmationEmail(emailLower, collegeName.trim(), contactName.trim());
     } catch { /* ignore */ }
+
+    try {
+      await sendSMSCollegeRegReceived(phoneTrimmed);
+    } catch (smsErr) {
+      console.error("[College Signup] SMS confirmation failed:", smsErr);
+    }
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {

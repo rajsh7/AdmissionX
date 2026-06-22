@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db";
 import crypto from "crypto";
 import { ObjectId } from "mongodb";
 import { sendPaymentSuccessEmail, sendPaymentFailedEmail, sendCollegeStudentEnrolledEmail } from "@/lib/email";
+import { sendSMSPaymentSuccess, sendSMSPaymentFailed } from "@/lib/sms";
 
 function getRequestOrigin(req: NextRequest): string {
   if (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes("0.0.0.0")) {
@@ -114,8 +115,18 @@ export async function POST(req: NextRequest) {
                 txnid,
                 new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
                 collegeName,
-                courseName
+                courseName,
+                appRef
               );
+
+              try {
+                const studentPhone = appDoc.personal_info?.phone || studentDoc.phone;
+                if (studentPhone) {
+                  await sendSMSPaymentSuccess(studentPhone, amount, txnid);
+                }
+              } catch (smsErr) {
+                console.error("[Easebuzz Callback] Student success SMS failed:", smsErr);
+              }
 
               // Notify College
               if (appDoc.collegeId) {
@@ -168,11 +179,23 @@ export async function POST(req: NextRequest) {
       // 2. Fire transaction failed email
       setImmediate(async () => {
         try {
+          const appDoc = await db.collection("applications").findOne(appFilter);
+          const appRef = appDoc ? (appDoc.applicationRef || appDoc.application_ref || "APP-2026-88094") : "APP-2026-88094";
+
           const studentDoc = await db.collection("next_student_signups").findOne({
             _id: (ObjectId.isValid(studentId) ? new ObjectId(studentId) : studentId) as any
           });
           if (studentDoc) {
-            await sendPaymentFailedEmail(studentDoc.email, studentDoc.name || "Student");
+            await sendPaymentFailedEmail(studentDoc.email, studentDoc.name || "Student", appRef);
+
+            try {
+              const studentPhone = appDoc?.personal_info?.phone || studentDoc.phone;
+              if (studentPhone) {
+                await sendSMSPaymentFailed(studentPhone);
+              }
+            } catch (smsErr) {
+              console.error("[Easebuzz Callback] Student failed SMS failed:", smsErr);
+            }
           }
         } catch (emailErr) {
           console.error("[Easebuzz Callback] Fail email notification failed:", emailErr);
