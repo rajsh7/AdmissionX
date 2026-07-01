@@ -74,7 +74,7 @@ export default function CollegeListItem({ college, index = 0, entityName = "Coll
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: Math.min(index * 0.05, 0.3) }}
     >
-      <div className="group relative flex flex-col md:flex-row gap-5 bg-white border border-[#e5e7eb] hover:shadow-lg transition-all duration-300 p-5 md:py-16 pl-5 pr-4 md:pr-5 mr-4 md:mr-80 rounded-[5px] min-h-[300px]">
+      <div className="group relative flex flex-col md:flex-row gap-5 bg-white border border-[#e5e7eb] hover:shadow-lg transition-all duration-300 p-5 md:py-16 pl-5 pr-4 md:pr-5 md:mr-10 rounded-[5px] min-h-[300px]">
         {/* Left Side: Thumbnail / Logo */}
         <div className="relative flex-shrink-0 w-full md:w-[180px] h-[130px] flex items-center justify-center bg-white border border-[#f3f4f6]">
           {image && image !== "" && !image.includes("default") ? (

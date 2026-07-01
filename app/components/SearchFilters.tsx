@@ -196,6 +196,7 @@ export default function SearchFilters({
         rating_ranges: overrides.rating_ranges !== undefined ? overrides.rating_ranges : ratingRanges.join(","),
         ownerships: overrides.ownerships !== undefined ? overrides.ownerships : ownerships.join(","),
       };
+      console.log("Next filters:", next);
       const params = new URLSearchParams(searchParams.toString());
       Object.entries(next).forEach(([key, val]) => {
         const isDefaultSort = key === "sort" && (val === "rating" || val === activeSort);
@@ -316,17 +317,15 @@ export default function SearchFilters({
                   {countries.filter(c => !citySearch || c.name.toLowerCase().includes(citySearch.toLowerCase())).map((country) => (
                     <button key={country.id} type="button"
                       onMouseDown={() => {
-                        const nextCountryId = String(country.id);
-                        const hasStates = states.some((state) => String(state.slug) === nextCountryId);
-                        setCountryId(nextCountryId);
-                        setStateId("");
-                        setCityId("");
-                        setCitySearch("");
-                        setCityDropOpen(false);
-                        if (!hasStates) {
+                          const nextCountryId = String(country.id);
+                          setCountryId(nextCountryId);
+                          setStateId("");
+                          setCityId("");
+                          setCitySearch("");
+                          setCityDropOpen(false);
+                          // Apply country filter immediately regardless of whether the country has states
                           applyFilters({ city_id: "", state_id: "", country_id: nextCountryId });
-                        }
-                      }}
+                        }}
                       className="w-full text-left px-3 py-2 text-sm hover:bg-[#FF3C3C]/5 text-neutral-700 flex items-center gap-2">
                       <span className="material-symbols-outlined text-[14px] text-neutral-400">public</span>
                       {country.name}

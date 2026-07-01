@@ -253,12 +253,16 @@ export default function SearchClient({
         params.delete("q");
       }
       params.delete("page");
+      // Preserve type param (e.g. "abroad") if not already in URL
+      if (initType && !params.get("type")) {
+        params.set("type", initType);
+      }
       setLoading(true);
       startTransition(() => {
         router.push(`${pathname}?${params.toString()}`);
       });
     },
-    [searchParams, router, pathname],
+    [searchParams, router, pathname, initType],
   );
 
   const isFiltered = !!(q || stream || degree || cityId || stateId || countryId || feesMax || ranking || feesRanges.length > 0 || ratingRanges.length > 0 || ownerships.length > 0);

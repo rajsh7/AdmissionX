@@ -230,13 +230,22 @@ export async function GET(req: NextRequest) {
     } else if (stateId) {
       const stateCities = await db.collection("city").find({ state_id: Number(stateId) }, { projection: { _id: 0, id: 1 } }).toArray();
       match.registeredAddressCityId = { $in: stateCities.map((c: any) => Number(c.id)) };
-    } else if (countryId) {
+    } else if (countryId && type !== "abroad") {
+      // only set country filter here if NOT abroad (abroad block handles it below)
       match.registeredAddressCountryId = Number(countryId);
     }
 
     if (type === "top") match.isShowOnTop = 1;
     else if (type === "university") match.isTopUniversity = 1;
-    else if (type === "abroad") match.registeredAddressCountryId = { $ne: 99 };
+    else if (type === "abroad") {
+      if (countryId) {
+        // country filter already set above, just ensure it's not India (99)
+        match.registeredAddressCountryId = Number(countryId);
+      } else {
+        // Show all international colleges (exclude India=99, and must have a country set)
+        match.registeredAddressCountryId = { $exists: true, $ne: null, $nin: [99, 0] };
+      }
+    }
 
     if (ownerships.length > 0) {
       const typeIds = ownerships.flatMap((o) => OWNERSHIP_MAP[o] ?? []);
