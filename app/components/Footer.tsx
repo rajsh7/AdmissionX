@@ -120,14 +120,14 @@ export default function Footer() {
       {/* ══════════════════════════════════════════════════════════════════
           FOOTER SECTION 1 — Links
       ══════════════════════════════════════════════════════════════════ */}
-      <footer className="w-full bg-[#0a0a0a] pt-16 pb-10 border-t border-white/10">
-        <div className="w-full px-[5%]">
+      <footer className="w-full bg-[#0a0a0a] pt-16 pb-10 border-t border-white/5">
+        <div className="home-page-shell px-0">
 
           {/* Section label */}
           <FadeIn>
             <div className="flex items-center gap-3 mb-10">
               <span className="text-[11px] font-bold text-primary uppercase tracking-[0.25em]">Quick Links</span>
-              <div className="flex-1 h-px bg-white/20" />
+              <div className="flex-1 h-px bg-white/10" />
             </div>
           </FadeIn>
 
@@ -135,9 +135,11 @@ export default function Footer() {
             className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 lg:gap-6"
             stagger={0.06}
           >
-            {Object.entries(footerLinks).map(([title, links]) => (
+            {Object.entries(footerLinks).map(([title, links]) => {
+              const forceWhiteLinks = title === "Top Colleges" || title === "Top Universities";
+              return (
               <StaggerItem key={title}>
-                <h4 className="text-[14px] font-bold text-white mb-5 pb-2 border-b border-white/20">
+                <h4 className="text-[13px] font-bold text-white mb-5 pb-2 border-b border-white/10">
                   {title}
                 </h4>
                 <ul className="space-y-3">
@@ -145,7 +147,9 @@ export default function Footer() {
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className="text-[13px] text-white hover:text-primary transition-colors leading-tight block font-normal"
+                        className={`text-[13px] transition-colors leading-tight block ${
+                          forceWhiteLinks ? "text-slate-400 hover:text-white" : "text-slate-400 hover:text-white"
+                        }`}
                       >
                         {link.label}
                       </Link>
@@ -153,11 +157,11 @@ export default function Footer() {
                   ))}
                 </ul>
               </StaggerItem>
-            ))}
+            )})}
           </StaggerContainer>
 
           {/* Divider */}
-          <div className="mt-12 border-t border-white/10" />
+          <div className="mt-12 border-t border-white/5" />
         </div>
       </footer>
 
