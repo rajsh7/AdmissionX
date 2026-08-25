@@ -11,12 +11,26 @@ export const runtime = "nodejs";
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 const httpAgent = new http.Agent({});
 
-const ALLOWED_DOMAINS = ["admin.admissionx.in", "admissionx.info"];
+const ALLOWED_DOMAINS = [
+  "admin.admissionx.in",
+  "admissionx.info",
+  "admissionx.com",
+  "res.cloudinary.com",
+  "images.unsplash.com",
+  "lh3.googleusercontent.com",
+];
 
 function isAllowedDomain(urlStr: string): boolean {
   try {
     const parsed = new URL(urlStr);
-    return ALLOWED_DOMAINS.includes(parsed.hostname.toLowerCase());
+    const host = parsed.hostname.toLowerCase();
+    return (
+      ALLOWED_DOMAINS.includes(host) ||
+      host.endsWith(".admissionx.in") ||
+      host.endsWith(".admissionx.info") ||
+      host.endsWith(".admissionx.com") ||
+      host.endsWith(".cloudinary.com")
+    );
   } catch {
     return false;
   }
