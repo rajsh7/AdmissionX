@@ -120,14 +120,14 @@ export default function Footer() {
       {/* ══════════════════════════════════════════════════════════════════
           FOOTER SECTION 1 — Links
       ══════════════════════════════════════════════════════════════════ */}
-      <footer className="w-full bg-[#0a0a0a] pt-16 pb-10 border-t border-white/5">
-        <div className="home-page-shell px-0">
+      <footer className="w-full bg-[#0a0a0a] pt-16 pb-10 border-t border-white/10">
+        <div className="w-full px-[5%]">
 
           {/* Section label */}
           <FadeIn>
             <div className="flex items-center gap-3 mb-10">
               <span className="text-[11px] font-bold text-primary uppercase tracking-[0.25em]">Quick Links</span>
-              <div className="flex-1 h-px bg-white/10" />
+              <div className="flex-1 h-px bg-white/20" />
             </div>
           </FadeIn>
 
@@ -135,11 +135,9 @@ export default function Footer() {
             className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 lg:gap-6"
             stagger={0.06}
           >
-            {Object.entries(footerLinks).map(([title, links]) => {
-              const forceWhiteLinks = title === "Top Colleges" || title === "Top Universities";
-              return (
+            {Object.entries(footerLinks).map(([title, links]) => (
               <StaggerItem key={title}>
-                <h4 className="text-[13px] font-bold text-white mb-5 pb-2 border-b border-white/10">
+                <h4 className="text-[14px] font-bold text-white mb-5 pb-2 border-b border-white/20">
                   {title}
                 </h4>
                 <ul className="space-y-3">
@@ -147,9 +145,7 @@ export default function Footer() {
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className={`text-[13px] transition-colors leading-tight block ${
-                          forceWhiteLinks ? "text-slate-400 hover:text-white" : "text-slate-400 hover:text-white"
-                        }`}
+                        className="text-[13px] text-white hover:text-primary transition-colors leading-tight block font-normal"
                       >
                         {link.label}
                       </Link>
@@ -157,11 +153,11 @@ export default function Footer() {
                   ))}
                 </ul>
               </StaggerItem>
-            )})}
+            ))}
           </StaggerContainer>
 
           {/* Divider */}
-          <div className="mt-12 border-t border-white/5" />
+          <div className="mt-12 border-t border-white/10" />
         </div>
       </footer>
 
@@ -169,12 +165,12 @@ export default function Footer() {
           FOOTER SECTION 2 — About AdmissionX
       ══════════════════════════════════════════════════════════════════ */}
       <footer className="w-full bg-[#111111] pt-14 pb-10">
-        <div className="home-page-shell px-0">
+        <div className="w-full px-[5%]">
 
           <FadeIn>
             <div className="flex items-center gap-3 mb-10">
               <span className="text-[11px] font-bold text-primary uppercase tracking-[0.25em]">About AdmissionX</span>
-              <div className="flex-1 h-px bg-white/10" />
+              <div className="flex-1 h-px bg-white/20" />
             </div>
           </FadeIn>
 
@@ -186,19 +182,19 @@ export default function Footer() {
                 <img src="/admissionx-logo.png" className="h-8 w-auto object-contain" alt="AdmissionX" />
               </Link>
 
-              <p className="text-slate-400 text-[14px] leading-relaxed mb-4 max-w-md">
+              <p className="text-white text-[14px] leading-relaxed mb-4 max-w-md">
                 AdmissionX is India&apos;s most trusted college admissions platform. We connect students with 16,000+ institutions, entrance exams, scholarships, and career guidance — all in one place.
               </p>
-              <p className="text-slate-500 text-[13px] leading-relaxed mb-2 max-w-md">
-                AdmissionX is a product of <span className="text-white font-semibold">Saroj Entertainment Pvt. Ltd.</span>
+              <p className="text-white/90 text-[13px] leading-relaxed mb-2 max-w-md">
+                AdmissionX is a product of <span className="text-white font-bold underline decoration-primary">Saroj Entertainment Pvt. Ltd.</span>
               </p>
-              <p className="text-slate-500 text-[13px] leading-relaxed mb-6 max-w-md">
+              <p className="text-white/80 text-[13px] leading-relaxed mb-6 max-w-md">
                 Founded with a mission to democratise access to quality education information, we help every student — regardless of background or location — make confident, well-informed decisions about their future.
               </p>
 
               <Link
                 href="/about"
-                className="inline-flex items-center gap-2 text-[13px] font-semibold text-primary hover:text-red-400 transition-colors mb-8"
+                className="inline-flex items-center gap-2 text-[13px] font-bold text-primary hover:text-red-400 transition-colors mb-8"
               >
                 Read our full story
                 <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
@@ -213,7 +209,7 @@ export default function Footer() {
                   { icon: <FacebookIcon />, label: "Facebook" },
                 ].map((s) => (
                   <a key={s.label} href="#" aria-label={s.label}
-                    className="w-9 h-9 rounded-full bg-white/8 border border-white/10 flex items-center justify-center hover:bg-white/15 hover:border-white/20 transition-all">
+                    className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/20 hover:border-white/40 transition-all">
                     {s.icon}
                   </a>
                 ))}
@@ -228,12 +224,12 @@ export default function Footer() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 justify-items-center">
                   {STATS.map((stat) => (
                     <div key={stat.label}
-                      className="rounded-xl p-4 text-center"
-                      style={{ background: "rgba(255,255,255,0.03)" }}>
+                      className="rounded-xl p-4 text-center w-full border border-white/10"
+                      style={{ background: "rgba(255,255,255,0.06)" }}>
                       <span className="material-symbols-outlined text-primary text-[22px] block mb-2"
                         style={{ fontVariationSettings: "'FILL' 1" }}>{stat.icon}</span>
-                      <p className="text-white font-black text-[18px] leading-tight">{stat.value}</p>
-                      <p className="text-slate-500 text-[11px] font-semibold mt-1 uppercase tracking-wide">{stat.label}</p>
+                      <p className="text-white font-black text-[20px] leading-tight">{stat.value}</p>
+                      <p className="text-white/90 text-[11px] font-semibold mt-1 uppercase tracking-wide">{stat.label}</p>
                     </div>
                   ))}
                 </div>
@@ -242,23 +238,23 @@ export default function Footer() {
               {/* Mission + Vision */}
               <FadeIn>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="rounded-xl p-5" style={{ background: "rgba(255,60,60,0.04)" }}>
+                  <div className="rounded-xl p-5 border border-primary/20" style={{ background: "rgba(255,60,60,0.08)" }}>
                     <div className="flex items-center gap-2 mb-3">
                       <span className="material-symbols-outlined text-primary text-[18px]"
                         style={{ fontVariationSettings: "'FILL' 1" }}>target</span>
-                      <h5 className="text-[13px] font-bold text-white">Our Mission</h5>
+                      <h5 className="text-[14px] font-bold text-white">Our Mission</h5>
                     </div>
-                    <p className="text-slate-500 text-[12px] leading-relaxed">
+                    <p className="text-white text-[13px] leading-relaxed">
                       To democratise access to quality education information for every student in India — making the admission process transparent, simple, and student-first.
                     </p>
                   </div>
-                  <div className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.02)" }}>
+                  <div className="rounded-xl p-5 border border-white/10" style={{ background: "rgba(255,255,255,0.05)" }}>
                     <div className="flex items-center gap-2 mb-3">
                       <span className="material-symbols-outlined text-amber-400 text-[18px]"
                         style={{ fontVariationSettings: "'FILL' 1" }}>visibility</span>
-                      <h5 className="text-[13px] font-bold text-white">Our Vision</h5>
+                      <h5 className="text-[14px] font-bold text-white">Our Vision</h5>
                     </div>
-                    <p className="text-slate-500 text-[12px] leading-relaxed">
+                    <p className="text-white text-[13px] leading-relaxed">
                       To become the definitive starting point for every student&apos;s higher education journey — from discovering the right stream to enrolling in their dream college.
                     </p>
                   </div>
@@ -269,15 +265,15 @@ export default function Footer() {
 
           {/* Bottom bar */}
           <FadeIn>
-            <div className="mt-12 pt-6 border-t border-white/8 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <p className="text-[12px] text-slate-600 text-center sm:text-left">
+            <div className="mt-12 pt-6 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <p className="text-[13px] text-white/90 text-center sm:text-left font-normal">
                 © 2026 Saroj Entertainment Pvt. Ltd. All Rights Reserved.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-                <Link href="/privacy-policy" className="text-[12px] text-slate-600 hover:text-white transition-colors">Privacy Policy</Link>
-                <Link href="/terms-and-conditions" className="text-[12px] text-slate-600 hover:text-white transition-colors">Terms & Conditions</Link>
-                <Link href="/cancellation-refunds" className="text-[12px] text-slate-600 hover:text-white transition-colors">Cancellation & Refunds</Link>
-                <Link href="/contact-us" className="text-[12px] text-slate-600 hover:text-white transition-colors">Contact Us</Link>
+                <Link href="/privacy-policy" className="text-[13px] text-white hover:text-primary transition-colors">Privacy Policy</Link>
+                <Link href="/terms-and-conditions" className="text-[13px] text-white hover:text-primary transition-colors">Terms & Conditions</Link>
+                <Link href="/cancellation-refunds" className="text-[13px] text-white hover:text-primary transition-colors">Cancellation & Refunds</Link>
+                <Link href="/contact-us" className="text-[13px] text-white hover:text-primary transition-colors">Contact Us</Link>
               </div>
             </div>
           </FadeIn>
