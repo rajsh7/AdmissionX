@@ -74,16 +74,10 @@ html {
     scroll-padding-top: 80px;
 }
 
-/* Desktop compact scale matching clean 80-85% zoom */
-@media (min-width: 1024px) {
+/* Desktop balanced scale (subtle 90% view) */
+@media (min-width: 1280px) {
     html {
-        zoom: 0.85;
-    }
-}
-
-@media (min-width: 1536px) {
-    html {
-        zoom: 0.80;
+        zoom: 0.90;
     }
 }
 
