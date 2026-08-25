@@ -132,6 +132,12 @@ export default function CollegeDashboardClient({
 
   useEffect(() => {
     setIsMounted(true);
+    document.body.classList.add("dashboard-layout");
+    document.documentElement.classList.add("dashboard-root");
+    return () => {
+      document.body.classList.remove("dashboard-layout");
+      document.documentElement.classList.remove("dashboard-root");
+    };
   }, []);
 
   useEffect(() => {
@@ -245,7 +251,7 @@ export default function CollegeDashboardClient({
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f6f6] dark:bg-[#0f1623]">
+    <div className="dashboard-shell min-h-screen min-h-[100dvh] bg-[#f8f6f6] dark:bg-[#0f1623]">
       <Header theme="light" />
 
       <div className="flex pt-[96px]">

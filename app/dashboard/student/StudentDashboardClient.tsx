@@ -43,6 +43,15 @@ export default function StudentDashboardClient({ user, activated }: Props) {
   const [showActivatedBanner, setShowActivatedBanner] = useState(!!activated);
 
   useEffect(() => {
+    document.body.classList.add("dashboard-layout");
+    document.documentElement.classList.add("dashboard-root");
+    return () => {
+      document.body.classList.remove("dashboard-layout");
+      document.documentElement.classList.remove("dashboard-root");
+    };
+  }, []);
+
+  useEffect(() => {
     if (activated) {
       const t = setTimeout(() => setShowActivatedBanner(false), 6000);
       return () => clearTimeout(t);
@@ -135,7 +144,7 @@ export default function StudentDashboardClient({ user, activated }: Props) {
 
 
   return (
-    <div className="flex flex-col h-screen bg-[#f1f2f6] overflow-hidden font-sans">
+    <div className="dashboard-shell flex flex-col h-screen min-h-screen min-h-[100dvh] bg-[#f1f2f6] overflow-hidden font-sans">
       <Header theme="light" />
 
       {/* Floating mobile sidebar drawer toggle button */}

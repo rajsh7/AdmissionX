@@ -84,10 +84,14 @@ export default function AdminShell({
   const pathname = usePathname();
   const router = useRouter();
 
-  // Mark body so global scrollbar-hide CSS is skipped for admin
+  // Mark body and html so global zoom is reset to 100% and scrollbars are normal
   useEffect(() => {
     document.body.classList.add("admin-layout");
-    return () => document.body.classList.remove("admin-layout");
+    document.documentElement.classList.add("admin-root");
+    return () => {
+      document.body.classList.remove("admin-layout");
+      document.documentElement.classList.remove("admin-root");
+    };
   }, []);
 
   // Close mobile sidebar on route change
@@ -152,7 +156,7 @@ export default function AdminShell({
   })();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 font-display" suppressHydrationWarning>
+    <div className="admin-shell flex h-screen min-h-screen min-h-[100dvh] overflow-hidden bg-slate-50 font-display" suppressHydrationWarning>
 
       {/* ── Desktop sidebar (always visible ≥ lg) ──────────────────────────── */}
       <aside className={`hidden lg:flex flex-col flex-shrink-0 overflow-hidden transition-all duration-300 ${collapsed ? "w-16" : "w-56 xl:w-60"}`} style={{ backgroundColor: "#313131" }}>

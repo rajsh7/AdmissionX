@@ -74,10 +74,20 @@ html {
     scroll-padding-top: 80px;
 }
 
-/* Desktop balanced scale (subtle 90% view) */
+/* Desktop balanced scale (subtle 90% view) for public pages */
 @media (min-width: 1280px) {
     html {
         zoom: 0.90;
+    }
+
+    /* Reset zoom to 100% full screen for Admin and Dashboards to eliminate white bottom gaps */
+    html.admin-root,
+    html.dashboard-root,
+    html:has(.admin-shell),
+    html:has(.dashboard-shell),
+    body.admin-layout,
+    body.dashboard-layout {
+        zoom: 1 !important;
     }
 }
 
