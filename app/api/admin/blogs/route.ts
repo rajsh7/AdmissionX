@@ -1,11 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { verifyAdminToken, ADMIN_COOKIE } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { saveUpload } from "@/lib/upload-utils";
 import { revalidatePath } from "next/cache";
 import { ObjectId } from "mongodb";
 
+async function requireAdminAuth() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(ADMIN_COOKIE)?.value;
+  if (!token) return null;
+  return await verifyAdminToken(token);
+}
+
 export async function POST(req: NextRequest) {
   try {
+    const admin = await requireAdminAuth();
+    if (!admin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const formData = await req.formData();
     const topic = formData.get("topic") as string;
     const slug = formData.get("slug") as string;
@@ -33,6 +47,11 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const admin = await requireAdminAuth();
+    if (!admin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const formData = await req.formData();
     const id = formData.get("id") as string;
     const topic = formData.get("topic") as string;

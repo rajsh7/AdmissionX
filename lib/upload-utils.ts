@@ -6,6 +6,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+
 /**
  * Uploads a File object to Cloudinary.
  * @param file    The File object from FormData
@@ -14,9 +17,18 @@ cloudinary.config({
  * @returns       The Cloudinary secure_url
  */
 export async function saveUpload(file: File, subDir: string, prefix: string = "img"): Promise<string> {
+  const fileType = file.type?.toLowerCase() || "image/jpeg";
+  if (!ALLOWED_MIME_TYPES.includes(fileType)) {
+    throw new Error(`Invalid file type: ${fileType}. Allowed types: ${ALLOWED_MIME_TYPES.join(", ")}`);
+  }
+
+  if (file.size > MAX_FILE_SIZE_BYTES) {
+    throw new Error(`File size exceeds maximum allowed limit of 10MB.`);
+  }
+
   const buffer = Buffer.from(await file.arrayBuffer());
   const base64 = buffer.toString("base64");
-  const dataUri = `data:${file.type || "image/jpeg"};base64,${base64}`;
+  const dataUri = `data:${fileType};base64,${base64}`;
 
   const result = await cloudinary.uploader.upload(dataUri, {
     folder: `admissionx/${subDir}`,

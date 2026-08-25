@@ -6,10 +6,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SMS_API_URL     = process.env.SMS_API_URL      ?? "https://sms.omnitechintegrators.com/fe/api/v1/multiSend";
-const SMS_USERNAME    = process.env.SMS_USERNAME      ?? "sarojent.trans";
-const SMS_PASSWORD    = process.env.SMS_PASSWORD      ?? "ySsYA";
+const SMS_USERNAME    = process.env.SMS_USERNAME;
+const SMS_PASSWORD    = process.env.SMS_PASSWORD;
 const SMS_SENDER_ID   = process.env.SMS_SENDER_ID     ?? "ADMXIN";
-const SMS_PE_ID       = process.env.SMS_PE_ID         ?? "1701178065512981587";
+const SMS_PE_ID       = process.env.SMS_PE_ID;
 
 // ── Template IDs ─────────────────────────────────────────────────────────────
 const TEMPLATES = {
@@ -66,6 +66,10 @@ const TEMPLATES = {
  * All errors are caught and logged — never re-thrown.
  */
 async function sendSMS(phone: string, templateId: string, text: string): Promise<void> {
+  if (!SMS_USERNAME || !SMS_PASSWORD || !SMS_PE_ID) {
+    return;
+  }
+
   const cleaned = String(phone ?? "").replace(/\D/g, "").slice(-10);
   if (cleaned.length !== 10) {
     console.warn(`[SMS] Invalid phone number skipped: ${phone}`);

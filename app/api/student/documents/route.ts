@@ -1,10 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { verifyAdminToken, verifyCollegeToken, ADMIN_COOKIE, COLLEGE_COOKIE } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { ObjectId } from "mongodb";
 import { sendDocumentsVerifiedEmail, sendDocumentsRejectedEmail } from "@/lib/email";
 import { sendSMSDocumentsVerified, sendSMSDocumentsRejected } from "@/lib/sms";
 
 export async function POST(req: NextRequest) {
   try {
+    const cookieStore = await cookies();
+    const adminToken = cookieStore.get(ADMIN_COOKIE)?.value;
+    const collegeToken = cookieStore.get(COLLEGE_COOKIE)?.value;
+
+    let isAuthorized = false;
+    if (adminToken && (await verifyAdminToken(adminToken))) {
+      isAuthorized = true;
+    } else if (collegeToken && (await verifyCollegeToken(collegeToken))) {
+      isAuthorized = true;
+    }
+
+    if (!isAuthorized) {
+      return NextResponse.json({ error: "Unauthorized. Admin or College login required." }, { status: 401 });
+    }
+
     const { application_id, status, reason } = await req.json();
 
     if (!application_id || !status) {
@@ -16,14 +34,17 @@ export async function POST(req: NextRequest) {
     }
 
     const db = await getDb();
-    const app = await db.collection("applications").findOne({ _id: application_id });
+    const appFilter = {
+      _id: ObjectId.isValid(application_id) ? new ObjectId(application_id) : application_id,
+    };
+    const app = await db.collection("applications").findOne(appFilter);
 
     if (!app) {
       return NextResponse.json({ error: "Application not found." }, { status: 404 });
     }
 
     await db.collection("applications").updateOne(
-      { _id: application_id },
+      appFilter,
       {
         $set: {
           document_status: status,

@@ -6,20 +6,13 @@ import { sendPaymentSuccessEmail, sendPaymentFailedEmail, sendCollegeStudentEnro
 import { sendSMSPaymentSuccess, sendSMSPaymentFailed } from "@/lib/sms";
 
 function getRequestOrigin(req: NextRequest): string {
-  if (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes("0.0.0.0")) {
-    return process.env.NEXT_PUBLIC_SITE_URL;
-  }
-  const forwardedHost = req.headers.get("x-forwarded-host");
-  const forwardedProto = req.headers.get("x-forwarded-proto") || "https";
-  if (forwardedHost && !forwardedHost.includes("0.0.0.0")) {
-    return `${forwardedProto}://${forwardedHost}`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL;
+  if (siteUrl && !siteUrl.includes("0.0.0.0")) {
+    return siteUrl.replace(/\/+$/, "");
   }
   const host = req.headers.get("host");
-  if (host && !host.includes("0.0.0.0")) {
-    const isLocal = host.includes("localhost") || host.includes("127.0.0.1");
-    const defaultProto = isLocal ? "http" : "https";
-    const proto = req.headers.get("x-forwarded-proto") || defaultProto;
-    return `${proto}://${host}`;
+  if (host && (host.includes("localhost") || host.includes("127.0.0.1"))) {
+    return `http://${host}`;
   }
   return "https://admissionx.com";
 }
@@ -29,14 +22,6 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const data = Object.fromEntries(formData.entries());
-
-    console.log("[Easebuzz Callback Received]", {
-      txnid: data.txnid,
-      status: data.status,
-      amount: data.amount,
-      udf1: data.udf1,
-      udf2: data.udf2,
-    });
 
     const studentId = String(data.udf1 || "");
     const applicationId = String(data.udf2 || "");
@@ -48,7 +33,11 @@ export async function POST(req: NextRequest) {
     const easepayid = String(data.easepayid || "");
     const errorMessage = String(data.error_Message || "Payment rejected or cancelled.");
 
-    const salt = process.env.EASEBUZZ_SALT || "JSJNP1ZOEC";
+    const salt = process.env.EASEBUZZ_SALT;
+    if (!salt) {
+      console.error("[Easebuzz Callback] EASEBUZZ_SALT environment variable is missing.");
+      return NextResponse.json({ error: "Server payment configuration error." }, { status: 500 });
+    }
 
     // Reconstruct reverse hash sequence:
     // salt|status|udf10|udf9|udf8|udf7|udf6|udf5|udf4|udf3|udf2|udf1|email|firstname|productinfo|amount|txnid|key

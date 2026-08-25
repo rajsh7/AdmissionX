@@ -1,25 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 import http from "http";
-import { join } from "path";
+import https from "https";
+import path, { join } from "path";
 import { readFile } from "fs/promises";
 import { existsSync } from "fs";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-// Proxy images from admin.admissionx.in which has an SSL SNI issue
-// AND serve local /uploads images dynamically to bypass dev server 404s.
+const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+const httpAgent = new http.Agent({});
+
+const ALLOWED_DOMAINS = ["admin.admissionx.in", "admissionx.info"];
+
+function isAllowedDomain(urlStr: string): boolean {
+  try {
+    const parsed = new URL(urlStr);
+    return ALLOWED_DOMAINS.includes(parsed.hostname.toLowerCase());
+  } catch {
+    return false;
+  }
+}
 
 export async function GET(req: NextRequest) {
   const url = req.nextUrl.searchParams.get("url");
-  const width = req.nextUrl.searchParams.get("w");
-  const quality = req.nextUrl.searchParams.get("q");
 
   if (!url) return new NextResponse("Missing url", { status: 400 });
 
-  // Handle local dynamic uploads bypassing Dev Server Cache
+  // Handle local dynamic uploads bypassing Dev Server Cache with path traversal protection
   if (url.startsWith("/uploads/")) {
-    const filePath = join(process.cwd(), "public", url.split("?")[0]);
+    const cleanPath = url.split("?")[0];
+    const uploadsBase = path.resolve(process.cwd(), "public", "uploads");
+    const filePath = path.resolve(process.cwd(), "public", cleanPath.replace(/^\/+/, ""));
+
+    // Prevent directory traversal outside public/uploads
+    if (!filePath.startsWith(uploadsBase)) {
+      return new NextResponse("Forbidden", { status: 403 });
+    }
+
     if (!existsSync(filePath)) {
       return new NextResponse("Not found", { status: 404 });
     }
@@ -44,8 +62,8 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // Handle old proxy for legacy domains with SSL SNI issues
-  if (!url.startsWith("https://admin.admissionx.in/") && !url.startsWith("https://admissionx.info/")) {
+  // Validate allowed proxy hostnames
+  if (!isAllowedDomain(url)) {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
@@ -55,15 +73,36 @@ export async function GET(req: NextRequest) {
 
     const buffer = await new Promise<Buffer>((resolve, reject) => {
       function fetchWithRedirects(targetUrl: string, redirectsLeft = 5) {
-        const fetchUrl = targetUrl.replace("https://", "http://");
-        http.get(fetchUrl, { timeout: 10000 }, (res: any) => {
+        if (!isAllowedDomain(targetUrl)) {
+          reject(new Error("Redirect to disallowed host"));
+          return;
+        }
+
+        const isHttps = targetUrl.startsWith("https://");
+        const client = isHttps ? https : http;
+        const agent = isHttps ? httpsAgent : httpAgent;
+
+        client.get(targetUrl, { agent, timeout: 10000 }, (res: any) => {
           // Follow 3xx redirects
           if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location && redirectsLeft > 0) {
             res.resume();
             const next = res.headers.location.startsWith("http")
               ? res.headers.location
               : new URL(res.headers.location, targetUrl).toString();
+
+            if (!isAllowedDomain(next)) {
+              reject(new Error("Redirect to disallowed host"));
+              return;
+            }
+
             fetchWithRedirects(next, redirectsLeft - 1);
+            return;
+          }
+          if (res.statusCode === 404) {
+            const err = new Error("Image not found on remote server");
+            (err as any).statusCode = 404;
+            reject(err);
+            res.resume();
             return;
           }
           if (res.statusCode !== 200) {
@@ -76,7 +115,6 @@ export async function GET(req: NextRequest) {
           res.on("end", () => resolve(Buffer.concat(chunks)));
           res.on("error", reject);
         }).on("error", (error: any) => {
-          console.error("HTTP request error:", error);
           reject(error);
         });
       }
@@ -98,7 +136,13 @@ export async function GET(req: NextRequest) {
         "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
       },
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.statusCode === 404) {
+      return new NextResponse("Image Not Found", {
+        status: 404,
+        headers: { "Cache-Control": "public, max-age=3600" },
+      });
+    }
     console.error("Image proxy error:", error);
     return new NextResponse("Fetch failed", { status: 502 });
   }

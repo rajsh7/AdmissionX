@@ -17,20 +17,13 @@ async function checkAuth(studentId: string) {
 }
 
 function getRequestOrigin(req: NextRequest): string {
-  if (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes("0.0.0.0")) {
-    return process.env.NEXT_PUBLIC_SITE_URL;
-  }
-  const forwardedHost = req.headers.get("x-forwarded-host");
-  const forwardedProto = req.headers.get("x-forwarded-proto") || "https";
-  if (forwardedHost && !forwardedHost.includes("0.0.0.0")) {
-    return `${forwardedProto}://${forwardedHost}`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL;
+  if (siteUrl && !siteUrl.includes("0.0.0.0")) {
+    return siteUrl.replace(/\/+$/, "");
   }
   const host = req.headers.get("host");
-  if (host && !host.includes("0.0.0.0")) {
-    const isLocal = host.includes("localhost") || host.includes("127.0.0.1");
-    const defaultProto = isLocal ? "http" : "https";
-    const proto = req.headers.get("x-forwarded-proto") || defaultProto;
-    return `${proto}://${host}`;
+  if (host && (host.includes("localhost") || host.includes("127.0.0.1"))) {
+    return `http://${host}`;
   }
   return "https://admissionx.com";
 }
@@ -39,7 +32,6 @@ export async function POST(req: NextRequest) {
   let body: {
     student_id?: number | string;
     application_id?: string;
-    amount?: number | string;
   };
 
   try {
@@ -48,7 +40,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  const { student_id, application_id, amount } = body;
+  const { student_id, application_id } = body;
 
   if (!student_id) return NextResponse.json({ error: "student_id is required." }, { status: 400 });
   if (!application_id) return NextResponse.json({ error: "application_id is required." }, { status: 400 });
@@ -70,7 +62,18 @@ export async function POST(req: NextRequest) {
   if (app.payment_status === "paid") return NextResponse.json({ error: "This application has already been paid for.", payment_url: null }, { status: 409 });
   if (app.status === "rejected") return NextResponse.json({ error: "Cannot process payment for a rejected application." }, { status: 409 });
 
-  const amountNum = app.fees ? parseFloat(String(app.fees)) : parseFloat(String(amount ?? "0"));
+  // Calculate verified fee strictly server-side
+  let verifiedFee = 0;
+  if (app.fees !== undefined && app.fees !== null && !isNaN(Number(app.fees))) {
+    verifiedFee = Number(app.fees);
+  } else if (app.courseId) {
+    const cm = await db.collection("collegemaster").findOne({ _id: app.courseId }, { projection: { fees: 1 } });
+    if (cm && cm.fees && !isNaN(Number(cm.fees))) {
+      verifiedFee = Number(cm.fees);
+    }
+  }
+
+  const amountNum = verifiedFee;
   if (isNaN(amountNum) || amountNum < 0) {
     return NextResponse.json({ error: "Application amount must be a positive number or zero." }, { status: 400 });
   }
@@ -183,9 +186,14 @@ export async function POST(req: NextRequest) {
   const furl = `${origin}/api/student/payment/callback`;
 
   // Easebuzz Credentials
-  const key = process.env.EASEBUZZ_KEY || "UUFS72X2L4";
-  const salt = process.env.EASEBUZZ_SALT || "JSJNP1ZOEC";
-  const env = process.env.EASEBUZZ_ENV || "prod";
+  const key = process.env.EASEBUZZ_KEY;
+  const salt = process.env.EASEBUZZ_SALT;
+  const env = process.env.EASEBUZZ_ENV || (process.env.NODE_ENV === "production" ? "prod" : "test");
+
+  if (!key || !salt) {
+    console.error("[Easebuzz Initiate] EASEBUZZ_KEY or EASEBUZZ_SALT environment variable is missing.");
+    return NextResponse.json({ error: "Payment gateway configuration error." }, { status: 500 });
+  }
 
   // User Defined Fields (UDF) returned on payment callback
   const udf1 = String(student_id);

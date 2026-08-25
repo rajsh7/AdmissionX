@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { signStudentToken, STUDENT_COOKIE, COOKIE_OPTIONS } from "@/lib/auth";
+import { enforceRateLimit } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
+  const rateLimitError = enforceRateLimit(req, "verify-login-otp", 10, 15 * 60 * 1000);
+  if (rateLimitError) return rateLimitError;
+
   try {
     const { email, otp } = await req.json();
 
@@ -19,6 +23,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Account not found." }, { status: 404 });
     }
 
+    if (student.is_active !== 1 && student.is_active !== true) {
+      return NextResponse.json({ error: "Please verify and activate your email address before logging in." }, { status: 403 });
+    }
+
     if (!student.otp_code || !student.otp_expiry) {
       return NextResponse.json({ error: "No OTP found. Please login again." }, { status: 400 });
     }
@@ -27,13 +35,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "OTP has expired. Please login again." }, { status: 400 });
     }
 
+    // Check failed attempt count (max 5)
+    const attempts = (student.otp_attempts ?? 0) + 1;
+    if (attempts > 5) {
+      await db.collection("next_student_signups").updateOne(
+        { email: email.toLowerCase() },
+        {
+          $unset: {
+            otp_code: "",
+            otp_expiry: "",
+            otp_purpose: "",
+            otp_attempts: "",
+          },
+        }
+      );
+      return NextResponse.json({ error: "Too many failed attempts. Please login again to receive a new OTP." }, { status: 429 });
+    }
+
     // Convert both to strings and trim for comparison
     const storedOTP = String(student.otp_code).trim();
     const providedOTP = String(otp).trim();
 
-    console.log("[Login OTP Verify] Stored:", storedOTP, "Provided:", providedOTP, "Match:", storedOTP === providedOTP);
-
     if (storedOTP !== providedOTP) {
+      await db.collection("next_student_signups").updateOne(
+        { email: email.toLowerCase() },
+        { $set: { otp_attempts: attempts } }
+      );
       return NextResponse.json({ error: "Invalid OTP. Please try again." }, { status: 400 });
     }
 
@@ -41,7 +68,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid OTP purpose." }, { status: 400 });
     }
 
-    // Clear OTP
+    // Clear OTP and attempts
     await db.collection("next_student_signups").updateOne(
       { email: email.toLowerCase() },
       {
@@ -52,6 +79,7 @@ export async function POST(req: NextRequest) {
           otp_code: "",
           otp_expiry: "",
           otp_purpose: "",
+          otp_attempts: "",
         },
       }
     );

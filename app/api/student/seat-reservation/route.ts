@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { verifyStudentToken, verifyAdminToken, STUDENT_COOKIE, ADMIN_COOKIE } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { ObjectId } from "mongodb";
 import { sendSeatReservationEmail } from "@/lib/email";
 import { sendSMSSeatReservedDetails } from "@/lib/sms";
 
@@ -14,11 +17,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const cookieStore = await cookies();
+    const studentToken = cookieStore.get(STUDENT_COOKIE)?.value;
+    const adminToken = cookieStore.get(ADMIN_COOKIE)?.value;
+
+    let isAuthorized = false;
+    if (studentToken) {
+      const studentPayload = await verifyStudentToken(studentToken);
+      if (studentPayload && String(studentPayload.id) === String(student_id)) {
+        isAuthorized = true;
+      }
+    } else if (adminToken && (await verifyAdminToken(adminToken))) {
+      isAuthorized = true;
+    }
+
+    if (!isAuthorized) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
     const db = await getDb();
-    const app = await db.collection("applications").findOne({
-      _id: application_id,
+    const appFilter = {
+      _id: ObjectId.isValid(application_id) ? new ObjectId(application_id) : application_id,
       studentId: String(student_id),
-    });
+    };
+    const app = await db.collection("applications").findOne(appFilter);
 
     if (!app) {
       return NextResponse.json({ error: "Application not found." }, { status: 404 });
@@ -39,7 +61,7 @@ export async function POST(req: NextRequest) {
     }
 
     await db.collection("applications").updateOne(
-      { _id: application_id },
+      appFilter,
       {
         $set: {
           seat_reserved: true,

@@ -1,10 +1,14 @@
 import { MongoClient, Db } from "mongodb";
 import dns from "node:dns";
 
-// Fix for Windows DNS resolution issues with MongoDB Atlas
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
-if (dns.setDefaultResultOrder) {
-  dns.setDefaultResultOrder("ipv4first");
+// Fix for Windows DNS resolution issues with MongoDB Atlas in dev
+if (process.env.NODE_ENV !== "production" || process.env.ENABLE_CUSTOM_DNS === "1") {
+  try {
+    dns.setServers(["8.8.8.8", "1.1.1.1"]);
+    if (dns.setDefaultResultOrder) {
+      dns.setDefaultResultOrder("ipv4first");
+    }
+  } catch {}
 }
 
 const uri = process.env.MONGODB_URI!;
@@ -201,7 +205,30 @@ function buildFilter(sql: string, params: unknown[]): Record<string, unknown> {
   const where = whereMatch[1];
   let pIdx = 0;
 
-  // Parse simple conditions: field = ?, field LIKE ?, field IS NOT NULL
+  // 1. Handle IN clauses: field IN (?) or field IN (1, 2, 3)
+  const inRe = /(\w+(?:\.\w+)?)\s+IN\s*\(([^)]+)\)/gi;
+  let inMatch: RegExpExecArray | null;
+  while ((inMatch = inRe.exec(where)) !== null) {
+    const rawField = inMatch[1].includes(".") ? inMatch[1].split(".").pop()! : inMatch[1];
+    const inBody = inMatch[2].trim();
+    if (inBody === "?") {
+      const val = params[pIdx++];
+      if (Array.isArray(val)) {
+        filter[rawField] = { $in: val };
+      } else {
+        filter[rawField] = { $in: [val] };
+      }
+    } else {
+      const vals = inBody.split(",").map(v => {
+        const trimmed = v.trim().replace(/^['"]|['"]$/g, "");
+        const num = Number(trimmed);
+        return !isNaN(num) ? num : trimmed;
+      });
+      filter[rawField] = { $in: vals };
+    }
+  }
+
+  // 2. Parse simple conditions: field = ?, field LIKE ?, field IS NOT NULL
   const condRe = /(\w+(?:\.\w+)?)\s*(=|!=|<>|LIKE|IS NOT NULL|IS NULL|>|<|>=|<=)\s*(\?)?/gi;
   let m: RegExpExecArray | null;
   while ((m = condRe.exec(where)) !== null) {
@@ -223,7 +250,7 @@ function buildFilter(sql: string, params: unknown[]): Record<string, unknown> {
     }
   }
 
-  // Handle OR groups: (f1 LIKE ? OR f2 LIKE ?)
+  // 3. Handle OR groups: (f1 LIKE ? OR f2 LIKE ?)
   const orMatch = where.match(/\(([^)]+(?:LIKE|=)[^)]+OR[^)]+)\)/i);
   if (orMatch) {
     const orParts = orMatch[1].split(/\s+OR\s+/i);

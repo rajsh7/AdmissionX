@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { verifyAdminToken, ADMIN_COOKIE } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(ADMIN_COOKIE)?.value;
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const adminPayload = await verifyAdminToken(token);
+    if (!adminPayload || adminPayload.adminRole !== "super_admin") {
+      return NextResponse.json({ error: "Forbidden: Super Admin access required." }, { status: 403 });
+    }
+
     const formData = await req.formData();
     const value      = (formData.get("value") as string)?.trim();
     const label      = (formData.get("label") as string)?.trim();

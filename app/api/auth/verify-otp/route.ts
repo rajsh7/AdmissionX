@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { sendStudentRegistrationEmail } from "@/lib/email";
 import crypto from "crypto";
+import { enforceRateLimit } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
+  const rateLimitError = enforceRateLimit(req, "verify-otp", 10, 15 * 60 * 1000);
+  if (rateLimitError) return rateLimitError;
+
   try {
     const { email, otp } = await req.json();
 
@@ -28,13 +32,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "OTP has expired. Please request a new one." }, { status: 400 });
     }
 
+    // Check failed attempt count (max 5)
+    const attempts = (student.otp_attempts ?? 0) + 1;
+    if (attempts > 5) {
+      await db.collection("next_student_signups").updateOne(
+        { email: email.toLowerCase() },
+        {
+          $unset: {
+            otp_code: "",
+            otp_expiry: "",
+            otp_purpose: "",
+            otp_attempts: "",
+          },
+        }
+      );
+      return NextResponse.json({ error: "Too many failed attempts. Please request a new OTP." }, { status: 429 });
+    }
+
     // Convert both to strings and trim for comparison
     const storedOTP = String(student.otp_code).trim();
     const providedOTP = String(otp).trim();
 
-    console.log("[OTP Verify] Stored:", storedOTP, "Provided:", providedOTP, "Match:", storedOTP === providedOTP);
-
     if (storedOTP !== providedOTP) {
+      await db.collection("next_student_signups").updateOne(
+        { email: email.toLowerCase() },
+        { $set: { otp_attempts: attempts } }
+      );
       return NextResponse.json({ error: "Invalid OTP. Please try again." }, { status: 400 });
     }
 
@@ -44,11 +67,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate activation token
-    const crypto = require("crypto");
     const activationToken = crypto.randomBytes(32).toString("hex");
     const activationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    const activationLink = `${baseUrl}/api/auth/activate?token=${activationToken}`;
+    const activationLink = `${baseUrl.replace(/\/+$/, "")}/api/auth/activate?token=${activationToken}`;
 
     // Mark OTP as verified and set activation token
     await db.collection("next_student_signups").updateOne(
@@ -64,6 +86,7 @@ export async function POST(req: NextRequest) {
           otp_code: "",
           otp_expiry: "",
           otp_purpose: "",
+          otp_attempts: "",
         },
       }
     );
@@ -92,3 +115,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to verify OTP." }, { status: 500 });
   }
 }
+
