@@ -713,10 +713,10 @@ export default function Header({ theme }: HeaderProps) {
         className="site-header fixed top-0 left-0 right-0 z-[100] w-full flex items-center h-[58px] bg-white"
       >
         <div className="w-full px-6 sm:px-10 lg:px-14 flex items-center justify-between">
-          {/* Logo Area - slightly nudged towards center */}
-          <div className="shrink-0 flex items-center lg:pl-10 xl:pl-16">
+          {/* Logo Area - vertically centered with top margin across dual nav */}
+          <div className="shrink-0 flex items-center lg:pl-10 xl:pl-16 lg:mt-6">
             <Link href="/" className="flex items-center gap-3 group">
-              <img src="/admissionx-logo.png" alt="AdmissionX" className="h-6 sm:h-7 w-auto object-contain" />
+              <img src="/admissionx-logo.png" alt="AdmissionX" className="h-6 sm:h-7 lg:h-8 w-auto object-contain" />
             </Link>
           </div>
 
