@@ -23,10 +23,10 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, []);
 
-  if (!isMounted) return <div className="min-h-[650px] bg-[#181C35]" />;
+  if (!isMounted) return <div className="min-h-screen lg:min-h-[calc(100vh/0.90)] bg-[#181C35]" />;
 
   return (
-    <section className="relative w-full min-h-[100svh]" style={{ zIndex: 10 }}>
+    <section className="relative w-full min-h-screen lg:min-h-[calc(100vh/0.90)] flex items-center overflow-hidden" style={{ zIndex: 10 }}>
       {/* Animated Background Slider */}
       <div className="absolute inset-0 z-0 bg-[#181C35]">
         <AnimatePresence>
@@ -44,7 +44,7 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
       </div>
 
-      <div className="relative z-10 flex min-h-[100svh] w-full items-center">
+      <div className="relative z-10 flex min-h-screen lg:min-h-[calc(100vh/0.90)] w-full items-center">
         <div className="home-page-shell flex h-full items-center justify-center lg:justify-end">
           <div className="w-full py-20 lg:w-[60%] lg:py-32 xl:w-[64%] 2xl:w-[68%]">
             <motion.div

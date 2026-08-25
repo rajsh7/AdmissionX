@@ -488,8 +488,8 @@ function SecondNav() {
   }, [updateRect]);
 
   return (
-    <div className="home-page-shell flex bg-white justify-end ">
-      <div ref={barRef} className="inline-flex mr-8  items-center gap-0">
+    <div className="w-full px-6 sm:px-10 lg:px-14 flex bg-white justify-end">
+      <div ref={barRef} className="inline-flex items-center gap-0">
         {secondNavLinks.map((item) => {
           const activeCat = hoveredCat[item.label] ?? item.mega?.[0]?.label ?? "";
           const activeCatData = item.mega?.find(c => c.label === activeCat) ?? item.mega?.[0];
@@ -712,17 +712,17 @@ export default function Header({ theme }: HeaderProps) {
       <motion.header
         className="site-header fixed top-0 left-0 right-0 z-[100] w-full flex items-center h-[58px] bg-white"
       >
-        <div className="home-page-shell flex w-full items-center justify-between">
+        <div className="w-full px-6 sm:px-10 lg:px-14 flex items-center justify-between">
           {/* Logo Area */}
-          <div className="shrink-0 lg:mt-10">
+          <div className="shrink-0 flex items-center">
             <Link href="/" className="flex items-center gap-3 group">
               <img src="/admissionx-logo.png" alt="AdmissionX" className="h-6 sm:h-7 w-auto object-contain" />
             </Link>
           </div>
 
           {/* Nav + Actions — right aligned */}
-          <div className="hidden lg:flex items-center  mr-6 ml-auto">
-          <nav className="flex  items-center  mr-12  gap-7">
+          <div className="hidden lg:flex items-center ml-auto">
+          <nav className="flex items-center mr-8 gap-7">
               {navLinks.map((link) => {
                 const activeCat = hoveredCat[link.label] ?? link.mega?.[0]?.label ?? "";
                 const activeCatData = link.mega?.find(c => c.label === activeCat) ?? link.mega?.[0];
