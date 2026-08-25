@@ -7,6 +7,7 @@ import TrackPageView from "./components/TrackPageView";
 import ClarityInit from "./components/ClarityInit";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://admissionx.com"),
   title: "Admissionx - Find Your Dream College",
   description:
     "Discover top universities and courses that match your career goals. Explore over 500+ institutes worldwide.",
