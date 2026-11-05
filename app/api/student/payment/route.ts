@@ -4,8 +4,7 @@ import { verifyStudentToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import crypto from "crypto";
 import { ObjectId } from "mongodb";
-import { sendPaymentSuccessEmail, sendCollegeStudentEnrolledEmail } from "@/lib/email";
-import { sendSMSPaymentSuccess } from "@/lib/sms";
+import { sendPaymentSuccessEmail } from "@/lib/email";
 
 async function checkAuth(studentId: string) {
   const cookieStore = await cookies();
@@ -17,13 +16,20 @@ async function checkAuth(studentId: string) {
 }
 
 function getRequestOrigin(req: NextRequest): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL;
-  if (siteUrl && !siteUrl.includes("0.0.0.0")) {
-    return siteUrl.replace(/\/+$/, "");
+  if (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes("0.0.0.0")) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+  const forwardedHost = req.headers.get("x-forwarded-host");
+  const forwardedProto = req.headers.get("x-forwarded-proto") || "https";
+  if (forwardedHost && !forwardedHost.includes("0.0.0.0")) {
+    return `${forwardedProto}://${forwardedHost}`;
   }
   const host = req.headers.get("host");
-  if (host && (host.includes("localhost") || host.includes("127.0.0.1"))) {
-    return `http://${host}`;
+  if (host && !host.includes("0.0.0.0")) {
+    const isLocal = host.includes("localhost") || host.includes("127.0.0.1");
+    const defaultProto = isLocal ? "http" : "https";
+    const proto = req.headers.get("x-forwarded-proto") || defaultProto;
+    return `${proto}://${host}`;
   }
   return "https://admissionx.com";
 }
@@ -32,6 +38,7 @@ export async function POST(req: NextRequest) {
   let body: {
     student_id?: number | string;
     application_id?: string;
+    amount?: number | string;
   };
 
   try {
@@ -40,7 +47,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  const { student_id, application_id } = body;
+  const { student_id, application_id, amount } = body;
 
   if (!student_id) return NextResponse.json({ error: "student_id is required." }, { status: 400 });
   if (!application_id) return NextResponse.json({ error: "application_id is required." }, { status: 400 });
@@ -62,18 +69,7 @@ export async function POST(req: NextRequest) {
   if (app.payment_status === "paid") return NextResponse.json({ error: "This application has already been paid for.", payment_url: null }, { status: 409 });
   if (app.status === "rejected") return NextResponse.json({ error: "Cannot process payment for a rejected application." }, { status: 409 });
 
-  // Calculate verified fee strictly server-side
-  let verifiedFee = 0;
-  if (app.fees !== undefined && app.fees !== null && !isNaN(Number(app.fees))) {
-    verifiedFee = Number(app.fees);
-  } else if (app.courseId) {
-    const cm = await db.collection("collegemaster").findOne({ _id: app.courseId }, { projection: { fees: 1 } });
-    if (cm && cm.fees && !isNaN(Number(cm.fees))) {
-      verifiedFee = Number(cm.fees);
-    }
-  }
-
-  const amountNum = verifiedFee;
+  const amountNum = app.fees ? parseFloat(String(app.fees)) : parseFloat(String(amount ?? "0"));
   if (isNaN(amountNum) || amountNum < 0) {
     return NextResponse.json({ error: "Application amount must be a positive number or zero." }, { status: 400 });
   }
@@ -103,7 +99,6 @@ export async function POST(req: NextRequest) {
     const nameToUse = app.personal_info?.name || studentDoc?.name || "Student";
     const collegeName = app.college_name || "AdmissionX College";
     const courseName = [app.degree_name, app.course_name].filter(Boolean).join(" - ") || "Application Fee";
-    const appRef = app.applicationRef || app.application_ref || "APP-2026-88094";
     
     if (emailToUse) {
       try {
@@ -114,52 +109,10 @@ export async function POST(req: NextRequest) {
           freeTxnid,
           new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
           collegeName,
-          courseName,
-          appRef
+          courseName
         );
       } catch (emailErr) {
         console.error("[Free Payment Bypass] Email notification failed:", emailErr);
-      }
-    }
-
-    // Send Free Bypass SMS to Student
-    try {
-      const studentPhone = app.personal_info?.phone || studentDoc?.phone;
-      if (studentPhone) {
-        await sendSMSPaymentSuccess(studentPhone, "0.00", freeTxnid);
-      }
-    } catch (smsErr) {
-      console.error("[Free Payment Bypass] SMS notification failed:", smsErr);
-    }
-
-    // Notify College
-    if (app.collegeId) {
-      try {
-        const colId = typeof app.collegeId === "string" && ObjectId.isValid(app.collegeId)
-          ? new ObjectId(app.collegeId)
-          : app.collegeId;
-
-        const collegeDoc = await db.collection("collegeprofile").aggregate([
-          { $match: { _id: colId } },
-          { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
-          { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
-          { $project: { email: "$u.email", name: "$u.firstname" } },
-          { $limit: 1 },
-        ]).toArray();
-
-        if (collegeDoc.length && collegeDoc[0].email) {
-          await sendCollegeStudentEnrolledEmail(
-            collegeDoc[0].email,
-            collegeDoc[0].name || collegeName,
-            nameToUse,
-            appRef,
-            courseName,
-            "0.00",
-            freeTxnid
-          );
-        }
-      } catch (collegeErr) {
-        console.error("[Free Payment Bypass] College enrollment email notification failed:", collegeErr);
       }
     }
 
@@ -186,14 +139,9 @@ export async function POST(req: NextRequest) {
   const furl = `${origin}/api/student/payment/callback`;
 
   // Easebuzz Credentials
-  const key = process.env.EASEBUZZ_KEY;
-  const salt = process.env.EASEBUZZ_SALT;
-  const env = process.env.EASEBUZZ_ENV || (process.env.NODE_ENV === "production" ? "prod" : "test");
-
-  if (!key || !salt) {
-    console.error("[Easebuzz Initiate] EASEBUZZ_KEY or EASEBUZZ_SALT environment variable is missing.");
-    return NextResponse.json({ error: "Payment gateway configuration error." }, { status: 500 });
-  }
+  const key = process.env.EASEBUZZ_KEY || "UUFS72X2L4";
+  const salt = process.env.EASEBUZZ_SALT || "JSJNP1ZOEC";
+  const env = process.env.EASEBUZZ_ENV || "prod";
 
   // User Defined Fields (UDF) returned on payment callback
   const udf1 = String(student_id);

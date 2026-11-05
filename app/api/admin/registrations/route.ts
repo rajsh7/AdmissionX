@@ -1,26 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { verifyAdminToken, ADMIN_COOKIE } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { ObjectId } from "mongodb";
 import bcrypt from "bcryptjs";
 import { sendCollegeApprovalEmail, sendCollegeWelcomePartnerEmail } from "@/lib/email";
-import { sendSMSCollegeVerified, sendSMSCollegeProfileLive } from "@/lib/sms";
-
-async function requireAdminAuth() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(ADMIN_COOKIE)?.value;
-  if (!token) return null;
-  return await verifyAdminToken(token);
-}
 
 export async function GET(req: NextRequest) {
   try {
-    const admin = await requireAdminAuth();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const db = await getDb();
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type") || "all";
@@ -105,11 +90,6 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const admin = await requireAdminAuth();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { _id, type, status, name, email, phone } = await req.json();
     if (!_id || !type) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
 
@@ -219,16 +199,6 @@ export async function PATCH(req: NextRequest) {
         console.error("[registrations] Approval email failed:", emailErr);
       }
 
-      // Send approval SMS notifications
-      try {
-        if (collegePhone) {
-          await sendSMSCollegeVerified(collegePhone, collegeName);
-          await sendSMSCollegeProfileLive(collegePhone);
-        }
-      } catch (smsErr) {
-        console.error("[registrations] Approval SMS failed:", smsErr);
-      }
-
       return NextResponse.json({
         success: true,
         slug,
@@ -244,11 +214,6 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const admin = await requireAdminAuth();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { _id, type } = await req.json();
     if (!_id || !type) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
 

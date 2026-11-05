@@ -1,28 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { verifyAdminToken, verifyCollegeToken, ADMIN_COOKIE, COLLEGE_COOKIE } from "@/lib/auth";
 import { getDb } from "@/lib/db";
-import { ObjectId } from "mongodb";
 import { sendDocumentsVerifiedEmail, sendDocumentsRejectedEmail } from "@/lib/email";
-import { sendSMSDocumentsVerified, sendSMSDocumentsRejected } from "@/lib/sms";
 
 export async function POST(req: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const adminToken = cookieStore.get(ADMIN_COOKIE)?.value;
-    const collegeToken = cookieStore.get(COLLEGE_COOKIE)?.value;
-
-    let isAuthorized = false;
-    if (adminToken && (await verifyAdminToken(adminToken))) {
-      isAuthorized = true;
-    } else if (collegeToken && (await verifyCollegeToken(collegeToken))) {
-      isAuthorized = true;
-    }
-
-    if (!isAuthorized) {
-      return NextResponse.json({ error: "Unauthorized. Admin or College login required." }, { status: 401 });
-    }
-
     const { application_id, status, reason } = await req.json();
 
     if (!application_id || !status) {
@@ -34,17 +15,14 @@ export async function POST(req: NextRequest) {
     }
 
     const db = await getDb();
-    const appFilter = {
-      _id: ObjectId.isValid(application_id) ? new ObjectId(application_id) : application_id,
-    };
-    const app = await db.collection("applications").findOne(appFilter);
+    const app = await db.collection("applications").findOne({ _id: application_id });
 
     if (!app) {
       return NextResponse.json({ error: "Application not found." }, { status: 404 });
     }
 
     await db.collection("applications").updateOne(
-      appFilter,
+      { _id: application_id },
       {
         $set: {
           document_status: status,
@@ -63,36 +41,13 @@ export async function POST(req: NextRequest) {
 
         if (student) {
           if (status === "verified") {
-            await sendDocumentsVerifiedEmail(
-              student.email,
-              student.name || "Student",
-              app.applicationRef || "APP-2026-88094",
-              app.courseName || "B.Tech - Computer Science",
-              app.collegeName || "Amity University"
-            );
-
-            try {
-              if (student.phone) {
-                await sendSMSDocumentsVerified(student.phone);
-              }
-            } catch (smsErr) {
-              console.error("[Documents] Verification success SMS failed:", smsErr);
-            }
+            await sendDocumentsVerifiedEmail(student.email, student.name || "Student");
           } else {
             await sendDocumentsRejectedEmail(
               student.email,
               student.name || "Student",
-              reason || "Documents do not meet requirements",
-              app.applicationRef || "APP-2026-88094"
+              reason || "Documents do not meet requirements"
             );
-
-            try {
-              if (student.phone) {
-                await sendSMSDocumentsRejected(student.phone);
-              }
-            } catch (smsErr) {
-              console.error("[Documents] Verification rejection SMS failed:", smsErr);
-            }
           }
         }
       } catch (emailErr) {

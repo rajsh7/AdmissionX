@@ -47,8 +47,6 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
     const nextCountry = overrides?.country ?? selectedCountry;
     const params = new URLSearchParams();
 
-    params.set("type", "abroad"); // always keep abroad filter
-
     if (nextQuery) {
       params.set("q", nextQuery);
     }
@@ -57,7 +55,8 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
       params.set("country_id", String(nextCountry.id));
     }
 
-    router.push(`/study-abroad?${params.toString()}`);
+    const queryString = params.toString();
+    router.push(queryString ? `/study-abroad?${queryString}` : "/study-abroad");
   };
 
   const handleQuickFilterClick = (country: CountryOption) => {
@@ -193,7 +192,7 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
                     <li>
                       <button
                         type="button"
-                        onClick={() => { setSelectedCountry(null); setIsCountryOpen(false); applySearch({ country: null }); }}
+                        onClick={() => { setSelectedCountry(null); setIsCountryOpen(false); }}
                         className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition-colors ${!selectedCountry ? "text-[#FF3C3C]" : "text-slate-600"
                           }`}
                       >
@@ -204,7 +203,7 @@ export default function HeroSection({ countries, quickFilters }: HeroSectionProp
                       <li key={country.id}>
                         <button
                           type="button"
-                          onClick={() => { setSelectedCountry(country); setIsCountryOpen(false); applySearch({ country }); }}
+                          onClick={() => { setSelectedCountry(country); setIsCountryOpen(false); }}
                           className={`w-full text-left px-4 py-2.5 text-sm font-semibold hover:bg-slate-50 transition-colors ${selectedCountry?.id === country.id ? "text-[#FF3C3C]" : "text-slate-600"
                             }`}
                         >

@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { verifyStudentToken, verifyAdminToken, STUDENT_COOKIE, ADMIN_COOKIE } from "@/lib/auth";
 import { getDb } from "@/lib/db";
-import { ObjectId } from "mongodb";
 import { sendSeatReservationEmail } from "@/lib/email";
-import { sendSMSSeatReservedDetails } from "@/lib/sms";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,30 +13,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const cookieStore = await cookies();
-    const studentToken = cookieStore.get(STUDENT_COOKIE)?.value;
-    const adminToken = cookieStore.get(ADMIN_COOKIE)?.value;
-
-    let isAuthorized = false;
-    if (studentToken) {
-      const studentPayload = await verifyStudentToken(studentToken);
-      if (studentPayload && String(studentPayload.id) === String(student_id)) {
-        isAuthorized = true;
-      }
-    } else if (adminToken && (await verifyAdminToken(adminToken))) {
-      isAuthorized = true;
-    }
-
-    if (!isAuthorized) {
-      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-    }
-
     const db = await getDb();
-    const appFilter = {
-      _id: ObjectId.isValid(application_id) ? new ObjectId(application_id) : application_id,
+    const app = await db.collection("applications").findOne({
+      _id: application_id,
       studentId: String(student_id),
-    };
-    const app = await db.collection("applications").findOne(appFilter);
+    });
 
     if (!app) {
       return NextResponse.json({ error: "Application not found." }, { status: 404 });
@@ -61,7 +38,7 @@ export async function POST(req: NextRequest) {
     }
 
     await db.collection("applications").updateOne(
-      appFilter,
+      { _id: application_id },
       {
         $set: {
           seat_reserved: true,
@@ -78,26 +55,12 @@ export async function POST(req: NextRequest) {
         });
 
         if (student) {
-          const appRef = app.applicationRef || app.application_ref || "APP-2026-88094";
           await sendSeatReservationEmail(
             student.email,
             student.name || "Student",
             app.courseName || "Course",
-            app.collegeName || "College",
-            appRef
+            app.collegeName || "College"
           );
-
-          try {
-            if (student.phone) {
-              await sendSMSSeatReservedDetails(
-                student.phone,
-                app.courseName || "Course",
-                app.collegeName || "College"
-              );
-            }
-          } catch (smsErr) {
-            console.error("[Seat Reservation] SMS failed:", smsErr);
-          }
         }
       } catch (emailErr) {
         console.error("[Seat Reservation] Email failed:", emailErr);

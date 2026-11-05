@@ -64,7 +64,7 @@ export default function ListingSearchV4({
   initSort,
   initPage,
   heroImage = "/images/hero-student.png",
-  heroRightImage = "",
+  heroRightImage = "/images/2999ec4e5233aa8cb9dbf010e3c51149ae41f951.png",
   heroHeight = "700px",
   heroObjectPosition,
   heroFit = "cover",

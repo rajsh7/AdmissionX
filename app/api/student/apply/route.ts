@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import { verifyStudentToken } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { sendApplicationSubmittedEmail, sendNewApplicationNotificationToCollege, sendApplicationStartedEmail } from "@/lib/email";
-import { sendSMSApplicationInitiated, sendSMSApplicationSubmitted, sendSMSCollegeNewApplication } from "@/lib/sms";
 
 async function checkAuth(req: NextRequest) {
   const cookieStore = await cookies();
@@ -255,7 +254,7 @@ export async function POST(req: NextRequest) {
   try {
     const studentDoc = await db.collection("next_student_signups").findOne(
       { email: payload.email },
-      { projection: { name: 1, email: 1, phone: 1 } }
+      { projection: { name: 1, email: 1 } }
     );
     
     if (studentDoc) {
@@ -265,15 +264,6 @@ export async function POST(req: NextRequest) {
           studentDoc.name || "Student",
           finalRef
         );
-
-        // Send Student Draft SMS
-        try {
-          if (studentDoc.phone) {
-            await sendSMSApplicationInitiated(studentDoc.phone);
-          }
-        } catch (smsErr) {
-          console.error("[Apply] Student draft SMS failed:", smsErr);
-        }
       } else {
         await sendApplicationSubmittedEmail(
           studentDoc.email,
@@ -283,51 +273,27 @@ export async function POST(req: NextRequest) {
           resolvedCollegeName || "College"
         );
 
-        // Send Student Submitted SMS
-        try {
-          if (studentDoc.phone) {
-            await sendSMSApplicationSubmitted(studentDoc.phone, finalRef);
-          }
-        } catch (smsErr) {
-          console.error("[Apply] Student submitted SMS failed:", smsErr);
-        }
-
         const collegeDoc = await db.collection("collegeprofile").aggregate([
           { $match: { _id: resolvedCollegeId } },
           { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "u" } },
           { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
-          { $project: { email: "$u.email", name: "$u.firstname", phone: 1 } },
+          { $project: { email: "$u.email", name: "$u.firstname" } },
           { $limit: 1 },
         ]).toArray();
 
-        if (collegeDoc.length) {
-          if (collegeDoc[0].email) {
-            await sendNewApplicationNotificationToCollege(
-              collegeDoc[0].email,
-              resolvedCollegeName || "Your Institution",
-              studentDoc.name || "Student",
-              finalRef,
-              resolvedCourseName || "General Admission"
-            );
-          }
-
-          // Send College SMS
-          try {
-            if (collegeDoc[0].phone) {
-              await sendSMSCollegeNewApplication(
-                collegeDoc[0].phone,
-                finalRef,
-                studentDoc.name || "Student"
-              );
-            }
-          } catch (smsErr) {
-            console.error("[Apply] College SMS failed:", smsErr);
-          }
+        if (collegeDoc.length && collegeDoc[0].email) {
+          await sendNewApplicationNotificationToCollege(
+            collegeDoc[0].email,
+            resolvedCollegeName || "Your Institution",
+            studentDoc.name || "Student",
+            finalRef,
+            resolvedCourseName || "General Admission"
+          );
         }
       }
     }
   } catch (emailErr) {
-    console.error("[Apply] Notification failed:", emailErr);
+    console.error("[Apply] Email notification failed:", emailErr);
   }
 });
 

@@ -7,7 +7,6 @@ import TrackPageView from "./components/TrackPageView";
 import ClarityInit from "./components/ClarityInit";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://admissionx.com"),
   title: "Admissionx - Find Your Dream College",
   description:
     "Discover top universities and courses that match your career goals. Explore over 500+ institutes worldwide.",
@@ -37,7 +36,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
         />
       </head>
-      <body className="font-display antialiased overflow-x-clip" suppressHydrationWarning>
+      <body className="font-display antialiased overflow-x-hidden" suppressHydrationWarning>
         <PublicProviders>
           <TrackPageView />
           <ClarityInit />

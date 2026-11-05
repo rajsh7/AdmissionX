@@ -38,14 +38,13 @@
 
 @media (min-width: 1024px) {
     .home-page-shell {
-        padding-inline: 3.5rem;
+        padding-inline: 4rem;
     }
 }
 
 @media (min-width: 1280px) {
     .home-page-shell {
-        max-width: 1600px;
-        padding-inline: 4rem;
+        padding-inline: 5rem;
     }
 }
 
@@ -74,30 +73,13 @@ html {
     scroll-padding-top: 80px;
 }
 
-/* Desktop balanced scale (subtle 90% view) for public pages */
-@media (min-width: 1280px) {
-    html {
-        zoom: 0.90;
-    }
-
-    /* Reset zoom to 100% full screen for Admin and Dashboards to eliminate white bottom gaps */
-    html.admin-root,
-    html.dashboard-root,
-    html:has(.admin-shell),
-    html:has(.dashboard-shell),
-    body.admin-layout,
-    body.dashboard-layout {
-        zoom: 1 !important;
-    }
-}
-
 body {
     font-family: "Poppins", sans-serif;
     background-color: var(--color-bg-white);
     color: #0f172a;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: clip;
+    overflow-x: hidden;
 }
 
 .dark body {

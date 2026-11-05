@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { sendCounsellingScheduledEmail } from "@/lib/email";
-import { sendSMSCounsellingScheduled } from "@/lib/sms";
 
 export async function POST(req: NextRequest) {
   try {
@@ -55,23 +54,13 @@ export async function POST(req: NextRequest) {
         });
 
         if (student) {
-          const appRef = app.applicationRef || app.application_ref || "APP-2026-88094";
           await sendCounsellingScheduledEmail(
             student.email,
             student.name || "Student",
             date,
             time,
-            venue,
-            appRef
+            venue
           );
-
-          try {
-            if (student.phone) {
-              await sendSMSCounsellingScheduled(student.phone, date, time);
-            }
-          } catch (smsErr) {
-            console.error("[Counselling] SMS failed:", smsErr);
-          }
         }
       } catch (emailErr) {
         console.error("[Counselling] Email failed:", emailErr);

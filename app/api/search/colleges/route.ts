@@ -41,16 +41,6 @@ const ALIASES: Record<string, string> = {
   "engineering": "engineering|be/b.tech|b.tech",
   "medical": "mbbs|medical|bds|bams",
   "management": "mba|bba|management|pgdm",
-  "bed": "b\\.ed|bed|bachelor of education|b.ed",
-  "b.ed": "b\\.ed|bed|bachelor of education|b.ed",
-  "med": "m\\.ed|med|master of education|m.ed",
-  "m.ed": "m\\.ed|med|master of education|m.ed",
-  "ded": "d\\.ed|ded|diploma in education|d.ed",
-  "d.ed": "d\\.ed|ded|diploma in education|d.ed",
-  "bsc": "b\\.sc|bachelor of science",
-  "b.sc": "b\\.sc|bachelor of science",
-  "msc": "m\\.sc|master of science",
-  "m.sc": "m\\.sc|master of science",
 };
 
 function buildImageUrl(raw: string | null): string | null {
@@ -68,21 +58,9 @@ export async function GET(req: NextRequest) {
   const sp = new URL(req.url).searchParams;
 
   const q = (sp.get("q") ?? "").trim();
-  let parsedSubject = q;
-  let parsedLocation: string | null = null;
-  if (q.length >= 2) {
-    const inMatch = q.match(/^(.+?)\s+in\s+(.+)$/i);
-    if (inMatch) {
-      parsedSubject = inMatch[1].trim();
-      parsedLocation = inMatch[2].trim();
-    }
-  }
-
   const stream = (sp.get("stream") ?? "").trim();
   const degree = (sp.get("degree") ?? "").trim();
   const cityId = sp.get("city_id") || null;
-  const stateId = sp.get("state_id") || null;
-  const countryId = sp.get("country_id") || null;
   const feesMax = sp.get("fees_max") ? parseInt(sp.get("fees_max")!) : null;
   const feesRanges = sp.get("fees_ranges") ? sp.get("fees_ranges")!.split(",") : [];
   const ratingRanges = sp.get("rating_ranges") ? sp.get("rating_ranges")!.split(",") : [];
@@ -140,12 +118,12 @@ export async function GET(req: NextRequest) {
     }
 
     // Resolve q → degree/stream IDs for course-specific fees
-    if (parsedSubject.length >= 2) {
-      let qLower = parsedSubject.toLowerCase().replace(/\s+/g, "");
-      qLower = qLower.replace(/^(collegeof|collageof|universityof|instituteof|schoolof|facultyof|departmentof|top|best)/g, "");
-      qLower = qLower.replace(/(colleges|collages|institutes|schools|academies|departments|college|collage|institute|school|academy|department)$/g, "");
-      qLower = qLower.replace(/universit(y|ies)$/g, "");
-      const aliasPattern = ALIASES[qLower] ?? parsedSubject;
+    if (q.length >= 2) {
+      let qLower = q.toLowerCase().replace(/\s+/g, "");
+      qLower = qLower.replace(/^(collegeof|collageof|universityof|instituteof|schoolof|facultyof|departmentof)/, "");
+      qLower = qLower.replace(/(college|collage|institute|school|academy|department)s?$/, "");
+      qLower = qLower.replace(/universit(y|ies)$/, "");
+      const aliasPattern = ALIASES[qLower] ?? q;
       const courseRegex = { $regex: aliasPattern, $options: "i" };
       const [qDegrees, qStreams] = await Promise.all([
         db.collection("degree").find({ name: courseRegex }).project({ id: 1 }).toArray(),
@@ -174,78 +152,29 @@ export async function GET(req: NextRequest) {
     // Build match
     const match: Record<string, unknown> = {};
     if (filteredIds && (filteredIds as unknown[]).length > 0) match.id = { $in: filteredIds };
-
-    let allCityIds: number[] = [];
-    let cityNamesToMatch: string[] = [];
-
     if (cityIntId) {
       const cityDoc = await db.collection("city").findOne({ id: cityIntId }, { projection: { name: 1 } });
-      if (cityDoc?.name) {
-        cityNamesToMatch.push(String(cityDoc.name).trim());
-      }
-      allCityIds.push(cityIntId);
-    }
-
-    if (parsedLocation) {
-      cityNamesToMatch.push(parsedLocation);
-      const matchedCities = await db.collection("city")
-        .find({ name: { $regex: parsedLocation.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" } })
-        .project({ id: 1 })
-        .toArray();
-      matchedCities.forEach((c: any) => {
-        if (c.id != null) allCityIds.push(Number(c.id));
-      });
-    }
-
-    if (cityNamesToMatch.length > 0) {
-      const siblingOrs = await Promise.all(
-        cityNamesToMatch.map(async (name) => {
-          const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-          const siblings = await db.collection("city")
-            .find({ name: { $regex: escapedName, $options: "i" } })
+      const cityName = String(cityDoc?.name ?? "").trim();
+      // Collect all sibling city IDs (e.g. New Delhi, Central Delhi, South Delhi for "Delhi")
+      const siblingCities = cityName
+        ? await db.collection("city")
+            .find({ name: { $regex: cityName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" } })
             .project({ id: 1 })
-            .toArray();
-          siblings.forEach((c: any) => {
-            if (c.id != null) allCityIds.push(Number(c.id));
-          });
-          return [
-            { registeredSortAddress: { $regex: `^\\s*${escapedName}`, $options: "i" } },
-            { campusSortAddress: { $regex: `^\\s*${escapedName}`, $options: "i" } },
-          ];
-        })
-      );
-
-      const uniqueCityIds = [...new Set(allCityIds.filter((id) => !isNaN(id)))];
-      const cityOr: Record<string, unknown>[] = [];
-      if (uniqueCityIds.length > 0) {
-        cityOr.push({ registeredAddressCityId: { $in: uniqueCityIds } });
+            .toArray()
+        : [];
+      const allCityIds = [...new Set([cityIntId, ...siblingCities.map((c: any) => Number(c.id))])];
+      // Do NOT use registeredFullAddress — causes false positives (e.g. "Mathura-Delhi Highway")
+      const cityOr: Record<string, unknown>[] = [{ registeredAddressCityId: { $in: allCityIds } }];
+      if (cityName) {
+        const escapedCity = cityName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        cityOr.push({ registeredSortAddress: { $regex: `^\\s*${escapedCity}`, $options: "i" } });
+        cityOr.push({ campusSortAddress: { $regex: `^\\s*${escapedCity}`, $options: "i" } });
       }
-      siblingOrs.flat().forEach((cond) => {
-        cityOr.push(cond);
-      });
-
-      if (cityOr.length > 0) {
-        match.$and = [{ $or: cityOr }];
-      }
-    } else if (stateId) {
-      const stateCities = await db.collection("city").find({ state_id: Number(stateId) }, { projection: { _id: 0, id: 1 } }).toArray();
-      match.registeredAddressCityId = { $in: stateCities.map((c: any) => Number(c.id)) };
-    } else if (countryId && type !== "abroad") {
-      // only set country filter here if NOT abroad (abroad block handles it below)
-      match.registeredAddressCountryId = Number(countryId);
+      match.$and = [{ $or: cityOr }];
     }
-
     if (type === "top") match.isShowOnTop = 1;
     else if (type === "university") match.isTopUniversity = 1;
-    else if (type === "abroad") {
-      if (countryId) {
-        // country filter already set above, just ensure it's not India (99)
-        match.registeredAddressCountryId = Number(countryId);
-      } else {
-        // Show all international colleges (exclude India=99, and must have a country set)
-        match.registeredAddressCountryId = { $exists: true, $ne: null, $nin: [99, 0] };
-      }
-    }
+    else if (type === "abroad") match.registeredAddressCountryId = { $ne: 1 };
 
     if (ownerships.length > 0) {
       const typeIds = ownerships.flatMap((o) => OWNERSHIP_MAP[o] ?? []);
@@ -272,7 +201,7 @@ export async function GET(req: NextRequest) {
     }
 
     // When searching a course with no explicit sort, default to fees
-    const effectiveSort = (parsedSubject.length >= 2 && (queryDegreeIds.length > 0 || queryStreamIds.length > 0) && sort === "rating") ? "fees" : sort;
+    const effectiveSort = (q.length >= 2 && (queryDegreeIds.length > 0 || queryStreamIds.length > 0) && sort === "rating") ? "fees" : sort;
     const isFeeSort = effectiveSort === "fees" || effectiveSort === "fees_high";
     const feesAscending = effectiveSort === "fees";
 
@@ -319,14 +248,8 @@ export async function GET(req: NextRequest) {
             min_fees: { $min: { $filter: { input: "$filtered_cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
             max_fees: { $max: { $filter: { input: "$filtered_cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
         }},
-        {
-          $addFields: {
-            sort_fees: feesAscending
-              ? { $cond: { if: { $or: [{ $eq: ["$min_fees", null] }, { $lt: ["$min_fees", 1000] }] }, then: 999999999, else: "$min_fees" } }
-              : { $cond: { if: { $or: [{ $eq: ["$max_fees", null] }, { $lt: ["$max_fees", 1000] }] }, then: -1, else: "$max_fees" } }
-          }
-        },
-        { $sort: feesAscending ? { sort_fees: 1 as const } : { sort_fees: -1 as const } },
+        { $match: feesAscending ? { min_fees: { $ne: null, $gte: 1000 } } : { max_fees: { $ne: null, $gte: 1000 } } },
+        { $sort: feesAscending ? { min_fees: 1 as const } : { max_fees: -1 as const } },
       ];
 
       const feesSortProjectStage = {
@@ -366,13 +289,13 @@ export async function GET(req: NextRequest) {
         { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
       ];
 
-      if (parsedSubject.length >= 2 && queryDegreeIds.length === 0 && queryStreamIds.length === 0) {
+      if (q.length >= 2 && queryDegreeIds.length === 0 && queryStreamIds.length === 0) {
         basePipeline.push({
           $match: {
             $or: [
-              { "user.firstname": { $regex: parsedSubject, $options: "i" } },
-              { registeredSortAddress: { $regex: parsedSubject, $options: "i" } },
-              { slug: { $regex: parsedSubject, $options: "i" } },
+              { "user.firstname": { $regex: q, $options: "i" } },
+              { registeredSortAddress: { $regex: q, $options: "i" } },
+              { slug: { $regex: q, $options: "i" } },
             ],
           },
         });

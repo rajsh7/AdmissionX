@@ -1,4 +1,4 @@
-import { getDb } from "@/lib/db";
+import pool, { getDb } from "@/lib/db";
 import Header from "@/app/components/Header";
 import SearchClient from "@/app/search/SearchClient";
 import type { CollegeResult } from "@/app/api/search/colleges/route";
@@ -13,16 +13,78 @@ import CostCalculator from "./components/CostCalculator";
 import JourneySteps from "./components/JourneySteps";
 import Footer from "@/app/components/Footer";
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 interface FilterOption {
   id: string | number;
   name: string;
   slug?: string;
+  count?: number;
 }
 
-interface CountryOption {
+interface CollegeRow {
+  id: number;
+  slug: string;
+  name: string;
+  location: string | null;
+  city_name: string | null;
+  state_id: number | null;
+  image: string | null;
+  rating: string | null;
+  totalRatingUser: string | null;
+  ranking: string | null;
+  isTopUniversity: number;
+  topUniversityRank: string | null;
+  universityType: string | null;
+  collegetype_id: number | null;
+  estyear: string | null;
+  verified: number;
+  totalStudent: string | null;
+  streams_raw: string | null;
+  min_fees: string | null;
+  max_fees: string | null;
+}
+
+interface StreamRow {
+  id: number;
+  name: string;
+  pageslug: string | null;
+}
+
+interface DegreeRow {
+  id: number;
+  name: string;
+  pageslug: string | null;
+}
+
+interface CountryRow {
   id: number;
   name: string;
   college_count?: number;
+}
+
+interface CountRow {
+  total: number;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const IMAGE_BASE = "https://admin.admissionx.in/uploads/";
+const DEFAULT_IMAGE =
+  "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=600";
+
+function buildImageUrl(raw: string | null): string {
+  if (!raw) return DEFAULT_IMAGE;
+  if (raw.startsWith("http")) return raw;
+  return `${IMAGE_BASE}${raw}`;
+}
+
+function slugToName(slug: string): string {
+  return slug
+    .replace(/-\d+$/, "")
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 }
 
 function escapeRegex(value: string): string {
@@ -44,9 +106,66 @@ function buildAdsFilter(positions: string[]) {
   };
 }
 
-// ─── Fetch abroad colleges using MongoDB directly (same logic as API) ─────────
+async function safeQuery<T>(
+  sql: string,
+  params: (string | number)[] = [],
+): Promise<T[]> {
+  try {
+    const [rows] = (await pool.query(sql, params)) as [T[], unknown];
+    return rows;
+  } catch (err) {
+    console.error("[study-abroad/page.tsx safeQuery]", err);
+    return [];
+  }
+}
 
-async function fetchAbroadColleges(opts: {
+function buildColleges(rows: CollegeRow[]): CollegeResult[] {
+  return rows.map((row) => {
+    const name =
+      row.name && row.name !== row.slug
+        ? row.name
+        : slugToName(row.slug || "college");
+
+    const streams = row.streams_raw
+      ? row.streams_raw
+          .split("|")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+
+    return {
+      id: row.id,
+      slug: row.slug,
+      name,
+      location: row.location || row.city_name || "International",
+      city_name: row.city_name,
+      state_id: row.state_id,
+      image: buildImageUrl(row.image),
+      rating: parseFloat(String(row.rating)) || 0,
+      totalRatingUser: parseInt(String(row.totalRatingUser)) || 0,
+      ranking: row.ranking ? parseInt(String(row.ranking)) : null,
+      isTopUniversity: row.isTopUniversity ?? 0,
+      topUniversityRank: row.topUniversityRank
+        ? parseInt(String(row.topUniversityRank))
+        : null,
+      universityType: row.universityType || null,
+      collegetype_id: row.collegetype_id ?? null,
+      estyear: row.estyear || null,
+      verified: row.verified ?? 0,
+      totalStudent: row.totalStudent
+        ? parseInt(String(row.totalStudent))
+        : null,
+      streams,
+      min_fees: row.min_fees ? parseInt(String(row.min_fees)) : null,
+      max_fees: row.max_fees ? parseInt(String(row.max_fees)) : null,
+      avg_package: null,
+    };
+  });
+}
+
+// ─── Page-specific fetch (international colleges) ─────────────────────────────
+
+async function fetchAbroadCollegesBase(opts: {
   q: string;
   stream: string;
   degree: string;
@@ -59,197 +178,146 @@ async function fetchAbroadColleges(opts: {
   const { q, stream, degree, countryId, feesMax, sort, page, limit } = opts;
   const offset = (page - 1) * limit;
 
+  const conditions: string[] = [
+    "(cp.registeredAddressCountryId != 1 OR cp.campusAddressCountryId != 1)",
+    "(cp.registeredAddressCountryId IS NOT NULL OR cp.campusAddressCountryId IS NOT NULL)",
+  ];
+  const params: (string | number)[] = [];
+
+  if (q.trim()) {
+    const likeQuery = `%${q.trim()}%`;
+    conditions.push(`(
+      cp.slug LIKE ?
+      OR COALESCE(cp.registeredSortAddress, '') LIKE ?
+      OR EXISTS (
+        SELECT 1 FROM users u_q
+        WHERE u_q.id = cp.users_id
+          AND TRIM(COALESCE(u_q.firstname, '')) LIKE ?
+      )
+    )`);
+    params.push(likeQuery, likeQuery, likeQuery);
+  }
+
+  if (stream) {
+    conditions.push(`EXISTS (
+      SELECT 1 FROM collegemaster cm_f1
+      INNER JOIN functionalarea fa_f1 ON fa_f1.id = cm_f1.functionalarea_id
+      WHERE cm_f1.collegeprofile_id = cp.id AND fa_f1.pageslug = ?
+    )`);
+    params.push(stream);
+  }
+
+  if (degree) {
+    conditions.push(`EXISTS (
+      SELECT 1 FROM collegemaster cm_f2
+      INNER JOIN degree d_f2 ON d_f2.id = cm_f2.degree_id
+      WHERE cm_f2.collegeprofile_id = cp.id AND d_f2.pageslug = ?
+    )`);
+    params.push(degree);
+  }
+
+  if (countryId && !isNaN(parseInt(countryId))) {
+    conditions.push(`(
+      cp.registeredAddressCountryId = ?
+      OR cp.campusAddressCountryId = ?
+    )`);
+    params.push(parseInt(countryId), parseInt(countryId));
+  }
+
+  if (feesMax && !isNaN(parseInt(feesMax))) {
+    conditions.push(`EXISTS (
+      SELECT 1 FROM collegemaster cm_f3
+      WHERE cm_f3.collegeprofile_id = cp.id
+        AND cm_f3.fees > 0 AND cm_f3.fees <= ?
+    )`);
+    params.push(parseInt(feesMax));
+  }
+
+  const whereClause = conditions.join(" AND ");
+  let orderBy = "cp.rating DESC, cp.id DESC";
+  let joinClause = "";
+  if (sort === "ranking") {
+    orderBy = "(cp.ranking IS NULL OR cp.ranking = 0) ASC, cp.ranking ASC";
+  } else if (sort === "name") {
+    joinClause = "LEFT JOIN users u_sort ON u_sort.id = cp.users_id";
+    orderBy = "COALESCE(NULLIF(TRIM(u_sort.firstname), ''), NULLIF(TRIM(cp.slug), ''), 'College') ASC";
+  }
+
+  const idSql = `
+    SELECT cp.id
+    FROM collegeprofile cp
+    ${joinClause}
+    WHERE ${whereClause}
+    ORDER BY ${orderBy}
+    LIMIT ${limit} OFFSET ${offset}
+  `;
+
+  const countSql = `
+    SELECT COUNT(*) AS total
+    FROM collegeprofile cp
+    WHERE ${whereClause}
+  `;
+
   try {
-    const db = await getDb();
-
-    // Build match — same logic as /api/search/colleges
-    const match: Record<string, unknown> = {};
-
-    // Always filter: abroad = not India (99), must have a country set
-    if (countryId && !isNaN(parseInt(countryId))) {
-      match.registeredAddressCountryId = parseInt(countryId);
-    } else {
-      match.registeredAddressCountryId = { $exists: true, $ne: null, $nin: [99, 0] };
-    }
-
-    // Stream filter
-    let streamIds: number[] = [];
-    if (stream) {
-      const faDoc = await db.collection("functionalarea").findOne({ pageslug: stream }, { projection: { id: 1 } });
-      if (faDoc?.id) {
-        const cmRows = await db.collection("collegemaster")
-          .find({ functionalarea_id: faDoc.id }, { projection: { collegeprofile_id: 1 } })
-          .limit(5000).toArray();
-        streamIds = [...new Set(cmRows.map((c: any) => Number(c.collegeprofile_id)))];
-      }
-    }
-
-    // Degree filter
-    let degreeIds: number[] = [];
-    if (degree) {
-      const degDoc = await db.collection("degree").findOne({ pageslug: degree }, { projection: { id: 1 } });
-      if (degDoc?.id) {
-        const cmRows = await db.collection("collegemaster")
-          .find({ degree_id: degDoc.id }, { projection: { collegeprofile_id: 1 } })
-          .limit(5000).toArray();
-        degreeIds = [...new Set(cmRows.map((c: any) => Number(c.collegeprofile_id)))];
-      }
-    }
-
-    // Fees filter
-    let feesFilterIds: number[] | null = null;
-    if (feesMax && !isNaN(parseInt(feesMax))) {
-      const cmRows = await db.collection("collegemaster")
-        .find({ fees: { $gt: 0, $lte: parseInt(feesMax) } }, { projection: { collegeprofile_id: 1 } })
-        .limit(5000).toArray();
-      feesFilterIds = [...new Set(cmRows.map((c: any) => Number(c.collegeprofile_id)))];
-    }
-
-    // Intersect IDs
-    let filteredIds: number[] | null = null;
-    if (streamIds.length > 0) filteredIds = streamIds;
-    if (degreeIds.length > 0) filteredIds = filteredIds ? filteredIds.filter(id => degreeIds.includes(id)) : degreeIds;
-    if (feesFilterIds) filteredIds = filteredIds ? filteredIds.filter(id => feesFilterIds!.includes(id)) : feesFilterIds;
-
-    if (filteredIds !== null) {
-      match.id = { $in: filteredIds };
-    }
-
-    // Text search
-    if (q.trim().length >= 2) {
-      const qRegex = { $regex: q.trim(), $options: "i" };
-      match.$or = [
-        { slug: qRegex },
-        { registeredSortAddress: qRegex },
-      ] as any;
-    }
-
-    const sortStage: Record<string, 1 | -1> =
-      sort === "name" ? { slug: 1 } :
-      sort === "ranking" ? { ranking: 1 } :
-      { rating: -1, totalRatingUser: -1 };
-
-    const pipeline = [
-      { $match: match },
-      { $sort: sortStage },
-    ];
-
-    const [countResult, dataRows] = await Promise.all([
-      db.collection("collegeprofile").aggregate([...pipeline, { $count: "total" }]).toArray(),
-      db.collection("collegeprofile").aggregate([
-        ...pipeline,
-        { $skip: offset },
-        { $limit: limit },
-        { $lookup: { from: "users", localField: "users_id", foreignField: "id", as: "user" } },
-        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-        { $lookup: { from: "city", localField: "registeredAddressCityId", foreignField: "id", as: "city" } },
-        { $unwind: { path: "$city", preserveNullAndEmptyArrays: true } },
-        { $lookup: { from: "collegemaster", localField: "id", foreignField: "collegeprofile_id", as: "cm" } },
-        { $lookup: { from: "functionalarea", localField: "cm.functionalarea_id", foreignField: "id", as: "fa" } },
-        {
-          $project: {
-            id: 1, slug: 1, bannerimage: 1, rating: 1, totalRatingUser: 1, ranking: 1,
-            isTopUniversity: 1, topUniversityRank: 1, universityType: 1, collegetype_id: 1,
-            estyear: 1, verified: 1, totalStudent: 1, registeredSortAddress: 1,
-            name: { $ifNull: [{ $trim: { input: "$user.firstname" } }, "$slug"] },
-            city_name: "$city.name",
-            streams: { $setUnion: ["$fa.name", []] },
-            min_fees: { $min: { $filter: { input: "$cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
-            max_fees: { $max: { $filter: { input: "$cm.fees", as: "f", cond: { $gte: ["$$f", 1000] } } } },
-          },
-        },
-      ]).toArray(),
+    const [[idRows], [countRows]] = await Promise.all([
+      pool.query(idSql, params) as Promise<[{ id: number }[], unknown]>,
+      pool.query(countSql, params) as Promise<[CountRow[], unknown]>,
     ]);
 
-    const total = countResult[0]?.total ?? 0;
+    const total = countRows[0]?.total ?? 0;
+    if (idRows.length === 0) {
+      return { colleges: [], total, totalPages: 0 };
+    }
 
-    const colleges: CollegeResult[] = dataRows.map((row: any) => {
-      const rawName = row.name?.trim();
-      const name = rawName && rawName !== row.slug
-        ? rawName
-        : row.slug?.replace(/-\d+$/, "").split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ") ?? "College";
-      const img = row.bannerimage;
-      const image = img && img !== "null" ? (img.startsWith("http") ? img : `https://admin.admissionx.in/uploads/${img}`) : null;
+    const idList = idRows.map((r) => r.id).join(",");
+    const enrichSql = `
+      SELECT
+        cp.id,
+        cp.slug,
+        COALESCE(NULLIF(TRIM(u.firstname), ''), NULLIF(TRIM(cp.slug), ''), 'College') AS name,
+        COALESCE(cp.registeredSortAddress, '') AS location,
+        c.name AS city_name,
+        c.state_id,
+        cp.bannerimage AS image,
+        COALESCE(cp.rating, 0) AS rating,
+        COALESCE(cp.totalRatingUser, 0) AS totalRatingUser,
+        cp.ranking,
+        cp.isTopUniversity,
+        cp.topUniversityRank,
+        cp.universityType,
+        cp.estyear,
+        cp.verified,
+        cp.totalStudent,
+        GROUP_CONCAT(DISTINCT fa.name ORDER BY fa.name SEPARATOR '|') AS streams_raw,
+        MIN(CASE WHEN cm.fees > 0 THEN cm.fees END) AS min_fees,
+        MAX(CASE WHEN cm.fees > 0 THEN cm.fees END) AS max_fees
+      FROM collegeprofile cp
+      LEFT JOIN users u ON u.id = cp.users_id
+      LEFT JOIN city c ON c.id = cp.registeredAddressCityId
+      LEFT JOIN collegemaster cm ON cm.collegeprofile_id = cp.id
+      LEFT JOIN functionalarea fa ON fa.id = cm.functionalarea_id
+      WHERE cp.id IN (${idList})
+      GROUP BY cp.id, u.firstname, c.name, c.state_id
+      ORDER BY FIELD(cp.id, ${idList})
+    `;
 
-      return {
-        id: row.id,
-        slug: row.slug,
-        name,
-        location: row.registeredSortAddress || row.city_name || "International",
-        city_name: row.city_name ?? null,
-        state_id: null,
-        image,
-        rating: parseFloat(String(row.rating)) || 0,
-        totalRatingUser: parseInt(String(row.totalRatingUser)) || 0,
-        ranking: row.ranking ? parseInt(String(row.ranking)) : null,
-        isTopUniversity: row.isTopUniversity ?? 0,
-        topUniversityRank: row.topUniversityRank ? parseInt(String(row.topUniversityRank)) : null,
-        universityType: row.universityType ?? null,
-        collegetype_id: row.collegetype_id ? parseInt(String(row.collegetype_id)) : null,
-        estyear: row.estyear ?? null,
-        verified: row.verified ?? 0,
-        totalStudent: row.totalStudent ? parseInt(String(row.totalStudent)) : null,
-        streams: Array.isArray(row.streams) ? row.streams.filter(Boolean) : [],
-        min_fees: row.min_fees ?? null,
-        max_fees: row.max_fees ?? null,
-        avg_package: null,
-      };
-    });
+    const [dataRows] = (await pool.query(enrichSql)) as [CollegeRow[], unknown];
 
-    return { colleges, total, totalPages: Math.ceil(total / limit) };
+    return {
+      colleges: buildColleges(dataRows),
+      total,
+      totalPages: Math.ceil(total / limit),
+    };
   } catch (err) {
-    console.error("[study-abroad/page.tsx fetchAbroadColleges]", err);
+    console.error("[study-abroad/page.tsx fetchAbroadCollegesBase]", err);
     return { colleges: [], total: 0, totalPages: 0 };
   }
 }
 
-// ─── Fetch filter options & countries ─────────────────────────────────────────
-
-const fetchFilterOptions = unstable_cache(
-  async () => {
-    try {
-      const db = await getDb();
-      const [streams, degrees, countries] = await Promise.all([
-        db.collection("functionalarea").find({}).sort({ isShowOnTop: -1, name: 1 }).limit(20).toArray(),
-        db.collection("degree").find({ isShowOnTop: 1 }).sort({ name: 1 }).limit(50).toArray(),
-        db.collection("collegeprofile")
-          .aggregate([
-            { $match: { registeredAddressCountryId: { $exists: true, $ne: null, $nin: [99, 0] } } },
-            { $group: { _id: "$registeredAddressCountryId" } },
-            { $lookup: { from: "country", localField: "_id", foreignField: "id", as: "country" } },
-            { $unwind: "$country" },
-            { $project: { _id: 0, id: "$country.id", name: "$country.name" } },
-            { $sort: { name: 1 } },
-          ]).toArray(),
-      ]);
-      return { streams, degrees, countries };
-    } catch {
-      return { streams: [], degrees: [], countries: [] };
-    }
-  },
-  ["study-abroad-filters-v2"],
-  { revalidate: 600 }
-);
-
-const fetchCountriesWithCount = unstable_cache(
-  async (): Promise<CountryOption[]> => {
-    try {
-      const db = await getDb();
-      const rows = await db.collection("collegeprofile").aggregate([
-        { $match: { registeredAddressCountryId: { $exists: true, $ne: null, $nin: [99, 0] } } },
-        { $group: { _id: "$registeredAddressCountryId", college_count: { $sum: 1 } } },
-        { $lookup: { from: "country", localField: "_id", foreignField: "id", as: "country" } },
-        { $unwind: "$country" },
-        { $project: { _id: 0, id: "$country.id", name: "$country.name", college_count: 1 } },
-        { $sort: { college_count: -1, name: 1 } },
-      ]).toArray();
-      return rows.map((r: any) => ({ id: r.id, name: String(r.name).trim(), college_count: r.college_count }));
-    } catch {
-      return [];
-    }
-  },
-  ["study-abroad-countries-v2"],
-  { revalidate: 600 }
+const fetchAbroadColleges = unstable_cache(
+  fetchAbroadCollegesBase,
+  ["study-abroad-colleges"],
+  { revalidate: 300 }
 );
 
 const fetchStudyAbroadAds = unstable_cache(
@@ -263,7 +331,8 @@ const fetchStudyAbroadAds = unstable_cache(
         .limit(8)
         .project({ _id: 0, id: 1, title: 1, description: 1, img: 1, redirectto: 1 })
         .toArray() as AdItem[];
-    } catch {
+    } catch (error) {
+      console.error("[study-abroad/page.tsx fetchStudyAbroadAds]", error);
       return [];
     }
   },
@@ -300,30 +369,50 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
   const showSearchResults = !!(q || stream || degree || countryId || feesMax || page > 1 || view === "all");
 
   if (showSearchResults) {
-    const [{ colleges, total, totalPages }, { streams, degrees, countries }] = await Promise.all([
-      fetchAbroadColleges({ q, stream, degree, countryId, feesMax, sort, page, limit: 12 }),
-      fetchFilterOptions(),
-    ]);
+    const [{ colleges, total, totalPages }, streamRows, degreeRows, countryRows] =
+      await Promise.all([
+        fetchAbroadColleges({ q, stream, degree, countryId, feesMax, sort, page, limit: 12 }),
+        safeQuery<StreamRow>(`
+          SELECT id, name, pageslug
+          FROM functionalarea
+          ORDER BY isShowOnTop DESC, name ASC LIMIT 20
+        `),
+        safeQuery<DegreeRow>(`
+          SELECT id, name, pageslug
+          FROM degree
+          WHERE isShowOnTop = 1
+          ORDER BY name LIMIT 50
+        `),
+        safeQuery<CountryRow>(`
+          SELECT DISTINCT c.id, c.name
+          FROM country c
+          INNER JOIN collegeprofile cp
+            ON cp.registeredAddressCountryId = c.id
+            OR cp.campusAddressCountryId = c.id
+          WHERE c.id != 1
+          ORDER BY c.name
+        `),
+      ]);
 
-    const streamOptions: FilterOption[] = streams.map((r: any) => ({
+    const streamOptions: FilterOption[] = streamRows.map((r) => ({
       id: r.id,
       name: r.name,
       slug: r.pageslug ?? r.name.toLowerCase().replace(/\s+/g, "-"),
     }));
 
-    const degreeOptions: FilterOption[] = degrees.map((r: any) => ({
+    const degreeOptions: FilterOption[] = degreeRows.map((r) => ({
       id: r.id,
       name: r.name,
       slug: r.pageslug ?? r.name.toLowerCase().replace(/\s+/g, "-"),
     }));
 
-    const countryOptions: FilterOption[] = countries.map((r: any) => ({
+    const countryOptions: FilterOption[] = countryRows.map((r) => ({
       id: r.id,
-      name: String(r.name).trim(),
+      name: r.name,
     }));
 
     const selectedCountryName =
-      countryOptions.find((c) => String(c.id) === countryId)?.name ?? "";
+      countryOptions.find((country) => String(country.id) === countryId)?.name ?? "";
 
     const pageSubtitle = selectedCountryName
       ? `${total.toLocaleString()} international colleges and universities in ${selectedCountryName}`
@@ -350,34 +439,60 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
         initType="abroad"
         pageTitle="Study Abroad Colleges"
         pageSubtitle={pageSubtitle}
-        heroImage="/images/study-abroad-hero.jpg"
       />
     );
   }
 
-  // ─── Landing page ──────────────────────────────────────────────────────────
   const [countryRows, ads] = await Promise.all([
-    fetchCountriesWithCount(),
+    safeQuery<CountryRow>(`
+      SELECT c.id, c.name, COUNT(DISTINCT cp.id) AS college_count
+      FROM country c
+      INNER JOIN collegeprofile cp
+        ON cp.registeredAddressCountryId = c.id
+        OR cp.campusAddressCountryId = c.id
+      WHERE c.id != 1
+      GROUP BY c.id, c.name
+      ORDER BY college_count DESC, c.name ASC
+    `),
     fetchStudyAbroadAds(),
   ]);
 
-  const countries = countryRows.sort((a, b) => a.name.localeCompare(b.name));
+  const countries = countryRows
+    .map((country) => ({
+      id: country.id,
+      name: country.name,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
-  const popularCountryIds = [230, 229, 38, 13];
-  const quickFilters = popularCountryIds
-    .map((id) => countries.find((c) => Number(c.id) === id))
-    .filter(Boolean)
-    .map((c) => ({ id: c!.id, name: c!.name }));
+  const quickFilters = [...countryRows]
+    .sort(
+      (a, b) =>
+        (b.college_count ?? 0) - (a.college_count ?? 0) ||
+        a.name.localeCompare(b.name),
+    )
+    .slice(0, 3)
+    .map((country) => ({
+      id: country.id,
+      name: country.name,
+    }));
 
   return (
     <div className="min-h-screen bg-white flex flex-col relative font-[family-name:var(--font-outfit)]">
       <Header theme="dark" />
-
+      
       <main className="flex-1">
-        <HeroSection countries={countries} quickFilters={quickFilters} />
+        <HeroSection
+          countries={countries}
+          quickFilters={quickFilters}
+        />
+        
         <TopDestinations countries={countries} />
+        
         <CostCalculator />
+        
         <JourneySteps ads={ads} />
+
+        {/* Explore Cards */}
         <div className="home-page-shell pb-16">
           <ExploreCards />
         </div>
@@ -387,3 +502,9 @@ export default async function StudyAbroadPage({ searchParams }: StudyAbroadPageP
     </div>
   );
 }
+
+// Force cache invalidation 3
+
+
+
+
